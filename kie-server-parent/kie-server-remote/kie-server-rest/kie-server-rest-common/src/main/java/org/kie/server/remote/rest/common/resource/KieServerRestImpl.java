@@ -15,7 +15,9 @@
 
 package org.kie.server.remote.rest.common.resource;
 
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -45,8 +47,12 @@ import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="kie-server")
+@Api(value="KIE Server :: Core")
 @Path("server")
 public class KieServerRestImpl {
 
@@ -73,20 +79,26 @@ public class KieServerRestImpl {
     }
 
 
+    @ApiOperation(value="Retrieves KIE Server information - id, name, location, capabilities, messages",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getInfo(@Context HttpHeaders headers) { 
         return createCorrectVariant(server.getInfo(), headers);
     }
 
+    @ApiOperation(value="Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response listContainers(@Context HttpHeaders headers,
-                                   @QueryParam("groupId") String groupId,
-                                   @QueryParam("artifactId") String artifactId,
-                                   @QueryParam("version") String version,
-                                   @QueryParam("status") String status) {
+            @ApiParam(value = "optional groupId to filter containers by", required = false) @QueryParam("groupId") String groupId,
+            @ApiParam(value = "optional artifactId to filter containers by", required = false) @QueryParam("artifactId") String artifactId,
+            @ApiParam(value = "optional version to filter containers by", required = false) @QueryParam("version") String version,
+            @ApiParam(value = "optional status to filter containers by", required = false) @QueryParam("status") String status) {
         ReleaseIdFilter releaseIdFilter = new ReleaseIdFilter.Builder()
                 .groupId(groupId)
                 .artifactId(artifactId)
@@ -98,11 +110,16 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.listContainers(containerFilter), headers);
     }
 
+    @ApiOperation(value="Creates (deploys) new KIE container to this server",
+            response=ServiceResponse.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 400, message = "container could not be created") })
     @PUT
     @Path("containers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response createContainer( @Context HttpHeaders headers, @PathParam("id") String id, String containerPayload ) {
+    public Response createContainer( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id to be assigned to deployed KIE Container", required = true) @PathParam("id") String id, 
+            @ApiParam(value = "KIE Container resource to be deployed as KieContainerResource", required = true) String containerPayload ) {
         String contentType = getContentType( headers );
 
         KieContainerResource container = marshallerHelper.unmarshal( containerPayload, contentType, KieContainerResource.class );
@@ -116,35 +133,52 @@ public class KieServerRestImpl {
         return createCorrectVariant( response, headers, Status.BAD_REQUEST );
     }
 
+    @ApiOperation(value="Retrieves container with given id",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getContainerInfo( @Context HttpHeaders headers, @PathParam("id") String id ) {
+    public Response getContainerInfo( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id to be retrieved", required = true) @PathParam("id") String id ) {
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.getContainerInfo(id), headers, conversationIdHeader);
     }
 
+    @ApiOperation(value="Disposes (undeploys) container with given id",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @DELETE
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response disposeContainer( @Context HttpHeaders headers, @PathParam("id") String id ) {
+    public Response disposeContainer( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id to be disposed (undeployed)", required = true) @PathParam("id") String id ) {
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.disposeContainer(id), headers, conversationIdHeader);
     }
 
+    @ApiOperation(value="Retrieves stanner information for given container",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("containers/{id}/scanner")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getScannerInfo( @Context HttpHeaders headers, @PathParam("id") String id ) {
+    public Response getScannerInfo( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id for scanner to be loaded", required = true) @PathParam("id") String id ) {
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.getScannerInfo(id), headers, conversationIdHeader);
     }
     
+    @ApiOperation(value="Updates scanner for given container",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @POST
     @Path("containers/{id}/scanner")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateScanner( @Context HttpHeaders headers, @PathParam("id") String id, String resourcePayload ) {
+    public Response updateScanner( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id for scanner to be updated", required = true) @PathParam("id") String id, 
+            @ApiParam(value = "Scanner information given as KieScannerResource type", required = true) String resourcePayload ) {
         String contentType = getContentType(headers);
 
         KieScannerResource resource = marshallerHelper.unmarshal(resourcePayload, contentType, KieScannerResource.class);
@@ -152,19 +186,28 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.updateScanner(id, resource), headers, conversationIdHeader);
     };
 
+    @ApiOperation(value="Retrieves release id of the KIE container with given id",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("containers/{id}/release-id")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getReleaseId( @Context HttpHeaders headers, @PathParam("id") String id) {
+    public Response getReleaseId( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id that release id should be loaded from", required = true) @PathParam("id") String id) {
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.getContainerReleaseId(id), headers, conversationIdHeader);
     }
 
+    @ApiOperation(value="Updates release id of the KIE container with given id to provided release id",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @POST
     @Path("containers/{id}/release-id")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateReleaseId( @Context HttpHeaders headers, @PathParam("id") String id, String releaseIdPayload) {
+    public Response updateReleaseId( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id that release id should be upgraded", required = true) @PathParam("id") String id, 
+            @ApiParam(value = "Release Id to be upgraded to as ReleaseId type", required = true) String releaseIdPayload) {
 
         String contentType = getContentType(headers);
 
@@ -173,6 +216,9 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers, conversationIdHeader);
     }
 
+    @ApiOperation(value="Retrieves server state - configuration that the server is currently running with",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("state")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

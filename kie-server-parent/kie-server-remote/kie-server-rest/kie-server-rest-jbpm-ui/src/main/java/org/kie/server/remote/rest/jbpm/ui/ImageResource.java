@@ -37,8 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="jbpm-images")
+@Api(value="Process definition and instance images :: BPM")
 @Path("server/" + IMAGE_URI)
 public class ImageResource {
 
@@ -55,10 +59,16 @@ public class ImageResource {
         this.context = context;
     }
 
+    @ApiOperation(value="Retrieves process definition image",
+            response=String.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process definition, image or Container Id not found") })
     @GET
     @Path(PROCESS_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})
-    public Response getProcessImage(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_ID) String processId) {
+    public Response getProcessImage(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that process definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of the process definition that image should be loaded for", required = true) @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -75,11 +85,16 @@ public class ImageResource {
         }
     }
 
+    @ApiOperation(value="Retrieves process instance image",
+            response=String.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process instance, image or Container Id not found") })
     @GET
     @Path(PROCESS_INST_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})
     public Response getProcessInstanceImage(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_INST_ID) Long procInstId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of the process instance that image should be loaded for", required = true) @PathParam(PROCESS_INST_ID) Long procInstId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {

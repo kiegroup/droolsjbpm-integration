@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
@@ -36,10 +37,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
-@Api(value="drools")
+@Api(value="Rules evaluation :: BRM")
 @Path("server/containers/instances/{id}")
 public class CommandResource {
 
@@ -59,10 +64,15 @@ public class CommandResource {
         this.marshallerHelper = new MarshallerHelper(registry);
     }
 
+    @ApiOperation(value="Evaluates rules by executing commands on the rule session",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response manageContainer(@Context HttpHeaders headers, @PathParam("id") String id, String cmdPayload) {
+    public Response manageContainer(@Context HttpHeaders headers, 
+            @ApiParam(value = "Container id where rules should be evaluated on", required = true) @PathParam("id") String id, 
+            @ApiParam(value = "Commands to be executed on rule engine given as BatchExecutionCommand type", required = true) String cmdPayload) {
 
         Variant v = getVariant(headers);
         String contentType = getContentType(headers);

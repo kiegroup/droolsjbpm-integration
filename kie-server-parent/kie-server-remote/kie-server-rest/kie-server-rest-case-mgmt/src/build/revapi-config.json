@@ -86,7 +86,25 @@
  		 "annotationType": "io.swagger.annotations.Api",
  		 "elementKind": "annotation",
  		 "justification": "Added Swagger annotations for kie server docs"
-         }
+         },
+	     {
+		    "code": "java.annotation.added",
+		    "annotationType": "io.swagger.annotations.ApiParam",
+		    "elementKind": "annotation",
+		    "justification": "Added Swagger annotations for kie server docs"
+	     },
+	     {
+		    "code": "java.annotation.added",
+		    "annotationType": "io.swagger.annotations.ApiOperation",
+		    "elementKind": "annotation",
+		    "justification": "Added Swagger annotations for kie server docs"
+	     },
+	     {
+		    "code": "java.annotation.added",
+		    "annotationType": "io.swagger.annotations.ApiResponses",
+		    "elementKind": "annotation",
+		    "justification": "Added Swagger annotations for kie server docs"
+	     }
       ]
     }
   }

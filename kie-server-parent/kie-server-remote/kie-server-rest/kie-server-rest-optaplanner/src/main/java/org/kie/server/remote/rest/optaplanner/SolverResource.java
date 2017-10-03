@@ -57,8 +57,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="planner-solvers")
+@Api(value="Planning and solvers :: BRP")
 @Path("server/" + RestURI.SOLVER_URI)
 public class SolverResource {
 
@@ -75,15 +79,19 @@ public class SolverResource {
         this.marshallerHelper = new MarshallerHelper(solverService.getKieServerRegistry());
     }
 
+    @ApiOperation(value="Creates solver within given container",
+            response=SolverInstance.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 400, message = "Container does not exist or failure in creating solver") })
     @PUT
     @Path(RestURI.SOLVER_ID_URI)
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createSolver(
             @javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CONTAINER_ID) String containerId,
-            @PathParam(SOLVER_ID) String solverId,
-            String payload) {
+            @ApiParam(value = "container id where the solver config resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver to create", required = true) @PathParam(SOLVER_ID) String solverId,
+            @ApiParam(value = "solver instance details as SolverInstance type", required = true) String payload) {
         logger.debug("About to create solver {} on container {}",
                      solverId,
                      containerId);
@@ -135,10 +143,14 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Retrieves solvers from given container",
+            response=SolverInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container does not exist or failure in creating solver") })
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getSolvers(@javax.ws.rs.core.Context HttpHeaders headers,
-                               @PathParam(CONTAINER_ID) String containerId) {
+            @ApiParam(value = "container id where the solvers reside", required = true) @PathParam(CONTAINER_ID) String containerId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),
@@ -170,12 +182,16 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Retrieves solver by its identifier from given container",
+            response=SolverInstance.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container does not exist or failure in creating solver") })
     @GET
     @Path(RestURI.SOLVER_ID_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getSolver(@javax.ws.rs.core.Context HttpHeaders headers,
-                              @PathParam(CONTAINER_ID) String containerId,
-                              @PathParam(SOLVER_ID) String solverId) {
+            @ApiParam(value = "container id where the solver resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver", required = true) @PathParam(SOLVER_ID) String solverId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),
@@ -208,12 +224,16 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Retrieves best solution from solver within container",
+            response=SolverInstance.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container does not exist or failure in creating solver") })
     @GET
     @Path(SOLVER_ID_URI + "/" + SOLVER_BEST_SOLUTION)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getSolverWithBestSolution(@javax.ws.rs.core.Context HttpHeaders headers,
-                                              @PathParam(CONTAINER_ID) String containerId,
-                                              @PathParam(SOLVER_ID) String solverId) {
+            @ApiParam(value = "container id where the solver resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver", required = true) @PathParam(SOLVER_ID) String solverId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),
@@ -246,13 +266,17 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Solves given planning problem with given solver",
+            response=Void.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container does not exist or failure in creating solver") })
     @POST
     @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_STATE_RUNNING)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response solvePlanningProblem(@javax.ws.rs.core.Context HttpHeaders headers,
-                                         @PathParam(CONTAINER_ID) String containerId,
-                                         @PathParam(SOLVER_ID) String solverId,
-                                         String payload) {
+            @ApiParam(value = "container id where the solver resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver", required = true) @PathParam(SOLVER_ID) String solverId,
+            @ApiParam(value = "planning problem", required = true) String payload) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),
@@ -291,12 +315,16 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Terminates early running solver with given id within container",
+            response=Void.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 400, message = "Container does not exist or failure in creating solver") })
     @POST
     @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_STATE_TERMINATING)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response terminateSolverEarly(@javax.ws.rs.core.Context HttpHeaders headers,
-                                         @PathParam(CONTAINER_ID) String containerId,
-                                         @PathParam(SOLVER_ID) String solverId) {
+            @ApiParam(value = "container id where the solver resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver", required = true) @PathParam(SOLVER_ID) String solverId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),
@@ -327,13 +355,17 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Adds problem fact changes to given solver",
+            response=Void.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 400, message = "Container does not exist or failure in creating solver") })
     @POST
     @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACT_CHANGES)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addProblemFactChanges(@javax.ws.rs.core.Context HttpHeaders headers,
-                                          @PathParam(CONTAINER_ID) String containerId,
-                                          @PathParam(SOLVER_ID) String solverId,
-                                          String payload) {
+            @ApiParam(value = "container id where the solver resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver", required = true) @PathParam(SOLVER_ID) String solverId,
+            @ApiParam(value = "Problem fact changes, either single one or a list of them", required = true) String payload) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),
@@ -372,12 +404,16 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Retrieves status if problem fact changes have been processed in given solver",
+            response=Boolean.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container does not exist or failure in creating solver") })
     @GET
     @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response isEveryProblemFactChangeProcessed(@javax.ws.rs.core.Context HttpHeaders headers,
-                                                      @PathParam(CONTAINER_ID) String containerId,
-                                                      @PathParam(SOLVER_ID) String solverId) {
+            @ApiParam(value = "container id where the solver resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver", required = true) @PathParam(SOLVER_ID) String solverId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),
@@ -410,12 +446,16 @@ public class SolverResource {
         }
     }
 
+    @ApiOperation(value="Disposes given solver",
+            response=Void.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container does not exist or failure in creating solver") })
     @DELETE
     @Path(RestURI.SOLVER_ID_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response disposeSolver(@javax.ws.rs.core.Context HttpHeaders headers,
-                                  @PathParam(CONTAINER_ID) String containerId,
-                                  @PathParam(SOLVER_ID) String solverId) {
+            @ApiParam(value = "container id where the solver resides", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the solver", required = true) @PathParam(SOLVER_ID) String solverId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId,
                                                                 solverService.getKieServerRegistry(),

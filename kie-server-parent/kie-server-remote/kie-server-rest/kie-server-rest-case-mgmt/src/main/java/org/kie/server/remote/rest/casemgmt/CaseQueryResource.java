@@ -43,8 +43,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="case-query")
+@Api(value="Queries - case definitions and instances :: Case Management")
 @Path("server/" + CASE_QUERY_URI)
 public class CaseQueryResource extends AbstractCaseResource {
 
@@ -60,14 +64,21 @@ public class CaseQueryResource extends AbstractCaseResource {
         super(caseManagementRuntimeDataServiceBase, context);
     }
 
+    @ApiOperation(value="Retrieves case instances with authntication checks and applies pagination, allows to filter by data (case file) name and value, owner and case instance status",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
-            @QueryParam("dataItemName") String dataItemName, @QueryParam("dataItemValue") String dataItemValue,
-            @QueryParam("owner") String owner, @QueryParam("status") List<String> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "data item name that case instances will be filtered by", required = false) @QueryParam("dataItemName") String dataItemName, 
+            @ApiParam(value = "data item value that case instances will be filtered by", required = false) @QueryParam("dataItemValue") String dataItemValue,
+            @ApiParam(value = "case instance owner that case instances will be filtered by", required = false) @QueryParam("owner") String owner,
+            @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -95,13 +106,19 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    @ApiOperation(value="Retrieves case instances where given user is involed in given role and applies pagination, allows to filter by case instance status",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstancesByRole(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CASE_ROLE_NAME) String roleName, @QueryParam("status") List<String> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "case role that instances should be found for", required = true) @PathParam(CASE_ROLE_NAME) String roleName, 
+            @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -119,12 +136,18 @@ public class CaseQueryResource extends AbstractCaseResource {
     /*
      * case definition methods
      */
+    
+    @ApiOperation(value="Retrieves case definitions with filtering by name or id of the case definition and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseDefinitions(@javax.ws.rs.core.Context HttpHeaders headers,
-            @QueryParam("filter") String filter,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "case definition id or name that case definitions will be filtered by", required = true) @QueryParam("filter") String filter,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -142,13 +165,18 @@ public class CaseQueryResource extends AbstractCaseResource {
     /*
      * process definition methods
      */
+    @ApiOperation(value="Retrieves process definitions with filtering by name or id of the process definition and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_ALL_PROCESSES_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessDefinitions(@javax.ws.rs.core.Context HttpHeaders headers,
-            @QueryParam("filter") String filter,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "process definition id or name that process definitions will be filtered by", required = true) @QueryParam("filter") String filter,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -163,12 +191,18 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    @ApiOperation(value="Retrieves process definitions that belong to given container and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getProcessDefinitionsByContainer(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+    public Response getProcessDefinitionsByContainer(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that process definitions should be filtered by", required = true) @PathParam("id") String containerId,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -187,14 +221,20 @@ public class CaseQueryResource extends AbstractCaseResource {
      * Case tasks
      */
 
+    @ApiOperation(value="Retrieves case instance tasks assigned as potential owner, allows to filter by task status and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_TASKS_AS_POT_OWNER_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstanceTasksAsPotentialOwner(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CASE_ID) String caseId,
-            @QueryParam("user") String user, @QueryParam("status") List<String> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "case instance identifier that tasks should belong to", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
+            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -208,14 +248,20 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    @ApiOperation(value="Retrieves case instance tasks assigned as business admin, allows to filter by task status and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_TASKS_AS_ADMIN_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstanceTasksAsAdmin(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CASE_ID) String caseId,
-            @QueryParam("user") String user, @QueryParam("status") List<String> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "case instance identifier that tasks should belong to", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
+            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -229,14 +275,20 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    @ApiOperation(value="Retrieves case instance tasks assigned as stakeholder, allows to filter by task status and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_TASKS_AS_STAKEHOLDER_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstanceTasksAsStakeholder(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CASE_ID) String caseId,
-            @QueryParam("user") String user, @QueryParam("status") List<String> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "case instance identifier that tasks should belong to", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
+            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -250,12 +302,18 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    @ApiOperation(value="Retrieves case instance data items, allows to filter by name or type of data and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_FILE_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getCaseInstanceDataItems(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CASE_ID) String caseId,
-            @QueryParam("name") List<String> names, @QueryParam("type") List<String> types,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+    public Response getCaseInstanceDataItems(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "case instance identifier that data items should belong to", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optionally filter by data item names", required = false) @QueryParam("name") List<String> names, 
+            @ApiParam(value = "optionally filter by data item types", required = false) @QueryParam("type") List<String> types,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         return invokeCaseOperation(headers,
                 "",
                 caseId,

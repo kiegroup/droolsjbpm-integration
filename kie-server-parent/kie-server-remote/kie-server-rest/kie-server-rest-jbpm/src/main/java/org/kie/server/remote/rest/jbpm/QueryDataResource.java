@@ -68,8 +68,12 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dashbuilder.dataset.exception.DataSetLookupException;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="jbpm-query-definitions")
+@Api(value="Custom queries :: BPM")
 @Path("server/" + QUERY_DEF_URI)
 public class QueryDataResource {
 
@@ -88,11 +92,14 @@ public class QueryDataResource {
         this.context = context;
     }
 
+    @ApiOperation(value="Retruns all custom queries defined in the system",
+            response=QueryDefinitionList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getQueries( @Context HttpHeaders headers,
-                                @QueryParam("page") @DefaultValue("0") Integer page,
-                                @QueryParam("pageSize") @DefaultValue("10") Integer pageSize ) {
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize ) {
         // no container id available so only used to transfer conversation id if
         // given by client
         Header conversationIdHeader = buildConversationIdHeader( "",
@@ -109,12 +116,16 @@ public class QueryDataResource {
                                      conversationIdHeader );
     }
 
+    @ApiOperation(value="Registers new query definition in the system with given queryName",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 409, message = "Query with given name already exists")})
     @POST
     @Path(CREATE_QUERY_DEF_POST_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
-                                           @PathParam("queryName") String queryName,
-                                           String payload ) {
+            @ApiParam(value = "identifier of the query definition to be registered", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "query definition represented as QueryDefinition", required = true) String payload ) {
         Variant v = getVariant( headers );
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -149,12 +160,15 @@ public class QueryDataResource {
         }
     }
 
+    @ApiOperation(value="Replaces existing query definition or registers new if not exists in the system with given queryName",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @PUT
     @Path(REPLACE_QUERY_DEF_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response replaceQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
-                                            @PathParam("queryName") String queryName,
-                                            String payload ) {
+            @ApiParam(value = "identifier of the query definition to be replaced", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "query definition represented as QueryDefinition", required = true) String payload ) {
         Variant v = getVariant( headers );
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -183,11 +197,15 @@ public class QueryDataResource {
         }
     }
 
+    @ApiOperation(value="Deletes existing query definition from the system with given queryName",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Query definition with given name not found")})
     @DELETE
     @Path(DROP_QUERY_DEF_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response dropQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
-                                         @PathParam("queryName") String queryName ) {
+            @ApiParam(value = "identifier of the query definition to be deleted", required = true) @PathParam("queryName") String queryName ) {
         Variant v = getVariant( headers );
         // no container id available so only used to transfer conversation id if
         // given by client
@@ -215,11 +233,15 @@ public class QueryDataResource {
         }
     }
 
+    @ApiOperation(value="Retrieves existing query definition from the system with given queryName",
+            response=QueryDefinition.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Query definition with given name not found")})
     @GET
     @Path(QUERY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getQuery( @Context HttpHeaders headers,
-                              @PathParam("queryName") String queryName ) {
+            @ApiParam(value = "identifier of the query definition to be retrieved", required = true) @PathParam("queryName") String queryName ) {
         Variant v = getVariant( headers );
         // no container id available so only used to transfer conversation id if
         // given by client
@@ -249,15 +271,19 @@ public class QueryDataResource {
         }
     }
 
+    @ApiOperation(value="Queries using query definition identified by queryName. Maps the result to concrete objects based on provided mapper.",
+            response=Object.class, responseContainer="List", code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Query definition with given name not found")})
     @GET
     @Path(RUN_QUERY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response runQuery( @Context HttpHeaders headers,
-                              @PathParam("queryName") String queryName,
-                              @QueryParam("mapper") String mapper,
-                              @QueryParam("orderBy") String orderBy,
-                              @QueryParam("page") @DefaultValue("0") Integer page,
-                              @QueryParam("pageSize") @DefaultValue("10") Integer pageSize ) {
+            @ApiParam(value = "identifier of the query definition to be used for query", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
+            @ApiParam(value = "optional sort order", required = false) @QueryParam("orderBy") String orderBy,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize ) {
 
         // no container id available so only used to transfer conversation id if
         // given by client
@@ -279,17 +305,21 @@ public class QueryDataResource {
                                      conversationIdHeader );
     }
 
+    @ApiOperation(value="Queries using query definition identified by queryName. Maps the result to concrete objects based on provided mapper. Query is additional altered by the filter spec and/or builder",
+            response=Object.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions")})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_POST_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response runQueryFiltered( @Context HttpHeaders headers,
-                                      @PathParam("queryName") String queryName,
-                                      @QueryParam("mapper") String mapper,
-                                      @QueryParam("builder") String builder,
-                                      @QueryParam("page") @DefaultValue("0") Integer page,
-                                      @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-                                      String payload ) {
-
+            @ApiParam(value = "identifier of the query definition to be used for query", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
+            @ApiParam(value = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @ApiParam(value = "optional query filter specification represented as QueryFilterSpec", required = false) String payload ) {
+        
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
         // given by client

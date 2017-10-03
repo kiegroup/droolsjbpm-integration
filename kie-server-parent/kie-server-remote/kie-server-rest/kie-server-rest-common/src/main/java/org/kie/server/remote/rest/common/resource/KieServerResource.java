@@ -32,8 +32,12 @@ import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="kie-server-config")
+@Api(value="KIE Server Script :: Core")
 @Path("server/config")
 public class KieServerResource {
 
@@ -48,10 +52,14 @@ public class KieServerResource {
         this.delegate = delegate;
     }
 
+    @ApiOperation(value="Executes command script on execution server, usually used as a batch to configure KIE Server",
+            response=ServiceResponsesList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response executeCommands(@Context HttpHeaders headers, String commandScriptPayload ) {
+    public Response executeCommands(@Context HttpHeaders headers, 
+            @ApiParam(value = "command script payload", required = true) String commandScriptPayload ) {
 
         String contentType = getContentType(headers);
 
