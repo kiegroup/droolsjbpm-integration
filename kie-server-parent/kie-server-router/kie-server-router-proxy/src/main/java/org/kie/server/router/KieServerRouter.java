@@ -75,7 +75,7 @@ public class KieServerRouter {
     private Undertow server;
     private ConfigRepository repository = new FileRepository();
     
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();    
     private ScheduledFuture<?> controllerConnectionAttempts;
 
     public KieServerRouter() {
@@ -94,13 +94,17 @@ public class KieServerRouter {
         });
     }
     
-    public void start(String host, Integer port) {
+    public void start(String host, Integer port, ConfigurationListener ...listeners) {
         System.setProperty(KieServerRouterConstants.ROUTER_HOST, host);
         System.setProperty(KieServerRouterConstants.ROUTER_PORT, port.toString());
 
         Configuration configuration = repository.load();
         
-        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository);
+        for (ConfigurationListener listener : listeners) {
+            configuration.addListener(listener);
+        }
+        
+        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository, executorService);
         final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
         Map<String, List<String>> perContainer = configuration.getHostsPerContainer();
 
