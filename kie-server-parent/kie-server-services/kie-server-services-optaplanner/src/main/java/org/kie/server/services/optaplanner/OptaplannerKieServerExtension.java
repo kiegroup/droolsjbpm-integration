@@ -16,6 +16,7 @@
 package org.kie.server.services.optaplanner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -59,6 +60,10 @@ public class OptaplannerKieServerExtension
     private List<Object> services = new ArrayList<Object>();
     private boolean initialized = false;
     private OptaplannerCommandServiceImpl optaplannerCommandService;
+    
+    private List<RealtimePlanning> globalContinuousPlannings;
+    
+    private Map<String, List<RealtimePlanning>> containerContinuousPlannings = new HashMap<>();
 
     @Override
     public boolean isInitialized() {
@@ -96,6 +101,8 @@ public class OptaplannerKieServerExtension
         this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);
 
         this.services.add( solverServiceBase );
+        
+        this.globalContinuousPlannings = loadPlannings(this.getClass().getClassLoader());
 
         initialized = true;
     }
@@ -105,10 +112,23 @@ public class OptaplannerKieServerExtension
         if( this.threadPool != null ) {
             this.threadPool.shutdownNow();
         }
+        
+        for (RealtimePlanning planning : globalContinuousPlannings) {
+            try {
+                planning.close();
+                logger.debug("ContinuousPlanning {} closed successfully", planning);
+            } catch (Exception e) {
+                logger.error("Unexpected error thrown when closing {}", planning, e);
+            }
+        }
     }
 
     @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        
+        List<RealtimePlanning> containerPlannings = loadPlannings(kieContainerInstance.getKieContainer().getClassLoader());
+        containerContinuousPlannings.put(id, containerPlannings);
+        solverServiceBase.boostrapContinuousPlanning(id, containerPlannings);        
     }
 
     @Override
@@ -124,6 +144,16 @@ public class OptaplannerKieServerExtension
     @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         solverServiceBase.disposeSolversForContainer( id, kieContainerInstance );
+        
+        List<RealtimePlanning> containerPlannings = containerContinuousPlannings.getOrDefault(id, new ArrayList<>());
+        for (RealtimePlanning planning : containerPlannings) {
+            try {
+                planning.close();
+                logger.debug("Container's {} ContinuousPlanning {} closed successfully", id, planning);
+            } catch (Exception e) {
+                logger.error("Unexpected error thrown when closing {} for container {}", planning, id, e);
+            }
+        }
     }
 
     @Override
@@ -174,4 +204,17 @@ public class OptaplannerKieServerExtension
         return EXTENSION_NAME + " KIE Server extension";
     }
 
+    
+    protected List<RealtimePlanning> loadPlannings(ClassLoader classLoader) {
+        List<RealtimePlanning> plannings = new ArrayList<>();
+        ServiceLoader<RealtimePlanning> discoveredPlannings = ServiceLoader.load(RealtimePlanning.class, classLoader);
+        
+        for (RealtimePlanning planning : discoveredPlannings) {
+            if (planning.init()) {
+                plannings.add(planning);
+            }
+        }
+        
+        return plannings;
+    }
 }
