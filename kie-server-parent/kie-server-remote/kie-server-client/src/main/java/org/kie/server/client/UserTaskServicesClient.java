@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskEventInstance;
@@ -69,6 +68,8 @@ public interface UserTaskServicesClient {
     void setTaskName(String containerId, Long taskId, String name);
 
     void setTaskDescription(String containerId, Long taskId, String description);
+    
+    void updateTask(String containerId, Long taskId, String userId, TaskInstance updatedTask);
 
     Long saveTaskContent(String containerId, Long taskId, Map<String, Object> values);
 
