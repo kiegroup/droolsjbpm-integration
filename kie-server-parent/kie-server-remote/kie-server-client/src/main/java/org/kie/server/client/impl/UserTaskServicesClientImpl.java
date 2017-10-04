@@ -1367,4 +1367,24 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         return Collections.emptyList();
     }
+    
+    @Override
+    public void updateTask(String containerId, Long taskId, String userId, TaskInstance updatedTask) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_PUT_URI, valuesMap) + getUserQueryStr(userId),
+                    updatedTask, String.class, getHeaders(null));
+        } else {
+
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "update", serialize(updatedTask), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+        }
+    }
 }

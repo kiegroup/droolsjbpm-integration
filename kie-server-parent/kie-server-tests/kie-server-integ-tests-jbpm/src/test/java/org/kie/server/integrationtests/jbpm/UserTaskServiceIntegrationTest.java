@@ -1322,6 +1322,117 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
+    
+    @Test
+    public void testUserTaskUpdate() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            // verify current task properties
+            assertEquals(0, taskSummary.getPriority().intValue());
+            assertNull(taskSummary.getExpirationTime());
+            assertEquals("First task", taskSummary.getName());
+            KieServerAssert.assertNullOrEmpty(taskSummary.getDescription());
+
+            // set task properties
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.add(Calendar.DAY_OF_YEAR, 1);
+            Date expirationDate = currentTime.getTime();
+           
+            TaskInstance task = TaskInstance.builder()
+                    .name("Modified name")
+                    .description("Simple user task.")
+                    .priority(10)
+                    .expirationTime(expirationDate)
+                    .build();
+            
+            taskClient.updateTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, task);
+
+            // retrieve started task
+            TaskInstance taskInstance = taskClient.getTaskInstance(CONTAINER_ID, taskSummary.getId());
+
+            // verify modified task properties
+            assertEquals(10, taskInstance.getPriority().intValue());
+            assertNotNull(taskInstance.getExpirationDate());
+            assertEquals("Modified name", taskInstance.getName());
+            assertEquals("Simple user task.", taskInstance.getDescription());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    @Test
+    public void testUserTaskUpdateWithData() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            // verify current task properties
+            assertEquals(0, taskSummary.getPriority().intValue());
+            assertNull(taskSummary.getExpirationTime());
+            assertEquals("First task", taskSummary.getName());
+            KieServerAssert.assertNullOrEmpty(taskSummary.getDescription());
+
+            // set task properties
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.add(Calendar.DAY_OF_YEAR, 1);
+            Date expirationDate = currentTime.getTime();
+            
+            Map<String, Object> inputData = new HashMap<>();
+            inputData.put("added input", "test");
+            
+            Map<String, Object> outputData = new HashMap<>();
+            outputData.put("string_", "my custom data");
+            outputData.put("person_", createPersonInstance(USER_MARY));
+           
+            TaskInstance task = TaskInstance.builder()
+                    .name("Modified name")
+                    .description("Simple user task.")
+                    .priority(10)
+                    .expirationTime(expirationDate)
+                    .inputData(inputData)
+                    .outputData(outputData)
+                    .build();
+            
+            taskClient.updateTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, task);
+
+            // retrieve started task
+            TaskInstance taskInstance = taskClient.getTaskInstance(CONTAINER_ID, taskSummary.getId(), true, true, false);
+
+            // verify modified task properties
+            assertEquals(10, taskInstance.getPriority().intValue());
+            assertNotNull(taskInstance.getExpirationDate());
+            assertEquals("Modified name", taskInstance.getName());
+            assertEquals("Simple user task.", taskInstance.getDescription());
+            
+            String inputVar = (String) taskInstance.getInputData().get("added input");
+            assertNotNull(inputVar);
+            assertEquals("test", inputVar);
+            
+            Object personVar = taskInstance.getOutputData().get("person_");
+            assertNotNull(personVar);
+            assertEquals(USER_MARY, KieServerReflections.valueOf(personVar, "name"));
+
+            String stringVar = (String) taskInstance.getOutputData().get("string_");
+            assertNotNull(personVar);
+            assertEquals("my custom data", stringVar);
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
 
     private void assertTaskEventInstance(TaskEventInstance expected, TaskEventInstance actual) {
         assertNotNull(actual);
