@@ -50,7 +50,7 @@ public class AdminHttpHandler implements HttpHandler {
     
     private static final Logger log = Logger.getLogger(AdminHttpHandler.class);
 
-    private static final String CONTROLLER = System.getProperty(KieServerRouterConstants.CONTROLLER);
+    private String CONTROLLER = System.getProperty(KieServerRouterConstants.CONTROLLER);
     private int interval = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "10"));
     private int attemptsLimit = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_RECOVERY_ATTEMPT_LIMIT, "100"));
     
