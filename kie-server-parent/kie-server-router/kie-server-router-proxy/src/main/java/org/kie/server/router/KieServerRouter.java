@@ -58,7 +58,7 @@ public class KieServerRouter {
     private static final String PORT = System.getProperty(KieServerRouterConstants.ROUTER_PORT, "9000");
     private int failedAttemptsInterval = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "10"));
 
-    private static final String CONTROLLER = System.getProperty(KieServerRouterConstants.CONTROLLER);
+    private String CONTROLLER = System.getProperty(KieServerRouterConstants.CONTROLLER);
     
     private static final Logger log = Logger.getLogger(KieServerRouter.class);
 
