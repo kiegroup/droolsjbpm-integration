@@ -40,6 +40,7 @@ import static org.kie.server.api.rest.RestURI.CASE_ID;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCES_BY_DEF_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCES_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_POST_URI;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_MILESTONES_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_NODE_INSTANCES_GET_URI;
@@ -151,7 +152,7 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Retrieves case instance by given identifier (case id) with optionally loading data, roles, milestones and stages",
+    @ApiOperation(value="Retrieves active case instance by given identifier (case id) with optionally loading data, roles, milestones and stages",
             response=CaseInstance.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found") })
@@ -196,6 +197,28 @@ public class CaseResource extends AbstractCaseResource {
                     logger.debug("Returning NO CONTENT response after cancelling a case with id {}", caseId);
 
                     return noContent(v, customHeaders);
+                });
+    }
+    
+    @ApiOperation(value="Closes case instance with given identifier (case id) optionally with comment",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Case instance not found") })
+    @POST
+    @Path(CASE_INSTANCE_POST_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response closeCaseInstance(@javax.ws.rs.core.Context HttpHeaders headers,
+            @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optional comment when closing a case instance as String", required = false) String payload) {
+        return invokeCaseOperation(headers,
+                containerId,
+                caseId,
+                (Variant v, String type, Header... customHeaders) -> {
+                    caseManagementServiceBase.closeCaseInstance(containerId, caseId, payload, type);
+                    logger.debug("Returning NO CONTENT response after closing a case with id {}", caseId);
+
+                    return createResponse("", v, Response.Status.CREATED, customHeaders);
                 });
     }
 

@@ -57,6 +57,8 @@ public interface CaseServicesClient {
 
     CaseInstance getCaseInstance(String containerId, String caseId, boolean withData, boolean withRoles, boolean withMilestones, boolean withStages);
 
+    void closeCaseInstance(String containerId, String caseId, String comment);
+    
     void cancelCaseInstance(String containerId, String caseId);
 
     void destroyCaseInstance(String containerId, String caseId);
@@ -127,7 +129,7 @@ public interface CaseServicesClient {
 
     void updateComment(String containerId, String caseId, String commentId, String author, String text);
 
-    void removeComment(String containerId, String caseId, String commentId);
+    void removeComment(String containerId, String caseId, String commentId);    
 
     List<CaseInstance> getCaseInstances(Integer page, Integer pageSize);
 

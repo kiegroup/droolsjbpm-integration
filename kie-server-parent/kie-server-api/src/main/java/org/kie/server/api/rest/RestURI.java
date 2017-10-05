@@ -274,6 +274,7 @@ public class RestURI {
     public static final String CASE_INSTANCES_GET_URI = "instances";
     public static final String CASE_INSTANCES_BY_DEF_GET_URI = "{" + CASE_DEF_ID + "}/instances";
     public static final String CASE_INSTANCE_GET_URI = "instances/{" + CASE_ID + "}";
+    public static final String CASE_INSTANCE_POST_URI = "instances/{" + CASE_ID + "}";
     public static final String CASE_INSTANCE_DELETE_URI = "instances/{" + CASE_ID + "}";
     public static final String CASE_MILESTONES_GET_URI = "instances/{" + CASE_ID + "}/milestones";
     public static final String CASE_STAGES_GET_URI = "instances/{" + CASE_ID + "}/stages";

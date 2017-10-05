@@ -15,6 +15,57 @@
 
 package org.kie.server.client.impl;
 
+import static org.kie.server.api.rest.RestURI.CASE_AD_HOC_FRAGMENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ALL_DEFINITIONS_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ALL_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ALL_PROCESSES_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_COMMENTS_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.CASE_COMMENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_COMMENTS_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_COMMENTS_PUT_URI;
+import static org.kie.server.api.rest.RestURI.CASE_COMMENT_ID;
+import static org.kie.server.api.rest.RestURI.CASE_DEFINITIONS_BY_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_DEF_ID;
+import static org.kie.server.api.rest.RestURI.CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_DYNAMIC_PROCESS_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_DYNAMIC_TASK_IN_STAGE_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.CASE_DYNAMIC_TASK_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_DYNAMIC_TASK_PUT_URI;
+import static org.kie.server.api.rest.RestURI.CASE_FILE_BY_NAME_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_FILE_BY_NAME_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_FILE_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.CASE_FILE_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_FILE_ITEM;
+import static org.kie.server.api.rest.RestURI.CASE_FILE_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ID;
+import static org.kie.server.api.rest.RestURI.CASE_INSTANCES_BY_DEF_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_POST_URI;
+import static org.kie.server.api.rest.RestURI.CASE_MILESTONES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_NODE_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_NODE_NAME;
+import static org.kie.server.api.rest.RestURI.CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_PROCESS_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_QUERY_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ROLES_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ROLES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ROLES_PUT_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ROLE_NAME;
+import static org.kie.server.api.rest.RestURI.CASE_STAGES_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_STAGE_ID;
+import static org.kie.server.api.rest.RestURI.CASE_TASKS_AS_ADMIN_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_TASKS_AS_POT_OWNER_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_TASKS_AS_STAKEHOLDER_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_URI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.REOPEN_CASE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.START_CASE_POST_URI;
+import static org.kie.server.api.rest.RestURI.build;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,8 +106,7 @@ import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.client.CaseServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 
-import static org.kie.server.api.rest.RestURI.*;
-
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implements CaseServicesClient {
 
     public CaseServicesClientImpl(KieServicesConfiguration config) {
@@ -71,7 +121,7 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     public String startCase(String containerId, String caseDefinitionId) {
         return startCase(containerId, caseDefinitionId, new CaseFile());
     }
-
+   
     @Override
     public String startCase(String containerId, String caseDefinitionId, CaseFile caseFile) {
         Object result = null;
@@ -152,6 +202,26 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+        }
+    }
+    
+    @Override
+    public void closeCaseInstance(String containerId, String caseId, String comment) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(CASE_ID, caseId);
+
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_INSTANCE_POST_URI, valuesMap), comment, String.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("CaseService", "closeCaseInstance", serialize(comment), marshaller.getFormat().getType(), new Object[]{containerId, caseId})) );
+            ServiceResponse<String> response = (ServiceResponse<String>)
+                    executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);            
         }
     }
 
@@ -1334,7 +1404,7 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     public List<CaseFileDataItem> getCaseInstanceDataItemsByType(String caseId, List<String> types, Integer page, Integer pageSize) {
         return internalGetCaseInstanceDataItems(caseId, null, types, page, pageSize);
     }
-
+    
     /*
      * internal methods
      */

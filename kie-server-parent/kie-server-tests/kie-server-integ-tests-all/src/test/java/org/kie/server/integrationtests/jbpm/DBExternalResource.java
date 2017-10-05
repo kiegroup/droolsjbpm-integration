@@ -27,7 +27,11 @@ public class DBExternalResource extends ExternalResource {
     protected void after() {
 
         if (pds != null) {
+            try {
             pds.close();
+            } catch (Exception e) {
+                
+            }
         }
     };
 

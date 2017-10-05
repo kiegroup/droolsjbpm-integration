@@ -38,6 +38,7 @@ import org.jbpm.casemgmt.api.model.instance.CaseRoleInstance;
 import org.jbpm.casemgmt.api.model.instance.CommentInstance;
 import org.jbpm.casemgmt.api.model.instance.CommentSortBy;
 import org.jbpm.services.api.DeploymentNotFoundException;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.TaskModelFactory;
@@ -138,25 +139,35 @@ public class CaseManagementServiceBase {
         CaseInstance actualCaseInstance = caseService.getCaseInstance(caseId, withData, withRoles, withMilestones, withStages);
 
         org.kie.server.api.model.cases.CaseInstance caseInstance = ConvertUtils.transformCaseInstance(actualCaseInstance);
-
-        if (withData) {
-            caseInstance.setCaseFile(CaseFile.builder().data(actualCaseInstance.getCaseFile().getData()).build());
-        }
-
-        if (withMilestones) {
-            caseInstance.setMilestones(ConvertUtils.transformMilestones(actualCaseInstance.getCaseMilestones()));
-        }
-
-        if (withStages) {
-            caseInstance.setStages(ConvertUtils.transformStages(actualCaseInstance.getCaseStages()));
-        }
-
-        if (withRoles) {
-            caseInstance.setRoleAssignments(ConvertUtils.transformRoleAssignment(actualCaseInstance.getCaseRoles()));
+        if (actualCaseInstance.getStatus().equals(ProcessInstance.STATE_ACTIVE)) {
+            if (withData) {
+                caseInstance.setCaseFile(CaseFile.builder().data(actualCaseInstance.getCaseFile().getData()).build());
+            }
+    
+            if (withMilestones) {
+                caseInstance.setMilestones(ConvertUtils.transformMilestones(actualCaseInstance.getCaseMilestones()));
+            }
+    
+            if (withStages) {
+                caseInstance.setStages(ConvertUtils.transformStages(actualCaseInstance.getCaseStages()));
+            }
+    
+            if (withRoles) {
+                caseInstance.setRoleAssignments(ConvertUtils.transformRoleAssignment(actualCaseInstance.getCaseRoles()));
+            }
         }
         logger.debug("About to marshal case instance with id '{}' {}", caseId, caseInstance);
         return marshallerHelper.marshal(containerId, marshallingType, caseInstance, new ByCaseIdContainerLocator(caseId));
 
+    }
+    
+    public void closeCaseInstance(String containerId, String caseId, String payload, String marshallingType) {
+        verifyContainerId(containerId, caseId);   
+        logger.debug("About to unmarshal task name from payload: '{}'", payload);
+        String comment = marshallerHelper.unmarshal(containerId, payload, marshallingType, String.class);
+        
+        logger.debug("Closing case with id {} inside container {} with comment {}", caseId, containerId, comment);
+        caseService.closeCase(caseId, comment);        
     }
 
     public void cancelCaseInstance(String containerId, String caseId, boolean destroy) {
