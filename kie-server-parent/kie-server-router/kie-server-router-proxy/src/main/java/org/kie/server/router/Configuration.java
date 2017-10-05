@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.kie.server.router.utils.FailedHostInfo;
+
 public class Configuration {
 
     private Map<String, List<String>> hostsPerServer = new ConcurrentHashMap<>();
@@ -121,7 +123,7 @@ public class Configuration {
         }
     }
 
-    public synchronized void removeUnavailableServer(String requestURL) {
+    public synchronized FailedHostInfo removeUnavailableServer(String requestURL) {
         String serverUrl = null;
         String serverId = null;
 
@@ -163,6 +165,8 @@ public class Configuration {
                     removeContainerHost(container, actualServerUrl)
             );
         }
+        FailedHostInfo failedHost = new FailedHostInfo(serverId, serverUrl, containers);
+        return failedHost;
     }
 
     public void addListener(ConfigurationListener listener) {

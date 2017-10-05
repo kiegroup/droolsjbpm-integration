@@ -31,4 +31,5 @@ public class KieServerRouterConstants {
     public static final String KIE_CONTROLLER_TOKEN = "org.kie.server.controller.token";
     public static final String CONFIG_FILE_WATCHER_ENABLED = "org.kie.server.router.config.watcher.enabled";
     public static final String KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL = "org.kie.server.controller.retry.interval";
+    public static final String KIE_SERVER_RECOVERY_ATTEMPT_LIMIT = "org.kie.server.recovery.retry.limit";
 }
