@@ -15,8 +15,56 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ACTIVATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_ADD_POST_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CLAIM_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_ADD_POST_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMPLETE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CONTENT_DATA_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_DELEGATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_DESCRIPTION_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EVENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EXIT_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EXPIRATION_DATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_FAIL_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_FORWARD_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_INPUT_DATA_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_NAME_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_NOMINATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_OUTPUT_DATA_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_OUTPUT_DATA_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_PRIORITY_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_RELEASE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_RESUME_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_SKIPABLE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_SKIP_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_START_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_STOP_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_SUSPEND_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
+
 import java.text.MessageFormat;
 import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -40,10 +88,6 @@ import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.kie.server.services.jbpm.UserTaskServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
 @Path("server/" + TASK_URI)
 public class UserTaskResource {
@@ -780,6 +824,31 @@ public class UserTaskResource {
             TaskEventInstanceList result = runtimeDataServiceBase.getTaskEvents(taskId, page, pageSize, sort, sortOrder);
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
         } catch (TaskNotFoundException e) {
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+    
+    @PUT
+    @Path(TASK_INSTANCE_PUT_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response update(@Context HttpHeaders headers, 
+            @PathParam("id") String containerId,
+            @PathParam("tInstanceId") Long taskId, 
+            @QueryParam("user") String userId,             
+            String payload) {
+
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            
+            userTaskServiceBase.update(containerId, taskId, userId, payload, type);
+            
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
+        } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);

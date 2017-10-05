@@ -236,6 +236,15 @@
 		  "methodName": "getRequestById",
 		  "elementKind": "method",
 		  "justification": "added support for jobs over kie server router"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.client.UserTaskServicesClient::updateTask(java.lang.String, java.lang.Long, java.lang.String, org.kie.server.api.model.instance.TaskInstance)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "UserTaskServicesClient",
+		  "methodName": "updateTask",
+		  "elementKind": "method",
+		  "justification": "Added support for update task operation"
 		 }
       ]
     }

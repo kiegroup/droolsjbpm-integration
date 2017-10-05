@@ -182,6 +182,7 @@ public class RestURI {
     public static final String TASK_INSTANCE_ATTACHMENT_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
 
     public static final String TASK_INSTANCE_GET_URI = "{" + TASK_INSTANCE_ID + "}";
+    public static final String TASK_INSTANCE_PUT_URI = "{" + TASK_INSTANCE_ID + "}";
 
     public static final String TASK_INSTANCE_EVENTS_GET_URI = "{" + TASK_INSTANCE_ID + "}/events";
 
