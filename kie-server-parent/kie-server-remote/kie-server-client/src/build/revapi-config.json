@@ -254,6 +254,15 @@
 		  "methodName": "closeCaseInstance",
 		  "elementKind": "method",
 		  "justification": "Added support for close case operation"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method java.util.Map<java.lang.String, java.lang.Object> org.kie.server.client.CaseServicesClient::getCaseInstanceData(java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "CaseServicesClient",
+		  "methodName": "getCaseInstanceData",
+		  "elementKind": "method",
+		  "justification": "Added support to filter case file data items by name"
 		 }
       ]
     }

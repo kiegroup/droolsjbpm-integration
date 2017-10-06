@@ -66,6 +66,7 @@ import static org.kie.server.api.rest.RestURI.REOPEN_CASE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.START_CASE_POST_URI;
 import static org.kie.server.api.rest.RestURI.build;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -260,21 +261,31 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             throwExceptionOnFailure(response);
         }
     }
+    
+    @Override
+    public Map<String, Object> getCaseInstanceData(String containerId, String caseId) {        
+        return getCaseInstanceData(containerId, caseId, new ArrayList<String>());
+    }
 
     @Override
-    public Map<String, Object> getCaseInstanceData(String containerId, String caseId) {
+    public Map<String, Object> getCaseInstanceData(String containerId, String caseId, List<String> names) {
         Object result = null;
 
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(CASE_ID, caseId);
+            
+            String queryString = "";
+            if (names != null && !names.isEmpty()) {
+                queryString = getAdditionalParams("", "name", names);
+            }
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_FILE_GET_URI, valuesMap), Object.class);
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_FILE_GET_URI, valuesMap) + queryString, Object.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseService", "getCaseFileData", marshaller.getFormat().getType(), new Object[]{containerId, caseId})) );
+                    (KieServerCommand) new DescriptorCommand("CaseService", "getCaseFileData", marshaller.getFormat().getType(), new Object[]{containerId, caseId, safeList(names)})) );
             ServiceResponse<String> response = (ServiceResponse<String>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 

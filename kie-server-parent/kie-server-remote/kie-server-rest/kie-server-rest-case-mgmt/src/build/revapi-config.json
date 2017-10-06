@@ -104,7 +104,17 @@
 		    "annotationType": "io.swagger.annotations.ApiResponses",
 		    "elementKind": "annotation",
 		    "justification": "Added Swagger annotations for kie server docs"
-	     }
+	     },
+	     {
+		  "code": "java.method.numberOfParametersChanged",
+		  "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceData(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
+		  "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceData(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
+		  "package": "org.kie.server.remote.rest.casemgmt",
+		  "classSimpleName": "CaseResource",
+		  "methodName": "getCaseInstanceData",
+		  "elementKind": "method",
+		  "justification": "Added support to filter case file data items by name"
+		 }
       ]
     }
   }

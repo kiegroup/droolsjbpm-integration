@@ -22,6 +22,7 @@ import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_GROUPS_PROP;
 import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_NAME_PROP;
 import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_NODE_TYPE_PROP;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -198,11 +199,24 @@ public class CaseManagementServiceBase {
 
     }
 
-    public String getCaseFileData(String containerId, String caseId, String marshallingType) {
+    public String getCaseFileData(String containerId, String caseId, List<String> names, String marshallingType) {
     	verifyContainerId(containerId, caseId);
         CaseFileInstance caseFileInstance = caseService.getCaseFileInstance(caseId);
 
         Map<String, Object> caseFileData = caseFileInstance.getData();
+        
+        if (names != null && !names.isEmpty()) {
+            logger.debug("Filtering case file data to return only items with following names {}", names);
+            Map<String, Object> filtered = new HashMap<>();
+            
+            for (String name : names) {
+                if (caseFileData.containsKey(name)) {
+                    filtered.put(name, caseFileData.get(name));
+                }
+            }
+            
+            caseFileData = filtered;
+        }
         logger.debug("About to marshal case file data for case with id '{}' {}", caseId, caseFileData);
         return marshallerHelper.marshal(containerId, marshallingType, caseFileData, new ByCaseIdContainerLocator(caseId));
 

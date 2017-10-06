@@ -68,6 +68,8 @@ public interface CaseServicesClient {
     void reopenCase(String caseId, String containerId, String caseDefinitionId, Map<String, Object> data);
 
     Map<String, Object> getCaseInstanceData(String containerId, String caseId);
+    
+    Map<String, Object> getCaseInstanceData(String containerId, String caseId, List<String> names);
 
     Object getCaseInstanceData(String containerId, String caseId, String name);
 

@@ -255,13 +255,14 @@ public class CaseResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstanceData(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId) {
+            @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optional name(s) of the data items to retrieve", required = false) @QueryParam("name") List<String> names) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to load case file data of case {}", caseId);
-                    String response = this.caseManagementServiceBase.getCaseFileData(containerId, caseId, type);
+                    String response = this.caseManagementServiceBase.getCaseFileData(containerId, caseId, names, type);
 
                     logger.debug("Returning OK response with content '{}'", response);
                     return createResponse(response, v, Response.Status.OK, customHeaders);

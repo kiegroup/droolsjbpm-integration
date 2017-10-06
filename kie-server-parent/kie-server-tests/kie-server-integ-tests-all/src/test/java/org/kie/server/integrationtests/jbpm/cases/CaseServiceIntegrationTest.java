@@ -190,10 +190,17 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         Assertions.assertThat(caseData).hasSize(3);
         Assertions.assertThat(caseData.get("car")).isEqualTo("fiat");
         Assertions.assertThat(caseData.get("owner")).isEqualTo("john");
-
+        
         caseClaimReport = caseData.get("report");
         Assertions.assertThat(caseClaimReport).isNotNull();
         Assertions.assertThat(caseClaimReport.getClass().getName()).isEqualTo(CLAIM_REPORT_CLASS_NAME);
+        
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, Arrays.asList("car", "owner"));
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(2);
+        Assertions.assertThat(caseData.get("car")).isEqualTo("fiat");
+        Assertions.assertThat(caseData.get("owner")).isEqualTo("john");
+
     }
 
     @Test
