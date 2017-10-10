@@ -15,11 +15,13 @@
 
 package org.kie.server.integrationtests.jbpm.cases;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -188,10 +190,17 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         Assertions.assertThat(caseData).hasSize(3);
         Assertions.assertThat(caseData.get("car")).isEqualTo("fiat");
         Assertions.assertThat(caseData.get("owner")).isEqualTo("john");
-
+        
         caseClaimReport = caseData.get("report");
         Assertions.assertThat(caseClaimReport).isNotNull();
         Assertions.assertThat(caseClaimReport.getClass().getName()).isEqualTo(CLAIM_REPORT_CLASS_NAME);
+        
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, Arrays.asList("car", "owner"));
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(2);
+        Assertions.assertThat(caseData.get("car")).isEqualTo("fiat");
+        Assertions.assertThat(caseData.get("owner")).isEqualTo("john");
+
     }
 
     @Test
@@ -210,7 +219,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
-        assertClientException(() -> caseClient.getCaseInstance(CONTAINER_ID, caseId), 404 , caseId.toString());
+        CaseInstance closed = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        Assertions.assertThat(closed.getCaseStatus()).isEqualTo(3);
     }
 
     @Test
@@ -225,7 +235,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
 
-        assertClientException(() -> caseClient.getCaseInstance(CONTAINER_ID, caseId), 404 , caseId.toString());
+        CaseInstance closed = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        Assertions.assertThat(closed.getCaseStatus()).isEqualTo(3);
 
         Map<String, Object> data = new HashMap<>();
         data.put("additionalComment", "reopening the case");
@@ -282,8 +293,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
-        // Should throw exception because case doesn't exist
-        assertClientException(() -> caseClient.getCaseInstance(CONTAINER_ID, caseId), 404 , caseId);
+        CaseInstance closed = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        Assertions.assertThat(closed.getCaseStatus()).isEqualTo(3);
         // Should throw exception because destroyed case cannot be reopen.
         assertClientException(() -> caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID), 404 , caseId);
     }
@@ -362,6 +373,35 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertClientException(
                 () -> caseClient.addDynamicTaskToStage(BAD_CONTAINER_ID, caseId, firstStageId,
                         "ContactCarProducer", "Contact car producer", null), 404, BAD_CONTAINER_ID);
+    }
+    
+    @Test
+    public void testCreateCloseAndReopenCaseWithEmptyCaseFile() {
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
+
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
+
+        caseClient.closeCaseInstance(CONTAINER_ID, caseId, "work done at the moment");
+       
+        CaseInstance closed = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        Assertions.assertThat(closed.getCaseStatus()).isEqualTo(2);
+        Assertions.assertThat(closed.getCompletionMessage()).isEqualTo("work done at the moment");        
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("additionalComment", "reopening the case");
+        caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID, data);
+
+        caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
+
+        Object additionalComment = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "additionalComment");
+        Assertions.assertThat(additionalComment).isNotNull();
+        Assertions.assertThat(additionalComment).isEqualTo("reopening the case");
     }
 
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
