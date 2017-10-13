@@ -40,6 +40,7 @@ import javax.websocket.WebSocketContainer;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.common.security.KieVaultReader;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandler;
 import org.slf4j.Logger;
@@ -64,10 +65,12 @@ public class WebsocketKieServerControllerClient extends Endpoint {
     private Thread reconnectThread = null;
     
     private Consumer<WebsocketKieServerControllerClient> onReconnect;
-    
+
+    private final boolean hasEAPVault;
     
     public WebsocketKieServerControllerClient(Consumer<WebsocketKieServerControllerClient> onReconnect) {
         this.onReconnect = onReconnect;
+        hasEAPVault = KieVaultReader.haveEAPVault();
     }
     
     @OnClose
@@ -147,7 +150,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
                             super.beforeRequest(headers);
                             
                             String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                            String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                            String password = loadPassword(config);
                             String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
                             
                             if (token != null && !token.isEmpty()) {
@@ -172,7 +175,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void close() {
         this.closed.set(true);
         if (reconnectThread != null) {
@@ -185,32 +188,47 @@ public class WebsocketKieServerControllerClient extends Endpoint {
             logger.warn("Unexpected error while closing websocket connection to controller", e);
         }
     }
-    
+
     public void sendWithHandler(String content, InternalMessageHandler handler) throws IOException {
         if (!session.isOpen()) {
             throw new RuntimeException("No connection to controller");
         }
-        
+
         messageHandler.addHandler(handler);
         session.getBasicRemote().sendText(content);
     }
-    
+
     public boolean isActive() {
         if (session != null && session.isOpen()) {
             return true;
         }
-        
+
         return false;
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
         logger.info("Connection to Kie Controller over websocket is now open with session id " + session.getId());
-        
+
     }
 
     @Override
     public void onError(Session session, Throwable thr) {
         logger.error("Error received {} on session {}", thr.getMessage(), session.getId(), thr);
+    }
+
+    private String loadPassword(KieServerConfig config) {
+        String password = null;
+        final String vaultName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_VAULT_NAME);
+
+        if (hasEAPVault && vaultName != null) {
+            password = KieVaultReader.decryptValue(vaultName);
+        }
+
+        if (password == null) {
+            password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+        }
+
+        return password;
     }
 }
