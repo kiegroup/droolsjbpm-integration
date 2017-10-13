@@ -70,6 +70,7 @@ public class KieServerConstants {
     public static final String CFG_KIE_CONTROLLER_USER = "org.kie.server.controller.user";
     public static final String CFG_KIE_CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
     public static final String CFG_KIE_CONTROLLER_TOKEN = "org.kie.server.controller.token";
+    public static final String CFG_KIE_CONTROLLER_VAULT_NAME = "org.kie.server.controller.vault.name";
 
     // non kie server parameters but used by its extensions etc
     public static final String CFG_HT_CALLBACK = "org.jbpm.ht.callback";
