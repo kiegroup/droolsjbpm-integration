@@ -53,8 +53,8 @@
 
     <!-- appformer workbench models -->
     <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-project-datamodel-api</artifactId>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-project-datamodel-api</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- drools workbench models -->
