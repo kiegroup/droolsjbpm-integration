@@ -302,6 +302,7 @@ public class CaseResource extends AbstractCaseResource {
     public Response putCaseInstanceData(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "map of data to be placed in case file as Map", required = true) String payload) {
 
         return invokeCaseOperation(headers,
@@ -309,7 +310,7 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to put case file data of case {}", caseId);
-                    this.caseManagementServiceBase.putCaseFileData(containerId, caseId, payload, type);
+                    this.caseManagementServiceBase.putCaseFileData(containerId, caseId, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
                     return createResponse("", v, Response.Status.CREATED, customHeaders);
@@ -328,6 +329,7 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId, 
             @ApiParam(value = "name of the data item to be added to case file", required = true) @PathParam(CASE_FILE_ITEM) String caseDataName,
+            @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "data to be placed in case file, any type can be provided", required = true) String payload) {
 
         return invokeCaseOperation(headers,
@@ -335,7 +337,7 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to put case file data of case {}", caseId);
-                    this.caseManagementServiceBase.putCaseFileDataByName(containerId, caseId, caseDataName, payload, type);
+                    this.caseManagementServiceBase.putCaseFileDataByName(containerId, caseId, caseDataName, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
                     return createResponse("", v, Response.Status.CREATED, customHeaders);
@@ -766,13 +768,14 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author, 
+            @ApiParam(value = "optional role name(s) that given comment should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "actual content of the comment to be added as String", required = true) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to add comment to case {}", caseId);
-                    this.caseManagementServiceBase.addCommentToCase(containerId, caseId, author, payload, type);
+                    this.caseManagementServiceBase.addCommentToCase(containerId, caseId, author, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
                     return createResponse("", v, Response.Status.CREATED, customHeaders);
@@ -791,6 +794,7 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "identifier of the comment to be updated", required = true) @PathParam(CASE_COMMENT_ID) String commentId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author, 
+            @ApiParam(value = "optional role name(s) that given comment should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "actual content of the comment to be updated to as String", required = true) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
@@ -799,7 +803,7 @@ public class CaseResource extends AbstractCaseResource {
                     logger.debug("About to update comment {} in case {}", commentId, caseId);
 
                     try {
-                        this.caseManagementServiceBase.updateCommentInCase(containerId, caseId, commentId, author, payload, type);
+                        this.caseManagementServiceBase.updateCommentInCase(containerId, caseId, commentId, author, restrictions, payload, type);
 
                         logger.debug("Returning CREATED response");
                         return createResponse("", v, Response.Status.CREATED, customHeaders);

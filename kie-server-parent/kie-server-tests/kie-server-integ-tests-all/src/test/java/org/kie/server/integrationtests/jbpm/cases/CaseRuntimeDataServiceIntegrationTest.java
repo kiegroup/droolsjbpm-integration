@@ -14,7 +14,23 @@
  */
 package org.kie.server.integrationtests.jbpm.cases;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
+import static org.kie.server.remote.rest.casemgmt.Messages.CASE_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.casemgmt.Messages.PROCESS_DEFINITION_NOT_FOUND;
+
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,15 +68,6 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.junit.Assert.*;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
-import static org.kie.server.remote.rest.casemgmt.Messages.CASE_INSTANCE_NOT_FOUND;
-import static org.kie.server.remote.rest.casemgmt.Messages.PROCESS_DEFINITION_NOT_FOUND;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -2063,6 +2070,103 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         }
     }
 
+    @Test
+    public void testAddDynamicProcessToCaseNotExistingCase() {
+        String invalidCaseId = "not-existing-case-id";
+        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, invalidCaseId, CLAIM_CASE_DEF_ID, null),
+                404,
+                MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
+                "Case with id " + invalidCaseId + " not found");
+    }
+
+    @Test
+    public void testAddDynamicProcessToCaseNotExistingProcessDefinition() {
+        String invalidProcessId = "not-existing-process-id";
+        Map<String, Object> data = new HashMap<>();
+        data.put("s", "first case started");
+        CaseFile caseFile = CaseFile.builder()
+                .data(data)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+        assertNotNull(caseId);
+
+        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, invalidProcessId, null),
+                404,
+                MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, invalidProcessId, CONTAINER_ID),
+                "No process definition found with id: " + invalidProcessId);
+    }
+    
+    @Test
+    public void testCreateCaseWithCaseFileWithCommentsWithRestrictions() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        // add a contact role to yoda so it can access a case once owner role is removed
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_CONTACT_ROLE, USER_YODA);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        List<CaseComment> comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(comments);
+        assertEquals(0, comments.size());
+
+        List<String> restrictions = new ArrayList<>();
+        restrictions.add(CASE_OWNER_ROLE);
+        
+        caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "first comment", restrictions);
+
+        comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(comments);
+        assertEquals(1, comments.size());
+
+        CaseComment comment = comments.get(0);
+        assertNotNull(comment);
+        assertEquals(USER_YODA, comment.getAuthor());
+        assertEquals("first comment", comment.getText());
+        assertNotNull(comment.getAddedAt());
+        assertNotNull(comment.getId());
+        
+        // remove yoda from owner role to simulate lack of access
+        caseClient.removeUserFromRole(CONTAINER_ID, caseId, CASE_OWNER_ROLE, USER_YODA);
+        
+        comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(comments);
+        assertEquals(0, comments.size());
+
+        final String commentId = comment.getId();
+        assertClientException(() -> caseClient.updateComment(CONTAINER_ID, caseId, commentId, USER_YODA, "updated comment"), 403, "");
+        
+        // add back yoda to owner role
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_OWNER_ROLE, USER_YODA);
+        
+        caseClient.updateComment(CONTAINER_ID, caseId, comment.getId(), USER_YODA, "updated comment");
+        comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(comments);
+        assertEquals(1, comments.size());
+
+        comment = comments.get(0);
+        assertNotNull(comment);
+        assertEquals(USER_YODA, comment.getAuthor());
+        assertEquals("updated comment", comment.getText());
+        assertNotNull(comment.getAddedAt());
+        assertNotNull(comment.getId());
+
+        final String updatedCommentId = comment.getId();
+        // remove yoda from owner role to simulate lack of access
+        caseClient.removeUserFromRole(CONTAINER_ID, caseId, CASE_OWNER_ROLE, USER_YODA);
+        
+        assertClientException(() -> caseClient.removeComment(CONTAINER_ID, caseId, updatedCommentId), 403, "");
+
+        // add back yoda to owner role
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_OWNER_ROLE, USER_YODA);
+        
+        caseClient.removeComment(CONTAINER_ID, caseId, updatedCommentId);
+        comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(comments);
+        assertEquals(0, comments.size());
+    }
+    
+
     private String startUserTaskCase(String owner, String contact) {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
@@ -2286,32 +2390,5 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comment);
         assertEquals(comment.getAuthor(), author);
         assertEquals(comment.getText(), text);
-    }
-
-    @Test
-    public void testAddDynamicProcessToCaseNotExistingCase() {
-        String invalidCaseId = "not-existing-case-id";
-        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, invalidCaseId, CLAIM_CASE_DEF_ID, null),
-                404,
-                MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
-                "Case with id " + invalidCaseId + " not found");
-    }
-
-    @Test
-    public void testAddDynamicProcessToCaseNotExistingProcessDefinition() {
-        String invalidProcessId = "not-existing-process-id";
-        Map<String, Object> data = new HashMap<>();
-        data.put("s", "first case started");
-        CaseFile caseFile = CaseFile.builder()
-                .data(data)
-                .build();
-
-        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
-        assertNotNull(caseId);
-
-        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, invalidProcessId, null),
-                404,
-                MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, invalidProcessId, CONTAINER_ID),
-                "No process definition found with id: " + invalidProcessId);
     }
 }

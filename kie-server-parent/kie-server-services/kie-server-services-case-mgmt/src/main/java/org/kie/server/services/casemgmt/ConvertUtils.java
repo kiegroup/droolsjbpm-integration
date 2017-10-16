@@ -132,13 +132,19 @@ public class ConvertUtils {
         List<CaseComment> comments = new ArrayList<>();
 
         if (caseComments != null) {
-            caseComments.forEach(c ->
+            caseComments.forEach(c -> {
+                String[] restrictions = new String[0];
+                if (c.getRestrictedTo() != null) {
+                    restrictions = c.getRestrictedTo().toArray(new String[c.getRestrictedTo().size()]);
+                }
                 comments.add(CaseComment.builder()
                         .id(c.getId())
                         .author(c.getAuthor())
                         .addedAt(c.getCreatedAt())
                         .text(c.getComment())
-                        .build())
+                        .restrictedTo(restrictions)
+                        .build());
+            }
             );
         }
         return comments;

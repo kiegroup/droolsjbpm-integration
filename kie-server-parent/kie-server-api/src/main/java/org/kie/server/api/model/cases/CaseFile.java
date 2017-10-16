@@ -17,6 +17,7 @@ package org.kie.server.api.model.cases;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -34,6 +35,9 @@ public class CaseFile {
 
     @XmlElement(name="case-group-assignments")
     private Map<String, String> groupAssignments = new HashMap<>();
+    
+    @XmlElement(name="case-data-restrictions")
+    private Map<String, String[]> accessRestrictions = new HashMap<>();
 
     public Map<String, Object> getData() {
         return data;
@@ -57,6 +61,14 @@ public class CaseFile {
 
     public void setGroupAssignments(Map<String, String> groupAssignments) {
         this.groupAssignments = groupAssignments;
+    }
+        
+    public Map<String, String[]> getAccessRestrictions() {
+        return accessRestrictions;
+    }
+   
+    public void setAccessRestrictions(Map<String, String[]> accessRestrictions) {
+        this.accessRestrictions = accessRestrictions;
     }
 
     public static Builder builder() {
@@ -93,6 +105,27 @@ public class CaseFile {
 
         public Builder addGroupAssignments(String role, String group) {
             caseFile.getGroupAssignments().put(role, group);
+            return this;
+        }
+        
+        public Builder dataAccessRestrictions(Map<String, String[]> accessRestrictions) {
+            caseFile.setAccessRestrictions(accessRestrictions);
+            return this;
+        }
+        
+        public Builder addDataAccessRestrictions(String dataItem, String... roles) {
+            String[] existingRestrictions = caseFile.getAccessRestrictions().get(dataItem);
+            if (existingRestrictions == null) {
+                existingRestrictions = roles;
+            } else {
+                String[] result = new String[existingRestrictions.length + roles.length];
+                System.arraycopy(existingRestrictions, 0, result, 0, existingRestrictions.length);
+                System.arraycopy(roles, 0, result, existingRestrictions.length, roles.length);
+                
+                existingRestrictions = result;
+            }
+            
+            caseFile.getAccessRestrictions().put(dataItem, existingRestrictions);
             return this;
         }
     }

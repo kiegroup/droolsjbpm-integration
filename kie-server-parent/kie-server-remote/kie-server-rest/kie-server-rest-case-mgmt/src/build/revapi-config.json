@@ -114,6 +114,78 @@
 		  "methodName": "getCaseInstanceData",
 		  "elementKind": "method",
 		  "justification": "Added support to filter case file data items by name"
+		 },
+		 {
+		  "code": "java.annotation.added",
+		  "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::addComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===)",
+		  "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::addComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.String)",
+		  "annotationType": "javax.ws.rs.QueryParam",
+		  "elementKind": "annotation",
+		  "justification": "Added support for optional restriction on comments"
+		 },
+		 {
+		  "code": "java.method.numberOfParametersChanged",
+		  "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::addComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+		  "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::addComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.String)",
+		  "package": "org.kie.server.remote.rest.casemgmt",
+		  "classSimpleName": "CaseResource",
+		  "methodName": "addComment",
+		  "elementKind": "method",
+		  "justification": "Added support for optional restriction on comments"
+		 },
+		 {
+		  "code": "java.annotation.added",
+		  "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceData(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.lang.String===)",
+		  "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceData(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.String)",
+		  "annotationType": "javax.ws.rs.QueryParam",
+		  "elementKind": "annotation",
+		  "justification": "Added support for optional restriction on case file "
+		 },
+		 {
+		  "code": "java.method.numberOfParametersChanged",
+		  "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceData(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String)",
+		  "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceData(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.String)",
+		  "package": "org.kie.server.remote.rest.casemgmt",
+		  "classSimpleName": "CaseResource",
+		  "methodName": "putCaseInstanceData",
+		  "elementKind": "method",
+		  "justification": "Added support for optional restriction on case file "
+		 },
+		 {
+		  "code": "java.annotation.added",
+		  "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceDataByName(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===)",
+		  "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceDataByName(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.String)",
+		  "annotationType": "javax.ws.rs.QueryParam",
+		  "elementKind": "annotation",
+		  "justification": "Added support for optional restriction on case file "
+		 },
+		 {
+		  "code": "java.method.numberOfParametersChanged",
+		  "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceDataByName(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+		  "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::putCaseInstanceDataByName(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.String)",
+		  "package": "org.kie.server.remote.rest.casemgmt",
+		  "classSimpleName": "CaseResource",
+		  "methodName": "putCaseInstanceDataByName",
+		  "elementKind": "method",
+		  "justification": ""
+		 },
+		 {
+		  "code": "java.annotation.added",
+		  "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::updateComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===)",
+		  "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::updateComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.String)",
+		  "annotationType": "javax.ws.rs.QueryParam",
+		  "elementKind": "annotation",
+		  "justification": "Added support for optional restriction on comments"
+		 },
+		 {
+		  "code": "java.method.numberOfParametersChanged",
+		  "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::updateComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+		  "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::updateComment(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.String)",
+		  "package": "org.kie.server.remote.rest.casemgmt",
+		  "classSimpleName": "CaseResource",
+		  "methodName": "updateComment",
+		  "elementKind": "method",
+		  "justification": "Added support for optional restriction on comments"
 		 }
       ]
     }
