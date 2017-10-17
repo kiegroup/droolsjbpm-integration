@@ -28,7 +28,7 @@ On pom.xml of local project add plugin:
     <plugin>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-controller-plugin</artifactId>
-        <version>8.0.0-SNAPSHOT</version>
+        <version>7.5.0-SNAPSHOT</version>
         <configuration>
           <controllerUsername>${controller.username}</controllerUsername>
           <controllerPassword>${controller.password}</controllerPassword>
@@ -92,7 +92,7 @@ mvn kie-ctrl:get-template -Dkie-ctrl.controller-username=fabio -Dkie-ctrl.contro
 
 An example of output might be:
 ```
-[INFO] --- kie-server-controller-plugin:8.0.0-SNAPSHOT:get-template (default-cli) @ bpms-signal ---
+[INFO] --- kie-server-controller-plugin:7.5.0-SNAPSHOT:get-template (default-cli) @ bpms-signal ---
 [INFO] Protocol: http
 [INFO] Host Name: localhost
 [INFO] Port: 8230
@@ -178,7 +178,7 @@ With the given maven configuration:
     <plugin>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-controller-plugin</artifactId>
-        <version>8.0.0-SNAPSHOT</version>
+        <version>7.5.0-SNAPSHOT</version>
         <configuration>
             <templateId>process-server</templateId>
             <controllerUsername>${controller.username}</controllerUsername>
@@ -343,7 +343,7 @@ With the given maven configuration:
     <plugin>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-plugin</artifactId>
-      <version>8.0.0-SNAPSHOT</version>
+      <version>7.5.0-SNAPSHOT</version>
       <configuration>
         <templateId>process-server</templateId>
         <controllerUsername>${controller.username}</controllerUsername>
@@ -504,7 +504,7 @@ With the given maven configuration:
     <plugin>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-plugin</artifactId>
-      <version>8.0.0-SNAPSHOT</version>
+      <version>7.5.0-SNAPSHOT</version>
       <configuration>
         <templateId>process-server</templateId>
         <controllerUsername>${controller.username}</controllerUsername>
@@ -613,7 +613,7 @@ With the given maven configuration:
     <plugin>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-plugin</artifactId>
-      <version>8.0.0-SNAPSHOT</version>
+      <version>7.5.0-SNAPSHOT</version>
       <configuration>
         <controllerUsername>${controller.username}</controllerUsername>
         <controllerPassword>${controller.password}</controllerPassword>
