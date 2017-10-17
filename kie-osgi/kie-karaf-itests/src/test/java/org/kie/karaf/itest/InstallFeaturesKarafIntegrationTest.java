@@ -69,7 +69,6 @@ public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegratio
                 {"jbpm"},
                 {"jbpm-spring-persistent"},
                 {"droolsjbpm-hibernate"},
-                {"hibernate-validator"},
                 {"h2"}
         });
     }
