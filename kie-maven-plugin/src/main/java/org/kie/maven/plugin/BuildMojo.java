@@ -52,6 +52,7 @@ import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
+import org.drools.core.common.ProjectClassLoader;
 import org.drools.core.rule.KieModuleMetaInfo;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieRepository;
@@ -127,6 +128,7 @@ public class BuildMojo extends AbstractKieMojo {
                         kmoduleDeps.add(new ZipKieModule(releaseId,
                                                          depModel,
                                                          file));
+
                     }
                 }
             }
@@ -155,6 +157,7 @@ public class BuildMojo extends AbstractKieMojo {
             KieContainerImpl kContainer = (KieContainerImpl) ks.newKieContainer(kModule.getReleaseId());
 
             KieProject kieProject = kContainer.getKieProject();
+
             ResultsImpl messages = kieProject.verify();
 
             List<Message> errors = messages.filterMessages(Message.Level.ERROR);
@@ -166,7 +169,9 @@ public class BuildMojo extends AbstractKieMojo {
             } else {
 
                 if (container != null && compilationID != null) {
+
                     shareKieObjectsWithMap(kModule);
+                    shareStoreWithMap(kieProject);
                 } else {
                     new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
                 }
@@ -176,6 +181,19 @@ public class BuildMojo extends AbstractKieMojo {
         }
         getLog().info("KieModule successfully built!");
     }
+
+
+    private void shareStoreWithMap(KieProject kieProject) {
+        if (kieProject.getClassLoader() instanceof ProjectClassLoader) {
+            ProjectClassLoader projectClassloder = (ProjectClassLoader) kieProject.getClassLoader();
+            if (projectClassloder.getStore() != null) {
+                shareTypesWithMap(projectClassloder.getStore());
+            }
+        }else {
+            getLog().info("KieProject's classloader is not a ProjecClassloader");
+        }
+    }
+
 
     private void shareKieObjectsWithMap(InternalKieModule kModule) {
         Optional<Map<String, Object>> optionalKieMap = getKieMap();
@@ -200,6 +218,19 @@ public class BuildMojo extends AbstractKieMojo {
         }
     }
 
+
+    private void shareTypesWithMap(Map<String, byte[]> types) {
+        Optional<Map<String, Object>> optionalKieMap = getKieMap();
+        if (optionalKieMap.isPresent()) {
+            if(types != null){
+                StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
+                optionalKieMap.get().put(sbTypes.toString(), types);
+                getLog().info("ProjectClassloader Store available in the map shared with the Maven Embedder");
+            }
+        }
+    }
+
+
     private Optional<Map<String, Object>> getKieMap() {
         try {
             /**
@@ -214,6 +245,7 @@ public class BuildMojo extends AbstractKieMojo {
             return Optional.empty();
         }
     }
+
 
     private KieModuleModel getDependencyKieModel(File jar) {
         ZipFile zipFile = null;
