@@ -136,14 +136,6 @@
     <bundle start-level="100">mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
   </feature>
 
-  <feature name="hibernate-validator" version="${version.org.hibernate.validator}" description="Hibernate Validator">
-    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.1.0/${karaf.version.org.apache.servicemix.specs.jsr303-api}</bundle>
-    <bundle>mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
-    <bundle>mvn:org.hibernate/hibernate-validator/${version.org.hibernate.validator}</bundle>
-    <bundle>mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
-    <bundle>mvn:com.fasterxml/classmate/${karaf.version.com.fasterxml.classmate}</bundle>
-  </feature>
-
   <feature name="h2" version="${h2.version}" description="H2 database">
     <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
