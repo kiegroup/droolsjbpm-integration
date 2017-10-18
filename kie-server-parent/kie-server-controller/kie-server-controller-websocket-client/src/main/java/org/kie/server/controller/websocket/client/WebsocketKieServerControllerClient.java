@@ -40,6 +40,8 @@ import javax.websocket.WebSocketContainer;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.common.config.KieConfigReader;
+import org.kie.server.common.security.EAPVaultException;
 import org.kie.server.common.security.KieVaultReader;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandler;
@@ -148,19 +150,24 @@ public class WebsocketKieServerControllerClient extends Endpoint {
                         @Override
                         public void beforeRequest(Map<String, List<String>> headers) {                            
                             super.beforeRequest(headers);
-                            
-                            String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                            String password = loadPassword(config);
-                            String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
-                            
-                            if (token != null && !token.isEmpty()) {
-                                headers.put(AUTHORIZATION, Arrays.asList("Bearer " + token));
-                            } else {
-                                try {
-                                    headers.put(AUTHORIZATION, Arrays.asList("Basic " + Base64.getEncoder().encodeToString((userName + ':' + password).getBytes("UTF-8"))));
-                                } catch (UnsupportedEncodingException e) {
-                                    logger.warn(e.getMessage());
+
+                            try {
+                                String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                                String password = KieConfigReader.loadPassword(config, hasEAPVault);
+                                String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
+                                if (token != null && !token.isEmpty()) {
+                                    headers.put(AUTHORIZATION, Arrays.asList("Bearer " + token));
+                                } else {
+                                    try {
+                                        headers.put(AUTHORIZATION, Arrays.asList("Basic " + Base64.getEncoder().encodeToString((userName + ':' + password).getBytes("UTF-8"))));
+                                    } catch (UnsupportedEncodingException e) {
+                                        logger.warn(e.getMessage());
+                                    }
                                 }
+                            } catch (EAPVaultException e) {
+                                logger.warn("Exception encountered while getting configurator error {}", e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+                                logger.debug("Exception encountered while getting configurator error {}", e.getMessage(), e);
                             }
                         }
                         
@@ -215,20 +222,5 @@ public class WebsocketKieServerControllerClient extends Endpoint {
     @Override
     public void onError(Session session, Throwable thr) {
         logger.error("Error received {} on session {}", thr.getMessage(), session.getId(), thr);
-    }
-
-    private String loadPassword(KieServerConfig config) {
-        String password = null;
-        final String vaultName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_VAULT_NAME);
-
-        if (hasEAPVault && vaultName != null) {
-            password = KieVaultReader.decryptValue(vaultName);
-        }
-
-        if (password == null) {
-            password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
-        }
-
-        return password;
     }
 }
