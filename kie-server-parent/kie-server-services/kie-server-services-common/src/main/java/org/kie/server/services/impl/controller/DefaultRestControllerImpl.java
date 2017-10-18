@@ -28,6 +28,7 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.common.config.KieConfigReader;
 import org.kie.server.common.rest.KieServerHttpRequest;
 import org.kie.server.common.rest.KieServerHttpResponse;
 import org.kie.server.common.security.KieVaultReader;
@@ -186,11 +187,11 @@ public class DefaultRestControllerImpl implements KieServerController {
     public KieServerSetup connectToSingleController(KieServerInfo serverInfo, KieServerConfig config, String controllerUrl) {
         String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
 
-        String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-        String password = loadPassword(config);
-        String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
-
         try {
+            String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+            String password = KieConfigReader.loadPassword(config, hasEAPVault);
+            String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
             KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password, token);
 
             if (kieServerSetup != null) {
@@ -214,7 +215,7 @@ public class DefaultRestControllerImpl implements KieServerController {
             connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId()+"/?location="+ URLEncoder.encode(serverInfo.getLocation(), "UTF-8");
 
             String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-            String password = loadPassword(config);
+            String password = KieConfigReader.loadPassword(config, hasEAPVault);
             String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
             makeHttpDeleteRequestAndCreateCustomResponse(connectAndSyncUrl, null, userName, password, token);
@@ -241,11 +242,11 @@ public class DefaultRestControllerImpl implements KieServerController {
                 if (controllerUrl != null && !controllerUrl.isEmpty()) {
                     String connectAndSyncUrl = controllerUrl + "/management/servers/" + KieServerEnvironment.getServerId() + "/containers/" + containerId + "/status/started";
 
-                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                    String password = loadPassword(config);
-                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
-
                     try {
+                        String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                        String password = KieConfigReader.loadPassword(config, hasEAPVault);
+                        String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
                         makeHttpPostRequestAndCreateCustomResponse(connectAndSyncUrl, "", null, userName, password, token);
                         break;
                     } catch (Exception e) {
@@ -272,11 +273,11 @@ public class DefaultRestControllerImpl implements KieServerController {
                 if (controllerUrl != null && !controllerUrl.isEmpty()) {
                     String connectAndSyncUrl = controllerUrl + "/management/servers/" + KieServerEnvironment.getServerId() + "/containers/" + containerId + "/status/stopped";
 
-                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                    String password = loadPassword(config);
-                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
-
                     try {
+                        String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                        String password = KieConfigReader.loadPassword(config, hasEAPVault);
+                        String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
                         makeHttpPostRequestAndCreateCustomResponse(connectAndSyncUrl, "", null, userName, password, token);
                         break;
                     } catch (Exception e) {
@@ -288,20 +289,5 @@ public class DefaultRestControllerImpl implements KieServerController {
                 }
             }
         }
-    }
-
-    private String loadPassword(KieServerConfig config) {
-        String password = null;
-        final String vaultName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_VAULT_NAME);
-
-        if (hasEAPVault && vaultName != null) {
-            password = KieVaultReader.decryptValue(vaultName);
-        }
-
-        if (password == null) {
-            password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
-        }
-
-        return password;
     }
 }
