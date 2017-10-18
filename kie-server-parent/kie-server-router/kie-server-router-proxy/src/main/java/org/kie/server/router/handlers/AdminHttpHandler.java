@@ -51,7 +51,7 @@ public class AdminHttpHandler implements HttpHandler {
     private static final Logger log = Logger.getLogger(AdminHttpHandler.class);
 
     private String CONTROLLER = System.getProperty(KieServerRouterConstants.CONTROLLER);
-    private int interval = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "10"));
+    private int interval = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "5"));
     private int attemptsLimit = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_RECOVERY_ATTEMPT_LIMIT, "100"));
     
 //    private KieServerProxyClient proxyClient;
@@ -252,85 +252,75 @@ public class AdminHttpHandler implements HttpHandler {
         if (CONTROLLER != null && controllerContainers.contains(containerId)) {
             List<String> hostsPerContainer = configuration.getHostsPerContainer().getOrDefault(containerId, Collections.emptyList());
             if (hostsPerContainer.isEmpty()) {
-
-                try {
-                    controllerContainers.remove(containerId);
-                    dropFromController(containerId);
-                } catch (Exception e) {
-                    log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + interval + " seconds");
-                    log.debug(e);
-                    containersToRemoveFromController.add(containerId);
-                    if (removeFromControllerAttempts == null) {
-                        removeFromControllerAttempts = executorService.scheduleAtFixedRate(() -> {
-                            
-                            try {
-                                List<String> sent = new ArrayList<>();
-                                for (String container : containersToRemoveFromController) {
-
-                                    if (controllerContainers.contains(container)) {
-                                        // skip given container if it's back in controllers containers                                            
-                                        sent.add(container);
-                                        continue;
-                                    }
-                                    dropFromController(container);
-                                    sent.add(container);
-                                }
-                                containersToRemoveFromController.removeAll(sent);
-                                if (containersToRemoveFromController.isEmpty()) {
-                                    removeFromControllerAttempts.cancel(false);
-                                    removeFromControllerAttempts = null;
-                                }
-                            } catch (Exception ex2) {
-                                log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + interval + " seconds");
-                                log.debug(ex2);
-                            }
-                        },
-                        interval, interval, TimeUnit.SECONDS);
-                    }
-                }
-            }
-        }
-    }
-    
-    protected void updateControllerOnAdd(String containerId, String releaseId, String alias, ContainerInfo containerInfo) {
-        if (CONTROLLER != null && releaseId != null && !controllerContainers.contains(containerId)) {
-            try {
-                controllerContainers.add(containerId);
-                pushToController(releaseId, containerId, alias);
                 
-                log.infof("Added %s container into controller at %s ", containerId, CONTROLLER);
-            } catch (Exception e) {
-                log.warn("Exception when notifying controller about new container " + e.getMessage());
-                containersToAddToController.add(containerInfo);
-                if (addToControllerAttempts == null) {
-                    addToControllerAttempts = executorService.scheduleAtFixedRate(() -> {
+                controllerContainers.remove(containerId);               
+                containersToRemoveFromController.add(containerId);
+                if (removeFromControllerAttempts == null) {
+                    removeFromControllerAttempts = executorService.scheduleAtFixedRate(() -> {
                         
                         try {
-                            List<ContainerInfo> sent = new ArrayList<>();
-                            for (ContainerInfo container : containersToAddToController) {
-                                if (!controllerContainers.contains(container.getContainerId())) {
-                                    
+                            List<String> sent = new ArrayList<>();
+                            for (String container : containersToRemoveFromController) {
+
+                                if (controllerContainers.contains(container)) {
+                                    // skip given container if it's back in controllers containers                                            
                                     sent.add(container);
                                     continue;
                                 }
-                                
-                                pushToController(container.getReleaseId(), container.getContainerId(), container.getAlias());
+                                dropFromController(container);
                                 sent.add(container);
                             }
-                            
-                            containersToAddToController.removeAll(sent);
-                            if (containersToAddToController.isEmpty()) {
-                                addToControllerAttempts.cancel(false);
-                                addToControllerAttempts = null;
+                            containersToRemoveFromController.removeAll(sent);
+                            if (containersToRemoveFromController.isEmpty()) {
+                                removeFromControllerAttempts.cancel(false);
+                                removeFromControllerAttempts = null;
                             }
-                        } catch (Exception ex2) {
+                        } catch (Exception e) {
                             log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + interval + " seconds");
-                            log.debug("Stacktrace", ex2);
+                            log.debug(e);
                         }
                     },
                     interval, interval, TimeUnit.SECONDS);
                 }
             }
+            
+        }
+    }
+    
+    protected void updateControllerOnAdd(String containerId, String releaseId, String alias, ContainerInfo containerInfo) {
+        if (CONTROLLER != null && releaseId != null && !controllerContainers.contains(containerId)) {
+            
+            controllerContainers.add(containerId);
+            containersToAddToController.add(containerInfo);
+            if (addToControllerAttempts == null) {
+                addToControllerAttempts = executorService.scheduleAtFixedRate(() -> {
+                    
+                    try {
+                        List<ContainerInfo> sent = new ArrayList<>();
+                        for (ContainerInfo container : containersToAddToController) {
+                            if (!controllerContainers.contains(container.getContainerId())) {
+                                
+                                sent.add(container);
+                                continue;
+                            }
+                            
+                            pushToController(container.getReleaseId(), container.getContainerId(), container.getAlias());
+                            sent.add(container);                            
+                        }
+                        
+                        containersToAddToController.removeAll(sent);
+                        if (containersToAddToController.isEmpty()) {
+                            addToControllerAttempts.cancel(false);
+                            addToControllerAttempts = null;
+                        }
+                    } catch (Exception e) {
+                        log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + interval + " seconds");
+                        log.debug("Stacktrace", e);
+                    }
+                },
+                interval, interval, TimeUnit.SECONDS);
+            }
+            
         }
     }
 }
