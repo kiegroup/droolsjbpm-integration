@@ -54,6 +54,7 @@ import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.core.common.ProjectClassLoader;
 import org.drools.core.rule.KieModuleMetaInfo;
+import org.drools.core.rule.TypeMetaInfo;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
@@ -169,9 +170,9 @@ public class BuildMojo extends AbstractKieMojo {
             } else {
 
                 if (container != null && compilationID != null) {
-
                     shareKieObjectsWithMap(kModule);
                     shareStoreWithMap(kieProject);
+                    shareTypesMetaInfoWithMap(kModule);
                 } else {
                     new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
                 }
@@ -180,18 +181,6 @@ public class BuildMojo extends AbstractKieMojo {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         getLog().info("KieModule successfully built!");
-    }
-
-
-    private void shareStoreWithMap(KieProject kieProject) {
-        if (kieProject.getClassLoader() instanceof ProjectClassLoader) {
-            ProjectClassLoader projectClassloder = (ProjectClassLoader) kieProject.getClassLoader();
-            if (projectClassloder.getStore() != null) {
-                shareTypesWithMap(projectClassloder.getStore());
-            }
-        }else {
-            getLog().info("KieProject's classloader is not a ProjecClassloader");
-        }
     }
 
 
@@ -219,13 +208,37 @@ public class BuildMojo extends AbstractKieMojo {
     }
 
 
-    private void shareTypesWithMap(Map<String, byte[]> types) {
+    private void shareStoreWithMap(KieProject kieProject) {
         Optional<Map<String, Object>> optionalKieMap = getKieMap();
-        if (optionalKieMap.isPresent()) {
-            if(types != null){
+        if (optionalKieMap.isPresent() && kieProject.getClassLoader() instanceof ProjectClassLoader) {
+            ProjectClassLoader projectClassloder = (ProjectClassLoader) kieProject.getClassLoader();
+            Map<String, byte[]> types = projectClassloder.getStore();
+            if (projectClassloder.getStore() != null) {
                 StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
                 optionalKieMap.get().put(sbTypes.toString(), types);
                 getLog().info("ProjectClassloader Store available in the map shared with the Maven Embedder");
+            }
+        }
+    }
+
+
+    private void shareTypesMetaInfoWithMap(InternalKieModule kModule) {
+        Optional<Map<String, Object>> optionalKieMap = getKieMap();
+        if (optionalKieMap.isPresent()) {
+            KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
+            KieModuleMetaInfo info = kb.generateKieModuleMetaInfo(null);
+            Map <String, TypeMetaInfo> typesMetaInfos =  info.getTypeMetaInfos();
+
+            if(typesMetaInfos != null){
+                StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append(TypeMetaInfo.class.getName());
+                Set<String> eventClasses = new HashSet<>();
+                for(Map.Entry<String,TypeMetaInfo> item :typesMetaInfos.entrySet()) {
+                    if (item.getValue().isEvent()){
+                        eventClasses.add(item.getKey());
+                    }
+                }
+                optionalKieMap.get().put(sbTypes.toString(), eventClasses);
+                getLog().info("TypesMetaInfo keys available in the map shared with the Maven Embedder");
             }
         }
     }
