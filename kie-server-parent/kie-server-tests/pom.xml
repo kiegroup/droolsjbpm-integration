@@ -46,6 +46,8 @@
     <failsafe.excluded.groups/>
     <!-- Sybase driver leaks its Timestamp implementation. To correctly handle it we need to add driver as additional test classpath. -->
     <maven.jdbc.driver.jar/>
+    <!-- Set to true if you want to skip JMS tests even for containers with available JMS. -->
+    <jms.skip>false</jms.skip>
 
     <version.tomcat8>8.5.12</version.tomcat8>
     <version.wildfly10>10.1.0.Final</version.wildfly10>
@@ -300,6 +302,7 @@
                 </additionalClasspathElements>
                 <systemPropertyVariables>
                   <kie.server.server.deployment.settings.xml>${kie.server.server.deployment.settings.xml}</kie.server.server.deployment.settings.xml>
+                  <jms.skip>${jms.skip}</jms.skip>
                 </systemPropertyVariables>
               </configuration>
             </execution>

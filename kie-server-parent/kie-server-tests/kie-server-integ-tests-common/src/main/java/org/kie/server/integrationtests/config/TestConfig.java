@@ -78,6 +78,8 @@ public class TestConfig {
 
     private static final StringTestParameter WEBLOGIC_HOME = new StringTestParameter("weblogic.home");
 
+    private static final StringTestParameter JMS_SKIP = new StringTestParameter("jms.skip");
+
     /**
      * Property holding datasource driver class FQCN to determine which DB the tests are currently run with
      */
@@ -212,6 +214,9 @@ public class TestConfig {
     public static boolean skipJMS() {
         if (TestConfig.class.getResource("/jms.skip") != null) {
             return true;
+        } else if (JMS_SKIP.isParameterConfigured()) {
+            String jmsSkip = JMS_SKIP.getParameterValue();
+            return Boolean.parseBoolean(jmsSkip);
         }
 
         return false;
