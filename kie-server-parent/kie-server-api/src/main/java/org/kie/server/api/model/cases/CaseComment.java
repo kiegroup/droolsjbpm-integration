@@ -33,6 +33,9 @@ public class CaseComment {
     private String text;
     @XmlElement(name="added-at")
     private Date addedAt;
+    @XmlElement(name="restricted-to")
+    private String[] restrictedTo;
+    
 
     public CaseComment() {
 
@@ -69,6 +72,14 @@ public class CaseComment {
     public void setAddedAt(Date addedAt) {
         this.addedAt = addedAt;
     }
+    
+    public String[] getRestrictedTo() {
+        return restrictedTo;
+    }
+    
+    public void setRestrictedTo(String[] restrictedTo) {
+        this.restrictedTo = restrictedTo;
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -99,6 +110,11 @@ public class CaseComment {
 
         public Builder addedAt(Date addedAt) {
             adHocFragment.setAddedAt(addedAt);
+            return this;
+        }
+        
+        public Builder restrictedTo(String[] restrictedTo) {
+            adHocFragment.setRestrictedTo(restrictedTo);
             return this;
         }
     }

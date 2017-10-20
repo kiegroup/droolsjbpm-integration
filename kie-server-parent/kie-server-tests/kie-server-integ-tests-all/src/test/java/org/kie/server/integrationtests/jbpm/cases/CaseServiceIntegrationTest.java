@@ -15,13 +15,15 @@
 
 package org.kie.server.integrationtests.jbpm.cases;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -31,11 +33,10 @@ import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.client.CaseServicesClient;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
-
-import static org.junit.Assert.*;
 
 public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -404,6 +405,79 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         Assertions.assertThat(additionalComment).isEqualTo("reopening the case");
     }
 
+    @Test
+    public void testCreateCaseWithCaseFileWithRestrictions() {
+
+        Map<String, Object> caseData = new HashMap<>();
+        caseData.put("car", "ford");
+        CaseFile caseFile = CaseFile.builder()
+                .addUserAssignments(CASE_INSURED_ROLE, USER_YODA)
+                .addUserAssignments(CASE_INS_REP_ROLE, USER_JOHN)
+                .addDataAccessRestrictions("car", CASE_INSURED_ROLE)
+                .data(caseData)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
+
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(1);
+        Assertions.assertThat(caseData.get("car")).isEqualTo("ford");
+        
+        // remove yoda from insured role to simulate lack of access
+        caseClient.removeUserFromRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA);
+        
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(0);
+        
+        // add back yoda to insured role
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA);
+        
+        List<String> restrictions = new ArrayList<>();
+        restrictions.add(CaseServicesClient.ACCESS_PUBLIC_GROUP);
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "car", "fiat", restrictions);
+
+        Object carCaseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "car");
+        Assertions.assertThat(carCaseData).isNotNull();
+        Assertions.assertThat(carCaseData).isInstanceOf(String.class);
+        Assertions.assertThat(carCaseData).isEqualTo("fiat");
+
+        // remove yoda from insured role to simulate lack of access
+        caseClient.removeUserFromRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA);
+        // but it should have access to it as all now eligible to see it
+        carCaseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "car");
+        Assertions.assertThat(carCaseData).isNotNull();
+        Assertions.assertThat(carCaseData).isInstanceOf(String.class);
+        Assertions.assertThat(carCaseData).isEqualTo("fiat");
+        
+        restrictions = new ArrayList<>();
+        restrictions.add(CASE_INSURED_ROLE);
+        
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("car", "opel");
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, updates, restrictions);
+        
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(0);
+               
+        assertClientException(() -> caseClient.removeCaseInstanceData(CONTAINER_ID, caseId, "car"), 403, "does not have access to data item named car");
+        
+        // add back yoda to insured role
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA);
+        
+        caseClient.removeCaseInstanceData(CONTAINER_ID, caseId, "car");
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(0);
+    }
+    
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
         Assertions.assertThat(caseInstance).isNotNull();
         Assertions.assertThat(caseInstance.getCaseId()).isEqualTo(caseId);

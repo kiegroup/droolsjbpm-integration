@@ -263,6 +263,42 @@
 		  "methodName": "getCaseInstanceData",
 		  "elementKind": "method",
 		  "justification": "Added support to filter case file data items by name"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "CaseServicesClient",
+		  "methodName": "addComment",
+		  "elementKind": "method",
+		  "justification": "Added support for optional restriction on comments"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.client.CaseServicesClient::putCaseInstanceData(java.lang.String, java.lang.String, java.lang.String, java.lang.Object, java.util.List<java.lang.String>)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "CaseServicesClient",
+		  "methodName": "putCaseInstanceData",
+		  "elementKind": "method",
+		  "justification": "Added support for optional restriction on case file data"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.client.CaseServicesClient::putCaseInstanceData(java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>, java.util.List<java.lang.String>)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "CaseServicesClient",
+		  "methodName": "putCaseInstanceData",
+		  "elementKind": "method",
+		  "justification": "Added support for optional restriction on case file data"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.client.CaseServicesClient::updateComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "CaseServicesClient",
+		  "methodName": "updateComment",
+		  "elementKind": "method",
+		  "justification": "Added support for optional restriction on comments"
 		 }
       ]
     }
