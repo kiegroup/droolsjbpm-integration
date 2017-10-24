@@ -1,24 +1,35 @@
 package org.kie.maven.plugin;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -31,11 +42,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
+import org.drools.compiler.compiler.io.memory.MemoryFile;
+import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.compiler.kie.builder.impl.KieProject;
+import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
@@ -63,7 +77,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-
     @Parameter(required = true, defaultValue = "${project}")
     private MavenProject project;
 
@@ -76,7 +89,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
      */
     @Parameter(required = false, defaultValue = "${compilation.ID}")
     private String compilationID;
-
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -105,7 +117,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
                         kmoduleDeps.add(new ZipKieModule(releaseId,
                                                          depModel,
                                                          file));
-
                     }
                 }
             }
@@ -130,43 +141,51 @@ public class GenerateModelMojo extends AbstractKieMojo {
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(rootDirectory);
             KieBuilder builder = kieBuilder.buildAll(CanonicalModelKieProject::new);
 
+            InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
+            final Collection<String> fileNames = kieModule.getFileNames();
+            List<String> generatedFiles = fileNames
+                    .stream()
+                    .filter(f -> f.endsWith("java"))
+                    .collect(Collectors.toList());
 
+            MemoryFileSystem mfs = ((MemoryKieModule) kieModule).getMemoryFileSystem();
 
+            for (String generatedFile : generatedFiles) {
+                MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
+
+                final String baseDir = project.getBasedir().getPath();
+                final Path newFile = Paths.get(baseDir, "target", f.getPath().toPortableString());
+
+                try {
+                    Files.createDirectories(newFile);
+                    Files.copy(f.getContents(), newFile, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Unable to write file", e);
+                }
+            }
+
+            System.out.println("builder");
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        KieFileSystem kfs = ks.newKieFileSystem();
-
-        KieBuilder kieBuilder = ((KieBuilderImpl) ks.newKieBuilder(kfs)).buildAll(CanonicalModelKieProject::new);
-
-        InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
-
-        ReleaseId releaseId = ks.newReleaseId( "org.kie", "kjar-test-" + UUID.randomUUID(), "1.0" );
-
-
-        File kjarFile = bytesToTempKJARFile( releaseId, kieModule.getBytes(), ".jar" );
-
-
         getLog().info("KieModule successfully built!");
         System.out.println("Hello world!");
-
     }
 
-    public static File bytesToTempKJARFile( ReleaseId releaseId, byte[] bytes, String extension ) {
-        File file = new File( System.getProperty( "java.io.tmpdir" ), releaseId.getArtifactId() + "-" + releaseId.getVersion() + extension );
+    public static File bytesToTempKJARFile(ReleaseId releaseId, byte[] bytes, String extension) {
+        File file = new File(System.getProperty("java.io.tmpdir"), releaseId.getArtifactId() + "-" + releaseId.getVersion() + extension);
         try {
             new PrintWriter(file).close();
-            FileOutputStream fos = new FileOutputStream(file, false );
-            fos.write( bytes );
+            FileOutputStream fos = new FileOutputStream(file, false);
+            fos.write(bytes);
             fos.flush();
             fos.close();
-        } catch ( IOException e ) {
-            throw new RuntimeException( e );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return file;
     }
-
 
     private KieModuleModel getDependencyKieModel(File jar) {
         ZipFile zipFile = null;

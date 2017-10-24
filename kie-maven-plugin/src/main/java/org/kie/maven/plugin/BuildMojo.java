@@ -227,7 +227,7 @@ public class BuildMojo extends AbstractKieMojo {
         Optional<Map<String, Object>> optionalKieMap = getKieMap();
         if (optionalKieMap.isPresent()) {
             KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
-            KieModuleMetaInfo info = kb.generateKieModuleMetaInfo(null);
+            KieModuleMetaInfo info = kb.getKieModuleMetaInfo();
             Map <String, TypeMetaInfo> typesMetaInfos =  info.getTypeMetaInfos();
 
             if(typesMetaInfos != null){
