@@ -131,11 +131,13 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 final Path newFile = Paths.get(targetDirectory.getPath(), f.getPath().toPortableString());
 
                 try {
+                    Files.deleteIfExists(newFile);
                     Files.createDirectories(newFile);
                     Files.copy(f.getContents(), newFile, StandardCopyOption.REPLACE_EXISTING);
 
                     getLog().info("Generating " + newFile);
                 } catch (IOException e) {
+                    e.printStackTrace();
                     throw new MojoExecutionException("Unable to write file", e);
                 }
             }
