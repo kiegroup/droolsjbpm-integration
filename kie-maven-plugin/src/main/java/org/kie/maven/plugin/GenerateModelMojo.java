@@ -47,7 +47,7 @@ import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsfor
 @Mojo(name = "generateModel",
         requiresDependencyResolution = ResolutionScope.NONE,
         requiresProject = true,
-        defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+        defaultPhase = LifecyclePhase.COMPILE)
 public class GenerateModelMojo extends AbstractKieMojo {
 
     @Parameter(required = true, defaultValue = "${project.build.directory}")
@@ -125,6 +125,8 @@ public class GenerateModelMojo extends AbstractKieMojo {
                     .collect(Collectors.toList());
 
             MemoryFileSystem mfs = ((MemoryKieModule) kieModule).getMemoryFileSystem();
+
+            project.addCompileSourceRoot(targetDirectory.getPath() + "/generated-sources");
 
             for (String generatedFile : generatedFiles) {
                 MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
