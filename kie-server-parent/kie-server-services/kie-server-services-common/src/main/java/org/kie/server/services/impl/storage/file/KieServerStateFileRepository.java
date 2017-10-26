@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+
+import org.kie.internal.xstream.XStreamUtils;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
@@ -43,7 +45,7 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
 
     public KieServerStateFileRepository(File repositoryDir) {
         this.repositoryDir = repositoryDir;
-        xs = new XStream(new PureJavaReflectionProvider());
+        xs = XStreamUtils.createTrustingXStream(new PureJavaReflectionProvider());
         String[] voidDeny = {"void.class", "Void.class"};
         xs.denyTypes(voidDeny);
         xs.alias("kie-server-state", KieServerState.class);

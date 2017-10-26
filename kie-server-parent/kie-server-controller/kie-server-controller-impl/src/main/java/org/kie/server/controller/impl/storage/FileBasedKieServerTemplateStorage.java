@@ -23,16 +23,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.kie.internal.xstream.XStreamUtils;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.StreamException;
 
 public class FileBasedKieServerTemplateStorage implements KieServerTemplateStorage {
@@ -46,6 +47,8 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     private Map<String, ServerTemplateKey> templateKeyMap = new ConcurrentHashMap<>();
     private String templatesLocation;
     private Marshaller templateMarshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM,ServerTemplate.class.getClassLoader());
+    
+    private XStream xstream;
     
     public static synchronized FileBasedKieServerTemplateStorage getInstance() {
     	if (INSTANCE == null) {
@@ -85,6 +88,7 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     protected synchronized void init(String templatesLocation) {
     	this.templateMap = new ConcurrentHashMap<>();
     	this.templateKeyMap = new ConcurrentHashMap<>();
+    	this.xstream = XStreamUtils.createTrustingXStream();
     	if (templatesLocation != null && !templatesLocation.trim().isEmpty()) {
     		this.templatesLocation = templatesLocation;
     	} else {
@@ -98,8 +102,7 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
      */
     private synchronized void writeTemplateMap() {
         try (FileWriter writer = new FileWriter(templatesLocation)) {
-            ((XStreamMarshaller)templateMarshaller).getXstream()
-            	.toXML(new ArrayList<ServerTemplate>(templateMap.values()), writer);
+            this.xstream.toXML(new ArrayList<ServerTemplate>(templateMap.values()), writer);
         } catch (Throwable e) {
             logger.error("Unable to write template maps for standalone controller",e);
         }
@@ -112,7 +115,7 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     private synchronized void loadTemplateMapsFromFile() {
         ArrayList<ServerTemplate> templates = null;
         try (FileReader reader = new FileReader(templatesLocation)) {
-            templates = (ArrayList<ServerTemplate>)((XStreamMarshaller)templateMarshaller).getXstream().fromXML(reader);
+            templates = (ArrayList<ServerTemplate>)this.xstream.fromXML(reader);
         } catch (StreamException se) {
         	if (se.getCause() instanceof EOFException) {
         		logger.warn("Unable to read server template maps from file {}. File does not exist or is empty",templatesLocation);
