@@ -144,6 +144,20 @@ public class GenerateModelMojo extends AbstractKieMojo {
                     throw new MojoExecutionException("Unable to write file", e);
                 }
             }
+
+
+            // copy the META-INF packages file
+            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile("META-INF/packages");
+            final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", "META-INF", packagesMemoryFile.getName());
+
+            try {
+                Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new MojoExecutionException("Unable to write file", e);
+            }
+
+
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
