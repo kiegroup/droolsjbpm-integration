@@ -150,8 +150,8 @@
           <artifactId>org.eclipse.sisu.plexus</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.uberfire</groupId>
-          <artifactId>uberfire-maven-integration</artifactId>
+          <groupId>org.kie.soup</groupId>
+          <artifactId>kie-soup-maven-integration</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
