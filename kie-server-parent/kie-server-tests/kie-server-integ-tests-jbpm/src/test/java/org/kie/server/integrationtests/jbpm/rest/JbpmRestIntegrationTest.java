@@ -28,6 +28,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,7 +102,7 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.request().post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(getMediaType().toString());
 
             JaxbLong pId = response.readEntity(JaxbLong.class);
             valuesMap.put(PROCESS_INST_ID, pId.unwrap());
@@ -147,7 +148,7 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.request(getMediaType()).post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(getMediaType().toString());
 
             JaxbLong pId = response.readEntity(JaxbLong.class);
             valuesMap.put(PROCESS_INST_ID, pId.unwrap());
@@ -182,7 +183,7 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.request(acceptHeadersByFormat.get(marshallingFormat)).post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(getMediaType().toString());
 
             JaxbLong pId = response.readEntity(JaxbLong.class);
             valuesMap.put(PROCESS_INST_ID, pId.unwrap());
