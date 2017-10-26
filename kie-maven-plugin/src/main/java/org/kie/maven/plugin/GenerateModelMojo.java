@@ -37,7 +37,7 @@ import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
-import org.drools.modelcompiler.builder.CanonicalModelKieProject;
+import org.drools.modelcompiler.builder.CanonicalModelMavenPluginKieProject;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
@@ -65,19 +65,17 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-
-        List<InternalKieModule> kmoduleDeps = new ArrayList<InternalKieModule>();
+        List<InternalKieModule> kmoduleDeps = new ArrayList<>();
 
         KieServices ks = KieServices.Factory.get();
 
         try {
-            Set<URL> urls = new HashSet<URL>();
+            Set<URL> urls = new HashSet<>();
             for (String element : project.getCompileClasspathElements()) {
                 urls.add(new File(element).toURI().toURL());
             }
@@ -96,7 +94,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
                         kmoduleDeps.add(new ZipKieModule(releaseId,
                                                          depModel,
                                                          file));
-
                     }
                 }
             }
@@ -106,9 +103,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
                                                                         getClass().getClassLoader());
 
             Thread.currentThread().setContextClassLoader(projectClassLoader);
-        } catch (DependencyResolutionRequiredException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
+        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
 
@@ -116,7 +111,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
             setSystemProperties(properties);
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(CanonicalModelKieProject::new);
+            kieBuilder.buildAll(CanonicalModelMavenPluginKieProject::new);
 
             InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
             List<String> generatedFiles = kieModule.getFileNames()
@@ -124,13 +119,19 @@ public class GenerateModelMojo extends AbstractKieMojo {
                     .filter(f -> f.endsWith("java"))
                     .collect(Collectors.toList());
 
+            getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
+
             MemoryFileSystem mfs = ((MemoryKieModule) kieModule).getMemoryFileSystem();
 
-            project.addCompileSourceRoot(targetDirectory.getPath() + "/generated-sources");
+            final String droolsModelCompilerPath = "/generated-sources/drools-model-compiler/main/java";
+            final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
+            project.addCompileSourceRoot(newCompileSourceRoot);
 
             for (String generatedFile : generatedFiles) {
-                MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
-                final Path newFile = Paths.get(targetDirectory.getPath(), f.getPath().toPortableString());
+                final MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
+                final Path newFile = Paths.get(targetDirectory.getPath(),
+                                               droolsModelCompilerPath,
+                                               f.getPath().toPortableString());
 
                 try {
                     Files.deleteIfExists(newFile);
@@ -149,7 +150,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
         getLog().info("DSL successfully generated");
     }
-
 
     private KieModuleModel getDependencyKieModel(File jar) {
         ZipFile zipFile = null;
@@ -172,5 +172,4 @@ public class GenerateModelMojo extends AbstractKieMojo {
         }
         return null;
     }
-
 }
