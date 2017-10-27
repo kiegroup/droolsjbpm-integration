@@ -72,8 +72,8 @@
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/soup/commons/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/soup/project-datamodel-api/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/soup/project-datamodel-commons/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/soup/maven-support/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/soup/maven-integration/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/uberfire/maven-support/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/uberfire/maven-integration/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/wildfly/extras/config/plugin/bpms/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/rome/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/xmlpull/assembly-component.xml</componentDescriptor>

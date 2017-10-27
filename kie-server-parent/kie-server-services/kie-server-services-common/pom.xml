@@ -179,8 +179,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.kie.soup</groupId>
-      <artifactId>kie-soup-maven-support</artifactId>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-maven-support</artifactId>
     </dependency>
 
   </dependencies>
