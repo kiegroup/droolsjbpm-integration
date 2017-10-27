@@ -6,9 +6,9 @@
   </resources>
 
   <dependencies>
+    <module name="com.thoughtworks.xstream" slot="main" services="import"/>
     <module name="javax.api" slot="main" services="import"/>
     <module name="javax.ejb.api" slot="main" services="import"/>
-    <module name="javax.enterprise.cdi" slot="main" services="import"/>
     <module name="org.slf4j" slot="main" services="import"/>
   </dependencies>
 </module>
