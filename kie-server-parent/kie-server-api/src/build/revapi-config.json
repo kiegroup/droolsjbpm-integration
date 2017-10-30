@@ -37,6 +37,15 @@
           "annotationType": "javax.xml.bind.annotation.XmlElements",
           "elementKind": "annotation",
           "justification": "PLANNER-815 Support real-time planning"
+        },
+        {
+          "code": "java.field.removedWithConstant",
+          "old": "field org.kie.server.api.marshalling.xstream.XStreamMarshaller.DEFAULT_PACKAGES_WILDCARD",
+          "package": "org.kie.server.api.marshalling.xstream",
+          "classSimpleName": "XStreamMarshaller",
+          "fieldName": "DEFAULT_PACKAGES_WILDCARD",
+          "elementKind": "field",
+          "justification": "Common XStream configuration used instead."
         }
       ]
     }
