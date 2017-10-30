@@ -9,6 +9,11 @@
   <artifactId>kie-server-controller-websocket</artifactId>
   <name>KIE :: Execution Server :: Controller :: Websocket Implementation</name>
   <description>KIE Execution Server Controller Websocket Implementation</description>
+
+  <properties>
+    <java.module.name>org.kie.server.controller.websocket.impl</java.module.name>
+  </properties>
+
   <dependencies>
 
     <dependency>

@@ -15,7 +15,7 @@
   <name>KIE :: OSGi Integration</name>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.osgi.integration</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.osgi.integration</java.module.name>
   </properties>
 
   <dependencies>

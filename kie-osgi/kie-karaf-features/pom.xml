@@ -13,6 +13,7 @@
   <name>KIE :: Karaf Features</name>
 
   <properties>
+    <java.module.name>org.kie.karaf.features</java.module.name>
     <!--
       CONVENTIONS:
       - All properties used in features.xml are declared here with the prefix "karaf.".

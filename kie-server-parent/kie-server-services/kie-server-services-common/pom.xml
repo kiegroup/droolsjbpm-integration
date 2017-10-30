@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Services :: Common</name>
   <description>KIE Execution Server Services</description>
 
+  <properties>
+    <java.module.name>org.kie.server.services.common</java.module.name>
+  </properties>
+
   <dependencies>
     <!-- kie server dependencies -->
     <dependency>

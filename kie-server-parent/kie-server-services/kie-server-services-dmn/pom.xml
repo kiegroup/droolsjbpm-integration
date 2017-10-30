@@ -10,6 +10,9 @@
   <name>KIE :: Execution Server :: Services :: DMN Extension</name>
   <description>KIE DMN Execution Server Extension</description>
 
+  <properties>
+    <java.module.name>org.kie.server.services.dmn</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

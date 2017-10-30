@@ -11,6 +11,10 @@
   <artifactId>kie-karaf-itests</artifactId>
   <name>KIE :: Karaf Integration Tests</name>
 
+  <properties>
+    <java.module.name>org.kie.karaf.itests.main</java.module.name>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>

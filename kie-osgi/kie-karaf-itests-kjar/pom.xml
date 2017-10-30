@@ -15,6 +15,7 @@
   <name>KIE :: Karaf Integration Tests Kjar</name>
 
   <properties>
+    <java.module.name>org.kie.karaf.itests.kjar</java.module.name>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 

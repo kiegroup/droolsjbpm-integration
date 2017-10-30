@@ -12,6 +12,10 @@
   <name>KIE :: Execution Server :: Tests :: Custom extension :: Client</name>
   <description>KIE Custom Extension Client implementation</description>
 
+  <properties>
+    <java.module.name>org.kie.server.itests.custom.extension.client</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>

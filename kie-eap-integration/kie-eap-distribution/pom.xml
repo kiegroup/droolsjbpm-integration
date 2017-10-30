@@ -11,6 +11,10 @@
   <artifactId>kie-eap-distribution</artifactId>
   <name>KIE EAP :: Distribution</name>
 
+  <properties>
+    <java.module.name>org.kie.eap.distribution</java.module.name>
+  </properties>
+
   <build>
     <resources>
       <resource>

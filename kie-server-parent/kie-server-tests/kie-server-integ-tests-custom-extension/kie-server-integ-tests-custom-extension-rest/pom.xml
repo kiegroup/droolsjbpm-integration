@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Tests :: Custom extension :: REST</name>
   <description>KIE Custom Extension Rest Endpoints</description>
 
+  <properties>
+    <java.module.name>org.kie.server.itests.custom.extension.rest</java.module.name>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
