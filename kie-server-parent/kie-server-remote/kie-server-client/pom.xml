@@ -14,7 +14,7 @@
   <description>KIE Execution Server Client</description>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.server.client</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.server.client</java.module.name>
   </properties>
 
   <dependencyManagement>

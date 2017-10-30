@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Services :: Swagger Extension</name>
   <description>KIE Execution Server Swagger Extension</description>
 
+  <properties>
+    <java.module.name>org.kie.server.services.swagger</java.module.name>
+  </properties>
+
   <dependencies>
 
     <dependency>

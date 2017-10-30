@@ -12,6 +12,9 @@
   <name>KIE :: Execution Server :: Tests :: Common Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS). Can be configured to run on different supported containers.</description>
 
+  <properties>
+    <java.module.name>org.kie.server.itests.common</java.module.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

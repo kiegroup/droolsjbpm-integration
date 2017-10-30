@@ -11,6 +11,10 @@
   <artifactId>kie-eap-config</artifactId>
   <name>KIE EAP :: Config</name>
 
+  <properties>
+    <java.module.name>org.kie.eap.config</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jdom</groupId>

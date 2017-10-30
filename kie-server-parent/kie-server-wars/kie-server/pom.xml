@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Wars :: Distribution Wars</name>
   <description>KIE Execution Server Distribution Wars. Name of the module is just 'kie-server' so that the final WARs have nicer names.</description>
 
+  <properties>
+    <java.module.name>org.kie.server.distribution.wars</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>

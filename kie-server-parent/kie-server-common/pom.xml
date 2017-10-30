@@ -14,7 +14,7 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.server.common</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.server.common</java.module.name>
   </properties>
 
   <dependencies>

@@ -8,6 +8,10 @@
     <version>7.5.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <java.module.name>org.kie.tomcat</java.module.name>
+  </properties>
+
   <groupId>org.kie</groupId>
   <artifactId>kie-tomcat-integration</artifactId>
   <name>KIE Tomcat integration</name>

@@ -13,6 +13,7 @@
   <description>KIE Execution Server Integration Tests (REST, JMS). Can be configured to run on different supported containers.</description>
 
   <properties>
+    <java.module.name>org.kie.server.itests.controller</java.module.name>
     <version.org.glassfish.tyrus>1.11.1</version.org.glassfish.tyrus>
   </properties>
 

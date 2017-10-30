@@ -14,6 +14,10 @@
   <description>KIE Execution Server Controller Standalone Implementation</description>
   <packaging>jar</packaging>
 
+  <properties>
+    <java.module.name>org.kie.server.controller.standalone.impl</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>

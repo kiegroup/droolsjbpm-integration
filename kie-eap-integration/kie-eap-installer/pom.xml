@@ -11,6 +11,10 @@
   <artifactId>kie-eap-installer</artifactId>
   <name>KIE EAP :: Installer</name>
 
+  <properties>
+    <java.module.name>org.kie.eap.installer</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>

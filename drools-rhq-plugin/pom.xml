@@ -13,6 +13,11 @@
 
   <name>Drools RHQ JMX Plugin</name>
   <description>RHQ/JOPR plugin that monitors Drools defined MBeans</description>
+
+  <properties>
+    <java.module.name>org.drools.rhq</java.module.name>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>

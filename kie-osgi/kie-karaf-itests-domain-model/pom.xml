@@ -11,4 +11,8 @@
 
   <artifactId>kie-karaf-itests-domain-model</artifactId>
 
+  <properties>
+    <java.module.name>org.kie.karaf.itests.domain.model</java.module.name>
+  </properties>
+
 </project>

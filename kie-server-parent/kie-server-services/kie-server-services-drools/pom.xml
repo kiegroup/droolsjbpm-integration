@@ -14,6 +14,9 @@
   <name>KIE :: Execution Server :: Services :: Drools Extension</name>
   <description>KIE Drools Execution Server Extension</description>
 
+  <properties>
+    <java.module.name>org.kie.server.services.drools</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

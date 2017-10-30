@@ -11,6 +11,10 @@
   <artifactId>jbpm-process-svg</artifactId>
   <name>jBPM Process SVG Manipulation</name>
 
+  <properties>
+    <java.module.name>org.jbpm.process.svg</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>batik</groupId>

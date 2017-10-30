@@ -11,7 +11,11 @@
     
   <name>KIE :: Execution Server :: Router :: Proxy</name>
   <description>KIE Execution Server Router Proxy</description>
-  
+
+  <properties>
+    <java.module.name>org.kie.server.router.proxy</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.undertow</groupId>

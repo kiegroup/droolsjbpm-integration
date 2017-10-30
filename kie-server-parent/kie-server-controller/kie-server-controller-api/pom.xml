@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Controller :: API</name>
   <description>KIE Execution Server Controller API</description>
 
+  <properties>
+    <java.module.name>org.kie.server.controller.api</java.module.name>
+  </properties>
+
   <dependencies>
 
     <dependency>

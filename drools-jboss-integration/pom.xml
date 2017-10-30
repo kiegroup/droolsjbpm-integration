@@ -14,6 +14,10 @@
 
   <name>Drools :: JBoss Integration</name>
 
+  <properties>
+    <java.module.name>org.drools.integration.jboss</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

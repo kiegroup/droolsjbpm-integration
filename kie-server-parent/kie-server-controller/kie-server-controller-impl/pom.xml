@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Controller :: Implementation</name>
   <description>KIE Execution Server Controller Implementation</description>
 
+  <properties>
+    <java.module.name>org.kie.server.controller.impl</java.module.name>
+  </properties>
+
   <dependencies>
 
     <dependency>

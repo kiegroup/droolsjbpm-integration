@@ -14,7 +14,7 @@
   <description>KIE Execution Server API</description>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.server.api</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.server.api</java.module.name>
   </properties>
 
   <dependencies>

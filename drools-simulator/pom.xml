@@ -14,6 +14,10 @@
   <name>Drools Simulator</name>
   <description>TODO</description>
 
+  <properties>
+    <java.module.name>org.drools.simulator</java.module.name>
+  </properties>
+
   <dependencies>
     <!-- Internal dependencies -->
     <dependency>

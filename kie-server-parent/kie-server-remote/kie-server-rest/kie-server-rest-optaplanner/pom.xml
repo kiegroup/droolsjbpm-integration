@@ -14,6 +14,10 @@
   <name>KIE :: Execution Server :: Remote :: REST :: OptaPlanner</name>
   <description>KIE OptaPlanner Execution Server Extension</description>
 
+  <properties>
+    <java.module.name>org.kie.server.rest.optaplanner</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>

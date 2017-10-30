@@ -15,6 +15,10 @@
   <name>Drools Benchmark</name>
   <description>Drools Benchmark</description>
 
+  <properties>
+    <java.module.name>org.drools.benchmark</java.module.name>
+  </properties>
+
   <!-- Drools 5.3.2-SNAPSHOT -->
 
   <!--dependencies>

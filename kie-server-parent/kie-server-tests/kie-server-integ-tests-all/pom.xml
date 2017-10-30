@@ -13,6 +13,7 @@
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration to run on different supported containers.</description>
 
   <properties>
+    <java.module.name>org.kie.server.itests.all</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
   </properties>
