@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Controller :: REST Implementation</name>
   <description>KIE Execution Server Controller REST Implementation</description>
 
+  <properties>
+    <java.module.name>org.kie.server.controller.rest</java.module.name>
+  </properties>
+
   <dependencies>
 
     <dependency>

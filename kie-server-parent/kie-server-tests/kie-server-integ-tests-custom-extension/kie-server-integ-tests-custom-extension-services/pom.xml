@@ -12,6 +12,10 @@
   <name>KIE :: Execution Server :: Tests :: Custom extension :: Service</name>
   <description>KIE Custom Extension Service</description>
 
+  <properties>
+    <java.module.name>org.kie.server.itests.custom.extension.service</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>

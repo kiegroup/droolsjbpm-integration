@@ -9,6 +9,11 @@
   <packaging>pom</packaging>
   <name>KIE :: Execution Server :: Standalone Controller</name>
   <description>Standalone Controller WAR files</description>
+
+  <properties>
+    <java.module.name>org.kie.server.controller.standalone.wars</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>

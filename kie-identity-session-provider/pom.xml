@@ -11,6 +11,10 @@
   <artifactId>kie-identity-session-provider</artifactId>
   <name>KIE Identity And Session Provider</name>
 
+  <properties>
+    <java.module.name>org.kie.identity.session.provider</java.module.name>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>

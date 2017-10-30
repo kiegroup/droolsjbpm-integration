@@ -11,6 +11,10 @@
   <artifactId>kie-eap-tests</artifactId>
   <name>KIE EAP :: Integration Tests</name>
 
+  <properties>
+    <java.module.name>org.kie.eap.tests</java.module.name>
+  </properties>
+
   <build>
     <testResources>
       <testResource>

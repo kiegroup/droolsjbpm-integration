@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Wars :: Distribution</name>
   <description>KIE Execution Server Distribution. Bundles the different WARs into single downloadable zip.</description>
 
+  <properties>
+    <java.module.name>org.kie.server.distribution.archive</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>

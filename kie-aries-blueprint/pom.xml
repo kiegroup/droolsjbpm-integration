@@ -18,7 +18,7 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.aries.blueprint</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.aries.blueprint</java.module.name>
   </properties>
 
   <dependencies>

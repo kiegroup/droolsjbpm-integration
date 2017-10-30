@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Remote :: REST :: Swagger</name>
   <description>KIE Server Swagger Extension</description>
 
+  <properties>
+    <java.module.name>org.kie.server.rest.swagger</java.module.name>
+  </properties>
+
   <dependencies>
 
     <dependency>

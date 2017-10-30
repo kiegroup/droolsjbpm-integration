@@ -14,6 +14,10 @@
 
   <name>Drools :: Android Integration</name>
 
+  <properties>
+    <java.module.name>org.drools.android</java.module.name>
+  </properties>
+
   <description>Integration code that enables Drools to run on the Android platform</description>
 
   <dependencies>

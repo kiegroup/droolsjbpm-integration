@@ -19,7 +19,7 @@
   <description>Drools and jBPM integration for Spring.</description>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.spring</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.spring</java.module.name>
   </properties>
 
   <dependencies>

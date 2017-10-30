@@ -15,6 +15,10 @@
   <name>KIE :: Infinispan :: jBPM persistence </name>
   <description>jBPM Infinispan Persistence</description>
 
+  <properties>
+    <java.module.name>org.jbpm.infinispan</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>

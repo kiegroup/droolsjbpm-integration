@@ -12,5 +12,8 @@
   <groupId>org.kie</groupId>
   <artifactId>kie-security</artifactId>
 
+  <properties>
+    <java.module.name>org.kie.security</java.module.name>
+  </properties>
 
 </project>

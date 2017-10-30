@@ -11,9 +11,12 @@
 
   <artifactId>kie-server-services-jbpm-ui</artifactId>
 
-
   <name>KIE :: Execution Server :: Services :: jBPM UI Extension</name>
   <description>KIE jBPM UI Execution Server Extension</description>
+
+  <properties>
+    <java.module.name>org.kie.server.services.jbpm.ui</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

@@ -9,6 +9,10 @@
   <artifactId>jbpm-simulation</artifactId>
   <name>jBPM Simulation</name>
 
+  <properties>
+    <java.module.name>org.jbpm.simulation</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.eclipse.emf</groupId>

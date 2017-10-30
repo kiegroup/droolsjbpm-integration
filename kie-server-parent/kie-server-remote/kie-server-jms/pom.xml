@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Remote :: JMS</name>
   <description>KIE Execution Server JMS transport</description>
 
+  <properties>
+    <java.module.name>org.kie.server.jms</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
