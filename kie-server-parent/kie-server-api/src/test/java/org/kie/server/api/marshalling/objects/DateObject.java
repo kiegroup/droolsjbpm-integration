@@ -16,10 +16,10 @@ import org.kie.internal.jaxb.LocalDateTimeXmlAdapter;
 import org.kie.internal.jaxb.LocalDateXmlAdapter;
 import org.kie.internal.jaxb.LocalTimeXmlAdapter;
 import org.kie.internal.jaxb.OffsetDateTimeXmlAdapter;
-import org.kie.internal.xstream.LocalDateTimeXStreamConverter;
-import org.kie.internal.xstream.LocalDateXStreamConverter;
-import org.kie.internal.xstream.LocalTimeXStreamConverter;
-import org.kie.internal.xstream.OffsetDateTimeXStreamConverter;
+import org.kie.soup.commons.xstream.LocalDateTimeXStreamConverter;
+import org.kie.soup.commons.xstream.LocalDateXStreamConverter;
+import org.kie.soup.commons.xstream.LocalTimeXStreamConverter;
+import org.kie.soup.commons.xstream.OffsetDateTimeXStreamConverter;
 
 /**
  * TODO Remove @XStreamConverter for java.time attributes once converters are provided by XStream out of the box.

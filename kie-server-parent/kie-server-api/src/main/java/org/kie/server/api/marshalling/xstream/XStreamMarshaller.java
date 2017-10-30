@@ -15,7 +15,7 @@
 
 package org.kie.server.api.marshalling.xstream;
 
-import static org.kie.internal.xstream.XStreamUtils.createNonTrustingXStream;
+import static org.kie.soup.commons.xstream.XStreamUtils.createNonTrustingXStream;
 
 import java.util.ArrayList;
 import java.util.Collections;

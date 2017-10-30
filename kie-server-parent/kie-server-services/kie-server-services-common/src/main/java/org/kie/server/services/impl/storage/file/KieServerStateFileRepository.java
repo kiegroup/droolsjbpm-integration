@@ -27,13 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
-import org.kie.internal.xstream.XStreamUtils;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
+import org.kie.soup.commons.xstream.XStreamUtils;
 
 public class KieServerStateFileRepository implements KieServerStateRepository {
 
