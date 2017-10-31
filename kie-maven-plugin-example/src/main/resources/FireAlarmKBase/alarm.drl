@@ -15,4 +15,4 @@
 
 package org.kie.sample.model
 declare Alarm
-end
+end;

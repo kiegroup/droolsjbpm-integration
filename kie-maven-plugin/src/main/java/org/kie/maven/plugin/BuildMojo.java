@@ -60,6 +60,7 @@ import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
+import org.drools.modelcompiler.builder.ModelBuilderImpl;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 
@@ -226,7 +227,7 @@ public class BuildMojo extends AbstractKieMojo {
         Optional<Map<String, Object>> optionalKieMap = getKieMap();
         if (optionalKieMap.isPresent()) {
             KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
-            KieModuleMetaInfo info = kb.generateKieModuleMetaInfo(null);
+            KieModuleMetaInfo info = kb.getKieModuleMetaInfo();
             Map <String, TypeMetaInfo> typesMetaInfos =  info.getTypeMetaInfos();
 
             if(typesMetaInfos != null){
