@@ -136,23 +136,23 @@ public class ModelEvaluatorServiceBase {
             LOG.debug("Will use dmnContext: {}", dmnContext);
             
             DMNResult result = null;
-            
-            if ( evalCtx.getDecisionName() == null && evalCtx.getDecisionId() == null ) {
+
+            final List<String> names = evalCtx.getDecisionNames();
+            final List<String> ids = evalCtx.getDecisionIds();
+
+            if ( names.isEmpty() && ids.isEmpty() ) {
                 // then implies evaluate All decisions
                 LOG.debug("Invoking evaluateAll...");
                 result = dmnRuntime.evaluateAll(model, dmnContext);
-            } else if ( evalCtx.getDecisionName() != null && evalCtx.getDecisionId() != null ) {
-                LOG.debug("Not supported case, trying to reconciliate manually");
-                if ( !model.getDecisionById(evalCtx.getDecisionId()).equals(model.getDecisionByName(evalCtx.getDecisionName())) ) {
-                    throw new RuntimeException("Unable to locate DMN Decision to evaluate");
-                }
-                result = dmnRuntime.evaluateDecisionById(model, evalCtx.getDecisionId(), dmnContext);
-            } else if ( evalCtx.getDecisionName() != null ) {
-                LOG.debug("Invoking evaluateDecisionByName using {}", evalCtx.getDecisionName());
-                result = dmnRuntime.evaluateDecisionByName(model, evalCtx.getDecisionName(), dmnContext);
-            } else if ( evalCtx.getDecisionId() != null ) {
-                LOG.debug("Invoking evaluateDecisionById using {}", evalCtx.getDecisionId());
-                result = dmnRuntime.evaluateDecisionById(model, evalCtx.getDecisionId(), dmnContext);
+            } else if ( !names.isEmpty()  && ids.isEmpty() ) {
+                LOG.debug("Invoking evaluateDecisionByName using {}", names);
+                result = dmnRuntime.evaluateByName( model, dmnContext, names.toArray(new String[]{}) );
+            } else if ( !ids.isEmpty() && names.isEmpty() ) {
+                LOG.debug("Invoking evaluateDecisionById using {}", ids);
+                result = dmnRuntime.evaluateById( model, dmnContext, ids.toArray(new String[]{}) );
+            } else {
+                LOG.debug("Not supported case");
+                throw new RuntimeException("Unable to locate DMN Decision to evaluate");
             }
             
             LOG.debug("Result:");
@@ -161,7 +161,7 @@ public class ModelEvaluatorServiceBase {
             LOG.debug("{}",result.getDecisionResults());
             LOG.debug("{}",result.getMessages());
             
-            DMNResultKS res = new DMNResultKS(model.getNamespace(), model.getName(), evalCtx.getDecisionName(), result);
+            DMNResultKS res = new DMNResultKS(model.getNamespace(), model.getName(), evalCtx.getDecisionNames(), result);
             
             kieSession.dispose();
             return new ServiceResponse<DMNResultKS>(

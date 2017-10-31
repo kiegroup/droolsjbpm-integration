@@ -18,6 +18,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.drools.core.xml.jaxb.util.JaxbMapAdapter;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNContext;
@@ -46,8 +48,9 @@ public class DMNResultKS implements DMNResult {
     private String modelName;
 
     @XmlElement(name="decision-name")
-    @XStreamAlias("decision-name")
-    private String decisionName;
+    @XStreamImplicit(itemFieldName = "decision-name")
+    @JsonFormat(with = { JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED })
+    private List<String> decisionNames = new ArrayList<>();
 
     @XmlElement(name="dmn-context")
     @XStreamAlias("dmn-context")
@@ -80,9 +83,9 @@ public class DMNResultKS implements DMNResult {
         this.modelName = modelName;
     }
     
-    public DMNResultKS(String namespace, String modelName, String decisionName, DMNResult dmnResult) {
+    public DMNResultKS(String namespace, String modelName, List<String> decisionNames, DMNResult dmnResult) {
         this(namespace, modelName, dmnResult);
-        this.decisionName = decisionName;
+        this.decisionNames = decisionNames;
     }
     
     public String getNamespace() {
@@ -105,13 +108,13 @@ public class DMNResultKS implements DMNResult {
     }
 
     
-    public String getDecisionName() {
-        return decisionName;
+    public List<String> getDecisionNames() {
+        return decisionNames;
     }
 
     
-    public void setDecisionName(String decisionName) {
-        this.decisionName = decisionName;
+    public void setDecisionNames(List<String> decisionNames) {
+        this.decisionNames = decisionNames;
     }
 
     
@@ -219,7 +222,9 @@ public class DMNResultKS implements DMNResult {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("DMNResultKS [namespace=").append(namespace).append(", modelName=").append(modelName).append(", decisionName=").append(decisionName).append(", dmnContext=").append(dmnContext).append(", messages=").append(messages).append(", decisionResults=").append(decisionResults).append("]");
+        builder.append("DMNResultKS [namespace=").append(namespace).append(", modelName=").append(modelName);
+        builder.append(", decisionName=").append(Arrays.toString(decisionNames.toArray()));
+        builder.append(", dmnContext=").append(dmnContext).append(", messages=").append(messages).append(", decisionResults=").append(decisionResults).append("]");
         return builder.toString();
     }
      
