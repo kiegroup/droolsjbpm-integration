@@ -47,7 +47,7 @@
     <module name="org.mvel" slot="main" services="import"/>
     <module name="org.slf4j" slot="main" services="import"/>
     <module name="org.eclipse.jdt.core.compiler"/>
-    <module name="org.uberfire.maven-support" slot="main" services="import"/>
+    <module name="org.kie.soup.maven-support" slot="main" services="import"/>
     <module name="org.kie.soup.project-datamodel-api" slot="main" services="import"/>
     <module name="org.kie.soup.project-datamodel-commons" slot="main" services="import"/>
     <module name="org.kie.soup.commons" slot="main" services="import"/>
