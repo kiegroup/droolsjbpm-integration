@@ -27,7 +27,7 @@
   },
   "ignores": {
     "revapi": {
-      "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored. They should be removed when 7.1.0.Final is available.",
+      "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored.",
       "ignore": [
         {
           "code": "java.annotation.attributeValueChanged",
@@ -37,7 +37,7 @@
           "oldValue": "\"sortBy\"",
           "newValue": "\"orderBy\"",
           "annotationType": "javax.ws.rs.QueryParam",
-          "elementKind": "annotation",
+          "elementKind": "parameter",
           "justification": "JBPM-5468 adding full ORDER BY clause querying with QueryService"
         },
         {
@@ -48,7 +48,7 @@
           "oldValue": "\"processes/instances/{pInstanceId}/nodes/instances\"",
           "newValue": "\"instances/{pInstanceId}/nodes/instances\"",
           "annotationType": "javax.ws.rs.Path",
-          "elementKind": "annotation",
+          "elementKind": "method",
           "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
         },
         {
@@ -59,7 +59,7 @@
           "oldValue": "\"processes/instances\"",
           "newValue": "\"instances\"",
           "annotationType": "javax.ws.rs.Path",
-          "elementKind": "annotation",
+          "elementKind": "method",
           "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
         },
         {
@@ -70,7 +70,7 @@
           "oldValue": "\"processes/instances/{pInstanceId}/variables/instances/{varName}\"",
           "newValue": "\"instances/{pInstanceId}/variables/instances/{varName}\"",
           "annotationType": "javax.ws.rs.Path",
-          "elementKind": "annotation",
+          "elementKind": "method",
           "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
         },
         {
@@ -81,7 +81,7 @@
           "oldValue": "\"processes/instances/{pInstanceId}/variables/instances\"",
           "newValue": "\"instances/{pInstanceId}/variables/instances\"",
           "annotationType": "javax.ws.rs.Path",
-          "elementKind": "annotation",
+          "elementKind": "method",
           "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
         },
         {
