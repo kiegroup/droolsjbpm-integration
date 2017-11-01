@@ -56,14 +56,14 @@
     <dependencySet>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <includes>
-        <include>org.dashbuilder:dashbuilder-dataset-api</include>
-        <include>org.dashbuilder:dashbuilder-dataset-core</include>
-        <include>org.dashbuilder:dashbuilder-dataset-shared</include>
-        <include>org.dashbuilder:dashbuilder-dataset-sql</include>
-        <include>org.dashbuilder:dashbuilder-json</include>
+        <include>org.kie.soup:kie-soup-dataset-api</include>
+        <include>org.kie.soup:kie-soup-dataset-core</include>
+        <include>org.kie.soup:kie-soup-dataset-shared</include>
+        <include>org.kie.soup:kie-soup-dataset-sql</include>
+        <include>org.kie.soup:kie-soup-json</include>
       </includes>
       <outputDirectory>modules/system/layers/bpms/org/jbpm/main</outputDirectory>
-      <outputFileNameMapping>${artifact.artifactId}-${version.org.dashbuilder}.${artifact.extension}</outputFileNameMapping>
+      <outputFileNameMapping>${artifact.artifactId}-${version.org.kie}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
   </dependencySets>
 </component>

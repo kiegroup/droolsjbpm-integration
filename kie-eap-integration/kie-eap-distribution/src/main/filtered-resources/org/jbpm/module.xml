@@ -2,11 +2,11 @@
 <module xmlns="urn:jboss:module:1.3" name="org.jbpm" slot="main">
 
   <resources>
-    <resource-root path="dashbuilder-dataset-api-${version.org.dashbuilder}.jar"/>
-    <resource-root path="dashbuilder-dataset-core-${version.org.dashbuilder}.jar"/>
-    <resource-root path="dashbuilder-dataset-shared-${version.org.dashbuilder}.jar"/>
-    <resource-root path="dashbuilder-dataset-sql-${version.org.dashbuilder}.jar"/>
-    <resource-root path="dashbuilder-json-${version.org.dashbuilder}.jar"/>
+    <resource-root path="kie-soup-dataset-api-${version.org.kie}.jar"/>
+    <resource-root path="kie-soup-dataset-core-${version.org.kie}.jar"/>
+    <resource-root path="kie-soup-dataset-shared-${version.org.kie}.jar"/>
+    <resource-root path="kie-soup-dataset-sql-${version.org.kie}.jar"/>
+    <resource-root path="kie-soup-json-${version.org.kie}.jar"/>
     <resource-root path="jbpm-audit-${version.org.kie}.jar"/>
     <resource-root path="jbpm-bpmn2-emfextmodel-${version.org.kie}.jar"/>
     <resource-root path="jbpm-bpmn2-${version.org.kie}.jar"/>
