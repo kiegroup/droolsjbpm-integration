@@ -17,18 +17,18 @@
 
   <files>
     <file>
-      <source>${project.build.outputDirectory}/org/uberfire/maven-integration/module.xml</source>
-      <outputDirectory>modules/system/layers/bpms/org/uberfire/maven-integration/main</outputDirectory>
+      <source>${project.build.outputDirectory}/org/kie/soup/maven-support/module.xml</source>
+      <outputDirectory>modules/system/layers/bpms/org/kie/soup/maven-support/main</outputDirectory>
     </file>
   </files>
   <dependencySets>
     <dependencySet>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <includes>
-        <include>org.uberfire:uberfire-maven-integration</include>
+        <include>org.kie.soup:kie-soup-maven-support</include>
       </includes>
-      <outputDirectory>modules/system/layers/bpms/org/uberfire/maven-integration/main</outputDirectory>
-      <outputFileNameMapping>${artifact.artifactId}-${version.org.uberfire}.${artifact.extension}</outputFileNameMapping>
+      <outputDirectory>modules/system/layers/bpms/org/kie/soup/maven-support/main</outputDirectory>
+      <outputFileNameMapping>${artifact.artifactId}-${version.org.kie}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
   </dependencySets>
 </component>
