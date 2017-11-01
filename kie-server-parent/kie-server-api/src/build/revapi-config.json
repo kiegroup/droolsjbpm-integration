@@ -16,7 +16,7 @@
   },
   "ignores": {
     "revapi": {
-      "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored. They should be removed when 7.1.0.Final is available.",
+      "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored.",
       "ignore": [
         {
           "code": "java.field.constantValueChanged",
@@ -35,17 +35,8 @@
           "new": "field org.kie.server.api.commands.CommandScript.commands",
           "attribute": "value",
           "annotationType": "javax.xml.bind.annotation.XmlElements",
-          "elementKind": "annotation",
-          "justification": "PLANNER-815 Support real-time planning"
-        },
-        {
-          "code": "java.field.removedWithConstant",
-          "old": "field org.kie.server.api.marshalling.xstream.XStreamMarshaller.DEFAULT_PACKAGES_WILDCARD",
-          "package": "org.kie.server.api.marshalling.xstream",
-          "classSimpleName": "XStreamMarshaller",
-          "fieldName": "DEFAULT_PACKAGES_WILDCARD",
           "elementKind": "field",
-          "justification": "Common XStream configuration used instead."
+          "justification": "PLANNER-815 Support real-time planning"
         }
       ]
     }
