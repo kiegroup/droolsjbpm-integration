@@ -60,7 +60,6 @@ import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
-import org.drools.modelcompiler.builder.ModelBuilderImpl;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 
