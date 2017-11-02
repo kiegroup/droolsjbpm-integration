@@ -128,38 +128,38 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
 
-    private boolean isExecutorAvailable = false;
+    protected boolean isExecutorAvailable = false;
 
-    private String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
+    protected String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
 
-    private KieServerImpl kieServer;
-    private KieServerRegistry context;
+    protected KieServerImpl kieServer;
+    protected KieServerRegistry context;
 
-    private DeploymentService deploymentService;
-    private DefinitionService definitionService;
-    private ProcessService processService;
-    private UserTaskService userTaskService;
-    private RuntimeDataService runtimeDataService;
-    private FormManagerService formManagerService;
+    protected DeploymentService deploymentService;
+    protected DefinitionService definitionService;
+    protected ProcessService processService;
+    protected UserTaskService userTaskService;
+    protected RuntimeDataService runtimeDataService;
+    protected FormManagerService formManagerService;
 
-    private ProcessInstanceMigrationService processInstanceMigrationService;
-    private ProcessInstanceAdminService processInstanceAdminService;
-    private UserTaskAdminService userTaskAdminService;
+    protected ProcessInstanceMigrationService processInstanceMigrationService;
+    protected ProcessInstanceAdminService processInstanceAdminService;
+    protected UserTaskAdminService userTaskAdminService;
 
-    private ExecutorService executorService;
+    protected ExecutorService executorService;
 
-    private QueryService queryService;
+    protected QueryService queryService;
 
-    private KieContainerCommandService kieContainerCommandService;
+    protected KieContainerCommandService kieContainerCommandService;
 
-    private DeploymentDescriptorManager deploymentDescriptorManager = new DeploymentDescriptorManager(persistenceUnitName);
-    private DeploymentDescriptorMerger merger = new DeploymentDescriptorMerger();
+    protected DeploymentDescriptorManager deploymentDescriptorManager = new DeploymentDescriptorManager(persistenceUnitName);
+    protected DeploymentDescriptorMerger merger = new DeploymentDescriptorMerger();
 
-    private List<Object> services = new ArrayList<Object>();
-    private boolean initialized = false;
+    protected List<Object> services = new ArrayList<Object>();
+    protected boolean initialized = false;
 
-    private Map<String, List<String>> containerMappers = new ConcurrentHashMap<String, List<String>>();
-    private Map<String, List<String>> containerQueries = new ConcurrentHashMap<String, List<String>>();
+    protected Map<String, List<String>> containerMappers = new ConcurrentHashMap<String, List<String>>();
+    protected Map<String, List<String>> containerQueries = new ConcurrentHashMap<String, List<String>>();
 
     @Override
     public boolean isInitialized() {
@@ -174,6 +174,32 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
 
+        this.kieServer = kieServer;
+        this.context = registry;
+        configureServices(kieServer, registry);
+        
+
+        if (registry.getKieSessionLookupManager() != null) {
+            registry.getKieSessionLookupManager().addHandler(new JBPMKieSessionLookupHandler());
+        }
+
+        services.add(formManagerService);
+        services.add(deploymentService);
+        services.add(definitionService);
+        services.add(processService);
+        services.add(userTaskService);
+        services.add(runtimeDataService);
+        services.add(executorService);
+        services.add(queryService);
+        services.add(processInstanceMigrationService);
+        services.add(processInstanceAdminService);
+        services.add(userTaskAdminService);
+        
+        registerDefaultQueryDefinitions();
+        initialized = true;
+    }
+
+    protected void configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
         KieServerConfig config = registry.getConfig();
 
         // loaded from system property as callback info isn't stored as configuration in kie server repository
@@ -186,9 +212,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
 
         this.isExecutorAvailable = isExecutorOnClasspath();
-
-        this.kieServer = kieServer;
-        this.context = registry;
 
 
         EntityManagerFactory emf = build(getPersistenceProperties(config));
@@ -286,26 +309,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
                 new UserTaskAdminServiceBase(userTaskAdminService, context));
 
-        if (registry.getKieSessionLookupManager() != null) {
-            registry.getKieSessionLookupManager().addHandler(new JBPMKieSessionLookupHandler());
-        }
-
-        services.add(formManagerService);
-        services.add(deploymentService);
-        services.add(definitionService);
-        services.add(processService);
-        services.add(userTaskService);
-        services.add(runtimeDataService);
-        services.add(executorService);
-        services.add(queryService);
-        services.add(processInstanceMigrationService);
-        services.add(processInstanceAdminService);
-        services.add(userTaskAdminService);
-        
-        registerDefaultQueryDefinitions();
-        initialized = true;
     }
-
 
 
     @Override
