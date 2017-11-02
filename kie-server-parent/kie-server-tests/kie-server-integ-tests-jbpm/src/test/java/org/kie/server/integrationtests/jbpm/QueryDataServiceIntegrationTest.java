@@ -303,6 +303,34 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         }
 
     }
+    
+    @Test
+    public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilderRawMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = createQueryDefinition("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("min", processInstanceIds.get(4));
+            params.put("max", processInstanceIds.get(0));
+
+            List<List> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_RAW, "test", params, 0, 10, List.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
 
     @Test
     public void testGetProcessInstancesWithQueryDataServiceRawMapper() throws Exception {
