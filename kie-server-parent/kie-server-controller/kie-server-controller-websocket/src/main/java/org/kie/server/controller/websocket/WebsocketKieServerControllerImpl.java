@@ -29,9 +29,7 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerInfo;
-import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
@@ -81,20 +79,23 @@ public class WebsocketKieServerControllerImpl extends KieServerControllerImpl {
     
     @OnOpen
     public void onKieServerConnect(@PathParam("server-id") String serverId, Session session) {
-        manager.addSession(session);
-        
-        manager.getHandler(session.getId()).addHandler(new ConnectedKieServerHandler(manager, session, this, serverId));
+        synchronized (manager) {            
+            manager.addSession(session);
+            
+            manager.getHandler(session.getId()).addHandler(new ConnectedKieServerHandler(manager, session, this, serverId));
+        }
     }
     
     @OnClose
     public void onKieServerDisconnect(@PathParam("server-id") String serverId, Session session, CloseReason closeReason) {
-        String url = manager.removeSession(session);
-        if (url != null) {
-            KieServerInfo serverInfo = new KieServerInfo(serverId, "", "", Collections.<String>emptyList(), url);
-            disconnect(serverInfo);
-            logger.info("Server with id '{}' disconnected", serverId);
+        synchronized (manager) {
+            String url = manager.removeSession(session);
+            if (url != null) {
+                KieServerInfo serverInfo = new KieServerInfo(serverId, "", "", Collections.<String>emptyList(), url);
+                disconnect(serverInfo);
+                logger.info("Server with id '{}' disconnected", serverId);
+            }
         }
-        
     }
     
     @OnError
