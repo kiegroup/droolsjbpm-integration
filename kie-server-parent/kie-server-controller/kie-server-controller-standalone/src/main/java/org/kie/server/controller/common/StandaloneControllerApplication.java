@@ -14,21 +14,41 @@
 */
 package org.kie.server.controller.common;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
 import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
 
+
 @ApplicationPath("/")
 public class StandaloneControllerApplication extends Application {
+    
+    private final Set<Object> instances;
+    
+    public StandaloneControllerApplication() {
+        instances = new CopyOnWriteArraySet<Object>() {
+            private static final long serialVersionUID = 1763183096852523317L;
+            {                
+                add(new StandaloneKieServerControllerImpl());
+                add(new StandaloneSpecManagementServiceImpl());
+            }
+        };
+    }
+
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(StandaloneKieServerControllerImpl.class);
-        classes.add(StandaloneSpecManagementServiceImpl.class);
-        return classes;
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<Object> getSingletons() {
+        return instances;
     }
 }
