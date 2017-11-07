@@ -32,15 +32,8 @@
 
   <artifactId>kie-spring-boot</artifactId>
 
-  <name>KIE :: SpringBoot</name>
+  <name>KIE :: Spring :: Boot</name>
   <description>Parent integration project for SpringBoot</description>
-
-  <developers>
-    <developer>
-      <name>Radovan STANCEL</name>
-      <email>rstancel@redhat.com</email>
-    </developer>
-  </developers>
 
   <properties>
     <spring-boot.version>1.5.8.RELEASE</spring-boot.version>
