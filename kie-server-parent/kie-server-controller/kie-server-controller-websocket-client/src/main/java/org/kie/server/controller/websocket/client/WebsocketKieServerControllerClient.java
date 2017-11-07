@@ -40,6 +40,9 @@ import javax.websocket.WebSocketContainer;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.common.config.KieConfigReader;
+import org.kie.server.common.security.EAPVaultException;
+import org.kie.server.common.security.KieVaultReader;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandler;
 import org.slf4j.Logger;
@@ -64,10 +67,12 @@ public class WebsocketKieServerControllerClient extends Endpoint {
     private Thread reconnectThread = null;
     
     private Consumer<WebsocketKieServerControllerClient> onReconnect;
-    
+
+    private final boolean hasEAPVault;
     
     public WebsocketKieServerControllerClient(Consumer<WebsocketKieServerControllerClient> onReconnect) {
         this.onReconnect = onReconnect;
+        hasEAPVault = KieVaultReader.haveEAPVault();
     }
     
     @OnClose
@@ -145,19 +150,24 @@ public class WebsocketKieServerControllerClient extends Endpoint {
                         @Override
                         public void beforeRequest(Map<String, List<String>> headers) {                            
                             super.beforeRequest(headers);
-                            
-                            String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                            String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
-                            String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
-                            
-                            if (token != null && !token.isEmpty()) {
-                                headers.put(AUTHORIZATION, Arrays.asList("Bearer " + token));
-                            } else {
-                                try {
-                                    headers.put(AUTHORIZATION, Arrays.asList("Basic " + Base64.getEncoder().encodeToString((userName + ':' + password).getBytes("UTF-8"))));
-                                } catch (UnsupportedEncodingException e) {
-                                    logger.warn(e.getMessage());
+
+                            try {
+                                String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                                String password = KieConfigReader.loadPassword(config, hasEAPVault);
+                                String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
+                                if (token != null && !token.isEmpty()) {
+                                    headers.put(AUTHORIZATION, Arrays.asList("Bearer " + token));
+                                } else {
+                                    try {
+                                        headers.put(AUTHORIZATION, Arrays.asList("Basic " + Base64.getEncoder().encodeToString((userName + ':' + password).getBytes("UTF-8"))));
+                                    } catch (UnsupportedEncodingException e) {
+                                        logger.warn(e.getMessage());
+                                    }
                                 }
+                            } catch (EAPVaultException e) {
+                                logger.warn("Exception encountered while getting configurator error {}", e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+                                logger.debug("Exception encountered while getting configurator error {}", e.getMessage(), e);
                             }
                         }
                         
@@ -172,7 +182,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void close() {
         this.closed.set(true);
         if (reconnectThread != null) {
@@ -185,28 +195,28 @@ public class WebsocketKieServerControllerClient extends Endpoint {
             logger.warn("Unexpected error while closing websocket connection to controller", e);
         }
     }
-    
+
     public void sendWithHandler(String content, InternalMessageHandler handler) throws IOException {
         if (!session.isOpen()) {
             throw new RuntimeException("No connection to controller");
         }
-        
+
         messageHandler.addHandler(handler);
         session.getBasicRemote().sendText(content);
     }
-    
+
     public boolean isActive() {
         if (session != null && session.isOpen()) {
             return true;
         }
-        
+
         return false;
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
         logger.info("Connection to Kie Controller over websocket is now open with session id " + session.getId());
-        
+
     }
 
     @Override
