@@ -27,11 +27,13 @@ public class StandaloneSpecManagementServiceImpl extends RestSpecManagementServi
 
     public StandaloneSpecManagementServiceImpl() {
         super();
-        ServiceLoader<PersistingServerTemplateStorageService> templateStorageServices = 
-        		ServiceLoader.load(PersistingServerTemplateStorageService.class);
+        ServiceLoader<PersistingServerTemplateStorageService> templateStorageServices =  ServiceLoader.load(PersistingServerTemplateStorageService.class);
+        
         if (templateStorageServices != null && templateStorageServices.iterator().hasNext()) {
+            
             PersistingServerTemplateStorageService storageService = templateStorageServices.iterator().next();
             this.setTemplateStorage(storageService.getTemplateStorage());
+        
             logger.debug("Setting template storage for SpecManagementService to {}",
             		storageService.getTemplateStorage().toString());
         } else {

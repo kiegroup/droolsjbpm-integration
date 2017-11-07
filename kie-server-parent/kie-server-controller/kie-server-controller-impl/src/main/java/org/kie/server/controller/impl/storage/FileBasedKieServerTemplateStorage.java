@@ -14,7 +14,6 @@
 */
 package org.kie.server.controller.impl.storage;
 
-import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -23,9 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -38,17 +34,22 @@ import com.thoughtworks.xstream.io.StreamException;
 
 public class FileBasedKieServerTemplateStorage implements KieServerTemplateStorage {
 	private static FileBasedKieServerTemplateStorage INSTANCE; 
+	
+    public static final String STORAGE_FILE_WATCHER_ENABLED = "org.kie.server.controller.templatefile.watcher.enabled";
     public static final String SERVER_TEMPLATE_FILE_NAME_PROP = "org.kie.server.controller.templatefile";
     public static final String DEFAULT_SERVER_TEMPLATE_FILENAME = System.getProperty("java.io.tmpdir")+
     		System.getProperty("file.separator")
     		+"template_store.xml";
+    
     private static Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorage.class);
     private Map<String, ServerTemplate> templateMap = new ConcurrentHashMap<>();
     private Map<String, ServerTemplateKey> templateKeyMap = new ConcurrentHashMap<>();
     private String templatesLocation;
-    private Marshaller templateMarshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM,ServerTemplate.class.getClassLoader());
-    
+  
     private XStream xstream;
+    
+    private boolean configWatcherEnabled = Boolean.parseBoolean(System.getProperty(STORAGE_FILE_WATCHER_ENABLED, "false"));
+    private ControllerStorageFileWatcher watcher;
     
     public static synchronized FileBasedKieServerTemplateStorage getInstance() {
     	if (INSTANCE == null) {
@@ -95,6 +96,13 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     		this.templatesLocation = System.getProperty(SERVER_TEMPLATE_FILE_NAME_PROP, DEFAULT_SERVER_TEMPLATE_FILENAME);
     	}
     	loadTemplateMapsFromFile();
+    	
+    	// setup template file watcher to be updated when changes are discovered
+        if (configWatcherEnabled ) {
+            this.watcher = new ControllerStorageFileWatcher(this.templatesLocation, this);
+            Thread watcherThread = new Thread(watcher, "Kie Controller File Storage Watch Thread");
+            watcherThread.start();
+        }
     }
 
     /**
@@ -116,14 +124,9 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
         ArrayList<ServerTemplate> templates = null;
         try (FileReader reader = new FileReader(templatesLocation)) {
             templates = (ArrayList<ServerTemplate>)this.xstream.fromXML(reader);
-        } catch (StreamException se) {
-        	if (se.getCause() instanceof EOFException) {
-        		logger.warn("Unable to read server template maps from file {}. File does not exist or is empty",templatesLocation);
-        	} else {
-        		logger.error("Unable to read server template maps from file due to stream error",se);
-        	}
-        } catch (FileNotFoundException e) {
+        } catch (StreamException | FileNotFoundException e) {
             logger.warn("Unable to read server template maps from file {}. File does not exist.", templatesLocation);
+            writeTemplateMap();
         } catch (Throwable e) {
             logger.error("Unable to read server template maps from file",e);
         }
@@ -226,5 +229,12 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     @Override
     public String toString() {
         return "FileBasedKieServerTemplateStorage: { templatesLocation = " + templatesLocation + "}";
+    }
+    
+    @Override
+    public void close() {
+        if (watcher != null) {
+            watcher.stop();
+        }
     }
 }

@@ -12,32 +12,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
-package org.kie.server.controller.service;
+package org.kie.server.controller.common;
 
 import java.util.ServiceLoader;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+
 import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
-import org.kie.server.controller.rest.RestKieServerControllerImpl;
+import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StandaloneKieServerControllerImpl extends RestKieServerControllerImpl {
-    private static Logger logger = LoggerFactory.getLogger(StandaloneKieServerControllerImpl.class);
+@WebListener
+public class KieControllerServletListener implements ServletContextListener {
 
+    private static final Logger logger = LoggerFactory.getLogger(KieControllerServletListener.class);
+    private KieServerTemplateStorage storage;
+    
+    @Override
+    public void contextDestroyed(ServletContextEvent event) {
+        if (storage != null) {
+            storage.close();
+            
+            logger.debug("Template storage {} closed successfully", storage);
+        }
+    }
 
-    public StandaloneKieServerControllerImpl() {
-        super();
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
         ServiceLoader<PersistingServerTemplateStorageService> storageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
         
         if (storageServices != null && storageServices.iterator().hasNext()) {
             PersistingServerTemplateStorageService storageService = storageServices.iterator().next();
-            this.setTemplateStorage(storageService.getTemplateStorage());
-        
-            logger.debug("Server template storage for standalone kie server controller is {}",
-            		storageService.getTemplateStorage().toString());
-        } else {
-        	logger.warn("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
+            storage = storageService.getTemplateStorage(); 
+            
+            logger.debug("Template storage {} initialized successfully", storage);
         }
     }
 
