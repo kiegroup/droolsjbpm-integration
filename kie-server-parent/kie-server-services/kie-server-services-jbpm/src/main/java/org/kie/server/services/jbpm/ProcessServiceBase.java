@@ -16,6 +16,7 @@
 package org.kie.server.services.jbpm;
 
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
 
 import java.util.ArrayList;
@@ -61,6 +62,10 @@ public class ProcessServiceBase {
         this.runtimeDataService = runtimeDataService;
         this.marshallerHelper = new MarshallerHelper(context);
         this.context = context;
+    }
+
+    public void setMarshallerHelper(MarshallerHelper marshallerHelper){
+        this.marshallerHelper = marshallerHelper;
     }
 
     public String startProcess(String containerId, String processId, String marshallingType) {
@@ -133,7 +138,7 @@ public class ProcessServiceBase {
     }
 
     public Object abortProcessInstances(String containerId, List<Long> processInstanceIds) {
-        
+
         processService.abortProcessInstances(containerId, convert(processInstanceIds));
         return null;
 
@@ -208,19 +213,7 @@ public class ProcessServiceBase {
             throw new IllegalStateException("Unable to find process instance with id " + processInstanceId);
         }
         containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
-        org.kie.server.api.model.instance.ProcessInstance processInstance = org.kie.server.api.model.instance.ProcessInstance.builder()
-                .id(instanceDesc.getId())
-                .processId(instanceDesc.getProcessId())
-                .processName(instanceDesc.getProcessName())
-                .processVersion(instanceDesc.getProcessVersion())
-                .state(instanceDesc.getState())
-                .containerId(instanceDesc.getDeploymentId())
-                .date(instanceDesc.getDataTimeStamp())
-                .initiator(instanceDesc.getInitiator())
-                .processInstanceDescription(instanceDesc.getProcessInstanceDescription())
-                .parentInstanceId(instanceDesc.getParentId())
-                .correlationKey(instanceDesc.getCorrelationKey())
-                .build();
+        org.kie.server.api.model.instance.ProcessInstance processInstance = convertToProcessInstance(instanceDesc);
 
         if (Boolean.TRUE.equals(withVars) && processInstance.getState().equals(ProcessInstance.STATE_ACTIVE)) {
             Map<String, Object> variables = processService.getProcessInstanceVariables(containerId, processInstanceId.longValue());
