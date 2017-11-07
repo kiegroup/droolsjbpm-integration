@@ -28,15 +28,8 @@
 
   <artifactId>jbpm-spring-boot</artifactId>
 
-  <name>jBPM :: SpringBoot</name>
+  <name>jBPM :: Spring :: Boot</name>
   <description>JBOM integration project for SpringBoot</description>
-
-  <developers>
-    <developer>
-      <name>Radovan STANCEL</name>
-      <email>rstancel@redhat.com</email>
-    </developer>
-  </developers>
 
   <dependencies>
     <dependency>
