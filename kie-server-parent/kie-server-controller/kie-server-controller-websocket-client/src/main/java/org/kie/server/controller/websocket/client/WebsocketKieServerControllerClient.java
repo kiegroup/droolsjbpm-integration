@@ -38,6 +38,7 @@ import javax.websocket.OnClose;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.drools.core.util.KeyStoreHelper;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
@@ -147,7 +148,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
                             super.beforeRequest(headers);
                             
                             String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                            String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                            String password = loadPassword();
                             String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
                             
                             if (token != null && !token.isEmpty()) {
@@ -172,7 +173,12 @@ public class WebsocketKieServerControllerClient extends Endpoint {
             throw new RuntimeException(e);
         }
     }
-    
+
+    private String loadPassword() {
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper();
+        return keyStoreHelper.getPasswordKey();
+    }
+
     public void close() {
         this.closed.set(true);
         if (reconnectThread != null) {
