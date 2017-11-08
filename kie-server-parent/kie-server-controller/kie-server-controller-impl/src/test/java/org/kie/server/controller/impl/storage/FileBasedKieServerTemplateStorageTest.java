@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Before;
@@ -162,6 +163,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @After
     public void clean() {
+        System.clearProperty(FileBasedKieServerTemplateStorage.STORAGE_FILE_WATCHER_ENABLED);
         try {
             Files.deleteIfExists(tmpTemplateStore.toPath());
         } catch (IOException e) {
@@ -276,5 +278,38 @@ public class FileBasedKieServerTemplateStorageTest {
     public void testGetStorageLocation() {
         String location = storage.getTemplatesLocation();
         assertEquals(tmpTemplateStore.getAbsolutePath(), location);
+    }
+    
+    @Test(timeout=30000)
+    public void testUpdatedStorageFromWatcher() throws Exception {
+        FileBasedKieServerTemplateStorage secondStorage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath());
+        
+        System.setProperty(FileBasedKieServerTemplateStorage.STORAGE_FILE_WATCHER_ENABLED, "true");
+        CountDownLatch waitForReload = new CountDownLatch(1);
+        storage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath()) {
+
+            @Override
+            public void reloadTemplateMaps() {                
+                super.reloadTemplateMaps();
+                waitForReload.countDown();
+            }
+            
+        };
+        List<ServerTemplate> templates = storage.load();
+        assertEquals(3, templates.size());
+        
+        // delay it a bit from the creation of the file
+        Thread.sleep(3000);        
+        
+        ServerTemplate serverTemplate = new ServerTemplate();
+
+        serverTemplate.setName("UpdateFromOtherController");
+        serverTemplate.setId(UUID.randomUUID().toString());
+        secondStorage.store(serverTemplate);
+        
+        waitForReload.await();
+        
+        templates = storage.load();
+        assertEquals(4, templates.size());
     }
 }

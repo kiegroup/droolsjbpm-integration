@@ -28,11 +28,12 @@ public class StandaloneKieServerControllerImpl extends RestKieServerControllerIm
 
     public StandaloneKieServerControllerImpl() {
         super();
-        ServiceLoader<PersistingServerTemplateStorageService> storageServices = 
-        		ServiceLoader.load(PersistingServerTemplateStorageService.class);
+        ServiceLoader<PersistingServerTemplateStorageService> storageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
+        
         if (storageServices != null && storageServices.iterator().hasNext()) {
             PersistingServerTemplateStorageService storageService = storageServices.iterator().next();
             this.setTemplateStorage(storageService.getTemplateStorage());
+        
             logger.debug("Server template storage for standalone kie server controller is {}",
             		storageService.getTemplateStorage().toString());
         } else {

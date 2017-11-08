@@ -67,4 +67,8 @@ public interface KieServerTemplateStorage {
      * @return
      */
     ServerTemplate delete(String identifier);
+    
+    default void close() {
+        
+    };
 }
