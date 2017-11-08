@@ -22,6 +22,7 @@ import static org.kie.server.api.rest.RestURI.build;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -98,7 +99,7 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
         public ServiceResponse<DMNResult> evaluateDecisionByName(String containerId, String namespace, String modelName, String decisionName, DMNContext dmnContext) {
             Objects.requireNonNull(decisionName, "Parameter decisionName cannot be null; method evaluateAllDecisions() can be used to avoid the need of supplying decisionName");
             DMNContextKS payload = new DMNContextKS(namespace, modelName, dmnContext.getAll()); 
-            payload.setDecisionName(decisionName);
+            payload.setDecisionNames(Collections.singletonList(decisionName));
             return evaluateDecisions(containerId, payload);
         }
 
@@ -106,7 +107,7 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
         public ServiceResponse<DMNResult> evaluateDecisionById(String containerId, String namespace, String modelName, String decisionId, DMNContext dmnContext) {
             Objects.requireNonNull(decisionId, "Parameter decisionId cannot be null; method evaluateAllDecisions() can be used to avoid the need of supplying decisionId");
             DMNContextKS payload = new DMNContextKS(namespace, modelName, dmnContext.getAll()); 
-            payload.setDecisionId(decisionId);
+            payload.setDecisionIds(Collections.singletonList(decisionId));
             return evaluateDecisions(containerId, payload);
         }
 
