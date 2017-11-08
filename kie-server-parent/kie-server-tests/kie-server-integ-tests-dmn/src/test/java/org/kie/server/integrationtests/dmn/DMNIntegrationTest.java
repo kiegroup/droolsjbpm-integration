@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
+import org.kie.dmn.api.core.DMNMessageType;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -29,6 +30,8 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DMNIntegrationTest
@@ -94,5 +97,21 @@ public class DMNIntegrationTest
         assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
     }
     
-    
+    @Test
+    public void test_evaluateAll_missingDependency() {
+        DMNContext dmnContext = dmnClient.newContext();
+        dmnContext.set( "a", 10 );
+        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
+        
+        assertEquals(ResponseType.SUCCESS, evaluateAll.getType());
+        
+        DMNResult dmnResult = evaluateAll.getResult();
+        
+        Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
+        assertThat( mathInCtx, nullValue()  );
+        
+        assertThat( dmnResult.getMessages().isEmpty(), is(false) );
+        
+        assertThat( dmnResult.getMessages().stream().anyMatch(m -> m.getMessageType() == DMNMessageType.REQ_NOT_FOUND), is(true) );
+    }
 }

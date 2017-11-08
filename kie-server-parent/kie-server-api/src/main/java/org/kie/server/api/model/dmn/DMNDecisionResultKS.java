@@ -15,6 +15,7 @@
 
 package org.kie.server.api.model.dmn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -53,7 +54,7 @@ public class DMNDecisionResultKS implements DMNDecisionResult {
     
     @XmlElementWrapper(name="messages")
     @XStreamAlias("messages")
-    private List<DMNMessageKS> messages;
+    private List<DMNMessageKS> messages = new ArrayList<>();
 
     @XmlElement(name="status")
     @XStreamAlias("status")
