@@ -15,6 +15,8 @@
 
 package org.kie.server.api.marshalling;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -75,7 +77,7 @@ public class DecisionMarshallingTest {
         DMNContextKS mu_dmnClientRequest = marshallUnmarshall(dmnClientRequest);
         assertEquals(dmnClientRequest.getNamespace(), mu_dmnClientRequest.getNamespace());
         assertEquals(dmnClientRequest.getModelName(), mu_dmnClientRequest.getModelName());
-        assertEquals(dmnClientRequest.getDecisionName(), mu_dmnClientRequest.getDecisionName());
+        assertThat(dmnClientRequest.getDecisionNames(), is(mu_dmnClientRequest.getDecisionNames()));
         assertEquals(dmnClientRequest.getDmnContext().size(), mu_dmnClientRequest.getDmnContext().size());
         assertEquals(dmnClientRequest.getDmnContext().keySet(), mu_dmnClientRequest.getDmnContext().keySet());
         
@@ -84,11 +86,11 @@ public class DecisionMarshallingTest {
         new ServiceResponse<DMNResultKS>(
                 ServiceResponse.ResponseType.SUCCESS,
                 "Test case",
-                new DMNResultKS(model.getNamespace(), model.getName(), dmnClientRequest.getDecisionName(), evaluateAll) );
+                new DMNResultKS(model.getNamespace(), model.getName(), dmnClientRequest.getDecisionNames(), evaluateAll) );
         ServiceResponse<DMNResultKS> mu_dmnClientResponse = marshallUnmarshall(dmnClientResponse);
         assertEquals(dmnClientResponse.getResult().getNamespace(), mu_dmnClientResponse.getResult().getNamespace());
         assertEquals(dmnClientResponse.getResult().getModelName(), mu_dmnClientResponse.getResult().getModelName());
-        assertEquals(dmnClientResponse.getResult().getDecisionName(), mu_dmnClientResponse.getResult().getDecisionName());
+        assertThat(dmnClientResponse.getResult().getDecisionNames(), is(mu_dmnClientResponse.getResult().getDecisionNames()));
         assertEquals(dmnClientResponse.getResult().getDmnContext().size(), mu_dmnClientResponse.getResult().getDmnContext().size());
         assertEquals(dmnClientResponse.getResult().getDmnContext().keySet(), mu_dmnClientResponse.getResult().getDmnContext().keySet());
     }

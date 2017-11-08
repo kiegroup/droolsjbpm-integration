@@ -155,6 +155,7 @@ public class JSONMarshaller implements Marshaller {
 
         deserializeObjectMapper.setConfig(objectMapper.getDeserializationConfig()
                 .with(introspectorPair)
+                .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
 
 
