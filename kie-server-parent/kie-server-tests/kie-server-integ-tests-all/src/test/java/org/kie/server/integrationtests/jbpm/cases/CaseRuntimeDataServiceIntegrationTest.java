@@ -1336,13 +1336,13 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         data.put("s", "first case started");
         CaseFile caseFile = CaseFile.builder()
                 .data(data)
+                .addUserAssignments(CASE_INSURED_ROLE, USER_YODA)
+                .addUserAssignments(CASE_INS_REP_ROLE, USER_JOHN)
                 .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
         assertNotNull(caseId);
-
-        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA);
-
+        
         // Try to add second user to insured role with cardinality 1
         assertClientException(
                 () -> caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA),
@@ -2086,6 +2086,8 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         data.put("s", "first case started");
         CaseFile caseFile = CaseFile.builder()
                 .data(data)
+                .addUserAssignments(CASE_INSURED_ROLE, USER_YODA)
+                .addUserAssignments(CASE_INS_REP_ROLE, USER_JOHN)
                 .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
