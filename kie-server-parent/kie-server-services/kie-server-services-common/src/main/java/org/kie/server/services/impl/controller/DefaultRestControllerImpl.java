@@ -21,7 +21,6 @@ import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.drools.core.util.KeyStoreHelper;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -39,6 +38,8 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.common.KeyStoreHelperUtil.loadPassword;
 
 public class DefaultRestControllerImpl implements KieServerController {
 
@@ -285,19 +286,5 @@ public class DefaultRestControllerImpl implements KieServerController {
                 }
             }
         }
-    }
-
-    private String loadPassword(KieServerConfig config) {
-        String passwordKey;
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper();
-
-        try {
-            passwordKey = keyStoreHelper.getPasswordKey();
-        } catch (RuntimeException re) {
-            logger.warn("Unable to load key store. Using password from configuration");
-            passwordKey = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
-        }
-
-        return passwordKey;
     }
 }

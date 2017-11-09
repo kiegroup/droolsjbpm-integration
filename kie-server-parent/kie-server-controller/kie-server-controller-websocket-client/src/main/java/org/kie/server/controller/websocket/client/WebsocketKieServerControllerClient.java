@@ -38,9 +38,9 @@ import javax.websocket.OnClose;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
-import org.drools.core.util.KeyStoreHelper;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.common.KeyStoreHelperUtil;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandler;
 import org.slf4j.Logger;
@@ -148,7 +148,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
                             super.beforeRequest(headers);
                             
                             String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                            String password = loadPassword(config);
+                            String password = KeyStoreHelperUtil.loadPassword(config);
                             String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
                             
                             if (token != null && !token.isEmpty()) {
@@ -213,19 +213,5 @@ public class WebsocketKieServerControllerClient extends Endpoint {
     @Override
     public void onError(Session session, Throwable thr) {
         logger.error("Error received {} on session {}", thr.getMessage(), session.getId(), thr);
-    }
-
-    private String loadPassword(KieServerConfig config) {
-        String passwordKey;
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper();
-
-        try {
-            passwordKey = keyStoreHelper.getPasswordKey();
-        } catch (RuntimeException re) {
-            logger.warn("Unable to load key store. Using password from configuration");
-            passwordKey = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
-        }
-
-        return passwordKey;
     }
 }

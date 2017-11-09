@@ -33,8 +33,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
     </dependency>
 
     <dependency>
