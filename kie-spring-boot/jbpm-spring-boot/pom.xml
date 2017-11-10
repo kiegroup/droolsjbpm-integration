@@ -29,7 +29,7 @@
   <artifactId>jbpm-spring-boot</artifactId>
 
   <name>jBPM :: Spring :: Boot</name>
-  <description>JBOM integration project for SpringBoot</description>
+  <description>jBPM integration project for SpringBoot</description>
 
   <dependencies>
     <dependency>
