@@ -18,6 +18,15 @@
   </properties>
 
   <dependencies>
+    <!-- KIE -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
     <!-- REST -->
     <dependency>
       <groupId>org.jboss.spec.javax.ws.rs</groupId>
