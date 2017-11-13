@@ -52,6 +52,7 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
 
     private static final String CASE_INSURED_ROLE = "insured";
     private static final String CASE_INS_REP_ROLE = "insuranceRepresentative";
+    private static final String CASE_INS_ASSESSOR_ROLE = "assessor";
 
     private static final String CLAIM_CASE_DEF_ID = "insurance-claims.CarInsuranceClaimCase";
 
@@ -222,6 +223,7 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         CaseFile caseFile = CaseFile.builder()
                 .addUserAssignments(CASE_INSURED_ROLE, insured)
                 .addUserAssignments(CASE_INS_REP_ROLE, insuranceRep)
+                .addUserAssignments(CASE_INS_ASSESSOR_ROLE, insuranceRep)
                 .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);

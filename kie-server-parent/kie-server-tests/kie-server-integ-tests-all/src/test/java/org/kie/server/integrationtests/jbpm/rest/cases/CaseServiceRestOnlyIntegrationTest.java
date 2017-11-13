@@ -71,7 +71,11 @@ public class CaseServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationT
 
     @Test
     public void testCreateCase() {
-        Entity<CaseFile> caseFile = Entity.entity(new CaseFile(), getMediaType());
+        CaseFile caseFileObj = CaseFile.builder()
+                .addUserAssignments(CASE_OWNER_ROLE, USER_YODA)
+                .addUserAssignments(CASE_CONTACT_ROLE, USER_JOHN)
+                .build();
+        Entity<CaseFile> caseFile = Entity.entity(caseFileObj, getMediaType());
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
         valuesMap.put(RestURI.CASE_DEF_ID, CASE_HR_DEF_ID);
