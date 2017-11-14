@@ -77,7 +77,7 @@ public class ControllerStorageFileWatcher implements Runnable {
                         if (modifiedFile.getName().equals(templateFileName)) {
                             log.debug("Received template file update event, reloading...");
                             try (FileReader reader = new FileReader(new File(toWatch.toFile(), templateFileName))){                                                                
-                                this.storage.reloadTemplateMaps();
+                                this.storage.loadTemplateMapsFromFile();
                                 log.info("Successfully reloaded server templates from file");
                             } catch (Exception e) {
                                 log.error("Unexpected exception while reading updated template file :: " + e.getMessage(), e);

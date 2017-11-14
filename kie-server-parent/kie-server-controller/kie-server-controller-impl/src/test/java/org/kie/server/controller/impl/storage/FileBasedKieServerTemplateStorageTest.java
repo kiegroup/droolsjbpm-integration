@@ -180,7 +180,7 @@ public class FileBasedKieServerTemplateStorageTest {
          * More in depth testing of the actual elements retrieve
          * happens in later tests
         */
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         assertEquals("Mismatched number of server templates",templateMap.keySet().size(),storage.loadKeys().size());
     }
     
@@ -191,7 +191,7 @@ public class FileBasedKieServerTemplateStorageTest {
          * that the code that checks for loading from
          * files is called
          */
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         List<ServerTemplateKey> keys = storage.loadKeys();
         /*
          * Now we check that both the number of keys retrieved is correct
@@ -206,7 +206,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @Test
     public void testLoadList() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         List<ServerTemplate> templates = storage.load();
         assertEquals("Mismatched number of server templates",templateMap.values().size(),templates.size());
         templateMap.values().forEach(value -> {
@@ -216,14 +216,14 @@ public class FileBasedKieServerTemplateStorageTest {
  
     @Test
     public void testLoadSingle() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         loadTemplateWithAssertEquals(toSearchFor);
     }
 
     @Test
     public void testLoadNotExisting() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         String notExists = "not-exists";
         ServerTemplate loadedTemplate = storage.load(notExists);
         assertNull(loadedTemplate);
@@ -231,14 +231,14 @@ public class FileBasedKieServerTemplateStorageTest {
 
     @Test
     public void testExists() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         assertTrue("Exists fails",storage.exists(toSearchFor.getId()));
     }
 
     @Test
     public void testNotExists() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         String notExists = "not-exists";
         assertFalse("Exists return true for not existing id: " + notExists, storage.exists(notExists));
     }
@@ -246,11 +246,11 @@ public class FileBasedKieServerTemplateStorageTest {
     @Test
     public void testUpdate() {
         final String testName = "Updated template Name";
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         ServerTemplate toUpdateTemplate = getFirstTemplateFromMap();
         toUpdateTemplate.setName(testName);
         storage.update(toUpdateTemplate);
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         loadTemplateWithAssertEquals(toUpdateTemplate);
     }
     
@@ -265,11 +265,11 @@ public class FileBasedKieServerTemplateStorageTest {
 
     @Test
     public void testDeleteNotExistingTemplate() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         List<ServerTemplate> templates = storage.load();
         assertEquals("Mismatched number of server templates", templateMap.values().size(), templates.size());
         storage.delete("not-exists");
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         templates = storage.load();
         assertEquals("Mismatched number of server templates", templateMap.values().size(), templates.size());
     }
@@ -285,12 +285,12 @@ public class FileBasedKieServerTemplateStorageTest {
         FileBasedKieServerTemplateStorage secondStorage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath());
         
         System.setProperty(FileBasedKieServerTemplateStorage.STORAGE_FILE_WATCHER_ENABLED, "true");
-        CountDownLatch waitForReload = new CountDownLatch(1);
+        CountDownLatch waitForReload = new CountDownLatch(2);
         storage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath()) {
 
             @Override
-            public void reloadTemplateMaps() {                
-                super.reloadTemplateMaps();
+            public void loadTemplateMapsFromFile() {
+                super.loadTemplateMapsFromFile();
                 waitForReload.countDown();
             }
             
