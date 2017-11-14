@@ -41,6 +41,13 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis' -->
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
