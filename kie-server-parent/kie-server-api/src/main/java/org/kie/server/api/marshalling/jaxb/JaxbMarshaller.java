@@ -45,6 +45,7 @@ import org.drools.core.command.runtime.rule.GetFactHandlesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.drools.core.common.DefaultFactHandle;
+import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -266,6 +267,7 @@ public class JaxbMarshaller implements Marshaller {
                 TaskAttachment.class,
                 TaskAttachmentList.class,
 
+                WorkItemImpl.class,
                 WorkItemInstance.class,
                 WorkItemInstanceList.class,
 
