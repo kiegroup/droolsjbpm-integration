@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -496,6 +497,36 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertEquals(jobId, jobRequest.getId());
         assertEquals(STATUS.DONE.toString(), jobRequest.getStatus());
         assertEquals(PRINT_OUT_COMMAND, jobRequest.getCommandName());
+    }
 
+    @Test
+    public void testScheduleAndRunJobWithWorkItem() throws Exception {
+        JobRequestInstance jobRequestInstance = createJobRequestInstance();
+        final WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setId(1);
+        workItem.setName("testWorkItemName");
+        workItem.setDeploymentId("test-1.0.0");
+        workItem.setState(1);
+        jobRequestInstance.getData().put("workItem",
+                                         workItem);
+
+        Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue(jobId.longValue() > 0);
+
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient,
+                                                    jobId);
+
+        final RequestInfoInstance jobRequest = jobServicesClient.getRequestById(jobId,
+                                                                                true,
+                                                                                true);
+        assertNotNull(jobRequest);
+        assertEquals(jobId,
+                     jobRequest.getId());
+        assertEquals(STATUS.DONE.toString(),
+                     jobRequest.getStatus());
+        assertEquals(PRINT_OUT_COMMAND,
+                     jobRequest.getCommandName());
+        assertNotNull(jobRequest.getData().get("workItem"));
     }
 }
