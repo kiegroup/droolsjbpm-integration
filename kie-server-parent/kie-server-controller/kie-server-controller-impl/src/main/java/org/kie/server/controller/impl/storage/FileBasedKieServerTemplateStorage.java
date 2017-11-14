@@ -95,7 +95,7 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     	} else {
     		this.templatesLocation = System.getProperty(SERVER_TEMPLATE_FILE_NAME_PROP, DEFAULT_SERVER_TEMPLATE_FILENAME);
     	}
-    	loadTemplateMapsFromFile();
+        loadTemplateMapsFromFile();
     	
     	// setup template file watcher to be updated when changes are discovered
         if (configWatcherEnabled ) {
@@ -120,8 +120,11 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
      * Loads the map of server templates from the file pointed at by the templatesLocation
      */
     @SuppressWarnings("unchecked")
-    private synchronized void loadTemplateMapsFromFile() {
+    public synchronized void loadTemplateMapsFromFile() {
         ArrayList<ServerTemplate> templates = null;
+        Map<String, ServerTemplate> newTemplateMap = new ConcurrentHashMap<>();
+        Map<String, ServerTemplateKey> newTemplateKeyMap = new ConcurrentHashMap<>();
+
         try (FileReader reader = new FileReader(templatesLocation)) {
             templates = (ArrayList<ServerTemplate>)this.xstream.fromXML(reader);
         } catch (StreamException | FileNotFoundException e) {
@@ -132,10 +135,12 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
         }
         if (templates != null && !templates.isEmpty()) {
             templates.forEach(template -> {
-                templateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
-                templateMap.put(template.getId(),template);
+                newTemplateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
+                newTemplateMap.put(template.getId(),template);
             });
         }
+        templateKeyMap = newTemplateKeyMap;
+        templateMap = newTemplateMap;
     }
 
 
@@ -211,11 +216,6 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
             templateKeyMap.entrySet().clear();
             templateMap.entrySet().clear();
         }
-    }
-    
-    public void reloadTemplateMaps() {
-        this.clearTemplateMaps();
-        loadTemplateMapsFromFile();
     }
 
     public void setTemplatesLocation(String templatesLocation) {
