@@ -27,8 +27,6 @@ import org.kie.server.api.model.definition.ProcessInstanceField;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.util.ProcessInstanceQueryFilterSpecBuilder;
 
-import static org.kie.server.remote.rest.jbpm.resources.Messages.BAD_REQUEST;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,8 +66,7 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
                                                                                            0,
                                                                                            100 ),
                                400,
-                               BAD_REQUEST.split( "\\{",
-                                                  2 )[0],
+                               "The request could not be understood by the server due to malformed syntax: ",
                                "Can't lookup on specified data set: getProcessInstancesWithFilters");
     }
 

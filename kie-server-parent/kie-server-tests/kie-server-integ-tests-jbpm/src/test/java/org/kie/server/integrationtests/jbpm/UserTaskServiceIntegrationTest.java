@@ -15,7 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,8 +46,6 @@ import org.kie.server.integrationtests.config.TestConfig;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 import static org.kie.server.integrationtests.jbpm.RuntimeDataServiceIntegrationTest.SORT_BY_TASK_EVENTS_TYPE;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_NOT_FOUND;
 
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -1258,20 +1255,20 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testFindTaskEventsForNotExistingTask() {
-        long invalidId = -9999l;
+        String invalidId = "-9,999";
         try {
-            taskClient.findTaskEvents(CONTAINER_ID, invalidId, 0, 10);
+            taskClient.findTaskEvents(CONTAINER_ID, -9999L, 0, 10);
             fail("KieServicesException should be thrown when task not found");
         } catch (KieServicesException e) {
             if(configuration.isRest()) {
-                KieServerAssert.assertResultContainsString(e.getMessage(),  MessageFormat.format(TASK_INSTANCE_NOT_FOUND, invalidId));
+                KieServerAssert.assertResultContainsString(e.getMessage(),  "Could not find task instance with id \"" + invalidId + "\"");
                 KieServicesHttpException httpEx = (KieServicesHttpException) e;
                 assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
             } else {
-                assertTrue(e.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+                assertTrue(e.getMessage().contains("No task found with id " + invalidId));
             }
         } catch (TaskNotFoundException tnfe) {
-            assertTrue(tnfe.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+            assertTrue(tnfe.getMessage().contains("No task found with id " + invalidId));
         }
     }
 
@@ -1303,14 +1300,14 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
                 events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 1, 3, SORT_BY_TASK_EVENTS_TYPE, true);
                 KieServerAssert.assertNullOrEmpty("Task events list is not empty.", events);
             } catch (TaskNotFoundException e) {
-                assertTrue(e.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+                assertTrue(e.getMessage().contains( "No task found with id " + taskInstance.getId() ));
             } catch (KieServicesException ee) {
                 if(configuration.isRest()) {
-                    KieServerAssert.assertResultContainsString(ee.getMessage(), MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskInstance.getId()));
+                    KieServerAssert.assertResultContainsString(ee.getMessage(), "Could not find task instance with id " + taskInstance.getId());
                     KieServicesHttpException httpEx = (KieServicesHttpException) ee;
                     assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
                 } else {
-                    assertTrue(ee.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+                    assertTrue(ee.getMessage().contains( "No task found with id " + taskInstance.getId() ));
                 }
             }
 

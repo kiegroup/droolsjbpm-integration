@@ -26,10 +26,7 @@ import static org.junit.Assert.fail;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
-import static org.kie.server.remote.rest.casemgmt.Messages.CASE_INSTANCE_NOT_FOUND;
-import static org.kie.server.remote.rest.casemgmt.Messages.PROCESS_DEFINITION_NOT_FOUND;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -2075,7 +2072,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         String invalidCaseId = "not-existing-case-id";
         assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, invalidCaseId, CLAIM_CASE_DEF_ID, null),
                 404,
-                MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
+                "Could not find case instance \"" + invalidCaseId + "\"",
                 "Case with id " + invalidCaseId + " not found");
     }
 
@@ -2095,7 +2092,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, invalidProcessId, null),
                 404,
-                MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, invalidProcessId, CONTAINER_ID),
+                "Could not find process definition \"" + invalidProcessId + "\" in container \"" + CONTAINER_ID + "\"",
                 "No process definition found with id: " + invalidProcessId);
     }
     

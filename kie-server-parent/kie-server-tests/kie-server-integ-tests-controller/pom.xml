@@ -62,6 +62,11 @@
         <artifactId>tyrus-core</artifactId>
         <version>${version.org.glassfish.tyrus}</version>
       </dependency>
+      <dependency>
+        <groupId>org.jboss.spec.javax.websocket</groupId>
+        <artifactId>jboss-websocket-api_1.1_spec</artifactId>
+        <version>1.1.1.Final</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -274,6 +279,18 @@
 
   <profiles>
     <profile>
+      <id>local-test-run</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.spec.javax.websocket</groupId>
+          <artifactId>jboss-websocket-api_1.1_spec</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>tomcat8</id>
       <dependencies>
         <dependency>
@@ -285,6 +302,16 @@
     </profile>
     <profile>
       <id>wildfly10</id>
+      <dependencies>
+        <dependency>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-websockets-jsr</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>wildfly11</id>
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>

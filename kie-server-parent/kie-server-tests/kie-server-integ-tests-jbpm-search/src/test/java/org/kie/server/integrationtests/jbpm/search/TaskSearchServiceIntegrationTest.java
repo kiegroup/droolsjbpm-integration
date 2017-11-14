@@ -27,8 +27,6 @@ import org.kie.server.api.model.definition.TaskField;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
 
-import static org.kie.server.remote.rest.jbpm.resources.Messages.BAD_REQUEST;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,8 +67,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
                                                                                      0,
                                                                                      100 ),
                                400,
-                               BAD_REQUEST.split( "\\{",
-                                                  2 )[0],
+                               "The request could not be understood by the server due to malformed syntax: ",
                                "Can't lookup on specified data set: getTasksWithFilters");
     }
 
