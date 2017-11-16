@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -21,6 +21,10 @@
     <module>jbpm-infinispan-persistence</module>
   </modules>
 
+  <properties>
+    <version.org.apache.lucene>5.3.1</version.org.apache.lucene>
+  </properties>
+
   <dependencyManagement>
     <!-- these dependency versions should eventually be moved to droolsjbpm-build-bootstrap -->
     <dependencies>
@@ -40,7 +44,12 @@
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>${version.org.apache.lucene}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
 </project>
