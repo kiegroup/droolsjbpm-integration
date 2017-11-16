@@ -148,7 +148,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
                             super.beforeRequest(headers);
                             
                             String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                            String password = KeyStoreHelperUtil.loadPassword(config);
+                            String password = KeyStoreHelperUtil.loadControllerPassword(config);
                             String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
                             
                             if (token != null && !token.isEmpty()) {
