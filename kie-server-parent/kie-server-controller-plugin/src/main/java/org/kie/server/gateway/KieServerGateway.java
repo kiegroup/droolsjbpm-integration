@@ -23,6 +23,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.common.rest.Authenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

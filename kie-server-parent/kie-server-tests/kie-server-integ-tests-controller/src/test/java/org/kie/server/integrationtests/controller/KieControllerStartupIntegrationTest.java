@@ -175,7 +175,7 @@ public class KieControllerStartupIntegrationTest extends KieControllerManagement
         assertEquals(releaseId, deployedContainer.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, deployedContainer.getStatus());
 
-        mgmtControllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+        mgmtControllerClient.startContainer(containerSpec);
 
         server.startKieServer();
 
@@ -200,7 +200,7 @@ public class KieControllerStartupIntegrationTest extends KieControllerManagement
         mgmtControllerClient.saveServerTemplate(serverTemplate);
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
         mgmtControllerClient.saveContainerSpec(kieServerInfo.getResult().getServerId(), containerSpec);
-        mgmtControllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+        mgmtControllerClient.startContainer(containerSpec);
 
         // Check that there is one container deployed.
         try {
@@ -208,7 +208,7 @@ public class KieControllerStartupIntegrationTest extends KieControllerManagement
         } catch (TimeoutException e) {
             // Sometimes creating container fails in embedded server (unknown Socket timeout error, tends to happen here).
             // Retrigger container creation. These tests should be refactored to use more reliable container instead of embedded TJWSEmbeddedJaxrsServer.
-            mgmtControllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+            mgmtControllerClient.startContainer(containerSpec);
             KieServerSynchronization.waitForKieServerSynchronization(client, 1);
         }
         ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
@@ -222,7 +222,7 @@ public class KieControllerStartupIntegrationTest extends KieControllerManagement
         // Turn kie server off, dispose container and start kie server again.
         server.stopKieServer();
 
-        mgmtControllerClient.stopContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+        mgmtControllerClient.stopContainer(containerSpec);
         mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
 
         server.startKieServer();

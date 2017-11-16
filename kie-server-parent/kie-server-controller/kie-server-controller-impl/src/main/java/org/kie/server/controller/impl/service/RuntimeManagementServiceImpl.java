@@ -30,7 +30,6 @@ public class RuntimeManagementServiceImpl implements RuntimeManagementService {
     private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
 
-
     @Override
     public Collection<ServerInstanceKey> getServerInstances(String serverTemplateId) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);

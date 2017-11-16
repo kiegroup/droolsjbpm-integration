@@ -46,7 +46,7 @@ import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
-import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.controller.management.client.exception.UnexpectedResponseCodeException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -398,7 +398,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
         KieServerAssert.assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
 
-        mgmtControllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+        mgmtControllerClient.startContainer(containerToDeploy);
 
         containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
@@ -411,7 +411,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
         assertEquals(releaseId, containerInfo.getResult().getReleaseId());
 
-        mgmtControllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+        mgmtControllerClient.stopContainer(containerToDeploy);
 
         containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
@@ -425,9 +425,12 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
     @Test
     public void testStartNotExistingContainer() throws Exception {
+        ContainerSpec containerSpec = new ContainerSpec();
+        containerSpec.setId(CONTAINER_ID);
+        containerSpec.setServerTemplateKey(new ServerTemplateKey(kieServerInfo.getServerId(), null));
         // Try to start not existing container using kie controller without created kie server instance.
         try {
-            mgmtControllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            mgmtControllerClient.startContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (UnexpectedResponseCodeException e) {
             assertEquals(404, e.getResponseCode());
@@ -436,7 +439,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         createServerTemplate();
         // Try to start not existing container using kie controller with created kie server instance.
         try {
-            mgmtControllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            mgmtControllerClient.startContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (UnexpectedResponseCodeException e) {
             assertEquals(404, e.getResponseCode());
@@ -445,9 +448,12 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
     @Test
     public void testStopNotExistingContainer() throws Exception {
+        ContainerSpec containerSpec = new ContainerSpec();
+        containerSpec.setId(CONTAINER_ID);
+        containerSpec.setServerTemplateKey(new ServerTemplateKey(kieServerInfo.getServerId(), null));
         // Try to stop not existing container using kie controller without created kie server instance.
         try {
-            mgmtControllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            mgmtControllerClient.stopContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (UnexpectedResponseCodeException e) {
             assertEquals(404, e.getResponseCode());
@@ -456,7 +462,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         createServerTemplate();
         // Try to stop not existing container using kie controller with created kie server instance.
         try {
-            mgmtControllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            mgmtControllerClient.stopContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (UnexpectedResponseCodeException e) {
             assertEquals(404, e.getResponseCode());
@@ -921,8 +927,8 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
 
         // Reset the container, since the update process should not do that by itself
-        mgmtControllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
-        mgmtControllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+        mgmtControllerClient.stopContainer(containerSpec);
+        mgmtControllerClient.startContainer(containerSpec);
 
         // Update the process configuration
         KieServerSynchronization.waitForKieServerConfig(client, CONTAINER_ID, KieServerConstants.PCFG_MERGE_MODE, "OVERRIDE_ALL");

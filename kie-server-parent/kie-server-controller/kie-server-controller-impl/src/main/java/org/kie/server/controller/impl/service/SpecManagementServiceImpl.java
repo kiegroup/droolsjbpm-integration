@@ -170,6 +170,16 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
+    public ContainerSpec getContainerInfo(String serverTemplateId,
+                                          String containerId) {
+        final ServerTemplate serverTemplate = getServerTemplate(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+        }
+        return serverTemplate.getContainerSpec(containerId);
+    }
+
+    @Override
     public synchronized void deleteContainerSpec(String serverTemplateId,
                                                  String containerSpecId) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
