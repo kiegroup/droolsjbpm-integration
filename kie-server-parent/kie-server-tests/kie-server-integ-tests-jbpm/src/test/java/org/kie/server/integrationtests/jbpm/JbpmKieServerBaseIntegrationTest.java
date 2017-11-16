@@ -15,7 +15,10 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -104,5 +107,11 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
 
         processAdminClient = client.getServicesClient(ProcessAdminServicesClient.class);
         userTaskAdminClient = client.getServicesClient(UserTaskAdminServicesClient.class);
+    }
+    
+    protected Date subtractOneMinuteFromDate(Date date) {
+        Instant instant = Instant.from(date.toInstant());
+        instant = instant.minus(Duration.ofMinutes(1));
+        return Date.from(instant);
     }
 }

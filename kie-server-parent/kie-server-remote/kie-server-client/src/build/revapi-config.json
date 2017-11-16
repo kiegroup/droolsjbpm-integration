@@ -299,7 +299,25 @@
 		  "methodName": "updateComment",
 		  "elementKind": "method",
 		  "justification": "Added support for optional restriction on comments"
-		 }
+		 },
+		 {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.TaskInstance> org.kie.server.client.QueryServicesClient::findHumanTasksWithFilters(java.lang.String, org.kie.server.api.model.definition.TaskQueryFilterSpec, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "QueryServicesClient",
+          "methodName": "findHumanTasksWithFilters",
+          "elementKind": "method",
+          "justification": ""
+         },
+         {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.QueryServicesClient::findProcessInstancesWithFilters(java.lang.String, org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "QueryServicesClient",
+          "methodName": "findProcessInstancesWithFilters",
+          "elementKind": "method",
+          "justification": ""
+         }
       ]
     }
   }
