@@ -27,6 +27,15 @@
           "methodName": "updateContainerSpec",
           "elementKind": "method",
           "justification": "Allow to check container integrity when updating specification"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.controller.api.model.spec.ContainerSpec org.kie.server.controller.api.service.SpecManagementService::getContainerInfo(java.lang.String, java.lang.String)",
+          "package": "org.kie.server.controller.api.service",
+          "classSimpleName": "SpecManagementService",
+          "methodName": "getContainerInfo",
+          "elementKind": "method",
+          "justification": "Allow to get container specification"
         }
       ]
     }

@@ -40,6 +40,10 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
     </dependency>
 
@@ -58,6 +62,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-mgmt-client</artifactId>
     </dependency>
 
     <dependency>

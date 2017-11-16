@@ -36,7 +36,6 @@ import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
     private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
-    ;
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
     private NotificationService notificationService = LoggingNotificationService.getInstance();
 

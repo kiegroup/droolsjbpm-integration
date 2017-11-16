@@ -49,7 +49,7 @@ import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.SolverServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 
 public class KieServerSynchronization {
 

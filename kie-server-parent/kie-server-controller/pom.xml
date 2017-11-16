@@ -23,6 +23,7 @@
     <module>kie-server-controller-websocket</module>
     <module>kie-server-controller-websocket-client</module>
     <module>kie-server-controller-websocket-common</module>
+    <module>kie-server-controller-mgmt-client</module>
   </modules>
 
 </project>
