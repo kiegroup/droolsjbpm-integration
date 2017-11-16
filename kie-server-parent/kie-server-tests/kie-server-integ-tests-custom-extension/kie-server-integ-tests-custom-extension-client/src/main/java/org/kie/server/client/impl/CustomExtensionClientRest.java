@@ -32,7 +32,7 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.CustomExtensionClient;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.filter.Authenticator;
+import org.kie.server.common.rest.Authenticator;
 
 public class CustomExtensionClientRest implements CustomExtensionClient {
 

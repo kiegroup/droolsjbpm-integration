@@ -1,27 +1,40 @@
-package org.kie.server.integrationtests.controller.client;
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.kie.server.controller.management.client.rest;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.common.rest.Authenticator;
 import org.kie.server.controller.api.model.KieServerInstance;
 import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
@@ -42,15 +55,14 @@ import org.kie.server.controller.api.model.spec.ServerConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
-import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
-import org.kie.server.integrationtests.shared.filter.Authenticator;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.exception.UnexpectedResponseCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerMgmtControllerClient {
+public class RestKieServerMgmtControllerClient implements KieServerMgmtControllerClient {
 
-    private static Logger logger = LoggerFactory.getLogger(KieServerMgmtControllerClient.class);
+    private static Logger logger = LoggerFactory.getLogger(RestKieServerMgmtControllerClient.class);
 
     private static final String MANAGEMENT_LAST_URI_PART = "/management/servers";
     private static final String CONTAINERS_LAST_URI_PART = "/containers";
@@ -68,83 +80,57 @@ public class KieServerMgmtControllerClient {
     private Client httpClient;
     protected Marshaller marshaller;
 
-    public KieServerMgmtControllerClient(String controllerBaseUrl, String login, String password) {
+    public RestKieServerMgmtControllerClient(String controllerBaseUrl, String login, String password) {
         this(controllerBaseUrl, login, password, DEFAULT_MARSHALLING_FORMAT);
     }
 
-    public KieServerMgmtControllerClient(String controllerBaseUrl, String login, String password, MarshallingFormat format) {
+    public RestKieServerMgmtControllerClient(String controllerBaseUrl, String login, String password, MarshallingFormat format) {
         this.controllerBaseUrl = controllerBaseUrl;
-        httpClient = new ResteasyClientBuilder()
-                .establishConnectionTimeout(10, TimeUnit.SECONDS)
-                .socketTimeout(60, TimeUnit.SECONDS)
-                .build();
-        if (login == null) {
-            login = TestConfig.getUsername();
-            password = TestConfig.getPassword();
-        }
-        httpClient.register(new Authenticator(login, password));
+        httpClient = ClientBuilder.newClient().register(new Authenticator(login, password));
         setMarshallingFormat(format);
     }
 
+    @Override
     public ServerTemplate getServerTemplate(String serverTemplateId) {
         return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId, ServerTemplate.class);
     }
 
-    public void saveContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
-        saveContainerSpec(serverTemplateId, serverTemplateName, containerId, containerAlias, groupId, artifactId, version, status, new HashMap<Capability, ContainerConfig>());
-    }
-
-    public void saveContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
-        ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
-        ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
-        ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);
-        saveContainerSpec(serverTemplateId, containerSpec);
-    }
-
+    @Override
     public void saveContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
         makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerSpec.getId(), containerSpec, Object.class);
     }
 
-    public void updateContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
-        updateContainerSpec(serverTemplateId, serverTemplateName, containerId, containerAlias, groupId, artifactId, version, status, new HashMap<Capability, ContainerConfig>());
-    }
-
-    public void updateContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
-        ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
-        ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
-        ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);
-        updateContainerSpec(serverTemplateId, containerId, containerSpec);
-    }
-
+    @Override
     public void updateContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
         updateContainerSpec(serverTemplateId, containerSpec.getId(), containerSpec);
     }
 
+    @Override
     public void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec) {
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, containerSpec, Object.class);
     }
 
-    public void saveServerTemplate(String serverTemplateId, String serverTemplateName) {
-        ServerTemplate serverTemplate = new ServerTemplate(serverTemplateId, serverTemplateName);
-        saveServerTemplate(serverTemplate);
-    }
-
+    @Override
     public void saveServerTemplate(ServerTemplate serverTemplate) {
         makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplate.getId(), serverTemplate, Object.class);
     }
 
+    @Override
     public void deleteServerTemplate(String serverTemplateId) {
         makeDeleteRequest(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId);
     }
 
+    @Override
     public ContainerSpec getContainerInfo(String serverTemplateId, String containerId) {
         return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, ContainerSpec.class);
     }
 
+    @Override
     public void deleteContainerSpec(String serverTemplateId, String containerId) {
         makeDeleteRequest(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId);
     }
 
+    @Override
     public Collection<ServerTemplate> listServerTemplates() {
         ServerTemplateList serverTemplateList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_LAST_URI_PART, ServerTemplateList.class);
         if (serverTemplateList != null && serverTemplateList.getServerTemplates() != null) {
@@ -154,6 +140,7 @@ public class KieServerMgmtControllerClient {
         return Collections.emptyList();
     }
 
+    @Override
     public Collection<ContainerSpec> listContainerSpec(String serverTemplateId) {
         ContainerSpecList containerSpecList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_LAST_URI_PART, ContainerSpecList.class);
         if (containerSpecList != null && containerSpecList.getContainerSpecs() != null) {
@@ -163,19 +150,78 @@ public class KieServerMgmtControllerClient {
         return Collections.emptyList();
     }
 
-    public void startContainer(String serverTemplateId, String containerId) {
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + STARTED_STATUS_URI_PART, "", null);
+    @Override
+    public void startContainer(ContainerSpecKey containerSpecKey) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + containerSpecKey.getServerTemplateKey().getId() + CONTAINERS_URI_PART + containerSpecKey.getId() + STARTED_STATUS_URI_PART, "", null);
     }
 
-    public void stopContainer(String serverTemplateId, String containerId) {
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + STOPPED_STATUS_URI_PART, "", null);
+    @Override
+    public void stopContainer(ContainerSpecKey containerSpecKey) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + containerSpecKey.getServerTemplateKey().getId() + CONTAINERS_URI_PART + containerSpecKey.getId() + STOPPED_STATUS_URI_PART, "", null);
     }
 
+    @Override
     public void updateContainerConfig(String serverTemplateId, String containerId, Capability capability, ContainerConfig config) {
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + CONFIG_URI_PART + capability.toString(), config, Object.class);
     }
 
+    private static void throwUnsupportedException(){
+        throw new UnsupportedOperationException("Not supported for REST implementation");
+    }
 
+    @Override
+    public Collection<ServerTemplateKey> listServerTemplateKeys() {
+        throwUnsupportedException();
+        return null;
+    }
+
+    @Override
+    public void copyServerTemplate(String serverTemplateId,
+                                   String newServerTemplateId,
+                                   String newServerTemplateName) {
+        throwUnsupportedException();
+    }
+
+    @Override
+    public void updateServerTemplateConfig(String serverTemplateId,
+                                           Capability capability,
+                                           ServerConfig serverTemplateConfig) {
+        throwUnsupportedException();
+    }
+
+    @Override
+    public void scanNow(ContainerSpecKey containerSpecKey) {
+        throwUnsupportedException();
+    }
+
+    @Override
+    public void startScanner(ContainerSpecKey containerSpecKey,
+                             long interval) {
+        throwUnsupportedException();
+    }
+
+    @Override
+    public Collection<ServerInstanceKey> getServerInstances(String serverTemplateId) {
+        throwUnsupportedException();
+        return null;
+    }
+
+    @Override
+    public void stopScanner(ContainerSpecKey containerSpecKey) {
+        throwUnsupportedException();
+    }
+
+    @Override
+    public Collection<Container> getContainers(ServerInstanceKey serverInstanceKey) {
+        throwUnsupportedException();
+        return null;
+    }
+
+    @Override
+    public void upgradeContainer(ContainerSpecKey containerSpecKey,
+                                 ReleaseId releaseId) {
+        throwUnsupportedException();
+    }
 
     private <T> T makeGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
         WebTarget clientRequest = httpClient.target(uri);
@@ -323,13 +369,13 @@ public class KieServerMgmtControllerClient {
 
         switch ( format ) {
             case JAXB:
-                this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerMgmtControllerClient.class.getClassLoader());
+                this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, RestKieServerMgmtControllerClient.class.getClassLoader());
                 break;
             case JSON:
-                this.marshaller = MarshallerFactory.getMarshaller(minimalControllerClasses, format, KieServerMgmtControllerClient.class.getClassLoader());
+                this.marshaller = MarshallerFactory.getMarshaller(minimalControllerClasses, format, RestKieServerMgmtControllerClient.class.getClassLoader());
                 break;
             default:
-                this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerMgmtControllerClient.class.getClassLoader());
+                this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, RestKieServerMgmtControllerClient.class.getClassLoader());
         }
 
     }
@@ -373,8 +419,4 @@ public class KieServerMgmtControllerClient {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> Class<T> castClass(Class<?> aClass) {
-        return (Class<T>)aClass;
-    }
 }

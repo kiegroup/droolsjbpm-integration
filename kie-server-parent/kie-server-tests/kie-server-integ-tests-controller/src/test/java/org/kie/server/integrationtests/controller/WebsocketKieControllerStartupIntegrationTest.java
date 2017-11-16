@@ -67,7 +67,6 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
 
     @BeforeClass
     public static void initialize() throws Exception {
- 
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
     }
@@ -204,7 +203,7 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
         assertEquals(releaseId, deployedContainer.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, deployedContainer.getStatus());
 
-        mgmtControllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+        mgmtControllerClient.startContainer(containerSpec);
 
         server.startKieServer();
 
@@ -229,7 +228,7 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
         mgmtControllerClient.saveServerTemplate(serverTemplate);
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
         mgmtControllerClient.saveContainerSpec(kieServerInfo.getResult().getServerId(), containerSpec);
-        mgmtControllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+        mgmtControllerClient.startContainer(containerSpec);
 
         // Check that there is one container deployed.
         try {
@@ -237,7 +236,7 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
         } catch (TimeoutException e) {
             // Sometimes creating container fails in embedded server (unknown Socket timeout error, tends to happen here).
             // Retrigger container creation. These tests should be refactored to use more reliable container instead of embedded TJWSEmbeddedJaxrsServer.
-            mgmtControllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+            mgmtControllerClient.startContainer(containerSpec);
             KieServerSynchronization.waitForKieServerSynchronization(client, 1);
         }
         ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
@@ -252,7 +251,7 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
         server.stopKieServer();
         KieServerSynchronization.waitForServerInstanceSynchronization(mgmtControllerClient, kieServerInfo.getResult().getServerId(), 0);
 
-        mgmtControllerClient.stopContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+        mgmtControllerClient.stopContainer(containerSpec);
         mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
         
         Collection<ContainerSpec> containerList = mgmtControllerClient.listContainerSpec(serverTemplate.getId());

@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.naming.Context;
 
 import org.junit.AfterClass;
@@ -42,7 +41,8 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieControllerExecutor;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -150,18 +150,25 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     private void disposeServerTemplates() {
-        KieServerMgmtControllerClient mgmtControllerClient;
-        if (TestConfig.isLocalServer()) {
-            mgmtControllerClient = new KieServerMgmtControllerClient(TestConfig.getControllerHttpUrl(), null, null);
-        } else {
-            mgmtControllerClient = new KieServerMgmtControllerClient(TestConfig.getControllerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
+        try (
+                KieServerMgmtControllerClient mgmtControllerClient =
+                TestConfig.isLocalServer() ?
+                        KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                           null,
+                                                                           null,
+                                                                           MarshallingFormat.JAXB) :
+                        KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                           TestConfig.getUsername(),
+                                                                           TestConfig.getPassword(),
+                                                                           MarshallingFormat.JAXB)
+        ) {
+            Collection<ServerTemplate> serverTemplates = mgmtControllerClient.listServerTemplates();
+            for (ServerTemplate serverTemplate : serverTemplates) {
+                mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
+            }
+        } catch (Exception ex){
+            logger.error("Error while deleting server templates: ", ex.getMessage(), ex);
         }
-        mgmtControllerClient.setMarshallingFormat(MarshallingFormat.JAXB);
-        Collection<ServerTemplate> serverTemplates = mgmtControllerClient.listServerTemplates();
-        for (ServerTemplate serverTemplate : serverTemplates) {
-            mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
-        }
-        mgmtControllerClient.close();
     }
 
     protected abstract KieServicesClient createDefaultClient() throws Exception;

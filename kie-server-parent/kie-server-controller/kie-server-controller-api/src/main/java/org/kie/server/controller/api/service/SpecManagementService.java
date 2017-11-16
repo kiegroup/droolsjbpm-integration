@@ -17,9 +17,6 @@ package org.kie.server.controller.api.service;
 
 import java.util.Collection;
 
-import org.kie.server.controller.api.model.runtime.Container;
-import org.kie.server.controller.api.model.runtime.ServerInstance;
-import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
@@ -45,6 +42,8 @@ public interface SpecManagementService {
     Collection<ServerTemplate> listServerTemplates();
 
     Collection<ContainerSpec> listContainerSpec(final String serverTemplateId);
+
+    ContainerSpec getContainerInfo(String serverTemplateId, String containerId);
 
     void deleteContainerSpec(final String serverTemplateId, final String containerSpecId);
 

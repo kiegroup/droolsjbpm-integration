@@ -15,10 +15,13 @@
 
 package org.kie.server.integrationtests.controller;
 
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.Before;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegrationTest {
@@ -28,11 +31,16 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
     @Before
     public void createControllerClient() {
         if (TestConfig.isLocalServer()) {
-            mgmtControllerClient = new KieServerMgmtControllerClient(TestConfig.getControllerHttpUrl(), null, null);
+            mgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                                      null,
+                                                                                      null,
+                                                                                      marshallingFormat);
         } else {
-            mgmtControllerClient = new KieServerMgmtControllerClient(TestConfig.getControllerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
+            mgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                                      TestConfig.getUsername(),
+                                                                                      TestConfig.getPassword(),
+                                                                                      marshallingFormat);
         }
-        mgmtControllerClient.setMarshallingFormat(marshallingFormat);
     }
 
     @Before
@@ -46,7 +54,13 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
     @After
     public void closeControllerClient() {
         if (mgmtControllerClient != null) {
-            mgmtControllerClient.close();
+            try {
+                mgmtControllerClient.close();
+            } catch (IOException e) {
+                logger.error("Error trying to close Kie Server Management Controller Client: {}",
+                             e.getMessage(),
+                             e);
+            }
         }
     }
 }

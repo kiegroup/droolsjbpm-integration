@@ -38,10 +38,10 @@ import org.kie.server.controller.api.model.spec.ContainerSpecList;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
-import org.kie.server.controller.impl.service.SpecManagementServiceImpl;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.impl.service.SpecManagementServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,16 +218,12 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
 
-            ServerTemplate serverTemplate = super.getServerTemplate(serverTemplateId);
-            if (serverTemplate == null) {
-                return createCorrectVariant("Server template " + serverTemplateId + " not found", headers, Response.Status.NOT_FOUND);
-            }
-            ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerId);
+            ContainerSpec containerSpec = super.getContainerInfo(serverTemplateId, containerId);
             if (containerSpec == null) {
                 return createCorrectVariant("Server template " + serverTemplateId + " does not have container with id " + containerId, headers, Response.Status.NOT_FOUND);
             }
             // set it as server template key only to avoid cyclic references between containers and templates
-            containerSpec.setServerTemplateKey(new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()));
+            containerSpec.setServerTemplateKey(new ServerTemplateKey(containerSpec.getServerTemplateKey().getId(), containerSpec.getServerTemplateKey().getName()));
 
             String response = marshal(contentType, containerSpec);
             logger.debug("Returning response for get container {} for server templates with id {}: {}", containerId, serverTemplateId, response);
