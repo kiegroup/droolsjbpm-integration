@@ -25,7 +25,7 @@ import org.kie.server.api.model.Wrapped;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance-query-filter-spec")
-public class ProcessInstanceQueryFilterSpec extends BaseQueryFilterSpec implements Wrapped<ProcessInstanceQueryFilterSpec> {
+public class ProcessInstanceQueryFilterSpec extends QueryFilterSpec implements Wrapped<ProcessInstanceQueryFilterSpec> {
 
 	public ProcessInstanceQueryFilterSpec() {
 	}

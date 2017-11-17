@@ -26,7 +26,7 @@
          parallel build (otherwise the tests fail because of conflicting port binding) -->
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-integ-tests-jbpm-search</artifactId>
+      <artifactId>kie-server-integ-tests-dmn</artifactId>
       <scope>test</scope>
       <exclusions>
         <exclusion>

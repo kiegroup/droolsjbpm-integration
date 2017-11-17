@@ -52,10 +52,13 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
@@ -316,6 +319,16 @@ public class WebsocketKieServerClient implements KieServicesClient {
                 
                 @Override
                 public List<NodeInstance> findActiveNodeInstances(Long processInstanceId, Integer page, Integer pageSize) {
+                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                }
+
+                @Override
+                public List<ProcessInstance> findProcessInstancesWithFilters(String queryName, ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
+                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                }
+
+                @Override
+                public List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
                     throw new UnsupportedOperationException("Not supported for websocket implementation");
                 }
             };
