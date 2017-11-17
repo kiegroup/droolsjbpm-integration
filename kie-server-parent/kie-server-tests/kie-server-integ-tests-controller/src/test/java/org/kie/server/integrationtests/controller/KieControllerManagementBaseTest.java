@@ -16,7 +16,10 @@
 package org.kie.server.integrationtests.controller;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import javax.ws.rs.core.Configuration;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
@@ -30,16 +33,25 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
 
     @Before
     public void createControllerClient() {
+        final Configuration configuration =
+                new ResteasyClientBuilder()
+                        .establishConnectionTimeout(10,
+                                                    TimeUnit.SECONDS)
+                        .socketTimeout(60,
+                                       TimeUnit.SECONDS)
+                        .getConfiguration();
         if (TestConfig.isLocalServer()) {
             mgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
                                                                                       null,
                                                                                       null,
-                                                                                      marshallingFormat);
+                                                                                      marshallingFormat,
+                                                                                      configuration);
         } else {
             mgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
                                                                                       TestConfig.getUsername(),
                                                                                       TestConfig.getPassword(),
-                                                                                      marshallingFormat);
+                                                                                      marshallingFormat,
+                                                                                      configuration);
         }
     }
 

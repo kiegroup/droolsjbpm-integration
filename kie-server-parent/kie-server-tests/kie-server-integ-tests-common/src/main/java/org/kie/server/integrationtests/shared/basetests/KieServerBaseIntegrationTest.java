@@ -23,8 +23,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import javax.naming.Context;
+import javax.ws.rs.core.Configuration;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -150,17 +153,26 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     private void disposeServerTemplates() {
+        final Configuration configuration =
+                new ResteasyClientBuilder()
+                        .establishConnectionTimeout(10,
+                                                    TimeUnit.SECONDS)
+                        .socketTimeout(60,
+                                       TimeUnit.SECONDS)
+                        .getConfiguration();
         try (
                 KieServerMgmtControllerClient mgmtControllerClient =
                 TestConfig.isLocalServer() ?
                         KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
                                                                            null,
                                                                            null,
-                                                                           MarshallingFormat.JAXB) :
+                                                                           MarshallingFormat.JAXB,
+                                                                           configuration) :
                         KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
                                                                            TestConfig.getUsername(),
                                                                            TestConfig.getPassword(),
-                                                                           MarshallingFormat.JAXB)
+                                                                           MarshallingFormat.JAXB,
+                                                                           configuration)
         ) {
             Collection<ServerTemplate> serverTemplates = mgmtControllerClient.listServerTemplates();
             for (ServerTemplate serverTemplate : serverTemplates) {
