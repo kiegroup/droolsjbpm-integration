@@ -31,6 +31,7 @@ public abstract class KSessionFactoryBeanHelper {
     public abstract Object internalNewObject();
 
     public abstract void internalAfterPropertiesSet() throws Exception;
+    public abstract void executeBatch();
 
     public KieBase getKieBase() {
         return kieBase;

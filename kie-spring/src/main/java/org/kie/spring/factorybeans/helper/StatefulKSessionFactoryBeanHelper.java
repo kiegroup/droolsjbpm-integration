@@ -60,7 +60,10 @@ public class StatefulKSessionFactoryBeanHelper extends KSessionFactoryBeanHelper
                         env);
             }
         }
+    }
 
+    @Override
+    public void executeBatch() {
         if (factoryBean.getBatch() != null && !factoryBean.getBatch().isEmpty()) {
             for (Command<?> cmd : factoryBean.getBatch()) {
                 kieSession.execute(cmd);

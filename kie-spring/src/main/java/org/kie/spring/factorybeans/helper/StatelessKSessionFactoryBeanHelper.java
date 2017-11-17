@@ -15,6 +15,11 @@
  */
 package org.kie.spring.factorybeans.helper;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.command.Command;
@@ -29,11 +34,6 @@ import org.kie.api.runtime.StatelessKieSession;
 import org.kie.internal.command.CommandFactory;
 import org.kie.spring.factorybeans.KSessionFactoryBean;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 public class StatelessKSessionFactoryBeanHelper extends KSessionFactoryBeanHelper {
 
     protected StatelessKieSession kieSession;
@@ -47,6 +47,10 @@ public class StatelessKSessionFactoryBeanHelper extends KSessionFactoryBeanHelpe
 
     @Override
     public void internalAfterPropertiesSet() throws Exception {
+    }
+
+    @Override
+    public void executeBatch() {
         if (factoryBean.getBatch() != null && !factoryBean.getBatch().isEmpty()) {
             commands = factoryBean.getBatch();
         }
