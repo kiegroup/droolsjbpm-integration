@@ -16,6 +16,10 @@
 
 package org.kie.server.controller.management.client;
 
+import java.util.Map;
+
+import javax.ws.rs.core.Configuration;
+
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.management.client.rest.RestKieServerMgmtControllerClient;
 
@@ -31,8 +35,12 @@ public class KieServerMgmtControllerClientFactory {
      * @param password user password
      * @return client instance
      */
-    public static KieServerMgmtControllerClient newRestClient(final String controllerUrl, final String login, final String password){
-        return new RestKieServerMgmtControllerClient(controllerUrl, login, password);
+    public static KieServerMgmtControllerClient newRestClient(final String controllerUrl,
+                                                              final String login,
+                                                              final String password) {
+        return new RestKieServerMgmtControllerClient(controllerUrl,
+                                                     login,
+                                                     password);
     }
 
     /**
@@ -43,8 +51,34 @@ public class KieServerMgmtControllerClientFactory {
      * @param format marshaling format
      * @return client instance
      */
-    public static KieServerMgmtControllerClient newRestClient(final String controllerUrl, final String login, final String password, final MarshallingFormat format){
-        return new RestKieServerMgmtControllerClient(controllerUrl, login, password, format);
+    public static KieServerMgmtControllerClient newRestClient(final String controllerUrl,
+                                                              final String login,
+                                                              final String password,
+                                                              final MarshallingFormat format) {
+        return new RestKieServerMgmtControllerClient(controllerUrl,
+                                                     login,
+                                                     password,
+                                                     format);
     }
 
+    /**
+     * Creates a new Kie Controller Management Client using REST based service
+     * @param controllerUrl the URL to the server (e.g.: "http://localhost:8080")
+     * @param login user login
+     * @param password user password
+     * @param format marshaling format
+     * @param configuration REST client configuration
+     * @return client instance
+     */
+    public static KieServerMgmtControllerClient newRestClient(final String controllerUrl,
+                                                              final String login,
+                                                              final String password,
+                                                              final MarshallingFormat format,
+                                                              final Configuration configuration) {
+        return new RestKieServerMgmtControllerClient(controllerUrl,
+                                                     login,
+                                                     password,
+                                                     format,
+                                                     configuration);
+    }
 }
