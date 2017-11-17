@@ -21,11 +21,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -44,17 +44,7 @@ import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ContainerKey;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.Capability;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ContainerSpecKey;
-import org.kie.server.controller.api.model.spec.ContainerSpecList;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
+import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.server.controller.management.client.exception.UnexpectedResponseCodeException;
 import org.slf4j.Logger;
@@ -85,8 +75,12 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
     }
 
     public RestKieServerMgmtControllerClient(String controllerBaseUrl, String login, String password, MarshallingFormat format) {
+        this(controllerBaseUrl, login, password, format, null);
+    }
+
+    public RestKieServerMgmtControllerClient(String controllerBaseUrl, String login, String password, MarshallingFormat format, Configuration configuration) {
         this.controllerBaseUrl = controllerBaseUrl;
-        httpClient = ClientBuilder.newClient().register(new Authenticator(login, password));
+        httpClient = (configuration == null ? ClientBuilder.newClient() : ClientBuilder.newClient(configuration) ).register(new Authenticator(login, password));
         setMarshallingFormat(format);
     }
 
