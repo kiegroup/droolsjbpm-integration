@@ -209,11 +209,13 @@ public class KSessionFactoryBean
             } else if (kSession instanceof KieSession) {
                 helper = new StatefulKSessionFactoryBeanHelper(this, (KieSession) kSession);
             }
-            attachLoggers((KieRuntimeEventManager) kSession);
-            attachListeners((KieRuntimeEventManager) kSession);
             helper.internalAfterPropertiesSet();
             // get ksession from helper as it might change the ksession when persistence is configured
             kSession = helper.internalGetObject();
+            attachLoggers((KieRuntimeEventManager) kSession);
+            attachListeners((KieRuntimeEventManager) kSession);
+            helper.executeBatch();
+
         } else {
             if ("stateless".equalsIgnoreCase(type)) {
                 helper = new StatelessKSessionFactoryBeanHelper(this, null);
