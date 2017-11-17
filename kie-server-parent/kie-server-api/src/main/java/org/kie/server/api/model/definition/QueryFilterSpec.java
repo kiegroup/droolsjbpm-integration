@@ -15,13 +15,17 @@
 
 package org.kie.server.api.model.definition;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.kie.server.api.model.Wrapped;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "query-filter-spec")
@@ -86,4 +90,24 @@ public class QueryFilterSpec {
         return "QueryFilterSpec{" + "orderBy='" + orderBy + '\'' + ", ascending=" + ascending + ", parameters=" + Arrays.toString(parameters) + '}';
     }
 
+    protected void unwrapParameters() {
+        if (parameters == null) {
+            return;
+        }
+        for (QueryParam param : parameters) {
+            if (param.getValue() != null) {
+                List<Object> items = new ArrayList<>();
+
+                param.getValue().forEach(item -> {
+                    Object toAdd = item;
+                    if (item instanceof Wrapped) {
+                        toAdd = ((Wrapped) item).unwrap();
+                    }
+                    items.add(toAdd);
+                });
+
+                param.setValue(items);
+            }
+        }
+    }
 }

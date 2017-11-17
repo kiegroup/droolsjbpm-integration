@@ -65,9 +65,11 @@ import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -1006,6 +1008,68 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
         }
 
         return Collections.emptyList();
+    }
+    
+    @Override
+    public List<ProcessInstance> findProcessInstancesWithFilters(String queryName, ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
+        String mapper = "ProcessInstances";
+        ProcessInstanceList result = null;
+
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+            
+            String queryString = getPagingQueryString("?mapper=" + mapper, page, pageSize);
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_POST_URI, valuesMap) + queryString,
+                    filterSpec, ProcessInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "queryFiltered", serialize(filterSpec), marshaller.getFormat().getType(), new Object[]{queryName, mapper, page, pageSize})));
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();          
+        }
+
+        if (result != null) {
+            return result.getItems();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    
+    @Override
+    public List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
+        String mapper = "UserTasks";
+        TaskInstanceList result = null;
+
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+            
+            String queryString = getPagingQueryString("?mapper=" + mapper, page, pageSize);
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_POST_URI, valuesMap) + queryString,
+                    filterSpec, TaskInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "queryFiltered", serialize(filterSpec), marshaller.getFormat().getType(), new Object[]{queryName, mapper, page, pageSize})));
+            ServiceResponse<TaskInstanceList> response = (ServiceResponse<TaskInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();  
+        }
+
+        if (result != null) {
+            return result.getItems();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     protected Class<?> getResultTypeList(Class<?> resultType) {
