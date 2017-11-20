@@ -63,24 +63,28 @@ import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.jms.ResponseHandler;
-import org.kie.server.controller.websocket.WebsocketSessionManager;
-import org.kie.server.controller.websocket.WebsocketUtils;
-import org.kie.server.controller.websocket.common.handlers.WebsocketServiceResponse;
+import org.kie.server.controller.websocket.WebSocketSessionManager;
+import org.kie.server.controller.websocket.WebSocketUtils;
+import org.kie.server.controller.websocket.common.handlers.WebSocketServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
-public class WebsocketKieServerClient implements KieServicesClient {
+public class WebSocketKieServerClient implements KieServicesClient {
     
-    private static final Logger logger = LoggerFactory.getLogger(WebsocketKieServerClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketKieServerClient.class);
     
-    private WebsocketSessionManager manager = WebsocketSessionManager.getInstance();
+    private WebSocketSessionManager manager = WebSocketSessionManager.getInstance();
     private String url;
     private KieServerInfo serverInfo;
     
-    public WebsocketKieServerClient(String url) {
+    public WebSocketKieServerClient(String url) {
         this.url = url;
         this.serverInfo = manager.getServerInfoByUrl(url);
+    }
+
+    private static <T> T throwUnsupportedException(){
+        throw new UnsupportedOperationException("Not supported for Web Socket implementation");
     }
 
     @Override
@@ -94,258 +98,258 @@ public class WebsocketKieServerClient implements KieServicesClient {
                 
                 @Override
                 public void unregisterQuery(String queryName) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    throwUnsupportedException();
                 }
                 
                 @Override
                 public void setResponseHandler(ResponseHandler responseHandler) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    throwUnsupportedException();
                 }
                 
                 @Override
                 public void replaceQuery(QueryDefinition queryDefinition) {
-                    CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "replaceQuery",  
-                            WebsocketUtils.marshal(MarshallingFormat.JSON.toString(), queryDefinition), MarshallingFormat.JSON.toString(), new Object[]{queryDefinition.getName()})));
-                    sendCommandToAllSessions(script, new WebsocketServiceResponse(true, (message) -> {
-                        WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+                    CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "replaceQuery",
+                                                                                                                                WebSocketUtils.marshal(MarshallingFormat.JSON.toString(), queryDefinition), MarshallingFormat.JSON.toString(), new Object[]{queryDefinition.getName()})));
+                    sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
+                        WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
                         return null;
                     })).getResponses();    
                 }
                 
                 @Override
                 public void registerQuery(QueryDefinition queryDefinition) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    throwUnsupportedException();
                 }
                 
                 @Override
                 public <T> List<T> query(String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public <T> List<T> query(String queryName, String mapper, QueryFilterSpec filterSpec, Integer page, Integer pageSize, Class<T> resultType) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public <T> List<T> query(String queryName, String mapper, String orderBy, Integer page, Integer pageSize, Class<T> resultType) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public <T> List<T> query(String queryName, String mapper, Integer page, Integer pageSize, Class<T> resultType) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public QueryDefinition getQuery(String queryName) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<QueryDefinition> getQueries(Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<VariableInstance> findVariablesCurrentState(Long processInstanceId) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<VariableInstance> findVariableHistory(Long processInstanceId, String variableName, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessDefinition> findProcessesById(String processId) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessDefinition> findProcesses(Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessDefinition> findProcesses(Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstances(Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<ProcessInstance> findProcessInstances(Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public ProcessInstance findProcessInstanceById(Long processInstanceId, boolean withVars) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public ProcessInstance findProcessInstanceById(Long processInstanceId) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public ProcessInstance findProcessInstanceByCorrelationKey(CorrelationKey correlationKey) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public ProcessDefinition findProcessByContainerIdProcessId(String containerId, String processId) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<NodeInstance> findNodeInstances(Long processInstanceId, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public NodeInstance findNodeInstanceByWorkItemId(Long processInstanceId, Long workItemId) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<NodeInstance> findCompletedNodeInstances(Long processInstanceId, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
                 
                 @Override
                 public List<NodeInstance> findActiveNodeInstances(Long processInstanceId, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
 
                 @Override
                 public List<ProcessInstance> findProcessInstancesWithFilters(String queryName, ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
 
                 @Override
                 public List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
-                    throw new UnsupportedOperationException("Not supported for websocket implementation");
+                    return throwUnsupportedException();
                 }
             };
         }
-        
-        throw new UnsupportedOperationException("Not supported for websocket implementation");
-    }    
+
+        return throwUnsupportedException();
+    }
     
-    protected ServiceResponsesList sendCommand(CommandScript script, WebsocketServiceResponse response) {
+    protected ServiceResponsesList sendCommand(CommandScript script, WebSocketServiceResponse response) {
         logger.debug("About to send command {} to kie server located at {}", script, url);
         List<Session> sessions = manager.getByUrl(url);
         
         Session session = sessions.get(0);
         
-        logger.debug("Websocket session ({}) is open {}", session.getId(), session.isOpen());
-        String content = WebsocketUtils.marshal(MarshallingFormat.JSON.getType(), script);
-        logger.debug("Content to be sent over websocket '{}'", content);
+        logger.debug("Web Socket session ({}) is open {}", session.getId(), session.isOpen());
+        String content = WebSocketUtils.marshal(MarshallingFormat.JSON.getType(), script);
+        logger.debug("Content to be sent over Web Socket '{}'", content);
         try {
             manager.getHandler(session.getId()).addHandler(response);
             
@@ -358,7 +362,7 @@ public class WebsocketKieServerClient implements KieServicesClient {
         
     }
     
-    protected ServiceResponsesList sendCommandToAllSessions(CommandScript script, WebsocketServiceResponse response) {
+    protected ServiceResponsesList sendCommandToAllSessions(CommandScript script, WebSocketServiceResponse response) {
         logger.debug("About to send command {} to kie server located at {}", script, url);
         List<Session> sessions = manager.getByUrl(url);
         List<ServiceResponse<?>> responses = new ArrayList<>();
@@ -366,9 +370,9 @@ public class WebsocketKieServerClient implements KieServicesClient {
                
         for (Session session : sessions) {
         
-            logger.debug("Websocket session ({}) is open {}", session.getId(), session.isOpen());
-            String content = WebsocketUtils.marshal(MarshallingFormat.JSON.getType(), script);
-            logger.debug("Content to be sent over websocket '{}'", content);
+            logger.debug("Web Socket session ({}) is open {}", session.getId(), session.isOpen());
+            String content = WebSocketUtils.marshal(MarshallingFormat.JSON.getType(), script);
+            logger.debug("Content to be sent over Web Socket '{}'", content);
             try {
                 manager.getHandler(session.getId()).addHandler(response);
                 
@@ -387,8 +391,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<KieServerInfo> getServerInfo() {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetServerInfoCommand()));
-        ServiceResponse<KieServerInfo> response = (ServiceResponse<KieServerInfo>) sendCommand(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<KieServerInfo> response = (ServiceResponse<KieServerInfo>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -404,8 +408,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new ListContainersCommand(containerFilter)));
-        ServiceResponse<KieContainerResourceList> response = (ServiceResponse<KieContainerResourceList>) sendCommand(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<KieContainerResourceList> response = (ServiceResponse<KieContainerResourceList>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -415,8 +419,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CreateContainerCommand(resource)));
-        ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommandToAllSessions(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -426,8 +430,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetContainerInfoCommand(id)));
-        ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommand(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -437,8 +441,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<Void> disposeContainer(String id) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DisposeContainerCommand(id)));
-        ServiceResponse<Void> response = (ServiceResponse<Void>) sendCommandToAllSessions(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<Void> response = (ServiceResponse<Void>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -447,14 +451,14 @@ public class WebsocketKieServerClient implements KieServicesClient {
 
     @Override
     public ServiceResponsesList executeScript(CommandScript script) {
-        throw new UnsupportedOperationException("Not supported for websocket implementation");
+        return throwUnsupportedException();
     }
 
     @Override
     public ServiceResponse<KieScannerResource> getScannerInfo(String id) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetScannerInfoCommand(id)));
-        ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) sendCommand(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -464,8 +468,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateScannerCommand(id, resource)));
-        ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) sendCommandToAllSessions(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -475,8 +479,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<ReleaseId> getReleaseId(String containerId) {
         CommandScript script = new CommandScript(Collections.singletonList(new GetReleaseIdCommand(containerId)));
-        ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) sendCommand(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -486,8 +490,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateReleaseIdCommand(id, releaseId)));
-        ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) sendCommandToAllSessions(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -497,8 +501,8 @@ public class WebsocketKieServerClient implements KieServicesClient {
     @Override
     public ServiceResponse<KieServerStateInfo> getServerState() {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetServerStateCommand()));
-        ServiceResponse<KieServerStateInfo> response = (ServiceResponse<KieServerStateInfo>) sendCommand(script, new WebsocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebsocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);            
+        ServiceResponse<KieServerStateInfo> response = (ServiceResponse<KieServerStateInfo>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -507,12 +511,12 @@ public class WebsocketKieServerClient implements KieServicesClient {
 
     @Override
     public ServiceResponse<String> executeCommands(String id, String payload) {
-        throw new UnsupportedOperationException("Not supported for websocket implementation");
+        return throwUnsupportedException();
     }
 
     @Override
     public ServiceResponse<String> executeCommands(String id, Command<?> cmd) {
-        throw new UnsupportedOperationException("Not supported for websocket implementation");
+        return throwUnsupportedException();
     }
 
     @Override

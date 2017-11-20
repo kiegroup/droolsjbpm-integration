@@ -17,11 +17,11 @@ package org.kie.server.controller.websocket.client;
 
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.impl.client.KieServicesClientProvider;
-import org.kie.server.controller.websocket.WebsocketSessionManager;
+import org.kie.server.controller.websocket.WebSocketSessionManager;
 
-public class WebsocketKieServerClientProvider implements KieServicesClientProvider {
+public class WebSocketKieServerClientProvider implements KieServicesClientProvider {
 
-    private WebsocketSessionManager manager = WebsocketSessionManager.getInstance();
+    private WebSocketSessionManager manager = WebSocketSessionManager.getInstance();
     
     @Override
     public boolean supports(String url) {        
@@ -30,8 +30,7 @@ public class WebsocketKieServerClientProvider implements KieServicesClientProvid
 
     @Override
     public KieServicesClient get(String url) {
-
-        return new WebsocketKieServerClient(url);
+        return new WebSocketKieServerClient(url);
     }
 
     @Override
