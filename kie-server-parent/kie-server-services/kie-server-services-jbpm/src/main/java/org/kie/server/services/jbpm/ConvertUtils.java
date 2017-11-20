@@ -27,6 +27,7 @@ import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
+import org.jbpm.services.api.model.UserTaskInstanceWithPotOwnerDesc;
 import org.jbpm.services.api.model.VariableDesc;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
@@ -370,6 +371,49 @@ public class ConvertUtils {
                 .expirationTime(userTask.getDueDate())
                 .status(userTask.getStatus())
                 .priority(userTask.getPriority())
+                .build();
+
+        return instance;
+    }
+    
+    public static TaskInstanceList convertToTaskInstanceListPO(Collection<UserTaskInstanceWithPotOwnerDesc> instances) {
+        if (instances == null) {
+            return new TaskInstanceList(new org.kie.server.api.model.instance.TaskInstance[0]);
+        }
+
+        List<TaskInstance> taskInstances = new ArrayList<TaskInstance>(instances.size());
+        for (UserTaskInstanceWithPotOwnerDesc task : instances) {
+            org.kie.server.api.model.instance.TaskInstance instance = convertToTaskPO(task);
+            taskInstances.add(instance);
+        }
+
+        return new TaskInstanceList(taskInstances);
+    }
+    
+    public static TaskInstance convertToTaskPO(UserTaskInstanceWithPotOwnerDesc userTask) {
+
+        TaskInstance instance = TaskInstance.builder()
+                .id(userTask.getTaskId())
+                .name(userTask.getName())
+                .processInstanceId(userTask.getProcessInstanceId())
+                .processId(userTask.getProcessId())
+                .activationTime(userTask.getActivationTime())
+                .actualOwner(userTask.getActualOwner())
+                .containerId(userTask.getDeploymentId())
+                .createdBy(userTask.getCreatedBy())
+                .createdOn(userTask.getCreatedOn())
+                .description(userTask.getDescription())
+                .formName(userTask.getFormName())
+                .expirationTime(userTask.getDueDate())
+                .status(userTask.getStatus())
+                .priority(userTask.getPriority())
+                .subject(userTask.getSubject())
+                .potentialOwners(userTask.getPotentialOwners())
+                .correlationKey(userTask.getCorrelationKey())
+                .lastModificationDate(userTask.getLastModificationDate())
+                .lastModificationUser(userTask.getLastModificationUser())
+                .inputData(userTask.getInputdata())
+                .outputData(userTask.getOutputdata())
                 .build();
 
         return instance;
