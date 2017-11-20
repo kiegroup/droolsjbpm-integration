@@ -39,11 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ServerEndpoint("/websocket/controller/{server-id}")
-public class WebsocketKieServerControllerImpl extends KieServerControllerImpl {
+public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
     
-    private static final Logger logger = LoggerFactory.getLogger(WebsocketKieServerControllerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketKieServerControllerImpl.class);
     
-    private WebsocketSessionManager manager = WebsocketSessionManager.getInstance();
+    private WebSocketSessionManager manager = WebSocketSessionManager.getInstance();
     
     @Inject
     private Instance<KieServerTemplateStorage> templateStorage;
@@ -51,7 +51,7 @@ public class WebsocketKieServerControllerImpl extends KieServerControllerImpl {
     @Inject
     private Instance<NotificationService> notificationService;    
     
-    public WebsocketKieServerControllerImpl() {
+    public WebSocketKieServerControllerImpl() {
         ServiceLoader<PersistingServerTemplateStorageService> storageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
         if (storageServices != null && storageServices.iterator().hasNext()) {
             PersistingServerTemplateStorageService storageService = storageServices.iterator().next();
