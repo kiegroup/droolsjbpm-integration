@@ -32,25 +32,25 @@ import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandl
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebsocketSessionManager {
+public class WebSocketSessionManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebsocketSessionManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketSessionManager.class);
     
     private ConcurrentMap<String, Session> availableSessionsById = new ConcurrentHashMap<>();
     private ConcurrentMap<String, List<Session>> availableSessionsByUrl = new ConcurrentHashMap<>();
     private ConcurrentMap<String, KieServerInfo> sessionToUrl = new ConcurrentHashMap<>();
     private ConcurrentMap<String, KieServerMessageHandler> handlersPerSession = new ConcurrentHashMap<>();
         
-    private static WebsocketSessionManager INSTANCE = new WebsocketSessionManager();
+    private static WebSocketSessionManager INSTANCE = new WebSocketSessionManager();
 
-    public static WebsocketSessionManager getInstance() {
+    public static WebSocketSessionManager getInstance() {
         return INSTANCE;
     }
     
     public void addSession(Session session) {
         this.availableSessionsById.put(session.getId(), session);
         this.handlersPerSession.put(session.getId(), new KieServerMessageHandler(session));
-        logger.debug("Session '" + session.getId() + "' added to websocket manager");
+        logger.debug("Session '" + session.getId() + "' added to Web Socket manager");
     }
     
     public void addSession(KieServerInfo serverInfo, Session session) {
@@ -80,7 +80,7 @@ public class WebsocketSessionManager {
         }
         
         this.handlersPerSession.remove(session.getId());
-        logger.debug("Session '" + session.getId() + "' removed to websocket manager");
+        logger.debug("Session '" + session.getId() + "' removed to Web Socket manager");
         
         if (availableSessionsByUrl.get(serverInfo.getLocation()).isEmpty()) {
             return serverInfo.getLocation();
@@ -115,7 +115,7 @@ public class WebsocketSessionManager {
                 try {
                     session.close(new CloseReason(CloseCodes.GOING_AWAY, "Server is going down"));
                 } catch (Exception e) {
-                   logger.warn("Unexpected error while shutting down websocket session", e);
+                   logger.warn("Unexpected error while shutting down Web Socket session", e);
                 }
             }
         });

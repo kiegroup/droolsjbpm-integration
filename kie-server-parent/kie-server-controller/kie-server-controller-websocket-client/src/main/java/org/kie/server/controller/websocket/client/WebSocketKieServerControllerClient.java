@@ -46,9 +46,9 @@ import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandl
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebsocketKieServerControllerClient extends Endpoint {
+public class WebSocketKieServerControllerClient extends Endpoint {
     
-    private static final Logger logger = LoggerFactory.getLogger(WebsocketKieServerControllerClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketKieServerControllerClient.class);
     
     public static final String AUTHORIZATION = "Authorization";
 
@@ -64,10 +64,10 @@ public class WebsocketKieServerControllerClient extends Endpoint {
     
     private Thread reconnectThread = null;
     
-    private Consumer<WebsocketKieServerControllerClient> onReconnect;
+    private Consumer<WebSocketKieServerControllerClient> onReconnect;
     
     
-    public WebsocketKieServerControllerClient(Consumer<WebsocketKieServerControllerClient> onReconnect) {
+    public WebSocketKieServerControllerClient(Consumer<WebSocketKieServerControllerClient> onReconnect) {
         this.onReconnect = onReconnect;
     }
     
@@ -95,10 +95,10 @@ public class WebsocketKieServerControllerClient extends Endpoint {
                     } catch (InterruptedException e) {
                         break;
                     } catch (RuntimeException e) {
-                        logger.warn("Unable to reconnect to controller over websocket {} due to {}", controllerUrl, e.getMessage());
+                        logger.warn("Unable to reconnect to controller over Web Socket {} due to {}", controllerUrl, e.getMessage());
                     }
                 }
-            }, "Kie Server - Websocket reconnect");
+            }, "Kie Server - Web Socket reconnect");
             reconnectThread.start();
         }
     }
@@ -183,7 +183,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
             this.messageHandler = null;
             session.close();
         } catch (IOException e) {
-            logger.warn("Unexpected error while closing websocket connection to controller", e);
+            logger.warn("Unexpected error while closing Web Socket connection to controller", e);
         }
     }
     
@@ -206,7 +206,7 @@ public class WebsocketKieServerControllerClient extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
-        logger.info("Connection to Kie Controller over websocket is now open with session id " + session.getId());
+        logger.info("Connection to Kie Controller over Web Socket is now open with session id " + session.getId());
         
     }
 

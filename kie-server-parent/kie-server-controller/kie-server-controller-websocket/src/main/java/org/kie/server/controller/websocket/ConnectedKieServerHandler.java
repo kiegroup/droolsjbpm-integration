@@ -35,14 +35,14 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
     
     private static final Logger logger = LoggerFactory.getLogger(ConnectedKieServerHandler.class);
 
-    private WebsocketSessionManager manager;
+    private WebSocketSessionManager manager;
     private Session session;
     private KieServerControllerImpl controller;
     private String serverId;    
     
     private KieServerInfo serverInfo;
     
-    public ConnectedKieServerHandler(WebsocketSessionManager manager, Session session, KieServerControllerImpl controller, String serverId) {
+    public ConnectedKieServerHandler(WebSocketSessionManager manager, Session session, KieServerControllerImpl controller, String serverId) {
         super();
         this.manager = manager;
         this.session = session;
@@ -54,14 +54,14 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
     public String onMessage(String message) {
         String contentType = MarshallingFormat.JSON.getType();
         
-        serverInfo = WebsocketUtils.unmarshal(message, contentType, KieServerInfo.class);
+        serverInfo = WebSocketUtils.unmarshal(message, contentType, KieServerInfo.class);
         manager.addSession(serverInfo, session);
         
         logger.debug("Server info {}", serverInfo);
         KieServerSetup serverSetup = controller.connect(serverInfo);
 
         logger.info("Server with id '{}' connected", serverId);
-        String response = WebsocketUtils.marshal(contentType, serverSetup);
+        String response = WebSocketUtils.marshal(contentType, serverSetup);
         
         return response;
     }

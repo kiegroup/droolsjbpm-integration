@@ -39,29 +39,29 @@ import org.kie.server.services.impl.storage.KieServerState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebsocketKieServerControllerImpl implements KieServerController, KieServerRegistryAware {
+public class WebSocketKieServerControllerImpl implements KieServerController, KieServerRegistryAware {
     
-    private static final Logger logger = LoggerFactory.getLogger(WebsocketKieServerControllerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketKieServerControllerImpl.class);
 
     private KieServerRegistry context;
-    private final WebsocketKieServerControllerClient client;
+    private final WebSocketKieServerControllerClient client;
     private final Marshaller marshaller;
     
     private KieServerInfo serverInfo;
     
     private DefaultRestControllerImpl restController;
 
-    public WebsocketKieServerControllerImpl() {        
+    public WebSocketKieServerControllerImpl() {
         this.marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader());
         
-        this.client = new WebsocketKieServerControllerClient((WebsocketKieServerControllerClient client) -> {
+        this.client = new WebSocketKieServerControllerClient((WebSocketKieServerControllerClient client) -> {
             try {
                 client.sendWithHandler(serialize(serverInfo), (String message) -> {
                     logger.info("Successfully reconnected");
                     return null;
                 });
             } catch (IOException e) {
-                logger.warn("Error when trying to reconnect to websocket server - {}", e.getMessage());
+                logger.warn("Error when trying to reconnect to Web Socket server - {}", e.getMessage());
             }
         });        
     }
@@ -104,7 +104,7 @@ public class WebsocketKieServerControllerImpl implements KieServerController, Ki
                             logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
                         }
                     } else {
-                        logger.info("Kie Server points to non websocket controller '{}', using default REST mechanism", controllerUrl);
+                        logger.info("Kie Server points to non Web Socket controller '{}', using default REST mechanism", controllerUrl);
                         
                         KieServerSetup kieServerSetup = restController.connectToSingleController(serverInfo, config, controllerUrl);
                         if (kieServerSetup != null) {
@@ -135,7 +135,7 @@ public class WebsocketKieServerControllerImpl implements KieServerController, Ki
 
                     if (controllerUrl != null && !controllerUrl.isEmpty() && !controllerUrl.toLowerCase().startsWith("ws")) {
                         
-                        logger.info("Kie Server points to non websocket controller '{}', using default REST mechanism", controllerUrl);
+                        logger.info("Kie Server points to non Web Socket controller '{}', using default REST mechanism", controllerUrl);
                         
                         boolean disconnected = restController.disconnectFromSingleController(serverInfo, config, controllerUrl);
                         if (disconnected) {

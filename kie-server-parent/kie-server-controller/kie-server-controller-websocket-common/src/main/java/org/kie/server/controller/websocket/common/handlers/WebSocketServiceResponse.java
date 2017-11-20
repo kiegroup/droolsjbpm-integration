@@ -23,14 +23,14 @@ import org.kie.server.api.model.ServiceResponse;
 
 
 @SuppressWarnings("rawtypes")
-public class WebsocketServiceResponse extends ServiceResponse implements InternalMessageHandler {
+public class WebSocketServiceResponse extends ServiceResponse implements InternalMessageHandler {
 
     private CountDownLatch latch;
     private ServiceResponse<?> result;
     private Function<String, ServiceResponse<?>> handler;
     
     
-    public WebsocketServiceResponse(boolean isBlocking, Function<String, ServiceResponse<?>> handler) {
+    public WebSocketServiceResponse(boolean isBlocking, Function<String, ServiceResponse<?>> handler) {
         this.handler = handler;
         if (isBlocking) {
             this.latch = new CountDownLatch(1);

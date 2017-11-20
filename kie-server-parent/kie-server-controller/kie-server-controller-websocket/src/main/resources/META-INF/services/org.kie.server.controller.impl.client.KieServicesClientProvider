@@ -1,1 +1,1 @@
-org.kie.server.controller.websocket.client.WebsocketKieServerClientProvider
+org.kie.server.controller.websocket.client.WebSocketKieServerClientProvider

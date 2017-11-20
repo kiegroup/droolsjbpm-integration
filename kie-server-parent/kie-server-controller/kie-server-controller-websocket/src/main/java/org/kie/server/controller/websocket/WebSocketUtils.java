@@ -41,11 +41,11 @@ import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 
-public class WebsocketUtils {
+public class WebSocketUtils {
 
 
-    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(getMinimalModelClasses(), MarshallingFormat.JSON, WebsocketSessionManager.class.getClassLoader());
-    private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, WebsocketSessionManager.class.getClassLoader());
+    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(getMinimalModelClasses(), MarshallingFormat.JSON, WebSocketSessionManager.class.getClassLoader());
+    private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, WebSocketSessionManager.class.getClassLoader());
 
     public static Set<Class<?>> getModelClasses() {
         Set<Class<?>> modelClasses = new HashSet<Class<?>>();

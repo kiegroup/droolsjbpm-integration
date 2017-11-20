@@ -49,7 +49,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerExecutor;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-public class WebsocketKieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
+public class WebSocketKieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0");
 
