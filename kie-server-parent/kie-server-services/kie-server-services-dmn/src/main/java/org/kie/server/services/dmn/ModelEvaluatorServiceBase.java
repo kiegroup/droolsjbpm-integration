@@ -28,10 +28,12 @@ import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
+import org.kie.dmn.api.core.ast.InputDataNode;
 import org.kie.dmn.core.api.DMNFactory;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
+import org.kie.server.api.model.dmn.DMNInputDataInfo;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
@@ -82,6 +84,7 @@ public class ModelEvaluatorServiceBase {
         res.setName(model.getName());
         res.setId(model.getDefinitions().getId());
         res.setDecisions(model.getDecisions().stream().map(ModelEvaluatorServiceBase::decisionToInfo).collect(Collectors.toSet()));
+        res.setInputs(model.getInputs().stream().map(ModelEvaluatorServiceBase::inputDataToInfo).collect(Collectors.toSet()));
         return res;
     }
     
@@ -89,6 +92,13 @@ public class ModelEvaluatorServiceBase {
         DMNDecisionInfo res = new DMNDecisionInfo();
         res.setName(decisionNode.getName());
         res.setId(decisionNode.getId());
+        return res;
+    }
+    
+    public static DMNInputDataInfo inputDataToInfo(InputDataNode inputDataNode) {
+        DMNInputDataInfo res = new DMNInputDataInfo();
+        res.setName(inputDataNode.getName());
+        res.setId(inputDataNode.getId());
         return res;
     }
     
