@@ -15,13 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,12 +33,26 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
-
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeFalse;
-
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 
 
 
@@ -321,12 +328,21 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             taskClient.skipTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
 
+            // find all tasks with Obsolete status - should be only one
+            taskList = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, Arrays.asList("Obsolete"), 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Obsolete);
+
+            // Verify we did skip the task and process moved on
             taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
             taskSummary = taskList.get(0);
-            assertEquals("Second task", taskSummary.getName());
+            checkTaskNameAndStatus(taskSummary, "Second task", Status.Reserved);
 
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
