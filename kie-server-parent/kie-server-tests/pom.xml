@@ -52,6 +52,8 @@
     <version.tomcat8>8.5.12</version.tomcat8>
     <version.wildfly10>10.1.0.Final</version.wildfly10>
     <version.wildfly11>11.0.0.Final</version.wildfly11>
+    <!-- Need to override jboss-remoting version to be compatible with jboss-remote-naming -->
+    <version.org.jboss.remoting>4.0.18.Final</version.org.jboss.remoting>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
@@ -554,6 +556,11 @@
             <scope>import</scope>
           </dependency>
           <dependency>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>${version.org.jboss.remoting}</version>
+          </dependency>
+          <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${version.com.google.guava}</version>
@@ -763,6 +770,11 @@
             <version>${version.wildfly10}</version>
             <type>pom</type>
             <scope>import</scope>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>${version.org.jboss.remoting}</version>
           </dependency>
           <dependency>
             <groupId>com.google.guava</groupId>

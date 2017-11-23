@@ -44,10 +44,10 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
 
     private ServiceLoader<ContainerResolver> containerResolverServiceLoader = ServiceLoader.load(ContainerResolver.class);
     private ServiceLoader<RestrictionPolicy> restrictionPolicyServiceLoader = ServiceLoader.load(RestrictionPolicy.class);
-    
+
     private ContainerResolver containerResolver = new DefaultContainerResolver();
     private RestrictionPolicy restrictionPolicy = new DefaultRestrictionPolicy();
-    
+
     private Map<String, CaptureHostLoadBalancingProxyClient> containerClients = new ConcurrentHashMap<>();
 
     private Configuration configuration;
@@ -85,9 +85,9 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
         }
         client.addHost(serverURI);
     }
-    
+
    public synchronized void removeContainer(String containerId, URI serverURI) {
-        
+
         LoadBalancingProxyClient client = containerClients.get(containerId);
         if (client == null) {
             log.debugf("No backend server found for %s and server URI %s", containerId, serverURI);
@@ -98,18 +98,18 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
 
     @Override
     public ProxyTarget findTarget(HttpServerExchange exchange) {
-        
+
         String containerId = containerResolver.resolveContainerId(exchange, configuration.getContainerInfosPerContainer());
         if (restrictionPolicy.restrictedEndpoint(exchange, containerId)) {
             log.debugf("URL %s is restricted according to policy %s", exchange.getRelativePath(), restrictionPolicy.toString());
             return null;
         }
         LoadBalancingProxyClient client = containerClients.get(containerId);
-        
+
         if (client == null) {
             return null;
         }
-        
+
         return client.findTarget(exchange);
     }
 
@@ -145,7 +145,11 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
                 }
             }, timeout, timeUnit);
         } catch (Exception e) {
-            if (e instanceof SocketException || e instanceof UnknownHostException || e instanceof UnresolvedAddressException ) {
+            if (e instanceof SocketException
+                    || e instanceof UnknownHostException
+                    || e instanceof UnresolvedAddressException
+                    // xnio throws IllegalArgumentException for unresolvable host
+                    || e instanceof IllegalArgumentException) {
                 adminHandler.removeUnavailableServer(client.getUri());
             }
 
