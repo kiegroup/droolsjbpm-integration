@@ -15,15 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response;
-
 import org.jbpm.services.api.TaskNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,25 +22,40 @@ import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.internal.task.api.model.TaskEvent;
+import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
-
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeFalse;
-import static org.kie.server.integrationtests.jbpm.RuntimeDataServiceIntegrationTest.SORT_BY_TASK_EVENTS_TYPE;
-
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
+
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.kie.server.integrationtests.jbpm.RuntimeDataServiceIntegrationTest.SORT_BY_TASK_EVENTS_TYPE;
 
 
 
@@ -359,12 +365,21 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             taskClient.skipTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
 
+            // find all tasks with Obsolete status - should be only one
+            taskList = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, Arrays.asList("Obsolete"), 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Obsolete);
+
+            // Verify we did skip the task and process moved on
             taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
             taskSummary = taskList.get(0);
-            assertEquals("Second task", taskSummary.getName());
+            checkTaskNameAndStatus(taskSummary, "Second task", Status.Reserved);
 
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -1319,7 +1334,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
-    
+
     @Test
     public void testUserTaskUpdate() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
@@ -1342,14 +1357,14 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             Calendar currentTime = Calendar.getInstance();
             currentTime.add(Calendar.DAY_OF_YEAR, 1);
             Date expirationDate = currentTime.getTime();
-           
+
             TaskInstance task = TaskInstance.builder()
                     .name("Modified name")
                     .description("Simple user task.")
                     .priority(10)
                     .expirationTime(expirationDate)
                     .build();
-            
+
             taskClient.updateTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, task);
 
             // retrieve started task
@@ -1364,7 +1379,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
-    
+
     @Test
     public void testUserTaskUpdateWithData() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
@@ -1387,14 +1402,14 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             Calendar currentTime = Calendar.getInstance();
             currentTime.add(Calendar.DAY_OF_YEAR, 1);
             Date expirationDate = currentTime.getTime();
-            
+
             Map<String, Object> inputData = new HashMap<>();
             inputData.put("added input", "test");
-            
+
             Map<String, Object> outputData = new HashMap<>();
             outputData.put("string_", "my custom data");
             outputData.put("person_", createPersonInstance(USER_MARY));
-           
+
             TaskInstance task = TaskInstance.builder()
                     .name("Modified name")
                     .description("Simple user task.")
@@ -1403,7 +1418,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
                     .inputData(inputData)
                     .outputData(outputData)
                     .build();
-            
+
             taskClient.updateTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, task);
 
             // retrieve started task
@@ -1414,11 +1429,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertNotNull(taskInstance.getExpirationDate());
             assertEquals("Modified name", taskInstance.getName());
             assertEquals("Simple user task.", taskInstance.getDescription());
-            
+
             String inputVar = (String) taskInstance.getInputData().get("added input");
             assertNotNull(inputVar);
             assertEquals("test", inputVar);
-            
+
             Object personVar = taskInstance.getOutputData().get("person_");
             assertNotNull(personVar);
             assertEquals(USER_MARY, KieServerReflections.valueOf(personVar, "name"));
