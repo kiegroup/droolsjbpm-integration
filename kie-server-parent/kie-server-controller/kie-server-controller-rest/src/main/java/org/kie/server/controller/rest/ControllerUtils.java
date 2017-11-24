@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.kie.server.common.KeyStoreHelperUtil;
 import org.kie.server.common.rest.RestEasy960Util;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
@@ -227,6 +228,6 @@ public class ControllerUtils {
     }
 
     public static String getPassword() {
-        return System.getProperty(KieServerConstants.CFG_KIE_PASSWORD, "kieserver1!");
+        return KeyStoreHelperUtil.loadPassword();
     }
 }
