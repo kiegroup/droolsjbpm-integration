@@ -51,6 +51,7 @@ public class ContainerUpdateDifferentKBaseIntegrationTest extends DroolsKieServe
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar103").getFile());
     }
 
     @Before
@@ -80,8 +81,6 @@ public class ContainerUpdateDifferentKBaseIntegrationTest extends DroolsKieServe
 
         Object outcome = result1.getValue(PERSON_OUT_IDENTIFIER);
         assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", KieServerReflections.valueOf(outcome, "id"));
-
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar103").getFile());
 
         // now update container with second release id. The rule in there should set different id
         // (namely "Person from kjar101") for the inserted person
