@@ -47,10 +47,10 @@ import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerInstanceManager;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -554,7 +554,6 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         specManagementService.setTemplateStorage(templateStorage);
 
         doReturn(serverTemplate).when(templateStorage).load(serverTemplateId);
-        doReturn(null).when(serverTemplate).getContainersSpec();
 
         expectedException.expect(KieServerControllerNotFoundException.class);
         expectedException.expectMessage("No container spec found for id containerSpecId within server template with id serverTemplateId");
