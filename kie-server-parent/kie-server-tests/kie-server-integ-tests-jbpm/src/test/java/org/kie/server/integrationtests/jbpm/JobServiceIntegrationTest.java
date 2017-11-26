@@ -529,4 +529,15 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
                      jobRequest.getCommandName());
         assertNotNull(jobRequest.getData().get("workItem"));
     }
+
+    @Test
+    public void testGetNonExistentJob() {
+        final long jobId = -1L;
+
+        assertClientException(() -> jobServicesClient.getRequestById(jobId,
+                                                                     false,
+                                                                     false),
+                              404,
+                              "Request with id: " + jobId + " doesn't exist");
+    }
 }
