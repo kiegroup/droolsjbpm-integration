@@ -53,7 +53,7 @@ public class RestKieServicesClientProvider implements KieServicesClientProvider 
     }
 
     protected String getPassword() {
-        return KeyStoreHelperUtil.loadPassword();
+        return KeyStoreHelperUtil.loadServerPassword();
     }
 
     protected String getToken() {
