@@ -58,7 +58,7 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
     @Override
     public void startScanner(final ContainerSpecKey containerSpecKey,
-                             long interval) {
+                             final Long interval) {
 
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {

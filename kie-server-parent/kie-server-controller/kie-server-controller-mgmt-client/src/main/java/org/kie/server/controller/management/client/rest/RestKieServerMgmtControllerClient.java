@@ -16,9 +16,6 @@
 
 package org.kie.server.controller.management.client.rest;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.client.Client;
@@ -42,8 +39,10 @@ import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.KieServerStatus;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ContainerKey;
+import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.server.controller.management.client.exception.UnexpectedResponseCodeException;
@@ -125,23 +124,13 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
     }
 
     @Override
-    public Collection<ServerTemplate> listServerTemplates() {
-        ServerTemplateList serverTemplateList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_LAST_URI_PART, ServerTemplateList.class);
-        if (serverTemplateList != null && serverTemplateList.getServerTemplates() != null) {
-            return Arrays.asList(serverTemplateList.getServerTemplates());
-        }
-
-        return Collections.emptyList();
+    public ServerTemplateList listServerTemplates() {
+        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_LAST_URI_PART, ServerTemplateList.class);
     }
 
     @Override
-    public Collection<ContainerSpec> listContainerSpec(String serverTemplateId) {
-        ContainerSpecList containerSpecList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_LAST_URI_PART, ContainerSpecList.class);
-        if (containerSpecList != null && containerSpecList.getContainerSpecs() != null) {
-            return Arrays.asList(containerSpecList.getContainerSpecs());
-        }
-
-        return Collections.emptyList();
+    public ContainerSpecList listContainerSpec(String serverTemplateId) {
+        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_LAST_URI_PART, ContainerSpecList.class);
     }
 
     @Override
@@ -159,14 +148,13 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + CONFIG_URI_PART + capability.toString(), config, Object.class);
     }
 
-    private static void throwUnsupportedException(){
+    private <T> T throwUnsupportedException(){
         throw new UnsupportedOperationException("Not supported for REST implementation");
     }
 
     @Override
-    public Collection<ServerTemplateKey> listServerTemplateKeys() {
-        throwUnsupportedException();
-        return null;
+    public ServerTemplateKeyList listServerTemplateKeys() {
+        return throwUnsupportedException();
     }
 
     @Override
@@ -190,14 +178,13 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
 
     @Override
     public void startScanner(ContainerSpecKey containerSpecKey,
-                             long interval) {
+                             Long interval) {
         throwUnsupportedException();
     }
 
     @Override
-    public Collection<ServerInstanceKey> getServerInstances(String serverTemplateId) {
-        throwUnsupportedException();
-        return null;
+    public ServerInstanceKeyList getServerInstances(String serverTemplateId) {
+        return throwUnsupportedException();
     }
 
     @Override
@@ -206,9 +193,8 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
     }
 
     @Override
-    public Collection<Container> getContainers(ServerInstanceKey serverInstanceKey) {
-        throwUnsupportedException();
-        return null;
+    public ContainerList getContainers(ServerInstanceKey serverInstanceKey) {
+        return throwUnsupportedException();
     }
 
     @Override

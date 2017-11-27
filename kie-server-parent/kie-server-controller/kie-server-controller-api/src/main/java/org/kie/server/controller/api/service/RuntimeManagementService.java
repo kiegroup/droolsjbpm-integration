@@ -15,16 +15,13 @@
 
 package org.kie.server.controller.api.service;
 
-import java.util.Collection;
-
-import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 
 public interface RuntimeManagementService {
 
-    Collection<ServerInstanceKey> getServerInstances( final String serverTemplateId );
+    ServerInstanceKeyList getServerInstances(String serverTemplateId);
 
-    Collection<Container> getContainers( final ServerInstanceKey serverInstanceKey );
-
-
+    ContainerList getContainers(ServerInstanceKey serverInstanceKey);
 }
