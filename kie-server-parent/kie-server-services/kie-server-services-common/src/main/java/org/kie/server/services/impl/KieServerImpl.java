@@ -766,6 +766,7 @@ public class KieServerImpl implements KieServer {
                 repository.store(KieServerEnvironment.getServerId(), currentState);
 
                 logger.info("Container {} successfully updated to release id {}", id, releaseId);
+                ks.getRepository().removeKieModule(originalReleaseId);
 
                 messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + id));
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
