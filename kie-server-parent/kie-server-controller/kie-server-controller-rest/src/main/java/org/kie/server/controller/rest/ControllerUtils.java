@@ -228,6 +228,6 @@ public class ControllerUtils {
     }
 
     public static String getPassword() {
-        return KeyStoreHelperUtil.loadPassword();
+        return KeyStoreHelperUtil.loadServerPassword();
     }
 }
