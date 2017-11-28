@@ -64,7 +64,7 @@ public class ControllerUtilsTest {
                                                               "mergeMode");
         spec.addConfig(Capability.PROCESS,
                        processConfig);
-        final RuleConfig ruleConfig = new RuleConfig(1l,
+        final RuleConfig ruleConfig = new RuleConfig(1L,
                                                      KieScannerStatus.SCANNING);
         spec.addConfig(Capability.RULE,
                        ruleConfig);
