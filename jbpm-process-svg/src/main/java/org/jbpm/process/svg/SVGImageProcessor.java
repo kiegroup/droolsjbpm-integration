@@ -27,8 +27,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
-import org.apache.batik.dom.svg.SVGOMTSpanElement;
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.anim.dom.SVGOMTSpanElement;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.jbpm.process.svg.model.NodeSummary;
 import org.jbpm.process.svg.model.SVGSummary;
