@@ -41,7 +41,8 @@ public class KieServerTypePermission extends WildcardTypePermission {
                                                                       "org.dashbuilder.dataset.filter.**",
                                                                       "org.dashbuilder.dataset.group.**",
                                                                       "org.dashbuilder.dataset.sort.**",
-                                                                      "org.drools.core.process.instance.impl.WorkItemImpl"
+                                                                      "org.drools.core.process.instance.impl.WorkItemImpl",
+                                                                      "org.jbpm.document.**"
     };
 
     private final Set<Class<?>> classes;
