@@ -54,6 +54,12 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
