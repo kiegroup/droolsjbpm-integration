@@ -56,7 +56,7 @@
         <exclude>javax.validation:validation-api</exclude>
         <exclude>stax:stax-api</exclude>
         <exclude>javax.activation:activation</exclude>
-        <exclude>xml-apis:xml-apis</exclude>
+        <exclude>xml-apis:xml-apis:jar</exclude>
         <exclude>javax.mail:mail</exclude>
       </excludes>
       <includes>
