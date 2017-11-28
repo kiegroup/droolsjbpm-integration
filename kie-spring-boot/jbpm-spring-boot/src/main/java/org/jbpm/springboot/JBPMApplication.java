@@ -24,9 +24,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-public class JBPMSBApplication {
+public class JBPMApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(JBPMSBApplication.class, args);
+        SpringApplication.run(JBPMApplication.class, args);
     }
 }
