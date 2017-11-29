@@ -5,6 +5,7 @@
     <prefer-application-packages>
       <package-name>com.fasterxml.jackson.*</package-name>
       <package-name>org.jboss.logging.*</package-name>
+      <package-name>com.google.common.*</package-name>
     </prefer-application-packages>
   </container-descriptor>
   <security-role-assignment>
