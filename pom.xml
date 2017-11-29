@@ -110,8 +110,8 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-bom</artifactId>
+        <groupId>org.appformer</groupId>
+        <artifactId>appformer-bom</artifactId>
         <version>${version.org.uberfire}</version>
         <type>pom</type>
         <scope>import</scope>

@@ -54,6 +54,8 @@
     <version.wildfly11>11.0.0.Final</version.wildfly11>
     <!-- Need to override jboss-remoting version to be compatible with jboss-remote-naming -->
     <version.org.jboss.remoting>4.0.18.Final</version.org.jboss.remoting>
+    <!-- Version of activemq compatible with versions used in wildfly 10 -->
+    <version.org.apache.activemq.wildfly10>1.1.0</version.org.apache.activemq.wildfly10>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
@@ -634,6 +636,11 @@
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>${version.com.sun.xml.bind}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-jms-client</artifactId>
+            <version>${version.org.apache.activemq.wildfly10}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
