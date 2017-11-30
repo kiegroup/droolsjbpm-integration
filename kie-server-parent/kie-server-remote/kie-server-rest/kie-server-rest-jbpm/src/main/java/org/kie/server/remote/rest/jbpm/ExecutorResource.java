@@ -32,6 +32,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.text.MessageFormat;
@@ -343,6 +344,8 @@ public class ExecutorResource {
             String response = executorServiceBase.getRequestById(requestId, withErrors, withData, type);
 
             return createResponse(response, v, Response.Status.OK, conversationIdHeader);
+        } catch (IllegalArgumentException e) {
+            return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
