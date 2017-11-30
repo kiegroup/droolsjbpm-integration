@@ -15,47 +15,39 @@
 
 package org.kie.server.controller.api.service;
 
-import java.util.Collection;
-
-import org.kie.server.controller.api.model.spec.Capability;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ContainerSpecKey;
-import org.kie.server.controller.api.model.spec.ServerConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.*;
 
 public interface SpecManagementService {
 
-    void saveContainerSpec(final String serverTemplateId, final ContainerSpec containerSpec);
+    void saveContainerSpec(String serverTemplateId, ContainerSpec containerSpec);
 
-    void updateContainerSpec(final String serverTemplateId, final ContainerSpec containerSpec);
+    void updateContainerSpec(String serverTemplateId, ContainerSpec containerSpec);
 
-    void updateContainerSpec(final String serverTemplateId, final String containerId, final ContainerSpec containerSpec);
+    void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec);
 
-    void saveServerTemplate(final ServerTemplate serverTemplate);
+    void saveServerTemplate(ServerTemplate serverTemplate);
 
-    ServerTemplate getServerTemplate(final String serverTemplateId);
+    ServerTemplate getServerTemplate(String serverTemplateId);
 
-    Collection<ServerTemplateKey> listServerTemplateKeys();
+    ServerTemplateKeyList listServerTemplateKeys();
 
-    Collection<ServerTemplate> listServerTemplates();
+    ServerTemplateList listServerTemplates();
 
-    Collection<ContainerSpec> listContainerSpec(final String serverTemplateId);
+    ContainerSpecList listContainerSpec(String serverTemplateId);
 
     ContainerSpec getContainerInfo(String serverTemplateId, String containerId);
 
-    void deleteContainerSpec(final String serverTemplateId, final String containerSpecId);
+    void deleteContainerSpec(String serverTemplateId, String containerSpecId);
 
-    void deleteServerTemplate(final String serverTemplateId);
+    void deleteServerTemplate(String serverTemplateId);
 
-    void copyServerTemplate(final String serverTemplateId,  final String newServerTemplateId, final String newServerTemplateName);
+    void copyServerTemplate(String serverTemplateId,  String newServerTemplateId, String newServerTemplateName);
 
-    void updateContainerConfig(final String serverTemplateId, final String containerSpecId, final Capability capability, final ContainerConfig containerConfig);
+    void updateContainerConfig(String serverTemplateId, String containerSpecId, Capability capability, ContainerConfig containerConfig);
 
-    void updateServerTemplateConfig(final String serverTemplateId, final Capability capability, final ServerConfig serverTemplateConfig);
+    void updateServerTemplateConfig(String serverTemplateId, Capability capability, ServerConfig serverTemplateConfig);
 
-    void startContainer(final ContainerSpecKey containerSpecKey);
+    void startContainer(ContainerSpecKey containerSpecKey);
 
-    void stopContainer(final ContainerSpecKey containerSpecKey);
+    void stopContainer(ContainerSpecKey containerSpecKey);
 }

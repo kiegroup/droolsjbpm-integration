@@ -15,7 +15,6 @@
 
 package org.kie.server.controller.rest;
 
-import java.util.Collection;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -34,10 +33,8 @@ import org.kie.server.controller.api.KieServerControllerNotFoundException;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpecKey;
-import org.kie.server.controller.api.model.spec.ContainerSpecList;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
@@ -169,9 +166,8 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get server templates");
-            Collection<ServerTemplate> servers = super.listServerTemplates();
 
-            String response = marshal(contentType, new ServerTemplateList(servers));
+            String response = marshal(contentType, super.listServerTemplates());
             logger.debug("Returning response for get server templates: {}", response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);
@@ -194,9 +190,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         try {
             logger.debug("Received get containers for server template with id {}", serverTemplateId);
 
-            Collection<ContainerSpec> containerSpecs =  super.listContainerSpec(serverTemplateId);
-
-            String response = marshal(contentType, new ContainerSpecList(containerSpecs));
+            String response = marshal(contentType, super.listContainerSpec(serverTemplateId));
             logger.debug("Returning response for get containers for server templates with id {}: {}", serverTemplateId, response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);

@@ -20,7 +20,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
@@ -42,7 +41,9 @@ import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ContainerSpecList;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -125,9 +126,9 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         server.stopKieServer();
 
         // Check that there are no kie servers deployed in controller.
-        Collection<ServerTemplate> instanceList = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
         assertNotNull(instanceList);
-        KieServerAssert.assertNullOrEmpty("Active kie server instance found!", instanceList);
+        KieServerAssert.assertNullOrEmpty("Active kie server instance found!", instanceList.getServerTemplates());
 
         // Turn on new kie server.
         server.startKieServer();
@@ -135,7 +136,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         // Check that kie server is registered in controller.
         instanceList = mgmtControllerClient.listServerTemplates();
         assertNotNull(instanceList);
-        assertEquals(1, instanceList.size());
+        assertEquals(1, instanceList.getServerTemplates().length);
 
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> reply = client.getServerInfo();
@@ -143,7 +144,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         assertNotNull(reply.getResult());
 
-        ServerTemplate deployedServerInstance = instanceList.iterator().next();
+        ServerTemplate deployedServerInstance = instanceList.getServerTemplates()[0];
         assertNotNull(deployedServerInstance);
         assertEquals(reply.getResult().getServerId(), deployedServerInstance.getId());
     }
@@ -159,17 +160,17 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         mgmtControllerClient.saveServerTemplate(serverTemplate);
 
         // Check that kie server is registered.
-        Collection<ServerTemplate> instanceList = mgmtControllerClient.listServerTemplates();
-        assertEquals(1, instanceList.size());
-        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.iterator().next().getId()); //maybe change to avoid next -> null
+        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
+        assertEquals(1, instanceList.getServerTemplates().length);
+        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getServerTemplates()[0].getId()); //maybe change to avoid next -> null
 
         // Turn off embedded kie server.
         server.stopKieServer();
 
         // Check that kie server is down in controller.
         instanceList = mgmtControllerClient.listServerTemplates();
-        assertEquals(1, instanceList.size());
-        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.iterator().next().getId()); //maybe change to avoid next -> null
+        assertEquals(1, instanceList.getServerTemplates().length);
+        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getServerTemplates()[0].getId()); //maybe change to avoid next -> null
     }
 
     @Test
@@ -185,8 +186,8 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         KieServerAssert.assertNullOrEmpty("Active containers found!", containersList.getResult().getContainers());
 
         // Check that there are no kie servers deployed in controller.
-        Collection<ServerTemplate> instanceList = mgmtControllerClient.listServerTemplates();
-        KieServerAssert.assertNullOrEmpty("Active kie server instance found!", instanceList);
+        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
+        KieServerAssert.assertNullOrEmpty("Active kie server instance found!", instanceList.getServerTemplates());
 
         // Turn kie server off, add embedded kie server to controller, create container and start kie server again.
         server.stopKieServer();
@@ -244,8 +245,8 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertNotNull(containersList.getResult().getContainers());
         assertEquals(1, containersList.getResult().getContainers().size());
 
-        Collection<ServerTemplate> instanceList = mgmtControllerClient.listServerTemplates();
-        assertEquals(1, instanceList.size());
+        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
+        assertEquals(1, instanceList.getServerTemplates().length);
 
         // Turn kie server off, dispose container and start kie server again.
         server.stopKieServer();
@@ -254,8 +255,8 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         mgmtControllerClient.stopContainer(containerSpec);
         mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
         
-        Collection<ContainerSpec> containerList = mgmtControllerClient.listContainerSpec(serverTemplate.getId());
-        assertEquals(0, containerList.size());
+        ContainerSpecList containerList = mgmtControllerClient.listContainerSpec(serverTemplate.getId());
+        KieServerAssert.assertNullOrEmpty("Active containers spec found!", containerList.getContainerSpecs());
 
         server.startKieServer();
 

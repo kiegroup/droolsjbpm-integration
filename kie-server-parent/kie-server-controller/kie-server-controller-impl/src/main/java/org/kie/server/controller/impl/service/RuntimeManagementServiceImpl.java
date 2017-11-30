@@ -18,7 +18,9 @@ package org.kie.server.controller.impl.service;
 import java.util.Collection;
 
 import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -31,21 +33,19 @@ public class RuntimeManagementServiceImpl implements RuntimeManagementService {
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
 
     @Override
-    public Collection<ServerInstanceKey> getServerInstances(String serverTemplateId) {
+    public ServerInstanceKeyList getServerInstances(String serverTemplateId) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
             throw new RuntimeException("No server template found for id " + serverTemplateId);
         }
 
-        return serverTemplate.getServerInstanceKeys();
+        return new ServerInstanceKeyList(serverTemplate.getServerInstanceKeys());
     }
 
     @Override
-    public Collection<Container> getContainers(ServerInstanceKey serverInstanceKey) {
-
+    public ContainerList getContainers(ServerInstanceKey serverInstanceKey) {
         Collection<Container> containers = kieServerInstanceManager.getContainers(serverInstanceKey);
-
-        return containers;
+        return new ContainerList(containers);
     }
 
 
