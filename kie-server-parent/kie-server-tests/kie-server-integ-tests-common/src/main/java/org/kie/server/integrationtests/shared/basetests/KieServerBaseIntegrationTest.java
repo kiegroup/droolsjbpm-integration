@@ -18,7 +18,6 @@ package org.kie.server.integrationtests.shared.basetests;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +43,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -174,9 +174,11 @@ public abstract class KieServerBaseIntegrationTest {
                                                                            MarshallingFormat.JAXB,
                                                                            configuration)
         ) {
-            Collection<ServerTemplate> serverTemplates = mgmtControllerClient.listServerTemplates();
-            for (ServerTemplate serverTemplate : serverTemplates) {
-                mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
+            ServerTemplateList serverTemplates = mgmtControllerClient.listServerTemplates();
+            if(serverTemplates.getServerTemplates() != null) {
+                for (ServerTemplate serverTemplate : serverTemplates.getServerTemplates()) {
+                    mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
+                }
             }
         } catch (Exception ex){
             logger.error("Error while deleting server templates: ", ex.getMessage(), ex);

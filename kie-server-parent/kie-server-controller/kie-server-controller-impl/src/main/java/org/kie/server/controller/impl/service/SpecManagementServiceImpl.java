@@ -29,15 +29,7 @@ import org.kie.server.controller.api.KieServerControllerNotFoundException;
 import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
-import org.kie.server.controller.api.model.spec.Capability;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ContainerSpecKey;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -150,23 +142,23 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public Collection<ServerTemplateKey> listServerTemplateKeys() {
-        return templateStorage.loadKeys();
+    public ServerTemplateKeyList listServerTemplateKeys() {
+        return new ServerTemplateKeyList(templateStorage.loadKeys());
     }
 
     @Override
-    public Collection<ServerTemplate> listServerTemplates() {
-        return templateStorage.load();
+    public ServerTemplateList listServerTemplates() {
+        return new ServerTemplateList(templateStorage.load());
     }
 
     @Override
-    public Collection<ContainerSpec> listContainerSpec(String serverTemplateId) {
+    public ContainerSpecList listContainerSpec(String serverTemplateId) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
             throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
-        return serverTemplate.getContainersSpec();
+        return new ContainerSpecList(serverTemplate.getContainersSpec());
     }
 
     @Override

@@ -39,13 +39,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.Capability;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.management.client.exception.UnexpectedResponseCodeException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.category.Smoke;
@@ -88,11 +82,11 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         ServerTemplate storedServerTemplate = mgmtControllerClient.getServerTemplate(serverTemplate.getId());
         checkServerTemplate(storedServerTemplate);
 
-        Collection<ServerTemplate> serverTemplates = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList serverTemplates = mgmtControllerClient.listServerTemplates();
         assertNotNull(serverTemplates);
-        assertEquals(1, serverTemplates.size());
+        assertEquals(1, serverTemplates.getServerTemplates().length);
 
-        storedServerTemplate = serverTemplates.iterator().next();
+        storedServerTemplate = serverTemplates.getServerTemplates()[0];
         checkServerTemplate(storedServerTemplate);
     }
 
@@ -114,16 +108,16 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
     public void testDeleteServerTemplate() {
         ServerTemplate serverTemplate = createServerTemplate();
 
-        Collection<ServerTemplate> serverTemplates = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList serverTemplates = mgmtControllerClient.listServerTemplates();
         assertNotNull(serverTemplates);
-        assertEquals(1, serverTemplates.size());
+        assertEquals(1, serverTemplates.getServerTemplates().length);
 
         // Delete created server template.
         mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
 
         // There are no kie server instances in controller now.
         serverTemplates = mgmtControllerClient.listServerTemplates();
-        KieServerAssert.assertNullOrEmpty("Active kie server instance found!", serverTemplates);
+        KieServerAssert.assertNullOrEmpty("Active kie server instance found!", serverTemplates.getServerTemplates());
     }
 
     @Test
@@ -177,12 +171,12 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         createServerTemplate();
 
         // List kie server instances.
-        Collection<ServerTemplate> instanceList = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
 
         assertNotNull(instanceList);
-        assertEquals(1, instanceList.size());
+        assertEquals(1, instanceList.getServerTemplates().length);
 
-        ServerTemplate serverInstance = instanceList.iterator().next();
+        ServerTemplate serverInstance = instanceList.getServerTemplates()[0];
         checkServerTemplate(serverInstance);
 
         assertNotNull("Kie server instance isn't managed!", serverInstance.getServerInstanceKeys());
@@ -196,8 +190,8 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
     @Test
     public void testEmptyListServerTemplates() throws Exception {
-        Collection<ServerTemplate> instanceList = mgmtControllerClient.listServerTemplates();
-        KieServerAssert.assertNullOrEmpty("Server templates found!", instanceList);
+        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
+        KieServerAssert.assertNullOrEmpty("Server templates found!", instanceList.getServerTemplates());
     }
 
     @Test
@@ -498,12 +492,12 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
         mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
-        Collection<ContainerSpec> containerList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
+        ContainerSpecList containerList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
 
         assertNotNull(containerList);
-        assertEquals(1, containerList.size());
+        assertEquals(1, containerList.getContainerSpecs().length);
 
-        ContainerSpec containerResponseEntity = containerList.iterator().next();
+        ContainerSpec containerResponseEntity = containerList.getContainerSpecs()[0];
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
     }
@@ -511,7 +505,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
     @Test
     public void testEmptyListContainers() {
         try {
-            Collection<ContainerSpec> emptyList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
+            ContainerSpecList emptyList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
             fail("Should throw exception about kie server instance not existing.");
         } catch (UnexpectedResponseCodeException e) {
             assertEquals(404, e.getResponseCode());
@@ -520,8 +514,8 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         // Create kie server instance connection in controller.
         createServerTemplate();
 
-        Collection<ContainerSpec> emptyList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
-        KieServerAssert.assertNullOrEmpty("Active containers found!", emptyList);
+        ContainerSpecList emptyList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
+        KieServerAssert.assertNullOrEmpty("Active containers found!", emptyList.getContainerSpecs());
     }
 
     @Test
@@ -627,10 +621,10 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
             KieServerAssert.assertResultContainsString(e.getMessage(), "Cannot change container template key during update.");
         }
 
-        assertEquals(2, mgmtControllerClient.listServerTemplates().size());
+        assertEquals(2, mgmtControllerClient.listServerTemplates().getServerTemplates().length);
         // Check that on other server template is not any container.
-        KieServerAssert.assertNullOrEmpty("Found container in second server template.", mgmtControllerClient.listContainerSpec(secondTemplate.getId()));
-        assertEquals(1, mgmtControllerClient.listContainerSpec(serverTemplate.getId()).size());
+        KieServerAssert.assertNullOrEmpty("Found container in second server template.", mgmtControllerClient.listContainerSpec(secondTemplate.getId()).getContainerSpecs());
+        assertEquals(1, mgmtControllerClient.listContainerSpec(serverTemplate.getId()).getContainerSpecs().length);
 
         // Check that container is not changed
         containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
@@ -781,7 +775,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
             assertEquals(404, e.getResponseCode());
         }
 
-        KieServerAssert.assertNullOrEmpty("Found deployed container.", mgmtControllerClient.listContainerSpec(serverTemplate.getId()));
+        KieServerAssert.assertNullOrEmpty("Found deployed container.", mgmtControllerClient.listContainerSpec(serverTemplate.getId()).getContainerSpecs());
     }
 
     @Test

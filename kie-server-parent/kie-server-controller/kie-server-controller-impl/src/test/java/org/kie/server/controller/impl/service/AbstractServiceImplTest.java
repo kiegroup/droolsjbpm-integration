@@ -15,7 +15,6 @@
 
 package org.kie.server.controller.impl.service;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -23,18 +22,12 @@ import java.util.UUID;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.controller.api.model.spec.Capability;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
+import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.impl.KieServerInstanceManager;
 import org.kie.server.controller.api.model.runtime.Container;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 
 import static org.junit.Assert.*;
 
@@ -57,9 +50,9 @@ public abstract class AbstractServiceImplTest {
 
         specManagementService.saveServerTemplate(serverTemplate);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(1, existing.size());
+        assertEquals(1, existing.getServerTemplates().length);
 
         Map<Capability, ContainerConfig> configs = new HashMap<Capability, ContainerConfig>();
         RuleConfig ruleConfig = new RuleConfig();

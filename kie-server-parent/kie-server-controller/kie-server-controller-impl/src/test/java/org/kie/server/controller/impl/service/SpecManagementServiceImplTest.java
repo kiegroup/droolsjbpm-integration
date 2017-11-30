@@ -35,13 +35,7 @@ import org.kie.server.controller.api.KieServerControllerNotFoundException;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.Capability;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerInstanceManager;
@@ -92,11 +86,11 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         specManagementService.saveServerTemplate(serverTemplate);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(1, existing.size());
+        assertEquals(1, existing.getServerTemplates().length);
 
-        org.kie.server.controller.api.model.spec.ServerTemplateKey saved = existing.iterator().next();
+        org.kie.server.controller.api.model.spec.ServerTemplateKey saved = existing.getServerTemplates()[0];
 
         assertEquals(serverTemplate.getName(), saved.getName());
         assertEquals(serverTemplate.getId(), saved.getId());
@@ -112,9 +106,9 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         specManagementService.saveServerTemplate(serverTemplate);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(1, existing.size());
+        assertEquals(1, existing.getServerTemplates().length);
 
         Map<Capability, ContainerConfig> configs = new HashMap<Capability, ContainerConfig>();
         RuleConfig ruleConfig = new RuleConfig();
@@ -156,11 +150,11 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         assertNotNull(container.getConfigs());
         assertEquals(containerSpec.getConfigs().size(), container.getConfigs().size());
 
-        Collection<org.kie.server.controller.api.model.spec.ContainerSpec> specs = specManagementService.listContainerSpec(serverTemplate.getId());
+        ContainerSpecList specs = specManagementService.listContainerSpec(serverTemplate.getId());
         assertNotNull(specs);
-        assertEquals(1, specs.size());
+        assertEquals(1, specs.getContainerSpecs().length);
 
-        container = specs.iterator().next();
+        container = specs.getContainerSpecs()[0];
         assertNotNull(container);
 
         assertEquals(containerSpec.getId(), container.getId());
@@ -184,13 +178,13 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
             specManagementService.saveServerTemplate(serverTemplate);
         }
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(limit, existing.size());
+        assertEquals(limit, existing.getServerTemplates().length);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplate> allTemplates = specManagementService.listServerTemplates();
+        ServerTemplateList allTemplates = specManagementService.listServerTemplates();
         assertNotNull(allTemplates);
-        assertEquals(limit, allTemplates.size());
+        assertEquals(limit, allTemplates.getServerTemplates().length);
     }
 
     @Test
@@ -203,11 +197,11 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         specManagementService.saveServerTemplate(serverTemplate);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(1, existing.size());
+        assertEquals(1, existing.getServerTemplates().length);
 
-        org.kie.server.controller.api.model.spec.ServerTemplateKey saved = existing.iterator().next();
+        org.kie.server.controller.api.model.spec.ServerTemplateKey saved = existing.getServerTemplates()[0];
 
         assertEquals(serverTemplate.getName(), saved.getName());
         assertEquals(serverTemplate.getId(), saved.getId());
@@ -215,7 +209,7 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         specManagementService.deleteServerTemplate(serverTemplate.getId());
         existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(0, existing.size());
+        assertEquals(0, existing.getServerTemplates().length);
     }
 
     @Test
@@ -228,9 +222,9 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         specManagementService.saveServerTemplate(serverTemplate);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(1, existing.size());
+        assertEquals(1, existing.getServerTemplates().length);
 
         int limit = getRandomInt(3, 6);
         for (int x = 0; x < limit; x++) {
@@ -280,9 +274,9 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         specManagementService.saveServerTemplate(serverTemplate);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(1, existing.size());
+        assertEquals(1, existing.getServerTemplates().length);
 
         Map<Capability, ContainerConfig> configs = new HashMap<Capability, ContainerConfig>();
         RuleConfig ruleConfig = new RuleConfig();
@@ -327,7 +321,7 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(2, existing.size());
+        assertEquals(2, existing.getServerTemplates().length);
 
         createdServerTemplate = specManagementService.getServerTemplate(newServerTemplateId);
         assertNotNull(createdServerTemplate);
@@ -359,9 +353,9 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         specManagementService.saveServerTemplate(serverTemplate);
 
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManagementService.listServerTemplateKeys();
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
         assertNotNull(existing);
-        assertEquals(1, existing.size());
+        assertEquals(1, existing.getServerTemplates().length);
 
         Map<Capability, ContainerConfig> configs = new HashMap<Capability, ContainerConfig>();
         RuleConfig ruleConfig = new RuleConfig();
@@ -415,11 +409,11 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         specManagementService.updateContainerConfig(serverTemplate.getId(), containerSpec.getId(), Capability.RULE, containerConfig);
 
-        Collection<org.kie.server.controller.api.model.spec.ContainerSpec> specs = specManagementService.listContainerSpec(serverTemplate.getId());
+        ContainerSpecList specs = specManagementService.listContainerSpec(serverTemplate.getId());
         assertNotNull(specs);
-        assertEquals(1, specs.size());
+        assertEquals(1, specs.getContainerSpecs().length);
 
-        container = specs.iterator().next();
+        container = specs.getContainerSpecs()[0];
         assertNotNull(container);
 
         assertEquals(containerSpec.getId(), container.getId());
