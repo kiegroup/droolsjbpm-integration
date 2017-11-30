@@ -649,10 +649,9 @@
     <profile>
       <id>wildfly11</id>
       <properties>
-<!--         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url> -->
+        <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly10x</cargo.container.id>
-        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JMSOnly</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -703,6 +702,28 @@
           </plugins>
         </pluginManagement>
       </build>
+      <dependencyManagement>
+        <dependencies>
+          <!-- This is far from ideal, as it is not designed as BOM. However, there is nothing like wildfly-bom,
+               so this is the closest thing I could find.
+               Important: this overrides lots of the versions coming from kie-p-w-d -->
+          <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-parent</artifactId>
+            <version>${version.wildfly11}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-jms-client-bom</artifactId>
+          <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
       <id>eap7</id>
