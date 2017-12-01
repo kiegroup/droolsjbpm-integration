@@ -36,6 +36,7 @@
   <description>Parent integration project for SpringBoot</description>
 
   <properties>
+    <btm.version>2.1.4</btm.version>
     <spring-boot.version>1.5.8.RELEASE</spring-boot.version>
   </properties>
 
@@ -93,6 +94,18 @@
           <artifactId>accessors-smart</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-ci</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.btm</groupId>
+      <artifactId>btm</artifactId>
+      <version>${btm.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
