@@ -41,6 +41,7 @@
     <property name="commandService" ref="transactionCmdService"/>
     <property name="identityProvider" ref="identityProvider"/>
     <property name="taskService" ref="taskService"/>
+    <property name="userGroupCallback" ref="userGroupCallback"/>
   </bean>
 
   <bean id="formManagerService" class="org.jbpm.kie.services.impl.FormManagerServiceImpl"/>
