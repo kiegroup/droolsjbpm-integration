@@ -66,6 +66,12 @@ public class TaskInstance {
     private String processId;
     @XmlElement(name="task-container-id")
     private String containerId;
+    @XmlElement(name="task-last-modification-user")
+    private String lastModificationUser;
+    @XmlElement(name="task-last-modificaiton-date")
+    private Date lastModificationDate;
+    @XmlElement(name="task-correlation-key")
+    private String correlationKey;
 
     @XmlElementWrapper(name="potential-owners")
     @XmlElement(name="task-pot-owners")
@@ -242,6 +248,30 @@ public class TaskInstance {
 
     public void setContainerId(String containerId) {
         this.containerId = containerId;
+    }
+    
+    public String getLastModificationUser() {
+        return lastModificationUser;
+    }
+
+    public void setLastModificationUser(String lastModificationUser) {
+        this.lastModificationUser = lastModificationUser;
+    }
+
+    public Date getLastModificationDate() {
+        return lastModificationDate;
+    }
+    
+    public void setLastModificationDate(Date lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
+    }
+    
+    public String getCorrelationKey() {
+        return correlationKey;
+    }
+    
+    public void setCorrelationKey(String correlationKey) {
+        this.correlationKey = correlationKey;
     }
 
     public List<String> getPotentialOwners() {
@@ -423,6 +453,21 @@ public class TaskInstance {
 
         public Builder outputData(Map<String, Object> outputData) {
             taskInstance.setOutputData(outputData);
+            return this;
+        }
+        
+        public Builder lastModificationUser(String lastModificationUser) {
+            taskInstance.setLastModificationUser(lastModificationUser);
+            return this;
+        }
+
+        public Builder lastModificationDate(Date lastModificationDate) {
+            taskInstance.setLastModificationDate(lastModificationDate);
+            return this;
+        }
+
+        public Builder correlationKey(String correlationKey) {
+            taskInstance.setCorrelationKey(correlationKey);
             return this;
         }
     }

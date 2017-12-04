@@ -23,6 +23,7 @@ import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinition
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceListPO;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
+import org.jbpm.services.api.model.UserTaskInstanceWithPotOwnerDesc;
 import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
 import org.jbpm.services.api.query.QueryAlreadyRegisteredException;
 import org.jbpm.services.api.query.QueryMapperRegistry;
@@ -241,6 +243,10 @@ public class QueryDataServiceBase {
 
                 logger.debug("Converting collection of UserTaskInstanceWithVarsDesc to TaskInstanceList");
                 actualResult = convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) result);
+            } else if (UserTaskInstanceWithPotOwnerDesc.class.isAssignableFrom(resultMapper.getType())) {
+
+                logger.debug("Converting collection of UserTaskInstanceWithPotOwnerDesc to TaskInstanceList");
+                actualResult = convertToTaskInstanceListPO((Collection<UserTaskInstanceWithPotOwnerDesc>) result);
             } else if (UserTaskInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
 
                 logger.debug("Converting collection of UserTaskInstanceDesc to TaskInstanceList");
@@ -257,7 +263,7 @@ public class QueryDataServiceBase {
 
                 logger.debug("Converting collection of List to ArrayList");
                 actualResult = new ArrayList((Collection) result);
-            } else {
+            }else {
 
                 logger.debug("Convert not supported for custom type {}", resultMapper.getType());
                 actualResult = result;

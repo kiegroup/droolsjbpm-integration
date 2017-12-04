@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -767,7 +768,76 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             }
         }
     }
+    
+    @Test
+    public void testGetTaskInstancesUsingUserTaskPOMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
 
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmHumanTasksPO");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select t.actualowner_id as actualowner, t.CREATEDBY_ID as createdby, t.CREATEDON as CREATEDON, t.EXPIRATIONTIME as expirationDate, " +
+                "t.id as TASKID, t.name as NAME, t.priority as PRIORITY, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, t.STATUS as STATUS,  " +
+                "po.entity_id as POTOWNER, t.FORMNAME AS FORMNAME, ck.name as CORRELATIONKEY, t.subject as SUBJECT, t.deploymentid as DEPLOYMENTID " +
+                "from TASK t " +
+                "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
+                "inner join CORRELATIONKEYINFO ck on t.processinstanceid = ck.processinstanceid");
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_PO, 0, 10, TaskInstance.class);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+            
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
+    public void testGetTaskInstancesUsingUserTaskWithModificationMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
+
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmGetTaskWithPO");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select t.id as TASKID, t.name as NAME,  t.FORMNAME AS FORMNAME, t.subject as SUBJECT, t.actualowner_id as actualowner, " +
+                "po.entity_id as POTOWNER, ck.name as CORRELATIONKEY, t.CREATEDON as CREATEDON, t.CREATEDBY_ID as CREATEDBY, t.EXPIRATIONTIME as EXPIRATIONTIME, " +
+                "d.modificationdate as LASTMODIFICATIONDATE, t.priority as PRIORITY, t.STATUS as STATUS, t.PROCESSINSTANCEID as PROCESSINSTANCEID, " +
+                "t.PROCESSID as PROCESSID, t.deploymentid as DEPLOYMENTID, d.name as TVNAME, d.type as TVTYPE, d.value as TVVALUE " +
+                "from TASK t inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
+                "inner join CORRELATIONKEYINFO ck on t.processinstanceid = ck.processinstanceid " +
+                "inner join TASKEVENT te on t.id = te.taskid " +
+                "inner join TASKVARIABLEIMPL d on t.id=d.taskid ");
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_MODIF, 0, 10, TaskInstance.class);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+            
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
 
     protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
         final QueryDefinition query = new QueryDefinition();
@@ -786,7 +856,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setTarget(target);
         return query;
     }
-
+    
     private QueryDefinition createErrorsQueryDefinition() {
         String queryExpression = "select * from ExecutionErrorInfo where ERROR_ACK = 0";
 
