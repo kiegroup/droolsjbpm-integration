@@ -1,15 +1,11 @@
 package org.jbpm.springboot;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class SpringBootJBPMTest {
 
     @Test
-    public void contextLoads() throws Exception {
+    public void testApplication() {
+        JBPMApplication.main(new String[]{"Test Value"});
     }
 }
