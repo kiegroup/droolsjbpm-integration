@@ -19,6 +19,13 @@
   -->
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.1">
   <deployment>
+    <exclusions>
+      <module name="com.fasterxml.jackson.core.jackson-core" />
+      <module name="com.fasterxml.jackson.core.jackson-databind" />
+      <module
+          name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" />
+      <module name="org.jboss.resteasy.resteasy-jackson2-provider" />
+    </exclusions>  
     <dependencies>
       <!-- IMPORTANT: when adding dependency (module) here, make sure it is a public one.
            Do not add private modules as there is no guarantee they won't be changed or
