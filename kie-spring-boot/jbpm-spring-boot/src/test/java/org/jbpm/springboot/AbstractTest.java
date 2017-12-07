@@ -1,10 +1,11 @@
 package org.jbpm.springboot;
 
 import java.io.File;
-import java.io.FilenameFilter;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
+import javax.naming.Context;
+
 import org.appformer.maven.integration.MavenRepository;
+import org.jbpm.test.util.PoolingDataSource;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -15,45 +16,42 @@ import static org.kie.scanner.KieMavenRepository.getMavenRepository;
 
 public abstract class AbstractTest {
 
-	protected static final String ARTIFACT_ID = "test-module";
-	protected static final String GROUP_ID = "org.jbpm.test";
-	protected static final String VERSION = "1.0.0";
-	protected static PoolingDataSource pds;
+	static final String ARTIFACT_ID = "test-module";
+	static final String GROUP_ID = "org.jbpm.test";
+	static final String VERSION = "1.0.0";
+
+	private static PoolingDataSource poolingDataSource;
 
 	@BeforeClass
 	public static void generalSetup() {
-        KieServices ks = KieServices.Factory.get();
-        ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
-        File kjar = new File("src/test/resources/kjar/jbpm-module.jar");
-        File pom = new File("src/test/resources/kjar/pom.xml");
-        MavenRepository repository = getMavenRepository();
-        repository.installArtifact(releaseId, kjar, pom);
-		
-		System.setProperty("java.naming.factory.initial",
-				"bitronix.tm.jndi.BitronixInitialContextFactory");
-		pds = setupPoolingDataSource();
+		KieServices ks = KieServices.Factory.get();
+		ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
+		File kjar = new File("src/test/resources/kjar/jbpm-module.jar");
+		File pom = new File("src/test/resources/kjar/pom.xml");
+		MavenRepository repository = getMavenRepository();
+		repository.installArtifact(releaseId, kjar, pom);
+
+		System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.jbpm.test.util.CloseSafeMemoryContextFactory");
+		poolingDataSource = setupDataSource();
 	}
 
 	@Before
 	public void setup() {
 		cleanupSingletonSessionId();
-
 	}
 
 	@AfterClass
 	public static void generalCleanup() {
-		System.clearProperty("java.naming.factory.initial");
-		if (pds != null) {
-			pds.close();
+		System.clearProperty(Context.INITIAL_CONTEXT_FACTORY);
+		if (poolingDataSource != null) {
+			poolingDataSource.close();
 		}
 	}
 
-	protected static PoolingDataSource setupPoolingDataSource() {
+	private static PoolingDataSource setupDataSource() {
 		PoolingDataSource pds = new PoolingDataSource();
 		pds.setUniqueName("jdbc/jbpm");
-		pds.setClassName("bitronix.tm.resource.jdbc.lrc.LrcXADataSource");
-		pds.setMaxPoolSize(50);
-		pds.setAllowLocalTransactions(true);
+		pds.setClassName("org.h2.jdbcx.JdbcDataSource");
 		pds.getDriverProperties().put("user", "sa");
 		pds.getDriverProperties().put("password", "");
 		pds.getDriverProperties().put("url", "jdbc:h2:mem:jbpm-db;MVCC=true");
@@ -62,18 +60,13 @@ public abstract class AbstractTest {
 		return pds;
 	}
 
-	protected static void cleanupSingletonSessionId() {
+	@SuppressWarnings({"ResultOfMethodCallIgnored"})
+	private static void cleanupSingletonSessionId() {
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));
 		if (tempDir.exists()) {
 
-			String[] jbpmSerFiles = tempDir.list(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File dir, String name) {
-
-					return name.endsWith("-jbpmSessionId.ser");
-				}
-			});
+			String[] jbpmSerFiles = tempDir.list((dir, name) -> name.endsWith("-jbpmSessionId.ser"));
+			assert jbpmSerFiles != null;
 			for (String file : jbpmSerFiles) {
 
 				new File(tempDir, file).delete();
