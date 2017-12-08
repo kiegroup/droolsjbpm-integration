@@ -16,19 +16,20 @@
 
 package org.kie.server.api.commands.optaplanner;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.KieServerCommand;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="get-solvers")
-@XStreamAlias( "get-solvers" )
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.model.KieServerCommand;
+
+@XmlRootElement(name = "get-solvers")
+@XStreamAlias("get-solvers")
 @XmlAccessorType(XmlAccessType.NONE)
 public class GetSolversCommand
         implements KieServerCommand {
+
     private static final long serialVersionUID = -1803374525440238478L;
 
     @XmlAttribute(name = "container-id")
@@ -52,8 +53,8 @@ public class GetSolversCommand
 
     @Override
     public String toString() {
-        return "GetSolversCommand{" +
-               "containerId='" + containerId + '\'' +
-               '}';
+        return "GetSolversCommand{"
+                + "containerId='" + containerId + '\''
+                + '}';
     }
 }

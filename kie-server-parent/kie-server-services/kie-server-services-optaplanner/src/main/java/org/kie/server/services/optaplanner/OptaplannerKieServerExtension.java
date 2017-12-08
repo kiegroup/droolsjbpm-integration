@@ -39,12 +39,14 @@ import org.slf4j.LoggerFactory;
 public class OptaplannerKieServerExtension
         implements KieServerExtension {
 
-    private static final Logger logger = LoggerFactory.getLogger( OptaplannerKieServerExtension.class );
+    private static final Logger logger = LoggerFactory.getLogger(OptaplannerKieServerExtension.class);
 
     public static final String EXTENSION_NAME = "OptaPlanner";
 
-    private static final Boolean droolsDisabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false" ) );
-    private static final Boolean disabled       = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false" ) );
+    private static final Boolean droolsDisabled = Boolean.parseBoolean(
+            System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean disabled = Boolean.parseBoolean(
+            System.getProperty(KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false"));
 
     private KieServerRegistry registry;
     private SolverServiceBase solverServiceBase;
@@ -74,36 +76,34 @@ public class OptaplannerKieServerExtension
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
-        KieServerExtension droolsExtension = registry.getServerExtension( "Drools" );
-        if ( droolsExtension == null ) {
-            logger.warn( "No Drools extension available, quiting..." );
+        KieServerExtension droolsExtension = registry.getServerExtension("Drools");
+        if (droolsExtension == null) {
+            logger.warn("No Drools extension available, quiting...");
             return;
         }
         this.registry = registry;
         // the following threadpool will have a max thread count equal to the number of cores on the machine.
         // if new jobs are submited and all threads are busy, the reject policy will kick in.
-        int availableProcessorCount = Runtime.getRuntime().availableProcessors();     
+        int availableProcessorCount = Runtime.getRuntime().availableProcessors();
         int resolvedActiveThreadCount = availableProcessorCount <= 2 ? 1 : availableProcessorCount - 2;
-    
-       
         this.threadPool = new ThreadPoolExecutor(
-        		resolvedActiveThreadCount, 
+                resolvedActiveThreadCount,
                 resolvedActiveThreadCount,
                 10, // thread keep alive time
                 TimeUnit.SECONDS,
                 new ArrayBlockingQueue<Runnable>(resolvedActiveThreadCount)); // queue with a size
-        this.solverServiceBase = new SolverServiceBase( registry, threadPool );
+        this.solverServiceBase = new SolverServiceBase(registry, threadPool);
 
         this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);
 
-        this.services.add( solverServiceBase );
+        this.services.add(solverServiceBase);
 
         initialized = true;
     }
 
     @Override
     public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
-        if( this.threadPool != null ) {
+        if (this.threadPool != null) {
             this.threadPool.shutdownNow();
         }
     }
@@ -124,17 +124,17 @@ public class OptaplannerKieServerExtension
 
     @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        solverServiceBase.disposeSolversForContainer( id, kieContainerInstance );
+        solverServiceBase.disposeSolversForContainer(id, kieContainerInstance);
     }
 
     @Override
     public List<Object> getAppComponents(SupportedTransports type) {
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
-                = ServiceLoader.load( KieServerApplicationComponentsService.class );
+                = ServiceLoader.load(KieServerApplicationComponentsService.class);
         List<Object> appComponentsList = new ArrayList<Object>();
         Object[] services = {solverServiceBase, registry};
-        for ( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
-            appComponentsList.addAll( appComponentsService.getAppComponents( EXTENSION_NAME, type, services ) );
+        for (KieServerApplicationComponentsService appComponentsService : appComponentsServices) {
+            appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
         }
         return appComponentsList;
     }
@@ -144,7 +144,7 @@ public class OptaplannerKieServerExtension
         if (serviceType.isAssignableFrom(optaplannerCommandService.getClass())) {
             return (T) optaplannerCommandService;
         }
-        if ( serviceType.isAssignableFrom( solverServiceBase.getClass() ) ) {
+        if (serviceType.isAssignableFrom(solverServiceBase.getClass())) {
             return (T) solverServiceBase;
         }
         return null;
@@ -175,18 +175,16 @@ public class OptaplannerKieServerExtension
         return EXTENSION_NAME + " KIE Server extension";
     }
 
-
     @Override
     public List<Message> healthCheck(boolean report) {
         List<Message> messages = KieServerExtension.super.healthCheck(report);
-        
+
         if (this.threadPool.isTerminated() && this.initialized) {
             messages.add(new Message(Severity.ERROR, getExtensionName() + " failed due to thread pool is terminated while the extension is still alive"));
         } else {
-            
             if (report) {
                 messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
-            }       
+            }
         }
         return messages;
     }

@@ -67,9 +67,9 @@ public class GetSolverCommand
 
     @Override
     public String toString() {
-        return "GetSolverCommand{" +
-                "containerId='" + containerId + '\'' +
-                ", solverId='" + solverId + '\'' +
-                '}';
+        return "GetSolverCommand{"
+                + "containerId='" + containerId + '\''
+                + ", solverId='" + solverId + '\''
+                + '}';
     }
 }

@@ -16,10 +16,14 @@
 
 package org.kie.server.api.commands.optaplanner;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieServerCommand;
-
-import javax.xml.bind.annotation.*;
 
 @XmlRootElement(name = "create-solver")
 @XStreamAlias("create-solver")
@@ -76,10 +80,10 @@ public class CreateSolverCommand
 
     @Override
     public String toString() {
-        return "CreateSolverCommand{" +
-               "containerId='" + containerId + '\'' +
-               ", solverId='" + solverId + '\'' +
-               ", solverConfigFile='" + solverConfigFile + '\'' +
-               '}';
+        return "CreateSolverCommand{"
+                + "containerId='" + containerId + '\''
+                + ", solverId='" + solverId + '\''
+                + ", solverConfigFile='" + solverConfigFile + '\''
+                + '}';
     }
 }

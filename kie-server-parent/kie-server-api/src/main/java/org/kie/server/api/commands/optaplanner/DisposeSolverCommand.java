@@ -16,28 +16,29 @@
 
 package org.kie.server.api.commands.optaplanner;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.KieServerCommand;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="dispose-solver")
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.model.KieServerCommand;
+
+@XmlRootElement(name = "dispose-solver")
 @XStreamAlias("dispose-solver")
 @XmlAccessorType(XmlAccessType.NONE)
 public class DisposeSolverCommand
         implements KieServerCommand {
+
     private static final long serialVersionUID = -1803374525440238478L;
 
-    @XmlAttribute(name="container-id")
-    @XStreamAlias( "container-id" )
-    private String    containerId;
+    @XmlAttribute(name = "container-id")
+    @XStreamAlias("container-id")
+    private String containerId;
 
-    @XmlAttribute(name="solver-id")
-    @XStreamAlias( "solver-id" )
-    private String    solverId;
+    @XmlAttribute(name = "solver-id")
+    @XStreamAlias("solver-id")
+    private String solverId;
 
     public DisposeSolverCommand() {
     }
@@ -65,9 +66,9 @@ public class DisposeSolverCommand
 
     @Override
     public String toString() {
-        return "DisposeSolverCommand{" +
-               "containerId='" + containerId + '\'' +
-               ", solverId='" + solverId + '\'' +
-               '}';
+        return "DisposeSolverCommand{"
+                + "containerId='" + containerId + '\''
+                + ", solverId='" + solverId + '\''
+                + '}';
     }
 }
