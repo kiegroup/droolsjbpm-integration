@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.kie.server.services.optaplanner;
 
 import java.util.ArrayList;
@@ -24,10 +23,10 @@ import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
 import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
 import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
@@ -144,7 +143,7 @@ public class OptaplannerCommandServiceImpl
                     response = solverService.addProblemFactChanges(containerId,
                                                                    addProblemFactChangesCommand.getSolverId(),
                                                                    addProblemFactChangesCommand.getProblemFactChanges());
-                }  else if (command instanceof IsEveryProblemFactChangeProcessedCommand) {
+                } else if (command instanceof IsEveryProblemFactChangeProcessedCommand) {
                     IsEveryProblemFactChangeProcessedCommand isEveryProblemFactChangeProcessedCommand
                             = (IsEveryProblemFactChangeProcessedCommand) command;
                     String containerId = context
@@ -182,7 +181,7 @@ public class OptaplannerCommandServiceImpl
                              e);
                 // return failure result
                 responses.add(new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
-                                                  e.getMessage()));
+                                                    e.getMessage()));
             }
         }
         logger.debug("About to return responses '{}'",

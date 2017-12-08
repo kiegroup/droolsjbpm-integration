@@ -61,8 +61,8 @@ public class SolverServiceBase {
             logger.error("Error creating solver. Configuration file name is null: " + instance);
             return new ServiceResponse<SolverInstance>(
                     ServiceResponse.ResponseType.FAILURE,
-                    "Failed to create solver for container " + containerId +
-                            ". Solver configuration file is null: " + instance);
+                    "Failed to create solver for container " + containerId
+                            + ". Solver configuration file is null: " + instance);
         }
         instance.setContainerId(containerId);
         instance.setSolverId(solverId);
@@ -80,8 +80,8 @@ public class SolverServiceBase {
                 if (solvers.containsKey(instance.getSolverInstanceKey())) {
                     logger.error("Error creating solver. Solver '" + solverId + "' already exists for container '" + containerId + "'.");
                     return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                               "Failed to create solver. Solver '" + solverId +
-                                                                       "' already exists for container '" + containerId + "'.");
+                                                               "Failed to create solver. Solver '" + solverId
+                                                                       + "' already exists for container '" + containerId + "'.");
                 }
                 SolverInstanceContext sic = new SolverInstanceContext(instance);
                 if (instance.getStatus() == null) {
@@ -90,7 +90,7 @@ public class SolverServiceBase {
 
                 try {
                     SolverFactory<Object> solverFactory = SolverFactory.createFromKieContainerXmlResource(ci.getKieContainer(),
-                                                                                                     instance.getSolverConfigFile());
+                                                                                                          instance.getSolverConfigFile());
 
                     Solver<Object> solver = solverFactory.buildSolver();
 
@@ -480,31 +480,28 @@ public class SolverServiceBase {
                                       final Object planningSolution) {
         sic.getInstance().setBestSolution(null);
         sic.getInstance().setStatus(SolverInstance.SolverStatus.SOLVING);
-        this.executor.execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            // If the executor's queue is full, it's possible that the solver gets canceled before it starts
-                            SolverInstance.SolverStatus status;
-                            synchronized (sic) {
-                                status = sic.getInstance().getStatus();
-                                // TODO Race condition: status turns into non-solving before solver starts
-                                // See https://issues.jboss.org/browse/PLANNER-540
-                            }
-                            if (status == SolverInstance.SolverStatus.SOLVING) {
-                                sic.getSolver().solve(planningSolution);
-                            }
-                        } catch (Exception e) {
-                            logger.error("Exception executing solver '" + sic.getInstance().getSolverId() + "' from container '" + sic.getInstance().getContainerId() + "'. Thread will terminate.",
-                                         e);
-                        } finally {
-                            synchronized (sic) {
-                                sic.getInstance().setStatus(SolverInstance.SolverStatus.NOT_SOLVING);
-                            }
-                        }
-                    }
-                });
+        this.executor.execute(() -> {
+            try {
+                // If the executor's queue is full, it's possible that the solver gets canceled before it starts
+                SolverInstance.SolverStatus status;
+                synchronized (sic) {
+                    status = sic.getInstance().getStatus();
+                    // TODO Race condition: status turns into non-solving before solver starts
+                    // See https://issues.jboss.org/browse/PLANNER-540
+                }
+                if (status == SolverInstance.SolverStatus.SOLVING) {
+                    sic.getSolver().solve(planningSolution);
+                }
+            } catch (Exception e) {
+                logger.error("Exception executing solver '" + sic.getInstance().getSolverId()
+                                     + "' from container '" + sic.getInstance().getContainerId() + "'. Thread will terminate.",
+                             e);
+            } finally {
+                synchronized (sic) {
+                    sic.getInstance().setStatus(SolverInstance.SolverStatus.NOT_SOLVING);
+                }
+            }
+        });
     }
 
     private void terminateSolverEarly(SolverInstanceContext sic) {

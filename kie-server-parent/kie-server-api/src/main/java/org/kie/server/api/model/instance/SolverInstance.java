@@ -98,13 +98,13 @@ public class SolverInstance {
 
     @Override
     public String toString() {
-        return "SolverInstance{" +
-                "containerId='" + containerId + '\'' +
-                ", solverId='" + solverId + '\'' +
-                ", solverConfigFile='" + solverConfigFile + '\'' +
-                ", status=" + status +
-                ", scoreWrapper=" + scoreWrapper +
-                '}';
+        return "SolverInstance{"
+                + "containerId='" + containerId + '\''
+                + ", solverId='" + solverId + '\''
+                + ", solverConfigFile='" + solverConfigFile + '\''
+                + ", status=" + status
+                + ", scoreWrapper=" + scoreWrapper
+                + '}';
     }
 
     public String getSolverInstanceKey() {
