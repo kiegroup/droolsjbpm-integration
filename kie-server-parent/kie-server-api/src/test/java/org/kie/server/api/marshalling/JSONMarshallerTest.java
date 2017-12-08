@@ -8,22 +8,13 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.junit.Test;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
-import org.kie.server.api.model.Wrapped;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -32,12 +23,12 @@ public class JSONMarshallerTest {
 
     @Test
     public void testMarshallDateObject() {
-        String expectedString = "{\n" +
-                "  \"localDate\" : \"2017-01-01\",\n" +
-                "  \"localDateTime\" : \"2017-01-01T10:10:10\",\n" +
-                "  \"localTime\" : \"10:10:10\",\n" +
-                "  \"offsetDateTime\" : \"2017-01-01T10:10:10+01:00\"\n" +
-                "}";
+        String expectedString = String.format("{%n" +
+                "  \"localDate\" : \"2017-01-01\",%n" +
+                "  \"localDateTime\" : \"2017-01-01T10:10:10\",%n" +
+                "  \"localTime\" : \"10:10:10\",%n" +
+                "  \"offsetDateTime\" : \"2017-01-01T10:10:10+01:00\"%n" +
+                "}");
 
         Marshaller marshaller = MarshallerFactory.getMarshaller( MarshallingFormat.JSON, getClass().getClassLoader() );
 
