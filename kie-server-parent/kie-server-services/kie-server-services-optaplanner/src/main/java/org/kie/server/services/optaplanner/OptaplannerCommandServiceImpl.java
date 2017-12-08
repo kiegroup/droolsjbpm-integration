@@ -49,11 +49,11 @@ public class OptaplannerCommandServiceImpl
 
     private static final Logger logger = LoggerFactory.getLogger(OptaplannerCommandServiceImpl.class);
 
-    private KieServerRegistry context;
+    private final KieServerRegistry context;
 
-    private SolverServiceBase solverService;
+    private final SolverServiceBase solverService;
 
-    private MarshallerHelper marshallerHelper;
+    private final MarshallerHelper marshallerHelper;
 
     public OptaplannerCommandServiceImpl(
             KieServerRegistry context,
@@ -76,11 +76,11 @@ public class OptaplannerCommandServiceImpl
     public ServiceResponsesList executeScript(CommandScript commands,
                                               MarshallingFormat marshallingFormat,
                                               String classType) {
-        List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
+        List<ServiceResponse<?>> responses = new ArrayList<>();
 
         for (KieServerCommand command : commands.getCommands()) {
             try {
-                ServiceResponse<?> response = null;
+                ServiceResponse<?> response;
                 logger.debug("About to execute command: {}",
                              command);
                 if (command instanceof CreateSolverCommand) {
