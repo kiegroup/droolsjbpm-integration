@@ -85,50 +85,51 @@ public class OptaplannerCommandServiceImpl
                 logger.debug("About to execute command: {}",
                              command);
                 if (command instanceof CreateSolverCommand) {
-                    CreateSolverCommand csc = (CreateSolverCommand) command;
-                    String containerId = context.getContainerId(csc.getContainerId(),
+                    CreateSolverCommand createSolverCommand = (CreateSolverCommand) command;
+                    String containerId = context.getContainerId(createSolverCommand.getContainerId(),
                                                                 ContainerLocatorProvider.get().getLocator());
                     SolverInstance instance = new SolverInstance();
                     instance.setContainerId(containerId);
-                    instance.setSolverId(csc.getSolverId());
-                    instance.setSolverConfigFile(csc.getSolverConfigFile());
+                    instance.setSolverId(createSolverCommand.getSolverId());
+                    instance.setSolverConfigFile(createSolverCommand.getSolverConfigFile());
                     response = solverService.createSolver(containerId,
-                                                          csc.getSolverId(),
+                                                          createSolverCommand.getSolverId(),
                                                           instance);
                 } else if (command instanceof GetSolversCommand) {
-                    GetSolversCommand gss = (GetSolversCommand) command;
-                    String containerId = context.getContainerId(gss.getContainerId(),
+                    GetSolversCommand getSolversCommand = (GetSolversCommand) command;
+                    String containerId = context.getContainerId(getSolversCommand.getContainerId(),
                                                                 ContainerLocatorProvider.get().getLocator());
                     response = solverService.getSolvers(containerId);
                 } else if (command instanceof GetSolverCommand) {
-                    GetSolverCommand gss = (GetSolverCommand) command;
-                    String containerId = context.getContainerId(gss.getContainerId(),
+                    GetSolverCommand getSolverCommand = (GetSolverCommand) command;
+                    String containerId = context.getContainerId(getSolverCommand.getContainerId(),
                                                                 ContainerLocatorProvider.get().getLocator());
                     response = solverService.getSolver(containerId,
-                                                       gss.getSolverId());
+                                                       getSolverCommand.getSolverId());
                 } else if (command instanceof GetSolverWithBestSolutionCommand) {
-                    GetSolverWithBestSolutionCommand gss = (GetSolverWithBestSolutionCommand) command;
-                    String containerId = context.getContainerId(gss.getContainerId(),
+                    GetSolverWithBestSolutionCommand getSolverWithBestSolutionCommand
+                            = (GetSolverWithBestSolutionCommand) command;
+                    String containerId = context.getContainerId(getSolverWithBestSolutionCommand.getContainerId(),
                                                                 ContainerLocatorProvider.get().getLocator());
                     response = solverService.getSolverWithBestSolution(containerId,
-                                                                       gss.getSolverId());
+                                                                       getSolverWithBestSolutionCommand.getSolverId());
                 } else if (command instanceof SolvePlanningProblemCommand) {
-                    SolvePlanningProblemCommand uss = (SolvePlanningProblemCommand) command;
-                    String containerId = context.getContainerId(uss.getContainerId(),
+                    SolvePlanningProblemCommand solvePlanningProblemCommand = (SolvePlanningProblemCommand) command;
+                    String containerId = context.getContainerId(solvePlanningProblemCommand.getContainerId(),
                                                                 ContainerLocatorProvider.get().getLocator());
                     KieContainerInstanceImpl kc = context.getContainer(containerId);
                     Marshaller marshaller = kc.getMarshaller(marshallingFormat);
-                    Object planningProblem = marshaller.unmarshall(uss.getPlanningProblem(),
+                    Object planningProblem = marshaller.unmarshall(solvePlanningProblemCommand.getPlanningProblem(),
                                                                    Object.class);
                     response = solverService.solvePlanningProblem(containerId,
-                                                                  uss.getSolverId(),
+                                                                  solvePlanningProblemCommand.getSolverId(),
                                                                   planningProblem);
                 } else if (command instanceof TerminateSolverEarlyCommand) {
-                    TerminateSolverEarlyCommand uss = (TerminateSolverEarlyCommand) command;
-                    String containerId = context.getContainerId(uss.getContainerId(),
+                    TerminateSolverEarlyCommand terminateSolverEarlyCommand = (TerminateSolverEarlyCommand) command;
+                    String containerId = context.getContainerId(terminateSolverEarlyCommand.getContainerId(),
                                                                 ContainerLocatorProvider.get().getLocator());
                     response = solverService.terminateSolverEarly(containerId,
-                                                                  uss.getSolverId());
+                                                                  terminateSolverEarlyCommand.getSolverId());
                 } else if (command instanceof AddProblemFactChangeCommand) {
                     AddProblemFactChangeCommand addProblemFactChangeCommand = (AddProblemFactChangeCommand) command;
                     String containerId = context.getContainerId(addProblemFactChangeCommand.getContainerId(),
@@ -144,11 +145,14 @@ public class OptaplannerCommandServiceImpl
                                                                    addProblemFactChangesCommand.getSolverId(),
                                                                    addProblemFactChangesCommand.getProblemFactChanges());
                 }  else if (command instanceof IsEveryProblemFactChangeProcessedCommand) {
-                    IsEveryProblemFactChangeProcessedCommand gss = (IsEveryProblemFactChangeProcessedCommand) command;
-                    String containerId = context.getContainerId(gss.getContainerId(),
-                                                                ContainerLocatorProvider.get().getLocator());
-                    ServiceResponse<Boolean> everyProblemFactChangeProcessedResponse = solverService.isEveryProblemFactChangeProcessed(containerId,
-                                                                                                                                       gss.getSolverId());
+                    IsEveryProblemFactChangeProcessedCommand isEveryProblemFactChangeProcessedCommand
+                            = (IsEveryProblemFactChangeProcessedCommand) command;
+                    String containerId = context
+                            .getContainerId(isEveryProblemFactChangeProcessedCommand.getContainerId(),
+                                            ContainerLocatorProvider.get().getLocator());
+                    ServiceResponse<Boolean> everyProblemFactChangeProcessedResponse = solverService
+                            .isEveryProblemFactChangeProcessed(containerId,
+                                                               isEveryProblemFactChangeProcessedCommand.getSolverId());
                     if (marshallingFormat.equals(MarshallingFormat.JAXB)) {
                         Object wrappedResult = ModelWrapper.wrap(everyProblemFactChangeProcessedResponse.getResult());
                         response = new ServiceResponse<>(everyProblemFactChangeProcessedResponse.getType(),
@@ -158,11 +162,11 @@ public class OptaplannerCommandServiceImpl
                         response = everyProblemFactChangeProcessedResponse;
                     }
                 } else if (command instanceof DisposeSolverCommand) {
-                    DisposeSolverCommand ds = (DisposeSolverCommand) command;
-                    String containerId = context.getContainerId(ds.getContainerId(),
+                    DisposeSolverCommand disposeSolverCommand = (DisposeSolverCommand) command;
+                    String containerId = context.getContainerId(disposeSolverCommand.getContainerId(),
                                                                 ContainerLocatorProvider.get().getLocator());
                     response = solverService.disposeSolver(containerId,
-                                                           ds.getSolverId());
+                                                           disposeSolverCommand.getSolverId());
                 } else {
                     throw new IllegalStateException("Unsupported command: " + command);
                 }
