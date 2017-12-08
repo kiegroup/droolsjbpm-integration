@@ -36,12 +36,10 @@ public class SolverInstanceList {
     private List<SolverInstance> solvers;
 
     public SolverInstanceList() {
-        super();
-        solvers = new ArrayList<SolverInstance>();
+        solvers = new ArrayList<>();
     }
 
     public SolverInstanceList(List<SolverInstance> solvers) {
-        super();
         this.solvers = solvers;
     }
 
