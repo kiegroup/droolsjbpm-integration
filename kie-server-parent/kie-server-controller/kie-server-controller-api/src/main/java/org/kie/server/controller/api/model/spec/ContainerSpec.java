@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "container-spec-details")
@@ -34,7 +33,7 @@ public class ContainerSpec extends ContainerSpecKey  {
     @XmlElement(name = "release-id")
     private ReleaseId releasedId;
     @XmlElement(name = "configuration")
-    private Map<Capability, Object> configs = new HashMap<Capability, Object>();
+    private Map<Capability, ContainerConfig> configs = new HashMap<>();
     @XmlElement(name = "status")
     private KieContainerStatus status = KieContainerStatus.STOPPED;
 
@@ -54,14 +53,14 @@ public class ContainerSpec extends ContainerSpecKey  {
         super( id, containerName, serverTemplateKey );
         this.releasedId = releasedId;
         this.status = status;
-        this.configs = (Map)configs;
+        this.configs = configs;
     }
 
     public Map<Capability, ContainerConfig> getConfigs() {
         if (configs == null) {
-            configs = new HashMap<Capability, Object>();
+            configs = new HashMap<>();
         }
-        return (Map)configs;
+        return configs;
     }
 
     public KieContainerStatus getStatus() {
@@ -77,7 +76,7 @@ public class ContainerSpec extends ContainerSpecKey  {
     }
 
     public void setConfigs(Map<Capability, ContainerConfig> configs) {
-        this.configs = (Map)configs;
+        this.configs = configs;
     }
 
     public void addConfig(Capability capability, ContainerConfig config) {
@@ -110,5 +109,14 @@ public class ContainerSpec extends ContainerSpecKey  {
         int result = super.hashCode();
         result = 31 * result + (releasedId != null ? releasedId.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ContainerSpec{" +
+                "releasedId=" + releasedId +
+                ", configs=" + configs +
+                ", status=" + status +
+                "} " + super.toString();
     }
 }

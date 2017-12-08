@@ -343,16 +343,12 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
         controllerClasses.add(ServerTemplateList.class);
         controllerClasses.add(ContainerSpecList.class);
 
-        Set<Class<?>> minimalControllerClasses = new HashSet<Class<?>>();
-        minimalControllerClasses.add(RuleConfig.class);
-        minimalControllerClasses.add(ProcessConfig.class);
-
         switch ( format ) {
             case JAXB:
                 this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, RestKieServerMgmtControllerClient.class.getClassLoader());
                 break;
             case JSON:
-                this.marshaller = MarshallerFactory.getMarshaller(minimalControllerClasses, format, RestKieServerMgmtControllerClient.class.getClassLoader());
+                this.marshaller = MarshallerFactory.getMarshaller(null, format, RestKieServerMgmtControllerClient.class.getClassLoader());
                 break;
             default:
                 this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, RestKieServerMgmtControllerClient.class.getClassLoader());
@@ -391,7 +387,7 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
                 return null;
             }
 
-            return marshaller.unmarshall( content, type );
+            return deserialize(content, type);
         } catch ( MarshallingException e ) {
             throw new RuntimeException( "Error while deserializing data received from server!", e );
         } finally {
@@ -399,4 +395,7 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
         }
     }
 
+    protected <T> T deserialize(String content, Class<T> type) {
+        return marshaller.unmarshall( content, type );
+    }
 }

@@ -19,8 +19,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "container-config")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonSubTypes({@JsonSubTypes.Type(value = ProcessConfig.class), @JsonSubTypes.Type(value = RuleConfig.class)})
 public class ContainerConfig {
 
 }
