@@ -26,14 +26,5 @@
           name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" />
       <module name="org.jboss.resteasy.resteasy-jackson2-provider" />
     </exclusions>  
-    <dependencies>
-      <!-- IMPORTANT: when adding dependency (module) here, make sure it is a public one.
-           Do not add private modules as there is no guarantee they won't be changed or
-           removed in future. EAP also generates warning(s) during the deployment if
-           the WAR depends on private modules. -->
-      <!-- Keep the alphabetical order! -->
-      <module name="org.apache.xerces"/>
-      <module name="org.apache.cxf"/>
-    </dependencies>
   </deployment>
 </jboss-deployment-structure>
