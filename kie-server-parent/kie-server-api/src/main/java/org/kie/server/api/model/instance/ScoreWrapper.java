@@ -12,7 +12,7 @@ import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.impl.score.ScoreUtils;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XStreamConverter(value = ToAttributedValueConverter.class, strings = { "scoreString" })
+@XStreamConverter(value = ToAttributedValueConverter.class, strings = {"scoreString"})
 public class ScoreWrapper {
 
     @XmlAttribute(name = "scoreClass")
@@ -26,7 +26,7 @@ public class ScoreWrapper {
     private ScoreWrapper() {
     }
 
-    public ScoreWrapper( Score score ) {
+    public ScoreWrapper(Score score) {
         this.scoreClass = score == null ? null : score.getClass();
         this.scoreString = score == null ? null : score.toString();
     }
@@ -43,23 +43,23 @@ public class ScoreWrapper {
      * Returns score representation of the object.
      *
      * @return Score representation of the object. Returns null if the score has not been assigned by the solver yet.
-     * @throws IllegalArgumentException If <code>scoreClass</code> is not one of the out-of-box score implementations. In this case
-     *                                       clients may implement their own way to extract the score object.
+     * @throws IllegalArgumentException If <code>scoreClass</code> is not one of the out-of-box score implementations.
+     * In this case clients may implement their own way to extract the score object.
      */
     public Score toScore() {
-        if ( scoreClass == null ) {
+        if (scoreClass == null) {
             return null;
         }
 
-        return ScoreUtils.parseScore( scoreClass, scoreString );
+        return ScoreUtils.parseScore(scoreClass, scoreString);
     }
 
     @Override
     public String toString() {
-        return "ScoreWrapper{" +
-                "scoreClass='" + scoreClass + '\'' +
-                ", scoreString='" + scoreString + '\'' +
-                '}';
+        return "ScoreWrapper{"
+                + "scoreClass='" + scoreClass + '\''
+                + ", scoreString='" + scoreString + '\''
+                + '}';
     }
 
 }

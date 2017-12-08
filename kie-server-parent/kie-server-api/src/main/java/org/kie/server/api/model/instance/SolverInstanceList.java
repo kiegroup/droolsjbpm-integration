@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.kie.server.api.model.instance;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import org.kie.server.api.model.KieContainerResource;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.List;
 
-@XmlRootElement(name="solvers")
-@XStreamAlias( "solvers" )
-@XmlAccessorType (XmlAccessType.FIELD)
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
+@XmlRootElement(name = "solvers")
+@XStreamAlias("solvers")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SolverInstanceList {
 
-    @XmlElement(name="solver")
+    @XmlElement(name = "solver")
     @XStreamImplicit(itemFieldName = "solver")
     private List<SolverInstance> solvers;
 
@@ -45,11 +44,11 @@ public class SolverInstanceList {
         super();
         this.solvers = solvers;
     }
-    
+
     public List<SolverInstance> getContainers() {
         return solvers;
     }
-    
+
     public void setContainers(List<SolverInstance> solvers) {
         this.solvers = solvers;
     }
