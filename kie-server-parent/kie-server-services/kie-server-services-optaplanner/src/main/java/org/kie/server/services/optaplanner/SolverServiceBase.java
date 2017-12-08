@@ -45,8 +45,8 @@ public class SolverServiceBase {
     private static final Logger logger = LoggerFactory.getLogger(SolverServiceBase.class);
     private final ExecutorService executor;
 
-    private KieServerRegistry context;
-    private Map<String, SolverInstanceContext> solvers = new ConcurrentHashMap<String, SolverInstanceContext>();
+    private final KieServerRegistry context;
+    private final Map<String, SolverInstanceContext> solvers = new ConcurrentHashMap<>();
 
     public SolverServiceBase(KieServerRegistry context,
                              ExecutorService executorService) {
@@ -59,7 +59,7 @@ public class SolverServiceBase {
                                                         SolverInstance instance) {
         if (instance == null || instance.getSolverConfigFile() == null) {
             logger.error("Error creating solver. Configuration file name is null: " + instance);
-            return new ServiceResponse<SolverInstance>(
+            return new ServiceResponse<>(
                     ServiceResponse.ResponseType.FAILURE,
                     "Failed to create solver for container " + containerId
                             + ". Solver configuration file is null: " + instance);
@@ -71,17 +71,17 @@ public class SolverServiceBase {
             KieContainerInstanceImpl ci = context.getContainer(containerId);
             if (ci == null) {
                 logger.error("Error creating solver. Container does not exist: " + containerId);
-                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                           "Failed to create solver. Container does not exist: " + containerId);
+                return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                             "Failed to create solver. Container does not exist: " + containerId);
             }
 
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
             synchronized (ci) {
                 if (solvers.containsKey(instance.getSolverInstanceKey())) {
                     logger.error("Error creating solver. Solver '" + solverId + "' already exists for container '" + containerId + "'.");
-                    return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                               "Failed to create solver. Solver '" + solverId
-                                                                       + "' already exists for container '" + containerId + "'.");
+                    return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                                 "Failed to create solver. Solver '" + solverId
+                                                         + "' already exists for container '" + containerId + "'.");
                 }
                 SolverInstanceContext sic = new SolverInstanceContext(instance);
                 if (instance.getStatus() == null) {
@@ -101,37 +101,37 @@ public class SolverServiceBase {
                                 sic);
 
                     logger.info("Solver '" + solverId + "' successfully created in container '" + containerId + "'");
-                    return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
-                                                               "Solver '" + solverId + "' successfully created in container '" + containerId + "'",
-                                                               instance);
+                    return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                                                 "Solver '" + solverId + "' successfully created in container '" + containerId + "'",
+                                                 instance);
                 } catch (Exception e) {
                     logger.error("Error creating solver factory for solver " + instance,
                                  e);
-                    return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                               "Error creating solver factory for solver: " + e.getMessage(),
-                                                               instance);
+                    return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                                 "Error creating solver factory for solver: " + e.getMessage(),
+                                                 instance);
                 }
             }
         } catch (Exception e) {
             logger.error("Error creating solver '" + solverId + "' in container '" + containerId + "'",
                          e);
-            return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                       "Error creating solver '" + solverId + "' in container '" + containerId + "': " + e.getMessage(),
-                                                       instance);
+            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                         "Error creating solver '" + solverId + "' in container '" + containerId + "': " + e.getMessage(),
+                                         instance);
         }
     }
 
     public ServiceResponse<SolverInstanceList> getSolvers(String containerId) {
         try {
             List<SolverInstance> sl = getSolversForContainer(containerId);
-            return new ServiceResponse<SolverInstanceList>(
+            return new ServiceResponse<>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "Solvers list successfully retrieved from container '" + containerId + "'",
                     new SolverInstanceList(sl));
         } catch (Exception e) {
             logger.error("Error retrieving solvers list from container '" + containerId + "'",
                          e);
-            return new ServiceResponse<SolverInstanceList>(
+            return new ServiceResponse<>(
                     ServiceResponse.ResponseType.FAILURE,
                     "Error retrieving solvers list from container '" + containerId + "'" + e.getMessage(),
                     null);
@@ -145,20 +145,20 @@ public class SolverServiceBase {
                                                                                         solverId));
             if (sic != null) {
                 updateSolverInstance(sic);
-                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
-                                                           "Solver '" + solverId + "' state successfully retrieved from container '" + containerId + "'",
-                                                           sic.getInstance());
+                return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                                             "Solver '" + solverId + "' state successfully retrieved from container '" + containerId + "'",
+                                             sic.getInstance());
             } else {
-                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                           "Solver '" + solverId + "' not found in container '" + containerId + "'",
-                                                           null);
+                return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                             "Solver '" + solverId + "' not found in container '" + containerId + "'",
+                                             null);
             }
         } catch (Exception e) {
             logger.error("Error retrieving solver '" + solverId + "' state from container '" + containerId + "'",
                          e);
-            return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                       "Error retrieving solver '" + solverId + "' state from container '" + containerId + "'" + e.getMessage(),
-                                                       null);
+            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                         "Error retrieving solver '" + solverId + "' state from container '" + containerId + "'" + e.getMessage(),
+                                         null);
         }
     }
 
@@ -170,20 +170,20 @@ public class SolverServiceBase {
             if (sic != null) {
                 updateSolverInstance(sic);
                 sic.getInstance().setBestSolution(sic.getSolver().getBestSolution());
-                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
-                                                           "Best computed solution for '" + solverId + "' successfully retrieved from container '" + containerId + "'",
-                                                           sic.getInstance());
+                return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                                             "Best computed solution for '" + solverId + "' successfully retrieved from container '" + containerId + "'",
+                                             sic.getInstance());
             } else {
-                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                           "Solver '" + solverId + "' not found in container '" + containerId + "'",
-                                                           null);
+                return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                             "Solver '" + solverId + "' not found in container '" + containerId + "'",
+                                             null);
             }
         } catch (Exception e) {
             logger.error("Error retrieving solver '" + solverId + "' state from container '" + containerId + "'",
                          e);
-            return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                       "Error retrieving solver '" + solverId + "' state from container '" + containerId + "'" + e.getMessage(),
-                                                       null);
+            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                         "Error retrieving solver '" + solverId + "' state from container '" + containerId + "'" + e.getMessage(),
+                                         null);
         }
     }
 
@@ -429,7 +429,7 @@ public class SolverServiceBase {
     }
 
     private List<SolverInstance> getSolversForContainer(String containerId) {
-        List<SolverInstance> sl = new ArrayList<SolverInstance>(solvers.size());
+        List<SolverInstance> sl = new ArrayList<>(solvers.size());
         for (SolverInstanceContext sic : solvers.values()) {
             if (containerId.equalsIgnoreCase(sic.getInstance().getContainerId())) {
                 updateSolverInstance(sic);

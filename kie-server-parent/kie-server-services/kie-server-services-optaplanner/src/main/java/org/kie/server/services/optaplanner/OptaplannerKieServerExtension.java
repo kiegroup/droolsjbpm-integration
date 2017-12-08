@@ -43,9 +43,9 @@ public class OptaplannerKieServerExtension
 
     public static final String EXTENSION_NAME = "OptaPlanner";
 
-    private static final Boolean droolsDisabled = Boolean.parseBoolean(
+    private static final Boolean DROOLS_DISABLED = Boolean.parseBoolean(
             System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
-    private static final Boolean disabled = Boolean.parseBoolean(
+    private static final Boolean OPTAPLANNER_DISABLED = Boolean.parseBoolean(
             System.getProperty(KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false"));
 
     private KieServerRegistry registry;
@@ -60,7 +60,7 @@ public class OptaplannerKieServerExtension
     // in the future.
     private ExecutorService threadPool = null;
 
-    private List<Object> services = new ArrayList<Object>();
+    private final List<Object> services = new ArrayList<>();
     private boolean initialized = false;
     private OptaplannerCommandServiceImpl optaplannerCommandService;
 
@@ -71,7 +71,7 @@ public class OptaplannerKieServerExtension
 
     @Override
     public boolean isActive() {
-        return disabled == false && droolsDisabled == false;
+        return !OPTAPLANNER_DISABLED && !DROOLS_DISABLED;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class OptaplannerKieServerExtension
                 resolvedActiveThreadCount,
                 10, // thread keep alive time
                 TimeUnit.SECONDS,
-                new ArrayBlockingQueue<Runnable>(resolvedActiveThreadCount)); // queue with a size
+                new ArrayBlockingQueue<>(resolvedActiveThreadCount)); // queue with a size
         this.solverServiceBase = new SolverServiceBase(registry, threadPool);
 
         this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);
@@ -131,7 +131,7 @@ public class OptaplannerKieServerExtension
     public List<Object> getAppComponents(SupportedTransports type) {
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
                 = ServiceLoader.load(KieServerApplicationComponentsService.class);
-        List<Object> appComponentsList = new ArrayList<Object>();
+        List<Object> appComponentsList = new ArrayList<>();
         Object[] services = {solverServiceBase, registry};
         for (KieServerApplicationComponentsService appComponentsService : appComponentsServices) {
             appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
