@@ -29,11 +29,23 @@
   <artifactId>kie-spring-boot-samples</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE :: Spring :: Boot :: samples</name>
+  <name>KIE :: Spring :: Boot :: Samples</name>
   <description>Parent integration project for SpringBoot samples</description>
 
   <modules>
     <module>kie-spring-boot-sample-jbpm-basic</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>kie-spring-boot-starters</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 </project>

@@ -34,4 +34,14 @@
   <modules>
     <module>kie-spring-boot-starter-jbpm-basic</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>kie-spring-boot-starter-jbpm-basic</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
