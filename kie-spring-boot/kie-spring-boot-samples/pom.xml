@@ -21,35 +21,19 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
+    <artifactId>kie-spring-boot</artifactId>
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-spring-boot</artifactId>
+  <artifactId>kie-spring-boot-samples</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE :: Spring :: Boot</name>
-  <description>Parent integration project for SpringBoot</description>
+  <name>KIE :: Spring :: Boot :: samples</name>
+  <description>Parent integration project for SpringBoot samples</description>
 
   <modules>
-    <module>kie-spring-boot-starters</module>
-    <module>kie-spring-boot-samples</module>
+    <module>kie-spring-boot-sample-jbpm-basic</module>
   </modules>
 
-  <properties>
-    <version.spring-boot>1.5.8.RELEASE</version.spring-boot>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${version.spring-boot}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

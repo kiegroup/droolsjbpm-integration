@@ -22,14 +22,14 @@
 
   <parent>
     <groupId>org.drools</groupId>
-    <artifactId>kie-spring-boot</artifactId>
+    <artifactId>kie-spring-boot-starters</artifactId>
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jbpm-spring-boot</artifactId>
+  <artifactId>kie-spring-boot-starter-jbpm-basic</artifactId>
 
-  <name>jBPM :: Spring :: Boot</name>
-  <description>jBPM integration project for SpringBoot</description>
+  <name>KIE :: Spring :: Boot :: Starter :: jBPM :: basic</name>
+  <description>jBPM basic integration project for SpringBoot</description>
 
   <dependencies>
     <!-- Spring boot dependencies -->
@@ -125,12 +125,7 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-kie-services</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>aopalliance</groupId>
-          <artifactId>aopalliance</artifactId>
-        </exclusion>
-      </exclusions>
+
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
@@ -191,6 +186,10 @@
       <artifactId>kie-spring</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
 
     <!-- spring dependencies -->
     <dependency>
@@ -207,6 +206,16 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
