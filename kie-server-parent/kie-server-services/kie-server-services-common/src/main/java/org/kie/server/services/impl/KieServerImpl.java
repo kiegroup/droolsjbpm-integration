@@ -84,6 +84,8 @@ public class KieServerImpl {
     private List<Message> serverMessages = new ArrayList<Message>();
     private Map<String, List<Message>> containerMessages = new ConcurrentHashMap<String, List<Message>>();
 
+    private KieServices ks = KieServices.Factory.get();
+
     public KieServerImpl() {
         this(new KieServerStateFileRepository());
     }
@@ -236,7 +238,6 @@ public class KieServerImpl {
                 previous = context.registerContainer(containerId, ci);
                 if (previous == null) {
                     try {
-                        KieServices ks = KieServices.Factory.get();
                         InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
                         if (kieContainer != null) {
                             ci.setKieContainer(kieContainer);
@@ -668,6 +669,7 @@ public class KieServerImpl {
             // would likely not be worth it. At this point a decision was made to fail the execution if a concurrent 
             // call do dispose() is executed.
             if (kci != null && kci.getKieContainer() != null) {
+                ReleaseId originalReleaseId = kci.getResource().getReleaseId();
                 // before upgrade check with all extensions if that is allowed
                 KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
                 Map<String, Object> parameters = new HashMap<String, Object>();
@@ -721,6 +723,7 @@ public class KieServerImpl {
                     repository.store(KieServerEnvironment.getServerId(), currentState);
 
                     logger.info("Container {} successfully updated to release id {}", id, releaseId);
+                    ks.getRepository().removeKieModule(originalReleaseId);
 
                     messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + id));
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
