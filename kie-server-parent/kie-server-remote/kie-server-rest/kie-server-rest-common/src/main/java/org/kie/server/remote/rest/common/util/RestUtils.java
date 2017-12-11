@@ -16,6 +16,8 @@
 package org.kie.server.remote.rest.common.util;
 
 import java.util.List;
+import java.util.Locale;
+
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,6 +38,7 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 public class RestUtils {
 
     private static MarshallerHelper marshallerHelper = new MarshallerHelper(null);
+    private static Variant ERROR_VARIANT = new Variant(MediaType.TEXT_PLAIN_TYPE, (Locale) null, null);
     
     public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, Header... customHeaders) {
         return createCorrectVariant(responseObj, headers, null, customHeaders);
@@ -151,23 +154,23 @@ public class RestUtils {
     }
 
     public static Response notFound(String message, Variant v, Header... customHeaders) {
-        return createResponse("\"" +message + "\"", v, Response.Status.NOT_FOUND, customHeaders);
+        return createResponse("\"" +message + "\"", ERROR_VARIANT, Response.Status.NOT_FOUND, customHeaders);
     }
 
     public static Response internalServerError(String message, Variant v, Header... customHeaders) {
-        return createResponse("\"" +message + "\"", v, Response.Status.INTERNAL_SERVER_ERROR, customHeaders);
+        return createResponse("\"" +message + "\"", ERROR_VARIANT, Response.Status.INTERNAL_SERVER_ERROR, customHeaders);
     }
 
     public static Response alreadyExists(String message, Variant v, Header... customHeaders) {
-        return createResponse("\"" +message + "\"", v, Response.Status.CONFLICT, customHeaders);
+        return createResponse("\"" +message + "\"", ERROR_VARIANT, Response.Status.CONFLICT, customHeaders);
     }
 
     public static Response badRequest(String reason, Variant v, Header... customHeaders) {
-        return createResponse("\"" +reason + "\"", v, Response.Status.BAD_REQUEST, customHeaders);
+        return createResponse("\"" +reason + "\"", ERROR_VARIANT, Response.Status.BAD_REQUEST, customHeaders);
     }
 
     public static Response forbidden(String reason, Variant v, Header... customHeaders) {
-        return createResponse("\"" +reason + "\"", v, Response.Status.FORBIDDEN, customHeaders);
+        return createResponse("\"" +reason + "\"", ERROR_VARIANT, Response.Status.FORBIDDEN, customHeaders);
     }
 
     public static Response noContent(Variant v, Header... customHeaders) {
