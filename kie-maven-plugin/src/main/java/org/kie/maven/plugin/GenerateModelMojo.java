@@ -71,9 +71,14 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
+    @Parameter(property = "generateModel", defaultValue = "false")
+    private Boolean generateModel;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        generateModel();
+        if (generateModel) {
+            generateModel();
+        }
     }
 
     private void generateModel() throws MojoExecutionException {
@@ -166,12 +171,10 @@ public class GenerateModelMojo extends AbstractKieMojo {
             }
 
             // Remove drl files
-
             try {
                 final Stream<Path> drlFiles = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p));
                 drlFiles.forEach(p -> {
                     try {
-                        System.out.println("Deleting p = " + p);
                         Files.delete(p);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -182,8 +185,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 e.printStackTrace();
                 throw new MojoExecutionException("Unable to find .drl files");
             }
-
-
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
