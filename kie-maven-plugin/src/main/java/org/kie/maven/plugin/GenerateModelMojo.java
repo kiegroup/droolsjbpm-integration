@@ -37,6 +37,7 @@ import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelMavenPluginKieProject;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
@@ -147,7 +148,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
 
             // copy the META-INF packages file
-            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile("META-INF/packages");
+            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(CanonicalKieModule.MODEL_FILE);
             final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", "META-INF", packagesMemoryFile.getName());
 
             try {
