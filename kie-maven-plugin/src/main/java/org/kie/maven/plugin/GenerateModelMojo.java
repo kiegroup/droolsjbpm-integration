@@ -71,12 +71,13 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-    @Parameter(property = "generateModel", defaultValue = "false")
-    private Boolean generateModel;
+    @Parameter(property = "generateModel", defaultValue = "no")
+    private String generateModel;
+
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (generateModel) {
+        if (ExecModelMode.shouldGenerateModel(generateModel)) {
             generateModel();
         }
     }
@@ -170,26 +171,32 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 throw new MojoExecutionException("Unable to write file", e);
             }
 
-            // Remove drl files
-            try {
-                final Stream<Path> drlFiles = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p));
-                drlFiles.forEach(p -> {
-                    try {
-                        Files.delete(p);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("Unable to delete file " + p);
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new MojoExecutionException("Unable to find .drl files");
+            if(ExecModelMode.shouldDeleteFile(generateModel)) {
+                deleteDrlFiles();
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
         getLog().info("DSL successfully generated");
+    }
+
+    private void deleteDrlFiles() throws MojoExecutionException {
+        // Remove drl files
+        try {
+            final Stream<Path> drlFiles = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p));
+            drlFiles.forEach(p -> {
+                try {
+                    Files.delete(p);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("Unable to delete file " + p);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new MojoExecutionException("Unable to find .drl files");
+        }
     }
 
     private KieModuleModel getDependencyKieModel(File jar) {

@@ -104,11 +104,11 @@ public class BuildMojo extends AbstractKieMojo {
     private PlexusContainer container;
 
 
-    @Parameter(property = "generateModel", defaultValue = "false")
-    private Boolean generateModel;
+    @Parameter(property = "generateModel", defaultValue = "no")
+    private String generateModel;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if(!generateModel) {
+        if(!ExecModelMode.shouldGenerateModel(generateModel)) {
             buildDrl();
         }
     }
