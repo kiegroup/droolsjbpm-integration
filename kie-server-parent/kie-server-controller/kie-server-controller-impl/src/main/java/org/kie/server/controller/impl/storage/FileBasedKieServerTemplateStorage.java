@@ -130,6 +130,16 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
 
         try (FileReader reader = new FileReader(templatesLocation)) {
             templates = (ArrayList<ServerTemplate>)this.xstream.fromXML(reader);
+
+            if (templates != null && !templates.isEmpty()) {
+                templates.forEach(template -> {
+                    newTemplateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
+                    newTemplateMap.put(template.getId(),template);
+                });
+            }
+            templateKeyMap = newTemplateKeyMap;
+            templateMap = newTemplateMap;
+
         } catch (FileNotFoundException e) {
             logger.warn("Unable to read server template maps from file {}. File does not exist.", templatesLocation);
             writeTemplateMap();
@@ -138,14 +148,6 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
         } catch (Throwable e) {
             logger.error("Unable to read server template maps from file",e);
         }
-        if (templates != null && !templates.isEmpty()) {
-            templates.forEach(template -> {
-                newTemplateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
-                newTemplateMap.put(template.getId(),template);
-            });
-        }
-        templateKeyMap = newTemplateKeyMap;
-        templateMap = newTemplateMap;
     }
 
 
