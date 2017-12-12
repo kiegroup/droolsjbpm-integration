@@ -16,7 +16,9 @@ package org.kie.server.controller.impl.storage;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.StreamException;
+import com.thoughtworks.xstream.XStreamException;
 
 public class FileBasedKieServerTemplateStorage implements KieServerTemplateStorage {
 	private static FileBasedKieServerTemplateStorage INSTANCE; 
@@ -109,10 +111,11 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
      * Writes the map of server templates to the file pointed at by templatesLocation
      */
     private synchronized void writeTemplateMap() {
-        try (FileWriter writer = new FileWriter(templatesLocation)) {
-            this.xstream.toXML(new ArrayList<ServerTemplate>(templateMap.values()), writer);
-        } catch (Throwable e) {
-            logger.error("Unable to write template maps for standalone controller",e);
+        String xml = this.xstream.toXML(new ArrayList<ServerTemplate>(templateMap.values()));
+        try {
+            Files.write(Paths.get(templatesLocation), xml.getBytes());
+        } catch (IOException e) {
+            logger.error("Unable to write template maps for standalone controller", e);
         }
     }
 
@@ -127,9 +130,11 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
 
         try (FileReader reader = new FileReader(templatesLocation)) {
             templates = (ArrayList<ServerTemplate>)this.xstream.fromXML(reader);
-        } catch (StreamException | FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             logger.warn("Unable to read server template maps from file {}. File does not exist.", templatesLocation);
             writeTemplateMap();
+        } catch (XStreamException e) {
+            logger.warn("Unable to read server template maps from file {}. File corrupted. Possible concurrent update in progress.", templatesLocation);
         } catch (Throwable e) {
             logger.error("Unable to read server template maps from file",e);
         }
