@@ -103,8 +103,17 @@ public class BuildMojo extends AbstractKieMojo {
     @Inject
     private PlexusContainer container;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
 
+    @Parameter(property = "generateModel", defaultValue = "false")
+    private Boolean generateModel;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if(!generateModel) {
+            buildDrl();
+        }
+    }
+
+    private void buildDrl() throws MojoFailureException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
         List<InternalKieModule> kmoduleDeps = new ArrayList<InternalKieModule>();
@@ -182,7 +191,6 @@ public class BuildMojo extends AbstractKieMojo {
         }
         getLog().info("KieModule successfully built!");
     }
-
 
     private void shareKieObjectsWithMap(InternalKieModule kModule) {
         Optional<Map<String, Object>> optionalKieMap = getKieMap();
