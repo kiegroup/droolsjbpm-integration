@@ -30,7 +30,6 @@ import static org.junit.Assert.assertEquals;
 public class KProjectTest {
 
     @Test
-    @Ignore
     public void testKJar() throws Exception {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
