@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -37,6 +40,7 @@ import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelMavenPluginKieProject;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
@@ -49,6 +53,8 @@ import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsfor
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
 public class GenerateModelMojo extends AbstractKieMojo {
+
+    public static PathMatcher drlFileMatcher = FileSystems.getDefault().getPathMatcher("glob:**.drl");
 
     @Parameter(required = true, defaultValue = "${project.build.directory}")
     private File targetDirectory;
@@ -65,9 +71,18 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
+    @Parameter(property = "generateModel", defaultValue = "no")
+    private String generateModel;
+
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (ExecModelMode.shouldGenerateModel(generateModel)) {
+            generateModel();
+        }
+    }
 
+    private void generateModel() throws MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
         List<InternalKieModule> kmoduleDeps = new ArrayList<>();
@@ -145,9 +160,8 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 }
             }
 
-
             // copy the META-INF packages file
-            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile("META-INF/packages");
+            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(CanonicalKieModule.MODEL_FILE);
             final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", "META-INF", packagesMemoryFile.getName());
 
             try {
@@ -157,12 +171,32 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 throw new MojoExecutionException("Unable to write file", e);
             }
 
-
+            if(ExecModelMode.shouldDeleteFile(generateModel)) {
+                deleteDrlFiles();
+            }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
         getLog().info("DSL successfully generated");
+    }
+
+    private void deleteDrlFiles() throws MojoExecutionException {
+        // Remove drl files
+        try {
+            final Stream<Path> drlFiles = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p));
+            drlFiles.forEach(p -> {
+                try {
+                    Files.delete(p);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("Unable to delete file " + p);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new MojoExecutionException("Unable to find .drl files");
+        }
     }
 
     private KieModuleModel getDependencyKieModel(File jar) {
