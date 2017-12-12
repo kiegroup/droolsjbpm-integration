@@ -275,6 +275,21 @@ public class FileBasedKieServerTemplateStorageTest {
     }
 
     @Test
+    public void testLoadNotExistingTemplate() {
+        List<ServerTemplate> templates = storage.load();
+        assertEquals(3, templates.size());
+
+        // Delete template file
+        tmpTemplateStore.delete();
+
+        storage.loadTemplateMapsFromFile();
+
+        // Storage should still contain previously loaded templates
+        templates = storage.load();
+        assertEquals(3, templates.size());
+    }
+
+    @Test
     public void testGetStorageLocation() {
         String location = storage.getTemplatesLocation();
         assertEquals(tmpTemplateStore.getAbsolutePath(), location);
