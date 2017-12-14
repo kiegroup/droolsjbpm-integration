@@ -51,6 +51,11 @@
       <artifactId>jbpm-kie-services</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-document</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- Needed by RemoteFormModellerFormProvider -->
     <dependency>
       <groupId>org.kie.server</groupId>

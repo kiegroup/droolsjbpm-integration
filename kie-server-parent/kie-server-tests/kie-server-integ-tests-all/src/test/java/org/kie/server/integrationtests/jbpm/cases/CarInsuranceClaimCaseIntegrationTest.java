@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jbpm.document.Document;
+import org.jbpm.document.service.impl.DocumentImpl;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -71,6 +73,7 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(CLAIM_REPORT_CLASS_NAME, Class.forName(CLAIM_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
         extraClasses.put(PROPERTY_DAMAGE_REPORT_CLASS_NAME, Class.forName(PROPERTY_DAMAGE_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
+        extraClasses.put(DocumentImpl.class.getName(), DocumentImpl.class);
     }
 
     @After
@@ -86,6 +89,55 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         assertCaseInstance(caseId);
         // let's look at what stages are active
         assertBuildClaimReportStage(caseId);
+        // since the first task assigned to insured is with auto start it should be already active
+        // the same task can be claimed by insuranceRepresentative in case claim is reported over phone
+        long taskId = assertBuildClaimReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide claim report with initial data
+        // claim report should be stored in case file data
+        provideAndAssertClaimReport(caseId, taskId, USER_YODA);
+        // now we have another task for insured to provide property damage report
+        taskId = assertPropertyDamageReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide the property damage report
+        provideAndAssertPropertyDamageReport(caseId, taskId, USER_YODA);
+        // let's complete the stage by explicitly stating that claimReport is done
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "claimReportDone", Boolean.TRUE);
+        // we should be in another stage - Claim assessment
+        assertClaimAssesmentStage(caseId);
+        // let's trigger claim offer calculation
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Calculate claim", null);
+        // now we have another task for insured as claim was calculated
+        // let's accept the calculated claim
+        assertAndAcceptClaimOffer(USER_YODA);
+        // there should be no process instances for the case
+        Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10);
+        assertEquals(0, caseProcesInstances.size());
+    }
+    
+    @Test
+    public void testCarInsuranceClaimCaseWithDocument() throws Exception {
+        // start case with users assigned to roles
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        // let's verify case is created
+        assertCaseInstance(caseId);
+        // let's look at what stages are active
+        assertBuildClaimReportStage(caseId);
+        
+        String docContent = "just a test data";
+        byte[] content = docContent.getBytes();
+        // add document to a case
+        Document document = new DocumentImpl("test.txt", content.length, new Date());
+        document.setContent(content);
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "document", document);
+        
+        Map<String, Object> alldata = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        assertNotNull(alldata);
+        
+        Document caseDoc = (Document) alldata.get("document");
+        assertEquals("test.txt", caseDoc.getName());
+        assertNotNull(caseDoc.getContent());
+        
+        String storedContent = new String(caseDoc.getContent());
+        assertEquals("just a test data", storedContent);
         // since the first task assigned to insured is with auto start it should be already active
         // the same task can be claimed by insuranceRepresentative in case claim is reported over phone
         long taskId = assertBuildClaimReportAvailableForBothRoles(USER_YODA, USER_JOHN);
