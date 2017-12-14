@@ -21,33 +21,23 @@
 
   <parent>
     <groupId>org.drools</groupId>
-    <artifactId>kie-spring-boot</artifactId>
+    <artifactId>kie-spring-boot-samples</artifactId>
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-spring-boot-starters</artifactId>
-  <packaging>pom</packaging>
+  <artifactId>kie-spring-boot-sample-jbpm-actuator</artifactId>
 
-  <name>KIE :: Spring :: Boot :: Starters</name>
-  <description>Parent integration project for SpringBoot starters</description>
+  <name>KIE :: Spring :: Boot :: Sample :: jBPM :: Actuator</name>
+  <description>jBPM actuator sample project for SpringBoot</description>
 
-  <modules>
-    <module>kie-spring-boot-starter-jbpm-basic</module>
-    <module>kie-spring-boot-starter-jbpm-actuator</module>
-  </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.drools</groupId>
-        <artifactId>kie-spring-boot-starter-jbpm-basic</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.drools</groupId>
-        <artifactId>kie-spring-boot-starter-jbpm-actuator</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>kie-spring-boot-starter-jbpm-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+    </dependency>
+  </dependencies>
 </project>
