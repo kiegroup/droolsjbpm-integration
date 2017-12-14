@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.springboot;
+package org.jboss.springboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

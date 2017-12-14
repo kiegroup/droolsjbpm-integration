@@ -11,32 +11,31 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SpringSecurityIdentityProvider implements IdentityProvider {
 
-	public String getName() {
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && auth.isAuthenticated()) {
-			return auth.getName();
-		}
-		return "system";
-	}
+    public String getName() {
 
-	public List<String> getRoles() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && auth.isAuthenticated()) {
-			List<String> roles = new ArrayList<String>();
-			
-			for (GrantedAuthority ga : auth.getAuthorities()) {
-				roles.add(ga.getAuthority());
-			}
-			
-			return roles;
-		}
-		
-		return Collections.emptyList();
-	}
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            return auth.getName();
+        }
+        return "system";
+    }
 
-	public boolean hasRole(String role) {
-		return false;
-	}
+    public List<String> getRoles() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            List<String> roles = new ArrayList<String>();
 
+            for (GrantedAuthority ga : auth.getAuthorities()) {
+                roles.add(ga.getAuthority());
+            }
+
+            return roles;
+        }
+
+        return Collections.emptyList();
+    }
+
+    public boolean hasRole(String role) {
+        return false;
+    }
 }
