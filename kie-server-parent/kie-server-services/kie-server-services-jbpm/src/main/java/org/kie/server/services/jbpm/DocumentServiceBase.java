@@ -23,8 +23,8 @@ import java.util.List;
 import org.jbpm.document.Document;
 import org.jbpm.document.service.DocumentStorageService;
 import org.jbpm.document.service.DocumentStorageServiceProvider;
-import org.jbpm.document.service.impl.DocumentStorageServiceImpl;
 import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstance.Builder;
 import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieServerRuntimeException;
@@ -127,17 +127,18 @@ public class DocumentServiceBase {
         if (document == null) {
             return null;
         }
-        DocumentInstance documentInstance = DocumentInstance.builder()
+        Builder documentBuilder = DocumentInstance.builder();
+        
+         documentBuilder
                 .id(document.getIdentifier())
                 .name(document.getName())
                 .link(document.getLink())
                 .size(document.getSize())
-                .lastModified(document.getLastModified())
-                .content(document.getContent())
-                .build();
-        if (!withContent) {
-            documentInstance.setContent(null);
+                .lastModified(document.getLastModified());
+        if (withContent) {
+            documentBuilder.content(document.getContent());
         }
+        DocumentInstance documentInstance = documentBuilder.build();
         return documentInstance;
     }
 }
