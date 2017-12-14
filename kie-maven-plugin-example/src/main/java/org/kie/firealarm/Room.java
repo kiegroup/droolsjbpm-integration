@@ -13,23 +13,39 @@
  * limitations under the License.
 */
 
-package org.kie.sample.model;
+package org.kie.firealarm;
 
-public class Fire {
+public class Room {
 
-    private Room room;
+    private String name;
 
-    public Fire() { }
+    public Room() { }
 
-    public Fire(Room room) {
-        this.room = room;
+    public Room(String name) {
+        this.name = name;
     }
 
-    public Room getRoom() {
-        return room;
+    public String getName() {
+        return name;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Room)) { return false; }
+        return name.equals(((Room) obj).getName());
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

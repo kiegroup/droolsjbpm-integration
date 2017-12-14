@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.test
-declare FactA
-    fieldB: FactB
+package org.kie.example
+declare FactB
+    fieldA: FactA
 end

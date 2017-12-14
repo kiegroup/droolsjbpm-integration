@@ -21,9 +21,9 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.sample.model.Fire;
-import org.kie.sample.model.Room;
-import org.kie.sample.model.Sprinkler;
+import org.kie.firealarm.Fire;
+import org.kie.firealarm.Room;
+import org.kie.firealarm.Sprinkler;
 
 import static org.junit.Assert.assertEquals;
 
