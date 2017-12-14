@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.sample.model;
+package org.kie.firealarm;
 
 public class Sprinkler {
 

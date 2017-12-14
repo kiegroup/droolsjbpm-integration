@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.test
+package org.kie.example
 rule R1 when
    $fieldA : FactA( $fieldB : fieldB )
    FactB( this == $fieldB, fieldA == $fieldA )

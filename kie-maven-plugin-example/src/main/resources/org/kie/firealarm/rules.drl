@@ -13,10 +13,10 @@
  * limitations under the License.
 */
 
-package org.kie.sample
+package org.kie.firealarm
 
 import java.util.*
-import org.kie.sample.model.*
+import org.kie.firealarm.*
 
 rule "When there is a fire turn on the sprinkler"
 when
