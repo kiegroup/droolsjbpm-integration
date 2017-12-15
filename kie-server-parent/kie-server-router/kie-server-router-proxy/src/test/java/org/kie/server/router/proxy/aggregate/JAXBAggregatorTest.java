@@ -21,10 +21,15 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
 import org.jboss.logging.Logger;
 import org.junit.Test;
 import org.kie.server.router.proxy.aggragate.JaxbXMLResponseAggregator;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
 public class JAXBAggregatorTest extends AbstractAggregateTest {
@@ -544,6 +549,34 @@ public class JAXBAggregatorTest extends AbstractAggregateTest {
     }
 
     @Test
+    public void testAggregateRawListNamespace() throws Exception {
+        String xml1 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-1.xml"));
+        String xml2 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-2.xml"));
+        JaxbXMLResponseAggregator aggregate = new JaxbXMLResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(xml1);
+        data.add(xml2);
+
+        String result = aggregate.aggregate(data);
+        logger.debug(result);
+
+        Document xml = toXml(result);
+        assertNotNull(xml);
+
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList evaluate = (NodeList) xPath.evaluate("/list-type/items/items", xml, XPathConstants.NODESET);
+        assertEquals(5, evaluate.getLength());
+
+        NamedNodeMap firstNodeAttributes = evaluate.item(0).getAttributes();
+        assertEquals("xmlns:xsi", firstNodeAttributes.item(0).getNodeName());
+        assertEquals("http://www.w3.org/2001/XMLSchema-instance", firstNodeAttributes.item(0).getNodeValue());
+        assertEquals("xsi:type", firstNodeAttributes.item(1).getNodeName());
+        assertEquals("jaxbList", firstNodeAttributes.item(1).getNodeValue());
+
+    }
+
+    @Test
     public void testAggregateRawListWithPaging() throws Exception {
         String xml1 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-1.xml"));
         String xml2 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-2.xml"));
@@ -562,7 +595,33 @@ public class JAXBAggregatorTest extends AbstractAggregateTest {
         NodeList processes = xml.getElementsByTagName("value");
         assertNotNull(processes);
         assertEquals(2, processes.getLength());
+    }
 
+    @Test
+    public void testAggregateRawListWithPagingNamespace() throws Exception {
+        String xml1 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-1.xml"));
+        String xml2 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-2.xml"));
+        JaxbXMLResponseAggregator aggregate = new JaxbXMLResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(xml1);
+        data.add(xml2);
+
+        String result = aggregate.aggregate(data, null, true, 1, 2);
+        logger.debug(result);
+
+        Document xml = toXml(result);
+        assertNotNull(xml);
+
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList evaluate = (NodeList) xPath.evaluate("/list-type/items/items", xml, XPathConstants.NODESET);
+        assertEquals(2, evaluate.getLength());
+
+        NamedNodeMap firstNodeAttributes = evaluate.item(0).getAttributes();
+        assertEquals("xmlns:xsi", firstNodeAttributes.item(0).getNodeName());
+        assertEquals("http://www.w3.org/2001/XMLSchema-instance", firstNodeAttributes.item(0).getNodeValue());
+        assertEquals("xsi:type", firstNodeAttributes.item(1).getNodeName());
+        assertEquals("jaxbList", firstNodeAttributes.item(1).getNodeValue());
     }
 }
 
