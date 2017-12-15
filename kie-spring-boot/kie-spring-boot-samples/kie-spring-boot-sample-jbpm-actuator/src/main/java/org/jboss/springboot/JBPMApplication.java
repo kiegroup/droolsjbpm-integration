@@ -16,6 +16,9 @@
 
 package org.jboss.springboot;
 
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -26,13 +29,21 @@ import org.springframework.context.annotation.Bean;
 public class JBPMApplication {
 
     @Autowired
+    private RuntimeManagerComponent runtimeManagerComponent;
 
     @Bean
     CommandLineRunner startProcess() {
         return new CommandLineRunner() {
             @Override
             public void run(String... strings) throws Exception {
+                runtimeManagerComponent.createRuntimeManager("simpleprocess.bpmn2");
+                RuntimeEngine engine = runtimeManagerComponent.getRuntimeEngine(EmptyContext.get());
 
+                KieSession ksession = engine.getKieSession();
+
+                for (int i = 0; i < 20; i++) {
+                    ksession.startProcess("simpleprocess");
+                }
             }
         };
     }
