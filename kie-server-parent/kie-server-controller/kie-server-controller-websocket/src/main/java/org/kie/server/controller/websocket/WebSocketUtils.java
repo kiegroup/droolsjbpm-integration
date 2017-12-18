@@ -22,6 +22,7 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.Wrapped;
+import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerInstance;
 import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
@@ -43,8 +44,7 @@ import org.kie.server.controller.api.model.spec.ServerTemplateList;
 
 public class WebSocketUtils {
 
-
-    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(getMinimalModelClasses(), MarshallingFormat.JSON, WebSocketSessionManager.class.getClassLoader());
+    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(null, MarshallingFormat.JSON, WebSocketSessionManager.class.getClassLoader());
     private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, WebSocketSessionManager.class.getClassLoader());
 
     public static Set<Class<?>> getModelClasses() {
@@ -70,18 +70,11 @@ public class WebSocketUtils {
         modelClasses.add(ServerTemplateList.class);
         modelClasses.add(ContainerSpecList.class);
 
-        return modelClasses;
-    }
-
-    public static Set<Class<?>> getMinimalModelClasses() {
-        Set<Class<?>> modelClasses = new HashSet<Class<?>>();
-
-        modelClasses.add(RuleConfig.class);
-        modelClasses.add(ProcessConfig.class);
+        modelClasses.add(KieServerControllerDescriptorCommand.class);
 
         return modelClasses;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static <T> T unmarshal(String data, String marshallingFormat, Class<T> unmarshalType) {
         if (data == null || data.isEmpty()) {

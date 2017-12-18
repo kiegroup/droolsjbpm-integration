@@ -45,7 +45,7 @@ import org.kie.server.controller.api.model.spec.*;
 
 public class ControllerUtils {
 
-    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(getMinimalModelClasses(), MarshallingFormat.JSON, ControllerUtils.class.getClassLoader());
+    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(null, MarshallingFormat.JSON, ControllerUtils.class.getClassLoader());
     private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, ControllerUtils.class.getClassLoader());
 
     public static Set<Class<?>> getModelClasses() {
@@ -73,15 +73,6 @@ public class ControllerUtils {
         modelClasses.add(ContainerKey.class);
         modelClasses.add(ServerTemplateList.class);
         modelClasses.add(ContainerSpecList.class);
-
-        return modelClasses;
-    }
-
-    public static Set<Class<?>> getMinimalModelClasses() {
-        Set<Class<?>> modelClasses = new HashSet<Class<?>>();
-
-        modelClasses.add(RuleConfig.class);
-        modelClasses.add(ProcessConfig.class);
 
         return modelClasses;
     }

@@ -20,8 +20,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-config")
 public class ProcessConfig extends ContainerConfig {
