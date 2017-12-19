@@ -16,29 +16,34 @@
 
 package org.kie.server.controller.management.client.exception;
 
-public class UnexpectedResponseCodeException extends RuntimeException{
+public class KieServerControllerHTTPClientException extends KieServerControllerClientException {
 
     private static final long serialVersionUID = 1L;
 
     private int responseCode;
 
-    public UnexpectedResponseCodeException(int responseCode) {
+    public KieServerControllerHTTPClientException(int responseCode) {
         super();
         this.responseCode = responseCode;
     }
 
-    public UnexpectedResponseCodeException(int responseCode, String message) {
+    public KieServerControllerHTTPClientException(int responseCode,
+                                                  String message) {
         super(message);
         this.responseCode = responseCode;
     }
 
-    public UnexpectedResponseCodeException(int responseCode, Throwable cause) {
+    public KieServerControllerHTTPClientException(int responseCode,
+                                                  Throwable cause) {
         super(cause);
         this.responseCode = responseCode;
     }
 
-    public UnexpectedResponseCodeException(int responseCode, String message, Throwable cause) {
-        super(message, cause);
+    public KieServerControllerHTTPClientException(int responseCode,
+                                                  String message,
+                                                  Throwable cause) {
+        super(message,
+              cause);
         this.responseCode = responseCode;
     }
 

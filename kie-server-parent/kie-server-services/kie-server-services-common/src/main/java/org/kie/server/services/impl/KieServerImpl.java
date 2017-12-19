@@ -51,7 +51,7 @@ import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;

@@ -16,12 +16,11 @@
 
 package org.kie.server.controller.management.client;
 
-import java.util.Map;
-
 import javax.ws.rs.core.Configuration;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.management.client.rest.RestKieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.websocket.WebSocketKieServerMgmtControllerClient;
 
 public class KieServerMgmtControllerClientFactory {
 
@@ -80,5 +79,35 @@ public class KieServerMgmtControllerClientFactory {
                                                      password,
                                                      format,
                                                      configuration);
+    }
+
+    /**
+     * Creates a new Kie Controller Management Client using Web Socket based service
+     * @param controllerUrl the URL to the server (e.g.: "ws://localhost:8080")
+     * @param login user login
+     * @param password user password
+     * @return client instance
+     */
+    public static KieServerMgmtControllerClient newWebSocketClient(final String controllerUrl,
+                                                                   final String login,
+                                                                   final String password) {
+        return new WebSocketKieServerMgmtControllerClient(controllerUrl,
+                                                          login,
+                                                          password,
+                                                          null);
+    }
+
+    /**
+     * Creates a new Kie Controller Management Client using Web Socket based service
+     * @param controllerUrl the URL to the server (e.g.: "ws://localhost:8080")
+     * @param token token
+     * @return client instance
+     */
+    public static KieServerMgmtControllerClient newWebSocketClient(final String controllerUrl,
+                                                                   final String token) {
+        return new WebSocketKieServerMgmtControllerClient(controllerUrl,
+                                                          null,
+                                                          null,
+                                                          token);
     }
 }

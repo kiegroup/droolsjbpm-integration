@@ -67,6 +67,7 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
     public void closeControllerClient() {
         if (mgmtControllerClient != null) {
             try {
+                logger.info("Closing Kie Server Management Controller client");
                 mgmtControllerClient.close();
             } catch (IOException e) {
                 logger.error("Error trying to close Kie Server Management Controller Client: {}",

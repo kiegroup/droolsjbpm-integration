@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -27,9 +28,12 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.common.KeyStoreHelperUtil;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.websocket.client.handlers.KieServerSetupMessageHandler;
+import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
+import org.kie.server.controller.websocket.common.WebSocketKieServerControllerClientImpl;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServerRegistry;
@@ -44,7 +48,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     private static final Logger logger = LoggerFactory.getLogger(WebSocketKieServerControllerImpl.class);
 
     private KieServerRegistry context;
-    private final WebSocketKieServerControllerClient client;
+    private final WebSocketKieServerControllerClientImpl client;
     private final Marshaller marshaller;
     
     private KieServerInfo serverInfo;
@@ -54,16 +58,16 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     public WebSocketKieServerControllerImpl() {
         this.marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader());
         
-        this.client = new WebSocketKieServerControllerClient((WebSocketKieServerControllerClient client) -> {
+        this.client = new WebSocketKieServerControllerClientImpl((WebSocketKieServerControllerClientImpl client) -> {
             try {
-                client.sendWithHandler(serialize(serverInfo), (String message) -> {
+                client.sendTextWithHandler(serialize(serverInfo), (String message) -> {
                     logger.info("Successfully reconnected");
                     return null;
                 });
             } catch (IOException e) {
                 logger.warn("Error when trying to reconnect to Web Socket server - {}", e.getMessage());
             }
-        });        
+        });
     }
 
     @Override
@@ -82,13 +86,18 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                         
                         String connectAndSyncUrl = controllerUrl + "/" + KieServerEnvironment.getServerId();
     
-                        
                         final KieServerSetup kieServerSetup = new KieServerSetup();
                         try {
-                            this.client.init(connectAndSyncUrl, config);
+                            this.client.init(WebSocketClientConfiguration.builder()
+                                                     .controllerUrl(connectAndSyncUrl)
+                                                     .userName(config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER,
+                                                                                         "kieserver"))
+                                                     .password(KeyStoreHelperUtil.loadControllerPassword(config))
+                                                     .token(config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN))
+                                                     .build());
                             CountDownLatch waitLatch = new CountDownLatch(1);
                             
-                            client.sendWithHandler(serialize(serverInfo), new KieServerSetupMessageHandler(context, waitLatch, kieServerSetup));
+                            client.sendTextWithHandler(serialize(serverInfo), new KieServerSetupMessageHandler(context, waitLatch, kieServerSetup));
     
                             boolean received = waitLatch.await(10, TimeUnit.SECONDS);
                             if (received && kieServerSetup.getContainers() != null) {

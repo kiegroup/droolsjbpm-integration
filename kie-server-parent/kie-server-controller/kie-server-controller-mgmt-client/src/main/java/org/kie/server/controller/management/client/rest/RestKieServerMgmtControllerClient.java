@@ -45,7 +45,7 @@ import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
-import org.kie.server.controller.management.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.controller.management.client.exception.KieServerControllerHTTPClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -288,7 +288,7 @@ public class RestKieServerMgmtControllerClient implements KieServerMgmtControlle
         }
 
         logger.debug( stringBuffer.toString());
-        return new UnexpectedResponseCodeException(response.getStatus(), stringBuffer.toString());
+        return new KieServerControllerHTTPClientException(response.getStatus(), stringBuffer.toString());
     }
 
     private RuntimeException createExceptionForUnexpectedFailure(
