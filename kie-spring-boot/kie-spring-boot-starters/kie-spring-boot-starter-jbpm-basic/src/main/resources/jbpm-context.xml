@@ -33,8 +33,10 @@
     </property>
   </bean>
 
-  <bean id="transactionCmdService" class="org.jbpm.shared.services.impl.TransactionalCommandService">
+  <bean id="transactionCmdService" class="org.kie.spring.jbpm.services.SpringTransactionalCommandService">
     <constructor-arg name="emf" ref="entityManagerFactory"/>
+    <constructor-arg name="txm" ref="kieSpringTransactionManager"/>
+    <constructor-arg name="transactionManager" ref="transactionManager"/>
   </bean>
 
   <bean id="runtimeDataService" class="org.jbpm.kie.services.impl.RuntimeDataServiceImpl">
@@ -53,7 +55,7 @@
     <property name="identityProvider" ref="identityProvider"/>
     <property name="runtimeDataService" ref="runtimeDataService"/>
     <property name="formManagerService" ref="formManagerService"/>
-    <property name="executorService" ref="executorService"/>
+    <!-- <property name="executorService" ref="executorService"/> -->
   </bean>
 
   <bean id="data" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" depends-on="deploymentService">
@@ -78,10 +80,10 @@
     <property name="deploymentService" ref="deploymentService"/>
   </bean>
 
-  <bean id="executorService" class="org.jbpm.executor.ExecutorServiceFactory"
+<!--   <bean id="executorService" class="org.jbpm.executor.ExecutorServiceFactory"
         factory-method="newExecutorService" depends-on="entityManagerFactory"
         init-method="init" destroy-method="destroy">
     <constructor-arg ref="entityManagerFactory"/>
-  </bean>
+  </bean> -->
 
 </beans>
