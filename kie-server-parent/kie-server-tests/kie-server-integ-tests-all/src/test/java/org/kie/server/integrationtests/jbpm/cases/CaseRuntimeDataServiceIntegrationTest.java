@@ -1041,8 +1041,9 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comments);
         assertEquals(0, comments.size());
 
-        caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "first comment");
-
+        String commentId = caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "first comment");
+        assertNotNull(commentId);
+        
         comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
         assertNotNull(comments);
         assertEquals(1, comments.size());
@@ -1053,6 +1054,8 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals("first comment", comment.getText());
         assertNotNull(comment.getAddedAt());
         assertNotNull(comment.getId());
+        
+        assertEquals(commentId, comment.getId());
 
         caseClient.updateComment(CONTAINER_ID, caseId, comment.getId(), USER_YODA, "updated comment");
         comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);

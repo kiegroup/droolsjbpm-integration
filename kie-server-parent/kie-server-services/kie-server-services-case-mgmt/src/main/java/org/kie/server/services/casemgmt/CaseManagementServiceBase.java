@@ -368,13 +368,14 @@ public class CaseManagementServiceBase {
         }
     }
 
-    public void addCommentToCase(String containerId, String caseId, String author, List<String> restrictions, String comment, String marshallingType) {
+    public String addCommentToCase(String containerId, String caseId, String author, List<String> restrictions, String comment, String marshallingType) {
     	verifyContainerId(containerId, caseId);
     	author = getUser(author);
         String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class, new ByCaseIdContainerLocator(caseId));
 
         logger.debug("Adding comment to case {} by {} with text '{}' with restrictions {}", caseId, author, actualComment, restrictions);
-        caseService.addCaseComment(caseId, author, actualComment, restrictions.toArray(new String[restrictions.size()]));
+        String commentId = caseService.addCaseComment(caseId, author, actualComment, restrictions.toArray(new String[restrictions.size()]));
+        return marshallerHelper.marshal(containerId, marshallingType, commentId);
     }
 
     public void updateCommentInCase(String containerId, String caseId, String commentId, String author, List<String> restrictions, String comment, String marshallingType) {

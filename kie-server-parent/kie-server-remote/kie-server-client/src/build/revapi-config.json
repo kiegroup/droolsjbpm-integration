@@ -317,6 +317,27 @@
           "methodName": "findProcessInstancesWithFilters",
           "elementKind": "method",
           "justification": ""
+         },
+         {
+           "code": "java.method.returnTypeChanged",
+           "old": "method void org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+           "new": "method java.lang.String org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+           "oldType": "void",
+           "newType": "java.lang.String",
+           "package": "org.kie.server.client",
+           "classSimpleName": "CaseServicesClient",
+           "methodName": "addComment",
+           "elementKind": "method",
+           "justification": "Return comment id when comment is added"
+         },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method java.lang.String org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "CaseServicesClient",
+           "methodName": "addComment",
+           "elementKind": "method",
+           "justification": "Return comment id when comment is added"
          }
       ]
     }
