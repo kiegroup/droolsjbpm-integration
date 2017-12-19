@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class KieServerMessageHandler implements MessageHandler.Whole<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerMessageHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerMessageHandler.class);
     private ArrayDeque<InternalMessageHandler> internalHandlers = new ArrayDeque<>();
     
     private Session session;    
@@ -38,22 +38,25 @@ public class KieServerMessageHandler implements MessageHandler.Whole<String> {
     
     @Override
     public void onMessage(String message) {
-        logger.debug("Message received with content '{}'", message);
+        LOGGER.debug("Message received on session id: '{}'", session.getId());
+        LOGGER.debug("Message content '{}'", message);
         InternalMessageHandler handler = internalHandlers.poll();
-        logger.debug("About to handle message with handler {}", handler);
-        
+        LOGGER.debug("About to handle message with handler {}", handler);
+        if(handler == null){
+            LOGGER.warn("No message handler available to process message");
+            throw new RuntimeException("No message handler available to process message");
+        }
         String response = handler.onMessage(message);
-        logger.debug("Response to be send (if not null) is '{}'", response);
+        LOGGER.debug("Response to be send (if not null) is '{}'", response);
         // add handler if the current one has next one, this needs to be before sending response
         addHandler(handler.getNextHandler());                     
         if (response != null) {
             try {
                 session.getBasicRemote().sendText(response);
-                logger.debug("Response successfully sent");
-                
+                LOGGER.debug("Response successfully sent");
                 handler.afterResponseSent();
             } catch (IOException e) {
-                logger.error("Error when sending response", e);
+                LOGGER.error("Error when sending response", e);
             }
         }
         
@@ -61,6 +64,7 @@ public class KieServerMessageHandler implements MessageHandler.Whole<String> {
 
     public void addHandler(InternalMessageHandler handler) {
         if (handler != null) {
+            LOGGER.debug("Adding message handler {} to session {}", handler, session.getId());
             this.internalHandlers.add(handler);
         }
     }

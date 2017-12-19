@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
@@ -138,7 +140,11 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
     @Override
     public ServerTemplate getServerTemplate(String serverTemplateId) {
-        return templateStorage.load(serverTemplateId);
+        final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+        }
+        return serverTemplate;
     }
 
     @Override
@@ -168,7 +174,11 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         if (serverTemplate == null) {
             throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
-        return serverTemplate.getContainerSpec(containerId);
+        final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerId);
+        if (containerSpec == null) {
+            throw new KieServerControllerNotFoundException("Server template " + serverTemplateId + " does not have container with id " + containerId);
+        }
+        return containerSpec;
     }
 
     @Override

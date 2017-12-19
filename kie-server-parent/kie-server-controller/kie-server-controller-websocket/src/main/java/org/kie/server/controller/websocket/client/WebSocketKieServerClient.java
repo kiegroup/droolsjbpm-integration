@@ -64,7 +64,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.jms.ResponseHandler;
 import org.kie.server.controller.websocket.WebSocketSessionManager;
-import org.kie.server.controller.websocket.WebSocketUtils;
+import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.handlers.WebSocketServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

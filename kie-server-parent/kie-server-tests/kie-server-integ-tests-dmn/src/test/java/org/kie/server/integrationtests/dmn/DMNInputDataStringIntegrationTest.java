@@ -23,7 +23,7 @@ import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 
 import java.util.Map;

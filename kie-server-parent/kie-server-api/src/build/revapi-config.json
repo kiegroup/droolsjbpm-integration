@@ -39,78 +39,137 @@
           "justification": "PLANNER-815 Support real-time planning"
         },
         {
-        "code": "java.method.removed",
-        "old": "method java.lang.String org.kie.server.api.model.dmn.DMNContextKS::getDecisionId()",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNContextKS",
-        "methodName": "getDecisionId",
-        "elementKind": "method",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.removed",
+          "old": "method java.lang.String org.kie.server.api.model.dmn.DMNContextKS::getDecisionId()",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNContextKS",
+          "methodName": "getDecisionId",
+          "elementKind": "method",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
         },
         {
-        "code": "java.method.removed",
-        "old": "method java.lang.String org.kie.server.api.model.dmn.DMNContextKS::getDecisionName()",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNContextKS",
-        "methodName": "getDecisionName",
-        "elementKind": "method",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.removed",
+          "old": "method java.lang.String org.kie.server.api.model.dmn.DMNContextKS::getDecisionName()",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNContextKS",
+          "methodName": "getDecisionName",
+          "elementKind": "method",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
         },
         {
-        "code": "java.method.removed",
-        "old": "method void org.kie.server.api.model.dmn.DMNContextKS::setDecisionId(java.lang.String)",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNContextKS",
-        "methodName": "setDecisionId",
-        "elementKind": "method",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.removed",
+          "old": "method void org.kie.server.api.model.dmn.DMNContextKS::setDecisionId(java.lang.String)",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNContextKS",
+          "methodName": "setDecisionId",
+          "elementKind": "method",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
         },
         {
-        "code": "java.method.removed",
-        "old": "method void org.kie.server.api.model.dmn.DMNContextKS::setDecisionName(java.lang.String)",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNContextKS",
-        "methodName": "setDecisionName",
-        "elementKind": "method",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.removed",
+          "old": "method void org.kie.server.api.model.dmn.DMNContextKS::setDecisionName(java.lang.String)",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNContextKS",
+          "methodName": "setDecisionName",
+          "elementKind": "method",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
         },
         {
-        "code": "java.method.numberOfParametersChanged",
-        "old": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, java.lang.String, org.kie.dmn.api.core.DMNResult)",
-        "new": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, org.kie.dmn.api.core.DMNResult)",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNResultKS",
-        "methodName": "<init>",
-        "elementKind": "constructor",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, java.lang.String, org.kie.dmn.api.core.DMNResult)",
+          "new": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, org.kie.dmn.api.core.DMNResult)",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNResultKS",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
         },
         {
-        "code": "java.method.numberOfParametersChanged",
-        "old": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, org.kie.dmn.api.core.DMNResult)",
-        "new": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, java.util.List<java.lang.String>, org.kie.dmn.api.core.DMNResult)",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNResultKS",
-        "methodName": "<init>",
-        "elementKind": "constructor",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, org.kie.dmn.api.core.DMNResult)",
+          "new": "method void org.kie.server.api.model.dmn.DMNResultKS::<init>(java.lang.String, java.lang.String, java.util.List<java.lang.String>, org.kie.dmn.api.core.DMNResult)",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNResultKS",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
         },
         {
-        "code": "java.method.removed",
-        "old": "method java.lang.String org.kie.server.api.model.dmn.DMNResultKS::getDecisionName()",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNResultKS",
-        "methodName": "getDecisionName",
-        "elementKind": "method",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.removed",
+          "old": "method java.lang.String org.kie.server.api.model.dmn.DMNResultKS::getDecisionName()",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNResultKS",
+          "methodName": "getDecisionName",
+          "elementKind": "method",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
         },
         {
-        "code": "java.method.removed",
-        "old": "method void org.kie.server.api.model.dmn.DMNResultKS::setDecisionName(java.lang.String)",
-        "package": "org.kie.server.api.model.dmn",
-        "classSimpleName": "DMNResultKS",
-        "methodName": "setDecisionName",
-        "elementKind": "method",
-        "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+          "code": "java.method.removed",
+          "old": "method void org.kie.server.api.model.dmn.DMNResultKS::setDecisionName(java.lang.String)",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNResultKS",
+          "methodName": "setDecisionName",
+          "elementKind": "method",
+          "justification": "DROOLS-2073 Kie server API to evaluate multiple decisions by name/id"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "enum org.kie.server.api.model.ServiceResponse.ResponseType",
+          "package": "org.kie.server.api.model",
+          "classSimpleName": "ResponseType",
+          "elementKind": "enum",
+          "justification": "JBPM-6243 - Moved ResponseType enum to interface"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.kie.server.api.model.ServiceResponse<T>::<init>(===org.kie.server.api.model.ServiceResponse.ResponseType===, java.lang.String)",
+          "new": "parameter void org.kie.server.api.model.ServiceResponse<T>::<init>(===org.kie.server.api.model.KieServiceResponse.ResponseType===, java.lang.String)",
+          "oldType": "org.kie.server.api.model.ServiceResponse.ResponseType",
+          "newType": "org.kie.server.api.model.KieServiceResponse.ResponseType",
+          "package": "org.kie.server.api.model",
+          "classSimpleName": "ServiceResponse",
+          "methodName": "<init>",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "JBPM-6243 - Moved ResponseType enum to interface"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.kie.server.api.model.ServiceResponse<T>::<init>(===org.kie.server.api.model.ServiceResponse.ResponseType===, java.lang.String, T)",
+          "new": "parameter void org.kie.server.api.model.ServiceResponse<T>::<init>(===org.kie.server.api.model.KieServiceResponse.ResponseType===, java.lang.String, T)",
+          "oldType": "org.kie.server.api.model.ServiceResponse.ResponseType",
+          "newType": "org.kie.server.api.model.KieServiceResponse.ResponseType",
+          "package": "org.kie.server.api.model",
+          "classSimpleName": "ServiceResponse",
+          "methodName": "<init>",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "JBPM-6243 - Moved ResponseType enum to interface"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.kie.server.api.model.ServiceResponse.ResponseType org.kie.server.api.model.ServiceResponse<T>::getType()",
+          "new": "method org.kie.server.api.model.KieServiceResponse.ResponseType org.kie.server.api.model.ServiceResponse<T>::getType()",
+          "oldType": "org.kie.server.api.model.ServiceResponse.ResponseType",
+          "newType": "org.kie.server.api.model.KieServiceResponse.ResponseType",
+          "package": "org.kie.server.api.model",
+          "classSimpleName": "ServiceResponse",
+          "methodName": "getType",
+          "elementKind": "method",
+          "justification": "JBPM-6243 - Moved ResponseType enum to interface"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.kie.server.api.model.ServiceResponse<T>::setType(===org.kie.server.api.model.ServiceResponse.ResponseType===)",
+          "new": "parameter void org.kie.server.api.model.ServiceResponse<T>::setType(===org.kie.server.api.model.KieServiceResponse.ResponseType===)",
+          "oldType": "org.kie.server.api.model.ServiceResponse.ResponseType",
+          "newType": "org.kie.server.api.model.KieServiceResponse.ResponseType",
+          "package": "org.kie.server.api.model",
+          "classSimpleName": "ServiceResponse",
+          "methodName": "setType",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "JBPM-6243 - Moved ResponseType enum to interface"
         }
       ]
     }

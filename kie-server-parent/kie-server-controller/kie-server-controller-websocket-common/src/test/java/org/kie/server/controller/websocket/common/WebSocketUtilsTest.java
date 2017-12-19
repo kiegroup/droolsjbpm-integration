@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.server.controller.websocket;
+package org.kie.server.controller.websocket.common;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,7 +66,7 @@ public class WebSocketUtilsTest {
                                                               "mergeMode");
         spec.addConfig(Capability.PROCESS,
                        processConfig);
-        final RuleConfig ruleConfig = new RuleConfig(1l,
+        final RuleConfig ruleConfig = new RuleConfig(1L,
                                                      KieScannerStatus.SCANNING);
         spec.addConfig(Capability.RULE,
                        ruleConfig);

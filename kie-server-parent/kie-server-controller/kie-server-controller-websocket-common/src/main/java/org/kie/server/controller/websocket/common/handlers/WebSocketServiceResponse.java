@@ -19,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ServiceResponse;
 
 
@@ -26,11 +27,10 @@ import org.kie.server.api.model.ServiceResponse;
 public class WebSocketServiceResponse extends ServiceResponse implements InternalMessageHandler {
 
     private CountDownLatch latch;
-    private ServiceResponse<?> result;
-    private Function<String, ServiceResponse<?>> handler;
+    private KieServiceResponse<?> result;
+    private Function<String, KieServiceResponse<?>> handler;
     
-    
-    public WebSocketServiceResponse(boolean isBlocking, Function<String, ServiceResponse<?>> handler) {
+    public WebSocketServiceResponse(boolean isBlocking, Function<String, KieServiceResponse<?>> handler) {
         this.handler = handler;
         if (isBlocking) {
             this.latch = new CountDownLatch(1);
@@ -39,25 +39,22 @@ public class WebSocketServiceResponse extends ServiceResponse implements Interna
     
     @Override
     public ResponseType getType() {
-        waitIfNeeded();
-        return result.getType();
+        return getWrapperResult().getType();
     }
 
     @Override
     public String getMsg() {
-        waitIfNeeded();
-        return result.getMsg();
+        return getWrapperResult().getMsg();
     }
 
     @Override
     public Object getResult() {
-        waitIfNeeded();
-        return result.getResult();
+        return getWrapperResult().getResult();
     }
 
     public String onMessage(String message) {
         this.result = handler.apply(message);
-        
+
         if (latch != null) {
            this.latch.countDown();
         }
@@ -65,12 +62,26 @@ public class WebSocketServiceResponse extends ServiceResponse implements Interna
         return null;
     }
     
-    protected void waitIfNeeded() {
+    protected KieServiceResponse<?> getWrapperResult() {
         if (latch != null) {
             try {
                 this.latch.await(30, TimeUnit.SECONDS);
             } catch (InterruptedException e) {                
             }
         }
+        if(result == null){
+            throw new RuntimeException("Service response not received");
+        } else {
+            return result;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "WebSocketServiceResponse{" +
+                "latch=" + latch +
+                ", result=" + result +
+                ", handler=" + handler +
+                "} " + super.toString();
     }
 }

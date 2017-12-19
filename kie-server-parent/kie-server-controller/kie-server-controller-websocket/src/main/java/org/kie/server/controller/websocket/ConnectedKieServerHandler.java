@@ -26,6 +26,7 @@ import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.impl.KieServerControllerImpl;
+import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

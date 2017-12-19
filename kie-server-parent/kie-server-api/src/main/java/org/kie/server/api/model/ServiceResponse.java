@@ -22,89 +22,32 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
-import org.kie.server.api.model.admin.EmailNotification;
-import org.kie.server.api.model.admin.ExecutionErrorInstance;
-import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
-import org.kie.server.api.model.admin.MigrationReportInstance;
-import org.kie.server.api.model.admin.MigrationReportInstanceList;
-import org.kie.server.api.model.admin.OrgEntities;
-import org.kie.server.api.model.admin.ProcessNode;
-import org.kie.server.api.model.admin.ProcessNodeList;
-import org.kie.server.api.model.admin.TaskNotification;
-import org.kie.server.api.model.admin.TaskNotificationList;
-import org.kie.server.api.model.admin.TaskReassignment;
-import org.kie.server.api.model.admin.TaskReassignmentList;
-import org.kie.server.api.model.admin.TimerInstance;
-import org.kie.server.api.model.admin.TimerInstanceList;
-import org.kie.server.api.model.cases.CaseAdHocFragment;
-import org.kie.server.api.model.cases.CaseAdHocFragmentList;
-import org.kie.server.api.model.cases.CaseComment;
-import org.kie.server.api.model.cases.CaseCommentList;
-import org.kie.server.api.model.cases.CaseDefinition;
-import org.kie.server.api.model.cases.CaseDefinitionList;
-import org.kie.server.api.model.cases.CaseFile;
-import org.kie.server.api.model.cases.CaseFileDataItem;
-import org.kie.server.api.model.cases.CaseFileDataItemList;
-import org.kie.server.api.model.cases.CaseInstance;
-import org.kie.server.api.model.cases.CaseInstanceList;
-import org.kie.server.api.model.cases.CaseMilestone;
-import org.kie.server.api.model.cases.CaseMilestoneDefinition;
-import org.kie.server.api.model.cases.CaseMilestoneList;
-import org.kie.server.api.model.cases.CaseRoleAssignment;
-import org.kie.server.api.model.cases.CaseRoleAssignmentList;
-import org.kie.server.api.model.cases.CaseStage;
-import org.kie.server.api.model.cases.CaseStageDefinition;
-import org.kie.server.api.model.cases.CaseStageList;
-import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
-import org.kie.server.api.model.definition.ProcessDefinition;
-import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.definition.QueryDefinition;
-import org.kie.server.api.model.definition.QueryDefinitionList;
-import org.kie.server.api.model.definition.ServiceTasksDefinition;
-import org.kie.server.api.model.definition.SubProcessesDefinition;
-import org.kie.server.api.model.definition.TaskInputsDefinition;
-import org.kie.server.api.model.definition.TaskOutputsDefinition;
-import org.kie.server.api.model.definition.UserTaskDefinition;
-import org.kie.server.api.model.definition.UserTaskDefinitionList;
-import org.kie.server.api.model.definition.VariablesDefinition;
-import org.kie.server.api.model.dmn.DMNContextKS;
-import org.kie.server.api.model.dmn.DMNModelInfoList;
-import org.kie.server.api.model.dmn.DMNNodeStub;
-import org.kie.server.api.model.dmn.DMNResultKS;
-import org.kie.server.api.model.instance.*;
-import org.kie.server.api.model.type.JaxbBoolean;
-import org.kie.server.api.model.type.JaxbByte;
-import org.kie.server.api.model.type.JaxbCharacter;
-import org.kie.server.api.model.type.JaxbDouble;
-import org.kie.server.api.model.type.JaxbFloat;
-import org.kie.server.api.model.type.JaxbInteger;
-import org.kie.server.api.model.type.JaxbList;
-import org.kie.server.api.model.type.JaxbLong;
-import org.kie.server.api.model.type.JaxbMap;
-import org.kie.server.api.model.type.JaxbShort;
-import org.kie.server.api.model.type.JaxbString;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.kie.server.api.model.admin.*;
+import org.kie.server.api.model.cases.*;
+import org.kie.server.api.model.definition.*;
+import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
+import org.kie.server.api.model.dmn.DMNResultKS;
+import org.kie.server.api.model.instance.*;
+import org.kie.server.api.model.type.*;
 
 @XmlRootElement(name="response")
 @XmlAccessorType(XmlAccessType.NONE)
 @XStreamAlias("response")
-public class ServiceResponse<T> {
-    public static enum ResponseType {
-        SUCCESS, FAILURE, NO_RESPONSE;
-    }
+public class ServiceResponse<T> implements KieServiceResponse<T> {
 
     @XmlAttribute
     @XStreamAsAttribute
-    private ServiceResponse.ResponseType type;
+    private ResponseType type;
+
     @XmlAttribute
     @XStreamAsAttribute
-    private String                       msg;
+    private String msg;
+
     @XmlElements({
             // types model
             @XmlElement(name = "boolean-type", type = JaxbBoolean.class),
@@ -211,33 +154,35 @@ public class ServiceResponse<T> {
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),
             @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class),
             @XmlElement(name = "dmn-model-info-list" , type = DMNModelInfoList.class)
-            
+
             })
-    private T                            result;
+    private T result;
 
     public ServiceResponse() {
     }
 
-    public ServiceResponse(ServiceResponse.ResponseType type, String msg) {
+    public ServiceResponse(ResponseType type, String msg) {
         this.type = type;
         this.msg = msg;
     }
 
-    public ServiceResponse(ServiceResponse.ResponseType type, String msg, T result) {
+    public ServiceResponse(ResponseType type, String msg, T result) {
         this.type = type;
         this.msg = msg;
         this.result = result;
     }
 
-    public ServiceResponse.ResponseType getType() {
+    @Override
+    public ResponseType getType() {
         return type;
     }
 
+    @Override
     public String getMsg() {
         return msg;
     }
 
-    public void setType(ServiceResponse.ResponseType type) {
+    public void setType(ResponseType type) {
         this.type = type;
     }
 
@@ -245,6 +190,7 @@ public class ServiceResponse<T> {
         this.msg = msg;
     }
 
+    @Override
     public T getResult() {
         return result;
     }
@@ -255,6 +201,6 @@ public class ServiceResponse<T> {
 
     @Override
     public String toString() {
-        return "ServiceResponse[" + type + ", msg='" + msg + "']";
+        return "ServiceResponse[" + type + ", msg='" + msg + "', result='"+ result +"']";
     }
 }

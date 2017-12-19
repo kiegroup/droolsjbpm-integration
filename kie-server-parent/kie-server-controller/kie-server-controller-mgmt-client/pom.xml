@@ -21,12 +21,23 @@
 
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-common</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-api</artifactId>
+      <artifactId>kie-server-controller-websocket-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.spec.javax.websocket</groupId>
+      <artifactId>jboss-websocket-api_1.0_spec</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

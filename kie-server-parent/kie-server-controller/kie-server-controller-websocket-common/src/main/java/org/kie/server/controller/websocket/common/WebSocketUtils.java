@@ -3,17 +3,18 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-package org.kie.server.controller.websocket;
+package org.kie.server.controller.websocket.common;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,29 +24,17 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
-import org.kie.server.controller.api.model.KieServerInstance;
-import org.kie.server.controller.api.model.KieServerInstanceInfo;
-import org.kie.server.controller.api.model.KieServerInstanceList;
-import org.kie.server.controller.api.model.KieServerSetup;
-import org.kie.server.controller.api.model.KieServerStatus;
+import org.kie.server.controller.api.model.*;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ContainerKey;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ContainerSpecKey;
-import org.kie.server.controller.api.model.spec.ContainerSpecList;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
+import org.kie.server.controller.api.model.spec.*;
 
 public class WebSocketUtils {
 
-    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(null, MarshallingFormat.JSON, WebSocketSessionManager.class.getClassLoader());
-    private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, WebSocketSessionManager.class.getClassLoader());
+    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(null, MarshallingFormat.JSON, WebSocketUtils.class.getClassLoader());
+    private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, WebSocketUtils.class.getClassLoader());
 
     public static Set<Class<?>> getModelClasses() {
         Set<Class<?>> modelClasses = new HashSet<Class<?>>();
@@ -70,6 +59,7 @@ public class WebSocketUtils {
         modelClasses.add(ServerTemplateList.class);
         modelClasses.add(ContainerSpecList.class);
 
+        modelClasses.add(KieServerControllerServiceResponse.class);
         modelClasses.add(KieServerControllerDescriptorCommand.class);
 
         return modelClasses;
