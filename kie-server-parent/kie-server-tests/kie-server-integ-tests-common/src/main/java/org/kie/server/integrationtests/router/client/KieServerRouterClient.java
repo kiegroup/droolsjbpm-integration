@@ -24,7 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.kie.server.controller.management.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.controller.management.client.exception.KieServerControllerHTTPClientException;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.repository.ConfigurationMarshaller;
 import org.slf4j.Logger;
@@ -93,7 +93,7 @@ public class KieServerRouterClient implements AutoCloseable {
         }
 
         logger.debug( stringBuffer.toString());
-        return new UnexpectedResponseCodeException(response.getStatus(), stringBuffer.toString());
+        return new KieServerControllerHTTPClientException(response.getStatus(), stringBuffer.toString());
     }
 
     private String getClientRequestUri(WebTarget clientRequest) {
