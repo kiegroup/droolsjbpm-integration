@@ -5,7 +5,9 @@
 
   <inherits name="org.kie.server.api.KieServerAPI"/>
 
-  <source path='model'/>
+  <source path='model'>
+    <exclude name="KieServerControllerServiceResponse.java" />
+  </source>
   <source path='service'/>
   <source path='storage'/>
 
