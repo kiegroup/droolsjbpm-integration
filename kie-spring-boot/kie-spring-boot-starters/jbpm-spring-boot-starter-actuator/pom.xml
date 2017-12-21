@@ -21,33 +21,38 @@
 
   <parent>
     <groupId>org.kie</groupId>
-    <artifactId>kie-spring-boot</artifactId>
+    <artifactId>kie-spring-boot-starters</artifactId>
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-spring-boot-starters</artifactId>
-  <packaging>pom</packaging>
+  <artifactId>jbpm-spring-boot-starter-actuator</artifactId>
 
-  <name>KIE :: Spring :: Boot :: Starters</name>
-  <description>Parent integration project for SpringBoot starters</description>
+  <name>jBPM :: Spring :: Boot :: Starter :: Actuator</name>
+  <description>jBPM actuator integration project for SpringBoot</description>
 
-  <modules>
-    <module>jbpm-spring-boot-starter-basic</module>
-    <module>jbpm-spring-boot-starter-actuator</module>
-  </modules>
+  <dependencies>
+    <!-- SpringBoot dependencies-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-actuator</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>jbpm-spring-boot-starter-basic</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>jbpm-spring-boot-starter-actuator</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+    <!-- KIE dependencies-->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>jbpm-spring-boot-starter-basic</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
 </project>
