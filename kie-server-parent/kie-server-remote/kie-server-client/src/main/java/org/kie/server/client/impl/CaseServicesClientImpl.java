@@ -771,8 +771,8 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public void addComment(String containerId, String caseId, String author, String text) {
-        addComment(containerId, caseId, author, text, null);
+    public String addComment(String containerId, String caseId, String author, String text) {
+        return addComment(containerId, caseId, author, text, null);
     }
     
     @Override
@@ -781,7 +781,8 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
     
     @Override
-    public void addComment(String containerId, String caseId, String author, String text, List<String> restrictions) {
+    public String addComment(String containerId, String caseId, String author, String text, List<String> restrictions) {
+        Object result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
@@ -790,16 +791,25 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             String queryString = "?author="+ author;
             queryString = getAdditionalParams(queryString, "restrictedTo", restrictions);
 
-            makeHttpPostRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_COMMENTS_POST_URI, valuesMap) + queryString, text, null);
+            result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_COMMENTS_POST_URI, valuesMap) + queryString, text, String.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand("CaseService", "addCommentToCase", serialize(text), marshaller.getFormat().getType(), new Object[]{containerId, caseId, author, safeList(restrictions)})) );
-            ServiceResponse<?> response = (ServiceResponse<?>)
+            ServiceResponse<String> response = (ServiceResponse<String>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = deserialize(response.getResult(), Object.class);
         }
+
+        if (result instanceof Wrapped) {
+            return (String) ((Wrapped) result).unwrap();
+        }
+        return (String) result;
     }
 
     @Override

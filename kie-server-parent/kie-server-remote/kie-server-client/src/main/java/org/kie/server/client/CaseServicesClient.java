@@ -133,11 +133,11 @@ public interface CaseServicesClient {
 
     List<CaseComment> getComments(String containerId, String caseId, String sortBy, Integer page, Integer pageSize);
 
-    void addComment(String containerId, String caseId, String author, String text);
+    String addComment(String containerId, String caseId, String author, String text);
 
     void updateComment(String containerId, String caseId, String commentId, String author, String text);
     
-    void addComment(String containerId, String caseId, String author, String text, List<String> restrictions);
+    String addComment(String containerId, String caseId, String author, String text, List<String> restrictions);
 
     void updateComment(String containerId, String caseId, String commentId, String author, String text, List<String> restrictions);
 
