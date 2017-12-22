@@ -775,10 +775,10 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to add comment to case {}", caseId);
-                    this.caseManagementServiceBase.addCommentToCase(containerId, caseId, author, restrictions, payload, type);
+                    String commentId = this.caseManagementServiceBase.addCommentToCase(containerId, caseId, author, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
-                    return createResponse("", v, Response.Status.CREATED, customHeaders);
+                    return createResponse(commentId, v, Response.Status.CREATED, customHeaders);
                 });
     }
 
