@@ -17,7 +17,6 @@ package org.kie.server.controller.websocket;
 
 import javax.websocket.Session;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.events.ServerInstanceConnected;
@@ -53,16 +52,14 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
 
     @Override
     public String onMessage(String message) {
-        String contentType = MarshallingFormat.JSON.getType();
-        
-        serverInfo = WebSocketUtils.unmarshal(message, contentType, KieServerInfo.class);
+        serverInfo = WebSocketUtils.unmarshal(message, KieServerInfo.class);
         manager.addSession(serverInfo, session);
         
         logger.debug("Server info {}", serverInfo);
         KieServerSetup serverSetup = controller.connect(serverInfo);
 
         logger.info("Server with id '{}' connected", serverId);
-        String response = WebSocketUtils.marshal(contentType, serverSetup);
+        String response = WebSocketUtils.marshal(serverSetup);
         
         return response;
     }

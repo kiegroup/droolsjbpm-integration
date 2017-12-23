@@ -20,7 +20,6 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
 
@@ -29,7 +28,6 @@ public class KieServerControllerDescriptorCommandDecoder implements Decoder.Text
     @Override
     public KieServerControllerDescriptorCommand decode(final String content) throws DecodeException {
         return WebSocketUtils.unmarshal(content,
-                                        MarshallingFormat.JSON.getType(),
                                         KieServerControllerDescriptorCommand.class);
     }
 
