@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Controller :: Client</name>
   <description>KIE Execution Server Controller Client</description>
 
+  <properties>
+    <java.module.name>org.kie.server.controller.client</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>
