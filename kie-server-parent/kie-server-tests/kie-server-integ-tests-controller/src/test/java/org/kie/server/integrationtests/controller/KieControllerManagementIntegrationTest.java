@@ -33,7 +33,7 @@ import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
-import org.kie.server.controller.management.client.exception.KieServerControllerClientException;
+import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
