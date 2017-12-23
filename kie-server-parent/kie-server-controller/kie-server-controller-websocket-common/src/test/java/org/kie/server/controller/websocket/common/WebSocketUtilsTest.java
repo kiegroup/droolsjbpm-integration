@@ -16,13 +16,7 @@
 
 package org.kie.server.controller.websocket.common;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
@@ -38,18 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
 
-@RunWith(Parameterized.class)
 public class WebSocketUtilsTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketUtilsTest.class);
-
-    @Parameterized.Parameter
-    public MarshallingFormat marshallingFormat;
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{MarshallingFormat.JAXB}, {MarshallingFormat.JSON}});
-    }
 
     @Test
     public void testContainerSpecSerialization() {
@@ -70,11 +55,9 @@ public class WebSocketUtilsTest {
                                                      KieScannerStatus.SCANNING);
         spec.addConfig(Capability.RULE,
                        ruleConfig);
-        final String specContent = WebSocketUtils.marshal(marshallingFormat.getType(),
-                                                          spec);
-        LOGGER.info("{} content\n{}", marshallingFormat.getType(), specContent);
+        final String specContent = WebSocketUtils.marshal(spec);
+        LOGGER.info("JSON content\n{}", specContent);
         final ContainerSpec specResult = WebSocketUtils.unmarshal(specContent,
-                                                                  marshallingFormat.getType(),
                                                                   ContainerSpec.class);
 
         assertNotNull(specResult);
@@ -119,11 +102,9 @@ public class WebSocketUtilsTest {
                                                                                                 capability,
                                                                                                 processConfig,
                                                                                                 ruleConfig);
-        final String content = WebSocketUtils.marshal(marshallingFormat.getType(),
-                                                      command);
-        LOGGER.info("{} content\n{}", marshallingFormat.getType(), content);
+        final String content = WebSocketUtils.marshal(command);
+        LOGGER.info("JSON content\n{}", content);
         final KieServerControllerDescriptorCommand commandResult = WebSocketUtils.unmarshal(content,
-                                                                                            marshallingFormat.getType(),
                                                                                             KieServerControllerDescriptorCommand.class);
         assertNotNull(commandResult);
         assertEquals(command.getService(),

@@ -18,7 +18,6 @@ package org.kie.server.controller.client.websocket;
 
 import java.io.IOException;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
@@ -87,8 +86,7 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
         LOGGER.debug("About to send descriptor command to kie server controller: {}",
                      command);
 
-        final String content = WebSocketUtils.marshal(MarshallingFormat.JSON.getType(),
-                                                      command);
+        final String content = WebSocketUtils.marshal(command);
         LOGGER.debug("Content to be sent over Web Socket '{}'",
                      content);
         try {
@@ -114,7 +112,6 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
     protected WebSocketServiceResponse getMessageHandler() {
         return new WebSocketServiceResponse(true,
                                             (message) -> WebSocketUtils.unmarshal(message,
-                                                                                  MarshallingFormat.JSON.getType(),
                                                                                   KieServerControllerServiceResponse.class));
     }
 

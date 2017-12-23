@@ -20,7 +20,6 @@ import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
 
@@ -28,8 +27,7 @@ public class KieServerControllerDescriptorCommandEncoder implements Encoder.Text
 
     @Override
     public String encode(final KieServerControllerDescriptorCommand command) throws EncodeException {
-        return WebSocketUtils.marshal(MarshallingFormat.JSON.getType(),
-                                      command);
+        return WebSocketUtils.marshal(command);
     }
 
     @Override

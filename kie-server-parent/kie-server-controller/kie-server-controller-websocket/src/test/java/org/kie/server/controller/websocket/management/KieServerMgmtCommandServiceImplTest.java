@@ -16,13 +16,7 @@
 
 package org.kie.server.controller.websocket.management;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
@@ -37,7 +31,6 @@ import static org.junit.Assert.*;
 import static org.kie.server.api.model.KieServiceResponse.ResponseType.FAILURE;
 import static org.kie.server.api.model.KieServiceResponse.ResponseType.SUCCESS;
 
-@RunWith(Parameterized.class)
 public class KieServerMgmtCommandServiceImplTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KieServerMgmtCommandServiceImplTest.class);
@@ -47,14 +40,6 @@ public class KieServerMgmtCommandServiceImplTest {
     private static final String CONTAINER_SPEC_NAME = "specName";
 
     private KieServerMgmtCommandService service = KieServerMgmtCommandServiceImpl.getInstance();
-
-    @Parameterized.Parameter
-    public MarshallingFormat marshallingFormat;
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{MarshallingFormat.JAXB}, {MarshallingFormat.JSON}});
-    }
 
     @Test
     public void testNullCommandScript() {
@@ -105,12 +90,10 @@ public class KieServerMgmtCommandServiceImplTest {
                                                                                                 "saveServerTemplate",
                                                                                                 serverTemplate);
 
-        final String content = WebSocketUtils.marshal(marshallingFormat.getType(),
-                                                      command);
+        final String content = WebSocketUtils.marshal(command);
 
-        LOGGER.info("{} content\n{}", marshallingFormat.getType(), content);
+        LOGGER.info("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
-                                                                                                      marshallingFormat.getType(),
                                                                                                       KieServerControllerDescriptorCommand.class));
 
         assertNotNull(response);
@@ -132,10 +115,8 @@ public class KieServerMgmtCommandServiceImplTest {
         assertEquals(serverTemplate,
                      response.getResult());
 
-        String responseContent = WebSocketUtils.marshal(marshallingFormat.getType(),
-                                                        response);
+        String responseContent = WebSocketUtils.marshal(response);
         response = WebSocketUtils.unmarshal(responseContent,
-                                            marshallingFormat.getType(),
                                             KieServerControllerServiceResponse.class);
         assertNotNull(response);
         assertEquals(SUCCESS,
@@ -156,11 +137,9 @@ public class KieServerMgmtCommandServiceImplTest {
                                                                                                 null,
                                                                                                 "templateId",
                                                                                                 containerSpec);
-        final String content = WebSocketUtils.marshal(marshallingFormat.getType(),
-                                                      command);
-        LOGGER.info("{} content\n{}", marshallingFormat.getType(), content);
+        final String content = WebSocketUtils.marshal(command);
+        LOGGER.info("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
-                                                                                                      marshallingFormat.getType(),
                                                                                                       KieServerControllerDescriptorCommand.class));
 
         assertNotNull(response);
@@ -183,11 +162,9 @@ public class KieServerMgmtCommandServiceImplTest {
                                                                                                 "upgradeContainer",
                                                                                                 serverTemplate,
                                                                                                 releaseId);
-        final String content = WebSocketUtils.marshal(marshallingFormat.getType(),
-                                                      command);
-        LOGGER.info("{} content\n{}", marshallingFormat.getType(), content);
+        final String content = WebSocketUtils.marshal(command);
+        LOGGER.info("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
-                                                                                                      marshallingFormat.getType(),
                                                                                                       KieServerControllerDescriptorCommand.class));
 
         assertNotNull(response);
@@ -207,11 +184,9 @@ public class KieServerMgmtCommandServiceImplTest {
                                                                                                 "containerSpecId",
                                                                                                 Capability.PROCESS,
                                                                                                 new ProcessConfig());
-        final String content = WebSocketUtils.marshal(marshallingFormat.getType(),
-                                                      command);
-        LOGGER.info("{} content\n{}", marshallingFormat.getType(), content);
+        final String content = WebSocketUtils.marshal(command);
+        LOGGER.info("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
-                                                                                                      marshallingFormat.getType(),
                                                                                                       KieServerControllerDescriptorCommand.class));
 
         assertNotNull(response);

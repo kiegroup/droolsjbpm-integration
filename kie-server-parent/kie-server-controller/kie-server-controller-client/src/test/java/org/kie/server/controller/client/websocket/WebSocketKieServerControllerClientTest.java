@@ -23,7 +23,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.server.api.commands.DescriptorCommand;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
@@ -83,7 +82,6 @@ public class WebSocketKieServerControllerClientTest {
                                                any(InternalMessageHandler.class));
 
             final DescriptorCommand command = WebSocketUtils.unmarshal(contentCaptor.getValue(),
-                                                                 MarshallingFormat.JSON.getType(),
                                                                  DescriptorCommand.class);
             assertNotNull(command);
             assertEquals(name,
