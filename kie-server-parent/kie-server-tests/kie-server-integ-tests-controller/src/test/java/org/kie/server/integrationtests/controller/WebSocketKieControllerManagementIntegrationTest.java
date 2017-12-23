@@ -20,15 +20,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
-import org.kie.server.controller.management.client.exception.KieServerControllerClientException;
-import org.kie.server.controller.management.client.exception.KieServerControllerHTTPClientException;
+import org.kie.server.controller.client.KieServerControllerClientFactory;
+import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
@@ -54,13 +49,13 @@ public class WebSocketKieControllerManagementIntegrationTest extends KieControll
     @Override
     public void createControllerClient() {
         if (TestConfig.isLocalServer()) {
-            mgmtControllerClient = KieServerMgmtControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
-                                                                                           null,
-                                                                                           null);
+            mgmtControllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
+                                                                                       null,
+                                                                                       null);
         } else {
-            mgmtControllerClient = KieServerMgmtControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
-                                                                                           TestConfig.getUsername(),
-                                                                                           TestConfig.getPassword());
+            mgmtControllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
+                                                                                       TestConfig.getUsername(),
+                                                                                       TestConfig.getPassword());
         }
     }
 

@@ -32,8 +32,8 @@ import org.kie.server.common.KeyStoreHelperUtil;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.websocket.client.handlers.KieServerSetupMessageHandler;
+import org.kie.server.controller.websocket.common.WebSocketClientImpl;
 import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
-import org.kie.server.controller.websocket.common.WebSocketKieServerControllerClientImpl;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServerRegistry;
@@ -48,7 +48,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     private static final Logger logger = LoggerFactory.getLogger(WebSocketKieServerControllerImpl.class);
 
     private KieServerRegistry context;
-    private final WebSocketKieServerControllerClientImpl client;
+    private final WebSocketClientImpl client;
     private final Marshaller marshaller;
     
     private KieServerInfo serverInfo;
@@ -58,7 +58,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     public WebSocketKieServerControllerImpl() {
         this.marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader());
         
-        this.client = new WebSocketKieServerControllerClientImpl((WebSocketKieServerControllerClientImpl client) -> {
+        this.client = new WebSocketClientImpl((WebSocketClientImpl client) -> {
             try {
                 client.sendTextWithHandler(serialize(serverInfo), (String message) -> {
                     logger.info("Successfully reconnected");
