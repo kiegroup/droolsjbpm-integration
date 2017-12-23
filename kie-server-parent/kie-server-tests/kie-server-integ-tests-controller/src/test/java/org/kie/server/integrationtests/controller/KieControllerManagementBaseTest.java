@@ -22,14 +22,14 @@ import javax.ws.rs.core.Configuration;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Before;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
+import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegrationTest {
 
-    protected KieServerMgmtControllerClient mgmtControllerClient;
+    protected KieServerControllerClient mgmtControllerClient;
 
     @Before
     public void createControllerClient() {
@@ -41,17 +41,17 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
                                        TimeUnit.SECONDS)
                         .getConfiguration();
         if (TestConfig.isLocalServer()) {
-            mgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
-                                                                                      null,
-                                                                                      null,
-                                                                                      marshallingFormat,
-                                                                                      configuration);
+            mgmtControllerClient = KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                                  null,
+                                                                                  null,
+                                                                                  marshallingFormat,
+                                                                                  configuration);
         } else {
-            mgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
-                                                                                      TestConfig.getUsername(),
-                                                                                      TestConfig.getPassword(),
-                                                                                      marshallingFormat,
-                                                                                      configuration);
+            mgmtControllerClient = KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                                  TestConfig.getUsername(),
+                                                                                  TestConfig.getPassword(),
+                                                                                  marshallingFormat,
+                                                                                  configuration);
         }
     }
 

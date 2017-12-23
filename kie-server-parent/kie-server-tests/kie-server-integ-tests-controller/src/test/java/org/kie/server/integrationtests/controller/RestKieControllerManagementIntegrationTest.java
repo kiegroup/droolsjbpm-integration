@@ -15,7 +15,7 @@
 
 package org.kie.server.integrationtests.controller;
 
-import org.kie.server.controller.management.client.exception.KieServerControllerHTTPClientException;
+import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 
 import static org.junit.Assert.*;
 
