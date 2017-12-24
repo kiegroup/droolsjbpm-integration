@@ -64,7 +64,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.jms.ResponseHandler;
 import org.kie.server.controller.websocket.WebSocketSessionManager;
-import org.kie.server.controller.websocket.WebSocketUtils;
+import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.handlers.WebSocketServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,9 +109,9 @@ public class WebSocketKieServerClient implements KieServicesClient {
                 @Override
                 public void replaceQuery(QueryDefinition queryDefinition) {
                     CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "replaceQuery",
-                                                                                                                                WebSocketUtils.marshal(MarshallingFormat.JSON.toString(), queryDefinition), MarshallingFormat.JSON.toString(), new Object[]{queryDefinition.getName()})));
+                                                                                                                                WebSocketUtils.marshal(queryDefinition), MarshallingFormat.JSON.toString(), new Object[]{queryDefinition.getName()})));
                     sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
-                        WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+                        WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
                         return null;
                     })).getResponses();    
                 }
@@ -348,7 +348,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
         Session session = sessions.get(0);
         
         logger.debug("Web Socket session ({}) is open {}", session.getId(), session.isOpen());
-        String content = WebSocketUtils.marshal(MarshallingFormat.JSON.getType(), script);
+        String content = WebSocketUtils.marshal(script);
         logger.debug("Content to be sent over Web Socket '{}'", content);
         try {
             manager.getHandler(session.getId()).addHandler(response);
@@ -371,7 +371,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
         for (Session session : sessions) {
         
             logger.debug("Web Socket session ({}) is open {}", session.getId(), session.isOpen());
-            String content = WebSocketUtils.marshal(MarshallingFormat.JSON.getType(), script);
+            String content = WebSocketUtils.marshal(script);
             logger.debug("Content to be sent over Web Socket '{}'", content);
             try {
                 manager.getHandler(session.getId()).addHandler(response);
@@ -392,7 +392,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<KieServerInfo> getServerInfo() {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetServerInfoCommand()));
         ServiceResponse<KieServerInfo> response = (ServiceResponse<KieServerInfo>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -409,7 +409,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new ListContainersCommand(containerFilter)));
         ServiceResponse<KieContainerResourceList> response = (ServiceResponse<KieContainerResourceList>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -420,7 +420,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CreateContainerCommand(resource)));
         ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -431,7 +431,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetContainerInfoCommand(id)));
         ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -442,7 +442,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<Void> disposeContainer(String id) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DisposeContainerCommand(id)));
         ServiceResponse<Void> response = (ServiceResponse<Void>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -458,7 +458,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<KieScannerResource> getScannerInfo(String id) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetScannerInfoCommand(id)));
         ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -469,7 +469,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateScannerCommand(id, resource)));
         ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -480,7 +480,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<ReleaseId> getReleaseId(String containerId) {
         CommandScript script = new CommandScript(Collections.singletonList(new GetReleaseIdCommand(containerId)));
         ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -491,7 +491,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateReleaseIdCommand(id, releaseId)));
         ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         
@@ -502,7 +502,7 @@ public class WebSocketKieServerClient implements KieServicesClient {
     public ServiceResponse<KieServerStateInfo> getServerState() {
         CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetServerStateCommand()));
         ServiceResponse<KieServerStateInfo> response = (ServiceResponse<KieServerStateInfo>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
-            ServiceResponsesList list = WebSocketUtils.unmarshal(message, MarshallingFormat.JSON.getType(), ServiceResponsesList.class);
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
         

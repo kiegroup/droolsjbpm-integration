@@ -21,6 +21,7 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 
 public interface InternalMessageHandler {
+
     Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, InternalMessageHandler.class.getClassLoader());
     
     default <T> T deserialize(String content, Class<T> type) {

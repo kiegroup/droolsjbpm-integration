@@ -44,8 +44,8 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
+import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieControllerExecutor;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -161,18 +161,18 @@ public abstract class KieServerBaseIntegrationTest {
                                        TimeUnit.SECONDS)
                         .getConfiguration();
         try (
-                KieServerMgmtControllerClient mgmtControllerClient =
+                KieServerControllerClient mgmtControllerClient =
                 TestConfig.isLocalServer() ?
-                        KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
-                                                                           null,
-                                                                           null,
-                                                                           MarshallingFormat.JAXB,
-                                                                           configuration) :
-                        KieServerMgmtControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
-                                                                           TestConfig.getUsername(),
-                                                                           TestConfig.getPassword(),
-                                                                           MarshallingFormat.JAXB,
-                                                                           configuration)
+                        KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                       null,
+                                                                       null,
+                                                                       MarshallingFormat.JAXB,
+                                                                       configuration) :
+                        KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                       TestConfig.getUsername(),
+                                                                       TestConfig.getPassword(),
+                                                                       MarshallingFormat.JAXB,
+                                                                       configuration)
         ) {
             ServerTemplateList serverTemplates = mgmtControllerClient.listServerTemplates();
             if(serverTemplates.getServerTemplates() != null) {

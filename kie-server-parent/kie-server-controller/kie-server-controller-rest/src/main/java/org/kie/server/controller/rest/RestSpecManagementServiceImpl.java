@@ -108,10 +108,6 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
 
         String contentType = getContentType(headers);
         try {
-            if (super.getServerTemplate(serverTemplateId) != null) {
-                return createCorrectVariant("Server template " + serverTemplateId + " already registered", headers, Response.Status.NOT_FOUND);
-            }
-
             logger.debug("Received save server template with id {}", serverTemplateId);
             ServerTemplate serverTemplate = unmarshal(serverTemplatePayload, contentType, ServerTemplate.class);
             if (serverTemplate == null) {
@@ -139,10 +135,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get server template with id {}", serverTemplateId);
-            ServerTemplate serverTemplate = super.getServerTemplate(serverTemplateId);
-            if (serverTemplate == null) {
-                return createCorrectVariant("Server template " + serverTemplateId + " not found", headers, Response.Status.NOT_FOUND);
-            }
+            final ServerTemplate serverTemplate = super.getServerTemplate(serverTemplateId);
             String response = marshal(contentType, serverTemplate);
             logger.debug("Returning response for get server template with id '{}': {}", serverTemplateId, response);
 
@@ -213,9 +206,6 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
 
             ContainerSpec containerSpec = super.getContainerInfo(serverTemplateId, containerId);
-            if (containerSpec == null) {
-                return createCorrectVariant("Server template " + serverTemplateId + " does not have container with id " + containerId, headers, Response.Status.NOT_FOUND);
-            }
             // set it as server template key only to avoid cyclic references between containers and templates
             containerSpec.setServerTemplateKey(new ServerTemplateKey(containerSpec.getServerTemplateKey().getId(), containerSpec.getServerTemplateKey().getName()));
 
