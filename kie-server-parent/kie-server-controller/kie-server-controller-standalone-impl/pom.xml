@@ -5,7 +5,7 @@
   <parent>
     <artifactId>kie-server-controller</artifactId>
     <groupId>org.kie.server</groupId>
-    <version>7.5.1-SNAPSHOT</version>
+    <version>7.5.1.t020</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
