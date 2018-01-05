@@ -84,13 +84,13 @@ public class DMNContextKSMarshallingTest {
            "        </element>\n" +
            "    </dmn-context>\n" +
            "</dmn-evaluation-context>\n";
-    JSON = "{\n" +
-           "  \"model-namespace\" : \"foo\",\n" +
-           "  \"model-name\" : \"bar\",\n" +
-           "  \"decision-name\" : \"qux\",\n" +
-           "  \"decision-id\" : \"baz\",\n" +
-           "  \"dmn-context\" : {\"quux\" : \"corge\"}\n" +
-           "}";
+    JSON = String.format("{%n" +
+           "  \"model-namespace\" : \"foo\",%n" +
+           "  \"model-name\" : \"bar\",%n" +
+           "  \"decision-name\" : \"qux\",%n" +
+           "  \"decision-id\" : \"baz\",%n" +
+           "  \"dmn-context\" : {\"quux\" : \"corge\"}%n" +
+           "}");
     xStreamMarshaller = MarshallerFactory.getMarshaller( classes, MarshallingFormat.XSTREAM, DMNContextKS.class.getClassLoader() );
     jaxbMarshaller = MarshallerFactory.getMarshaller( classes, MarshallingFormat.JAXB, DMNContextKS.class.getClassLoader() );
     jsonMarshaller = MarshallerFactory.getMarshaller( MarshallingFormat.JSON, DMNContextKS.class.getClassLoader() );
@@ -162,7 +162,7 @@ public class DMNContextKSMarshallingTest {
   @Test
   public void testJsonMarshalling() {
     final String result = jsonMarshaller.marshall( BEAN );
-    assertEquals( result, JSON ); // TODO: jsonpath?
+    assertEquals( JSON, result ); // TODO: jsonpath?
   }
 
   @Test
