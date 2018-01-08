@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.config;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -130,6 +131,23 @@ public class TestConfig {
         }
 
         return httpUrl;
+    }
+
+    /**
+     * Get kie-servers controller management URL for WebSocket service.
+     *
+     * @return controller management WS URL.
+     */
+    public static String getControllerWebSocketManagementUrl() {
+        try {
+            final URL controllerUrl = new URL(getControllerHttpUrl());
+            return String.format("ws://%s:%s/%s/websocket/controller/management",
+                                 controllerUrl.getHost(),
+                                 controllerUrl.getPort(),
+                                 getKieServerControllerContext());
+        } catch (Exception ex){
+            throw new RuntimeException("Failed to create controller Web Socket URL", ex);
+        }
     }
 
     /**

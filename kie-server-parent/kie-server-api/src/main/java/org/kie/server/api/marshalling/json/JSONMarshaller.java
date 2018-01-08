@@ -188,7 +188,6 @@ public class JSONMarshaller implements Marshaller {
 
             for (Class<?> clazz : classes) {
                 mod.addSerializer(clazz, customObjectSerializer);
-
             }
 
             objectMapper.registerModule(mod);

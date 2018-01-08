@@ -16,14 +16,13 @@
 package org.kie.server.integrationtests.dmn;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 
@@ -67,7 +66,6 @@ public class DMNTwoDMNModelsIntegrationTest
         assertEquals(ResponseType.SUCCESS, getModels.getType());
         
         List<DMNModelInfo> models = getModels.getResult().getModels();
-        System.out.println(models);
         assertThat( models, hasSize( 2 ) );
         
         DMNModelInfo fdModel = models.stream().filter(mi -> mi.getName().equals("function-definition")).findFirst().orElse(null);

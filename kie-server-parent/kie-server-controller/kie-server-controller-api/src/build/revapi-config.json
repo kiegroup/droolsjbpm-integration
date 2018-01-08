@@ -107,6 +107,28 @@
           "methodName": "listServerTemplates",
           "elementKind": "method",
           "justification": "Use list object type for serialization"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "new": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "annotationType": "com.fasterxml.jackson.annotation.JsonSubTypes",
+          "annotation": "@com.fasterxml.jackson.annotation.JsonSubTypes({@com.fasterxml.jackson.annotation.JsonSubTypes.Type(org.kie.server.controller.api.model.spec.ProcessConfig.class), @com.fasterxml.jackson.annotation.JsonSubTypes.Type(org.kie.server.controller.api.model.spec.RuleConfig.class)})",
+          "package": "org.kie.server.controller.api.model.spec",
+          "classSimpleName": "ContainerConfig",
+          "elementKind": "class",
+          "justification": "Handle JSON serialization of sub types"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "new": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "annotationType": "com.fasterxml.jackson.annotation.JsonTypeInfo",
+          "annotation": "@com.fasterxml.jackson.annotation.JsonTypeInfo(use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS, include = com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT)",
+          "package": "org.kie.server.controller.api.model.spec",
+          "classSimpleName": "ContainerConfig",
+          "elementKind": "class",
+          "justification": "Handle JSON serialization of sub types"
         }
       ]
     }

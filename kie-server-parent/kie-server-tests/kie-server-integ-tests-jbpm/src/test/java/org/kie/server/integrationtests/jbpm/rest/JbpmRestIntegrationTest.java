@@ -278,4 +278,31 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             }
         }
     }
+    
+    @Test
+    public void testContentTypeOnErrorResponse() throws Exception {
+        Map<String, Object> empty = new HashMap<>();
+        Response response = null;
+        try {
+            // create document
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI, empty));
+           
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(DOCUMENT_ID, "not-existing-doc");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI +"/"+ DOCUMENT_INSTANCE_GET_URI, valuesMap));
+            logger.info( "[GET] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).get();
+            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+            Assert.assertEquals(MediaType.TEXT_PLAIN, response.getHeaders().getFirst("Content-Type"));
+            
+            String responseBody = response.readEntity(String.class);
+            Assert.assertEquals( "\"Document with id not-existing-doc not found\"", responseBody);
+           
+
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
 }
