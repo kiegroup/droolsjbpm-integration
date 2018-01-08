@@ -25,6 +25,14 @@ import javax.sql.DataSource;
 
 import org.drools.core.impl.EnvironmentFactory;
 import org.drools.persistence.api.TransactionManager;
+import org.jbpm.casemgmt.api.CaseRuntimeDataService;
+import org.jbpm.casemgmt.api.CaseService;
+import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
+import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
+import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
+import org.jbpm.casemgmt.impl.CaseServiceImpl;
+import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
+import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
 import org.jbpm.executor.impl.AvailableJobsExecutor;
 import org.jbpm.executor.impl.ClassCacheManager;
 import org.jbpm.executor.impl.ExecutorImpl;
@@ -362,5 +370,52 @@ public class JBPMAutoConfiguration {
         ((KModuleDeploymentService) deploymentService).setExecutorService(service);
         
         return service;
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean(name = "caseIdGenerator")
+    public CaseIdGenerator caseIdGenerator(TransactionalCommandService transactionalCommandService) {
+        
+        return new TableCaseIdGenerator(transactionalCommandService);
+    }
+    
+    @Bean
+    @ConditionalOnClass({ CaseRuntimeDataServiceImpl.class })
+    @ConditionalOnMissingBean(name = "caseRuntimeService")
+    public CaseRuntimeDataService caseRuntimeService(CaseIdGenerator caseIdGenerator, RuntimeDataService runtimeDataService, DeploymentService deploymentService, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider) {
+        
+        CaseRuntimeDataServiceImpl caseRuntimeDataService = new CaseRuntimeDataServiceImpl();
+        caseRuntimeDataService.setCaseIdGenerator(caseIdGenerator);
+        caseRuntimeDataService.setRuntimeDataService(runtimeDataService);
+        caseRuntimeDataService.setCommandService(transactionalCommandService);
+        caseRuntimeDataService.setIdentityProvider(identityProvider);
+        
+        // configure case mgmt services as listeners
+        ((KModuleDeploymentService)deploymentService).addListener(caseRuntimeDataService);
+        
+        return caseRuntimeDataService;
+    }
+    
+    @Bean
+    @ConditionalOnClass({ CaseServiceImpl.class })
+    @ConditionalOnMissingBean(name = "caseService")
+    public CaseService caseService(CaseIdGenerator caseIdGenerator, CaseRuntimeDataService caseRuntimeDataService, RuntimeDataService runtimeDataService, ProcessService processService, DeploymentService deploymentService, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider) {
+        CaseServiceImpl caseService = new CaseServiceImpl();
+        caseService.setCaseIdGenerator(caseIdGenerator);
+        caseService.setCaseRuntimeDataService(caseRuntimeDataService);
+        caseService.setProcessService(processService);
+        caseService.setDeploymentService(deploymentService);
+        caseService.setRuntimeDataService(runtimeDataService);
+        caseService.setCommandService(transactionalCommandService);
+        caseService.setAuthorizationManager(new AuthorizationManagerImpl(identityProvider, transactionalCommandService));
+        caseService.setIdentityProvider(identityProvider);
+        
+        // build case configuration on deployment listener
+        CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(identityProvider);
+
+        // configure case mgmt services as listeners        
+        ((KModuleDeploymentService)deploymentService).addListener(configurationListener);
+        
+        return caseService;
     }
 }

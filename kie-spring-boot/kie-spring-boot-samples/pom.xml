@@ -35,6 +35,7 @@
   <modules>
     <module>jbpm-spring-boot-sample-basic</module>
     <module>jbpm-spring-boot-sample-actuator</module>
+    <module>kie-server-spring-boot-sample</module>
   </modules>
 
   <dependencyManagement>

@@ -132,6 +132,15 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-runtime-manager</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-case-mgmt-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-case-mgmt-impl</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.kie</groupId>

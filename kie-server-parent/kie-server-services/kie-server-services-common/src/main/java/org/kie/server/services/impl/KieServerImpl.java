@@ -79,8 +79,8 @@ public class KieServerImpl implements KieServer {
     private static final ServiceLoader<KieServerExtension> serverExtensions = ServiceLoader.load(KieServerExtension.class);
 
     private static final ServiceLoader<KieServerController> kieControllers = ServiceLoader.load(KieServerController.class);
-    private final KieServerRegistry context;
-    private final PolicyManager policyManager;
+    private KieServerRegistry context;
+    private PolicyManager policyManager;
     private final KieServerStateRepository repository;
     // TODO figure out how to get actual URL of the kie server
     private String kieServerLocation = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION, "http://localhost:8230/kie-server/services/rest/server");
@@ -98,8 +98,10 @@ public class KieServerImpl implements KieServer {
     }
 
     public KieServerImpl(KieServerStateRepository stateRepository) {
-        this.repository = stateRepository;
-
+        this.repository = stateRepository;    
+    }
+    
+    public void init() {
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
         this.context.registerStateRepository(repository);
@@ -186,6 +188,7 @@ public class KieServerImpl implements KieServer {
         }
         eventSupport.fireAfterServerStarted(this);
     }
+    
 
     public KieServerRegistry getServerRegistry() {
         return context;
