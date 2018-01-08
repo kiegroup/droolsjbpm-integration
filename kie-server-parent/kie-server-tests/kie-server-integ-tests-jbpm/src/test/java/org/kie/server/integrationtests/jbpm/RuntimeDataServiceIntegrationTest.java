@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -174,7 +175,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses("evaluation", 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        assertEquals(2, definitions.size());
+        Assertions.assertThat(definitions).hasSize(2);
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.get(0).equals(PROCESS_ID_CALL_EVALUATION));
         assertTrue(processIds.get(1).equals(PROCESS_ID_EVALUATION));
@@ -195,7 +196,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        Assertions.assertThat(definitions).hasSize(12);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -231,7 +232,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        Assertions.assertThat(definitions).hasSize(12);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -260,7 +261,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesById(PROCESS_ID_USERTASK);
         assertNotNull(definitions);
 
-        assertEquals(1, definitions.size());
+        Assertions.assertThat(definitions).hasSize(1);
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains(PROCESS_ID_USERTASK));
 
