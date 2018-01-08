@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-spring-boot-autoconfiguration</artifactId>
+    <version>7.6.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>kie-server-spring-boot-autoconfiguration-drools</artifactId>
+  <name>KIE :: Spring :: Boot :: KIE Server Auto Configuration :: Drools</name>
+  <description>Drools KIE Server SpringBoot Auto Configuration</description>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-spring-boot-autoconfiguration</artifactId>
+    </dependency>
+    
+    <!-- drools kie server dependencies -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-drools</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-drools</artifactId>
+    </dependency>
+    
+    
+    <!-- dmn kie server dependencies -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-dmn</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-dmn</artifactId>
+    </dependency>
+  </dependencies>
+</project>

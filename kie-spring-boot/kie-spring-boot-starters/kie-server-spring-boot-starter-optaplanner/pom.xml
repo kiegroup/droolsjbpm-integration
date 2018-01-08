@@ -1,41 +1,20 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-starters</artifactId>
     <version>7.6.0-SNAPSHOT</version>
   </parent>
-  <artifactId>kie-server-spring-boot-starter</artifactId>
-
-  <name>KIE Server :: Spring :: Boot :: Starter</name>
-  <description>KIE Server SpringBoot Starter</description>
-
-
+  <artifactId>kie-server-spring-boot-starter-optaplanner</artifactId>
+  
+  
+  <name>KIE Server :: Spring :: Boot :: Starter :: OptaPlanner</name>
+  <description>OptaPlanner - KIE Server SpringBoot Starter</description>
+  
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jdbc</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>jul-to-slf4j</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jta-narayana</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>jms</artifactId>
-          <groupId>org.jboss.narayana.jta</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -58,10 +37,6 @@
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-server-spring-boot-autoconfiguration-jbpm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration-optaplanner</artifactId>
     </dependency>
   </dependencies>
@@ -75,4 +50,5 @@
       </plugin>
     </plugins>
   </build>
+  
 </project>

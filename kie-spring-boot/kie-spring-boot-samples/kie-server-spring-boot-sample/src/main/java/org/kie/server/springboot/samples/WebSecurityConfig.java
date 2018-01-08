@@ -29,13 +29,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic();
+        http.csrf().disable().httpBasic();
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
-                .withUser("john").password("john1").roles("jbpm,HR,IT,Accounting,PM");
+                .withUser("john").password("john1").roles("jbpm,HR,IT,Accounting,PM,kie-server");
     }
 }

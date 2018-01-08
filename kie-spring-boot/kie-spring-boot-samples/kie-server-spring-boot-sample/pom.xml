@@ -7,6 +7,9 @@
     <version>7.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-sample</artifactId>
+  
+  <name>KIE Server :: Spring :: Boot :: Sample</name>
+  <description>KIE Server SpringBoot Sample (includes all KIE Server capabilities)</description>
 
   <properties>
     <start-class>org.jbpm.springboot.samples.JBPMApplication</start-class>
@@ -39,7 +42,35 @@
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-client</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  
+   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>enforce-direct-dependencies</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <fail>false</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <profiles>
     <profile>

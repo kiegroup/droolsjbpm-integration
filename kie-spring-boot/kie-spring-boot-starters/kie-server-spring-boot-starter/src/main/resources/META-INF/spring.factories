@@ -1,5 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.kie.springboot.kieserver.autoconfigure.KieServerAutoConfiguration,\
-org.kie.springboot.kieserver.autoconfigure.extensions.DroolsKieServerAutoConfiguration,\
-org.kie.springboot.kieserver.autoconfigure.extensions.JBPMKieServerAutoConfiguration,\
-org.kie.springboot.kieserver.autoconfigure.extensions.JBPMUIKieServerAutoConfiguration,
-org.kie.springboot.kieserver.autoconfigure.extensions.DMNKieServerAutoConfiguration

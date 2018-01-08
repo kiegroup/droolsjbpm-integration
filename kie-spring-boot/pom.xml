@@ -28,6 +28,7 @@
   <modules>
     <module>kie-spring-boot-starters</module>
     <module>kie-spring-boot-samples</module>
+    <module>kie-spring-boot-autoconfiguration</module>
   </modules>
 
   <properties>
@@ -43,6 +44,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- overrides of narayana version -->
       <dependency>
         <groupId>org.jboss.narayana.jta</groupId>
         <artifactId>jdbc</artifactId>
@@ -62,6 +64,62 @@
         <groupId>org.jboss.narayana.jts</groupId>
         <artifactId>narayana-jts-integration</artifactId>
         <version>${version.org.jboss.narayana.tomcat}</version>
+      </dependency>
+
+      <!-- spring boot auto configuration modules -->
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>jbpm-spring-boot-autoconfiguration</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-spring-boot-autoconfiguration</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-spring-boot-autoconfiguration-drools</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-spring-boot-autoconfiguration-jbpm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-spring-boot-autoconfiguration-optaplanner</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- starters -->
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>jbpm-spring-boot-starter-basic</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>jbpm-spring-boot-starter-actuator</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-spring-boot-starter</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- jersey -->
+      <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>2.25.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet-core</artifactId>
+        <version>2.25.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

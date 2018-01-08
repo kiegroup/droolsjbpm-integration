@@ -27,25 +27,8 @@
     <module>jbpm-spring-boot-starter-basic</module>
     <module>jbpm-spring-boot-starter-actuator</module>
     <module>kie-server-spring-boot-starter</module>
+    <module>kie-server-spring-boot-starter-drools</module>
+    <module>kie-server-spring-boot-starter-jbpm</module>
+    <module>kie-server-spring-boot-starter-optaplanner</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>jbpm-spring-boot-starter-basic</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>jbpm-spring-boot-starter-actuator</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-server-spring-boot-starter</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

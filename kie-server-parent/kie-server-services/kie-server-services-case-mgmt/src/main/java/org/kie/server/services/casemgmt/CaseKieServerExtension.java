@@ -82,11 +82,15 @@ public class CaseKieServerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         this.registry = registry;
-       
-        boolean configured = configureServices(kieServer, registry);
-        if (!configured) {
+        KieServerExtension jbpmExtension = registry.getServerExtension("jBPM");
+        if (jbpmExtension == null) {
+            initialized = false;
+            logger.warn("jBPM extension not found, Case Management cannot work without jBPM extension, disabling itself");
             return;
         }
+        
+        configureServices(kieServer, registry);
+        
 
         this.services.add(this.caseManagementServiceBase);
         this.services.add(this.caseManagementRuntimeDataService);
@@ -96,14 +100,9 @@ public class CaseKieServerExtension implements KieServerExtension {
         initialized = true;
     }
     
-    protected boolean configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
-        KieServerExtension jbpmExtension = registry.getServerExtension("jBPM");
-        if (jbpmExtension == null) {
-            initialized = false;
-            logger.warn("jBPM extension not found, Case Management cannot work without jBPM extension, disabling itself");
-            return false;
-        }
+    protected void configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
         
+        KieServerExtension jbpmExtension = registry.getServerExtension("jBPM");
         List<Object> jbpmServices = jbpmExtension.getServices();
         RuntimeDataService runtimeDataService = null;
         ProcessService processService = null;
@@ -157,7 +156,6 @@ public class CaseKieServerExtension implements KieServerExtension {
         this.caseManagementServiceBase = new CaseManagementServiceBase(caseService, caseRuntimeDataService, registry);
         this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, registry);
         
-        return true;
     }
 
     protected CaseIdGenerator getCaseIdGenerator() {
