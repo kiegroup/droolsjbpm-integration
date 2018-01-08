@@ -373,7 +373,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
         Assertions.assertThat( instance.getName() ).isEqualTo( FIRST_TASK_NAME );
         Assertions.assertThat( instance.getActualOwner() ).isEqualTo( USER_YODA );
         Assertions.assertThat( instance.getCreatedBy() ).isEqualTo( USER_YODA );
-        Assertions.assertThat( instance.getDescription() ).isEqualTo( "" );
+        Assertions.assertThat( instance.getDescription().trim() ).isEmpty();
         Assertions.assertThat( instance.getExpirationDate() ).isEqualTo( task.getExpirationTime() );
         Assertions.assertThat( instance.getPriority() ).isEqualTo( task.getPriority() );
         Assertions.assertThat( instance.getStatus() ).isEqualTo( task.getStatus() );
