@@ -1,7 +1,32 @@
 <kie-server-state>
-  <controllers/>
+  <controllers>
+    <string></string>
+  </controllers>
   <configuration>
-    <configItems/>
+    <configItems>
+      <config-item>
+        <name>org.kie.server.location</name>
+        <value>http://localhost:0/rest/server</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
+        <name>org.kie.server.controller</name>
+        <value></value>
+        <type>java.lang.String</type>
+      </config-item>
+    </configItems>
   </configuration>
-  <containers/>
+  <containers>
+    <container>
+      <containerId>evaluation1</containerId>
+      <releaseId>
+        <groupId>evaluation</groupId>
+        <artifactId>evaluation</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+      </releaseId>
+      <status>STARTED</status>
+      <configItems/>
+      <messages/>
+    </container>
+  </containers>
 </kie-server-state>

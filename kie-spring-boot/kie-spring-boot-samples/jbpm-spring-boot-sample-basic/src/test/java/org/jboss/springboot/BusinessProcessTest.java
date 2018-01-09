@@ -31,11 +31,12 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.QueryFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {JBPMApplication.class, TestAutoConfiguration.class})
+@SpringBootTest(classes = {JBPMApplication.class, TestAutoConfiguration.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-test.properties")
 public class BusinessProcessTest {
     
@@ -61,8 +62,8 @@ public class BusinessProcessTest {
     public static void generalSetup() {
         KieServices ks = KieServices.Factory.get();
         ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
-        File kjar = new File("src/test/resources/kjar/jbpm-module.jar");
-        File pom = new File("src/test/resources/kjar/pom.xml");
+        File kjar = new File("../kjars/evaluation/jbpm-module.jar");
+        File pom = new File("../kjars/evaluation/pom.xml");
         MavenRepository repository = getMavenRepository();
         repository.installArtifact(releaseId, kjar, pom);
 
