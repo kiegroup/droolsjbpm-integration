@@ -1006,8 +1006,7 @@
                   <home>${websphere.home}</home>
                   <timeout>240000</timeout>
                   <systemProperties>
-                    <!-- JtaPlatform doesn't work for new version of Hibernate, user needs to provide own implementation, see https://hibernate.atlassian.net/browse/HHH-11606 . -->
-                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WebSphereExtendedJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.tm>org.hibernate.engine.transaction.jta.platform.internal.WebSphereJtaPlatform</org.kie.server.persistence.tm>
                     <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.kie.server.domain>WSLogin</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
