@@ -19,6 +19,7 @@ package org.kie.server.controller.client;
 import javax.ws.rs.core.Configuration;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.controller.client.event.EventHandler;
 import org.kie.server.controller.client.rest.RestKieServerControllerClient;
 import org.kie.server.controller.client.websocket.WebSocketKieServerControllerClient;
 
@@ -29,7 +30,7 @@ public class KieServerControllerClientFactory {
 
     /**
      * Creates a new Kie Controller Client using REST based service
-     * @param controllerUrl the URL to the server (e.g.: "http://localhost:8080")
+     * @param controllerUrl the URL to the server (e.g.: "http://localhost:8080/kie-server-controller/rest/controller")
      * @param login user login
      * @param password user password
      * @return client instance
@@ -44,7 +45,7 @@ public class KieServerControllerClientFactory {
 
     /**
      * Creates a new Kie Controller Client using REST based service
-     * @param controllerUrl the URL to the server (e.g.: "http://localhost:8080")
+     * @param controllerUrl the URL to the server (e.g.: "http://localhost:8080/kie-server-controller/rest/controller")
      * @param login user login
      * @param password user password
      * @param format marshaling format
@@ -62,7 +63,7 @@ public class KieServerControllerClientFactory {
 
     /**
      * Creates a new Kie Controller Client using REST based service
-     * @param controllerUrl the URL to the server (e.g.: "http://localhost:8080")
+     * @param controllerUrl the URL to the server (e.g.: "http://localhost:8080/kie-server-controller/rest/controller")
      * @param login user login
      * @param password user password
      * @param format marshaling format
@@ -83,7 +84,7 @@ public class KieServerControllerClientFactory {
 
     /**
      * Creates a new Kie Controller Client using Web Socket based service
-     * @param controllerUrl the URL to the server (e.g.: "ws://localhost:8080")
+     * @param controllerUrl the URL to the server (e.g.: "ws://localhost:8080/kie-server-controller/websocket/controller")
      * @param login user login
      * @param password user password
      * @return client instance
@@ -94,20 +95,43 @@ public class KieServerControllerClientFactory {
         return new WebSocketKieServerControllerClient(controllerUrl,
                                                       login,
                                                       password,
+                                                      null,
                                                       null);
     }
 
     /**
      * Creates a new Kie Controller Client using Web Socket based service
-     * @param controllerUrl the URL to the server (e.g.: "ws://localhost:8080")
-     * @param token token
+     * @param controllerUrl the URL to the server (e.g.: "ws://localhost:8080/kie-server-controller/websocket/controller")
+     * @param login user login
+     * @param password user password
+     * @param handler notification handler for controller events
      * @return client instance
      */
     public static KieServerControllerClient newWebSocketClient(final String controllerUrl,
-                                                               final String token) {
+                                                               final String login,
+                                                               final String password,
+                                                               final EventHandler handler) {
+        return new WebSocketKieServerControllerClient(controllerUrl,
+                                                      login,
+                                                      password,
+                                                      null,
+                                                      handler);
+    }
+
+    /**
+     * Creates a new Kie Controller Client using Web Socket based service
+     * @param controllerUrl the URL to the server (e.g.: "ws://localhost:8080/kie-server-controller/websocket/controller")
+     * @param token token
+     * @param handler notification handler for controller events
+     * @return client instance
+     */
+    public static KieServerControllerClient newWebSocketClient(final String controllerUrl,
+                                                               final String token,
+                                                               final EventHandler handler) {
         return new WebSocketKieServerControllerClient(controllerUrl,
                                                       null,
                                                       null,
-                                                      token);
+                                                      token,
+                                                      handler);
     }
 }

@@ -86,7 +86,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         serverTemplate.setName( name );
 
         serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), location));
-        mgmtControllerClient.saveServerTemplate(serverTemplate);
+        controllerClient.saveServerTemplate(serverTemplate);
 
         return serverTemplate;
     }
@@ -99,7 +99,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     }
 
     protected void checkContainerConfig(String serverTemplateId, String containerId, ContainerConfig... configs) {
-        Map<Capability, ContainerConfig> configMap = mgmtControllerClient.getContainerInfo(serverTemplateId, containerId).getConfigs();
+        Map<Capability, ContainerConfig> configMap = controllerClient.getContainerInfo(serverTemplateId, containerId).getConfigs();
         assertNotNull(configMap);
 
         for (ContainerConfig config : configs) {
@@ -125,7 +125,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testDeleteNotExistingServerTemplate() {
         try {
             // Try to delete not existing server template.
-            mgmtControllerClient.deleteServerTemplate("not existing");
+            controllerClient.deleteServerTemplate("not existing");
             fail("Should throw exception about kie server instance not existing.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -137,10 +137,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testCreateKieServerTemplate() {
         ServerTemplate serverTemplate = createServerTemplate();
 
-        ServerTemplate storedServerTemplate = mgmtControllerClient.getServerTemplate(serverTemplate.getId());
+        ServerTemplate storedServerTemplate = controllerClient.getServerTemplate(serverTemplate.getId());
         checkServerTemplate(storedServerTemplate);
 
-        ServerTemplateList serverTemplates = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList serverTemplates = controllerClient.listServerTemplates();
         assertNotNull(serverTemplates);
         assertEquals(1, serverTemplates.getServerTemplates().length);
 
@@ -154,8 +154,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         ServerTemplate serverTemplate = createServerTemplate();
 
         // Trying to create same kie server will result in updating instead.
-        mgmtControllerClient.saveServerTemplate(serverTemplate);
-        ServerTemplateList serverTemplates = mgmtControllerClient.listServerTemplates();
+        controllerClient.saveServerTemplate(serverTemplate);
+        ServerTemplateList serverTemplates = controllerClient.listServerTemplates();
         assertNotNull(serverTemplates);
         assertEquals(1, serverTemplates.getServerTemplates().length);
     }
@@ -164,15 +164,15 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testDeleteServerTemplate() {
         ServerTemplate serverTemplate = createServerTemplate();
 
-        ServerTemplateList serverTemplates = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList serverTemplates = controllerClient.listServerTemplates();
         assertNotNull(serverTemplates);
         assertEquals(1, serverTemplates.getServerTemplates().length);
 
         // Delete created server template.
-        mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
+        controllerClient.deleteServerTemplate(serverTemplate.getId());
 
         // There are no kie server instances in controller now.
-        serverTemplates = mgmtControllerClient.listServerTemplates();
+        serverTemplates = controllerClient.listServerTemplates();
         KieServerAssert.assertNullOrEmpty("Active kie server instance found!", serverTemplates.getServerTemplates());
     }
 
@@ -185,7 +185,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         ServerInstanceKey serverInstanceKey = serverTemplate.getServerInstanceKeys().iterator().next();
 
         // Get kie server instance.
-        ServerTemplate serverInstance = mgmtControllerClient.getServerTemplate(serverTemplate.getId());
+        ServerTemplate serverInstance = controllerClient.getServerTemplate(serverTemplate.getId());
 
         checkServerTemplate(serverInstance);
 
@@ -203,7 +203,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testGetNotExistingServerTemplate() {
         try {
             // Try to get not existing kie server template.
-            mgmtControllerClient.getServerTemplate(kieServerInfo.getServerId());
+            controllerClient.getServerTemplate(kieServerInfo.getServerId());
             fail("Should throw exception about kie server instance not existing.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -216,7 +216,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         createServerTemplate();
 
         // List kie server instances.
-        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList instanceList = controllerClient.listServerTemplates();
 
         assertNotNull(instanceList);
         assertEquals(1, instanceList.getServerTemplates().length);
@@ -234,7 +234,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
     @Test
     public void testEmptyListServerTemplates() throws Exception {
-        ServerTemplateList instanceList = mgmtControllerClient.listServerTemplates();
+        ServerTemplateList instanceList = controllerClient.listServerTemplates();
         KieServerAssert.assertNullOrEmpty("Server templates found!", instanceList.getServerTemplates());
     }
 
@@ -245,10 +245,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Check that container is deployed.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
 
         // Container is in stopped state, so there are no containers deployed in kie server.
@@ -257,11 +257,11 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         KieServerAssert.assertNullOrEmpty("Active containers found!", containersList.getResult().getContainers());
 
         // Undeploy container for kie server instance.
-        mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
+        controllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
 
         // Check that container is disposed.
         try {
-            mgmtControllerClient.getContainerInfo(serverTemplate.getId(), CONTAINER_ID);
+            controllerClient.getContainerInfo(serverTemplate.getId(), CONTAINER_ID);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -275,10 +275,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Check that container is deployed.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
 
         // Container is in started state, so it should already be in kie server
@@ -305,10 +305,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()), releaseId, KieContainerStatus.STARTED, new HashMap());
         serverTemplate.addContainerSpec(containerToDeploy);
 
-        mgmtControllerClient.saveServerTemplate(serverTemplate);
+        controllerClient.saveServerTemplate(serverTemplate);
 
         // Check that container is deployed.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
 
         // Container is in started state, so it should already be in kie server
@@ -331,10 +331,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
     }
@@ -346,18 +346,18 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
 
         containerToDeploy.setReleasedId(releaseId101);
-        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
 
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         assertNotNull(containerResponseEntity);
         assertEquals(CONTAINER_ID, containerResponseEntity.getId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
@@ -372,10 +372,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
 
         // Check that container is not deployed in kie server (as container is in STOPPED state).
@@ -383,9 +383,9 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
         KieServerAssert.assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
 
-        mgmtControllerClient.startContainer(containerToDeploy);
+        controllerClient.startContainer(containerToDeploy);
 
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
 
         // Check that container is deployed in kie server.
@@ -396,9 +396,9 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
         assertEquals(releaseId, containerInfo.getResult().getReleaseId());
 
-        mgmtControllerClient.stopContainer(containerToDeploy);
+        controllerClient.stopContainer(containerToDeploy);
 
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
 
         // Check that container is not deployed in kie server (as container is in STOPPED state).
@@ -412,7 +412,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testGetNotExistingContainer() {
         // Try to get not existing container using kie controller without created kie server instance.
         try {
-            mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+            controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -421,7 +421,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         createServerTemplate();
         // Try to get not existing container using kie controller with created kie server instance.
         try {
-            mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+            controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -435,9 +435,9 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
-        ContainerSpecList containerList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
+        ContainerSpecList containerList = controllerClient.listContainerSpec(kieServerInfo.getServerId());
 
         assertNotNull(containerList);
         assertEquals(1, containerList.getContainerSpecs().length);
@@ -461,22 +461,22 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         containerConfigMap.put(Capability.RULE, ruleConfig);
 
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, containerConfigMap);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
 
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
 
         // Check process config and rule config
         checkContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, processConfig, ruleConfig);
 
         processConfig = new ProcessConfig("SINGLETON", "defaultKieBase", "defaultKieSession", "OVERRIDE_ALL");
-        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
 
         // Check process config and rule config
         checkContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, processConfig, ruleConfig);
 
         ruleConfig = new RuleConfig(1000l, KieScannerStatus.STOPPED);
-        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
 
         // Check process config and rule config
         checkContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, processConfig, ruleConfig);
@@ -488,7 +488,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, new ServerTemplate(), releaseId, KieContainerStatus.STOPPED, new HashMap());
         try {
 
-            mgmtControllerClient.saveContainerSpec(kieServerInfo.getServerId(), containerToDeploy);
+            controllerClient.saveContainerSpec(kieServerInfo.getServerId(), containerToDeploy);
             fail("Should throw exception about kie server instance not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -502,11 +502,11 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         try {
             // Try to create same container.
-            mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+            controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
             fail("Should throw exception about container being created already.");
         } catch (KieServerControllerClientException e) {
             assertBadRequestException((T)e);
@@ -517,7 +517,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testDeleteNotExistingContainer() {
         // Try to dispose not existing container using kie controller without created kie server instance.
         try {
-            mgmtControllerClient.deleteContainerSpec(kieServerInfo.getServerId(), CONTAINER_ID);
+            controllerClient.deleteContainerSpec(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about kie server instance not exists.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -526,7 +526,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         createServerTemplate();
         // Try to dispose not existing container using kie controller with created kie server instance.
         try {
-            mgmtControllerClient.deleteContainerSpec(kieServerInfo.getServerId(), CONTAINER_ID);
+            controllerClient.deleteContainerSpec(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about container not exists.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -540,7 +540,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         containerSpec.setServerTemplateKey(new ServerTemplateKey(kieServerInfo.getServerId(), null));
         // Try to start not existing container using kie controller without created kie server instance.
         try {
-            mgmtControllerClient.startContainer(containerSpec);
+            controllerClient.startContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -549,7 +549,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         createServerTemplate();
         // Try to start not existing container using kie controller with created kie server instance.
         try {
-            mgmtControllerClient.startContainer(containerSpec);
+            controllerClient.startContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -563,7 +563,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         containerSpec.setServerTemplateKey(new ServerTemplateKey(kieServerInfo.getServerId(), null));
         // Try to stop not existing container using kie controller without created kie server instance.
         try {
-            mgmtControllerClient.stopContainer(containerSpec);
+            controllerClient.stopContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -572,7 +572,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         createServerTemplate();
         // Try to stop not existing container using kie controller with created kie server instance.
         try {
-            mgmtControllerClient.stopContainer(containerSpec);
+            controllerClient.stopContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -582,7 +582,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     @Test
     public void testEmptyListContainers() {
         try {
-            ContainerSpecList emptyList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
+            ContainerSpecList emptyList = controllerClient.listContainerSpec(kieServerInfo.getServerId());
             fail("Should throw exception about kie server instance not existing.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -591,7 +591,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         // Create kie server instance connection in controller.
         createServerTemplate();
 
-        ContainerSpecList emptyList = mgmtControllerClient.listContainerSpec(kieServerInfo.getServerId());
+        ContainerSpecList emptyList = controllerClient.listContainerSpec(kieServerInfo.getServerId());
         KieServerAssert.assertNullOrEmpty("Active containers found!", emptyList.getContainerSpecs());
     }
 
@@ -599,7 +599,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testUpdateContainerConfigOnNotExistingContainer() {
         ProcessConfig config = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
         try {
-            mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
+            controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
             fail("Should throw exception about kie server instance not existing.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -609,7 +609,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         createServerTemplate();
 
         try {
-            mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
+            controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
@@ -621,10 +621,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         ServerTemplate serverTemplate = createServerTemplate();
 
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
@@ -634,20 +634,20 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         containerToDeploy.setServerTemplateKey(secondTemplate);
 
         try {
-            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+            controllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
             fail("Template key should not be allowed to be changed during update.");
         } catch (KieServerControllerClientException e) {
             assertBadRequestException((T)e);
             KieServerAssert.assertResultContainsString(e.getMessage(), "Cannot change container template key during update.");
         }
 
-        assertEquals(2, mgmtControllerClient.listServerTemplates().getServerTemplates().length);
+        assertEquals(2, controllerClient.listServerTemplates().getServerTemplates().length);
         // Check that on other server template is not any container.
-        KieServerAssert.assertNullOrEmpty("Found container in second server template.", mgmtControllerClient.listContainerSpec(secondTemplate.getId()).getContainerSpecs());
-        assertEquals(1, mgmtControllerClient.listContainerSpec(serverTemplate.getId()).getContainerSpecs().length);
+        KieServerAssert.assertNullOrEmpty("Found container in second server template.", controllerClient.listContainerSpec(secondTemplate.getId()).getContainerSpecs());
+        assertEquals(1, controllerClient.listContainerSpec(serverTemplate.getId()).getContainerSpecs().length);
 
         // Check that container is not changed
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(serverTemplate.getId(), containerResponseEntity.getServerTemplateKey().getId());
         assertEquals(serverTemplate.getName(), containerResponseEntity.getServerTemplateKey().getName());
@@ -664,13 +664,13 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         // Deploy container for kie server instance.
         ContainerSpec containerOneToDeploy = new ContainerSpec(ONE_ID, ONE_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
         ContainerSpec containerTwoToDeploy = new ContainerSpec(TWO_ID, TWO_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerOneToDeploy);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerTwoToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerOneToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerTwoToDeploy);
 
         containerOneToDeploy.setReleasedId(releaseId101);
 
         try {
-            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerTwoToDeploy.getId(), containerOneToDeploy);
+            controllerClient.updateContainerSpec(serverTemplate.getId(), containerTwoToDeploy.getId(), containerOneToDeploy);
             fail("Container one was updated from container two REST endpoint.");
         } catch (KieServerControllerClientException e) {
             assertBadRequestException((T)e);
@@ -678,12 +678,12 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         }
 
         // Check container that are not changed
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(serverTemplate.getId(), ONE_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(serverTemplate.getId(), ONE_ID);
         assertEquals(ONE_ID, containerResponseEntity.getId());
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
 
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(serverTemplate.getId(), TWO_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(serverTemplate.getId(), TWO_ID);
         assertEquals(TWO_ID, containerResponseEntity.getId());
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
@@ -697,13 +697,13 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
         try {
-            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+            controllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
             fail("Container was created by update command - REST Post method.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T)e);
         }
 
-        KieServerAssert.assertNullOrEmpty("Found deployed container.", mgmtControllerClient.listContainerSpec(serverTemplate.getId()).getContainerSpecs());
+        KieServerAssert.assertNullOrEmpty("Found deployed container.", controllerClient.listContainerSpec(serverTemplate.getId()).getContainerSpecs());
     }
 
     @Test
@@ -713,16 +713,16 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
 
         containerToDeploy.setId("newID");
         try {
-            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), CONTAINER_ID, containerToDeploy);
+            controllerClient.updateContainerSpec(serverTemplate.getId(), CONTAINER_ID, containerToDeploy);
             fail("Container has updated id.");
         } catch (KieServerControllerClientException e) {
             assertBadRequestException((T)e);
@@ -736,20 +736,20 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         ServerTemplate serverTemplate = createServerTemplate();
 
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
 
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         KieServerAssert.assertNullOrEmpty("Config is not empty.", containerResponseEntity.getConfigs().values());
 
         // Try update not existing ProcessConfig
         ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
-        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
 
 
         // Try update not existing RuleConfig
         RuleConfig ruleConfig = new RuleConfig(500l, KieScannerStatus.SCANNING);
-        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
     }
 
     @Test
@@ -759,10 +759,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, Collections.EMPTY_MAP);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
 
@@ -780,10 +780,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         containerToDeploy.setReleasedId(nonValidReleaseId);
 
         // We can update container to new version, but if can't be found, then deployed container is not changed.
-        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller. Container has changed ReleaseId
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         assertEquals(CONTAINER_ID, containerResponseEntity.getId());
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
         assertEquals(KieContainerStatus.STARTED, containerResponseEntity.getStatus());
@@ -815,10 +815,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
 
@@ -829,10 +829,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Update container
         containerToDeploy.setStatus(KieContainerStatus.STARTED);
-        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
 
         // Check that container is deployed in kie server.
@@ -859,10 +859,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Deploy container for kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, containerConfigMap);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
@@ -872,10 +872,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Update container
         containerToDeploy.setConfigs(Collections.EMPTY_MAP);
-        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         // Get container using kie controller.
-        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
@@ -895,13 +895,13 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Tell the controller to save the spec for the given template, which since the
         // container status is STARTED should also cause it to be deployed to the kie-server
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);
         checkContainerConfigAgainstServer(processConfig,ruleConfig);
 
         // Update the rule configuration, turning off the scanner
         ruleConfig.setScannerStatus(KieScannerStatus.STOPPED);
-        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
 
         // Check the rule configuration
         KieServerSynchronization.waitForKieServerScannerStatus(client, CONTAINER_ID, KieScannerStatus.STOPPED);
@@ -909,11 +909,11 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Update the configuration
         processConfig = new ProcessConfig("SINGLETON", "defaultKieBase", "defaultKieSession", "OVERRIDE_ALL");
-        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
 
         // Reset the container, since the update process should not do that by itself
-        mgmtControllerClient.stopContainer(containerSpec);
-        mgmtControllerClient.startContainer(containerSpec);
+        controllerClient.stopContainer(containerSpec);
+        controllerClient.startContainer(containerSpec);
 
         // Update the process configuration
         KieServerSynchronization.waitForKieServerConfig(client, CONTAINER_ID, KieServerConstants.PCFG_MERGE_MODE, "OVERRIDE_ALL");
@@ -922,7 +922,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         // Restart the scanner with the new interval
         ruleConfig.setScannerStatus(KieScannerStatus.STARTED);
         ruleConfig.setPollInterval(1000L);
-        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
         KieServerSynchronization.waitForKieServerScannerStatus(client, CONTAINER_ID, KieScannerStatus.STARTED, 1000L);
         checkContainerConfigAgainstServer(ruleConfig,processConfig);
     }
@@ -933,7 +933,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         Map<Capability, ContainerConfig> containerConfigMap = new HashMap<>();
 
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);
 
         ServiceResponse<KieServerStateInfo> response = client.getServerState();
@@ -943,7 +943,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         assertNotNull(serverState);
         assertTrue("Expected to find containers, but none were found", serverState.getContainers() != null && serverState.getContainers().size() > 0);
 
-        mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
+        controllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
         KieServerSynchronization.waitForKieServerSynchronization(client, 0);
 
         response = client.getServerState();
