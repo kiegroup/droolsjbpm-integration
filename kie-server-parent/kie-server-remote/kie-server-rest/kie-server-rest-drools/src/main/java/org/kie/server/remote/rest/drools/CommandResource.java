@@ -82,7 +82,7 @@ public class CommandResource {
         if (format == null) {
             format = MarshallingFormat.valueOf(contentType);
         }
-
+        logger.debug("Received request with content '{}'", cmdPayload);
         Object result = delegate.callContainer(id, cmdPayload, format, classType);
         Header conversationIdHeader = buildConversationIdHeader(id, registry, headers);
         try {
