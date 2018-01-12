@@ -1,5 +1,3 @@
-package org.kie.server.services.swagger;
-
 /*
  * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
@@ -14,6 +12,8 @@ package org.kie.server.services.swagger;
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+package org.kie.server.services.swagger;
 
 import static org.junit.Assert.*;
 
