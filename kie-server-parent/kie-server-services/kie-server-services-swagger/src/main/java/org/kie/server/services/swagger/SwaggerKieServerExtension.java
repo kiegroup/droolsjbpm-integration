@@ -80,7 +80,7 @@ public class SwaggerKieServerExtension implements KieServerExtension {
 		// beanConfig.setVersion("1.0.2");
 
 		String contextRoot = KieServerEnvironment.getContextRoot();
-		if (contextRoot != null && !contextRoot.isEmpty()) {
+		if (contextRoot != null) {
 			beanConfig.setBasePath(contextRoot + "/services/rest");
 		}
 
