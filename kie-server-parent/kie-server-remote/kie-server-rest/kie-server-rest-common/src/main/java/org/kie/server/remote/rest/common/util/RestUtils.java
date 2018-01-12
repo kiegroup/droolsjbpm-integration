@@ -176,6 +176,10 @@ public class RestUtils {
     public static Response noContent(Variant v, Header... customHeaders) {
         return createResponse("", v, Response.Status.NO_CONTENT, customHeaders);
     }
+    
+    public static Response serviceUnavailable(Header... customHeaders) {
+        return createResponse("", ERROR_VARIANT, Response.Status.SERVICE_UNAVAILABLE, customHeaders);
+    }
 
     protected static void applyCustomHeaders(Response.ResponseBuilder builder, Header... customHeaders) {
         if (customHeaders != null && customHeaders.length > 0) {

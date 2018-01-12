@@ -15,9 +15,12 @@
 
 package org.kie.server.services.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.impl.KieServerImpl;
 
 public interface KieServerExtension {
@@ -49,4 +52,13 @@ public interface KieServerExtension {
     String getExtensionName();
 
     Integer getStartOrder();
+    
+    default List<Message> healthCheck(boolean report) {
+        List<Message> messages = new ArrayList<>();
+        if (!isInitialized()) {
+            messages.add(new Message(Severity.ERROR, getExtensionName() + " failed to start"));
+        }
+        
+        return messages;
+    }
 }
