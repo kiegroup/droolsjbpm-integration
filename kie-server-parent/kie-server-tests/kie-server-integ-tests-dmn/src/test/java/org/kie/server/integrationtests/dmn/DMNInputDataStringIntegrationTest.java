@@ -15,24 +15,27 @@
 
 package org.kie.server.integrationtests.dmn;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNResult;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.KieServiceResponse.ResponseType;
+import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
-
-import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
-
+import org.kie.server.client.impl.DMNServicesClientImpl;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class DMNInputDataStringIntegrationTest
         extends DMNKieServerBaseIntegrationTest {
@@ -185,4 +188,22 @@ public class DMNInputDataStringIntegrationTest
         }
     }
     
+    @Test
+    public void testDROOLS2234() {
+        // DROOLS-2234
+        DMNContext dmnContext = dmnClient.newContext();
+        dmnContext.set("Full Name", "John Doe");
+
+        DMNServicesClientImpl testClient = (DMNServicesClientImpl) dmnClient;
+
+        DMNContextKS custom_payload = new DMNContextKS(MODEL_NAMESPACE, MODEL_NAME, dmnContext.getAll());
+        custom_payload.setDecisionIds(null);
+        custom_payload.setDecisionNames(null);
+
+        DMNResult dmnResult = testClient.evaluateDecisions(CONTAINER_ID, custom_payload).getResult();
+
+        assertThat(dmnResult.getDecisionResults().size(), is(1));
+        assertThat(dmnResult.getDecisionResultById("d_GreetingMessage").getResult(), is("Hello John Doe"));
+    }
+
 }
