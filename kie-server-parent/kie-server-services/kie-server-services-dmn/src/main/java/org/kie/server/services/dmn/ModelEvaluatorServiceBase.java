@@ -15,44 +15,31 @@
 
 package org.kie.server.services.dmn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.kie.api.runtime.KieSession;
 import org.kie.dmn.api.core.DMNContext;
-import org.kie.dmn.api.core.DMNModel;   
+import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.core.api.DMNFactory;
-import org.kie.dmn.model.v1_1.Decision;
-import org.kie.server.api.model.*;
-import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
-import org.kie.server.api.model.instance.ScoreWrapper;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
-import org.kie.server.api.model.type.JaxbList;
-import org.kie.server.api.model.type.JaxbMap;
-import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.optaplanner.core.api.score.Score;
-import org.optaplanner.core.api.solver.Solver;
-import org.optaplanner.core.api.solver.SolverFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 
 public class ModelEvaluatorServiceBase {
 
@@ -137,8 +124,8 @@ public class ModelEvaluatorServiceBase {
             
             DMNResult result = null;
 
-            final List<String> names = evalCtx.getDecisionNames();
-            final List<String> ids = evalCtx.getDecisionIds();
+            final List<String> names = Optional.ofNullable(evalCtx.getDecisionNames()).orElse(Collections.emptyList());
+            final List<String> ids = Optional.ofNullable(evalCtx.getDecisionIds()).orElse(Collections.emptyList());
 
             if ( names.isEmpty() && ids.isEmpty() ) {
                 // then implies evaluate All decisions

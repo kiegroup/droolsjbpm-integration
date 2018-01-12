@@ -111,7 +111,11 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return evaluateDecisions(containerId, payload);
         }
 
-        private ServiceResponse<DMNResult> evaluateDecisions(String containerId, DMNContextKS payload) {
+        /**
+         * Please notice this method is NOT exposed to the API interface.
+         */
+        // DO NOT ADD @Override
+        public ServiceResponse<DMNResult> evaluateDecisions(String containerId, DMNContextKS payload) {
             ServiceResponse<DMNResult> result = null;
             if( config.isRest() ) {
                 Map<String, Object> valuesMap = new HashMap<String, Object>();
