@@ -492,6 +492,8 @@
         <kie.server.context.factory>org.jboss.naming.remote.client.InitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly10x</cargo.container.id>
+        <!-- Excluded due to Cargo bug. -->
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
