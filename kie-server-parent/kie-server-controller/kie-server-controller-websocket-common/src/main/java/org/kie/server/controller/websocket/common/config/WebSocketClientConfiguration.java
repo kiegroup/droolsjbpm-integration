@@ -16,6 +16,11 @@
 
 package org.kie.server.controller.websocket.common.config;
 
+import java.util.Arrays;
+import java.util.List;
+import javax.websocket.Decoder;
+import javax.websocket.Encoder;
+
 public interface WebSocketClientConfiguration {
 
     static Builder builder() {
@@ -31,6 +36,12 @@ public interface WebSocketClientConfiguration {
     String getToken();
 
     Long getMaxSessionIdleTimeout();
+
+    Long getAsyncSendTimeout();
+
+    List<Class<? extends Encoder>> getEncoders();
+
+    List<Class<? extends Decoder>> getDecoders();
 
     class Builder {
 
@@ -58,6 +69,21 @@ public interface WebSocketClientConfiguration {
 
         public Builder setMaxSessionIdleTimeout(final Long maxSessionIdleTimeout) {
             config.setMaxSessionIdleTimeout(maxSessionIdleTimeout);
+            return this;
+        }
+
+        public Builder setAsyncSendTimeout(final Long asyncSendTimeout) {
+            config.setAsyncSendTimeout(asyncSendTimeout);
+            return this;
+        }
+
+        public Builder encoders(final Class<? extends Encoder>... encoders) {
+            config.setEncoders(Arrays.asList(encoders));
+            return this;
+        }
+
+        public Builder decoders(final Class<? extends Decoder>... decoders) {
+            config.setDecoders(Arrays.asList(decoders));
             return this;
         }
 

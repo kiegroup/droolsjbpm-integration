@@ -16,6 +16,10 @@
 
 package org.kie.server.controller.websocket.common.config;
 
+import java.util.List;
+import javax.websocket.Decoder;
+import javax.websocket.Encoder;
+
 public class WebSocketClientConfigurationImpl implements WebSocketClientConfiguration {
 
     private String controllerUrl;
@@ -27,6 +31,12 @@ public class WebSocketClientConfigurationImpl implements WebSocketClientConfigur
     private String password;
 
     private Long maxSessionIdleTimeout = 0L;
+
+    private Long asyncSendTimeout = 120 * 1000L;
+
+    private List<Class<? extends Encoder>> encoders;
+
+    private List<Class<? extends Decoder>> decoders;
 
     protected WebSocketClientConfigurationImpl() {
     }
@@ -77,6 +87,33 @@ public class WebSocketClientConfigurationImpl implements WebSocketClientConfigur
     }
 
     @Override
+    public Long getAsyncSendTimeout() {
+        return asyncSendTimeout;
+    }
+
+    public void setAsyncSendTimeout(Long asyncSendTimeout) {
+        this.asyncSendTimeout = asyncSendTimeout;
+    }
+
+    @Override
+    public List<Class<? extends Encoder>> getEncoders() {
+        return encoders;
+    }
+
+    public void setEncoders(List<Class<? extends Encoder>> encoders) {
+        this.encoders = encoders;
+    }
+
+    @Override
+    public List<Class<? extends Decoder>> getDecoders() {
+        return decoders;
+    }
+
+    public void setDecoders(List<Class<? extends Decoder>> decoders) {
+        this.decoders = decoders;
+    }
+
+    @Override
     public String toString() {
         return "WebSocketClientConfigurationImpl{" +
                 "controllerUrl='" + controllerUrl + '\'' +
@@ -84,6 +121,9 @@ public class WebSocketClientConfigurationImpl implements WebSocketClientConfigur
                 ", token='" + token + '\'' +
                 ", password='" + password + '\'' +
                 ", maxSessionIdleTimeout=" + maxSessionIdleTimeout +
+                ", asyncSendTimeout=" + asyncSendTimeout +
+                ", encoders=" + encoders +
+                ", decoders=" + decoders +
                 '}';
     }
 }

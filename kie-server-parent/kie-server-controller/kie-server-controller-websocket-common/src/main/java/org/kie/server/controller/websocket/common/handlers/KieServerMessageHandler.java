@@ -33,7 +33,6 @@ public class KieServerMessageHandler implements MessageHandler.Whole<String> {
     
     public KieServerMessageHandler(Session session) {
         this.session = session;
-        this.session.addMessageHandler(this);
     }
     
     @Override

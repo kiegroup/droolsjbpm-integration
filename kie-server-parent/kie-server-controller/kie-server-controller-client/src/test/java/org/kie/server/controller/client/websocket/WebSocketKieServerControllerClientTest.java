@@ -26,7 +26,7 @@ import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
-import org.kie.server.controller.websocket.common.WebSocketClient;
+import org.kie.server.controller.websocket.common.KieServerMessageHandlerWebSocketClient;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 import org.kie.server.controller.websocket.common.handlers.WebSocketServiceResponse;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.*;
 public class WebSocketKieServerControllerClientTest {
 
     @Mock
-    private WebSocketClient client;
+    private KieServerMessageHandlerWebSocketClient client;
 
     @InjectMocks
     @Spy
@@ -78,8 +78,8 @@ public class WebSocketKieServerControllerClientTest {
                                      new Object[m.getParameterCount()]);
 
             ArgumentCaptor<String> contentCaptor = ArgumentCaptor.forClass(String.class);
-            verify(client).sendTextWithHandler(contentCaptor.capture(),
-                                               any(InternalMessageHandler.class));
+            verify(client).sendTextWithInternalHandler(contentCaptor.capture(),
+                                                       any(InternalMessageHandler.class));
 
             final DescriptorCommand command = WebSocketUtils.unmarshal(contentCaptor.getValue(),
                                                                  DescriptorCommand.class);

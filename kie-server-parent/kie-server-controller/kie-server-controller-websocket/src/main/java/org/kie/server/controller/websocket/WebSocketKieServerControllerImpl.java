@@ -32,6 +32,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.service.NotificationService;
+import org.kie.server.controller.api.service.NotificationServiceFactory;
 import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerControllerImpl;
@@ -49,7 +50,7 @@ public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
     private Instance<KieServerTemplateStorage> templateStorage;
     
     @Inject
-    private Instance<NotificationService> notificationService;    
+    private Instance<NotificationService> notificationService;
     
     public WebSocketKieServerControllerImpl() {
         ServiceLoader<PersistingServerTemplateStorageService> storageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
@@ -59,6 +60,17 @@ public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
             logger.debug("Server template storage for standalone kie server controller is {}", storageService.getTemplateStorage().toString());
         } else {
             logger.debug("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
+        }
+
+        ServiceLoader<NotificationServiceFactory> notificationServiceLoader = ServiceLoader.load(NotificationServiceFactory.class);
+        if (notificationServiceLoader != null && notificationServiceLoader.iterator().hasNext()) {
+            final NotificationService notificationService = notificationServiceLoader.iterator().next().getNotificationService();
+            this.setNotificationService(notificationService);
+
+            logger.debug("Notification service for standalone kie server controller is {}",
+                         notificationService.toString());
+        } else {
+            logger.warn("Notification service not defined. Default notification: LoggingNotificationService will be used");
         }
     }
     
@@ -79,9 +91,8 @@ public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
     
     @OnOpen
     public void onKieServerConnect(@PathParam("server-id") String serverId, Session session) {
-        synchronized (manager) {            
+        synchronized (manager) {
             manager.addSession(session);
-            
             manager.getHandler(session.getId()).addHandler(new ConnectedKieServerHandler(manager, session, this, serverId));
         }
     }

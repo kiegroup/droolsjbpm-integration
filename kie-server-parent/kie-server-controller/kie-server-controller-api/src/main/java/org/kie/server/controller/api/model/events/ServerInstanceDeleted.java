@@ -15,7 +15,7 @@
 
 package org.kie.server.controller.api.model.events;
 
-public class ServerInstanceDeleted {
+public class ServerInstanceDeleted implements KieServerControllerEvent {
 
     private String serverInstanceId;
 

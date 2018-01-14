@@ -17,21 +17,19 @@
 package org.kie.server.controller.websocket.common;
 
 import java.io.IOException;
-import java.util.List;
-import javax.websocket.Decoder;
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
+import java.util.function.Consumer;
+import javax.websocket.MessageHandler;
 
 import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
-import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 
-public interface WebSocketClient {
+public interface WebSocketClient<T extends MessageHandler> {
 
     void init(WebSocketClientConfiguration config);
 
     void close();
 
-    void sendTextWithHandler(String content, InternalMessageHandler handler) throws IOException;
+    void sendTextWithHandler(String content,
+                             Consumer<T> handler) throws IOException;
 
     boolean isActive();
 }

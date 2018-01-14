@@ -49,13 +49,13 @@ public class WebSocketKieControllerManagementIntegrationTest extends KieControll
     @Override
     public void createControllerClient() {
         if (TestConfig.isLocalServer()) {
-            mgmtControllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
-                                                                                       null,
-                                                                                       null);
+            controllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
+                                                                                   null,
+                                                                                   (String)null);
         } else {
-            mgmtControllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
-                                                                                       TestConfig.getUsername(),
-                                                                                       TestConfig.getPassword());
+            controllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
+                                                                                   TestConfig.getUsername(),
+                                                                                   TestConfig.getPassword());
         }
     }
 

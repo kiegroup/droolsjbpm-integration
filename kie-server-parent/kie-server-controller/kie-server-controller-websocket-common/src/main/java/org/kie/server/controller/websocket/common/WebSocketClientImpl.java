@@ -24,12 +24,10 @@ import javax.websocket.*;
 
 import org.kie.server.controller.websocket.common.auth.WebSocketAuthConfigurator;
 import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
-import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
-import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebSocketClientImpl extends Endpoint implements WebSocketClient {
+public abstract class WebSocketClientImpl<T extends MessageHandler> extends Endpoint implements WebSocketClient<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketClientImpl.class);
 
@@ -39,24 +37,24 @@ public class WebSocketClientImpl extends Endpoint implements WebSocketClient {
 
     private ClientEndpointConfig config = null;
 
-    private KieServerMessageHandler messageHandler;
+    protected T messageHandler;
 
     private AtomicBoolean closed = new AtomicBoolean(true);
 
     private Thread reconnectThread = null;
 
-    private Consumer<WebSocketClientImpl> onReconnect;
+    private Consumer<WebSocketClient> onReconnect;
 
     public WebSocketClientImpl() {
         super();
     }
 
-    public WebSocketClientImpl(final Consumer<WebSocketClientImpl> onReconnect) {
+    public WebSocketClientImpl(final Consumer<WebSocketClient> onReconnect) {
         this();
         this.onReconnect = onReconnect;
     }
 
-    @OnClose
+    @Override
     public void onClose(Session session, CloseReason reason) {
         if (!session.getId().equals(this.session.getId())) {
             LOGGER.info("Session closed does not match this session... ignoring");
@@ -95,11 +93,14 @@ public class WebSocketClientImpl extends Endpoint implements WebSocketClient {
             if (container == null) {
                 container = ContainerProvider.getWebSocketContainer();
                 container.setDefaultMaxSessionIdleTimeout(clientConfig.getMaxSessionIdleTimeout());
+                container.setAsyncSendTimeout(clientConfig.getAsyncSendTimeout());
             }
             this.config = ClientEndpointConfig.Builder.create()
                     .configurator(new WebSocketAuthConfigurator(clientConfig.getUserName(),
                                                                 clientConfig.getPassword(),
                                                                 clientConfig.getToken()))
+                    .encoders(clientConfig.getEncoders())
+                    .decoders(clientConfig.getDecoders())
                     .build();
             session = container.connectToServer(this, this.config, URI.create(clientConfig.getControllerUrl()));
             LOGGER.info("New Web Socket Session with id: {}, started", session.getId());
@@ -124,37 +125,39 @@ public class WebSocketClientImpl extends Endpoint implements WebSocketClient {
     }
 
     @Override
-    public void sendTextWithHandler(final String content, final InternalMessageHandler handler) throws IOException {
+    public void sendTextWithHandler(final String content,
+                                    final Consumer<T> handler) throws IOException {
         if (!session.isOpen()) {
             throw new RuntimeException("No connection to controller");
         }
 
-        LOGGER.debug("Sending test message using Web Socket Session with id: {}", session.getId());
-
-        if(handler != null && messageHandler != null) {
-            messageHandler.addHandler(handler);
+        if(handler != null && this.messageHandler != null) {
+            handler.accept(this.messageHandler);
         }
+
+        LOGGER.debug("Sending text message using Web Socket Session with id: {}", session.getId());
+
         session.getBasicRemote().sendText(content);
     }
 
     @Override
     public boolean isActive() {
-        if (session != null && session.isOpen()) {
-            return true;
-        }
-
-        return false;
+        return session != null && session.isOpen();
     }
 
     @Override
-    public void onOpen(final Session session, final EndpointConfig config) {
+    public void onOpen(final Session session,
+                       final EndpointConfig config) {
         LOGGER.info("Connection to Kie Controller over Web Socket is now open with session id: {}", session.getId());
-        this.messageHandler = new KieServerMessageHandler(session);
+        if(this.messageHandler != null) {
+            session.addMessageHandler(this.messageHandler);
+        }
         this.closed.set(false);
     }
 
     @Override
-    public void onError(final Session session, final Throwable thr) {
+    public void onError(final Session session,
+                        final Throwable thr) {
         LOGGER.error("Error received on session id: {}, message: {}", session.getId(), thr.getMessage(), thr);
     }
 }

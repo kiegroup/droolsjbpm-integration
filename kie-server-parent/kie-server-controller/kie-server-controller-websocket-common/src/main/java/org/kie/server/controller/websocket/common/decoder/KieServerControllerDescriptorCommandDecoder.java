@@ -22,11 +22,17 @@ import javax.websocket.EndpointConfig;
 
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KieServerControllerDescriptorCommandDecoder implements Decoder.Text<KieServerControllerDescriptorCommand> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerControllerDescriptorCommandDecoder.class);
+
     @Override
     public KieServerControllerDescriptorCommand decode(final String content) throws DecodeException {
+        LOGGER.debug("Content received for decoding: {}",
+                     content);
         return WebSocketUtils.unmarshal(content,
                                         KieServerControllerDescriptorCommand.class);
     }

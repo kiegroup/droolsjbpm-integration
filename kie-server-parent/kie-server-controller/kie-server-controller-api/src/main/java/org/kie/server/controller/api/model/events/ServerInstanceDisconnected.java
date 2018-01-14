@@ -15,7 +15,7 @@
 
 package org.kie.server.controller.api.model.events;
 
-public class ServerInstanceDisconnected {
+public class ServerInstanceDisconnected implements KieServerControllerEvent {
 
     private String serverInstanceId;
 

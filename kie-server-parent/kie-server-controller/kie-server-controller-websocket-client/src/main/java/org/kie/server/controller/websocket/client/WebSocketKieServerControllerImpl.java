@@ -32,7 +32,8 @@ import org.kie.server.common.KeyStoreHelperUtil;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.websocket.client.handlers.KieServerSetupMessageHandler;
-import org.kie.server.controller.websocket.common.WebSocketClientImpl;
+import org.kie.server.controller.websocket.common.KieServerMessageHandlerWebSocketClient;
+import org.kie.server.controller.websocket.common.WebSocketClient;
 import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
@@ -48,7 +49,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     private static final Logger logger = LoggerFactory.getLogger(WebSocketKieServerControllerImpl.class);
 
     private KieServerRegistry context;
-    private final WebSocketClientImpl client;
+    private final KieServerMessageHandlerWebSocketClient client;
     private final Marshaller marshaller;
     
     private KieServerInfo serverInfo;
@@ -58,12 +59,13 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     public WebSocketKieServerControllerImpl() {
         this.marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader());
         
-        this.client = new WebSocketClientImpl((WebSocketClientImpl client) -> {
+        this.client = new KieServerMessageHandlerWebSocketClient((WebSocketClient client) -> {
             try {
-                client.sendTextWithHandler(serialize(serverInfo), (String message) -> {
-                    logger.info("Successfully reconnected");
-                    return null;
-                });
+                ((KieServerMessageHandlerWebSocketClient) client).sendTextWithInternalHandler(serialize(serverInfo),
+                                                                                              message -> {
+                                                                                                  logger.info("Successfully reconnected");
+                                                                                                  return null;
+                                                                                              });
             } catch (IOException e) {
                 logger.warn("Error when trying to reconnect to Web Socket server - {}", e.getMessage());
             }
@@ -97,7 +99,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                                                      .build());
                             CountDownLatch waitLatch = new CountDownLatch(1);
                             
-                            client.sendTextWithHandler(serialize(serverInfo), new KieServerSetupMessageHandler(context, waitLatch, kieServerSetup));
+                            client.sendTextWithInternalHandler(serialize(serverInfo), new KieServerSetupMessageHandler(context, waitLatch, kieServerSetup));
     
                             boolean received = waitLatch.await(10, TimeUnit.SECONDS);
                             if (received && kieServerSetup.getContainers() != null) {
