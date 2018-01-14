@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,21 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
+import org.kie.server.controller.api.model.notification.KieServerControllerNotification;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerControllerDescriptorCommandDecoder implements Decoder.Text<KieServerControllerDescriptorCommand> {
+public class KieServerControllerNotificationDecoder implements Decoder.Text<KieServerControllerNotification> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerControllerDescriptorCommandDecoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerControllerNotificationDecoder.class);
 
     @Override
-    public KieServerControllerDescriptorCommand decode(final String content) throws DecodeException {
+    public KieServerControllerNotification decode(final String content) throws DecodeException {
         LOGGER.debug("Content received for decoding: {}",
                      content);
         return WebSocketUtils.unmarshal(content,
-                                        KieServerControllerDescriptorCommand.class);
+                                        KieServerControllerNotification.class);
     }
 
     @Override

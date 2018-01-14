@@ -29,7 +29,7 @@ import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationT
 
 public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegrationTest {
 
-    protected KieServerControllerClient mgmtControllerClient;
+    protected KieServerControllerClient controllerClient;
 
     @Before
     public void createControllerClient() {
@@ -41,17 +41,17 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
                                        TimeUnit.SECONDS)
                         .getConfiguration();
         if (TestConfig.isLocalServer()) {
-            mgmtControllerClient = KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
-                                                                                  null,
-                                                                                  null,
-                                                                                  marshallingFormat,
-                                                                                  configuration);
+            controllerClient = KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                              null,
+                                                                              null,
+                                                                              marshallingFormat,
+                                                                              configuration);
         } else {
-            mgmtControllerClient = KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
-                                                                                  TestConfig.getUsername(),
-                                                                                  TestConfig.getPassword(),
-                                                                                  marshallingFormat,
-                                                                                  configuration);
+            controllerClient = KieServerControllerClientFactory.newRestClient(TestConfig.getControllerHttpUrl(),
+                                                                              TestConfig.getUsername(),
+                                                                              TestConfig.getPassword(),
+                                                                              marshallingFormat,
+                                                                              configuration);
         }
     }
 
@@ -65,10 +65,10 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
 
     @After
     public void closeControllerClient() {
-        if (mgmtControllerClient != null) {
+        if (controllerClient != null) {
             try {
                 logger.info("Closing Kie Server Management Controller client");
-                mgmtControllerClient.close();
+                controllerClient.close();
             } catch (IOException e) {
                 logger.error("Error trying to close Kie Server Management Controller Client: {}",
                              e.getMessage(),

@@ -26,6 +26,8 @@ import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
+import org.kie.server.controller.api.service.NotificationService;
+import org.kie.server.controller.api.service.NotificationServiceFactory;
 import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
@@ -61,6 +63,18 @@ public class KieServerMgmtCommandServiceImpl implements KieServerMgmtCommandServ
                          storageService.getTemplateStorage().toString());
         } else {
             LOGGER.debug("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
+        }
+
+        ServiceLoader<NotificationServiceFactory> notificationServiceLoader = ServiceLoader.load(NotificationServiceFactory.class);
+        if (notificationServiceLoader != null && notificationServiceLoader.iterator().hasNext()) {
+            final NotificationService notificationService = notificationServiceLoader.iterator().next().getNotificationService();
+            specManagementService.setNotificationService(notificationService);
+            ruleCapabilitiesService.setNotificationService(notificationService);
+
+            LOGGER.debug("Notification service for standalone kie server controller is {}",
+                         notificationService.toString());
+        } else {
+            LOGGER.warn("Notification service not defined. Default notification: LoggingNotificationService will be used");
         }
     }
 
