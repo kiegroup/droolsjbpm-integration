@@ -42,12 +42,16 @@ public class KieServerExecutor {
     private static SimpleDateFormat serverIdSuffixDateFormat = new SimpleDateFormat("yyyy-MM-DD-HHmmss_SSS");
 
     public void startKieServer() {
+        startKieServer(false);
+    }
+
+    public void startKieServer(boolean syncWithController) {
         if (server != null) {
             throw new RuntimeException("Kie execution server is already created!");
         }
 
         registerKieServerId();
-        setKieServerProperties();
+        setKieServerProperties(syncWithController);
         
 
         server = new TJWSEmbeddedJaxrsServer();
@@ -56,7 +60,7 @@ public class KieServerExecutor {
 
         addServerSingletonResources();
     }
-    protected void setKieServerProperties() {
+    protected void setKieServerProperties(boolean syncWithController) {
         System.setProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "true");
         System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
         System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, "org.kie.server.integrationtests.jbpm.util.FixedUserGroupCallbackImpl");
@@ -67,6 +71,7 @@ public class KieServerExecutor {
         System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, TestConfig.getPassword());
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getEmbeddedKieServerHttpUrl());
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
+        System.setProperty(KieServerConstants.CFG_SYNC_DEPLOYMENT, Boolean.toString(syncWithController));
 
         // kie server policy settings
         System.setProperty(KieServerConstants.KIE_SERVER_ACTIVATE_POLICIES, "KeepLatestOnly");
