@@ -26,7 +26,7 @@ import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerRegistryImpl;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;

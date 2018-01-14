@@ -42,7 +42,7 @@ import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -233,7 +233,6 @@ public class KieServerInstanceManagerTest {
 
         doReturn(containerId).when(containerSpec).getId();
         doReturn(releaseId).when(containerSpec).getReleasedId();
-        doReturn(containerResource).when(instanceManager).makeContainerResource(container, containerSpec);
         doReturn(response).when(client).updateReleaseId(containerId, releaseId);
         doReturn(responseType).when(response).getType();
         doNothing().when(instanceManager).collectContainerInfo(containerSpec, client, container);
@@ -257,7 +256,6 @@ public class KieServerInstanceManagerTest {
 
         doReturn(containerId).when(containerSpec).getId();
         doReturn(releaseId).when(containerSpec).getReleasedId();
-        doReturn(containerResource).when(instanceManager).makeContainerResource(container, containerSpec);
         doReturn(response).when(client).updateReleaseId(containerId, releaseId);
         doReturn(responseType).when(response).getType();
         doReturn(msg).when(response).getMsg();

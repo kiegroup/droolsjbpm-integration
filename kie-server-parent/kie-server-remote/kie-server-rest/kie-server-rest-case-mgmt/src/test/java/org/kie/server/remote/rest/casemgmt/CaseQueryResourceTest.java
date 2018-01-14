@@ -16,24 +16,24 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
+
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.server.api.model.cases.CaseDefinitionList;
-import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.kie.server.services.impl.KieServerRegistryImpl;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.mockito.Mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CaseQueryResourceTest {
@@ -78,7 +78,6 @@ public class CaseQueryResourceTest {
         Integer pageSize= 10;
         String sort = "CorrelationKey";
         boolean sortOrder = true;
-        when(runtimeDataService.getCaseInstances(status, page, pageSize, sort, sortOrder)).thenReturn(new CaseInstanceList());
 
         caseQueryResource.getCaseInstances(httpHeaders, null, null, null, status, page, pageSize, sort, sortOrder);
 
