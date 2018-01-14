@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package org.kie.server.controller.websocket.common;
+package org.kie.server.controller.websocket.notification;
 
-import java.io.IOException;
-import java.util.function.Consumer;
-import javax.websocket.MessageHandler;
+import org.kie.server.controller.api.service.NotificationService;
+import org.kie.server.controller.api.service.NotificationServiceFactory;
 
-import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
+public class WebSocketNotificationServiceFactory implements NotificationServiceFactory {
 
-public interface WebSocketClient<T extends MessageHandler> {
-
-    void init(WebSocketClientConfiguration config);
-
-    void close();
-
-    void sendTextWithHandler(String content,
-                             Consumer<T> handler) throws IOException;
-
-    boolean isActive();
+    @Override
+    public NotificationService getNotificationService() {
+        return WebSocketNotificationService.getInstance();
+    }
 }

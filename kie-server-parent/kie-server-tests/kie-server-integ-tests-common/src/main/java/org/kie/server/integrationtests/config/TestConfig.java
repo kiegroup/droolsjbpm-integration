@@ -141,7 +141,7 @@ public class TestConfig {
     public static String getControllerWebSocketManagementUrl() {
         try {
             final URL controllerUrl = new URL(getControllerHttpUrl());
-            return String.format("ws://%s:%s/%s/websocket/controller/management",
+            return String.format("ws://%s:%s/%s/websocket/controller",
                                  controllerUrl.getHost(),
                                  controllerUrl.getPort(),
                                  getKieServerControllerContext());

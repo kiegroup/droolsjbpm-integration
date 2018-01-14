@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,17 @@ import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
+import org.kie.server.controller.api.model.notification.KieServerControllerNotification;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerControllerServiceResponseEncoder implements Encoder.Text<KieServerControllerServiceResponse> {
+public class KieServerControllerNotificationEncoder implements Encoder.Text<KieServerControllerNotification> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerControllerServiceResponseEncoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerControllerNotificationEncoder.class);
 
     @Override
-    public String encode(final KieServerControllerServiceResponse object) throws EncodeException {
+    public String encode(final KieServerControllerNotification object) throws EncodeException {
         LOGGER.debug("Encoding object: {}",
                      object);
         return WebSocketUtils.marshal(object);

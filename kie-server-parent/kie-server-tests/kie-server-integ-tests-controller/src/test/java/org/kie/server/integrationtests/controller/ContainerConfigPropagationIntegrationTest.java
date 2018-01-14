@@ -82,7 +82,7 @@ public class ContainerConfigPropagationIntegrationTest extends KieControllerMana
         containerConfigMap.put(Capability.PROCESS, processConfig);
 
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);
 
@@ -104,7 +104,7 @@ public class ContainerConfigPropagationIntegrationTest extends KieControllerMana
         serverTemplate.setName(kieServerInfo.getName());
 
         serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), kieServerInfo.getLocation()));
-        mgmtControllerClient.saveServerTemplate(serverTemplate);
+        controllerClient.saveServerTemplate(serverTemplate);
 
         return serverTemplate;
     }

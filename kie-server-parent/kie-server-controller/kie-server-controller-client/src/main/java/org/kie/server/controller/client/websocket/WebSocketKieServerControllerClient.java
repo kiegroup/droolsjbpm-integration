@@ -30,11 +30,13 @@ import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.server.controller.client.event.EventHandler;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
-import org.kie.server.controller.websocket.common.WebSocketClient;
-import org.kie.server.controller.websocket.common.WebSocketClientImpl;
+import org.kie.server.controller.websocket.common.KieServerControllerNotificationWebSocketClient;
+import org.kie.server.controller.websocket.common.KieServerMessageHandlerWebSocketClient;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
+import org.kie.server.controller.websocket.common.decoder.KieServerControllerNotificationDecoder;
 import org.kie.server.controller.websocket.common.handlers.WebSocketServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,31 +45,45 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketKieServerControllerClient.class);
 
-    private WebSocketClient client;
+    private KieServerMessageHandlerWebSocketClient client;
+    private KieServerControllerNotificationWebSocketClient notificationClient;
 
     public WebSocketKieServerControllerClient(final String controllerUrl,
                                               final String userName,
                                               final String password,
-                                              final String token) {
+                                              final String token,
+                                              final EventHandler handler) {
         this(controllerUrl,
              userName,
              password,
              token,
-             new WebSocketClientImpl());
+             new KieServerMessageHandlerWebSocketClient(),
+             handler == null ? null : new KieServerControllerNotificationWebSocketClient(new WebSocketEventHandler(handler)));
     }
 
     public WebSocketKieServerControllerClient(final String controllerUrl,
                                               final String userName,
                                               final String password,
                                               final String token,
-                                              final WebSocketClient client) {
+                                              final KieServerMessageHandlerWebSocketClient client,
+                                              final KieServerControllerNotificationWebSocketClient notificationClient) {
         this.client = client;
         this.client.init(WebSocketClientConfiguration.builder()
-                                 .controllerUrl(controllerUrl)
+                                 .controllerUrl(controllerUrl + "/management")
                                  .userName(userName)
                                  .password(password)
                                  .token(token)
                                  .build());
+        if(notificationClient != null){
+            this.notificationClient = notificationClient;
+            this.notificationClient.init(WebSocketClientConfiguration.builder()
+                                     .controllerUrl(controllerUrl + "/notification")
+                                     .userName(userName)
+                                     .password(password)
+                                     .token(token)
+                                     .decoders(KieServerControllerNotificationDecoder.class)
+                                     .build());
+        }
     }
 
     @Override
@@ -91,8 +107,8 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
                      content);
         try {
             final WebSocketServiceResponse response = getMessageHandler();
-            client.sendTextWithHandler(content,
-                                       response);
+            client.sendTextWithInternalHandler(content,
+                                               response);
             LOGGER.debug("Message successfully sent to kie server controller");
             if (response.getType() == ResponseType.FAILURE) {
                 throw new KieServerControllerClientException(response.getMsg());
