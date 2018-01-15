@@ -293,11 +293,11 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI +"/"+ DOCUMENT_INSTANCE_GET_URI, valuesMap));
             logger.info( "[GET] " + clientRequest.getUri());
             response = clientRequest.request(getMediaType()).get();
-            Assertions.assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
-            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(MediaType.TEXT_PLAIN);
+            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+            Assert.assertEquals(MediaType.TEXT_PLAIN, response.getHeaders().getFirst("Content-Type"));
             
             String responseBody = response.readEntity(String.class);
-            Assertions.assertThat(responseBody).isEqualTo("\"Document with id not-existing-doc not found\"");
+            Assert.assertEquals( "\"Document with id not-existing-doc not found\"", responseBody);
            
 
         } finally {
