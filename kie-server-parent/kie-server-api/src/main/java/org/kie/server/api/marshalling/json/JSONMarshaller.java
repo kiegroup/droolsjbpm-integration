@@ -210,7 +210,7 @@ public class JSONMarshaller implements Marshaller {
                         TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
                         switch (_includeAs) {
                             case WRAPPER_OBJECT:
-                                return new CustomAsWrapperTypeDeserializer(baseType, idRes, _typeProperty, true, baseType);
+                                return new CustomAsWrapperTypeDeserializer(baseType, idRes, _typeProperty, true, _defaultImpl);
 
                         }
                     }
@@ -223,7 +223,6 @@ public class JSONMarshaller implements Marshaller {
             typer2 = typer2.init(JsonTypeInfo.Id.CLASS, null);
             typer2 = typer2.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
             deserializeObjectMapper.setDefaultTyping(typer2);
-            
 
             SimpleModule modDeser = new SimpleModule("custom-object-unmapper", Version.unknownVersion());
             modDeser.addDeserializer(Object.class, new CustomObjectDeserializer(classes));
@@ -755,7 +754,7 @@ public class JSONMarshaller implements Marshaller {
 
     class CustomAsWrapperTypeDeserializer extends AsWrapperTypeDeserializer {
 
-        public CustomAsWrapperTypeDeserializer(JavaType bt, TypeIdResolver idRes, String typePropertyName, boolean typeIdVisible, JavaType defaultImpl) {
+        public CustomAsWrapperTypeDeserializer(JavaType bt, TypeIdResolver idRes, String typePropertyName, boolean typeIdVisible, Class<?> defaultImpl) {
             super(bt, idRes, typePropertyName, typeIdVisible, defaultImpl);
         }
 
