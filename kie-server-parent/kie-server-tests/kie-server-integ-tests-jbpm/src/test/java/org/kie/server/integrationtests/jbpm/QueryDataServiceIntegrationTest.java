@@ -57,7 +57,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     private static final String CONTAINER_ID = "query-definition-project";
 
-    private static final long EXTENDED_TIMEOUT = 600000;
+    private static final long EXTENDED_TIMEOUT = 300000;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
