@@ -31,6 +31,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.api.ContainerLocator;
+import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.storage.KieServerState;
@@ -85,10 +86,20 @@ public class KieServerRegistryImpl implements KieServerRegistry {
         KieContainerInstanceImpl containerInstance = getContainer(alias);
 
         if (containerInstance == null) {
-            String containerId = locator.locateContainer(alias, containersByAlias.getOrDefault(alias, new ArrayList<KieContainerInstanceImpl>()));
+            List<KieContainerInstanceImpl> aliasedContainers = containersByAlias.getOrDefault(alias, new ArrayList<KieContainerInstanceImpl>());
+            if (aliasedContainers.isEmpty()) {
+                // since there are no containers for given alias reject it
+                throw new IllegalArgumentException("Container '" + alias + "' is not instantiated or cannot find container for alias '" + alias + "'");
+            }
+            String containerId = locator.locateContainer(alias, aliasedContainers);
             if (containerId == null) {
                 throw new IllegalArgumentException("Cannot find container for alias '" + alias + "'");
             }
+            
+            aliasedContainers.stream()
+            .filter(kci -> kci.getContainerId().equals(containerId))
+            .findAny()
+            .orElseThrow(() ->  new IllegalArgumentException("Container '" + containerId + "' is not associated with alias '" + alias + "'"));
 
             return getContainer(containerId);
         }

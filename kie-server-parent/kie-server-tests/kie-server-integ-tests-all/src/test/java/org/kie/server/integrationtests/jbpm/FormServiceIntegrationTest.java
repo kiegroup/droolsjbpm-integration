@@ -31,6 +31,7 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.UIServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -42,6 +43,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     protected static final String CONTAINER_ALIAS = "project";
     private static final String CONTAINER_ID = "definition-project";
+    private static final String CONTAINER_ID_V2 = "definition-project-2";
     protected static final String CONTAINER_ID_101 = "definition-project-101";
 
     private static final String HIRING_PROCESS_ID = "hiring";
@@ -324,6 +326,30 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         assertThat(oldResultViaAlias).isNotEqualTo(newResultViaAlias);
 
+    }
+    
+    @Test
+    public void testGetTaskFormWithWrongContainerId() throws Exception {
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_SUBFORM_PROCESS_ID);
+        assertThat(processInstanceId).isGreaterThan(0);
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertThat(tasks).isNotNull().hasSize(1);
+
+            Long taskId = tasks.get(0).getId();            
+            // create another container with different id to make sure it cannot be used to stop task
+            createContainer(CONTAINER_ID_V2, releaseId, "custom-alias");
+            
+            assertClientException(
+                                  () -> uiServicesClient.getTaskRawForm(CONTAINER_ID_V2, taskId),
+                                  404,
+                                  "Could not find task instance",
+                                  "Task with id " + taskId + " is not associated with " + CONTAINER_ID_V2);
+            
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            KieServerAssert.assertSuccess(client.disposeContainer(CONTAINER_ID_V2));
+        }
     }
 
 }
