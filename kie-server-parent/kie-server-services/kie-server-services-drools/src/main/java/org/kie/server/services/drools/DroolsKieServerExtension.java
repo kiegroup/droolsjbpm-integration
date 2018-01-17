@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.kie.api.remote.Remotable;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -229,5 +232,16 @@ public class DroolsKieServerExtension implements KieServerExtension {
         } else {
             extraClasses.add(classToAdd);
         }
+    }
+    
+
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        if (report) {
+            messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+        }        
+        return messages;
     }
 }

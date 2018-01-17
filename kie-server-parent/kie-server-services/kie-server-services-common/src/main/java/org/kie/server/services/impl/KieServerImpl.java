@@ -29,8 +29,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.naming.InitialContext;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.appformer.maven.support.DependencyFilter;
 import org.drools.core.impl.InternalKieContainer;
 import org.kie.api.KieServices;
@@ -48,13 +50,14 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServer;
@@ -85,6 +88,7 @@ public class KieServerImpl implements KieServer {
     // TODO figure out how to get actual URL of the kie server
     private String kieServerLocation = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION, "http://localhost:8230/kie-server/services/rest/server");
     private volatile AtomicBoolean kieServerActive = new AtomicBoolean(false);
+    private volatile AtomicBoolean kieServerReady = new AtomicBoolean(false);
 
     private List<Message> serverMessages = new ArrayList<Message>();
     private Map<String, List<Message>> containerMessages = new ConcurrentHashMap<String, List<Message>>();
@@ -92,6 +96,8 @@ public class KieServerImpl implements KieServer {
     private KieServerEventSupport eventSupport = new KieServerEventSupport();
 
     private KieServices ks = KieServices.Factory.get();
+    
+    private long startTimestamp;
 
     public KieServerImpl() {
         this(new KieServerStateFileRepository());
@@ -139,6 +145,8 @@ public class KieServerImpl implements KieServer {
         kieServerActive.set(true);
         eventSupport.fireBeforeServerStarted(this);
 
+        startTimestamp = System.currentTimeMillis();
+        
         boolean readyToRun = false;
         KieServerController kieController = getController();
         // try to load container information from available controllers if any...
@@ -184,6 +192,7 @@ public class KieServerImpl implements KieServer {
                 containerManager.installContainers(this, containers, currentState, kieServerSetup);
             }
         }
+        
         eventSupport.fireAfterServerStarted(this);
     }
 
@@ -354,6 +363,11 @@ public class KieServerImpl implements KieServer {
             return new ServiceResponse<KieContainerResourceList>(ServiceResponse.ResponseType.FAILURE, "Error listing containers: " +
                     e.getClass().getName() + ": " + e.getMessage());
         }
+    }
+    
+    protected List<KieContainerInstanceImpl> getContainers() {
+        
+        return context.getContainers();
     }
 
     private List<KieContainerResource> getContainersWithMessages() {
@@ -918,7 +932,63 @@ public class KieServerImpl implements KieServer {
     public PolicyManager getPolicyManager() {
         return this.policyManager;
     }
+    
+    public boolean isKieServerReady() {
+        return kieServerReady.get();
+    }
 
+    public void markAsReady() {
+        kieServerReady.set(true);
+        logger.info("KieServer {} is ready to receive requests", KieServerEnvironment.getServerId());
+    }
+    
+    public List<Message> healthCheck(boolean report) throws IllegalStateException {
+        List<Message> healthMessages = new ArrayList<>();
+        long start = System.currentTimeMillis();
+        if (!isKieServerReady()) {
+            healthMessages.add(new Message(Severity.ERROR, String.format("KIE Server '%s' is not ready to serve requests",
+                                                                         KieServerEnvironment.getServerId())));
+        }
+        
+        if (report) {
+            List<String> mainInfo = new ArrayList<>();
+            mainInfo.add(String.format("KIE Server '%s' is ready to serve requests %s", 
+                                       KieServerEnvironment.getServerId(), 
+                                       isKieServerReady()));
+            mainInfo.add("Server is up for " + calculateUptime());
+            
+            Message header = new Message(Severity.INFO, mainInfo);
+            healthMessages.add(header);
+        }
+        // first check of KIE Server's containers if any of them is in failed state
+        for (KieContainerInstance container : getContainers()) {
+            if (container.getStatus().equals(KieContainerStatus.FAILED)) {
+                healthMessages.add(new Message(Severity.ERROR, String.format("KIE Container '%s' is in FAILED state",
+                                                                             container.getContainerId()) ));
+            }
+        }
+        // next check all extensions for their health
+        for (KieServerExtension extension : getServerExtensions()) {
+            List<Message> extensionMessages = extension.healthCheck(report);
+            healthMessages.addAll(extensionMessages);        
+        }
+        
+        if (report) {           
+            Message footer = new Message(Severity.INFO, "Health check done in " + (System.currentTimeMillis() - start) + " ms");
+            healthMessages.add(footer);
+        }
+        
+        return healthMessages;
+ 
+    }
+    
+    private String calculateUptime() {
+
+        long different = System.currentTimeMillis() - startTimestamp;
+        return DurationFormatUtils.formatDurationWords(different, false, false);
+
+    }
+    
     @Override
     public String toString() {
         return "KieServer{" +
@@ -928,4 +998,5 @@ public class KieServerImpl implements KieServer {
                 "location='" + kieServerLocation + '\'' +
                 '}';
     }
+
 }

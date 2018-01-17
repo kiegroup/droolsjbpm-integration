@@ -241,4 +241,13 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         return EXTENSION_NAME + " KIE Server extension";
     }
 
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        if (report) {
+            messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+        }        
+        return messages;
+    }
 }

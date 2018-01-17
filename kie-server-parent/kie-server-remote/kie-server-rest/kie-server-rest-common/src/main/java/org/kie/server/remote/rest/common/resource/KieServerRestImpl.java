@@ -18,9 +18,13 @@ package org.kie.server.remote.rest.common.resource;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.serviceUnavailable;
+
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -38,9 +42,11 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerStatusFilter;
 import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.Severity;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
@@ -224,6 +230,45 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerState(@Context HttpHeaders headers) {
         return createCorrectVariant(server.getServerState(), headers);
+    }
+    
+    
+    
+    @ApiOperation(value="Readiness check for KIE Server that indicates that server is fully booted and ready to accept requests",
+            response=Void.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 503, message = "Service not yet available") })
+    @GET
+    @Path("readycheck")
+    @Produces({MediaType.TEXT_PLAIN})
+    public Response readycheck(@Context HttpHeaders headers) { 
+        if (server.isKieServerReady()) {
+            return Response.status(Response.Status.OK).build();
+        }
+        return serviceUnavailable();
+    }
+    
+    @ApiOperation(value="Liveness check for KIE Server that validates both kie server and all extensions, optionally produces report",
+            response=Message.class, code=200, responseContainer="List")
+    @ApiResponses(value = { @ApiResponse(code = 503, message = "If any of the checks failed") })
+    @GET
+    @Path("healthcheck")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response healthcheck(@Context HttpHeaders headers,
+                             @ApiParam(value = "optional report flag to return detailed report of the check, defaults to false", required = false) @QueryParam("report")  @DefaultValue("false") boolean report) { 
+        List<Message> healthMessages = server.healthCheck(report);
+        
+        boolean anyfailures = healthMessages.stream().anyMatch(msg -> msg.getSeverity().equals(Severity.ERROR));
+        if (anyfailures) {
+            if (report) {
+                return createCorrectVariant(healthMessages, headers, Response.Status.SERVICE_UNAVAILABLE);
+            }
+            
+            return serviceUnavailable();
+        }
+        if (report) {
+            return createCorrectVariant(healthMessages, headers, Response.Status.OK);
+        }
+        return Response.status(Response.Status.OK).build();
     }
 
 }

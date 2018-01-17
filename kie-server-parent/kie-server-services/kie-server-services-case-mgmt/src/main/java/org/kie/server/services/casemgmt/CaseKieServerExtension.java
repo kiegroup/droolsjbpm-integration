@@ -20,24 +20,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
 import org.jbpm.casemgmt.impl.CaseServiceImpl;
 import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
-import org.jbpm.casemgmt.impl.generator.InMemoryCaseIdGenerator;
 import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
-import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
-import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
-import org.jbpm.services.api.UserTaskService;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -256,5 +253,16 @@ public class CaseKieServerExtension implements KieServerExtension {
     @Override
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
+    }
+    
+
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        if (report) {
+            messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+        }        
+        return messages;
     }
 }
