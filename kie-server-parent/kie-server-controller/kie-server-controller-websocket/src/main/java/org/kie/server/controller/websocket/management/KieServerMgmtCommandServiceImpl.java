@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.KieServiceResponse.ResponseType;
+import org.kie.server.api.model.Wrapped;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
 import org.kie.server.controller.api.service.NotificationService;
@@ -32,6 +32,7 @@ import org.kie.server.controller.api.service.PersistingServerTemplateStorageServ
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
+import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.service.RuleCapabilitiesServiceImpl;
 import org.kie.server.controller.impl.service.RuntimeManagementServiceImpl;
 import org.kie.server.controller.impl.service.SpecManagementServiceImpl;
@@ -46,9 +47,9 @@ public class KieServerMgmtCommandServiceImpl implements KieServerMgmtCommandServ
     private RuntimeManagementServiceImpl runtimeManagementService = new RuntimeManagementServiceImpl();
     private RuleCapabilitiesServiceImpl ruleCapabilitiesService = new RuleCapabilitiesServiceImpl();
 
-    private static KieServerMgmtCommandService INSTANCE = new KieServerMgmtCommandServiceImpl();
+    private static KieServerMgmtCommandServiceImpl INSTANCE = new KieServerMgmtCommandServiceImpl();
 
-    public static KieServerMgmtCommandService getInstance(){
+    public static KieServerMgmtCommandServiceImpl getInstance(){
         return INSTANCE;
     }
 
@@ -56,11 +57,7 @@ public class KieServerMgmtCommandServiceImpl implements KieServerMgmtCommandServ
         ServiceLoader<PersistingServerTemplateStorageService> storageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
         if (storageServices != null && storageServices.iterator().hasNext()) {
             PersistingServerTemplateStorageService storageService = storageServices.iterator().next();
-            specManagementService.setTemplateStorage(storageService.getTemplateStorage());
-            runtimeManagementService.setTemplateStorage(storageService.getTemplateStorage());
-            ruleCapabilitiesService.setTemplateStorage(storageService.getTemplateStorage());
-            LOGGER.debug("Server template storage for standalone kie server controller is {}",
-                         storageService.getTemplateStorage().toString());
+            setTemplateStorage(storageService.getTemplateStorage());
         } else {
             LOGGER.debug("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
         }
@@ -68,14 +65,26 @@ public class KieServerMgmtCommandServiceImpl implements KieServerMgmtCommandServ
         ServiceLoader<NotificationServiceFactory> notificationServiceLoader = ServiceLoader.load(NotificationServiceFactory.class);
         if (notificationServiceLoader != null && notificationServiceLoader.iterator().hasNext()) {
             final NotificationService notificationService = notificationServiceLoader.iterator().next().getNotificationService();
-            specManagementService.setNotificationService(notificationService);
-            ruleCapabilitiesService.setNotificationService(notificationService);
-
-            LOGGER.debug("Notification service for standalone kie server controller is {}",
-                         notificationService.toString());
+            setNotificationService(notificationService);
         } else {
             LOGGER.warn("Notification service not defined. Default notification: LoggingNotificationService will be used");
         }
+    }
+
+    public void setTemplateStorage(final KieServerTemplateStorage templateStorage) {
+        specManagementService.setTemplateStorage(templateStorage);
+        runtimeManagementService.setTemplateStorage(templateStorage);
+        ruleCapabilitiesService.setTemplateStorage(templateStorage);
+        LOGGER.debug("Server template storage for kie server controller is {}",
+                     templateStorage.toString());
+    }
+
+    public void setNotificationService(final NotificationService notificationService) {
+        specManagementService.setNotificationService(notificationService);
+        ruleCapabilitiesService.setNotificationService(notificationService);
+
+        LOGGER.debug("Notification service for kie server controller is {}",
+                     notificationService.toString());
     }
 
     @Override
