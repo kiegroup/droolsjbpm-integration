@@ -22,6 +22,8 @@ import java.util.ServiceLoader;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
@@ -157,4 +159,13 @@ public class SwaggerKieServerExtension implements KieServerExtension {
         return EXTENSION_NAME + " KIE Server extension";
     }
    
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        if (report) {
+            messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+        }        
+        return messages;
+    }
 }

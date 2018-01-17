@@ -766,4 +766,22 @@ public class JbpmKieServerExtension implements KieServerExtension {
         this.context = context;
     }
 
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        try {
+            // run base query to make sure data access layer is available
+            runtimeDataService.getProcessInstanceById(-99999);
+            if (report) {
+                messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+            }
+        } catch (Exception e) {
+            messages.add(new Message(Severity.ERROR, getExtensionName() + " failed due to " + e.getMessage()));
+        }
+        
+        return messages;
+    }
+
+    
 }

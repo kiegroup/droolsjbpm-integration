@@ -25,6 +25,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
@@ -174,4 +176,19 @@ public class OptaplannerKieServerExtension
         return EXTENSION_NAME + " KIE Server extension";
     }
 
+
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        if (this.threadPool.isTerminated() && this.initialized) {
+            messages.add(new Message(Severity.ERROR, getExtensionName() + " failed due to thread pool is terminated while the extension is still alive"));
+        } else {
+            
+            if (report) {
+                messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+            }       
+        }
+        return messages;
+    }
 }
