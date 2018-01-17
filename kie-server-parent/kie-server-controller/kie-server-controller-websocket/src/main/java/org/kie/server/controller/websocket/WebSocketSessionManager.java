@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
-
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Session;
@@ -48,9 +47,13 @@ public class WebSocketSessionManager {
     }
     
     public void addSession(Session session) {
-        this.availableSessionsById.put(session.getId(), session);
-        this.handlersPerSession.put(session.getId(), new KieServerMessageHandler(session));
-        logger.debug("Session '" + session.getId() + "' added to Web Socket manager");
+        this.availableSessionsById.put(session.getId(),
+                                       session);
+        final KieServerMessageHandler messageHandler = new KieServerMessageHandler(session);
+        this.handlersPerSession.put(session.getId(),
+                                    messageHandler);
+        session.addMessageHandler(messageHandler);
+        logger.debug("Session '{}' added to Web Socket manager", session.getId());
     }
     
     public void addSession(KieServerInfo serverInfo, Session session) {
@@ -61,7 +64,7 @@ public class WebSocketSessionManager {
         }
         sessions.add(session);
         this.sessionToUrl.put(session.getId(), serverInfo);        
-        logger.debug("Session '" + session.getId() + "' associated with url: " + serverInfo.getLocation());
+        logger.debug("Session '{}' associated with url: {}", session.getId(), serverInfo.getLocation());
     }
     
     public String removeSession(Session session) {
@@ -80,7 +83,7 @@ public class WebSocketSessionManager {
         }
         
         this.handlersPerSession.remove(session.getId());
-        logger.debug("Session '" + session.getId() + "' removed to Web Socket manager");
+        logger.debug("Session '{}' removed to Web Socket manager", session.getId());
         
         if (availableSessionsByUrl.get(serverInfo.getLocation()).isEmpty()) {
             return serverInfo.getLocation();
