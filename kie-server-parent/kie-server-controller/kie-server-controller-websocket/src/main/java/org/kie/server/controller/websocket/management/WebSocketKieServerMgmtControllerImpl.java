@@ -18,11 +18,15 @@ package org.kie.server.controller.websocket.management;
 
 import java.io.IOException;
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
+import org.kie.server.controller.api.service.NotificationService;
+import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.websocket.common.decoder.KieServerControllerDescriptorCommandDecoder;
 import org.kie.server.controller.websocket.common.encoder.KieServerControllerServiceResponseEncoder;
 import org.slf4j.Logger;
@@ -35,11 +39,27 @@ public class WebSocketKieServerMgmtControllerImpl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketKieServerMgmtControllerImpl.class);
 
-    private KieServerMgmtCommandService commandService = KieServerMgmtCommandServiceImpl.getInstance();
+    private KieServerMgmtCommandServiceImpl commandService = KieServerMgmtCommandServiceImpl.getInstance();
+
+    @Inject
+    private Instance<KieServerTemplateStorage> templateStorage;
+
+    @Inject
+    private Instance<NotificationService> notificationService;
 
     @PostConstruct
     public void configure() {
         LOGGER.info("Kie Server Controller Management WebSocket service initialized");
+        try {
+            commandService.setTemplateStorage(templateStorage.get());
+        } catch (RuntimeException e) {
+            LOGGER.warn("Unable to find template storage implementation, using in memory");
+        }
+        try {
+            commandService.setNotificationService(notificationService.get());
+        } catch (RuntimeException e) {
+            LOGGER.warn("Unable to find notification service implementation, using logging only");
+        }
     }
 
     @OnOpen
