@@ -98,6 +98,8 @@ public class KieServerImpl implements KieServer {
     private KieServices ks = KieServices.Factory.get();
     
     private long startTimestamp;
+    
+    private boolean managementDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "false"));
 
     public KieServerImpl() {
         this(new KieServerStateFileRepository());
@@ -191,7 +193,7 @@ public class KieServerImpl implements KieServer {
             } else {
                 containerManager.installContainers(this, containers, currentState, kieServerSetup);
             }
-        }
+        }        
         
         eventSupport.fireAfterServerStarted(this);
     }
@@ -987,6 +989,14 @@ public class KieServerImpl implements KieServer {
         long different = System.currentTimeMillis() - startTimestamp;
         return DurationFormatUtils.formatDurationWords(different, false, false);
 
+    }
+    
+    public ServiceResponse<?> checkAccessability() {
+        if (managementDisabled) {
+            return new ServiceResponse<Void>(ServiceResponse.ResponseType.FAILURE, "KIE Server management api is disabled");
+        }
+        
+        return null;
     }
     
     @Override

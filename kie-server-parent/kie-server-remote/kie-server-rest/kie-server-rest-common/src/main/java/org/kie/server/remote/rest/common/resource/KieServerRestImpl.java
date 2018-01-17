@@ -125,9 +125,14 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createContainer( @Context HttpHeaders headers, 
             @ApiParam(value = "Container id to be assigned to deployed KIE Container", required = true) @PathParam("id") String id, 
-            @ApiParam(value = "KIE Container resource to be deployed as KieContainerResource", required = true) String containerPayload ) {
-        String contentType = getContentType( headers );
+            @ApiParam(value = "KIE Container resource to be deployed as KieContainerResource", required = true) String containerPayload ) {        
+        
+        ServiceResponse<?> forbidden = this.server.checkAccessability();
+        if (forbidden != null) {                       
+            return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
+        }
 
+        String contentType = getContentType(headers);
         KieContainerResource container = marshallerHelper.unmarshal( containerPayload, contentType, KieContainerResource.class );
 
         ServiceResponse<KieContainerResource> response = server.createContainer( id, container );
@@ -159,6 +164,11 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response disposeContainer( @Context HttpHeaders headers, 
             @ApiParam(value = "Container id to be disposed (undeployed)", required = true) @PathParam("id") String id ) {
+        ServiceResponse<?> forbidden = this.server.checkAccessability();
+        if (forbidden != null) {                       
+            return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
+        }
+        
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.disposeContainer(id), headers, conversationIdHeader);
     }
@@ -184,9 +194,15 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateScanner( @Context HttpHeaders headers, 
             @ApiParam(value = "Container id for scanner to be updated", required = true) @PathParam("id") String id, 
-            @ApiParam(value = "Scanner information given as KieScannerResource type", required = true) String resourcePayload ) {
+            @ApiParam(value = "Scanner information given as KieScannerResource type", required = true) String resourcePayload ) {        
+        
+        ServiceResponse<?> forbidden = this.server.checkAccessability();
+        if (forbidden != null) {                       
+            return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
+        }
+        
         String contentType = getContentType(headers);
-
+        
         KieScannerResource resource = marshallerHelper.unmarshal(resourcePayload, contentType, KieScannerResource.class);
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.updateScanner(id, resource), headers, conversationIdHeader);
@@ -214,7 +230,12 @@ public class KieServerRestImpl {
     public Response updateReleaseId( @Context HttpHeaders headers, 
             @ApiParam(value = "Container id that release id should be upgraded", required = true) @PathParam("id") String id, 
             @ApiParam(value = "Release Id to be upgraded to as ReleaseId type", required = true) String releaseIdPayload) {
-
+        
+        ServiceResponse<?> forbidden = this.server.checkAccessability();
+        if (forbidden != null) {                       
+            return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
+        }
+        
         String contentType = getContentType(headers);
 
         ReleaseId releaseId = marshallerHelper.unmarshal(releaseIdPayload, contentType, ReleaseId.class);

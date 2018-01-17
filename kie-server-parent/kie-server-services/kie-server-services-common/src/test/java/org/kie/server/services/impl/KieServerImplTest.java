@@ -15,6 +15,12 @@
 
 package org.kie.server.services.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,16 +42,25 @@ import org.kie.api.builder.KieModule;
 import org.kie.scanner.KieMavenRepository;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DisposeContainerCommand;
+import org.kie.server.api.commands.UpdateReleaseIdCommand;
+import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
@@ -58,8 +73,6 @@ import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
-
-import static org.junit.Assert.*;
 
 public class KieServerImplTest {
 
@@ -278,6 +291,57 @@ public class KieServerImplTest {
         assertEquals(1, failedContainer.getMessages().size());
         assertEquals("TEST extension is unhealthy", failedContainer.getMessages().iterator().next());
     }
+    
+    @Test
+    public void testManagementDisabledDefault() {
+        
+        assertNull(kieServer.checkAccessability());
+    }
+    
+    @Test
+    public void testManagementDisabledConfigured() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "true");
+        try {
+            kieServer.destroy();
+            kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+            ServiceResponse<?> forbidden = kieServer.checkAccessability();
+            assertForbiddenResponse(forbidden);
+        } finally {
+            System.clearProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED);
+        }
+    }
+    
+    @Test
+    public void testManagementDisabledConfiguredViaCommandService() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "true");
+        try {
+            kieServer.destroy();
+            kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+            
+            KieContainerCommandServiceImpl commandService = new KieContainerCommandServiceImpl(kieServer, kieServer.getServerRegistry());
+            List<KieServerCommand> commands = new ArrayList<>();
+            
+            commands.add(new CreateContainerCommand());
+            commands.add(new DisposeContainerCommand());
+            commands.add(new UpdateScannerCommand());
+            commands.add(new UpdateReleaseIdCommand());
+            
+            CommandScript commandScript = new CommandScript(commands);
+            ServiceResponsesList responseList = commandService.executeScript(commandScript, MarshallingFormat.JAXB, null);
+            assertNotNull(responseList);
+            
+            List<ServiceResponse<?>> responses = responseList.getResponses();
+            assertEquals(4, responses.size());
+            
+            for (ServiceResponse<?> forbidden : responses) {
+            
+                assertForbiddenResponse(forbidden);
+            }
+            
+        } finally {
+            System.clearProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED);
+        }
+    }
 
     @Test
     // https://issues.jboss.org/browse/RHBPMS-4087
@@ -470,6 +534,13 @@ public class KieServerImplTest {
             }
             
         };
+    }
+    
+    private void assertForbiddenResponse(ServiceResponse<?> forbidden) {        
+        assertNotNull(forbidden);
+        
+        assertEquals(ResponseType.FAILURE, forbidden.getType());
+        assertEquals("KIE Server management api is disabled", forbidden.getMsg());
     }
 
 }
