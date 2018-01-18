@@ -133,7 +133,8 @@ public class SVGImageProcessor {
                             if (nodeId != null) {
                                 background = svgDocument.getElementById(svgId + "fill_el");
                                 border = svgDocument.getElementById(svgId + "bg_frame");
-                                summary.addNode(new NodeSummary(nodeId, border, background));
+                                Element borderSubProcess = svgDocument.getElementById(svgId + "frame");
+                                summary.addNode(new NodeSummary(nodeId, border, background, borderSubProcess));
                             }
                         }
                     } else {
@@ -152,7 +153,8 @@ public class SVGImageProcessor {
                             if (!name.trim().isEmpty()) {
                                 Element background = svgDocument.getElementById(svgId + "fill_el");
                                 Element border = svgDocument.getElementById(svgId + "bg_frame");
-                                summary.addNode(new NodeSummary(name, border, background));
+                                Element borderSubProcess = svgDocument.getElementById(svgId + "frame");
+                                summary.addNode(new NodeSummary(name, border, background, borderSubProcess));
                             }
                         }
                     }
