@@ -38,6 +38,12 @@ public class SetBorderColorTransformation extends NodeTransformation {
                 border.setAttribute("stroke", color);
                 border.setAttribute("stroke-width", "2");
             }
+            
+            Element borderSubProcess = node.getBorderSubProcess();
+            if (borderSubProcess != null) {
+                borderSubProcess.setAttribute("stroke", color);
+                borderSubProcess.setAttribute("stroke-width", "2");
+            }
         }
     }
 

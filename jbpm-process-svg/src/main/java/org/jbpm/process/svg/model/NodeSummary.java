@@ -22,11 +22,13 @@ public class NodeSummary {
     private String nodeId;
     private Element border;
     private Element background;
+    private Element borderSubProcess;
 
-    public NodeSummary(String nodeId, Element border, Element background) {
+    public NodeSummary(String nodeId, Element border, Element background, Element borderSubProcess) {
         this.nodeId = nodeId;
         this.border = border;
         this.background = background;
+        this.borderSubProcess = borderSubProcess;
     }
 
     public String getNodeId() {
@@ -39,6 +41,10 @@ public class NodeSummary {
 
     public Element getBackground() {
         return background;
+    }
+    
+    public Element getBorderSubProcess() {
+        return borderSubProcess;
     }
 
 }
