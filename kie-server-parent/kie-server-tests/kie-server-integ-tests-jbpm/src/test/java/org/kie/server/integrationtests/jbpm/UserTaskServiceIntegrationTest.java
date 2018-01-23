@@ -15,6 +15,27 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.kie.server.integrationtests.jbpm.RuntimeDataServiceIntegrationTest.SORT_BY_TASK_EVENTS_TYPE;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.jbpm.services.api.TaskNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,28 +57,6 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
-
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
-import static org.kie.server.integrationtests.jbpm.RuntimeDataServiceIntegrationTest.SORT_BY_TASK_EVENTS_TYPE;
-
-
 
 public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -1445,7 +1444,57 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
+    
+    @Test
+    public void testStartAndStopWithWrongContainerId() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
 
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+
+            // release task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.InProgress);
+            
+            Long taskId = taskSummary.getId();
+            // create another container with different id to make sure it cannot be used to stop task
+            createContainer(CONTAINER_ID_V2, releaseId, "custom-alias");
+            
+            assertClientException(
+                                  () -> taskClient.stopTask(CONTAINER_ID_V2, taskId, USER_YODA),
+                                  404,
+                                  "Could not find task instance",
+                                  "Task with id " + taskId + " is not associated with " + CONTAINER_ID_V2);
+
+            // task should be still in progress
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.InProgress);
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            KieServerAssert.assertSuccess(client.disposeContainer(CONTAINER_ID_V2));
+        }
+    }
+    
+    
+    
+    
     private void assertTaskEventInstance(TaskEventInstance expected, TaskEventInstance actual) {
         assertNotNull(actual);
         assertEquals(expected.getType(), actual.getType());

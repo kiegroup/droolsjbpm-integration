@@ -244,15 +244,20 @@ public class CaseManagementRuntimeDataServiceBase {
 
     public CaseDefinitionList getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         sort = safeCaseDefinitionSort(sort);
-        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
-
-        Collection<CaseDefinition> caseDescs = caseRuntimeDataService.getCasesByDeployment(containerId, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
-
-        List<org.kie.server.api.model.cases.CaseDefinition> cases = ConvertUtils.transformCases(caseDescs);
-
-        CaseDefinitionList caseList = new CaseDefinitionList(cases);
-
-        return caseList;
+        try {
+            containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+    
+            Collection<CaseDefinition> caseDescs = caseRuntimeDataService.getCasesByDeployment(containerId, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+    
+            List<org.kie.server.api.model.cases.CaseDefinition> cases = ConvertUtils.transformCases(caseDescs);
+    
+            CaseDefinitionList caseList = new CaseDefinitionList(cases);
+    
+            return caseList;
+        } catch (IllegalArgumentException e) {
+            // container was not found by locator
+            return new CaseDefinitionList();
+        }
     }
 
     public CaseDefinitionList getCaseDefinitions(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder) {
@@ -279,7 +284,11 @@ public class CaseManagementRuntimeDataServiceBase {
         sort = safeCaseDefinitionSort(sort);
 
         if (containerId != null && !containerId.isEmpty()) {
-            containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+            try {
+                containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+            } catch (IllegalArgumentException e) {
+                // container was not found by locator use given                          
+            }
             processDescs = caseRuntimeDataService.getProcessDefinitionsByDeployment(containerId, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
         } else if (filter != null && !filter.isEmpty()) {
             processDescs = caseRuntimeDataService.getProcessDefinitions(filter, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
@@ -293,16 +302,21 @@ public class CaseManagementRuntimeDataServiceBase {
     }
 
     public org.kie.server.api.model.cases.CaseDefinition getCaseDefinition(String containerId, String caseDefinitionId) {
-        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
-        CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
-
-        if (caseDef == null) {
-            throw new IllegalStateException("Case definition " + containerId + " : " + caseDefinitionId + " not found");
+        try {
+            containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+            CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
+    
+            if (caseDef == null) {
+                throw new IllegalStateException("Case definition " + containerId + " : " + caseDefinitionId + " not found");
+            }
+    
+            org.kie.server.api.model.cases.CaseDefinition caseDefinition = ConvertUtils.transformCase(caseDef);
+    
+            return caseDefinition;
+        } catch (IllegalArgumentException e) {
+            // container was not found by locator
+            throw new IllegalStateException("Case definition " + containerId + " : " + caseDefinitionId + " not found");           
         }
-
-        org.kie.server.api.model.cases.CaseDefinition caseDefinition = ConvertUtils.transformCase(caseDef);
-
-        return caseDefinition;
     }
 
     public TaskSummaryList getCaseTasks(String caseId, String user, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {

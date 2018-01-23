@@ -114,7 +114,7 @@ public class OptaplannerIntegrationTest
             fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
             KieServerAssert.assertResultContainsStringRegex(e.getMessage(),
-                                                            ".*Failed to create solver. Container does not exist: .*");
+                                                            ".*Container '" + NOT_EXISTING_CONTAINER_ID + "' is not instantiated or cannot find container for alias '" + NOT_EXISTING_CONTAINER_ID + "'.*");
         }
     }
 
