@@ -132,4 +132,14 @@ public class Container extends ContainerKey {
         result = 31 * result + (resolvedReleasedId != null ? resolvedReleasedId.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Container{" +
+                "serverInstanceId='" + serverInstanceId + '\'' +
+                ", resolvedReleasedId=" + resolvedReleasedId +
+                ", messages=" + messages +
+                ", status=" + status +
+                "} " + super.toString();
+    }
 }
