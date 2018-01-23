@@ -98,7 +98,7 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
         assertTrue("Expected message about non-instantiated container. Got: " + reply.getMsg(),
-                reply.getMsg().contains(String.format("Container %s is not instantiated", CONTAINER_ID)));
+                reply.getMsg().contains(String.format("Container '%s' is not instantiated", CONTAINER_ID)));
     }
 
     @Test
