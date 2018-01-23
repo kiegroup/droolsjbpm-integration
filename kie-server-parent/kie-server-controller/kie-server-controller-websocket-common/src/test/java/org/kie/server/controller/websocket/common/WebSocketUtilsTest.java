@@ -16,11 +16,19 @@
 
 package org.kie.server.controller.websocket.common;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
+import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
+import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.runtime.ContainerList;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
@@ -56,7 +64,8 @@ public class WebSocketUtilsTest {
         spec.addConfig(Capability.RULE,
                        ruleConfig);
         final String specContent = WebSocketUtils.marshal(spec);
-        LOGGER.info("JSON content\n{}", specContent);
+        LOGGER.info("JSON content\n{}",
+                    specContent);
         final ContainerSpec specResult = WebSocketUtils.unmarshal(specContent,
                                                                   ContainerSpec.class);
 
@@ -91,8 +100,12 @@ public class WebSocketUtilsTest {
         final String serverTemplateId = "serverTemplateId";
         final String containerSpecId = "containerSpecId";
         final Capability capability = Capability.PROCESS;
-        final ProcessConfig processConfig = new ProcessConfig("runtimeStrategy", "kBase", "kSession", "mergeMode");
-        final RuleConfig ruleConfig = new RuleConfig(1l, KieScannerStatus.SCANNING);
+        final ProcessConfig processConfig = new ProcessConfig("runtimeStrategy",
+                                                              "kBase",
+                                                              "kSession",
+                                                              "mergeMode");
+        final RuleConfig ruleConfig = new RuleConfig(1l,
+                                                     KieScannerStatus.SCANNING);
         KieServerControllerDescriptorCommand command = new KieServerControllerDescriptorCommand(SpecManagementService.class.getName(),
                                                                                                 "updateContainerConfig",
                                                                                                 null,
@@ -103,7 +116,8 @@ public class WebSocketUtilsTest {
                                                                                                 processConfig,
                                                                                                 ruleConfig);
         final String content = WebSocketUtils.marshal(command);
-        LOGGER.info("JSON content\n{}", content);
+        LOGGER.info("JSON content\n{}",
+                    content);
         final KieServerControllerDescriptorCommand commandResult = WebSocketUtils.unmarshal(content,
                                                                                             KieServerControllerDescriptorCommand.class);
         assertNotNull(commandResult);
@@ -118,6 +132,36 @@ public class WebSocketUtilsTest {
         assertTrue(commandResult.getArguments().contains(capability));
         assertTrue(commandResult.getArguments().contains(processConfig));
         assertTrue(commandResult.getArguments().contains(ruleConfig));
+    }
 
+    @Test
+    public void testContainerListSerialization() {
+        final ServerInstanceKey serverInstanceKey = new ServerInstanceKey("serverTemplateId",
+                                                                          "serverName",
+                                                                          "serverInstanceId",
+                                                                          "url");
+        final ReleaseId releaseId = new ReleaseId("group",
+                                                  "artifact",
+                                                  "version");
+        final Container container = new Container("containerSpecId",
+                                                  "containerName",
+                                                  serverInstanceKey,
+                                                  Collections.emptyList(),
+                                                  releaseId,
+                                                  "url");
+        final ContainerList containerList = new ContainerList(Collections.singletonList(container));
+        final KieServerControllerServiceResponse<ContainerList> response = new KieServerControllerServiceResponse(KieServiceResponse.ResponseType.SUCCESS,
+                                                                                                                  "",
+                                                                                                                  containerList);
+        final String content = WebSocketUtils.marshal(response);
+        LOGGER.info("JSON content\n{}",
+                    content);
+        final KieServerControllerServiceResponse<ContainerList> responseResult = WebSocketUtils.unmarshal(content,
+                                                                                                          KieServerControllerServiceResponse.class);
+        assertNotNull(responseResult);
+        assertEquals(response.getMsg(),
+                     responseResult.getMsg());
+        assertArrayEquals(response.getResult().getContainers(),
+                          responseResult.getResult().getContainers());
     }
 }
