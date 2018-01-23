@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.KieServiceResponse;
+import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
@@ -52,7 +53,8 @@ public class KieServerControllerServiceResponse<T> implements KieServiceResponse
             @XmlElement(name = "container-spec-list", type = ContainerSpecList.class),
             @XmlElement(name = "container-spec-details", type = ContainerSpec.class),
             @XmlElement(name = "server-instance-key-list", type = ServerInstanceKeyList.class),
-            @XmlElement(name = "server-instance-key", type = ServerInstanceKey.class)
+            @XmlElement(name = "server-instance-key", type = ServerInstanceKey.class),
+            @XmlElement(name = "container-details-list", type = ContainerList.class)
     })
     private T result;
 
