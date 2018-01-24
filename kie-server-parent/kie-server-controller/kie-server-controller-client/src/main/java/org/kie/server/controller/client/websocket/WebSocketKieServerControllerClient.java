@@ -312,4 +312,11 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
                            "getServerInstances",
                            serverTemplateId);
     }
+
+    @Override
+    public void deleteServerInstance(final ServerInstanceKey serverInstanceKey) {
+        sendCommand(SpecManagementService.class.getName(),
+                    "deleteServerInstance",
+                    serverInstanceKey);
+    }
 }
