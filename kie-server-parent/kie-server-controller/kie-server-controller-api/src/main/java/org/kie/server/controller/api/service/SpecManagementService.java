@@ -15,6 +15,7 @@
 
 package org.kie.server.controller.api.service;
 
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.*;
 
 public interface SpecManagementService {
@@ -50,4 +51,7 @@ public interface SpecManagementService {
     void startContainer(ContainerSpecKey containerSpecKey);
 
     void stopContainer(ContainerSpecKey containerSpecKey);
+
+    void deleteServerInstance(ServerInstanceKey serverInstanceKey);
+
 }

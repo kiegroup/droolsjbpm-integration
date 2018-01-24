@@ -16,7 +16,6 @@
 package org.kie.server.controller.impl.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -731,5 +730,53 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
     protected int getRandomInt(int min, int max) {
         return (int) Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    @Test
+    public void testDeleteServerInstance() {
+        final ServerTemplate serverTemplate = new ServerTemplate("serverTemplateId",
+                                                                 "serverTemplateName");
+        final ServerInstanceKey serverInstanceKey = new ServerInstanceKey(serverTemplate.getId(),
+                                                                          "serverName",
+                                                                          "serverInstanceId",
+                                                                          "url");
+
+        serverTemplate.addServerInstance(serverInstanceKey);
+        specManagementService.saveServerTemplate(serverTemplate);
+        when(kieServerInstanceManager.isAlive(serverInstanceKey)).thenReturn(false);
+
+        specManagementService.deleteServerInstance(serverInstanceKey);
+
+        final ServerTemplate updatedServerTemplate = specManagementService.getServerTemplate(serverTemplate.getId());
+
+        assertEquals(0,
+                     updatedServerTemplate.getServerInstanceKeys().size());
+    }
+
+    @Test
+    public void testDeleteServerInstanceAlive() {
+        final ServerTemplate serverTemplate = new ServerTemplate("serverTemplateId",
+                                                                 "serverTemplateName");
+        final ServerInstanceKey serverInstanceKey = new ServerInstanceKey(serverTemplate.getId(),
+                                                                          "serverName",
+                                                                          "serverInstanceId",
+                                                                          "url");
+
+        serverTemplate.addServerInstance(serverInstanceKey);
+        specManagementService.saveServerTemplate(serverTemplate);
+        when(kieServerInstanceManager.isAlive(serverInstanceKey)).thenReturn(true);
+
+        try {
+            specManagementService.deleteServerInstance(serverInstanceKey);
+            fail("Deleting a live server instance should fail");
+        } catch (Exception ex) {
+            assertEquals("Can't delete live instance.",
+                         ex.getMessage());
+        }
+
+        final ServerTemplate updatedServerTemplate = specManagementService.getServerTemplate(serverTemplate.getId());
+
+        assertEquals(1,
+                     updatedServerTemplate.getServerInstanceKeys().size());
     }
 }

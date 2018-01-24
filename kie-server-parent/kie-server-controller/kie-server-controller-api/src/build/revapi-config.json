@@ -129,6 +129,15 @@
           "classSimpleName": "ContainerConfig",
           "elementKind": "class",
           "justification": "Handle JSON serialization of sub types"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.controller.api.service.SpecManagementService::deleteServerInstance(org.kie.server.controller.api.model.runtime.ServerInstanceKey)",
+          "package": "org.kie.server.controller.api.service",
+          "classSimpleName": "SpecManagementService",
+          "methodName": "deleteServerInstance",
+          "elementKind": "method",
+          "justification": "New method for excluding a server instance from a template"
         }
       ]
     }

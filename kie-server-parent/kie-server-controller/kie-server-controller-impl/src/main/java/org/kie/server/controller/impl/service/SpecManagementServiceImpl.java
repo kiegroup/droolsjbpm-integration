@@ -28,9 +28,11 @@ import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.KieServerControllerException;
 import org.kie.server.controller.api.KieServerControllerNotFoundException;
+import org.kie.server.controller.api.model.events.ServerInstanceDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.service.SpecManagementService;
@@ -39,6 +41,8 @@ import org.kie.server.controller.impl.KieServerInstanceManager;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 public class SpecManagementServiceImpl implements SpecManagementService {
 
@@ -418,6 +422,23 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         List<Container> containers = kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
 
         notificationService.notify(serverTemplate, containerSpec, containers);
+    }
+
+    @Override
+    public void deleteServerInstance(final ServerInstanceKey serverInstanceKey) {
+        checkNotNull("serverInstanceKey",
+                     serverInstanceKey);
+        if (getKieServerInstanceManager().isAlive(serverInstanceKey)) {
+            throw new RuntimeException("Can't delete live instance.");
+        } else {
+            final String serverInstanceId = serverInstanceKey.getServerInstanceId();
+            final ServerTemplate serverTemplate = getServerTemplate(serverInstanceKey.getServerTemplateId());
+            if (serverTemplate != null) {
+                serverTemplate.deleteServerInstance(serverInstanceId);
+                getTemplateStorage().update(serverTemplate);
+                getNotificationService().notify(new ServerInstanceDeleted(serverInstanceId));
+            }
+        }
     }
 
     public KieServerTemplateStorage getTemplateStorage() {
