@@ -203,6 +203,11 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
         throwUnsupportedException();
     }
 
+    @Override
+    public void deleteServerInstance(ServerInstanceKey serverInstanceKey) {
+        throwUnsupportedException();
+    }
+
     private <T> T makeGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
         WebTarget clientRequest = httpClient.target(uri);
         Response response;
