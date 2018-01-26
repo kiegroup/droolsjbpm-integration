@@ -35,6 +35,10 @@ public class DMNInputDataInfo {
     @XStreamAlias("inputdata-name")
     private String name;
 
+    @XmlElement(name = "inputdata-typeRef")
+    @XStreamAlias("inputdata-typeRef")
+    private String typeRef;
+
     public DMNInputDataInfo() {
         // To avoid the need for kie-server-api to depend on kie-dmn-backend, in order to access DMN's Definitions and DMN's inputdata element
         // build this as DTO and only on server-side leverage setters to populate data as needed.
@@ -55,5 +59,13 @@ public class DMNInputDataInfo {
     public void setName(String name) {
         this.name = name;
     }
-    
+
+    public String getTypeRef() {
+        return typeRef;
+    }
+
+    public void setTypeRef(String typeRef) {
+        this.typeRef = typeRef;
+    }
+
 }

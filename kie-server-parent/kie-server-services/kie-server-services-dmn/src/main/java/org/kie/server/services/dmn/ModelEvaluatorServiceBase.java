@@ -15,12 +15,13 @@
 
 package org.kie.server.services.dmn;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.xml.namespace.QName;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.dmn.api.core.DMNContext;
@@ -29,7 +30,9 @@ import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.ast.InputDataNode;
+import org.kie.dmn.backend.marshalling.v1_1.xstream.MarshallingUtils;
 import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.core.ast.InputDataNodeImpl;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
@@ -99,6 +102,8 @@ public class ModelEvaluatorServiceBase {
         DMNInputDataInfo res = new DMNInputDataInfo();
         res.setName(inputDataNode.getName());
         res.setId(inputDataNode.getId());
+        QName typeRef = ((InputDataNodeImpl) inputDataNode).getInputData().getVariable().getTypeRef();
+        res.setTypeRef(MarshallingUtils.formatQName(typeRef));
         return res;
     }
     

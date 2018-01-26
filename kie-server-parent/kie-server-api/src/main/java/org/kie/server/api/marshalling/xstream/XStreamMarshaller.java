@@ -15,8 +15,6 @@
 
 package org.kie.server.api.marshalling.xstream;
 
-import static org.kie.soup.commons.xstream.XStreamUtils.createNonTrustingXStream;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +23,9 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
@@ -63,6 +64,7 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
+import org.kie.server.api.model.dmn.DMNInputDataInfo;
 import org.kie.server.api.model.dmn.DMNMessageKS;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
@@ -73,9 +75,7 @@ import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConvert
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.mapper.MapperWrapper;
+import static org.kie.soup.commons.xstream.XStreamUtils.createNonTrustingXStream;
 
 public class XStreamMarshaller
         implements Marshaller {    
@@ -196,6 +196,7 @@ public class XStreamMarshaller
         this.xstream.processAnnotations(DMNModelInfoList.class);
         this.xstream.processAnnotations(DMNModelInfo.class);
         this.xstream.processAnnotations(DMNDecisionInfo.class);
+        this.xstream.processAnnotations(DMNInputDataInfo.class);
 
         if (classes != null) {
             for (Class<?> clazz : classes) {
