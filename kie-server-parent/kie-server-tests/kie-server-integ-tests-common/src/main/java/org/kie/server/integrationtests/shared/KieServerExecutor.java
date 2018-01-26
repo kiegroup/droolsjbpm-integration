@@ -80,6 +80,7 @@ public class KieServerExecutor {
     }
     private void addServerSingletonResources() {
         kieServer = new KieServerImpl();
+        kieServer.init();
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl(kieServer));
 
         List<KieServerExtension> extensions = kieServer.getServerExtensions();
