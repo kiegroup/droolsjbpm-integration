@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.kie.server.springboot.autoconfiguration.drools.DroolsKieServerAutoConfiguration,\
+org.kie.server.springboot.autoconfiguration.drools.DMNKieServerAutoConfiguration

@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.kie.server.springboot.autoconfiguration.jbpm.JBPMKieServerAutoConfiguration,\
+org.kie.server.springboot.autoconfiguration.jbpm.JBPMUIKieServerAutoConfiguration,\
+org.kie.server.springboot.autoconfiguration.jbpm.CaseMgmtKieServerAutoConfiguration

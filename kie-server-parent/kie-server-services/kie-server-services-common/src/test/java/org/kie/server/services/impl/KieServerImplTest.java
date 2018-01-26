@@ -94,6 +94,7 @@ public class KieServerImplTest {
         FileUtils.deleteDirectory(REPOSITORY_DIR);
         FileUtils.forceMkdir(REPOSITORY_DIR);
         kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+        kieServer.init();
     }
 
     @After
@@ -186,7 +187,7 @@ public class KieServerImplTest {
             }
             
         };
-        
+        kieServer.init();
         List<Message> healthMessages = kieServer.healthCheck(false);
         
         assertEquals(healthMessages.size(), 1);
@@ -282,7 +283,7 @@ public class KieServerImplTest {
             }
             
         };
-        
+        kieServer.init();
         List<Message> healthMessages = kieServer.healthCheck(false);
         
         assertEquals(healthMessages.size(), 1);
@@ -304,6 +305,7 @@ public class KieServerImplTest {
         try {
             kieServer.destroy();
             kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+            kieServer.init();
             ServiceResponse<?> forbidden = kieServer.checkAccessability();
             assertForbiddenResponse(forbidden);
         } finally {
@@ -317,6 +319,7 @@ public class KieServerImplTest {
         try {
             kieServer.destroy();
             kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+            kieServer.init();
             
             KieContainerCommandServiceImpl commandService = new KieContainerCommandServiceImpl(kieServer, kieServer.getServerRegistry());
             List<KieServerCommand> commands = new ArrayList<>();
@@ -507,7 +510,7 @@ public class KieServerImplTest {
     }
     
     private KieServerImpl delayedKieServer(CountDownLatch latch, CountDownLatch startedlatch) {
-        return new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR)) {
+        KieServerImpl server = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR)) {
 
             @Override
             public void markAsReady() {
@@ -534,6 +537,8 @@ public class KieServerImplTest {
             }
             
         };
+        server.init();
+        return server;
     }
     
     private void assertForbiddenResponse(ServiceResponse<?> forbidden) {        

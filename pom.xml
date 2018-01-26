@@ -77,6 +77,7 @@
     <!-- <module>drools-examples-android</module> -->
     <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
+    <module>kie-spring-boot</module>
   </modules>
 
   <dependencyManagement>

@@ -67,6 +67,7 @@ public class KieServerRestImplTest {
         FileUtils.deleteDirectory(REPOSITORY_DIR);
         FileUtils.forceMkdir(REPOSITORY_DIR);
         kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+        kieServer.init();
         
         MultivaluedHashMap<String, String> mockedRequestHeaders = new MultivaluedHashMap<>();
         mockedRequestHeaders.add("Accept", "application/json");
