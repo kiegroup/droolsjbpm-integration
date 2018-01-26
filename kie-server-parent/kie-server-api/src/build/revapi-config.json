@@ -170,6 +170,31 @@
           "parameterIndex": "0",
           "elementKind": "parameter",
           "justification": "JBPM-6243 - Moved ResponseType enum to interface"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method java.util.Set<org.kie.server.api.model.dmn.DMNDecisionInfo> org.kie.server.api.model.dmn.DMNModelInfo::getDecisions()",
+          "new": "method java.util.Collection<org.kie.server.api.model.dmn.DMNDecisionInfo> org.kie.server.api.model.dmn.DMNModelInfo::getDecisions()",
+          "oldType": "java.util.Set<org.kie.server.api.model.dmn.DMNDecisionInfo>",
+          "newType": "java.util.Collection<org.kie.server.api.model.dmn.DMNDecisionInfo>",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNModelInfo",
+          "methodName": "getDecisions",
+          "elementKind": "method",
+          "justification": ""
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.kie.server.api.model.dmn.DMNModelInfo::setDecisions(===java.util.Set<org.kie.server.api.model.dmn.DMNDecisionInfo>===)",
+          "new": "parameter void org.kie.server.api.model.dmn.DMNModelInfo::setDecisions(===java.util.Collection<org.kie.server.api.model.dmn.DMNDecisionInfo>===)",
+          "oldType": "java.util.Set<org.kie.server.api.model.dmn.DMNDecisionInfo>",
+          "newType": "java.util.Collection<org.kie.server.api.model.dmn.DMNDecisionInfo>",
+          "package": "org.kie.server.api.model.dmn",
+          "classSimpleName": "DMNModelInfo",
+          "methodName": "setDecisions",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": ""
         }
       ]
     }
