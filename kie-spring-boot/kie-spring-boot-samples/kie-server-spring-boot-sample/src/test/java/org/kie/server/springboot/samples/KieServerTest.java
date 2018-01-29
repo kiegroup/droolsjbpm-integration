@@ -62,7 +62,7 @@ public class KieServerTest {
     private int port;    
    
     private String user = "john";
-    private String password = "john1";
+    private String password = "john@pwd1";
 
     private String containerId = "evaluation";
     private String processId = "evaluation";

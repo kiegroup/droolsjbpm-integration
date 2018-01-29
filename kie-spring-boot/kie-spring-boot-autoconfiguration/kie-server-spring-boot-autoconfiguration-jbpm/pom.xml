@@ -193,5 +193,9 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <artifactId>xercesImpl</artifactId>
+      <groupId>xerces</groupId>
+    </dependency>
   </dependencies>
 </project>

@@ -23,6 +23,9 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.dashbuilder.dataprovider.sql.SQLDataSetProvider;
+import org.dashbuilder.dataprovider.sql.SQLDataSourceLocator;
+import org.dashbuilder.dataset.def.SQLDataSetDef;
 import org.drools.core.impl.EnvironmentFactory;
 import org.drools.persistence.api.TransactionManager;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
@@ -66,9 +69,9 @@ import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.audit.TaskAuditServiceFactory;
 import org.jbpm.services.task.identity.DefaultUserInfo;
-import org.jbpm.services.task.identity.JBossUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.jbpm.springboot.security.SpringSecurityIdentityProvider;
+import org.jbpm.springboot.security.SpringSecurityUserGroupCallback;
 import org.kie.api.executor.Executor;
 import org.kie.api.executor.ExecutorAdminService;
 import org.kie.api.executor.ExecutorQueryService;
@@ -146,10 +149,8 @@ public class JBPMAutoConfiguration {
     
     @Bean
     @ConditionalOnMissingBean(name = "userGroupCallback")
-    public UserGroupCallback userGroupCallback() throws IOException {
-        Resource resource = new ClassPathResource("/roles.properties");
-        Properties userGroups = PropertiesLoaderUtils.loadProperties(resource);
-        return new JBossUserGroupCallbackImpl(userGroups);
+    public UserGroupCallback userGroupCallback(IdentityProvider identityProvider) throws IOException {
+        return new SpringSecurityUserGroupCallback(identityProvider);
     }
     
     @Bean
@@ -268,7 +269,17 @@ public class JBPMAutoConfiguration {
         
         QueryServiceImpl queryService = new QueryServiceImpl();
         queryService.setIdentityProvider(identityProvider);
-        queryService.setCommandService(transactionalCommandService);
+        queryService.setCommandService(transactionalCommandService);        
+        // override data source locator to not use JNDI
+        SQLDataSetProvider sqlDataSetProvider = SQLDataSetProvider.get();
+        sqlDataSetProvider.setDataSourceLocator(new SQLDataSourceLocator() {
+                        
+            @Override
+            public DataSource lookup(SQLDataSetDef def) throws Exception {
+                return dataSource;
+            }
+        });
+        
         queryService.init();
         
         return queryService;
