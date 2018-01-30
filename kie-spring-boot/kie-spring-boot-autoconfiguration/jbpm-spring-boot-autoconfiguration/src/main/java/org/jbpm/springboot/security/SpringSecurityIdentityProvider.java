@@ -42,7 +42,11 @@ public class SpringSecurityIdentityProvider implements IdentityProvider {
             List<String> roles = new ArrayList<String>();
 
             for (GrantedAuthority ga : auth.getAuthorities()) {
-                roles.add(ga.getAuthority());
+                String roleName = ga.getAuthority();
+                if (roleName.startsWith("ROLE_")) {
+                    roleName = roleName.replaceFirst("ROLE_", "");
+                }
+                roles.add(roleName);
             }
 
             return roles;
