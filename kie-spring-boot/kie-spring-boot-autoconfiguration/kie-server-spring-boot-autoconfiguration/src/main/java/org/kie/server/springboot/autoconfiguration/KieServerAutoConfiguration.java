@@ -66,7 +66,7 @@ public class KieServerAutoConfiguration extends ResourceConfig {
         return new KieServerContainerExtension();
     }   
     
-    @Bean
+    @Bean(destroyMethod="destroy")
     @ConditionalOnMissingBean(name = "kieServer")
     public KieServer kieServer(List<KieServerExtension> extensions) {
         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, properties.getControllers());

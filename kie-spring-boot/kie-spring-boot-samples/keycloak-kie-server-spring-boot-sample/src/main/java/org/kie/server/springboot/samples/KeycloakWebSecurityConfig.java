@@ -31,9 +31,9 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
-@Configuration
+@Configuration("kieServerSecurity")
 @EnableWebSecurity
-public class WebSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+public class KeycloakWebSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
