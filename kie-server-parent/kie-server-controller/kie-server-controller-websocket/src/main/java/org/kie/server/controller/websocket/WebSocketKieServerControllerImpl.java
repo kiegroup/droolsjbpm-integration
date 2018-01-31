@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.ServiceLoader;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.websocket.CloseReason;
@@ -46,10 +47,10 @@ public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
     
     private WebSocketSessionManager manager = WebSocketSessionManager.getInstance();
     
-    @Inject
+    @Inject @Any
     private Instance<KieServerTemplateStorage> templateStorage;
     
-    @Inject
+    @Inject @Any
     private Instance<NotificationService> notificationService;
     
     public WebSocketKieServerControllerImpl() {
@@ -76,15 +77,15 @@ public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
     
     @PostConstruct
     public void configure() {
-        try {
-            setTemplateStorage(templateStorage.get());
-        } catch (RuntimeException e) {
+        if(templateStorage.isUnsatisfied()){
             logger.warn("Unable to find template storage implementation, using in memory");
+        } else {
+            setTemplateStorage(templateStorage.get());
         }
-        try {
-            setNotificationService(notificationService.get());
-        } catch (RuntimeException e) {
+        if(notificationService.isUnsatisfied()) {
             logger.warn("Unable to find notification service implementation, using logging only");
+        } else {
+            setNotificationService(notificationService.get());
         }
     }
 
