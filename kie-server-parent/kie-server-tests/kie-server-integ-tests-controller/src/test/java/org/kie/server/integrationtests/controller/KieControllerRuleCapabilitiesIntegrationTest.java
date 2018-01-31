@@ -15,10 +15,11 @@
  */
 package org.kie.server.integrationtests.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import static org.assertj.core.api.Assertions.*;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -31,26 +32,18 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
-import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerManagementBaseTest {
+public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends KieServerControllerClientException> extends KieControllerManagementBaseTest {
 
     private KieServerInfo kieServerInfo;
 
-    protected void assertNotFoundException(KieServerControllerHTTPClientException e) {
-        assertEquals(404,
-                e.getResponseCode());
-        assertNotNull(e.getMessage());
-    }
+    protected abstract void assertNotFoundException(T exception);
 
-    protected void assertBadRequestException(KieServerControllerHTTPClientException e) {
-        assertEquals(400, e.getResponseCode());
-        assertNotNull(e.getMessage());
-    }
+    protected abstract void assertBadRequestException(T exception);
 
     @BeforeClass
     public static void initialize() throws Exception {
@@ -89,12 +82,12 @@ public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerM
     @Test
     public void testScanNowNotExistingContainer() {
         ServerTemplate serverTemplate = createServerTemplate();
-        ContainerSpec container = createContainerSpec(serverTemplate, RELEASE_ID);
+        ContainerSpec container = new ContainerSpec("not-existing", "not-existing", serverTemplate, RELEASE_ID, KieContainerStatus.STARTED, null);
         try {
             controllerClient.scanNow(container);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((KieServerControllerHTTPClientException) e);
+            assertNotFoundException((T)e);
         }
     }
 
@@ -125,7 +118,7 @@ public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerM
             controllerClient.startScanner(container, -200L);
             fail("Should throw exception about wrong parameter.");
         } catch (KieServerControllerClientException e) {
-            assertBadRequestException((KieServerControllerHTTPClientException) e);
+            assertBadRequestException((T) e);
         }
 
         // Check that contianer is not upgraded by scanner
@@ -141,19 +134,19 @@ public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerM
             controllerClient.startScanner(container, 1000L);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((KieServerControllerHTTPClientException) e);
+            assertNotFoundException((T) e);
         }
     }
 
     @Test
     public void testStopScannerNotExisitngContainer() {
         ServerTemplate serverTemplate = createServerTemplate();
-        ContainerSpec container = createContainerSpec(serverTemplate, RELEASE_ID_LATEST);
+        ContainerSpec container = new ContainerSpec("not-existing", "not-existing", serverTemplate, RELEASE_ID, KieContainerStatus.STARTED, null);
         try {
             controllerClient.stopScanner(container);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((KieServerControllerHTTPClientException) e);
+            assertNotFoundException((T) e);
         }
     }
 
@@ -168,7 +161,7 @@ public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerM
             controllerClient.stopScanner(container);
             fail("Should throw exception about wrong operation.");
         } catch (KieServerControllerClientException e) {
-            assertBadRequestException((KieServerControllerHTTPClientException) e);
+            assertBadRequestException((T) e);
         }
     }
 
@@ -189,12 +182,12 @@ public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerM
     @Test
     public void testUpgradeNotExisitngContainer() {
         ServerTemplate serverTemplate = createServerTemplate();
-        ContainerSpec container = createContainerSpec(serverTemplate, RELEASE_ID_LATEST);
+        ContainerSpec container = new ContainerSpec("not-existing", "not-existing", serverTemplate, RELEASE_ID, KieContainerStatus.STARTED, null);
         try {
             controllerClient.upgradeContainer(container, RELEASE_ID_101);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((KieServerControllerHTTPClientException) e);
+            assertNotFoundException((T) e);
         }
     }
 
@@ -210,12 +203,21 @@ public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerM
         controllerClient.upgradeContainer(container, notExistingVersion);
 
         ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo(CONTAINER_ID);
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerResponse.getType());
+        assertThat(containerResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
         KieContainerResource containerResource = containerResponse.getResult();
+
+        String errorUpdatingMessage = "Error updating releaseId for container kie-concurrent to version org.kie.server.testing:stateless-session-kjar:6.6.6";
+        String noKieModuleMessage =  "Cannot find KieModule with ReleaseId: org.kie.server.testing:stateless-session-kjar:6.6.6";
+
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(containerResource.getContainerId()).isEqualTo(CONTAINER_ID);
-            softly.assertThat(containerResource.getStatus()).isEqualTo(KieContainerStatus.FAILED);
-            softly.assertThat(containerResource.getReleaseId()).isEqualTo(notExistingVersion);
+            softly.assertThat(containerResource.getStatus()).isEqualTo(KieContainerStatus.STARTED);
+            softly.assertThat(containerResource.getReleaseId()).isNotEqualTo(notExistingVersion).isEqualTo(RELEASE_ID);
+            List<String> kieServerMessages = new ArrayList<>();
+            containerResource.getMessages().stream().forEach((item) -> {
+                kieServerMessages.addAll(item.getMessages());
+            });
+            softly.assertThat(kieServerMessages).contains(errorUpdatingMessage, noKieModuleMessage);
         });
     }
 
@@ -254,7 +256,7 @@ public class KieControllerRuleCapabilitiesIntegrationTest extends KieControllerM
 
     protected void checkKieContainerResource(ReleaseId expectedReleaseId, ReleaseId expectedResolvedReleaseId) {
         ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertThat(containerInfo.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
         KieContainerResource container = containerInfo.getResult();
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(container.getContainerId()).isEqualTo(CONTAINER_ID);

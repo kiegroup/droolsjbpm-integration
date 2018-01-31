@@ -15,9 +15,10 @@
  */
 package org.kie.server.integrationtests.controller;
 
+import static org.assertj.core.api.Assertions.*;
 import org.assertj.core.api.SoftAssertions;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,26 +31,18 @@ import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
-import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-public class KieControllerRuntimeManagementIntegrationTest extends KieControllerManagementBaseTest {
+public abstract class KieControllerRuntimeManagementIntegrationTest<T extends KieServerControllerClientException> extends KieControllerManagementBaseTest {
 
     private KieServerInfo kieServerInfo;
 
-    protected void assertNotFoundException(KieServerControllerHTTPClientException e) {
-        assertEquals(404,
-                e.getResponseCode());
-        assertNotNull(e.getMessage());
-    }
+    protected abstract void assertNotFoundException(T exception);
 
-    protected void assertBadRequestException(KieServerControllerHTTPClientException e) {
-        assertEquals(400, e.getResponseCode());
-        assertNotNull(e.getMessage());
-    }
+    protected abstract void assertBadRequestException(T exception);
 
     @BeforeClass
     public static void initialize() throws Exception {
@@ -72,8 +65,7 @@ public class KieControllerRuntimeManagementIntegrationTest extends KieController
         ServerTemplate serverTemplate = createServerTemplate();
 
         ServerInstanceKeyList serverInstances = controllerClient.getServerInstances(serverTemplate.getId());
-        assertNotNull(serverInstances);
-        assertEquals(1, serverInstances.getServerInstanceKeys().length);
+        assertThat(serverInstances.getServerInstanceKeys()).hasSize(1);
         ServerInstanceKey serverInstance = serverInstances.getServerInstanceKeys()[0];
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(serverInstance.getServerName()).isEqualTo(kieServerInfo.getName());
@@ -88,7 +80,7 @@ public class KieControllerRuntimeManagementIntegrationTest extends KieController
             controllerClient.getServerInstances("not-existing");
             fail("Should throw exception about server template not existing.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((KieServerControllerHTTPClientException) e);
+            assertNotFoundException((T) e);
         }
     }
 
@@ -105,8 +97,7 @@ public class KieControllerRuntimeManagementIntegrationTest extends KieController
         ServerInstanceKey serverInstance = serverInstances.getServerInstanceKeys()[0];
 
         ContainerList containers = controllerClient.getContainers(serverInstance);
-        assertNotNull(containers);
-        assertEquals(1, containers.getContainers().length);
+        assertThat(containers.getContainers()).hasSize(1);
         Container container = containers.getContainers()[0];
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(container.getContainerSpecId()).isEqualTo(CONTAINER_ID);
@@ -125,7 +116,7 @@ public class KieControllerRuntimeManagementIntegrationTest extends KieController
             controllerClient.getContainers(serverInstance);
             fail("Should throw exception about the server instance not existing.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((KieServerControllerHTTPClientException) e);
+            assertNotFoundException((T) e);
 
         }
     }
