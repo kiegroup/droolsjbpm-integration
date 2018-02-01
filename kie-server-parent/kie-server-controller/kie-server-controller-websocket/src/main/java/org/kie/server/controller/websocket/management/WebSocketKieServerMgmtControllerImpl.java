@@ -18,6 +18,7 @@ package org.kie.server.controller.websocket.management;
 
 import java.io.IOException;
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.websocket.*;
@@ -41,24 +42,24 @@ public class WebSocketKieServerMgmtControllerImpl {
 
     private KieServerMgmtCommandServiceImpl commandService = KieServerMgmtCommandServiceImpl.getInstance();
 
-    @Inject
+    @Inject @Any
     private Instance<KieServerTemplateStorage> templateStorage;
 
-    @Inject
+    @Inject @Any
     private Instance<NotificationService> notificationService;
 
     @PostConstruct
     public void configure() {
         LOGGER.info("Kie Server Controller Management WebSocket service initialized");
-        try {
-            commandService.setTemplateStorage(templateStorage.get());
-        } catch (RuntimeException e) {
+        if(templateStorage.isUnsatisfied()){
             LOGGER.warn("Unable to find template storage implementation, using in memory");
+        } else {
+            commandService.setTemplateStorage(templateStorage.get());
         }
-        try {
-            commandService.setNotificationService(notificationService.get());
-        } catch (RuntimeException e) {
+        if(notificationService.isUnsatisfied()){
             LOGGER.warn("Unable to find notification service implementation, using logging only");
+        } else {
+            commandService.setNotificationService(notificationService.get());
         }
     }
 
