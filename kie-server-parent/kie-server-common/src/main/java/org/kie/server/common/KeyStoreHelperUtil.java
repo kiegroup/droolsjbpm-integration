@@ -36,20 +36,21 @@ public class KeyStoreHelperUtil {
         return passwordKey;
     }
 
-    public static String loadControllerPassword(KieServerConfig config) {
-        String passwordKey;
+    public static String loadControllerPassword(final KieServerConfig config) {
+        return loadControllerPassword(config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!"));
+    }
+
+    public static String loadControllerPassword(final String defaultPassword) {
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper();
 
         try {
             String pwdKeyAlias = System.getProperty(PROP_PWD_CTRL_ALIAS, "");
             char[] pwdKeyPassword = System.getProperty(PROP_PWD_CTRL_PWD, "").toCharArray();
 
-            passwordKey = keyStoreHelper.getPasswordKey(pwdKeyAlias, pwdKeyPassword);
+            return keyStoreHelper.getPasswordKey(pwdKeyAlias, pwdKeyPassword);
         } catch (RuntimeException re) {
             logger.warn("Unable to load key store. Using password from configuration");
-            passwordKey = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+            return defaultPassword;
         }
-
-        return passwordKey;
     }
 }
