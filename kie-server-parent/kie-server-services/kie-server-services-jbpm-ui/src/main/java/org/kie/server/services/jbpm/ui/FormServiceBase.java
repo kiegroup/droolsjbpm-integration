@@ -33,8 +33,8 @@ import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.task.model.Task;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.kie.server.services.jbpm.ui.api.UIFormProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,25 +139,25 @@ public class FormServiceBase {
         throw new IllegalStateException("No form for process with id " + processDesc.getName() + " found");
     }
 
-    public String getFormDisplayTask(long taskId, String lang, boolean filterContent, String formType) {
+    public String getFormDisplayTask(String containerId, long taskId, String lang, boolean filterContent, String formType) {
+        containerId = registry.getContainerId(containerId, new ByTaskIdContainerLocator(taskId));
         Task task = userTaskService.getTask(taskId);
         if (task == null) {
             throw new IllegalStateException("No task with id " + taskId + " found");
         }
         String name = task.getName();
-        ProcessDefinition processDesc = dataService.getProcessesByDeploymentIdProcessId(task.getTaskData()
-                .getDeploymentId(), task.getTaskData().getProcessId());
+        ProcessDefinition processDesc = dataService.getProcessesByDeploymentIdProcessId(containerId, task.getTaskData().getProcessId());
         Map<String, Object> renderContext = new HashMap<>();
         renderContext.put("filterForm", filterContent);
 
-        Map<String, Object> input = userTaskService.getTaskInputContentByTaskId(taskId);
+        Map<String, Object> input = userTaskService.getTaskInputContentByTaskId(containerId, taskId);
         renderContext.put("inputs", input);
         for (Map.Entry<String, Object> inputVar : input.entrySet()) {
             renderContext.put(inputVar.getKey(), inputVar.getValue());
         }
 
-        Map<String, String> outputDef = definitionService.getTaskOutputMappings(task.getTaskData().getDeploymentId(), task.getTaskData().getProcessId(), task.getName());
-        Map<String, Object> output = userTaskService.getTaskOutputContentByTaskId(taskId);
+        Map<String, String> outputDef = definitionService.getTaskOutputMappings(containerId, task.getTaskData().getProcessId(), task.getName());
+        Map<String, Object> output = userTaskService.getTaskOutputContentByTaskId(containerId, taskId);
         renderContext.put("outputs", output);
         for (Map.Entry<String, Object> outputVar : output.entrySet()) {
             renderContext.put(outputVar.getKey(), outputVar.getValue());

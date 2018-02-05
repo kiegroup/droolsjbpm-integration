@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-spring-boot</artifactId>
+    <version>7.7.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>kie-spring-boot-autoconfiguration</artifactId>
+  <name>KIE :: Spring :: Boot :: Auto Configuration</name>
+  <description>Parent integration project for SpringBoot Auto Configurations</description>
+
+  <packaging>pom</packaging>
+  <modules>
+    <module>jbpm-spring-boot-autoconfiguration</module>
+    <module>kie-server-spring-boot-autoconfiguration</module>
+    <module>kie-server-spring-boot-autoconfiguration-drools</module>
+    <module>kie-server-spring-boot-autoconfiguration-jbpm</module>
+    <module>kie-server-spring-boot-autoconfiguration-optaplanner</module>
+  </modules>
+
+</project>

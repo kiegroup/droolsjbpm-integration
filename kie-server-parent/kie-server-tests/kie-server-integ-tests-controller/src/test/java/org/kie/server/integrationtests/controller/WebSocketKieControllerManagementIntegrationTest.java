@@ -20,11 +20,21 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.controller.api.KieServerControllerException;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
+import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerExecutor;
 
 import static org.junit.Assert.*;
 
@@ -57,6 +67,52 @@ public class WebSocketKieControllerManagementIntegrationTest extends KieControll
                                                                                    TestConfig.getUsername(),
                                                                                    TestConfig.getPassword());
         }
+    }
+
+    @Test
+    public void testDeleteServerInstance() {
+        // Create kie server instance in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        assertEquals(1, serverTemplate.getServerInstanceKeys().size());
+
+        ServerInstanceKey serverInstanceKey = new ServerInstanceKey(serverTemplate.getId(),
+                                                                          "serverName",
+                                                                          "serverInstanceId",
+                                                                          "url");
+
+        serverTemplate.addServerInstance(serverInstanceKey);
+        assertEquals(2, serverTemplate.getServerInstanceKeys().size());
+
+        controllerClient.saveServerTemplate(serverTemplate);
+
+        ServerInstanceKeyList serverInstanceKeyList = controllerClient.getServerInstances(serverTemplate.getId());
+        assertEquals(2, serverInstanceKeyList.getServerInstanceKeys().length);
+
+        controllerClient.deleteServerInstance(serverInstanceKey);
+
+        serverInstanceKeyList = controllerClient.getServerInstances(serverTemplate.getId());
+        assertEquals(1, serverInstanceKeyList.getServerInstanceKeys().length);
+    }
+
+    @Test
+    public void testDeleteLiveServerInstance() {
+        // Create kie server instance in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        ServerInstanceKey serverInstanceKey = serverTemplate.getServerInstanceKeys().iterator().next();
+        assertEquals(1, serverTemplate.getServerInstanceKeys().size());
+
+        try {
+            controllerClient.deleteServerInstance(serverInstanceKey);
+            fail("Deleting a live server instance should fail");
+        } catch (KieServerControllerClientException ex){
+            assertEquals("Can't delete live instance.",
+                         ex.getMessage());
+        }
+
+        ServerInstanceKeyList serverInstanceKeyList = controllerClient.getServerInstances(serverTemplate.getId());
+        assertEquals(1, serverInstanceKeyList.getServerInstanceKeys().length);
     }
 
 }

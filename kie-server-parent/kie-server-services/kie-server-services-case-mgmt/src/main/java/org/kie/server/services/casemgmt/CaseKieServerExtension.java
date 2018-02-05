@@ -54,17 +54,17 @@ public class CaseKieServerExtension implements KieServerExtension {
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_CASE_SERVER_EXT_DISABLED, "false"));
     private static final Boolean jbpmDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
-    private String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
+    protected String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
 
-    private List<Object> services = new ArrayList<Object>();
-    private boolean initialized = false;
+    protected List<Object> services = new ArrayList<Object>();
+    protected boolean initialized = false;
 
-    private KieServerRegistry registry;
+    protected KieServerRegistry registry;
 
-    private CaseManagementServiceBase caseManagementServiceBase;
-    private CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService;
+    protected CaseManagementServiceBase caseManagementServiceBase;
+    protected CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService;
 
-    private KieContainerCommandService kieContainerCommandService;
+    protected KieContainerCommandService kieContainerCommandService;
 
     @Override
     public boolean isInitialized() {
@@ -85,6 +85,21 @@ public class CaseKieServerExtension implements KieServerExtension {
             logger.warn("jBPM extension not found, Case Management cannot work without jBPM extension, disabling itself");
             return;
         }
+        
+        configureServices(kieServer, registry);
+        
+
+        this.services.add(this.caseManagementServiceBase);
+        this.services.add(this.caseManagementRuntimeDataService);
+
+        this.kieContainerCommandService = new CaseKieContainerCommandServiceImpl(registry, caseManagementServiceBase, caseManagementRuntimeDataService);
+
+        initialized = true;
+    }
+    
+    protected void configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
+        
+        KieServerExtension jbpmExtension = registry.getServerExtension("jBPM");
         List<Object> jbpmServices = jbpmExtension.getServices();
         RuntimeDataService runtimeDataService = null;
         ProcessService processService = null;
@@ -137,16 +152,10 @@ public class CaseKieServerExtension implements KieServerExtension {
 
         this.caseManagementServiceBase = new CaseManagementServiceBase(caseService, caseRuntimeDataService, registry);
         this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, registry);
-
-        this.services.add(this.caseManagementServiceBase);
-        this.services.add(this.caseManagementRuntimeDataService);
-
-        this.kieContainerCommandService = new CaseKieContainerCommandServiceImpl(registry, caseManagementServiceBase, caseManagementRuntimeDataService);
-
-        initialized = true;
+        
     }
 
-    private CaseIdGenerator getCaseIdGenerator() {
+    protected CaseIdGenerator getCaseIdGenerator() {
         String selectedGenerator = System.getProperty(KieServerConstants.CFG_CASE_ID_GENERATOR);
 
         if (selectedGenerator == null) {

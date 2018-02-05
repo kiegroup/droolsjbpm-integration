@@ -51,6 +51,7 @@ import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.remote.rest.optaplanner.resources.Messages;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.optaplanner.SolverServiceBase;
 import org.slf4j.Logger;
@@ -102,7 +103,8 @@ public class SolverResource {
         try {
             String contentType = getContentType(headers);
 
-            if (solverService.getKieServerRegistry().getContainer(containerId) == null) {
+            if (solverService.getKieServerRegistry().getContainer(containerId,
+                                                                  ContainerLocatorProvider.get().getLocator()) == null) {
                 ServiceResponse<SolverInstance> response = new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
                                                                                                "Failed to create solver. Container does not exist: " + containerId);
                 return createCorrectVariant(response,
