@@ -33,9 +33,11 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -154,6 +156,41 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         assertClaimAssesmentStage(caseId);
         // let's trigger claim offer calculation
         caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Calculate claim", null);
+        // now we have another task for insured as claim was calculated
+        // let's accept the calculated claim
+        assertAndAcceptClaimOffer(USER_YODA);
+        // there should be no process instances for the case
+        Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10);
+        assertEquals(0, caseProcesInstances.size());
+    }
+    
+    @Test
+    public void testCarInsuranceClaimCaseTriggerInStage() throws Exception {
+        // start case with users assigned to roles
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        // let's verify case is created
+        assertCaseInstance(caseId);
+        // let's look at what stages are active
+        assertBuildClaimReportStage(caseId);
+        // since the first task assigned to insured is with auto start it should be already active
+        // the same task can be claimed by insuranceRepresentative in case claim is reported over phone
+        long taskId = assertBuildClaimReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide claim report with initial data
+        // claim report should be stored in case file data
+        provideAndAssertClaimReport(caseId, taskId, USER_YODA);
+        // now we have another task for insured to provide property damage report
+        taskId = assertPropertyDamageReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide the property damage report
+        provideAndAssertPropertyDamageReport(caseId, taskId, USER_YODA);
+        // let's complete the stage by explicitly stating that claimReport is done
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "claimReportDone", Boolean.TRUE);
+        // we should be in another stage - Claim assessment
+        assertClaimAssesmentStage(caseId);
+        // let's trigger claim offer calculation
+        CaseDefinition definition = caseClient.getCaseDefinition(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+        CaseStageDefinition stage = definition.getCaseStages().stream().filter(s -> s.getName().equals("Claim assesment")).findFirst().get();
+        
+        caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stage.getIdentifier(), "Calculate claim", null);
         // now we have another task for insured as claim was calculated
         // let's accept the calculated claim
         assertAndAcceptClaimOffer(USER_YODA);

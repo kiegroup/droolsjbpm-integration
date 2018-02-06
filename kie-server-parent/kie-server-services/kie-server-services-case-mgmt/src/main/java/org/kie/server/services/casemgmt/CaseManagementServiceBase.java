@@ -320,7 +320,7 @@ public class CaseManagementServiceBase {
 
         logger.debug("AdHoc task {} will be triggered with data = {}", adHocName, adHocTaskData);
         if (stageId != null && !stageId.isEmpty()) {
-            // todo add support for trigger within given stage
+            caseService.triggerAdHocFragment(caseId, stageId, adHocName, adHocTaskData);
         } else {
             caseService.triggerAdHocFragment(caseId, adHocName, adHocTaskData);
         }
