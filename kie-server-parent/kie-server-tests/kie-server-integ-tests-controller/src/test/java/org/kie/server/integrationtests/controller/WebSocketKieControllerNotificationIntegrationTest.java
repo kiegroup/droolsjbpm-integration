@@ -17,7 +17,7 @@
 package org.kie.server.integrationtests.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 
 import org.junit.After;
@@ -125,9 +125,8 @@ public class WebSocketKieControllerNotificationIntegrationTest extends KieServer
             controllerClient.deleteServerTemplate(template.getId());
         });
 
-        InOrder inOrder = inOrder(eventHandler);
-        inOrder.verify(eventHandler).onServerTemplateUpdated(any());
-        inOrder.verify(eventHandler).onServerTemplateDeleted(any());
+        verify(eventHandler, timeout(2000L)).onServerTemplateUpdated(any());
+        verify(eventHandler, timeout(2000L)).onServerTemplateDeleted(any());
 
         verifyNoMoreInteractions(eventHandler);
     }
@@ -159,7 +158,7 @@ public class WebSocketKieControllerNotificationIntegrationTest extends KieServer
                                                             template,
                                                             releaseId,
                                                             KieContainerStatus.STOPPED,
-                                                            new HashMap());
+                                                            Collections.emptyMap());
             controllerClient.saveContainerSpec(template.getId(),
                                                containerSpec);
             controllerClient.startContainer(containerSpec);
