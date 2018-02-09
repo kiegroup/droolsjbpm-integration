@@ -16,8 +16,10 @@
 package org.kie.server.integrationtests.controller;
 
 import org.assertj.core.api.SoftAssertions;
+import org.junit.Ignore;
 import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 
+@Ignore("Rule capabilities REST API is not aviable yet")
 public class RestKieControllerRuleCapabilitiesIntegrationTest extends KieControllerRuleCapabilitiesIntegrationTest<KieServerControllerHTTPClientException> {
 
     @Override

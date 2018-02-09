@@ -202,12 +202,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             softly.assertThat(serverTemplate).isNotNull();
             softly.assertThat(serverTemplate.getName()).isEqualTo(NEW_TEMPLATE_NAME);
             softly.assertThat(serverTemplate.getCapabilities()).isEqualTo(capabilities);
-            System.out.println("\n*******\n"+serverTemplate.getConfigs());
-            softly.assertThat(serverTemplate.getConfigs()).isNotEmpty().containsEntry(Capability.RULE, serverConfig).containsKey(Capability.RULE).containsValue(serverConfig); //TODO how check server config
-//            WebSocketKieControllerManagementIntegrationTest>KieControllerManagementIntegrationTest.testCopyServerTemplateWithConfiguration:221 
-//The following assertion failed:
-//1) expected:<...l.spec.ServerConfig@[58acf350]}> but was:<...l.spec.ServerConfig@[304dde06]}>
-//at KieControllerManagementIntegrationTest.lambda$testCopyServerTemplateWithConfiguration$0(KieControllerManagementIntegrationTest.java:225) expected:<...l.spec.ServerConfig@[58acf350]}> but was:<...l.spec.ServerConfig@[304dde06]}>
+            softly.assertThat(serverTemplate.getConfigs()).isNotEmpty().containsEntry(Capability.RULE, serverConfig).containsKey(Capability.RULE).containsValue(serverConfig);
         });
     }
 

@@ -16,8 +16,10 @@
 package org.kie.server.integrationtests.controller;
 
 import org.assertj.core.api.SoftAssertions;
+import org.junit.Ignore;
 import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 
+@Ignore("Runtime management REST API is not aviable yet")
 public class RestKieControllerRuntimeManagementIntegrationTest extends KieControllerRuntimeManagementIntegrationTest<KieServerControllerHTTPClientException> {
 
     @Override
