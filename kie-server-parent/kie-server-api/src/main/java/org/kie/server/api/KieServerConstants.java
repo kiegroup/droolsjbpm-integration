@@ -90,5 +90,8 @@ public class KieServerConstants {
     public static final String CFG_KIE_SERVER_JMS_SESSION_TX = "org.kie.server.jms.session.tx";
     public static final String CFG_KIE_SERVER_JMS_SESSION_ACK = "org.kie.server.jms.session.ack";
     public static final String CFG_KIE_SERVER_RESPONSE_QUEUE = "kie.server.jms.queues.response";
+    
+    public static final String QUERY_ORDER_BY = "q_order_by";
+    public static final String QUERY_ASCENDING = "q_ascending";
 
 }

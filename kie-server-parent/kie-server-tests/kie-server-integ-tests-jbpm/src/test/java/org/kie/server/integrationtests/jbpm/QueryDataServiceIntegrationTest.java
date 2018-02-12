@@ -15,6 +15,10 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +29,7 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -36,12 +41,6 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
-
-import static org.junit.Assert.*;
-
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import static org.junit.Assume.assumeFalse;
-
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -408,6 +407,41 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             processClient.abortProcessInstance(CONTAINER_ID, pid);
             queryClient.unregisterQuery(query.getName());
         }
+    }
+    
+    @Test
+    public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilderAndFilterSpec() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = createQueryDefinition("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("min", processInstanceIds.get(4));
+            params.put("max", processInstanceIds.get(0));
+            params.put(KieServerConstants.QUERY_ORDER_BY, "processInstanceId");
+            params.put(KieServerConstants.QUERY_ASCENDING, false);
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, "test", params, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+            long pi1 = instances.get(0).getId();
+            long pi2 = instances.get(1).getId();
+            // since sort order is descending first should be instance id which is bigger then second
+            assertTrue(pi1 > pi2);
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
     }
 
     private QueryDefinition createQueryDefinition(String target) {

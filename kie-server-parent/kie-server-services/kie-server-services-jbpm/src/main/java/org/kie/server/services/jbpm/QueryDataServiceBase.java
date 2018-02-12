@@ -35,6 +35,7 @@ import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
@@ -160,6 +161,15 @@ public class QueryDataServiceBase {
         if (payload != null && !payload.isEmpty()) {
             logger.debug("About to unmarshal query params from payload: '{}'", payload);
             queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
+            
+            String orderBy = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY);
+            Boolean ascending = (Boolean) queryParameters.remove(KieServerConstants.QUERY_ASCENDING);
+            if (orderBy != null) {
+                queryContext.setOrderBy(orderBy);
+            }
+            if (ascending != null) {
+                queryContext.setAscending(ascending);
+            }
         }
 
         logger.debug("About to perform query '{}' with page {} and page size {}", queryName, page, pageSize);
