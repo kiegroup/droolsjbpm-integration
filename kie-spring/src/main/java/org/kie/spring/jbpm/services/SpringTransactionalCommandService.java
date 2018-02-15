@@ -78,11 +78,11 @@ public class SpringTransactionalCommandService extends TransactionalCommandServi
     }
 
 
-    public AbstractPlatformTransactionManager getTransactionManager() {
+    public AbstractPlatformTransactionManager getPlatformTransactionManager() {
         return transactionManager;
     }
 
-    public void setTransactionManager(AbstractPlatformTransactionManager transactionManager) {
+    public void setPlatformTransactionManager(AbstractPlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 

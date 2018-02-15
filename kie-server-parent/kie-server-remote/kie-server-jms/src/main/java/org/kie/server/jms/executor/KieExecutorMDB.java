@@ -15,7 +15,6 @@
 
 package org.kie.server.jms.executor;
 
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
@@ -29,7 +28,6 @@ import org.jbpm.executor.impl.ExecutorServiceImpl;
 import org.jbpm.executor.impl.jms.JmsAvailableJobsExecutor;
 import org.kie.api.executor.ExecutorService;
 import org.kie.server.services.api.KieServerExtension;
-import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
@@ -75,6 +73,7 @@ public class KieExecutorMDB extends JmsAvailableJobsExecutor {
         setClassCacheManager(new ClassCacheManager());
         setQueryService(((ExecutorServiceImpl) executorService).getQueryService());
         setExecutorStoreService(((ExecutorImpl) ((ExecutorServiceImpl) executorService).getExecutor()).getExecutorStoreService());
+        setExecutor(((ExecutorServiceImpl) executorService).getExecutor());
 
     }
 

@@ -60,6 +60,10 @@ public class SpringBootJBPMKieServerExtension extends JbpmKieServerExtension {
 
         this.executorService = executorService;
         this.queryService = queryService;
+        
+        if (executorService != null) {
+            this.isExecutorAvailable = true;
+        }
     }
 
     @Override
