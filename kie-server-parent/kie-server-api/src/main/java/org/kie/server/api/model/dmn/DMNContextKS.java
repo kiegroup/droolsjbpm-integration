@@ -16,7 +16,6 @@
 package org.kie.server.api.model.dmn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -118,11 +116,12 @@ public class DMNContextKS {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("DMNContextKS [namespace=").append(namespace).append(", modelName=").append(modelName);
-        builder.append(", decisionNames=").append(Arrays.toString(decisionNames.toArray()));
-        builder.append(", decisionIds=").append(Arrays.toString(decisionIds.toArray()));
-        builder.append(", dmnContext=").append(dmnContext).append("]");
-        return builder.toString();
+        return new StringBuilder("DMNContextKS [")
+               .append("namespace=").append(namespace)
+               .append(", modelName=").append(modelName)
+               .append(", decisionNames=").append(decisionNames)
+               .append(", decisionIds=").append(decisionIds)
+               .append(", dmnContext=").append(dmnContext)
+               .append("]").toString();
     }
 }
