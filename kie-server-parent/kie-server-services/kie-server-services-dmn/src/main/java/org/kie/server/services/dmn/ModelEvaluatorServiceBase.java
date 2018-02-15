@@ -15,7 +15,6 @@
 
 package org.kie.server.services.dmn;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -37,6 +36,7 @@ import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class ModelEvaluatorServiceBase {
     
     public ServiceResponse<DMNModelInfoList> getModels(String containerId) {
         try {
-            KieContainerInstanceImpl kContainer = context.getContainer(containerId);
+            KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
             DMNRuntime kieRuntime = kieSession.getKieRuntime(DMNRuntime.class);
             
@@ -94,7 +94,7 @@ public class ModelEvaluatorServiceBase {
     
     public ServiceResponse<DMNResultKS> evaluateDecisions(String containerId, String contextPayload, String marshallingType) {
         try {
-            KieContainerInstanceImpl kContainer = context.getContainer(containerId);
+            KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
             DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
             
