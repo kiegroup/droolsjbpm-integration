@@ -81,8 +81,8 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
             server = new KieServerExecutor() {
                 
                 @Override
-                protected void setKieServerProperties(boolean syncWithController) {
-                    super.setKieServerProperties(syncWithController);
+                protected void setKieServerProperties() {
+                    super.setKieServerProperties();
                     URL controllerUrl;
                     try {
                         origControllerUrl = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
@@ -206,7 +206,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
 
         controllerClient.startContainer(containerSpec);
 
-        server.startKieServer(true);
+        server.startKieServer();
 
         // Check that container is deployed on kie server.
         ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
@@ -258,7 +258,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         ContainerSpecList containerList = controllerClient.listContainerSpec(serverTemplate.getId());
         KieServerAssert.assertNullOrEmpty("Active containers spec found!", containerList.getContainerSpecs());
 
-        server.startKieServer(true);
+        server.startKieServer();
 
         // Check that no container is deployed on kie server.
         containersList = client.listContainers();
