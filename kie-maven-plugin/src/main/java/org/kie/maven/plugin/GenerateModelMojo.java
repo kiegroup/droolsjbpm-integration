@@ -41,7 +41,7 @@ import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
-import org.drools.modelcompiler.builder.CanonicalModelMavenPluginKieProject;
+import org.drools.modelcompiler.CanonicalModelMavenProject;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
@@ -126,7 +126,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
             setSystemProperties(properties);
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(CanonicalModelMavenPluginKieProject::new);
+            kieBuilder.buildAll(CanonicalModelMavenProject.class);
 
             InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
             List<String> generatedFiles = kieModule.getFileNames()
