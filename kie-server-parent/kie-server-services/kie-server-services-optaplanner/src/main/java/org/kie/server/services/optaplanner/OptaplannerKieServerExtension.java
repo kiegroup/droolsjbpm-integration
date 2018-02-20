@@ -82,17 +82,16 @@ public class OptaplannerKieServerExtension
         this.registry = registry;
         // the following threadpool will have a max thread count equal to the number of cores on the machine.
         // if new jobs are submited and all threads are busy, the reject policy will kick in.
-        int poolSize = Runtime.getRuntime().availableProcessors();
-        if ( poolSize >= 4 ) {
-            // Leave 1 processor alone to handle REST/JMS requests and run the OS
-            poolSize--;
-        }
+        int availableProcessorCount = Runtime.getRuntime().availableProcessors();     
+        int resolvedActiveThreadCount = availableProcessorCount <= 2 ? 1 : availableProcessorCount - 2;
+    
+       
         this.threadPool = new ThreadPoolExecutor(
-                Math.min(2, poolSize), // core size
-                poolSize, // max size
-                120, // idle timeout
-                                                 TimeUnit.SECONDS,
-                                                 new ArrayBlockingQueue<Runnable>(poolSize)); // queue with a size
+        		resolvedActiveThreadCount, 
+                resolvedActiveThreadCount,
+                10, // thread keep alive time
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(resolvedActiveThreadCount)); // queue with a size
         this.solverServiceBase = new SolverServiceBase( registry, threadPool );
 
         this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);
