@@ -65,6 +65,7 @@ import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
 import org.kie.server.api.model.dmn.DMNInputDataInfo;
+import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNMessageKS;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
@@ -197,6 +198,7 @@ public class XStreamMarshaller
         this.xstream.processAnnotations(DMNModelInfo.class);
         this.xstream.processAnnotations(DMNDecisionInfo.class);
         this.xstream.processAnnotations(DMNInputDataInfo.class);
+        this.xstream.processAnnotations(DMNItemDefinitionInfo.class);
 
         if (classes != null) {
             for (Class<?> clazz : classes) {

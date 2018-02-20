@@ -136,6 +136,7 @@ import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
 import org.kie.server.api.model.dmn.DMNInputDataInfo;
+import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNMessageKS;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
@@ -356,7 +357,8 @@ public class JaxbMarshaller implements Marshaller {
                 DMNModelInfoList.class,
                 DMNModelInfo.class,
                 DMNDecisionInfo.class,
-                DMNInputDataInfo.class
+                DMNInputDataInfo.class,
+                DMNItemDefinitionInfo.class
         };
     }
 

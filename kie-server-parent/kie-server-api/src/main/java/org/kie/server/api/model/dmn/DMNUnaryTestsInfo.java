@@ -23,49 +23,36 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "dmn-inputdata-info")
-@XStreamAlias("dmn-inputdata-info")
-public class DMNInputDataInfo {
+@XmlRootElement(name = "dmn-unarytests-info")
+@XStreamAlias("dmn-unarytests-info")
+public class DMNUnaryTestsInfo {
 
-    @XmlElement(name="inputdata-id")
-    @XStreamAlias("inputdata-id")
-    private String id;
+    @XmlElement(name = "unarytests-text")
+    @XStreamAlias("unarytests-text")
+    private String text;
 
-    @XmlElement(name="inputdata-name")
-    @XStreamAlias("inputdata-name")
-    private String name;
+    @XmlElement(name = "unarytests-expressionLanguage")
+    @XStreamAlias("unarytests-expressionLanguage")
+    private String expressionLanguage;
 
-    @XmlElement(name = "inputdata-typeRef")
-    @XStreamAlias("inputdata-typeRef")
-    private DMNQNameInfo typeRef;
-
-    public DMNInputDataInfo() {
+    public DMNUnaryTestsInfo() {
         // To avoid the need for kie-server-api to depend on kie-dmn-backend, in order to access DMN's Definitions and DMN's inputdata element
         // build this as DTO and only on server-side leverage setters to populate data as needed.
     }
     
-    public String getId() {
-        return id;
+    public String getText() {
+        return text;
     }
     
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
+    public void setText(String text) {
+        this.text = text;
     }
     
-    public void setName(String name) {
-        this.name = name;
+    public String getExpressionLanguage() {
+        return expressionLanguage;
     }
 
-    public DMNQNameInfo getTypeRef() {
-        return typeRef;
+    public void setExpressionLanguage(String expressionLanguage) {
+        this.expressionLanguage = expressionLanguage;
     }
-
-    public void setTypeRef(DMNQNameInfo typeRef) {
-        this.typeRef = typeRef;
-    }
-
 }

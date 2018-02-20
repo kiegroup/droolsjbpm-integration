@@ -59,6 +59,13 @@ public class DMNModelInfo {
     @XStreamAlias("inputs")
     private Collection<DMNInputDataInfo> inputs = new HashSet<>();
     
+    // note Jackson annotation is needed on this field and getter, in order for Jackson to NOT use JAXB annotation but proper Jackson annotation
+    @XmlElementWrapper(name = "itemDefinitions")
+    @XmlElement(name = "dmn-itemdefinition-info")
+    @JsonIgnore
+    @XStreamAlias("itemDefinitions")
+    private Collection<DMNItemDefinitionInfo> itemDefinitions = new HashSet<>();
+
     public DMNModelInfo() {
         // To avoid the need for kie-server-api to depend on kie-dmn-backend, in order to access DMN's Definitions and DMN's Decision element
         // build this as DTO and only on server-side leverage setters to populate data as needed.
@@ -104,6 +111,15 @@ public class DMNModelInfo {
     
     public void setInputs(Collection<DMNInputDataInfo> inputs) {
         this.inputs = inputs;
+    }
+
+    @JsonProperty("itemDefinitions")
+    public Collection<DMNItemDefinitionInfo> getItemDefinitions() {
+        return itemDefinitions;
+    }
+
+    public void setItemDefinitions(Collection<DMNItemDefinitionInfo> itemDefinitions) {
+        this.itemDefinitions = itemDefinitions;
     }
 
 }

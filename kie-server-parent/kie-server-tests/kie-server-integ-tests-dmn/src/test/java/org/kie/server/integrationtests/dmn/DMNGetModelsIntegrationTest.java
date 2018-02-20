@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -26,12 +28,15 @@ import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNInputDataInfo;
+import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
+import org.kie.server.api.model.dmn.DMNQNameInfo;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class DMNGetModelsIntegrationTest
@@ -72,17 +77,40 @@ public class DMNGetModelsIntegrationTest
         assertThat(modelInfo.getName(), is("a number a string a list of numbers"));
         
         Collection<DMNInputDataInfo> inputs = modelInfo.getInputs();
+        assertThat(inputs, hasSize(4));
 
-        assertThat(inputs, hasSize(3));
+        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a number", "feel", "number");
+        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a string", "feel", "string");
+        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a list of numbers", XMLConstants.DEFAULT_NS_PREFIX, "tList");
+        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a Person", XMLConstants.DEFAULT_NS_PREFIX, "tPerson");
 
-        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a number", "feel:number");
-        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a string", "feel:string");
-        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a list of numbers", "tList");
+        Collection<DMNItemDefinitionInfo> itemDefs = modelInfo.getItemDefinitions();
+        assertThat(itemDefs, hasSize(2));
+        DMNItemDefinitionInfo tList = itemDefs.stream().filter(id -> id.getName().equals("tList")).findFirst().get();
+        assertThat(tList.getTypeRef().getLocalPart(), is("number"));
+        assertThat(tList.getTypeRef().getPrefix(), is("feel"));
+        assertThat(tList.getIsCollection(), is(true));
+
+        DMNItemDefinitionInfo tPerson = itemDefs.stream().filter(id -> id.getName().equals("tPerson")).findFirst().get();
+        assertThat(tPerson.getTypeRef(), nullValue());
+        assertThat(tPerson.getIsCollection(), is(false));
+        assertThat(tPerson.getItemComponent(), hasSize(3));
+        assertThat(tPerson.getItemComponent().get(0).getName(), is("full name"));
+        assertThat(tPerson.getItemComponent().get(0).getTypeRef().getLocalPart(), is("string"));
+        assertThat(tPerson.getItemComponent().get(0).getTypeRef().getPrefix(), is("feel"));
+        assertThat(tPerson.getItemComponent().get(1).getName(), is("age"));
+        assertThat(tPerson.getItemComponent().get(1).getTypeRef().getLocalPart(), is("number"));
+        assertThat(tPerson.getItemComponent().get(1).getTypeRef().getPrefix(), is("feel"));
+        assertThat(tPerson.getItemComponent().get(2).getName(), is("favorite numbers"));
+        assertThat(tPerson.getItemComponent().get(2).getTypeRef().getLocalPart(), is("tList"));
+        assertThat(tPerson.getItemComponent().get(2).getTypeRef().getPrefix(), is(XMLConstants.DEFAULT_NS_PREFIX));
     }
 
-    private void assertCollectionOfInputDataForNameHasTypeRef(Collection<DMNInputDataInfo> inputs, String name, String typeRef) {
+    private void assertCollectionOfInputDataForNameHasTypeRef(Collection<DMNInputDataInfo> inputs, String name, String typeRefPrefix, String typeRefLocalPart) {
         DMNInputDataInfo idANumber = inputs.stream().filter(id -> id.getName().equals(name)).findFirst().get();
-        assertThat(idANumber.getTypeRef(), is(typeRef));
+        DMNQNameInfo typeRef = idANumber.getTypeRef();
+        assertThat(typeRef.getLocalPart(), is(typeRefLocalPart));
+        assertThat(typeRef.getPrefix(), is(typeRefPrefix));
     }
-    
+
 }
