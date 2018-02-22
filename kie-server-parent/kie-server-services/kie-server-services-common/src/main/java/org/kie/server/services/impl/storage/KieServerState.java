@@ -43,7 +43,7 @@ public class KieServerState {
 
     public KieServerState() {
         String defaultController = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
-        if (defaultController != null) {
+        if (defaultController != null && !defaultController.trim().isEmpty()) {
             String[] controllerList = defaultController.split(",");
 
             for (String controller : controllerList) {

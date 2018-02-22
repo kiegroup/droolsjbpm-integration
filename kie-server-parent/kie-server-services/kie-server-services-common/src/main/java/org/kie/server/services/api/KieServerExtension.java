@@ -61,4 +61,8 @@ public interface KieServerExtension {
         
         return messages;
     }
+    
+    default void serverStarted() {
+        
+    }
 }

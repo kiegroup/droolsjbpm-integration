@@ -91,7 +91,7 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
                 kieServerState = (KieServerState) xs.fromXML(serverStateFile);
                 // override controllers if given as system property
                 String defaultController = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
-                if (defaultController != null) {
+                if (defaultController != null && !defaultController.trim().isEmpty()) {
                     String[] controllerList = defaultController.split(",");
                     Set<String> controllers = new HashSet<String>();
                     for (String controller : controllerList) {

@@ -277,14 +277,13 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
             // build executor service
             executorService = ExecutorServiceFactory.newExecutorService(emf);
-            executorService.setInterval(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_INTERVAL, "3")));
+            executorService.setInterval(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_INTERVAL, "0")));
             executorService.setRetries(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_RETRIES, "3")));
             executorService.setThreadPoolSize(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_POOL, "1")));
             executorService.setTimeunit(TimeUnit.valueOf(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_TIME_UNIT, "SECONDS")));
 
             ((ExecutorImpl) ((ExecutorServiceImpl) executorService).getExecutor()).setQueueName(executorQueueName);
 
-            executorService.init();
 
             ((KModuleDeploymentService) deploymentService).setExecutorService(executorService);
         }
@@ -323,6 +322,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
         EntityManagerFactory emf = EntityManagerFactoryManager.get().remove(persistenceUnitName);
         if (emf != null && emf.isOpen()) {
             emf.close();
+        }
+    }
+
+    @Override
+    public void serverStarted() {
+        if (executorService != null) {
+
+            executorService.init();
         }
     }
 
@@ -609,7 +616,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
             final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
             descriptor.getBuilder()
                     .addWorkItemHandler(new NamedObjectModel("mvel", "async",
-                            "new org.jbpm.executor.impl.wih.AsyncWorkItemHandler(org.jbpm.executor.ExecutorServiceFactory.newExecutorService(),\"org.jbpm.executor.commands.PrintOutCommand\")"));
+                            "new org.jbpm.executor.impl.wih.AsyncWorkItemHandler(org.jbpm.executor.ExecutorServiceFactory.newExecutorService(null),\"org.jbpm.executor.commands.PrintOutCommand\")"));
 
             unit.setDeploymentDescriptor(descriptor);
         }

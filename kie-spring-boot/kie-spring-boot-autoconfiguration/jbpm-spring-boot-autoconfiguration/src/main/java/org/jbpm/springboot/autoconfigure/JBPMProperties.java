@@ -41,7 +41,7 @@ public class JBPMProperties implements InitializingBean {
 
 
     public static class Executor {
-        private int interval = 3;
+        private int interval = 0;
         private int threadPoolSize = 1;
         private int retries = 3;
         private String timeUnit = TimeUnit.SECONDS.name();
