@@ -170,7 +170,6 @@
             </Export-Package>
             <Import-Package>
               javax.jms;resolution:=optional,
-              org.codehaus.jackson;resolution:=optional,
               com.thoughtworks.xstream;resolution:=optional,
               org.xmlpull;resolution:=optional,
               javax.security.jacc;resolution:=optional,
