@@ -166,7 +166,9 @@ public class GenerateModelMojo extends AbstractKieMojo {
             final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
 
             try {
-                Files.createDirectories( packagesDestinationPath );
+                if(!Files.exists(packagesDestinationPath)) {
+                    Files.createDirectories(packagesDestinationPath);
+                }
                 Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
