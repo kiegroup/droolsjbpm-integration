@@ -282,8 +282,12 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobServicesClient.requeueRequest(jobId);
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
-        expected.setStatus(STATUS.QUEUED.toString());
-        assertRequestInfoInstance(expected, jobRequest);
+        assertNotNull(jobRequest);
+        assertEquals(expected.getId(), jobRequest.getId());
+        assertEquals(expected.getBusinessKey(), jobRequest.getBusinessKey());
+        // job is fired immediately when requeued
+        assertNotEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertEquals(expected.getCommandName(), jobRequest.getCommandName());
     }
 
     @Test

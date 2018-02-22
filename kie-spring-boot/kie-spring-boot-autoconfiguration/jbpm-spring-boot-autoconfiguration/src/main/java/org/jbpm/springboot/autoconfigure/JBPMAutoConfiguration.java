@@ -36,15 +36,8 @@ import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
 import org.jbpm.casemgmt.impl.CaseServiceImpl;
 import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
 import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
-import org.jbpm.executor.impl.AvailableJobsExecutor;
-import org.jbpm.executor.impl.ClassCacheManager;
-import org.jbpm.executor.impl.ExecutorImpl;
-import org.jbpm.executor.impl.ExecutorRunnable;
-import org.jbpm.executor.impl.ExecutorServiceImpl;
+import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.executor.impl.event.ExecutorEventSupport;
-import org.jbpm.executor.impl.jpa.ExecutorQueryServiceImpl;
-import org.jbpm.executor.impl.jpa.ExecutorRequestAdminServiceImpl;
-import org.jbpm.executor.impl.jpa.JPAExecutorStoreService;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -72,11 +65,7 @@ import org.jbpm.services.task.identity.DefaultUserInfo;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.jbpm.springboot.security.SpringSecurityIdentityProvider;
 import org.jbpm.springboot.security.SpringSecurityUserGroupCallback;
-import org.kie.api.executor.Executor;
-import org.kie.api.executor.ExecutorAdminService;
-import org.kie.api.executor.ExecutorQueryService;
 import org.kie.api.executor.ExecutorService;
-import org.kie.api.executor.ExecutorStoreService;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
@@ -321,62 +310,14 @@ public class JBPMAutoConfiguration {
     @ConditionalOnProperty(name = "jbpm.executor.enabled")
     public ExecutorService executorService(EntityManagerFactory entityManagerFactory, TransactionalCommandService transactionalCommandService, DeploymentService deploymentService) {
         
-        ExecutorEventSupport eventSupport = new ExecutorEventSupport();
-        // create instances of executor services
-
-        ExecutorQueryService queryService = new ExecutorQueryServiceImpl(true);
-        Executor executor = new ExecutorImpl();
-        ExecutorAdminService adminService = new ExecutorRequestAdminServiceImpl();
-
-        ExecutorStoreService storeService = new JPAExecutorStoreService(true) {
-
-            @Override
-            public Runnable buildExecutorRunnable() {
-                ExecutorRunnable runnable = new ExecutorRunnable();
-                AvailableJobsExecutor jobExecutor = new AvailableJobsExecutor();
-                ClassCacheManager classCacheManager = new ClassCacheManager();
-                ExecutorQueryService queryService = new ExecutorQueryServiceImpl(true);
-                
-                ExecutorStoreService storeService = new JPAExecutorStoreService(true);
-                ((JPAExecutorStoreService) storeService).setCommandService(transactionalCommandService);
-                ((JPAExecutorStoreService) storeService).setEmf(entityManagerFactory);
-
-                ((ExecutorQueryServiceImpl) queryService).setCommandService(transactionalCommandService);
-                jobExecutor.setClassCacheManager(classCacheManager);
-                jobExecutor.setQueryService(queryService);
-                jobExecutor.setExecutorStoreService(storeService);
-                jobExecutor.setEventSupport(eventSupport);
-                
-                runnable.setAvailableJobsExecutor(jobExecutor);
-                return runnable;
-            }
-            
-        };
-        ((JPAExecutorStoreService)storeService).setCommandService(transactionalCommandService);
-        ((JPAExecutorStoreService)storeService).setEmf(entityManagerFactory);
-        ((JPAExecutorStoreService)storeService).setEventSupport(eventSupport);
-        
-        ((ExecutorImpl) executor).setExecutorStoreService(storeService);
-        ((ExecutorImpl) executor).setEventSupport(eventSupport);
-        
-        // set executor on all instances that requires it
-        ((ExecutorQueryServiceImpl) queryService).setCommandService(transactionalCommandService);        
-        ((ExecutorRequestAdminServiceImpl) adminService).setCommandService(transactionalCommandService);
-        
-        
+        ExecutorEventSupport eventSupport = new ExecutorEventSupport();        
         // configure services
-        ExecutorService service = new ExecutorServiceImpl(executor);
-        ((ExecutorServiceImpl)service).setQueryService(queryService);
-        ((ExecutorServiceImpl)service).setExecutor(executor);
-        ((ExecutorServiceImpl)service).setAdminService(adminService);
-        ((ExecutorServiceImpl)service).setEventSupport(eventSupport);
+        ExecutorService service = ExecutorServiceFactory.newExecutorService(entityManagerFactory, transactionalCommandService, eventSupport);
         
         service.setInterval(properties.getExecutor().getInterval());
         service.setRetries(properties.getExecutor().getRetries());
         service.setThreadPoolSize(properties.getExecutor().getThreadPoolSize());
         service.setTimeunit(TimeUnit.valueOf(properties.getExecutor().getTimeUnit()));
-
-        service.init();
 
         ((KModuleDeploymentService) deploymentService).setExecutorService(service);
         
