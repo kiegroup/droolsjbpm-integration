@@ -136,7 +136,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
             getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
 
-            MemoryFileSystem mfs = ((MemoryKieModule) kieModule).getMemoryFileSystem();
+            MemoryFileSystem mfs = ((MemoryKieModule) ((CanonicalKieModule)kieModule).getInternalKieModule()).getMemoryFileSystem();
 
             final String droolsModelCompilerPath = "/generated-sources/drools-model-compiler/main/java";
             final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
@@ -166,7 +166,9 @@ public class GenerateModelMojo extends AbstractKieMojo {
             final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
 
             try {
-                Files.createDirectories( packagesDestinationPath );
+                if(!Files.exists(packagesDestinationPath)) {
+                    Files.createDirectories(packagesDestinationPath);
+                }
                 Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
