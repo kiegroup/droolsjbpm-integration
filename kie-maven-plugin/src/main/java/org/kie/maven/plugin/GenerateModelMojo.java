@@ -41,7 +41,6 @@ import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
-import org.drools.modelcompiler.CanonicalModelMavenProject;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
@@ -126,7 +125,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
             setSystemProperties(properties);
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(CanonicalModelMavenProject.class);
+            kieBuilder.buildAll(ExecutableModelMavenProject.class);
 
             InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
             List<String> generatedFiles = kieModule.getFileNames()
@@ -136,7 +135,9 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
             getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
 
-            MemoryFileSystem mfs = ((MemoryKieModule) ((CanonicalKieModule)kieModule).getInternalKieModule()).getMemoryFileSystem();
+            MemoryFileSystem mfs = kieModule instanceof CanonicalKieModule ?
+                    ((MemoryKieModule) ((CanonicalKieModule)kieModule).getInternalKieModule()).getMemoryFileSystem() :
+                    ((MemoryKieModule)kieModule).getMemoryFileSystem();
 
             final String droolsModelCompilerPath = "/generated-sources/drools-model-compiler/main/java";
             final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;

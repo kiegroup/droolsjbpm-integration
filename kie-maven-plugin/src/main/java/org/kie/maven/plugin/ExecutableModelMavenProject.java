@@ -1,0 +1,58 @@
+/*
+ * Copyright 2005 JBoss Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.kie.maven.plugin;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+
+import org.drools.compiler.compiler.io.Folder;
+import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
+import org.drools.compiler.kie.builder.impl.ResultsImpl;
+import org.drools.modelcompiler.builder.CanonicalModelKieProject;
+import org.drools.modelcompiler.builder.ModelWriter;
+import org.drools.modelcompiler.builder.ModelBuilderImpl;
+import org.kie.api.builder.KieBuilder;
+
+public class ExecutableModelMavenProject implements KieBuilder.ProjectType {
+
+    public static final BiFunction<InternalKieModule, ClassLoader, KieModuleKieProject> SUPPLIER = ExecutableModelMavenPluginKieProject::new;
+
+    public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
+
+        public ExecutableModelMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
+            super(true, kieModule, classLoader);
+        }
+
+        @Override
+        public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
+            MemoryFileSystem srcMfs = new MemoryFileSystem();
+            List<String> modelFiles = new ArrayList<>();
+            ModelWriter modelWriter = new ModelWriter();
+            for (ModelBuilderImpl modelBuilder : modelBuilders) {
+                ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageModels());
+                modelFiles.addAll(result.getModelFiles());
+                final Folder sourceFolder = srcMfs.getFolder("src/main/java");
+                final Folder targetFolder = trgMfs.getFolder(".");
+                srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
+            }
+            modelWriter.writeModelFile(modelFiles, trgMfs);
+        }
+    }
+}
