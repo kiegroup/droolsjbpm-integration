@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,6 +44,7 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
@@ -782,17 +782,17 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select t.actualowner_id as actualowner, t.CREATEDBY_ID as createdby, t.CREATEDON as CREATEDON, t.EXPIRATIONTIME as expirationDate, " +
                 "t.id as TASKID, t.name as NAME, t.priority as PRIORITY, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, t.STATUS as STATUS,  " +
-                "po.entity_id as POTOWNER, t.FORMNAME AS FORMNAME, ck.name as CORRELATIONKEY, t.subject as SUBJECT, t.deploymentid as DEPLOYMENTID " +
+                "po.entity_id as POTOWNER, t.FORMNAME AS FORMNAME, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.subject as SUBJECT, t.deploymentid as DEPLOYMENTID " +
                 "from TASK t " +
                 "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
-                "inner join CORRELATIONKEYINFO ck on t.processinstanceid = ck.processinstanceid");
+                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid");
         query.setTarget("CUSTOM");
         
         try {
 
             queryClient.registerQuery(query);
 
-            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_PO, 0, 10, TaskInstance.class);
+            List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_PO, 0, 10, TaskWithProcessDescription.class);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
             
@@ -814,21 +814,24 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("jbpmGetTaskWithPO");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select t.id as TASKID, t.name as NAME,  t.FORMNAME AS FORMNAME, t.subject as SUBJECT, t.actualowner_id as actualowner, " +
-                "po.entity_id as POTOWNER, ck.name as CORRELATIONKEY, t.CREATEDON as CREATEDON, t.CREATEDBY_ID as CREATEDBY, t.EXPIRATIONTIME as EXPIRATIONTIME, " +
-                "d.modificationdate as LASTMODIFICATIONDATE, t.priority as PRIORITY, t.STATUS as STATUS, t.PROCESSINSTANCEID as PROCESSINSTANCEID, " +
-                "t.PROCESSID as PROCESSID, t.deploymentid as DEPLOYMENTID, d.name as TVNAME, d.type as TVTYPE, d.value as TVVALUE " +
-                "from TASK t inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
-                "inner join CORRELATIONKEYINFO ck on t.processinstanceid = ck.processinstanceid " +
-                "inner join TASKEVENT te on t.id = te.taskid " +
-                "inner join TASKVARIABLEIMPL d on t.id=d.taskid ");
+        query.setExpression("select t.id as TASKID, t.name as NAME,  t.FORMNAME AS FORMNAME, t.subject as SUBJECT, " +
+                "t.actualowner_id as ACTUALOWNER, po.entity_id as POTOWNER, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.CREATEDON as CREATEDON, " +
+                "t.CREATEDBY_ID as CREATEDBY, t.EXPIRATIONTIME as EXPIRATIONTIME, " +
+                "(select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id) as lastmodificationdate, " +
+                "(select userid from taskevent where logtime = (select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id)) as lastmodificationuser, " +
+                "t.priority as PRIORITY, t.STATUS as STATUS, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, " +
+                "t.deploymentid as DEPLOYMENTID, d.name as TVNAME, d.type as TVTYPE, d.value as TVVALUE " +
+                "from TASK t " +
+                "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
+                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid " +
+                "inner join TASKVARIABLEIMPL d on t.id=d.taskid");
         query.setTarget("CUSTOM");
         
         try {
 
             queryClient.registerQuery(query);
 
-            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_MODIF, 0, 10, TaskInstance.class);
+            List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_MODIF, 0, 10, TaskWithProcessDescription.class);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
             
