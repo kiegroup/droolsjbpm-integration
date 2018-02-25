@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -65,10 +66,10 @@ import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
 import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
 import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
@@ -134,6 +135,8 @@ import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
+import org.kie.server.api.model.dmn.DMNInputDataInfo;
+import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNMessageKS;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
@@ -353,7 +356,9 @@ public class JaxbMarshaller implements Marshaller {
                 DMNDecisionResultKS.class,
                 DMNModelInfoList.class,
                 DMNModelInfo.class,
-                DMNDecisionInfo.class
+                DMNDecisionInfo.class,
+                DMNInputDataInfo.class,
+                DMNItemDefinitionInfo.class
         };
     }
 

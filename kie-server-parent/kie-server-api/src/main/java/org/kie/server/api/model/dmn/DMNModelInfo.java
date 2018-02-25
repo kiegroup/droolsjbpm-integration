@@ -15,8 +15,8 @@
 
 package org.kie.server.api.model.dmn;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -50,8 +50,22 @@ public class DMNModelInfo {
     @XmlElement(name="dmn-decision-info")
     @JsonIgnore
     @XStreamAlias("decisions")
-    private Set<DMNDecisionInfo> decisions = new HashSet<>();
+    private Collection<DMNDecisionInfo> decisions = new HashSet<>();
     
+    // note Jackson annotation is needed on this field and getter, in order for Jackson to NOT use JAXB annotation but proper Jackson annotation
+    @XmlElementWrapper(name="inputs")
+    @XmlElement(name="dmn-inputdata-info")
+    @JsonIgnore
+    @XStreamAlias("inputs")
+    private Collection<DMNInputDataInfo> inputs = new HashSet<>();
+    
+    // note Jackson annotation is needed on this field and getter, in order for Jackson to NOT use JAXB annotation but proper Jackson annotation
+    @XmlElementWrapper(name = "itemDefinitions")
+    @XmlElement(name = "dmn-itemdefinition-info")
+    @JsonIgnore
+    @XStreamAlias("itemDefinitions")
+    private Collection<DMNItemDefinitionInfo> itemDefinitions = new HashSet<>();
+
     public DMNModelInfo() {
         // To avoid the need for kie-server-api to depend on kie-dmn-backend, in order to access DMN's Definitions and DMN's Decision element
         // build this as DTO and only on server-side leverage setters to populate data as needed.
@@ -82,12 +96,30 @@ public class DMNModelInfo {
     }
     
     @JsonProperty("decisions")
-    public Set<DMNDecisionInfo> getDecisions() {
+    public Collection<DMNDecisionInfo> getDecisions() {
         return decisions;
     }
     
-    public void setDecisions(Set<DMNDecisionInfo> decisions) {
+    public void setDecisions(Collection<DMNDecisionInfo> decisions) {
         this.decisions = decisions;
     }
     
+    @JsonProperty("inputs")
+    public Collection<DMNInputDataInfo> getInputs() {
+        return inputs;
+    }
+    
+    public void setInputs(Collection<DMNInputDataInfo> inputs) {
+        this.inputs = inputs;
+    }
+
+    @JsonProperty("itemDefinitions")
+    public Collection<DMNItemDefinitionInfo> getItemDefinitions() {
+        return itemDefinitions;
+    }
+
+    public void setItemDefinitions(Collection<DMNItemDefinitionInfo> itemDefinitions) {
+        this.itemDefinitions = itemDefinitions;
+    }
+
 }

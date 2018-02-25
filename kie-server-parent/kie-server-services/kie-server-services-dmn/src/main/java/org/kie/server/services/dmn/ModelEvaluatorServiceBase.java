@@ -21,19 +21,31 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+
 import org.kie.api.runtime.KieSession;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
+import org.kie.dmn.api.core.ast.InputDataNode;
 import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.core.ast.InputDataNodeImpl;
+import org.kie.dmn.core.ast.ItemDefNodeImpl;
+import org.kie.dmn.model.v1_1.InputData;
+import org.kie.dmn.model.v1_1.ItemDefinition;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
+import org.kie.server.api.model.dmn.DMNInputDataInfo;
+import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
+import org.kie.server.api.model.dmn.DMNQNameInfo;
 import org.kie.server.api.model.dmn.DMNResultKS;
+import org.kie.server.api.model.dmn.DMNUnaryTestsInfo;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
@@ -82,6 +94,8 @@ public class ModelEvaluatorServiceBase {
         res.setName(model.getName());
         res.setId(model.getDefinitions().getId());
         res.setDecisions(model.getDecisions().stream().map(ModelEvaluatorServiceBase::decisionToInfo).collect(Collectors.toSet()));
+        res.setInputs(model.getInputs().stream().map(ModelEvaluatorServiceBase::inputDataToInfo).collect(Collectors.toSet()));
+        res.setItemDefinitions(model.getItemDefinitions().stream().map(id -> itemDefinitionToInfo(((ItemDefNodeImpl) id).getItemDef())).collect(Collectors.toSet()));
         return res;
     }
     
@@ -92,6 +106,43 @@ public class ModelEvaluatorServiceBase {
         return res;
     }
     
+    public static DMNInputDataInfo inputDataToInfo(InputDataNode inputDataNode) {
+        DMNInputDataInfo res = new DMNInputDataInfo();
+        res.setName(inputDataNode.getName());
+        res.setId(inputDataNode.getId());
+        InputData id = ((InputDataNodeImpl) inputDataNode).getInputData();
+        QName typeRef = id.getVariable().getTypeRef();
+        // for InputData sometimes the NS is not really valorized inside the jdk QName as internally ns are resolved by prefix directly.
+        if (typeRef != null && XMLConstants.NULL_NS_URI.equals(typeRef.getNamespaceURI())) {
+            String actualNS = id.getNamespaceURI(typeRef.getPrefix());
+            typeRef = new QName(actualNS, typeRef.getLocalPart(), typeRef.getPrefix());
+        }
+        res.setTypeRef(DMNQNameInfo.of(typeRef));
+        return res;
+    }
+    
+    public static DMNItemDefinitionInfo itemDefinitionToInfo(ItemDefinition itemDef) {
+        DMNItemDefinitionInfo res = new DMNItemDefinitionInfo();
+        res.setId(itemDef.getId());
+        res.setName(itemDef.getName());
+        if (itemDef.getTypeRef() != null) {
+            res.setTypeRef(DMNQNameInfo.of(itemDef.getTypeRef()));
+        }
+        if (itemDef.getAllowedValues() != null) {
+            DMNUnaryTestsInfo av = new DMNUnaryTestsInfo();
+            av.setText(itemDef.getAllowedValues().getText());
+            av.setExpressionLanguage(itemDef.getAllowedValues().getExpressionLanguage());
+            res.setAllowedValues(av);
+        }
+        if (itemDef.getItemComponent() != null && !itemDef.getItemComponent().isEmpty()) {
+            List<DMNItemDefinitionInfo> components = itemDef.getItemComponent().stream().map(ModelEvaluatorServiceBase::itemDefinitionToInfo).collect(Collectors.toList());
+            res.setItemComponent(components);
+        }
+        res.setTypeLanguage(itemDef.getTypeLanguage());
+        res.setIsCollection(itemDef.isIsCollection());
+        return res;
+    }
+
     public ServiceResponse<DMNResultKS> evaluateDecisions(String containerId, String contextPayload, String marshallingType) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());

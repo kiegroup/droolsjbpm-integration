@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<semantic:definitions xmlns:semantic="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns="http://www.trisotech.com/definitions/_90f31e4e-48cf-4d03-99b3-e75c15ee4b46" xmlns:feel="http://www.omg.org/spec/FEEL/20140401" xmlns:tc="http://www.omg.org/spec/DMN/20160719/testcase" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:trisofeed="http://trisotech.com/feed" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="DMN Modeler" exporterVersion="6.0.2.2" id="_90f31e4e-48cf-4d03-99b3-e75c15ee4b46" name="a number a string a list of numbers" namespace="http://www.trisotech.com/definitions/_90f31e4e-48cf-4d03-99b3-e75c15ee4b46" triso:logoChoice="Default">
+  <semantic:extensionElements>
+    <triso:dmnInputs>[{"name":"a string","id":"_75e1cc10-9bf2-4587-977d-c657f89123a5","type":"string"},{"name":"a number","id":"_b8f159b6-eccb-49d2-a378-cac1cd991a87","type":"number"},{"name":"a list of numbers","id":"_e2215d34-30b1-4a69-a26f-593cfc00479c","type":"number","isCollection":true},{"name":"a Person","id":"_bfaa6db1-90d4-4f11-b813-5d8583a9c295","type":"complex","children":[{"name":"full name","id":"_bfaa6db1-90d4-4f11-b813-5d8583a9c295_5607d5de-71e7-4a89-bf1c-bc53bc065dcd","type":"string"},{"name":"age","id":"_bfaa6db1-90d4-4f11-b813-5d8583a9c295_48f502dc-ab29-41c4-ac6b-e31bfe3dd59d","type":"number"},{"name":"favorite numbers","id":"_bfaa6db1-90d4-4f11-b813-5d8583a9c295_99c19617-e316-4a6b-8385-57ed8952692f","isCollection":true,"type":"number"}]}]</triso:dmnInputs>
+  </semantic:extensionElements>
+  <semantic:itemDefinition isCollection="true" label="tList" name="tList">
+    <semantic:typeRef>feel:number</semantic:typeRef>
+  </semantic:itemDefinition>
+  <semantic:itemDefinition label="tPerson" name="tPerson">
+    <semantic:itemComponent id="_5607d5de-71e7-4a89-bf1c-bc53bc065dcd" name="full name">
+      <semantic:typeRef>feel:string</semantic:typeRef>
+    </semantic:itemComponent>
+    <semantic:itemComponent id="_48f502dc-ab29-41c4-ac6b-e31bfe3dd59d" name="age">
+      <semantic:typeRef>feel:number</semantic:typeRef>
+    </semantic:itemComponent>
+    <semantic:itemComponent id="_99c19617-e316-4a6b-8385-57ed8952692f" name="favorite numbers">
+      <semantic:typeRef>tList</semantic:typeRef>
+    </semantic:itemComponent>
+  </semantic:itemDefinition>
+  <semantic:inputData id="_b8f159b6-eccb-49d2-a378-cac1cd991a87" name="a number">
+    <semantic:variable id="_a7e9fe7a-3f96-4b44-8b37-e2968de2f108" name="a number" typeRef="feel:number"/>
+  </semantic:inputData>
+  <semantic:inputData id="_75e1cc10-9bf2-4587-977d-c657f89123a5" name="a string">
+    <semantic:variable id="_d23f0692-431d-43d3-9ee5-dd3a6d019527" name="a string" typeRef="feel:string"/>
+  </semantic:inputData>
+  <semantic:inputData id="_e2215d34-30b1-4a69-a26f-593cfc00479c" name="a list of numbers">
+    <semantic:variable id="_64ea423b-501a-43d1-87f3-9d92d5932c7a" name="a list of numbers" typeRef="tList"/>
+  </semantic:inputData>
+  <semantic:decision id="_0aa6d516-a6b1-4a98-a139-38e308353fa1" name="a decision">
+    <semantic:variable id="_7b25dbdf-5da6-44e3-a314-0447d249e3a8" name="a decision" typeRef="feel:string"/>
+    <semantic:informationRequirement>
+      <semantic:requiredInput href="#_75e1cc10-9bf2-4587-977d-c657f89123a5"/>
+    </semantic:informationRequirement>
+    <semantic:informationRequirement>
+      <semantic:requiredInput href="#_b8f159b6-eccb-49d2-a378-cac1cd991a87"/>
+    </semantic:informationRequirement>
+    <semantic:informationRequirement>
+      <semantic:requiredInput href="#_e2215d34-30b1-4a69-a26f-593cfc00479c"/>
+    </semantic:informationRequirement>
+    <semantic:informationRequirement>
+      <semantic:requiredInput href="#_bfaa6db1-90d4-4f11-b813-5d8583a9c295"/>
+    </semantic:informationRequirement>
+    <semantic:literalExpression id="_8cba348b-c45d-479e-9fa4-6f811f98bc25">
+      <semantic:text>"You have supplied a number "+string(a number)+" a string "+a string+" and a list "+string(a list of numbers)</semantic:text>
+    </semantic:literalExpression>
+  </semantic:decision>
+  <semantic:inputData id="_bfaa6db1-90d4-4f11-b813-5d8583a9c295" name="a Person">
+    <semantic:variable id="_fa779f85-99a3-4edc-a36d-d97f0af57cd6" name="a Person" typeRef="tPerson"/>
+  </semantic:inputData>
+</semantic:definitions>
