@@ -100,6 +100,8 @@ public class ConvertUtils {
                 .date(pi.getDataTimeStamp())
                 .initiator(pi.getInitiator())
                 .state(pi.getState())
+                .slaCompliance(pi.getSlaCompliance())
+                .slaDueDate(pi.getSlaDueDate())
                 .build();
 
         if (pi.getActiveTasks() != null && !pi.getActiveTasks().isEmpty()) {
@@ -276,6 +278,8 @@ public class ConvertUtils {
                 .connection(nodeInstanceDesc.getConnection())
                 .date(nodeInstanceDesc.getDataTimeStamp())
                 .referenceId(nodeInstanceDesc.getReferenceId())
+                .slaCompliance(nodeInstanceDesc.getSlaCompliance())
+                .slaDueDate(nodeInstanceDesc.getSlaDueDate())
                 .build();
 
         return nodeInstance;
