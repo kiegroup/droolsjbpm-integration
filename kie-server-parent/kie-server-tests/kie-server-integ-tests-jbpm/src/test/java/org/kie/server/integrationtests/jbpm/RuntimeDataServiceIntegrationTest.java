@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -1321,24 +1322,35 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 50, "processInstanceId", false);
             assertNotNull(tasks);
 
+            List<TaskSummary> reservedTasks = new ArrayList<TaskSummary>();
+            for (TaskSummary taskSummary : tasks) {
+                if (Status.Reserved.toString().equals(taskSummary.getStatus())) {
+                    reservedTasks.add(taskSummary);
+                }
+            }
+
+            TaskSummary firstTask = reservedTasks.get(0);
+            TaskSummary secondTask = reservedTasks.get(1);
+            Assertions.assertThat(firstTask.getProcessInstanceId())
+                .as("First reserved task should have bigger process instance id as results should be sorted in descending order.")
+                .isGreaterThan(secondTask.getProcessInstanceId());
+
             //latest task is from second process
-            TaskSummary task = tasks.get(0);
             TaskSummary expectedTaskSummary;
             if (processInstanceId2 > processInstanceId) {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
             } else {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
             }
-            assertTaskSummary(expectedTaskSummary, task);
+            assertTaskSummary(expectedTaskSummary, firstTask);
 
-            task = tasks.get(1);
             expectedTaskSummary = null;
             if (processInstanceId2 > processInstanceId) {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
             } else {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
             }
-            assertTaskSummary(expectedTaskSummary, task);
+            assertTaskSummary(expectedTaskSummary, secondTask);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
