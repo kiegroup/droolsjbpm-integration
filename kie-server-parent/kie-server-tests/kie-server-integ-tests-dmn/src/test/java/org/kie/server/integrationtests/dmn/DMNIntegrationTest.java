@@ -41,6 +41,7 @@ public class DMNIntegrationTest
             "1.0.0.Final" );
 
     private static final String CONTAINER_1_ID  = "function-definition";
+    private static final String CONTAINER_1_ALIAS  = "functions";
 
     @BeforeClass
     public static void deployArtifacts() {
@@ -48,7 +49,7 @@ public class DMNIntegrationTest
         KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/function-definition" ).getFile() );
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
-        createContainer(CONTAINER_1_ID, kjar1);
+        createContainer(CONTAINER_1_ID, kjar1, CONTAINER_1_ALIAS);
     }
 
     @Override
@@ -113,5 +114,23 @@ public class DMNIntegrationTest
         assertThat( dmnResult.getMessages().isEmpty(), is(false) );
         
         assertThat( dmnResult.getMessages().stream().anyMatch(m -> m.getMessageType() == DMNMessageType.REQ_NOT_FOUND), is(true) );
+    }
+    
+    @Test
+    public void test_evaluateAllWithAlias() {
+        DMNContext dmnContext = dmnClient.newContext();
+        dmnContext.set( "a", 10 );
+        dmnContext.set( "b", 5 );
+        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ALIAS, dmnContext);
+        
+        assertEquals(ResponseType.SUCCESS, evaluateAll.getType());
+        
+        DMNResult dmnResult = evaluateAll.getResult();
+        
+        Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
+        assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
+        
+        Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
+        assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
     }
 }

@@ -945,6 +945,15 @@ public class KieServerImpl implements KieServer {
     public void markAsReady() {
         kieServerReady.set(true);
         logger.info("KieServer {} is ready to receive requests", KieServerEnvironment.getServerId());
+        
+        for (KieServerExtension extension : context.getServerExtensions()) {
+
+            try {
+                extension.serverStarted();
+            } catch (Exception e) {
+                logger.error("Error when destroying server extension of type {}", extension, e);
+            }
+        }
     }
     
     public List<Message> healthCheck(boolean report) throws IllegalStateException {

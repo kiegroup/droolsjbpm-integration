@@ -3,11 +3,9 @@ package org.kie.server.api.model.dmn;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,11 +18,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import org.drools.core.xml.jaxb.util.JaxbMapAdapter;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
-import org.kie.dmn.api.core.DMNDecisionResult.DecisionEvaluationStatus;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.DMNMessage.Severity;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
@@ -221,11 +217,14 @@ public class DMNResultKS implements DMNResult {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("DMNResultKS [namespace=").append(namespace).append(", modelName=").append(modelName);
-        builder.append(", decisionName=").append(Arrays.toString(decisionNames.toArray()));
-        builder.append(", dmnContext=").append(dmnContext).append(", messages=").append(messages).append(", decisionResults=").append(decisionResults).append("]");
-        return builder.toString();
+        return new StringBuilder("DMNResultKS [")
+               .append("namespace=").append(namespace)
+               .append(", modelName=").append(modelName)
+               .append(", decisionNames=").append(decisionNames)
+               .append(", dmnContext=").append(dmnContext)
+               .append(", messages=").append(messages)
+               .append(", decisionResults=").append(decisionResults)
+               .append("]").toString();
     }
      
     public static Object stubDMNResult(Object result) {

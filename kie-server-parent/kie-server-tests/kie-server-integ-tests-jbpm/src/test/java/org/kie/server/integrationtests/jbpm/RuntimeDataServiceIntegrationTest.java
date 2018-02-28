@@ -88,24 +88,24 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        assertEquals(14, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcesses(0, 3);
+        definitions = queryClient.findProcesses(0, 5);
 
         assertNotNull(definitions);
-        assertEquals(3, definitions.size());
+        assertEquals(5, definitions.size());
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
         assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
         assertTrue(processIds.contains(PROCESS_ID_TIMER));
 
-        definitions = queryClient.findProcesses(1, 3);
+        definitions = queryClient.findProcesses(1, 5);
         assertNotNull(definitions);
 
-        assertEquals(3, definitions.size());
+        assertEquals(5, definitions.size());
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
         assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
@@ -118,7 +118,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20, QueryServicesClient.SORT_BY_NAME, false);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        assertEquals(14, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -196,24 +196,24 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20);
         assertNotNull(definitions);
 
-        Assertions.assertThat(definitions).hasSize(12);
+        Assertions.assertThat(definitions).hasSize(14);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3);
+        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 5);
 
         assertNotNull(definitions);
-        assertEquals(3, definitions.size());
+        assertEquals(5, definitions.size());
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
         assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
         assertTrue(processIds.contains(PROCESS_ID_TIMER));
 
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 1, 3);
+        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 1, 5);
         assertNotNull(definitions);
 
-        assertEquals(3, definitions.size());
+        assertEquals(5, definitions.size());
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
         assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
@@ -232,7 +232,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        Assertions.assertThat(definitions).hasSize(12);
+        Assertions.assertThat(definitions).hasSize(14);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
