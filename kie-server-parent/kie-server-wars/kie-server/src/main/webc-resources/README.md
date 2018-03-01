@@ -47,8 +47,12 @@ This instruction describes all steps to install KIE Server on Tomcat 8 standalon
 
  7. Create setenv.sh|bat in TOMCAT_HOME/bin with following content
 
+    - setenv.sh:
     CATALINA_OPTS="-Xmx512M -Djbpm.tsr.jndi.lookup=java:comp/env/TransactionSynchronizationRegistry -Dorg.kie.server.persistence.ds=java:comp/env/jdbc/jbpm -Djbpm.tm.jndi.lookup=java:comp/env/TransactionManager -Dorg.kie.server.persistence.tm=JBossTS -Dhibernate.connection.release_mode=after_transaction -Dorg.kie.server.id=tomcat-kieserver -Dorg.kie.server.location=http://localhost:8080/kie-server/services/rest/server -Dorg.kie.server.controller=http://localhost:8080/kie-wb/rest/controller"
 
+    - setenv.bat:
+    set "CATALINA_OPTS=-Xmx512M -Djbpm.tsr.jndi.lookup=java:comp/env/TransactionSynchronizationRegistry -Dorg.kie.server.persistence.ds=java:comp/env/jdbc/jbpm -Djbpm.tm.jndi.lookup=java:comp/env/TransactionManager -Dorg.kie.server.persistence.tm=JBossTS -Dhibernate.connection.release_mode=after_transaction -Dorg.kie.server.id=tomcat-kieserver -Dorg.kie.server.location=http://localhost:8080/kie-server/services/rest/server -Dorg.kie.server.controller=http://localhost:8080/kie-wb/rest/controller"
+    
     Last three parameters might require reconfiguration as they depend on actual environment they run on:
     Actual kie server id to identify given kie server
     -Dorg.kie.server.id=tomcat-kieserver
@@ -73,7 +77,13 @@ This instruction describes all steps to install KIE Server on Tomcat 8 standalon
     </properties>
 
     Append to CATALINA_OPTS in setenv.sh|bat file following:
+    
+    - setenv.sh:
     -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery\;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml\ \;1
+    
+    - setenv.bat:
+    -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml" ";1
+
 
     BasicXARecovery supports following parameters:
      - path to the properties file
