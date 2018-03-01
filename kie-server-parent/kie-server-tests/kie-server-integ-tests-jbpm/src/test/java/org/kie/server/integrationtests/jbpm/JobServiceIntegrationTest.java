@@ -246,11 +246,15 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleAndRequeueJob() throws Exception {
-        String command = "org.jbpm.executor.commands.DelayedPrintOutCommand";
+        String command = "org.jbpm.executor.commands.LogCleanupCommand";
 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", BUSINESS_KEY);
-        data.put("delay", "wrong-value");
+        data.put("DateFormat", "wrong-value");
+        data.put("SkipProcessLog", "true");
+        data.put("SkipTaskLog", "true");
+        data.put("SkipExecutorLog", "true");
+        data.put("SingleRun", "true");
         data.put("retries", 0);
 
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
@@ -278,15 +282,19 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
         assertRequestInfoInstance(expected, jobRequest);
+        
+        data.put("DateFormat", "yyyy-MM-dd");
+        jobServicesClient.updateRequestData(jobId, null, data);
 
         jobServicesClient.requeueRequest(jobId);
+        
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
         assertNotNull(jobRequest);
         assertEquals(expected.getId(), jobRequest.getId());
         assertEquals(expected.getBusinessKey(), jobRequest.getBusinessKey());
-        // job is fired immediately when requeued
-        assertNotEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertEquals(STATUS.DONE.toString(), jobRequest.getStatus());
         assertEquals(expected.getCommandName(), jobRequest.getCommandName());
     }
 
