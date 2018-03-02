@@ -19,12 +19,15 @@ package org.kie.camel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
@@ -198,9 +201,26 @@ public class KieProducer extends DefaultProducer {
 
         private Map<String, Collection<Method>> indexClientMethod(Class<?> cls) {
             return Stream.of(cls.getMethods()).collect( groupingBy(Method::getName,
-                                                                   Collector.of(() -> new TreeSet<Method>( (m1,m2) -> m2.getParameterCount() - m1.getParameterCount() ),
+                                                                   Collector.of(() -> new TreeSet<Method>( methodComparator()),
                                                                                 Collection::add,
                                                                                 (left, right) -> { left.addAll(right); return left; })) );
+        }
+
+        private Comparator<Method> methodComparator() {
+            return (m1, m2) -> {
+                if (m1.getParameterCount() != m2.getParameterCount()) {
+                    return m2.getParameterCount() - m1.getParameterCount();
+                } else {
+                    // Just something returning a consistent ordering
+                    Function<Method, String> typeSerializer = m ->
+                            Arrays.stream(m.getParameterTypes())
+                                    .map(Class::getCanonicalName)
+                                    .reduce((c1, c2) -> c1 + "," + c2)
+                                    .orElse("");
+
+                    return typeSerializer.apply(m2).compareTo(typeSerializer.apply(m1));
+                }
+            };
         }
     }
 

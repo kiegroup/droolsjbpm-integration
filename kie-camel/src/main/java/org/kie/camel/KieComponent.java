@@ -50,6 +50,11 @@ public class KieComponent extends DefaultComponent {
 
         kieServicesConf.setUserName( kieConfiguration.getUsername() );
         kieServicesConf.setPassword( kieConfiguration.getPassword() );
+
+        if (kieConfiguration.getKieServicesConfigurationCustomizer() != null) {
+            kieServicesConf = kieConfiguration.getKieServicesConfigurationCustomizer().apply(kieServicesConf);
+        }
+
         return new KieEndpoint(uri, this, kieServicesConf, configuration);
     }
 
