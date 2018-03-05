@@ -82,10 +82,11 @@ public class OptaplannerKieServerExtension
             return;
         }
         this.registry = registry;
-        // the following threadpool will have a max thread count equal to the number of cores on the machine.
-        // if new jobs are submited and all threads are busy, the reject policy will kick in.
+        // The following thread pool will have a max thread count equal to the number of cores on the machine minus 2,
+        // leaving a few cores unoccupied to handle REST/JMS requests and run the OS.
+        // If new jobs are submitted and all threads are busy, the default reject policy will kick in.
         int availableProcessorCount = Runtime.getRuntime().availableProcessors();
-        int resolvedActiveThreadCount = availableProcessorCount <= 2 ? 1 : availableProcessorCount - 2;
+        int resolvedActiveThreadCount = Math.max(1, availableProcessorCount - 2);
         this.threadPool = new ThreadPoolExecutor(
                 resolvedActiveThreadCount,
                 resolvedActiveThreadCount,
