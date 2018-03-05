@@ -62,8 +62,7 @@ public class LoadBalancer {
         
         String baseUrl = balancerStrategy.markAsOffline(url);
         failedEndpoints.add(baseUrl);
-        logger.debug("Url '{}' is marked as failed and will be considered offline by {}", url, balancerStrategy);
-        
+        logger.debug("failed endpoint '{}' from Url '{}' is marked as failed and will be considered offline by {}  - failedEndpoints size='{}'", baseUrl, url, balancerStrategy, failedEndpoints.size());
         return baseUrl;
     }
 
@@ -71,7 +70,7 @@ public class LoadBalancer {
         
         String baseUrl = balancerStrategy.markAsOnline(url);
         failedEndpoints.remove(baseUrl);
-        logger.debug("Url '{}' is marked as activated and will be considered online by {}", url, balancerStrategy);
+        logger.debug("failed endpoint '{}' from Url '{}' is marked as activated and will be considered online by {} - failedEndpoints size='{}'", baseUrl, url, balancerStrategy, failedEndpoints.size());
     }
 
     public void close() {
