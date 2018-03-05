@@ -17,7 +17,7 @@ package org.kie.server.api.model.cases;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -53,6 +53,12 @@ public class CaseInstance {
 
     @XmlElement(name="case-completion-msg")
     private String completionMessage;
+    
+    @XmlElement(name="case-sla-compliance")
+    private Integer slaCompliance;
+    
+    @XmlElement(name="case-sla-due-date")
+    private Date slaDueDate;    
 
     @XmlElement(name="case-file")
     private CaseFile caseFile;
@@ -170,6 +176,22 @@ public class CaseInstance {
         this.roleAssignments = roleAssignments;
     }
 
+    public Integer getSlaCompliance() {
+        return slaCompliance;
+    }
+    
+    public void setSlaCompliance(Integer slaCompliance) {
+        this.slaCompliance = slaCompliance;
+    }
+    
+    public Date getSlaDueDate() {
+        return slaDueDate;
+    }
+    
+    public void setSlaDueDate(Date slaDueDate) {
+        this.slaDueDate = slaDueDate;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -244,6 +266,16 @@ public class CaseInstance {
 
         public Builder roleAssignments(List<CaseRoleAssignment> roleAssignments) {
             caseInstance.setRoleAssignments(roleAssignments);
+            return this;
+        }
+        
+        public Builder slaDueDate(Date slaDueDate) {
+            caseInstance.setSlaDueDate(slaDueDate);
+            return this;
+        }
+        
+        public Builder slaCompliance(Integer slaCompliance) {
+            caseInstance.setSlaCompliance(slaCompliance);
             return this;
         }
     }

@@ -125,6 +125,8 @@ public class ConvertUtils {
                 .startedAt(actualCaseInstance.getStartedAt())
                 .completedAt(actualCaseInstance.getCompletedAt())
                 .completionMessage(actualCaseInstance.getCompletionMessage())
+                .slaCompliance(actualCaseInstance.getSlaCompliance())
+                .slaDueDate(actualCaseInstance.getSlaDueDate())
                 .build();
     }
 
@@ -167,6 +169,8 @@ public class ConvertUtils {
                         .processInstanceId(an.getProcessInstanceId())
                         .workItemId(an.getWorkItemId())
                         .referenceId(an.getReferenceId())
+                        .slaCompliance(an.getSlaCompliance())
+                        .slaDueDate(an.getSlaDueDate())
                         .build())
                 .collect(toList());
     }
@@ -202,6 +206,8 @@ public class ConvertUtils {
                         .date(pi.getDataTimeStamp())
                         .initiator(pi.getInitiator())
                         .state(pi.getState())
+                        .slaCompliance(pi.getSlaCompliance())
+                        .slaDueDate(pi.getSlaDueDate())
                         .build()
         )
         .collect(toList());
