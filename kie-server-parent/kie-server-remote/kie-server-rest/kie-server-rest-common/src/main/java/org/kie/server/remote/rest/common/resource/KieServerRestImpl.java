@@ -173,7 +173,7 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.disposeContainer(id), headers, conversationIdHeader);
     }
 
-    @ApiOperation(value="Retrieves stanner information for given container",
+    @ApiOperation(value="Retrieves scanner information for given container",
             response=ServiceResponse.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
