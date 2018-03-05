@@ -17,6 +17,7 @@ package org.kie.server.api.model.instance;
 
 import java.util.Date;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -48,6 +49,10 @@ public class ProcessInstance {
     private String correlationKey;
     @XmlElement(name="parent-instance-id")
     private Long parentId;
+    @XmlElement(name="sla-compliance")
+    private Integer slaCompliance;   
+    @XmlElement(name="sla-due-date")
+    private Date slaDueDate;
 
     @XmlElement(name="active-user-tasks")
     private TaskSummaryList activeUserTasks;
@@ -165,6 +170,22 @@ public class ProcessInstance {
     public void setActiveUserTasks(TaskSummaryList activeUserTasks) {
         this.activeUserTasks = activeUserTasks;
     }
+    
+    public Integer getSlaCompliance() {
+        return slaCompliance;
+    }
+    
+    public void setSlaCompliance(Integer slaCompliance) {
+        this.slaCompliance = slaCompliance;
+    }
+    
+    public Date getSlaDueDate() {
+        return slaDueDate;
+    }
+    
+    public void setSlaDueDate(Date slaDueDate) {
+        this.slaDueDate = slaDueDate;
+    }
 
     @Override
     public String toString() {
@@ -247,6 +268,16 @@ public class ProcessInstance {
 
         public Builder activeUserTasks(TaskSummaryList activeUserTasks) {
             processInstance.setActiveUserTasks(activeUserTasks);
+            return this;
+        }
+        
+        public Builder slaDueDate(Date slaDueDate) {
+            processInstance.setSlaDueDate(slaDueDate);
+            return this;
+        }
+        
+        public Builder slaCompliance(Integer slaCompliance) {
+            processInstance.setSlaCompliance(slaCompliance);
             return this;
         }
     }
