@@ -32,6 +32,7 @@ import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.drools.DroolsKieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,7 @@ public class OptaplannerKieServerExtension
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
-        KieServerExtension droolsExtension = registry.getServerExtension("Drools");
+        KieServerExtension droolsExtension = registry.getServerExtension(DroolsKieServerExtension.EXTENSION_NAME);
         if (droolsExtension == null) {
             logger.warn("No Drools extension available, quiting...");
             return;
