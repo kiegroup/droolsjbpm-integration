@@ -36,13 +36,13 @@ public class SpringBootKieServerImpl extends KieServerImpl{
     
     @Override
     protected List<KieServerExtension> sortKnownExtensions() {
+        getServerRegistry().registerIdentityProvider(identityProvider);
         return extensions;
     }
 
     @Override
     public void init() {        
         super.init();
-        getServerRegistry().registerIdentityProvider(identityProvider);
     }
 
 
