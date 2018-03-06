@@ -62,7 +62,14 @@ public class SpringRuntimeManagerFactoryImpl extends RuntimeManagerFactoryImpl {
 		return super.newPerProcessInstanceRuntimeManager(environment, identifier);
 	}
 
-	public UserGroupCallback getUserGroupCallback() {
+	@Override
+    public RuntimeManager newPerCaseRuntimeManager(RuntimeEnvironment environment, String identifier) {
+	    disallowSharedTaskService(environment);
+        adjustEnvironment(environment);
+        return super.newPerCaseRuntimeManager(environment, identifier);
+    }
+
+    public UserGroupCallback getUserGroupCallback() {
 		return userGroupCallback;
 	}
 
