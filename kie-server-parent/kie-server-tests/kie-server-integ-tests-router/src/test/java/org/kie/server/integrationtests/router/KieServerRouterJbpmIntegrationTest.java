@@ -209,7 +209,7 @@ public class KieServerRouterJbpmIntegrationTest extends KieServerRouterBaseInteg
             assertEquals(1, instances.size());
 
             for (List row : instances) {
-                assertEquals(16, row.size());
+                assertEquals(18, row.size());
             }
 
 

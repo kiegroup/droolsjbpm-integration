@@ -323,7 +323,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             assertEquals(5, instances.size());
 
             for (List row : instances) {
-                assertEquals(16, row.size());
+                assertEquals(18, row.size());
             }
 
             instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_RAW, 0, 3, List.class);
