@@ -363,7 +363,7 @@ public class JBPMAutoConfiguration {
         caseService.setIdentityProvider(identityProvider);
         
         // build case configuration on deployment listener
-        CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(identityProvider);
+        CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(identityProvider, transactionalCommandService);
 
         // configure case mgmt services as listeners        
         ((KModuleDeploymentService)deploymentService).addListener(configurationListener);
