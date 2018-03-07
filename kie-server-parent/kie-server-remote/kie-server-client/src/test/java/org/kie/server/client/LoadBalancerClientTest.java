@@ -30,6 +30,8 @@ import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.common.rest.NoEndpointFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +54,8 @@ public class LoadBalancerClientTest {
     private WireMockServer wireMockServer3;
 
     private KieServicesConfiguration config;
+
+    private static final Logger logger = LoggerFactory.getLogger(LoadBalancerClientTest.class);
 
     protected WireMockServer createMockServer(String version, int port) {
         WireMockServer wireMockServer = new WireMockServer(port);
@@ -313,7 +317,7 @@ public class LoadBalancerClientTest {
             public void run() {
                 try {
                     startLatch.await();
-                    System.out.println("Th#" + threadNo + " Calling Kie Server ");
+                    logger.debug("Th#" + threadNo + " Calling Kie Server ");
 
                     // Stagger execution of threads by 20ms
                     Thread.sleep(20 * threadNo);
@@ -326,9 +330,10 @@ public class LoadBalancerClientTest {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+
+                    logger.debug("Exception while calling kie Server: "+e);
                 } finally {
-                    System.out.println("Th#" + threadNo +" Done.");
+                    logger.debug("Th#" + threadNo +" Done.");
                     stopLatch.countDown();
                 }
             }
@@ -409,7 +414,7 @@ public class LoadBalancerClientTest {
 
         // Kickoff first scenario
         int threadCount=2;
-        System.out.println("Starting 2 Threads");
+        logger.debug("Starting 2 Threads");
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch stopLatch = new CountDownLatch(threadCount);
         for (int i=1; i<= threadCount; i++) {
@@ -420,17 +425,17 @@ public class LoadBalancerClientTest {
 
         // We expect the threads to complete within 7 seconds
         stopLatch.await(7, TimeUnit.SECONDS);
-        System.out.println("\nEnd of Threads - ");
+        logger.debug("\nEnd of Threads - ");
 
         // Need to sleep to ensure background thread completes.
-        System.out.println("\nSleeping for 3 seconds - ");
+        logger.debug("\nSleeping for 3 seconds - ");
         Thread.sleep(3000);
 
         // Expect to now have server:/state incorrectly retained in failedEndpoints
         List<String> availableList = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getAvailableEndpoints();
-        availableList.forEach(item -> System.out.println("Available Endpoint : [" + item + "]"));
+        availableList.forEach(item -> logger.debug("Available Endpoint : [" + item + "]"));
         List<String> failedList = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getFailedEndpoints();
-        failedList.forEach(item -> System.out.println("Failed Endpoint : [" + item + "]"));
+        failedList.forEach(item -> logger.debug("Failed Endpoint : [" + item + "]"));
 
         // Now set up a subsequent request failure due to server temporarily not responding.");
         // Could have many successful requests up to this point after first failing scenario but as
@@ -474,7 +479,7 @@ public class LoadBalancerClientTest {
                                 "  </kie-server-info>\n" +
                                 "</response>"))
                 .willSetStateTo("After success 2"));
-        System.out.println(" Current wireMockServer1 stub count =" + wireMockServer1.listAllStubMappings().getMappings().size());
+        logger.debug(" Current wireMockServer1 stub count =" + wireMockServer1.listAllStubMappings().getMappings().size());
 
         // Make call to failing request
         try {
@@ -486,13 +491,13 @@ public class LoadBalancerClientTest {
 
         // Expect to now have server:/state incorrectly retained in availableEndpoints transferred from failedEndpoints
         availableList = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getAvailableEndpoints();
-        availableList.forEach(item -> System.out.println("Available Endpoint : [" + item + "]"));
+        availableList.forEach(item -> logger.debug("Available Endpoint : [" + item + "]"));
         failedList = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getFailedEndpoints();
         if (failedList.isEmpty()) {
-            System.out.println("Failed Endpoint : []");
+            logger.debug("Failed Endpoint : []");
         }
         else {
-            failedList.forEach(item -> System.out.println("Failed Endpoint : [" + item + "]"));
+            failedList.forEach(item -> logger.debug("Failed Endpoint : [" + item + "]"));
         }
 
         // Need delay here to give background thread a chance to complete scanning to see if server is online
