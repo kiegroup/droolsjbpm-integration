@@ -16,6 +16,7 @@
 package org.kie.server.api.model.instance;
 
 import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -47,6 +48,10 @@ public class NodeInstance {
     private Boolean completed;
     @XmlElement(name="reference-id")
     private Long referenceId;
+    @XmlElement(name="sla-compliance")
+    private Integer slaCompliance;   
+    @XmlElement(name="sla-due-date")
+    private Date slaDueDate;
 
     public NodeInstance() {
     }
@@ -143,6 +148,22 @@ public class NodeInstance {
         this.referenceId = referenceId;
     }
 
+    public Integer getSlaCompliance() {
+        return slaCompliance;
+    }
+    
+    public void setSlaCompliance(Integer slaCompliance) {
+        this.slaCompliance = slaCompliance;
+    }
+    
+    public Date getSlaDueDate() {
+        return slaDueDate;
+    }
+    
+    public void setSlaDueDate(Date slaDueDate) {
+        this.slaDueDate = slaDueDate;
+    }
+
     @Override
     public String toString() {
         return "NodeInstance{" +
@@ -217,6 +238,15 @@ public class NodeInstance {
 
         public Builder referenceId(Long referenceId) {
             nodeInstance.setReferenceId(referenceId);
+            return this;
+        }
+        public Builder slaDueDate(Date slaDueDate) {
+            nodeInstance.setSlaDueDate(slaDueDate);
+            return this;
+        }
+        
+        public Builder slaCompliance(Integer slaCompliance) {
+            nodeInstance.setSlaCompliance(slaCompliance);
             return this;
         }
 
