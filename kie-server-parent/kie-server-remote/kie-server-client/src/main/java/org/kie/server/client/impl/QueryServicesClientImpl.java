@@ -78,6 +78,8 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
@@ -1079,6 +1081,8 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             return ProcessInstanceList.class;
         } else if (TaskInstance.class.isAssignableFrom(resultType)) {
             return TaskInstanceList.class;
+        } else if (TaskWithProcessDescription.class.isAssignableFrom(resultType)) {
+            return TaskWithProcessDescriptionList.class;
         } else if (ExecutionErrorInstance.class.isAssignableFrom(resultType)) {
             return ExecutionErrorInstanceList.class;
         } else {

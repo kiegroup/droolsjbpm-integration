@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,18 @@ package org.kie.server.api.model.instance;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "task-instance")
-public class TaskInstance {
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "task-instance-custom")
+public class TaskWithProcessDescription {
+    
     @XmlElement(name="task-id")
     private Long id;
     @XmlElement(name="task-priority")
@@ -54,10 +56,6 @@ public class TaskInstance {
     private Date activationTime;
     @XmlElement(name="task-expiration-time")
     private Date expirationDate;
-    @XmlElement(name="task-skippable")
-    private Boolean skipable;
-    @XmlElement(name="task-workitem-id")
-    private Long workItemId;
     @XmlElement(name="task-process-instance-id")
     private Long processInstanceId;
     @XmlElement(name="task-parent-id")
@@ -66,6 +64,14 @@ public class TaskInstance {
     private String processId;
     @XmlElement(name="task-container-id")
     private String containerId;
+    @XmlElement(name="process-instance-desc")
+    private String processInstanceDescription;
+    @XmlElement(name="task-last-modification-user")
+    private String lastModificationUser;
+    @XmlElement(name="task-last-modificaiton-date")
+    private Date lastModificationDate;
+    @XmlElement(name="task-correlation-key")
+    private String correlationKey;
 
     @XmlElementWrapper(name="potential-owners")
     @XmlElement(name="task-pot-owners")
@@ -85,7 +91,7 @@ public class TaskInstance {
     @XmlElement(name="task-output-data")
     private Map<String, Object> outputData;
 
-    public TaskInstance() {
+    public TaskWithProcessDescription() {
     }
 
     public static Builder builder() {
@@ -196,22 +202,6 @@ public class TaskInstance {
         this.expirationDate = expirationDate;
     }
 
-    public Boolean getSkipable() {
-        return skipable;
-    }
-
-    public void setSkipable(Boolean skipable) {
-        this.skipable = skipable;
-    }
-
-    public Long getWorkItemId() {
-        return workItemId;
-    }
-
-    public void setWorkItemId(Long workItemId) {
-        this.workItemId = workItemId;
-    }
-
     public Long getProcessInstanceId() {
         return processInstanceId;
     }
@@ -235,6 +225,15 @@ public class TaskInstance {
     public void setProcessId(String processId) {
         this.processId = processId;
     }
+
+    public String getProcessInstanceDescription() {
+        return processInstanceDescription;
+    }
+
+    
+    public void setProcessInstanceDescription(String processInstanceDescription) {
+        this.processInstanceDescription = processInstanceDescription;
+    }
     
     public String getContainerId() {
         return containerId;
@@ -244,6 +243,30 @@ public class TaskInstance {
         this.containerId = containerId;
     }
     
+    public String getLastModificationUser() {
+        return lastModificationUser;
+    }
+
+    public void setLastModificationUser(String lastModificationUser) {
+        this.lastModificationUser = lastModificationUser;
+    }
+
+    public Date getLastModificationDate() {
+        return lastModificationDate;
+    }
+    
+    public void setLastModificationDate(Date lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
+    }
+    
+    public String getCorrelationKey() {
+        return correlationKey;
+    }
+    
+    public void setCorrelationKey(String correlationKey) {
+        this.correlationKey = correlationKey;
+    }
+
     public List<String> getPotentialOwners() {
         return potentialOwners;
     }
@@ -286,7 +309,7 @@ public class TaskInstance {
 
     @Override
     public String toString() {
-        return "TaskInstance{" +
+        return "TaskWithProcessDescription{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
@@ -295,14 +318,17 @@ public class TaskInstance {
                 ", processInstanceId=" + processInstanceId +
                 ", processId='" + processId + '\'' +
                 ", containerId='" + containerId + '\'' +
+                ", lastModificationDate='" + lastModificationDate + '\'' +
+                ", lastModificationUser='" + lastModificationUser + '\'' +
+                ", processInstanceDescription='" + processInstanceDescription + '\'' +
                 '}';
     }
 
     public static class Builder {
 
-        private TaskInstance taskInstance = new TaskInstance();
+        private TaskWithProcessDescription taskInstance = new TaskWithProcessDescription();
 
-        public TaskInstance build() {
+        public TaskWithProcessDescription build() {
             return taskInstance;
         }
 
@@ -371,16 +397,6 @@ public class TaskInstance {
             return this;
         }
 
-        public Builder skippable(Boolean skippable) {
-            taskInstance.setSkipable(skippable);
-            return this;
-        }
-
-        public Builder workItemId(Long workItemId) {
-            taskInstance.setWorkItemId(workItemId);
-            return this;
-        }
-
         public Builder processInstanceId(Long processInstanceId) {
             taskInstance.setProcessInstanceId(processInstanceId);
             return this;
@@ -396,6 +412,11 @@ public class TaskInstance {
             return this;
         }
         
+        public Builder processInstanceDescription(String processInstanceDescription) {
+            taskInstance.setProcessInstanceDescription(processInstanceDescription);
+            return this;
+        }
+
         public Builder containerId(String containerId) {
             taskInstance.setContainerId(containerId);
             return this;
@@ -426,5 +447,19 @@ public class TaskInstance {
             return this;
         }
         
+        public Builder lastModificationUser(String lastModificationUser) {
+            taskInstance.setLastModificationUser(lastModificationUser);
+            return this;
+        }
+
+        public Builder lastModificationDate(Date lastModificationDate) {
+            taskInstance.setLastModificationDate(lastModificationDate);
+            return this;
+        }
+
+        public Builder correlationKey(String correlationKey) {
+            taskInstance.setCorrelationKey(correlationKey);
+            return this;
+        }
     }
 }
