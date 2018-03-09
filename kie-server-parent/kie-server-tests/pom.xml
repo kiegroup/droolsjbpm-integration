@@ -491,7 +491,7 @@
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>org.jboss.naming.remote.client.InitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-        <cargo.container.id>wildfly10x</cargo.container.id>
+        <cargo.container.id>wildfly11x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -570,8 +570,8 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-        <!-- eap7 is basically wildfly10; until there is a EAP 7 specific containerId, 'wildfly10x' should work just fine -->
-        <cargo.container.id>wildfly10x</cargo.container.id>
+        <!-- eap7 is basically wildfly11; until there is a EAP 7 specific containerId, 'wildfly11x' should work just fine -->
+        <cargo.container.id>wildfly11x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
