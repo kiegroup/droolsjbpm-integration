@@ -166,6 +166,8 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
@@ -261,6 +263,8 @@ public class JaxbMarshaller implements Marshaller {
                 TaskInstanceList.class,
                 TaskSummary.class,
                 TaskSummaryList.class,
+                TaskWithProcessDescription.class,
+                TaskWithProcessDescriptionList.class,
 
                 TaskEventInstance.class,
                 TaskEventInstanceList.class,
