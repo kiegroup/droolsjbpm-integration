@@ -320,7 +320,7 @@ public class LoadBalancerClientTest {
                     logger.debug("Th#" + threadNo + " Calling Kie Server ");
 
                     // Stagger execution of threads by 20ms
-                    Thread.sleep(20 * threadNo);
+                    Thread.sleep(1 * threadNo);
                     // Call KieServer...
                     try {
                         ServiceResponse<KieServerStateInfo> response = this.kieClient.getServerState();
