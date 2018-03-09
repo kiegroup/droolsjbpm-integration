@@ -46,6 +46,8 @@ import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 
@@ -380,23 +382,23 @@ public class ConvertUtils {
         return instance;
     }
     
-    public static TaskInstanceList convertToTaskInstanceListPO(Collection<UserTaskInstanceWithPotOwnerDesc> instances) {
+    public static TaskWithProcessDescriptionList convertToTaskInstanceListPO(Collection<UserTaskInstanceWithPotOwnerDesc> instances) {
         if (instances == null) {
-            return new TaskInstanceList(new org.kie.server.api.model.instance.TaskInstance[0]);
+            return new TaskWithProcessDescriptionList(new org.kie.server.api.model.instance.TaskWithProcessDescription[0]);
         }
 
-        List<TaskInstance> taskInstances = new ArrayList<TaskInstance>(instances.size());
+        List<TaskWithProcessDescription> taskInstances = new ArrayList<TaskWithProcessDescription>(instances.size());
         for (UserTaskInstanceWithPotOwnerDesc task : instances) {
-            org.kie.server.api.model.instance.TaskInstance instance = convertToTaskPO(task);
+            org.kie.server.api.model.instance.TaskWithProcessDescription instance = convertToTaskPO(task);
             taskInstances.add(instance);
         }
 
-        return new TaskInstanceList(taskInstances);
+        return new TaskWithProcessDescriptionList(taskInstances);
     }
     
-    public static TaskInstance convertToTaskPO(UserTaskInstanceWithPotOwnerDesc userTask) {
+    public static TaskWithProcessDescription convertToTaskPO(UserTaskInstanceWithPotOwnerDesc userTask) {
 
-        TaskInstance instance = TaskInstance.builder()
+        TaskWithProcessDescription instance = TaskWithProcessDescription.builder()
                 .id(userTask.getTaskId())
                 .name(userTask.getName())
                 .processInstanceId(userTask.getProcessInstanceId())
@@ -418,6 +420,7 @@ public class ConvertUtils {
                 .lastModificationUser(userTask.getLastModificationUser())
                 .inputData(userTask.getInputdata())
                 .outputData(userTask.getOutputdata())
+                .processInstanceDescription(userTask.getProcessInstanceDescription())
                 .build();
 
         return instance;

@@ -24,16 +24,17 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.task.model.TaskSummary;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
@@ -45,6 +46,7 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
@@ -782,17 +784,17 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select t.actualowner_id as actualowner, t.CREATEDBY_ID as createdby, t.CREATEDON as CREATEDON, t.EXPIRATIONTIME as expirationDate, " +
                 "t.id as TASKID, t.name as NAME, t.priority as PRIORITY, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, t.STATUS as STATUS,  " +
-                "po.entity_id as POTOWNER, t.FORMNAME AS FORMNAME, ck.name as CORRELATIONKEY, t.subject as SUBJECT, t.deploymentid as DEPLOYMENTID " +
+                "po.entity_id as POTOWNER, t.FORMNAME AS FORMNAME, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.subject as SUBJECT, t.deploymentid as DEPLOYMENTID " +
                 "from TASK t " +
                 "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
-                "inner join CORRELATIONKEYINFO ck on t.processinstanceid = ck.processinstanceid");
+                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid");
         query.setTarget("CUSTOM");
         
         try {
 
             queryClient.registerQuery(query);
 
-            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_PO, 0, 10, TaskInstance.class);
+            List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_PO, 0, 10, TaskWithProcessDescription.class);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
             
@@ -814,21 +816,24 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("jbpmGetTaskWithPO");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select t.id as TASKID, t.name as NAME,  t.FORMNAME AS FORMNAME, t.subject as SUBJECT, t.actualowner_id as actualowner, " +
-                "po.entity_id as POTOWNER, ck.name as CORRELATIONKEY, t.CREATEDON as CREATEDON, t.CREATEDBY_ID as CREATEDBY, t.EXPIRATIONTIME as EXPIRATIONTIME, " +
-                "d.modificationdate as LASTMODIFICATIONDATE, t.priority as PRIORITY, t.STATUS as STATUS, t.PROCESSINSTANCEID as PROCESSINSTANCEID, " +
-                "t.PROCESSID as PROCESSID, t.deploymentid as DEPLOYMENTID, d.name as TVNAME, d.type as TVTYPE, d.value as TVVALUE " +
-                "from TASK t inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
-                "inner join CORRELATIONKEYINFO ck on t.processinstanceid = ck.processinstanceid " +
-                "inner join TASKEVENT te on t.id = te.taskid " +
-                "inner join TASKVARIABLEIMPL d on t.id=d.taskid ");
+        query.setExpression("select t.id as TASKID, t.name as NAME,  t.FORMNAME AS FORMNAME, t.subject as SUBJECT, " +
+                "t.actualowner_id as ACTUALOWNER, po.entity_id as POTOWNER, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.CREATEDON as CREATEDON, " +
+                "t.CREATEDBY_ID as CREATEDBY, t.EXPIRATIONTIME as EXPIRATIONTIME, " +
+                "(select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id) as lastmodificationdate, " +
+                "(select userid from taskevent where logtime = (select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id)) as lastmodificationuser, " +
+                "t.priority as PRIORITY, t.STATUS as STATUS, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, " +
+                "t.deploymentid as DEPLOYMENTID, d.name as TVNAME, d.type as TVTYPE, d.value as TVVALUE " +
+                "from TASK t " +
+                "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
+                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid " +
+                "inner join TASKVARIABLEIMPL d on t.id=d.taskid");
         query.setTarget("CUSTOM");
         
         try {
 
             queryClient.registerQuery(query);
 
-            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_MODIF, 0, 10, TaskInstance.class);
+            List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_MODIF, 0, 10, TaskWithProcessDescription.class);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
             
@@ -839,12 +844,49 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     }
 
+    @Test
+    public void testGetTasksWithPotentialOwnerDoubleGroup() throws Exception {
+        changeUser(USER_JOHN);
+        Long pidOne = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_DOUBLE_GROUP);
+        Long pidTwo = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_DOUBLE_GROUP);
+
+        QueryDefinition query = getTasksWithPotentialOwnerQueryDefinition();
+
+        try {
+            queryClient.registerQuery(query);
+            
+            List<org.kie.server.api.model.instance.TaskSummary> test = taskClient.findTasksAssignedAsPotentialOwner(USER_JOHN, 0, 10);
+            assertNotNull(test);
+            assertEquals(2, test.size());
+            
+            QueryFilterSpec filterSpec = new QueryFilterSpecBuilder().in("processInstanceId", Arrays.asList(pidOne, pidTwo)).get();
+            
+            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, filterSpec, 0, 10, TaskInstance.class);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pidOne);
+            processClient.abortProcessInstance(CONTAINER_ID, pidTwo);
+            queryClient.unregisterQuery(query.getName());
+            changeUser(USER_YODA);
+        }
+    }
+
     protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
         final QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstancesWithVars");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select pil.*, v.variableId, v.value " + "from ProcessInstanceLog pil " + "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " + "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " + "inner join VariableInstanceLog v " + "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " + "where pil.status = 1");
         query.setTarget("CUSTOM");
+        return query;
+    }
+
+    private QueryDefinition getTasksWithPotentialOwnerQueryDefinition() {
+        final QueryDefinition query = new QueryDefinition();
+        query.setName("getAllTasks");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select ti.taskId, ti.activationTime, ti.actualOwner, ti.createdBy, ti.createdOn, ti.deploymentId, ti.description, ti.dueDate, ti.name, ti.parentId, ti.priority, ti.processId, ti.processInstanceId, ti.processSessionId, ti.status, ti.workItemId, oe.id, eo.entity_id from AuditTaskImpl ti left join PeopleAssignments_PotOwners po on ti.taskId = po.task_id left join OrganizationalEntity oe on po.entity_id = oe.id left join PeopleAssignments_ExclOwners eo on ti.taskId = eo.task_id");
+        query.setTarget("PO_TASK");
         return query;
     }
 
