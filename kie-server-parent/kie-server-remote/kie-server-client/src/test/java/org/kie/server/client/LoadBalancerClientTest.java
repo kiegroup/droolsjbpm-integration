@@ -340,7 +340,7 @@ public class LoadBalancerClientTest {
         }
 
         // Setup a single server
-        config = KieServicesFactory.newRestConfiguration( mockServerBaseUri1, null, null );
+        config = KieServicesFactory.newRestConfiguration( mockServerBaseUri1, null, null,2 );
         config.setCapabilities(Arrays.asList("KieServer"));
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
@@ -356,7 +356,7 @@ public class LoadBalancerClientTest {
                 .inScenario("Timeout Fails followed by Scan Success")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(aResponse()
-                        .withFixedDelay(5100)
+                        .withFixedDelay(5)
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml")
                         .withBody("<response type=\"SUCCESS\" msg=\"Kie Server state\">\n" +
@@ -371,7 +371,7 @@ public class LoadBalancerClientTest {
                 .inScenario("Timeout Fails followed by Scan Success")
                 .whenScenarioStateIs("Req Timeout 1")
                 .willReturn(aResponse()
-                        .withFixedDelay(5100)
+                        .withFixedDelay(5)
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml")
                         .withBody("<response type=\"SUCCESS\" msg=\"Kie Server state\">\n" +
@@ -387,7 +387,7 @@ public class LoadBalancerClientTest {
                 .inScenario("Timeout Fails followed by Scan Success")
                 .whenScenarioStateIs("Req Timeout 2")
                 .willReturn(aResponse()
-                        .withFixedDelay(500)
+                        .withFixedDelay(2)
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml")
                         .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
@@ -429,7 +429,7 @@ public class LoadBalancerClientTest {
 
         // Need to sleep to ensure background thread completes.
         logger.debug("\nSleeping for 3 seconds - ");
-        Thread.sleep(3000);
+        Thread.sleep(100);
 
         // Expect to now have server:/state incorrectly retained in failedEndpoints
         List<String> availableList = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getAvailableEndpoints();
@@ -444,7 +444,7 @@ public class LoadBalancerClientTest {
                 .withHeader("Accept", equalTo("application/xml"))
                 .inScenario("Brief Timeout Fails followed by Scan Success")
                 .willReturn(aResponse()
-                        .withFixedDelay(5100)
+                        .withFixedDelay(5)
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml")
                         .withBody("<response type=\"SUCCESS\" msg=\"Kie Server state\">\n" +
@@ -501,7 +501,7 @@ public class LoadBalancerClientTest {
         }
 
         // Need delay here to give background thread a chance to complete scanning to see if server is online
-        Thread.sleep(1000);
+        Thread.sleep(100);
 
         // Set up what should be a successful request
         wireMockServer1.stubFor(get(urlEqualTo("/state"))
