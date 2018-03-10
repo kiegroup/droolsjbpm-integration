@@ -56,6 +56,12 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>kie-pmml</artifactId>
+       <exclusions>
+         <exclusion>
+           <groupId>ch.qos.logback</groupId>
+           <artifactId>logback-classic</artifactId>
+         </exclusion>
+       </exclusions>
     </dependency>
 
     <!-- appformer workbench models -->

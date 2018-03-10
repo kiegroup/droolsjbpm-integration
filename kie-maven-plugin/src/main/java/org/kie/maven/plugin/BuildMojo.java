@@ -20,13 +20,19 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.inject.Inject;
@@ -43,11 +49,15 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.drools.compiler.compiler.io.memory.MemoryFile;
+import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
 import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.compiler.kie.builder.impl.KieProject;
+import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
@@ -55,11 +65,15 @@ import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.core.common.ProjectClassLoader;
 import org.drools.core.rule.KieModuleMetaInfo;
 import org.drools.core.rule.TypeMetaInfo;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
+import org.kie.api.io.Resource;
+import org.kie.internal.io.ResourceFactory;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 
@@ -90,6 +104,11 @@ public class BuildMojo extends AbstractKieMojo {
     @Parameter
     private Map<String, String> properties;
 
+    @Parameter(required = false, defaultValue = "no")
+    private String usesPMML;
+
+    private boolean containsPMML;
+
     /**
      * Param passed by the Maven Incremental compiler to identify the value used in the kieMap to identify the
      * KieModuleMetaInfo from the current complation
@@ -110,6 +129,37 @@ public class BuildMojo extends AbstractKieMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         if(!ExecModelMode.shouldGenerateModel(generateModel)) {
             buildDrl();
+        }
+    }
+
+    private List<File> getResourceFiles(File parent) {
+        List<File> files = new ArrayList<>();
+        if (parent.isDirectory()) {
+            File children[] = parent.listFiles();
+            for (File child: children) {
+                if (child.isDirectory()) {
+                    List<File> childsFiles = getResourceFiles(child);
+                    if (childsFiles != null && !childsFiles.isEmpty()) files.addAll(childsFiles);
+                } else {
+                    files.add(child);
+                    if (child.getName().endsWith(".pmml")) containsPMML = true;
+                }
+            }
+        }
+        return files;
+    }
+
+    private void saveFile(MemoryFileSystem mfs, String fileName) throws MojoFailureException {
+        MemoryFile memFile = (MemoryFile)mfs.getFile(fileName);
+        final Path path = Paths.get(outputDirectory.getPath(), memFile.getPath().toPortableString());
+
+        try {
+            Files.deleteIfExists(path);
+            Files.createDirectories(path);
+            Files.copy(memFile.getContents(), path, StandardCopyOption.REPLACE_EXISTING);
+        } catch(IOException iox) {
+            iox.printStackTrace();
+            throw new MojoFailureException("Unable to write file", iox);
         }
     }
 
@@ -158,19 +208,53 @@ public class BuildMojo extends AbstractKieMojo {
 
         try {
             setSystemProperties(properties);
-            KieRepository kr = ks.getRepository();
-            InternalKieModule kModule = (InternalKieModule) kr.addKieModule(ks.getResources().newFileSystemResource(sourceFolder));
-            for (InternalKieModule kmoduleDep : kmoduleDeps) {
-                kModule.addKieDependency(kmoduleDep);
+            List<File> resources = getResourceFiles(sourceFolder);
+            ResultsImpl messages = null;
+            InternalKieModule kModule = null;
+            KieProject kieProject = null;
+            if (containsPMML) {
+                KieFileSystem kfs = ks.newKieFileSystem();
+                for (File file: resources) {
+                    if (!file.getPath().contains("META-INF")) {
+                        Resource fresource = ResourceFactory.newFileResource(file);
+                        kfs.write(fresource);
+                    }
+                }
+                final KieBuilderImpl kieBuilder = new KieBuilderImpl(kfs);
+                kieBuilder.buildAll();
+                messages = (ResultsImpl)kieBuilder.getResults();
+                kModule = (InternalKieModule)kieBuilder.getKieModule();
+                List<String> classFiles = kModule.getFileNames()
+                        .stream()
+                        .filter(name -> name.endsWith(".class"))
+                        .collect(Collectors.toList());
+
+                MemoryFileSystem mfs = kModule instanceof CanonicalKieModule ?
+                        ((MemoryKieModule) ((CanonicalKieModule)kModule).getInternalKieModule()).getMemoryFileSystem() :
+                        ((MemoryKieModule)kModule).getMemoryFileSystem();
+
+                for (String classFile: classFiles) {
+                    saveFile(mfs,classFile);
+                }
+                KieContainerImpl kieContainer = (KieContainerImpl)ks.newKieContainer(kModule.getReleaseId());
+
+                kieProject = kieContainer.getKieProject();
+
+
+            } else {
+                KieRepository kr = ks.getRepository();
+                kModule = (InternalKieModule) kr.addKieModule(ks.getResources().newFileSystemResource(sourceFolder));
+                for (InternalKieModule kmoduleDep : kmoduleDeps) {
+                    kModule.addKieDependency(kmoduleDep);
+                }
+
+                KieContainerImpl kContainer = (KieContainerImpl) ks.newKieContainer(kModule.getReleaseId());
+
+                kieProject = kContainer.getKieProject();
+
+                messages = kieProject.verify();
             }
-
-            KieContainerImpl kContainer = (KieContainerImpl) ks.newKieContainer(kModule.getReleaseId());
-
-            KieProject kieProject = kContainer.getKieProject();
-
-            ResultsImpl messages = kieProject.verify();
-
-            List<Message> errors = messages.filterMessages(Message.Level.ERROR);
+            List<Message> errors = messages != null ? messages.filterMessages(Message.Level.ERROR):Collections.emptyList();
             if (!errors.isEmpty()) {
                 for (Message error : errors) {
                     getLog().error(error.toString());
