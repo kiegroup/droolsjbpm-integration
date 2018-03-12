@@ -87,6 +87,12 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     }
 
     @Test
+    public void testStartNonExistingCaseDefinition() {
+        assertClientException(() -> caseClient.startCase(CONTAINER_ID, "NonExistingCaseDefinition"), 404,
+                              "Could not find case definition \"NonExistingCaseDefinition\" in container \"insurance\"");
+    }
+
+    @Test
     public void testCreateCaseWithEmptyCaseFile() {
         String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
 
