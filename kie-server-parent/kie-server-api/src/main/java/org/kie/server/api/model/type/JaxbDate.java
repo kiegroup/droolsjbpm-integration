@@ -26,7 +26,7 @@ import org.kie.server.api.model.Wrapped;
 
 @XmlRootElement(name = "date-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbDate implements Wrapped<Date> {
+public class JaxbDate implements Wrapped<Date>, Comparable<Date> {
 
     @XmlElement
     @XmlSchemaType(name = "dateTime")
@@ -50,5 +50,10 @@ public class JaxbDate implements Wrapped<Date> {
     @Override
     public Date unwrap() {
         return value;
+    }
+
+    @Override
+    public int compareTo(Date o) {
+        return value.compareTo(o);
     }
 }
