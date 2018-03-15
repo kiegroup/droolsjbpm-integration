@@ -143,6 +143,10 @@ public class QueryDataServiceBase {
     }
 
     public Object queryFiltered(String queryName, String mapper, Integer page, Integer pageSize, String payload, String marshallingType) {
+        return queryFiltered(null, queryName, mapper, page, pageSize, payload, marshallingType);
+    }
+
+    public Object queryFiltered(String containerId, String queryName, String mapper, Integer page, Integer pageSize, String payload, String marshallingType) {
         QueryParam[] params = new QueryParam[0];
         Map<String, String> columnMapping = null;
 
@@ -151,7 +155,11 @@ public class QueryDataServiceBase {
 
         if (payload != null && !payload.isEmpty()) {
             logger.debug("About to unmarshal queryDefinition from payload: '{}'", payload);
-            filterSpec = marshallerHelper.unmarshal(payload, marshallingType, QueryFilterSpec.class);
+            if(containerId != null) {
+                filterSpec = marshallerHelper.unmarshal(containerId, payload, marshallingType, QueryFilterSpec.class);
+            } else {
+                filterSpec = marshallerHelper.unmarshal(payload, marshallingType, QueryFilterSpec.class);
+            }
 
             // build parameters for filtering the query
             if (filterSpec.getParameters() != null) {
@@ -183,6 +191,10 @@ public class QueryDataServiceBase {
     }
 
     public Object queryFilteredWithBuilder(String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {
+        return queryFilteredWithBuilder(null, queryName, mapper, builder, page, pageSize, payload, marshallingType);
+    }
+
+    public Object queryFilteredWithBuilder(String containerId, String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {
         Map<String, String> columnMapping = null;
         QueryContext queryContext = buildQueryContext(page, pageSize);
         Map<String, Object> queryParameters = new HashMap<String, Object>();
@@ -192,7 +204,11 @@ public class QueryDataServiceBase {
 
         if (payload != null && !payload.isEmpty()) {
             logger.debug("About to unmarshal query params from payload: '{}'", payload);
-            queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
+            if(containerId != null) {
+                queryParameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+            } else {
+                queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
+            }
             orderBy = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY);
             ascending = (Boolean) queryParameters.remove(KieServerConstants.QUERY_ASCENDING);
             orderByClause = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY_CLAUSE);

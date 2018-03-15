@@ -43,29 +43,29 @@ public class QueryDataServiceBaseTest {
         Date today = new Date();
         KieServerEnvironment.setServerId(UUID.randomUUID().toString());
         QueryService queryService = Mockito.mock(QueryService.class);
-        
+
         KieServerRegistry context = new KieServerRegistryImpl();
         context.registerStateRepository(new KieServerStateFileRepository(new File("target")));
         JbpmKieServerExtension extension = new JbpmKieServerExtension();
         extension.setQueryService(queryService);
         extension.setContext(context);
         extension.registerDefaultQueryDefinitions();
-        
+
         QueryDataServiceBase queryServiceBase = new QueryDataServiceBase(queryService,context);
-        
+
         QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor("UserTasksWithPotOwners", null);
-        
+
         List<UserTaskInstanceWithPotOwnerDesc> result = new ArrayList<UserTaskInstanceWithPotOwnerDesc>();
         UserTaskInstanceWithPotOwnerDesc resultPO = new org.jbpm.kie.services.impl.model.UserTaskInstanceWithPotOwnerDesc(
-                                                                                         "mcivantos", "mcivantos", today,today,
-                                                                                         Long.valueOf(1), "test-task", 0, 
-                                                                                         Long.valueOf(1), "processId", "Reserved",
-                                                                                         "salaboy", "formName", "correlation-123", 
-                                                                                         "subject", "container-1","processDescription");
+                "mcivantos", "mcivantos", today, today,
+                Long.valueOf(1), "test-task", 0,
+                Long.valueOf(1), "processId", "Reserved",
+                "salaboy", "formName", "correlation-123",
+                "subject", "container-1","processDescription");
         result.add(resultPO);
 
         Object resultQueryBase = queryServiceBase.transform(result, resultMapper);
-        assertNotNull(resultQueryBase); 
+        assertNotNull(resultQueryBase);
     }
 
 }
