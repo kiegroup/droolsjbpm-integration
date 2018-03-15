@@ -39,6 +39,7 @@ import static org.kie.server.api.rest.RestURI.QUERY_DEF_URI;
 import static org.kie.server.api.rest.RestURI.QUERY_NAME;
 import static org.kie.server.api.rest.RestURI.QUERY_URI;
 import static org.kie.server.api.rest.RestURI.REPLACE_QUERY_DEF_PUT_URI;
+import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI;
 import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_POST_URI;
 import static org.kie.server.api.rest.RestURI.RUN_QUERY_DEF_GET_URI;
 import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_INSTANCE_ID_GET_URI;
@@ -989,6 +990,44 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "queryFilteredWithBuilder", serialize(safeMap(parameters)), marshaller.getFormat().getType(), new Object[]{queryName, mapper, builder, page, pageSize})));
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null) {
+
+            if (result instanceof ItemList) {
+                return ((ItemList<T>) result).getItems();
+            } else if (result instanceof List) {
+                return (List) result;
+            } else if (result instanceof Wrapped) {
+                return (List) ((Wrapped) result).unwrap();
+            }
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public <T> List<T> query(String containerId, String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType) {
+        Object result = null;
+        Class<?> resultTypeList = getResultTypeList(resultType);
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(QUERY_NAME, queryName);
+
+            String queryString = getPagingQueryString("?mapper=" + mapper + "&builder=" + builder, page, pageSize);
+
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI, valuesMap) + queryString, parameters, resultTypeList);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "queryFilteredWithBuilder", serialize(safeMap(parameters)), marshaller.getFormat().getType(), new Object[]{containerId, queryName, mapper, builder, page, pageSize})));
             ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
 
             throwExceptionOnFailure(response);

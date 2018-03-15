@@ -140,6 +140,11 @@ public class WebSocketKieServerClient implements KieServicesClient {
                 public <T> List<T> query(String queryName, String mapper, Integer page, Integer pageSize, Class<T> resultType) {
                     return throwUnsupportedException();
                 }
+
+                @Override
+                public <T> List<T> query(String containerId, String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType) {
+                    return throwUnsupportedException();
+                }
                 
                 @Override
                 public QueryDefinition getQuery(String queryName) {

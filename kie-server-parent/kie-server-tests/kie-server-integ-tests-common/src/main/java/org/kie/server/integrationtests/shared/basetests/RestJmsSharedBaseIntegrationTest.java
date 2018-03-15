@@ -78,6 +78,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
     protected static KieContainer kieContainer;
 
     protected static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
+    protected static final String CUSTOM_PARAM_CLASS_NAME = "org.jbpm.data.CustomParameter";
 
     @Override
     protected KieServicesClient createDefaultClient() throws Exception {
@@ -102,6 +103,10 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
 
     protected Object createPersonInstance(String name) {
         return createInstance(PERSON_CLASS_NAME, name);
+    }
+
+    protected Object createCustomParameterInstance(String name, long value) {
+        return createInstance(CUSTOM_PARAM_CLASS_NAME, name, value);
     }
 
     /**

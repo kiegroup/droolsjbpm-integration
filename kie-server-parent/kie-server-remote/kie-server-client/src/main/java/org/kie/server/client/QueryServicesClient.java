@@ -138,6 +138,8 @@ public interface QueryServicesClient {
 
     <T> List<T> query(String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType);
 
+    <T> List<T> query(String containerId, String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType);
+
     List<ProcessInstance> findProcessInstancesWithFilters(String queryName, ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize);
     
     List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);

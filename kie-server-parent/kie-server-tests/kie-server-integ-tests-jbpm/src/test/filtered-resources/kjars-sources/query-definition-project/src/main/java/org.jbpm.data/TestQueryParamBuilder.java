@@ -17,6 +17,7 @@
 package org.jbpm.data;
 
 import java.util.Map;
+import java.util.List;
 
 import org.dashbuilder.dataset.filter.ColumnFilter;
 import org.dashbuilder.dataset.filter.FilterFactory;
@@ -39,14 +40,25 @@ public class TestQueryParamBuilder implements QueryParamBuilder<ColumnFilter> {
         }
         
         String columnName = "processInstanceId";
-        
-        ColumnFilter filter = FilterFactory.OR(
-                FilterFactory.greaterOrEqualsTo(((Number)parameters.get("min")).longValue()),
-                FilterFactory.lowerOrEqualsTo(((Number)parameters.get("max")).longValue()));
-        filter.setColumnId(columnName);
+
+        ColumnFilter filter;
+        if(parameters.containsKey("customparams")) {
+            List customParamsList = (List) parameters.get("customparams");
+            CustomParameter paramOne = (CustomParameter) customParamsList.get(0);
+            CustomParameter paramTwo = (CustomParameter) customParamsList.get(1);
+            filter = FilterFactory.OR(
+                    FilterFactory.greaterOrEqualsTo(paramOne.getParamValue()),
+                    FilterFactory.lowerOrEqualsTo(paramTwo.getParamValue())
+            );
+            filter.setColumnId(columnName);
+        } else {
+            filter = FilterFactory.OR(
+                    FilterFactory.greaterOrEqualsTo(((Number)parameters.get("min")).longValue()),
+                    FilterFactory.lowerOrEqualsTo(((Number)parameters.get("max")).longValue()));
+            filter.setColumnId(columnName);
+        }
        
         built = true;
         return filter;
     }
-
 }
