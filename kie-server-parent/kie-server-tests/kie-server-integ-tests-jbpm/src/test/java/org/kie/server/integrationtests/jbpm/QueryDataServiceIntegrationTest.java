@@ -15,14 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +45,9 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
+
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "query-definition-project", "1.0.0.Final");
@@ -77,6 +72,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
+        extraClasses.put(CUSTOM_PARAMETER_CLASS_NAME, Class.forName(CUSTOM_PARAMETER_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
 
     @Test
@@ -297,6 +293,35 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             params.put("max", processInstanceIds.get(0));
 
             List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, "test", params, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
+    public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilderAndCustomParameters() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = createQueryDefinition("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("customparams",
+                       Arrays.asList(createCustomParameterInstance("min", processInstanceIds.get(4)),
+                                     createCustomParameterInstance("max", processInstanceIds.get(0))));
+
+            List<ProcessInstance> instances = queryClient.query(CONTAINER_ID, query.getName(), QueryServicesClient.QUERY_MAP_PI, "test", params, 0, 10, ProcessInstance.class);
             assertNotNull(instances);
             assertEquals(2, instances.size());
 
