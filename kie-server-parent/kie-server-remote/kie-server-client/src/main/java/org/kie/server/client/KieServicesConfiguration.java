@@ -15,17 +15,18 @@
 
 package org.kie.server.client;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.client.balancer.LoadBalancer;
-import org.kie.server.client.jms.ResponseHandler;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.balancer.LoadBalancer;
+import org.kie.server.client.jms.ResourcesCache;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface KieServicesConfiguration {
     public static enum Transport {
@@ -81,6 +82,8 @@ public interface KieServicesConfiguration {
     KieServicesConfiguration setRequestQueue(Queue requestQueue);
 
     Queue getResponseQueue();
+    
+    ResourcesCache getResources();
 
     KieServicesConfiguration setResponseQueue(Queue responseQueue);
 

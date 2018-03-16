@@ -16,6 +16,7 @@
 package org.kie.server.client.jms;
 
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.jms.Connection;
@@ -61,6 +62,11 @@ public class AsyncResponseHandler implements ResponseHandler {
     @Override
     public int getInteractionPattern() {
         return JMSConstants.ASYNC_REPLY_PATTERN;
+    }
+
+    @Override
+    public String getCorrelationID(KieServicesConfiguration config) {        
+        return UUID.randomUUID().toString();
     }
 
     @Override
@@ -129,29 +135,7 @@ public class AsyncResponseHandler implements ResponseHandler {
                     } catch (JMSException e) {
                         logger.warn("Error when closing JMS consumer due to {}", e.getMessage());
                     }
-                }
-                // submit work to executor service to close resources
-                // as they cannot be closed from message listener
-                // due to AMQ129006: It is illegal to call this method (session.close()) from within a Message Listener
-                executorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (session != null) {
-                                session.close();
-                                logger.debug("Session closed via separate thread.");
-                            }
-                            if (connection != null) {
-                                connection.close();
-                                logger.debug("Connection closed via separate thread.");
-                            }
-                        } catch (JMSException jmse) {
-                            logger.warn("Unable to close connection or session!", jmse);
-                        }
-
-                    }
-                });
-                logger.debug("Cleanup of JMS resources requested via separate thread.");
+                }    
             }
         }
     }

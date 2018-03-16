@@ -58,4 +58,8 @@ public interface ResponseHandler {
      * @param session jms session used
      */
     void dispose(Connection connection, Session session);
+    
+    default String getCorrelationID(KieServicesConfiguration config) {
+        return config.getResources().getIdentifier();
+    }
 }

@@ -17,6 +17,7 @@ package org.kie.server.client;
 
 import org.kie.server.client.impl.KieServicesClientImpl;
 import org.kie.server.client.impl.KieServicesConfigurationImpl;
+import org.kie.server.client.jms.ResourcesCache;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
@@ -90,6 +91,42 @@ public class KieServicesFactory {
      */
     public static KieServicesConfiguration newJMSConfiguration( InitialContext context, String username, String password ) {
         return new KieServicesConfigurationImpl( context, username, password );
+    }
+    
+    /**
+     * Creates a new configuration object for JMS based service
+     * @param connectionFactory a JMS connection factory
+     * @param requestQueue a reference to the requests queue
+     * @param responseQueue a reference to the responses queue
+     * @return configuration instance
+     */
+    public static KieServicesConfiguration newJMSConfiguration( ConnectionFactory connectionFactory, Queue requestQueue, Queue responseQueue, ResourcesCache resources) {
+        return new KieServicesConfigurationImpl( connectionFactory, requestQueue, responseQueue, resources );
+    }
+
+    /**
+     * Creates a new configuration object for JMS based service
+     * @param connectionFactory a JMS connection factory
+     * @param requestQueue a reference to the requests queue
+     * @param responseQueue a reference to the responses queue
+     * @param username user name
+     * @param password password
+     * @return configuration instance
+     */
+    public static KieServicesConfiguration newJMSConfiguration( ConnectionFactory connectionFactory, Queue requestQueue, Queue responseQueue,
+                                                                String username, String password, ResourcesCache resources ) {
+        return new KieServicesConfigurationImpl( connectionFactory, requestQueue, responseQueue, username, password, resources );
+    }
+
+    /**
+     * Creates a new configuration object for JMS based service
+     * @param context a context to look up for the JMS request and response queues
+     * @param username user name
+     * @param password user password
+     * @return configuration instance
+     */
+    public static KieServicesConfiguration newJMSConfiguration( InitialContext context, String username, String password, ResourcesCache resources ) {
+        return new KieServicesConfigurationImpl( context, username, password, resources );
     }
 
     /**

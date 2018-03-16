@@ -15,23 +15,25 @@
 
 package org.kie.server.client.impl;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.client.CredentialsProvider;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.client.balancer.LoadBalancer;
-import org.kie.server.client.credentials.EnteredCredentialsProvider;
-import org.kie.server.client.jms.RequestReplyResponseHandler;
-import org.kie.server.client.jms.ResponseHandler;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.CredentialsProvider;
+import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.balancer.LoadBalancer;
+import org.kie.server.client.credentials.EnteredCredentialsProvider;
+import org.kie.server.client.jms.RequestReplyResponseHandler;
+import org.kie.server.client.jms.ResourcesCache;
+import org.kie.server.client.jms.ResponseHandler;
 
 /**
  * In order to protect the Remote (Java) API, this class may not be extended nor may its constructor be made public.
@@ -63,6 +65,7 @@ public final class KieServicesConfigurationImpl
     private Queue             responseQueue;
     private ResponseHandler responseHandler = new RequestReplyResponseHandler();
     private boolean jmsTransactional = false;
+    private ResourcesCache resources;
 
     private MarshallingFormat format           = MarshallingFormat.JAXB;
     private Set<Class<?>>     extraClasses = new HashSet<Class<?>>();
@@ -155,6 +158,8 @@ public final class KieServicesConfigurationImpl
         this.responseQueue = responseQueue;
         this.credentialsProvider = null;
         checkValidValues( this.connectionFactory, this.requestQueue, this.responseQueue );
+        
+        this.resources = new ResourcesCache(connectionFactory, requestQueue, responseQueue, jmsTransactional, null, null);
     }
 
     public KieServicesConfigurationImpl(
@@ -162,6 +167,7 @@ public final class KieServicesConfigurationImpl
             Queue responseQueue, String username, String password) {
         this( connectionFactory, requestQueue, responseQueue );
         setAndCheckUserNameAndPassword( username, password );
+        
     }
 
     public KieServicesConfigurationImpl(InitialContext context, String username, String password) {
@@ -170,11 +176,47 @@ public final class KieServicesConfigurationImpl
         setRemoteInitialContext( context );
         this.credentialsProvider = new EnteredCredentialsProvider(username, password);
 
+        this.resources = new ResourcesCache(connectionFactory, requestQueue, responseQueue, jmsTransactional, userName, password);
+    }
+    
+    public KieServicesConfigurationImpl(ConnectionFactory connectionFactory, Queue requestQueue, Queue responseQueue, ResourcesCache resources) {
+        this.transport = Transport.JMS;
+        this.connectionFactory = connectionFactory;
+        this.requestQueue = requestQueue;
+        this.responseQueue = responseQueue;
+        this.credentialsProvider = null;
+        checkValidValues( this.connectionFactory, this.requestQueue, this.responseQueue );
+        
+        this.resources = resources;
+    }
+
+    public KieServicesConfigurationImpl(
+            ConnectionFactory connectionFactory, Queue requestQueue,
+            Queue responseQueue, String username, String password, ResourcesCache resources) {
+        this.transport = Transport.JMS;
+        this.connectionFactory = connectionFactory;
+        this.requestQueue = requestQueue;
+        this.responseQueue = responseQueue;
+        this.credentialsProvider = null;
+        checkValidValues( this.connectionFactory, this.requestQueue, this.responseQueue );
+        setAndCheckUserNameAndPassword( username, password );
+        
+        this.resources = resources;
+    }
+
+    public KieServicesConfigurationImpl(InitialContext context, String username, String password, ResourcesCache resources) {
+        this.transport = Transport.JMS;
+        setAndCheckUserNameAndPassword( username, password );
+        setRemoteInitialContext( context );
+        this.credentialsProvider = new EnteredCredentialsProvider(username, password);
+
+        this.resources = resources;
     }
 
     public void checkValidJmsValues() {
         checkValidValues( connectionFactory, requestQueue, responseQueue );
     }
+
 
     private static void checkValidValues(ConnectionFactory connectionFactory, Queue requestQueue, Queue responseQueue)
             throws IllegalStateException {
@@ -428,6 +470,10 @@ public final class KieServicesConfigurationImpl
         return this.headers;
     }
 
+    @Override
+    public ResourcesCache getResources() {
+        return resources;
+    }
 
     // Clone ---
     private KieServicesConfigurationImpl(KieServicesConfigurationImpl config) {
@@ -449,6 +495,7 @@ public final class KieServicesConfigurationImpl
         this.responseHandler = config.responseHandler;
         this.jmsTransactional = config.jmsTransactional;
         this.headers = config.headers;
+        this.resources = config.resources.copy();
     }
 
     @Override
@@ -490,4 +537,6 @@ public final class KieServicesConfigurationImpl
     public KieServicesConfiguration clearJaxbClasses() {
         return clearExtraClasses();
     }
+
+
 }
