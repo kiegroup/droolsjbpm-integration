@@ -347,8 +347,16 @@
           "methodName": "query",
           "elementKind": "method",
           "justification": "JBPM-6891 - Added support to pass container id when executing advanced query"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.client.jms.ResourcesCache org.kie.server.client.KieServicesConfiguration::getResources()",
+          "package": "org.kie.server.client",
+          "classSimpleName": "KieServicesConfiguration",
+          "methodName": "getResources",
+          "elementKind": "method",
+          "justification": "Allow to configure JMS to be cached"
         }
-
       ]
     }
   }

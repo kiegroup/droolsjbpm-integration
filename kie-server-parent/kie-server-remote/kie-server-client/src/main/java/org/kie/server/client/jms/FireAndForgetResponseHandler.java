@@ -16,8 +16,8 @@
 package org.kie.server.client.jms;
 
 import java.util.Arrays;
+
 import javax.jms.Connection;
-import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.Session;
 
@@ -54,15 +54,6 @@ public class FireAndForgetResponseHandler implements ResponseHandler {
 
     @Override
     public void dispose(Connection connection, Session session) {
-        try {
-            if ( session != null ) {
-                session.close();
-            }
-            if ( connection != null ) {
-                connection.close();
-            }
-        } catch( JMSException jmse ) {
-            logger.warn("Unable to close connection or session!", jmse);
-        }
+      
     }
 }

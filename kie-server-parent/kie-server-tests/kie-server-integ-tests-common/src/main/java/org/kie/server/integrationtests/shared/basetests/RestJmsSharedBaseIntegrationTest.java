@@ -25,6 +25,7 @@ import javax.naming.InitialContext;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.kie.api.command.KieCommands;
@@ -35,6 +36,7 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
+import org.kie.server.client.jms.ResourcesCache;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 
@@ -76,7 +78,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
 
     protected static KieCommands commandsFactory;
     protected static KieContainer kieContainer;
-
+    
     protected static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
     protected static final String CUSTOM_PARAM_CLASS_NAME = "org.jbpm.data.CustomParameter";
 
@@ -87,6 +89,11 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
             configuration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);
         }
         return createDefaultClient(configuration, marshallingFormat);
+    }
+    
+    @AfterClass
+    public static void clearResourceCache() {
+        JMSResourcePool.get().dispose();
     }
 
 
@@ -130,9 +137,11 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
             Queue responseQueue = (Queue) context.lookup(TestConfig.getResponseQueueJndi());
             ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(TestConfig.getConnectionFactory());
 
+            
             KieServicesConfiguration jmsConfiguration = KieServicesFactory.newJMSConfiguration(
                     connectionFactory, requestQueue, responseQueue, TestConfig.getUsername(),
-                    TestConfig.getPassword());
+                    TestConfig.getPassword(), 
+                    JMSResourcePool.get().resources(connectionFactory, requestQueue, responseQueue));
 
             return jmsConfiguration;
         } catch (Exception e) {

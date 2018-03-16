@@ -483,25 +483,14 @@ public abstract class AbstractKieServicesClientImpl {
         Connection connection = null;
         Session session = null;
         ServiceResponsesList cmdResponse = null;
-        String corrId = UUID.randomUUID().toString();
+        String corrId = responseHandler.getCorrelationID(config);
         String selector = "JMSCorrelationID = '" + corrId + "'";
         try {
             // setup
             MessageProducer producer;
-
-            try {
-                if( config.getPassword() != null ) {
-                    connection = factory.createConnection(config.getUserName(), config.getPassword());
-                } else {
-                    connection = factory.createConnection();
-                }
-                session = connection.createSession(config.isJmsTransactional(), Session.AUTO_ACKNOWLEDGE);
-                producer = session.createProducer(sendQueue);
-
-                connection.start();
-            } catch( JMSException jmse ) {
-                throw new KieServicesException("Unable to setup a JMS connection.", jmse);
-            }
+            connection = config.getResources().getConnection();
+            session = config.getResources().getSession();
+            producer = config.getResources().getProducer();
 
             // Create msg
             TextMessage textMsg;

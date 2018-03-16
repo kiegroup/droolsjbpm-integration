@@ -32,9 +32,11 @@ import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.slf4j.Logger;
@@ -67,6 +69,12 @@ public class ConcurrentRequestsIntegrationTest extends DroolsKieServerBaseIntegr
             KieContainer kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
             extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
         }
+    }
+
+    @Override
+    protected KieServicesClient createDefaultClient(KieServicesConfiguration configuration, MarshallingFormat marshallingFormat) throws Exception {
+        
+        return super.createDefaultClient(configuration.clone(), marshallingFormat);
     }
 
     @Test
