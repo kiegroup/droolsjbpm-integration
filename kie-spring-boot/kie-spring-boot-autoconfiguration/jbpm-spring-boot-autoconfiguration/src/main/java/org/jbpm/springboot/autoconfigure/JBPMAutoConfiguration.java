@@ -37,7 +37,7 @@ import org.jbpm.casemgmt.impl.CaseServiceImpl;
 import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
 import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
 import org.jbpm.executor.ExecutorServiceFactory;
-import org.jbpm.executor.impl.event.ExecutorEventSupport;
+import org.jbpm.executor.impl.event.ExecutorEventSupportImpl;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -310,7 +310,7 @@ public class JBPMAutoConfiguration {
     @ConditionalOnProperty(name = "jbpm.executor.enabled")
     public ExecutorService executorService(EntityManagerFactory entityManagerFactory, TransactionalCommandService transactionalCommandService, DeploymentService deploymentService) {
         
-        ExecutorEventSupport eventSupport = new ExecutorEventSupport();        
+        ExecutorEventSupportImpl eventSupport = new ExecutorEventSupportImpl();
         // configure services
         ExecutorService service = ExecutorServiceFactory.newExecutorService(entityManagerFactory, transactionalCommandService, eventSupport);
         
