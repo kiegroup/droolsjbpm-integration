@@ -16,27 +16,29 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
+import org.drools.core.command.runtime.RegisterChannelCommand;
+import org.drools.core.command.runtime.UnregisterChannelCommand;
 import org.kie.api.runtime.Channel;
-import org.kie.internal.runtime.KnowledgeRuntime;
+import org.kie.api.runtime.CommandExecutor;
 
 /** A consumer that consumes objects sent into channels of a drools
  * session */
 public class KieConsumer extends DefaultConsumer {
 
     private KieEndpoint ke;
-    private KnowledgeRuntime krt;
+    private CommandExecutor krt;
     private String channelId;
 
     public KieConsumer(Endpoint endpoint, Processor processor) {
         super(endpoint, processor);
         ke = (KieEndpoint)endpoint;
-        krt = (KnowledgeRuntime)ke.getExecutor();
+        krt = ke.getExecutor();
         channelId = ke.getChannel();
     }
 
     @Override
     protected void doStop() throws Exception {
-        krt.unregisterChannel(channelId);
+        krt.execute(new UnregisterChannelCommand(channelId));
         super.doStop();
     }
 
@@ -44,7 +46,7 @@ public class KieConsumer extends DefaultConsumer {
     protected void doStart() throws Exception {
         super.doStart();
         KSessionChannel channel = new KSessionChannel();
-        krt.registerChannel(channelId, channel);
+        krt.execute(new RegisterChannelCommand(channelId, channel));
     }
 
     class KSessionChannel implements Channel {

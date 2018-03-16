@@ -80,6 +80,12 @@
 
     <dependency>
       <groupId>org.apache.camel</groupId>
+      <artifactId>camel-cxf</artifactId>
+      <version>${version.org.apache.camel}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel</groupId>
       <artifactId>camel-cxf-transport</artifactId>
       <version>${version.org.apache.camel}</version>
       <exclusions>
