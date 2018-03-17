@@ -29,7 +29,17 @@ import org.jbpm.services.api.query.QueryService;
 import org.kie.api.executor.ExecutorService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.jbpm.DefinitionServiceBase;
+import org.kie.server.services.jbpm.DocumentServiceBase;
+import org.kie.server.services.jbpm.ExecutorServiceBase;
+import org.kie.server.services.jbpm.JBPMKieContainerCommandServiceImpl;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
+import org.kie.server.services.jbpm.ProcessServiceBase;
+import org.kie.server.services.jbpm.QueryDataServiceBase;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
+import org.kie.server.services.jbpm.UserTaskServiceBase;
+import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
+import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 
 public class SpringBootJBPMKieServerExtension extends JbpmKieServerExtension {
 
@@ -69,6 +79,12 @@ public class SpringBootJBPMKieServerExtension extends JbpmKieServerExtension {
     @Override
     protected void configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
         // all services are injected from JBPMAutoConfigure
+        
+        this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService, context),
+                                                                                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
+                                                                                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context),
+                                                                                 new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
+                                                                                 new UserTaskAdminServiceBase(userTaskAdminService, context));
     }
 
 }

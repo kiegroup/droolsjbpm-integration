@@ -116,7 +116,7 @@ public class JBPMAutoConfiguration {
         factoryBean.setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
         factoryBean.setPersistenceXmlLocation(PERSISTENCE_XML_LOCATION);
         factoryBean.setJtaDataSource(dataSource);
-        factoryBean.setJpaPropertyMap(jpaProperties.getHibernateProperties(dataSource));
+        factoryBean.setJpaPropertyMap(jpaProperties.getProperties());
                 
    
         return factoryBean;
