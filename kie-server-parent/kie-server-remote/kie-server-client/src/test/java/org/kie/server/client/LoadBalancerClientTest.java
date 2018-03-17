@@ -319,8 +319,8 @@ public class LoadBalancerClientTest {
                     startLatch.await();
                     logger.debug("Th#" + threadNo + " Calling Kie Server ");
 
-                    // Stagger execution of threads by 20ms
-                    Thread.sleep(1 * threadNo);
+                    // Stagger execution of threads by 5ms
+                    Thread.sleep(5 * threadNo);
                     // Call KieServer...
                     try {
                         ServiceResponse<KieServerStateInfo> response = this.kieClient.getServerState();
@@ -340,7 +340,7 @@ public class LoadBalancerClientTest {
         }
 
         // Setup a single server
-        config = KieServicesFactory.newRestConfiguration( mockServerBaseUri1, null, null,2 );
+        config = KieServicesFactory.newRestConfiguration( mockServerBaseUri1, null, null,4 );
         config.setCapabilities(Arrays.asList("KieServer"));
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
@@ -387,7 +387,7 @@ public class LoadBalancerClientTest {
                 .inScenario("Timeout Fails followed by Scan Success")
                 .whenScenarioStateIs("Req Timeout 2")
                 .willReturn(aResponse()
-                        .withFixedDelay(2)
+                        .withFixedDelay(3)
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml")
                         .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
