@@ -36,14 +36,12 @@ import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
 import org.junit.Test;
-import org.kie.api.cdi.KSession;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.internal.command.CommandFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.camel.embedded.pipeline.camel.Person;
+import org.kie.pipeline.camel.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

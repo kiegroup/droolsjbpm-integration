@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.kie.camel.embedded.pipeline.camel;
+package org.kie.pipeline.camel;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -16,7 +16,7 @@
  * and open the template in the editor.
  */
 
-package org.kie.camel.embedded.pipeline.camel;
+package org.kie.pipeline.camel;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

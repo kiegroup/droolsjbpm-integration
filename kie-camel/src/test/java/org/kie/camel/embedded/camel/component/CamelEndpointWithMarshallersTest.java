@@ -48,7 +48,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.camel.embedded.component.KiePolicy;
 import org.kie.internal.runtime.helper.BatchExecutionHelper;
-import org.kie.camel.embedded.pipeline.camel.Person;
+import org.kie.pipeline.camel.Person;
 
 public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
     private String handle;

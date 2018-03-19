@@ -36,7 +36,7 @@ import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.ObjectInsertedEvent;
 import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.KieSession;
-import org.kie.camel.embedded.pipeline.camel.Person;
+import org.kie.pipeline.camel.Person;
 import org.mockito.ArgumentCaptor;
 
 import static org.hamcrest.core.Is.is;

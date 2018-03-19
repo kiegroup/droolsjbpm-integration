@@ -45,8 +45,8 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.kie.camel.embedded.component.KiePolicy;
 import org.kie.internal.builder.JaxbConfiguration;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.camel.embedded.pipeline.camel.Person;
-import org.kie.camel.embedded.pipeline.camel.WrappedList;
+import org.kie.pipeline.camel.Person;
+import org.kie.pipeline.camel.WrappedList;
 
 public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSupport {
 

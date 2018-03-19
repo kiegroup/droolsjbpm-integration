@@ -38,7 +38,7 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.internal.command.CommandFactory;
-import org.kie.camel.embedded.pipeline.camel.Person;
+import org.kie.pipeline.camel.Person;
 
 public class CamelProxyEndpointTest extends KieCamelTestSupport {
     private String handle;
