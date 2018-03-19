@@ -17,7 +17,8 @@
 package org.kie.server.springboot.samples;
 
 import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.HashMap;
@@ -43,6 +44,11 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.services.api.KieContainerCommandService;
+import org.kie.server.services.api.KieServer;
+import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.impl.KieServerImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -68,6 +74,9 @@ public class KieServerTest {
     private String processId = "evaluation";
     
     private KieServicesClient kieServicesClient;
+    
+    @Autowired
+    private KieServer kieServer;
     
     @BeforeClass
     public static void generalSetup() {
@@ -173,5 +182,14 @@ public class KieServerTest {
         ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
         assertNotNull(processInstance);
         assertEquals(3, processInstance.getState().intValue());        
+    }
+    
+    @Test
+    public void testCommandServiceSetup() {
+        for (KieServerExtension extension : ((KieServerImpl)kieServer).getServerExtensions()) {
+            KieContainerCommandService<?> tmp = extension.getAppComponents(KieContainerCommandService.class);
+
+            assertNotNull(tmp);
+        }
     }
 }
