@@ -61,10 +61,10 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
         SetGlobalCommand setGlobal = new SetGlobalCommand("list", new WrappedList());
         setGlobal.setOutIdentifier("list");
 
-        cmd.getCommands().add(setGlobal);
-        cmd.getCommands().add(new InsertObjectCommand(new Person("baunax")));
-        cmd.getCommands().add(new FireAllRulesCommand());
-        cmd.getCommands().add(new GetGlobalCommand("list"));
+        cmd.addCommand(setGlobal);
+        cmd.addCommand(new InsertObjectCommand(new Person("baunax")));
+        cmd.addCommand(new FireAllRulesCommand());
+        cmd.addCommand(new GetGlobalCommand("list"));
 
         Marshaller marshaller = getJaxbContext().createMarshaller();
         marshaller.setProperty("jaxb.formatted.output", true);
@@ -94,8 +94,8 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
 
         String rule = "";
         rule += "package org.kie.pipeline.camel \n";
-        rule += "import org.kie.camel.embedded.pipeline.camel.Person\n";
-        rule += "import org.kie.camel.embedded.pipeline.camel.WrappedList\n";
+        rule += "import org.kie.pipeline.camel.Person\n";
+        rule += "import org.kie.pipeline.camel.WrappedList\n";
         rule += "global WrappedList list\n";
         rule += "rule rule1 \n";
         rule += "  when \n";

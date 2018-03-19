@@ -1,0 +1,720 @@
+
+@declare{"testListenForChanges.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testListenForChanges.in.2"}
+
+<batch-execution>
+    <insert out-identifier="person" return-object="true">
+        <org.kie.camel.testdomain.Person>
+            <name>mic</name>
+            <age>0</age>
+            <sex/>
+            <alive>false</alive>
+        </org.kie.camel.testdomain.Person>
+    </insert>
+    <insert out-identifier="changes" return-object="true">
+        <org.kie.camel.testdomain.ChangeCollector/>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testListenForChanges.expected.1"}
+
+<execution-results>
+    <result identifier="changes">
+        <org.kie.camel.testdomain.ChangeCollector>
+            <changes>
+                <org.kie.camel.testdomain.Cheese>
+                    <type>stilton</type>
+                    <price>42</price>
+                    <oldPrice>0</oldPrice>
+                </org.kie.camel.testdomain.Cheese>
+            </changes>
+        </org.kie.camel.testdomain.ChangeCollector>
+    </result>
+    <result identifier="person">
+        <org.kie.camel.testdomain.Person>
+            <name>mic</name>
+            <age>0</age>
+            <sex/>
+            <alive>false</alive>
+        </org.kie.camel.testdomain.Person>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="changes"/>
+    <fact-handle external-form="@{var2}" identifier="person"/>
+</execution-results>
+@end{}
+
+@declare{"testListenForChanges.in.3"}
+
+<batch-execution>
+    <insert out-identifier="person" return-object="true">
+        <org.kie.camel.testdomain.Person>
+            <name>mark</name>
+            <age>0</age>
+            <sex/>
+            <alive>false</alive>
+        </org.kie.camel.testdomain.Person>
+    </insert>
+    <insert out-identifier="changes" return-object="true">
+        <org.kie.camel.testdomain.ChangeCollector/>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertWithDefaults.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertWithDefaults.expected.1"}
+
+<execution-results>
+    <result identifier="outStilton">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="outStilton"/>
+</execution-results>
+@end{}
+
+@declare{"testInsertWithReturnObjectFalse.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="false">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertWithReturnObjectFalse.expected.1"}
+
+<execution-results>
+    <fact-handle external-form="@{var1}" identifier="outStilton"/>
+</execution-results>
+@end{}
+
+@declare{"testFactHandleReturn.in.1"}
+
+<batch-execution>
+    <get-global identifier="list1" out-identifier="out-list"/>
+</batch-execution>
+@end{}
+
+@declare{"testFactHandleReturn.expected.1"}
+
+<execution-results>
+    <result identifier="out-list">
+        <list>
+            <fact-handle external-form="@{var1}"/>
+        </list>
+    </result>
+</execution-results>
+@end{}
+
+@declare{"testGetObject.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules max="10"/>
+</batch-execution>
+@end{}
+
+@declare{"testGetObject.in.2"}
+
+<batch-execution>
+    <get-object fact-handle="0:1:19419730:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+</batch-execution>
+@end{}
+
+@declare{"testRetractObject.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules max="10"/>
+</batch-execution>
+@end{}
+
+@declare{"testRetractObject.in.2"}
+
+<batch-execution>
+    <retract fact-handle="0:1:16031375:-1889973673:1:DEFAULT"/>
+</batch-execution>
+@end{}
+
+@declare{"testRetractObject.in.3"}
+
+<batch-execution>
+    <get-object fact-handle="0:1:16031375:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+</batch-execution>
+@end{}
+
+@declare{"testModifyObject.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testModifyObject.expected.1"}
+
+<execution-results>
+    <result identifier="outStilton">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="outStilton"/>
+</execution-results>
+@end{}
+
+@declare{"testModifyObject.in.2"}
+
+<batch-execution>
+    <modify fact-handle="0:1:8501308:-1889973673:1:DEFAULT">
+        <set accessor="oldPrice" value="42"/>
+        <set accessor="price" value="50"/>
+    </modify>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testModifyObject.in.3"}
+
+<batch-execution>
+    <get-object fact-handle="0:1:8501308:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+</batch-execution>
+@end{}
+
+@declare{"testModifyObject.in.4"}
+
+<batch-execution>
+    <modify fact-handle="0:1:8501308:-1889973673:1:DEFAULT" allow-modify-expr="false">
+        <set accessor="type" value="throwException()"/>
+        <set accessor="price" value="100"/>
+    </modify>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testModifyObject.in.5"}
+
+<batch-execution>
+    <get-object fact-handle="0:1:8501308:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertElements.in.1"}
+
+<batch-execution>
+    <set-global identifier="list1" out-identifier="list1">
+        <list/>
+    </set-global>
+    <insert-elements>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert-elements>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertElements.expected.1"}
+
+<execution-results>
+    <result identifier="list1">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>35</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>30</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+</execution-results>
+@end{}
+
+@declare{"testInsertElementsWithReturnObjects.in.1"}
+
+<batch-execution>
+    <set-global identifier="list1" out-identifier="list1">
+        <list/>
+    </set-global>
+    <insert-elements out-identifier="myfacts" return-objects="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert-elements>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertElementsWithReturnObjects.expected.1"}
+
+<execution-results>
+    <result identifier="myfacts">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>30</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>35</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+    <result identifier="list1">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>35</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>30</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+    <fact-handles identifier="myfacts">
+        <fact-handle external-form="@{var1}"/>
+        <fact-handle external-form="@{var2}"/>
+    </fact-handles>
+</execution-results>
+@end{}
+
+@declare{"testSetGlobal.in.1"}
+
+<batch-execution>
+    <set-global identifier="list1">
+        <list/>
+    </set-global>
+    <set-global identifier="list2" out-identifier="list2">
+        <list/>
+    </set-global>
+    <set-global identifier="list3" out-identifier="outList3">
+        <list/>
+    </set-global>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>5</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testSetGlobal.expected.1"}
+
+<execution-results>
+    <result identifier="list2">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>30</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+    <result identifier="outStilton">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </result>
+    <result identifier="outList3">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>30</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="outStilton"/>
+</execution-results>
+@end{}
+
+@declare{"testGetGlobal.in.1"}
+
+<batch-execution>
+    <set-global identifier="list1" out-identifier="list1">
+        <list/>
+    </set-global>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <get-global identifier="list1" out-identifier="out-list"/>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testGetGlobal.expected.1"}
+
+<execution-results>
+    <result identifier="out-list">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>25</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+    <result identifier="outStilton">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </result>
+    <result identifier="list1">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>25</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="outStilton"/>
+</execution-results>
+@end{}
+
+@declare{"testGetObjects.in.1"}
+
+<batch-execution>
+    <insert-elements>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert-elements>
+    <get-objects out-identifier="list1"/>
+</batch-execution>
+@end{}
+
+@declare{"testQuery.in.1"}
+
+<batch-execution>
+    <insert-elements>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>2</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+        <org.kie.camel.testdomain.Cheese>
+            <type>cheddar</type>
+            <price>1</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+        <org.kie.camel.testdomain.Cheese>
+            <type>cheddar</type>
+            <price>2</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>1</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert-elements>
+    <query name="cheeses" out-identifier="cheeses"/>
+</batch-execution>
+@end{}
+
+@declare{"testManualFireAllRules.in.1"}
+
+<batch-execution>
+    <set-global identifier="list1" out-identifier="list1">
+        <list/>
+    </set-global>
+    <insert-elements>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert-elements>
+    <fire-all-rules/>
+    <insert out-identifier="outBrie" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>brie</type>
+            <price>10</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+</batch-execution>
+@end{}
+
+@declare{"testManualFireAllRules.expected.1"}
+
+<execution-results>
+    <result identifier="outBrie">
+        <org.kie.camel.testdomain.Cheese>
+            <type>brie</type>
+            <price>10</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </result>
+    <result identifier="list1">
+        <list>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>35</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+            <org.kie.camel.testdomain.Cheese>
+                <type>stilton</type>
+                <price>30</price>
+                <oldPrice>0</oldPrice>
+            </org.kie.camel.testdomain.Cheese>
+        </list>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="outBrie"/>
+</execution-results>
+@end{}
+
+@declare{"testProcess.in.1"}
+
+<batch-execution>
+    <start-process processId="org.drools.actions">
+        <parameter identifier="person">
+            <org.kie.camel.testdomain.TestVariable>
+                <name>John Doe</name>
+            </org.kie.camel.testdomain.TestVariable>
+        </parameter>
+    </start-process>
+    <get-global identifier="list1" out-identifier="out-list"/>
+</batch-execution>
+@end{}
+
+@declare{"testProcess.expected.1"}
+
+<execution-results>
+    <result identifier="out-list">
+        <list>
+            <string>John Doe</string>
+        </list>
+    </result>
+</execution-results>
+@end{}
+
+@declare{"testProcessInstanceSignalEvent.in.1"}
+
+<batch-execution>
+    <signal-event event-type="MyEvent" process-instance-id="1">
+        <string>MyValue</string>
+    </signal-event>
+</batch-execution>
+@end{}
+
+@declare{"testProcessRuntimeSignalEvent.in.1"}
+
+<batch-execution>
+    <signal-event event-type="MyEvent">
+        <string>MyValue</string>
+    </signal-event>
+</batch-execution>
+@end{}
+
+@declare{"testCompleteWorkItem.in.1"}
+
+<complete-work-item id="1"/>
+@end{}
+
+@declare{"testCompleteWorkItem.in.2"}
+
+<complete-work-item id="2">
+    <result identifier="Result">
+        <string>SomeOtherString</string>
+    </result>
+</complete-work-item>
+@end{}
+
+@declare{"testAbortWorkItem.in.1"}
+
+<abort-work-item id="1"/>
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFact.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.foo.Whee>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.foo.Whee>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFact.expected.1"}
+
+<execution-results>
+    <result identifier="outStilton">
+        <org.foo.Whee>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.foo.Whee>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="outStilton"/>
+</execution-results>
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFactAndQuery.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.foo.Whee>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.foo.Whee>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFactAndQuery.in.2"}
+
+<batch-execution>
+    <query name="results" out-identifier="matchingthings"/>
+</batch-execution>
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFactAndQuery.expected.1"}
+
+<execution-results>
+    <result identifier="matchingthings">
+        <query-results>
+            <identifiers/>
+            <row/>
+        </query-results>
+    </result>
+</execution-results>
+@end{}
+
+@declare{"testExecutionNodeLookup.in.1"}
+
+<batch-execution>
+    <insert out-identifier="outStilton" return-object="true">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>25</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </insert>
+    <fire-all-rules/>
+</batch-execution>
+@end{}
+
+@declare{"testExecutionNodeLookup.expected.1"}
+
+<execution-results>
+    <result identifier="outStilton">
+        <org.kie.camel.testdomain.Cheese>
+            <type>stilton</type>
+            <price>30</price>
+            <oldPrice>0</oldPrice>
+        </org.kie.camel.testdomain.Cheese>
+    </result>
+    <fact-handle external-form="@{var1}" identifier="outStilton"/>
+</execution-results>
+@end{}
