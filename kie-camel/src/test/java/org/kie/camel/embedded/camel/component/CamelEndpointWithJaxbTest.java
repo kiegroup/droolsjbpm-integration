@@ -64,10 +64,10 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup("ksession1");
-        cmd.getCommands().add(new InsertObjectCommand(new Person("lucaz", 25), "person1"));
-        cmd.getCommands().add(new InsertObjectCommand(new Person("hadrian", 25), "person2"));
-        cmd.getCommands().add(new InsertObjectCommand(new Person("baunax", 21), "person3"));
-        cmd.getCommands().add(new FireAllRulesCommand());
+        cmd.addCommand(new InsertObjectCommand(new Person("lucaz", 25), "person1"));
+        cmd.addCommand(new InsertObjectCommand(new Person("hadrian", 25), "person2"));
+        cmd.addCommand(new InsertObjectCommand(new Person("baunax", 21), "person3"));
+        cmd.addCommand(new FireAllRulesCommand());
 
         StringWriter xmlReq = new StringWriter();
         Marshaller marshaller = getJaxbContext().createMarshaller();
@@ -98,7 +98,7 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup("ksession1");
-        cmd.getCommands().add(new GetObjectCommand(DefaultFactHandle.createFromExternalFormat(handle), "hadrian"));
+        cmd.addCommand(new GetObjectCommand(DefaultFactHandle.createFromExternalFormat(handle), "hadrian"));
 
         StringWriter xmlReq = new StringWriter();
         Marshaller marshaller = getJaxbContext().createMarshaller();
@@ -184,8 +184,8 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
         elems.getObjects().add(new Person("baunax", 21));
         elems.getObjects().add("xxx");
 
-        cmd.getCommands().add(elems);
-        cmd.getCommands().add(new FireAllRulesCommand());
+        cmd.addCommand(elems);
+        cmd.addCommand(new FireAllRulesCommand());
 
         StringWriter xmlReq = new StringWriter();
         Marshaller marshaller = getJaxbContext().createMarshaller();
@@ -210,12 +210,12 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
     public void testQuery() throws Exception {
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup("ksession1");
-        cmd.getCommands().add(new InsertObjectCommand(new Person("lucaz")));
-        cmd.getCommands().add(new InsertObjectCommand(new Person("hadrian")));
-        cmd.getCommands().add(new InsertObjectCommand(new Person("baunax", 43)));
-        cmd.getCommands().add(new InsertObjectCommand(new Person("baunax", 21)));
-        cmd.getCommands().add(new QueryCommand("persons", "persons", null));
-        cmd.getCommands().add(new QueryCommand("person", "personWithName", new String[] {"baunax"}));
+        cmd.addCommand(new InsertObjectCommand(new Person("lucaz")));
+        cmd.addCommand(new InsertObjectCommand(new Person("hadrian")));
+        cmd.addCommand(new InsertObjectCommand(new Person("baunax", 43)));
+        cmd.addCommand(new InsertObjectCommand(new Person("baunax", 21)));
+        cmd.addCommand(new QueryCommand("persons", "persons", null));
+        cmd.addCommand(new QueryCommand("person", "personWithName", new String[] {"baunax"}));
 
         StringWriter xmlReq = new StringWriter();
         Marshaller marshaller = getJaxbContext().createMarshaller();
@@ -254,7 +254,7 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
         start.putParameter("person2", new Person("hadrian", 25));
         start.putParameter("person3", new Person("baunax", 21));
 
-        cmd.getCommands().add(start);
+        cmd.addCommand(start);
 
         StringWriter xmlReq = new StringWriter();
         Marshaller marshaller = getJaxbContext().createMarshaller();

@@ -78,17 +78,6 @@
 
     <!-- imported from fuse-bxms-integ -->
 
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-jaxb</artifactId>
-      <version>${version.org.kie}</version>
-      <exclusions>
-        <exclusion>  <!-- declare the exclusion here -->
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
 
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -100,6 +89,13 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow-builder</artifactId>
+      <version>${version.org.kie}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
