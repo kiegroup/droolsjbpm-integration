@@ -644,12 +644,18 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         try {
             checkAvailableSignals(CONTAINER_ID, processInstanceId);
 
-            Object person = createPersonInstance(USER_JOHN);
+            Object person = createPersonInstance("My custom person");
             processClient.signal(CONTAINER_ID, "Signal1", person);
 
-            processClient.signal(CONTAINER_ID, "Signal2", "My custom string event");
+            processClient.signal(CONTAINER_ID, "Signal2", "My custom string event - debug");
 
-            ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            ProcessInstance pi = null;
+            for (int i=0; i<10; i++) {
+                pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+                System.out.println("********" + pi.getState().intValue());
+                Thread.sleep(100);
+            }
+
             assertNotNull(pi);
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, pi.getState().intValue());
         } catch (Exception e) {

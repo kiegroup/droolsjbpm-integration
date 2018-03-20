@@ -68,17 +68,17 @@
   </properties>
 
   <modules>
-    <module>kie-server-integ-tests-common</module>
-    <module>kie-server-integ-tests-drools</module>
+<!--     <module>kie-server-integ-tests-common</module> -->
+<!--     <module>kie-server-integ-tests-drools</module> -->
     <module>kie-server-integ-tests-jbpm</module>
-    <module>kie-server-integ-tests-optaplanner</module>
-    <module>kie-server-integ-tests-all</module>
-    <module>kie-server-integ-tests-controller</module>
-    <module>kie-server-integ-tests-policy</module>
-    <module>kie-server-integ-tests-router</module>
-    <module>kie-server-integ-tests-case-id-generator</module>
-    <module>kie-server-integ-tests-dmn</module>
-    <module>kie-server-integ-tests-custom-extension</module>
+<!--     <module>kie-server-integ-tests-optaplanner</module> -->
+<!--     <module>kie-server-integ-tests-all</module> -->
+<!--     <module>kie-server-integ-tests-controller</module> -->
+<!--     <module>kie-server-integ-tests-policy</module> -->
+<!--     <module>kie-server-integ-tests-router</module> -->
+<!--     <module>kie-server-integ-tests-case-id-generator</module> -->
+<!--     <module>kie-server-integ-tests-dmn</module> -->
+<!--     <module>kie-server-integ-tests-custom-extension</module> -->
   </modules>
 
   <dependencyManagement>
@@ -597,7 +597,8 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+<!--                     <cargo.jvmargs>-Xmx2g -XX:MaxMetaspaceSize=512m</cargo.jvmargs> -->
+                    <cargo.jvmargs>-Xmx1536m -XX:MaxMetaspaceSize=512m</cargo.jvmargs>
                     <cargo.resource.resource.mail>
                        cargo.resource.name=mail/Session|
                        cargo.resource.type=javax.mail.Session|
