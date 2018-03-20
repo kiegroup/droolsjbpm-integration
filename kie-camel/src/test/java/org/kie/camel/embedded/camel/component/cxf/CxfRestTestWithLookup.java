@@ -34,9 +34,9 @@ public class CxfRestTestWithLookup extends CamelSpringTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "  <insert out-identifier=\"salaboy\">\n";
-        cmd += "      <org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd += "      <org.kie.pipeline.camel.Person>\n";
         cmd += "         <name>salaboy</name>\n";
-        cmd += "      </org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd += "      </org.kie.pipeline.camel.Person>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -48,9 +48,9 @@ public class CxfRestTestWithLookup extends CamelSpringTestSupport {
         String cmd2 = "";
         cmd2 += "<batch-execution lookup=\"ksession2\">\n";
         cmd2 += "  <insert out-identifier=\"salaboy\">\n";
-        cmd2 += "      <org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd2 += "      <org.kie.pipeline.camel.Person>\n";
         cmd2 += "         <name>salaboy</name>\n";
-        cmd2 += "      </org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd2 += "      </org.kie.pipeline.camel.Person>\n";
         cmd2 += "   </insert>\n";
         cmd2 += "   <fire-all-rules/>\n";
         cmd2 += "</batch-execution>\n";

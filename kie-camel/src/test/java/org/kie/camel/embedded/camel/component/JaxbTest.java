@@ -80,7 +80,7 @@ public class JaxbTest {
         // classesName.add("org.kie.drools.AddressType");
         // classesName.add("org.kie.drools.ObjectFactory");
         // classesName.add("org.kie.drools.Person");
-        classesName.add("org.kie.camel.embedded.pipeline.camel.Person");
+        classesName.add("org.kie.pipeline.camel.Person");
 
         // jaxbDataFormat = new JaxbDataFormat();
         // jaxbDataFormat.setContextPath( contextPath )

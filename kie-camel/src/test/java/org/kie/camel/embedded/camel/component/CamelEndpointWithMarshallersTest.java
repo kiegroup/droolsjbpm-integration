@@ -63,9 +63,9 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "  <insert out-identifier=\"salaboy\">\n";
-        cmd += "      <org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd += "      <org.kie.pipeline.camel.Person>\n";
         cmd += "         <name>salaboy</name>\n";
-        cmd += "      </org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd += "      </org.kie.pipeline.camel.Person>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -79,9 +79,9 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"salaboy\">";
-        expectedXml += "<org.kie.camel.embedded.pipeline.camel.Person>";
+        expectedXml += "<org.kie.pipeline.camel.Person>";
         expectedXml += "<name>salaboy</name>";
-        expectedXml += "</org.kie.camel.embedded.pipeline.camel.Person>";
+        expectedXml += "</org.kie.pipeline.camel.Person>";
         expectedXml += "</result>";
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle)result.getFactHandle("salaboy")).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
@@ -96,7 +96,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"lookup\":\"ksession1\", ";
-        inXml += "             \"object\":{\"org.kie.camel.embedded.pipeline.camel.Person\":{\"name\":\"salaboy\"}}, \"out-identifier\":\"salaboy\" } }";
+        inXml += "             \"object\":{\"org.kie.pipeline.camel.Person\":{\"name\":\"salaboy\"}}, \"out-identifier\":\"salaboy\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
 
@@ -113,9 +113,9 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "<insert out-identifier=\"salaboy\">\n";
-        cmd += "<org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd += "<org.kie.pipeline.camel.Person>\n";
         cmd += "<name>salaboy</name>\n";
-        cmd += "</org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd += "</org.kie.pipeline.camel.Person>\n";
         cmd += "</insert>\n";
         cmd += "<fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -129,9 +129,9 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"salaboy\">";
-        expectedXml += "<org.kie.camel.embedded.pipeline.camel.Person>";
+        expectedXml += "<org.kie.pipeline.camel.Person>";
         expectedXml += "<name>salaboy</name>";
-        expectedXml += "</org.kie.camel.embedded.pipeline.camel.Person>";
+        expectedXml += "</org.kie.pipeline.camel.Person>";
         expectedXml += "</result>";
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle)result.getFactHandle("salaboy")).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
@@ -145,8 +145,8 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "<insert out-identifier=\"salaboy\">\n";
-        cmd += "<org.kie.camel.embedded.pipeline.camel.Person name=\"salaboy\">\n";
-        cmd += "</org.kie.camel.embedded.pipeline.camel.Person>\n";
+        cmd += "<org.kie.pipeline.camel.Person name=\"salaboy\">\n";
+        cmd += "</org.kie.pipeline.camel.Person>\n";
         cmd += "</insert>\n";
         cmd += "<fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -164,7 +164,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"salaboy\">";
-        expectedXml += "<org.kie.camel.embedded.pipeline.camel.Person name=\"salaboy\"/>";
+        expectedXml += "<org.kie.pipeline.camel.Person name=\"salaboy\"/>";
         expectedXml += "</result>";
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle)result.getFactHandle("salaboy")).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
@@ -188,9 +188,9 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"rider\">";
-        expectedXml += "<org.kie.camel.embedded.pipeline.camel.Person>";
+        expectedXml += "<org.kie.pipeline.camel.Person>";
         expectedXml += "<name>Hadrian</name>";
-        expectedXml += "</org.kie.camel.embedded.pipeline.camel.Person>";
+        expectedXml += "</org.kie.pipeline.camel.Person>";
         expectedXml += "</result>";
         expectedXml += "</execution-results>";
 
