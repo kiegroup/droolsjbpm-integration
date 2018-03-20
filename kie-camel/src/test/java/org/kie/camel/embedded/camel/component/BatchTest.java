@@ -280,6 +280,7 @@ public abstract class BatchTest extends CamelTestSupport {
         String str = "";
         str += "package org.kie.camel.testdomain \n";
         str += "import org.kie.camel.embedded.camel.testdomain.Cheese \n";
+        str += "import org.kie.camel.embedded.camel.testdomain.Person \n";
         str += "import org.kie.camel.embedded.camel.testdomain.ChangeCollector \n";
         str += "rule rule1 \n";
         str += "  when \n";
