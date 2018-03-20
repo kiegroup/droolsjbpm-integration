@@ -424,6 +424,35 @@
       </dependencies>
     </profile>
     <profile>
+      <id>oracle</id>
+      <properties>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.Oracle12cDialect</org.kie.server.persistence.dialect>
+        <org.kie.server.datasource.driver.class>oracle.jdbc.xa.client.OracleXADataSource</org.kie.server.datasource.driver.class>
+        <!-- Connection URL, format example: jdbc:oracle:thin:@localhost:1521:mydb  -->
+        <org.kie.server.datasource.connection.url>specify-oracle-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+        <org.kie.server.datasource.driver.path>specify-oracle-driver-path-in-org.kie.server.datasource.driver.path</org.kie.server.datasource.driver.path>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <dependency>
+                      <location>${org.kie.server.datasource.driver.path}</location>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>tomcat8</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
