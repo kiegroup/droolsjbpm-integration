@@ -325,7 +325,7 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
 
         String rule = "";
         rule += "package org.kie.pipeline.camel \n";
-        rule += "import org.kie.camel.embedded.pipeline.camel.Person \n";
+        rule += "import org.kie.pipeline.camel.Person \n";
         rule += "global java.util.List list \n";
         rule += "query persons \n";
         rule += "   $p : Person(name != null) \n";
@@ -444,7 +444,12 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
 
         kfs.write("src/main/resources/process2.rf", process2);
 
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        KieBuilder kieBuilder;
+        try {
+            kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        } catch(Exception e) {
+            throw e;
+        }
 
         List<Message> errors = kieBuilder.getResults().getMessages(Message.Level.ERROR);
         if (!errors.isEmpty()) {
