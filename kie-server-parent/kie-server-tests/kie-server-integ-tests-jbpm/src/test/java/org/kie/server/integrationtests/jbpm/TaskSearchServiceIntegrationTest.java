@@ -117,7 +117,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
         Assertions.assertThat( tasks ).isNotEmpty();
         TaskSummary task = tasks.get( 0 );
         testFindTaskInstanceWithSearchService( createQueryFilterGreaterThanOrEqualsTo( TaskField.CREATEDON,
-                                                                                       subtractOneMinuteFromDate( task.getCreatedOn() ) ),
+                                                                                       subtractOneMinuteFromDate( task.getCreatedOn() ) ) ,
                                                task.getId() );
     }
 
