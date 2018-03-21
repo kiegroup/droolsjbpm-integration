@@ -156,7 +156,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
         Assertions.assertThat( tasks ).isNotEmpty();
         TaskSummary task = tasks.get( 0 );
         testFindTaskInstanceWithSearchService( createQueryFilterEqualsTo( TaskField.DESCRIPTION,
-                                                                          "" ),
+                                                                          task.getDescription() ),
                                                task.getId() );
     }
 
@@ -347,7 +347,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
         compareList.put( TaskField.ACTUALOWNER,
                          USER_YODA );
         compareList.put( TaskField.DESCRIPTION,
-                         "" );
+                         task.getDescription() );
         compareList.put( TaskField.DUEDATE,
                          task.getExpirationTime() );
         compareList.put( TaskField.PRIORITY,
@@ -380,7 +380,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
         Assertions.assertThat( instance.getName() ).isEqualTo( FIRST_TASK_NAME );
         Assertions.assertThat( instance.getActualOwner() ).isEqualTo( USER_YODA );
         Assertions.assertThat( instance.getCreatedBy() ).isEqualTo( USER_YODA );
-        Assertions.assertThat( instance.getDescription().trim() ).isEmpty();
+        Assertions.assertThat( instance.getDescription() ).isEqualTo( task.getDescription() );
         Assertions.assertThat( instance.getExpirationDate() ).isEqualTo( task.getExpirationTime() );
         Assertions.assertThat( instance.getPriority() ).isEqualTo( task.getPriority() );
         Assertions.assertThat( instance.getStatus() ).isEqualTo( task.getStatus() );
