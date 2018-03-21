@@ -25,7 +25,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.client.DocumentServicesClient;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
@@ -113,9 +115,15 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         userTaskAdminClient = client.getServicesClient(UserTaskAdminServicesClient.class);
     }
     
-    protected Date subtractOneMinuteFromDate(Date date) {
+    protected Comparable<?> subtractOneMinuteFromDate(Date date) {
         Instant instant = Instant.from(date.toInstant());
         instant = instant.minus(Duration.ofMinutes(1));
-        return Date.from(instant);
+        Date calculated = Date.from(instant);
+        
+        if (marshallingFormat.equals(MarshallingFormat.JAXB)) {
+            return new JaxbDate(calculated);
+        }
+        
+        return calculated;
     }
 }
