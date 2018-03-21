@@ -70,8 +70,8 @@ public class KieEmbeddedEndpointChannelTest extends KieCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("kie://ksession1?channel=bobs").to("mock:bobs");
-                from("kie://ksession1?channel=marks").to("mock:marks");
+                from("kie-local://ksession1?channel=bobs").to("mock:bobs");
+                from("kie-local://ksession1?channel=marks").to("mock:marks");
             }
         };
     }

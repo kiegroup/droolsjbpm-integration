@@ -313,8 +313,8 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
                 // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
                 def.setContextPath("org.kie.pipeline.camel");
 
-                from("direct:test-with-session").policy(new KiePolicy()).unmarshal(def).to("kie:ksession1").marshal(def);
-                from("direct:test-no-session").policy(new KiePolicy()).unmarshal(def).to("kie:dynamic").marshal(def);
+                from("direct:test-with-session").policy(new KiePolicy()).unmarshal(def).to("kie-local:ksession1").marshal(def);
+                from("direct:test-no-session").policy(new KiePolicy()).unmarshal(def).to("kie-local:dynamic").marshal(def);
             }
         };
         return routeBuilder;

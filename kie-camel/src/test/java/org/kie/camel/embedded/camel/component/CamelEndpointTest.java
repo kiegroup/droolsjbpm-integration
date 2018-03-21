@@ -197,10 +197,10 @@ public class CamelEndpointTest extends KieCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-with-session").to("kie://ksession1");
-                from("direct:test-no-session").to("kie://dynamic");
-                from("direct:test-with-session-withHeader").to("kie://ksession1").to("mock:resultWithHeader");
-                from("direct:test-no-session-withHeader").to("kie://dynamic").to("mock:resultWithHeader");
+                from("direct:test-with-session").to("kie-local://ksession1");
+                from("direct:test-no-session").to("kie-local://dynamic");
+                from("direct:test-with-session-withHeader").to("kie-local://ksession1").to("mock:resultWithHeader");
+                from("direct:test-no-session-withHeader").to("kie-local://dynamic").to("mock:resultWithHeader");
             }
         };
     }

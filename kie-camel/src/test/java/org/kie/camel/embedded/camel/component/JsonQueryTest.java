@@ -57,7 +57,7 @@ public class JsonQueryTest {
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:test-session").policy(new KiePolicy()).unmarshal("json").to("kie://ksession").marshal("json");
+                from("direct:test-session").policy(new KiePolicy()).unmarshal("json").to("kie-local://ksession").marshal("json");
                 from("direct:unmarshall").policy(new KiePolicy()).unmarshal("json");
                 from("direct:marshall").policy(new KiePolicy()).marshal("json");
             }

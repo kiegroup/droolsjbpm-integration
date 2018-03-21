@@ -79,7 +79,7 @@ public class JaxbInsertTest {
                 jdf.setContextPath("org.kie.camel.embedded.camel.testdomain");
                 jdf.setPrettyPrint(true);
 
-                from("direct:test-session").policy(new KiePolicy()).unmarshal(jdf).to("kie://ksession").marshal(jdf);
+                from("direct:test-session").policy(new KiePolicy()).unmarshal(jdf).to("kie-local://ksession").marshal(jdf);
                 from("direct:unmarshall").policy(new KiePolicy()).unmarshal(jdf);
                 from("direct:marshall").policy(new KiePolicy()).marshal(jdf);
             }

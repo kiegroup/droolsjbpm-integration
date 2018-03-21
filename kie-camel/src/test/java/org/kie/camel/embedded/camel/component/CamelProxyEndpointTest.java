@@ -58,7 +58,7 @@ public class CamelProxyEndpointTest extends KieCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-no-marshal").to("kie://ksession1");
+                from("direct:test-no-marshal").to("kie-local://ksession1");
             }
         };
     }

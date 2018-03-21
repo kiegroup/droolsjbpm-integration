@@ -103,10 +103,10 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-no-ep").to("kie://ksession1?action=insertBody");
-                from("direct:test-with-ep").to("kie://ksession1?action=insertBody&entryPoint=ep1");
-                from("direct:test-message").to("kie://ksession1?action=insertMessage");
-                from("direct:test-exchange").to("kie://ksession1?action=insertExchange");
+                from("direct:test-no-ep").to("kie-local://ksession1?action=insertBody");
+                from("direct:test-with-ep").to("kie-local://ksession1?action=insertBody&entryPoint=ep1");
+                from("direct:test-message").to("kie-local://ksession1?action=insertMessage");
+                from("direct:test-exchange").to("kie-local://ksession1?action=insertExchange");
             }
         };
     }

@@ -210,10 +210,10 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
                 dataFormats.put("custom-xstream", xstreamDataFormat);
                 getContext().setDataFormats(dataFormats);
 
-                from("direct:test-with-session").policy(new KiePolicy()).unmarshal("xstream").to("kie:ksession1").marshal("xstream");
-                from("direct:test-with-session-json").policy(new KiePolicy()).unmarshal("json").to("kie:ksession1").marshal("json");
-                from("direct:test-no-session").policy(new KiePolicy()).unmarshal("xstream").to("kie:dynamic").marshal("xstream");
-                from("direct:test-no-session-custom").policy(new KiePolicy()).unmarshal("custom-xstream").to("kie:dynamic").marshal("custom-xstream");
+                from("direct:test-with-session").policy(new KiePolicy()).unmarshal("xstream").to("kie-local:ksession1").marshal("xstream");
+                from("direct:test-with-session-json").policy(new KiePolicy()).unmarshal("json").to("kie-local:ksession1").marshal("json");
+                from("direct:test-no-session").policy(new KiePolicy()).unmarshal("xstream").to("kie-local:dynamic").marshal("xstream");
+                from("direct:test-no-session-custom").policy(new KiePolicy()).unmarshal("custom-xstream").to("kie-local:dynamic").marshal("custom-xstream");
             }
         };
     }

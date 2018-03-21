@@ -91,8 +91,8 @@ public abstract class BatchTest extends CamelTestSupport {
                 JaxbDataFormat jaxbDf = new JaxbDataFormat();
                 jaxbDf.setContextPath("org.kie.camel.testdomain");
 
-                from("direct:exec").policy(new KiePolicy()).unmarshal(dataformat).to("kie://ksession1").marshal(dataformat);
-                from("direct:execWithLookup").policy(new KiePolicy()).unmarshal(dataformat).to("kie://dynamic").marshal(dataformat);
+                from("direct:exec").policy(new KiePolicy()).unmarshal(dataformat).to("kie-local://ksession1").marshal(dataformat);
+                from("direct:execWithLookup").policy(new KiePolicy()).unmarshal(dataformat).to("kie-local://dynamic").marshal(dataformat);
                 from("direct:unmarshal").policy(new KiePolicy()).unmarshal(dataformat);
                 from("direct:marshal").policy(new KiePolicy()).marshal(dataformat);
                 from("direct:to-xstream").policy(new KiePolicy()).unmarshal(dataformat).marshal("xstream");

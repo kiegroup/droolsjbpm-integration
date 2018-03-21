@@ -132,7 +132,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
                 def.setPrettyPrint(true);
                 def.setContextPath("org.kie.pipeline.camel");
 
-                from("direct:test-with-session").policy(new KiePolicy()).unmarshal(def).to("kie:ksession1").marshal(def);
+                from("direct:test-with-session").policy(new KiePolicy()).unmarshal(def).to("kie-local:ksession1").marshal(def);
             }
         };
         return routeBuilder;

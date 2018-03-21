@@ -93,8 +93,8 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:exec").policy(new KiePolicy()).unmarshal("xstream").to("kie://ksession1").marshal("xstream");
-                from("direct:execWithLookup").policy(new KiePolicy()).unmarshal("xstream").to("kie://dynamic").marshal("xstream");
+                from("direct:exec").policy(new KiePolicy()).unmarshal("xstream").to("kie-local://ksession1").marshal("xstream");
+                from("direct:execWithLookup").policy(new KiePolicy()).unmarshal("xstream").to("kie-local://dynamic").marshal("xstream");
                 from("direct:unmarshal").policy(new KiePolicy()).unmarshal("xstream");
                 from("direct:marshal").policy(new KiePolicy()).marshal("xstream");
             }
