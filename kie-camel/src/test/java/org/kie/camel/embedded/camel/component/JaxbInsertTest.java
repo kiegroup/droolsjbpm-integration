@@ -76,7 +76,7 @@ public class JaxbInsertTest {
             @Override
             public void configure() throws Exception {
                 JaxbDataFormat jdf = new JaxbDataFormat();
-                jdf.setContextPath("org.kie.camel.testdomain");
+                jdf.setContextPath("org.kie.camel.embedded.camel.testdomain");
                 jdf.setPrettyPrint(true);
 
                 from("direct:test-session").policy(new KiePolicy()).unmarshal(jdf).to("kie://ksession").marshal(jdf);
