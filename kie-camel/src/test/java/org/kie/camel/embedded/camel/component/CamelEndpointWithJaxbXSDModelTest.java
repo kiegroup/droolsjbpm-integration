@@ -77,9 +77,9 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup("ksession1");
-        cmd.getCommands().add(new InsertObjectCommand(lucaz, "lucaz"));
-        cmd.getCommands().add(new InsertObjectCommand(baunax, "baunax"));
-        cmd.getCommands().add(new FireAllRulesCommand());
+        cmd.addCommand(new InsertObjectCommand(lucaz, "lucaz"));
+        cmd.addCommand(new InsertObjectCommand(baunax, "baunax"));
+        cmd.addCommand(new FireAllRulesCommand());
 
         StringWriter xmlReq = new StringWriter();
         Marshaller marshaller = getJaxbContext().createMarshaller();
