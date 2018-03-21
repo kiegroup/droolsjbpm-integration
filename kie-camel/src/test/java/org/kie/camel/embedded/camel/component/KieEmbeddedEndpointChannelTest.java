@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.pipeline.camel.Person;
 
-public class KieEndpointChannelTest extends KieCamelTestSupport {
+public class KieEmbeddedEndpointChannelTest extends KieCamelTestSupport {
     private KieSession ksession;
 
     @Test

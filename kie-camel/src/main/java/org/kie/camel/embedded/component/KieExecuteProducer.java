@@ -46,7 +46,7 @@ public class KieExecuteProducer extends DefaultProducer {
     }
 
     public void process(Exchange exchange) throws Exception {
-        KieEndpoint ke = (KieEndpoint)getEndpoint();
+        KieEmbeddedEndpoint ke = (KieEmbeddedEndpoint)getEndpoint();
 
         Command<?> cmd = exchange.getIn().getBody(ExecutableCommand.class);
 

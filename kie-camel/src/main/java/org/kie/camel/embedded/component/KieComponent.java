@@ -46,7 +46,7 @@ public class KieComponent extends DefaultComponent {
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
         Endpoint endpoint;
-        endpoint = new KieEndpoint(uri, remaining, this);
+        endpoint = new KieEmbeddedEndpoint(uri, remaining, this);
         setProperties(endpoint, parameters);
         return endpoint;
     }

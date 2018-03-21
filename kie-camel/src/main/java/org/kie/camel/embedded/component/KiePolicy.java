@@ -245,7 +245,7 @@ public class KiePolicy implements Policy {
     public static class KieProcess implements Processor {
 
         private String kieUri;
-        private KieEndpoint ke;
+        private KieEmbeddedEndpoint ke;
         private Processor processor;
 
         public KieProcess(String kieUri, Processor processor) {
@@ -260,7 +260,7 @@ public class KiePolicy implements Policy {
             String body = exchange.getIn().getBody(String.class);
             if (ke == null) {
 
-                this.ke = exchange.getContext().getEndpoint(this.kieUri, KieEndpoint.class);
+                this.ke = exchange.getContext().getEndpoint(this.kieUri, KieEmbeddedEndpoint.class);
             }
 
             if (ke == null) {

@@ -48,7 +48,7 @@ import org.drools.core.impl.StatelessKnowledgeSessionImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.runtime.CommandExecutor;
 
-public class KieEndpoint extends DefaultEndpoint {
+public class KieEmbeddedEndpoint extends DefaultEndpoint {
 
     private static final String NO_KSESSION_ENDPOINT = "dynamic";
 
@@ -96,7 +96,7 @@ public class KieEndpoint extends DefaultEndpoint {
     private String entryPoint = null;
     private String channel = null;
 
-    public KieEndpoint(String endpointUri, String remaining, KieComponent component) throws URISyntaxException {
+    public KieEmbeddedEndpoint(String endpointUri, String remaining, KieComponent component) throws URISyntaxException {
         super(endpointUri, component);
         configure(component, remaining);
     }
@@ -138,7 +138,7 @@ public class KieEndpoint extends DefaultEndpoint {
                 if (NO_KSESSION_ENDPOINT.equals(ksessionId)) {
                     executorsByName = new HashMap<String, CommandExecutor>();
                 } else {
-                    throw new RuntimeCamelException("Failed to instantiate KieEndpoint. Could not find ksession for " + " uri=\"" + uri + "\". Check configuration.");
+                    throw new RuntimeCamelException("Failed to instantiate KieEmbeddedEndpoint. Could not find ksession for " + " uri=\"" + uri + "\". Check configuration.");
                 }
             }
         }

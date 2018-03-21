@@ -25,13 +25,13 @@ import org.kie.api.runtime.CommandExecutor;
  * session */
 public class KieConsumer extends DefaultConsumer {
 
-    private KieEndpoint ke;
+    private KieEmbeddedEndpoint ke;
     private CommandExecutor krt;
     private String channelId;
 
     public KieConsumer(Endpoint endpoint, Processor processor) {
         super(endpoint, processor);
-        ke = (KieEndpoint)endpoint;
+        ke = (KieEmbeddedEndpoint)endpoint;
         krt = ke.getExecutor();
         channelId = ke.getChannel();
     }
