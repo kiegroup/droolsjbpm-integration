@@ -61,7 +61,7 @@ public class TestConfig {
     private static final StringTestParameter USERNAME = new StringTestParameter("username", "yoda");
     private static final StringTestParameter PASSWORD = new StringTestParameter("password", "usetheforce123@");
 
-    private static final StringTestParameter INITIAL_CONTEXT_FACTORY = new StringTestParameter("kie.server.context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
+    private static final StringTestParameter INITIAL_CONTEXT_FACTORY = new StringTestParameter("kie.server.context.factory", "org.wildfly.naming.client.WildFlyInitialContextFactory");
     private static final StringTestParameter CONNECTION_FACTORY = new StringTestParameter("kie.server.connection.factory", "jms/RemoteConnectionFactory");
     private static final StringTestParameter REMOTING_URL = new StringTestParameter("kie.server.remoting.url");
     private static final StringTestParameter REQUEST_QUEUE_JNDI = new StringTestParameter("kie.server.jndi.request.queue", "jms/queue/KIE.SERVER.REQUEST");
