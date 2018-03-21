@@ -845,7 +845,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
                 "t.actualowner_id as ACTUALOWNER, po.entity_id as POTOWNER, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.CREATEDON as CREATEDON, " +
                 "t.CREATEDBY_ID as CREATEDBY, t.EXPIRATIONTIME as EXPIRATIONTIME, " +
                 "(select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id) as lastmodificationdate, " +
-                "(select userid from taskevent where logtime = (select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id)) as lastmodificationuser, " +
+                "(select userid from taskevent where logtime = (select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id) and type = 'ADDED' and processinstanceid = t.processinstanceid and taskid = t.id) as lastmodificationuser, " +
                 "t.priority as PRIORITY, t.STATUS as STATUS, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, " +
                 "t.deploymentid as DEPLOYMENTID, d.name as TVNAME, d.type as TVTYPE, d.value as TVVALUE " +
                 "from TASK t " +
