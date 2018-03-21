@@ -49,6 +49,14 @@
     <!-- Set to true if you want to skip JMS tests even for containers with available JMS. -->
     <jms.skip>false</jms.skip>
 
+    <!-- Kie server datasource configuration. -->
+    <!--  <org.kie.server.persistence.ds/> Defined in container profiles.-->
+    <org.kie.server.persistence.dialect>org.hibernate.dialect.H2Dialect</org.kie.server.persistence.dialect>
+    <org.kie.server.datasource.connection.url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</org.kie.server.datasource.connection.url>
+    <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
+    <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
+    <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
+
     <version.tomcat8>8.5.12</version.tomcat8>
     <version.wildfly11>11.0.0.Final</version.wildfly11>      
     <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
@@ -203,6 +211,9 @@
                 <java.security.egd>file:/dev/./urandom</java.security.egd>
                 <org.jbpm.document.storage>${org.jbpm.document.storage}</org.jbpm.document.storage>
                 <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
+                <!-- Persistence configuration -->
+                <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
+                <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}</org.kie.server.persistence.dialect>
               </systemProperties>
             </container>
             <deployables>
@@ -378,6 +389,70 @@
 
   <profiles>
     <profile>
+      <id>mysql</id>
+      <properties>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</org.kie.server.persistence.dialect>
+        <org.kie.server.datasource.driver.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</org.kie.server.datasource.driver.class>
+        <!-- Connection URL, format example: jdbc:mysql://localhost:3306/mydb -->
+        <org.kie.server.datasource.connection.url>specify-mysql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <dependency>
+                      <groupId>mysql</groupId>
+                      <artifactId>mysql-connector-java</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>oracle</id>
+      <properties>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.Oracle12cDialect</org.kie.server.persistence.dialect>
+        <org.kie.server.datasource.driver.class>oracle.jdbc.xa.client.OracleXADataSource</org.kie.server.datasource.driver.class>
+        <!-- Connection URL, format example: jdbc:oracle:thin:@localhost:1521:mydb  -->
+        <org.kie.server.datasource.connection.url>specify-oracle-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+        <org.kie.server.datasource.driver.path>specify-oracle-driver-path-in-org.kie.server.datasource.driver.path</org.kie.server.datasource.driver.path>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <dependency>
+                      <location>${org.kie.server.datasource.driver.path}</location>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>tomcat8</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
@@ -407,7 +482,6 @@
                     <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
                     <jbpm.tm.jndi.lookup>java:comp/env/TransactionManager</jbpm.tm.jndi.lookup>
                     <org.kie.server.persistence.tm>JBossTS</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
                     <hibernate.connection.release_mode>after_transaction</hibernate.connection.release_mode>
@@ -489,8 +563,8 @@
       <id>wildfly11</id>
       <properties>        
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
-        <kie.server.context.factory>org.jboss.naming.remote.client.InitialContextFactory</kie.server.context.factory>
-        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
+        <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly11x</cargo.container.id>
       </properties>
       <build>
@@ -513,6 +587,12 @@
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
                     <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
                   </systemProperties>
+                  <dependencies>
+                    <dependency>
+                      <groupId>com.h2database</groupId>
+                      <artifactId>h2</artifactId>
+                    </dependency>
+                  </dependencies>
                 </container>
                 <configuration>
                   <properties>
@@ -525,6 +605,16 @@
                        cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
                     </cargo.resource.resource.mail>
                   </properties>
+                  <datasources>
+                    <datasource>
+                      <jndiName>${org.kie.server.persistence.ds}</jndiName>
+                      <driverClass>${org.kie.server.datasource.driver.class}</driverClass>
+                      <url>${org.kie.server.datasource.connection.url}</url>
+                      <username>${org.kie.server.datasource.username}</username>
+                      <password>${org.kie.server.datasource.password}</password>
+                      <transactionSupport>XA_TRANSACTION</transactionSupport>
+                    </datasource>
+                  </datasources>
                 </configuration>
               </configuration>
             </plugin>
@@ -557,6 +647,11 @@
         </dependencies>
       </dependencyManagement>
       <dependencies>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
         <dependency>
           <groupId>org.wildfly</groupId>
           <artifactId>wildfly-jms-client-bom</artifactId>
@@ -667,7 +762,6 @@
                   <home>${weblogic.home}/wlserver</home>
                   <systemProperties>
                     <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WeblogicJtaPlatform</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.kie.server.domain>OracleDefaultLoginConfiguration</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
@@ -788,7 +882,6 @@
                   <timeout>240000</timeout>
                   <systemProperties>
                     <org.kie.server.persistence.tm>org.hibernate.engine.transaction.jta.platform.internal.WebSphereJtaPlatform</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.kie.server.domain>WSLogin</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
