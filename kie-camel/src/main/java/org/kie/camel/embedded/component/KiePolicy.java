@@ -49,6 +49,9 @@ public class KiePolicy implements Policy {
 
     private static boolean augmented;
 
+    // this should be the same namespace defined in META-INF/org.apache.camel.component file
+    public static final String URI_PREFIX = "kie-local:";
+
     public void beforeWrap(RouteContext routeContext, ProcessorDefinition<?> processorDefinition) {
         augmentNodes(routeContext, processorDefinition, new HashSet<Object>());
     }
@@ -184,7 +187,7 @@ public class KiePolicy implements Policy {
             for (ProcessorDefinition child : children) {
                 if (child instanceof ToDefinition) {
                     ToDefinition to = (ToDefinition)child;
-                    if (to.getUri().trim().startsWith("kie:")) {
+                    if (to.getUri().trim().startsWith(URI_PREFIX)) {
                         return to;
                     }
                 }
