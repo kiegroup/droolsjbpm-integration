@@ -80,6 +80,11 @@
 
 
     <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-xjc</artifactId>
       <scope>runtime</scope>
@@ -95,6 +100,11 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-core</artifactId>
     </dependency>
 
     <dependency>
