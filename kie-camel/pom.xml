@@ -94,32 +94,33 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
-      <version>${version.org.kie}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-cxf</artifactId>
-      <version>${version.org.apache.camel}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-xstream</artifactId>
-      <version>${version.org.apache.camel}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jaxb</artifactId>
-      <version>${version.org.apache.camel}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-cxf-transport</artifactId>
-      <version>${version.org.apache.camel}</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -151,14 +152,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel</groupId>
       <artifactId>camel-test-spring</artifactId>
       <scope>test</scope>
-      <version>${version.org.apache.camel}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
@@ -175,11 +170,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency><!-- For unit test logging: configure in src/test/resources/logback-test.xml -->
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
