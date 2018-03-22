@@ -20,18 +20,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.drools.persistence.api.TransactionManagerFactory;
 import org.jbpm.runtime.manager.impl.SimpleRuntimeEnvironment;
+import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.manager.RuntimeEnvironment;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
 import org.kie.internal.runtime.conf.ObjectModelResolver;
 import org.kie.internal.runtime.conf.ObjectModelResolverProvider;
 import org.kie.internal.runtime.manager.RuntimeManagerRegistry;
+import org.kie.spring.persistence.KieSpringTransactionManagerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 /**
  * FactoryBean responsible to create instances of <code>RuntimeManager</code> of given type based on provided
@@ -66,6 +70,11 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean,
             return RuntimeManagerRegistry.get().getManager(getIdentifier());
         }
         else {
+            TransactionManagerFactory transactionManagerFactory = TransactionManagerFactory.get();
+            if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
+                ((KieSpringTransactionManagerFactory) transactionManagerFactory).setGlobalTransactionManager(applicationContext.getBean(AbstractPlatformTransactionManager.class));
+            }
+            
             RuntimeManager manager = null;
             if ("PER_REQUEST".equalsIgnoreCase(type)) {
                 disallowSharedTaskService(runtimeEnvironment);
@@ -76,6 +85,7 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean,
             } else {
                 manager = factory.newSingletonRuntimeManager(runtimeEnvironment, identifier);
             }
+            
 
             runtimeManagerSet.add(manager);
             return manager;
@@ -133,7 +143,7 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean,
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-
+        
         // init any spring based ObjectModelResolvers
         List<ObjectModelResolver> resolvers = ObjectModelResolverProvider.getResolvers();
         if (resolvers != null) {
