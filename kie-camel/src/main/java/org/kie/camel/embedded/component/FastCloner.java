@@ -168,14 +168,6 @@ public class FastCloner {
         }
     }
 
-    /** spring framework friendly version of registerStaticFields
-     * 
-     * @param set
-     *            a set of classes which will be scanned for static fields */
-    public void setExtraStaticFields(final Set<Class<?>> set) {
-        registerStaticFields((Class<?>[])set.toArray());
-    }
-
     /** instances of classes that shouldn't be cloned can be registered using this method.
      * 
      * @param c

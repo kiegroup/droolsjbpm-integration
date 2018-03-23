@@ -32,7 +32,8 @@ public class PreCxfTransportSoapProcessor implements Processor {
         MimeHeaders mimeHeaders = new MimeHeaders();
         for (Map.Entry<String, Object> header : headers.entrySet()) {
             if (header.getValue() instanceof String) {
-                mimeHeaders.addHeader(header.getKey(), (String)headers.get(header));
+                String value = (String) header.getValue();
+                mimeHeaders.addHeader(header.getKey(), value);
             }
         }
         SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(mimeHeaders, is);
