@@ -17,6 +17,7 @@ package org.kie.spring.manager;
 
 import javax.persistence.EntityManager;
 
+import org.drools.persistence.api.TransactionManagerFactory;
 import org.jbpm.process.core.timer.GlobalSchedulerService;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
 import org.jbpm.runtime.manager.impl.SimpleRuntimeEnvironment;
@@ -25,6 +26,7 @@ import org.kie.api.runtime.manager.RuntimeEnvironment;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.task.api.UserInfo;
+import org.kie.spring.persistence.KieSpringTransactionManagerFactory;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 public class SpringRuntimeManagerFactoryImpl extends RuntimeManagerFactoryImpl {
@@ -137,6 +139,11 @@ public class SpringRuntimeManagerFactoryImpl extends RuntimeManagerFactoryImpl {
         }
         if (pessimisticLocking) {
             ((SimpleRuntimeEnvironment)environment).getEnvironmentTemplate().set(EnvironmentName.USE_PESSIMISTIC_LOCKING, true);
+        }
+        
+        TransactionManagerFactory transactionManagerFactory = TransactionManagerFactory.get();
+        if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
+            ((KieSpringTransactionManagerFactory) transactionManagerFactory).setGlobalTransactionManager(transactionManager);
         }
 	}
 
