@@ -32,6 +32,7 @@ import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.spring.persistence.KieSpringTransactionManager;
 import org.kie.spring.persistence.KieSpringTransactionManagerFactory;
 import org.springframework.transaction.jta.JtaTransactionManager;
+import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 @RunWith(Parameterized.class)
 public class KieSpringTransactionManagerFactoryTest extends AbstractJbpmSpringParameterizedTest {
@@ -78,5 +79,24 @@ public class KieSpringTransactionManagerFactoryTest extends AbstractJbpmSpringPa
         Environment env = EnvironmentFactory.newEnvironment();
         KieSpringTransactionManagerFactory factory = new KieSpringTransactionManagerFactory();
         Object springTxManager = factory.newTransactionManager(env);
+    }
+    
+    @Test
+    public void testGlobalTransactionManagerSet() throws Exception {
+        Object txManager = context.getBean("jbpmTxManager");
+        assertNotNull(txManager);
+        assertTrue(txManager instanceof JtaTransactionManager);
+        KieSpringTransactionManagerFactory factory = new KieSpringTransactionManagerFactory();
+        factory.setGlobalTransactionManager((AbstractPlatformTransactionManager) txManager);
+        Object springTxManager = factory.newTransactionManager();
+        assertNotNull(springTxManager);
+        assertTrue(springTxManager instanceof KieSpringTransactionManager);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void testGlobalTransactionManagerNotSet() throws Exception {        
+        KieSpringTransactionManagerFactory factory = new KieSpringTransactionManagerFactory();
+        
+        Object springTxManager = factory.newTransactionManager();        
     }
 }

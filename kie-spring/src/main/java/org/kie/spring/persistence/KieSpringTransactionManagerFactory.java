@@ -24,9 +24,14 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 
 public class KieSpringTransactionManagerFactory extends TransactionManagerFactory {
 
+    private AbstractPlatformTransactionManager globalTransactionManager;
+    
     @Override
     public TransactionManager newTransactionManager() {
-        throw new UnsupportedOperationException("use newTransactionManager(Environment) instead");
+        if (globalTransactionManager == null) {
+            throw new RuntimeException("No transaction manager set nor environment provided to look it up");
+        }
+        return new KieSpringTransactionManager(globalTransactionManager);
     }
 
     @Override
@@ -44,5 +49,9 @@ public class KieSpringTransactionManagerFactory extends TransactionManagerFactor
         KieSpringTransactionManager springTransactionManager = new KieSpringTransactionManager((AbstractPlatformTransactionManager) tm);
         environment.set(EnvironmentName.TRANSACTION_MANAGER, springTransactionManager);
         return springTransactionManager;
+    }
+    
+    public void setGlobalTransactionManager(AbstractPlatformTransactionManager txm) {
+        this.globalTransactionManager = txm;       
     }
 }
