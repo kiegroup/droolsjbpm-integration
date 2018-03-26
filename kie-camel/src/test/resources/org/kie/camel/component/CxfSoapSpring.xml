@@ -42,7 +42,7 @@
   <cxf:cxfEndpoint id="soapServer"
              address="http://localhost:58002/soap"
              serviceName="ns:CommandExecutor"
-             wsdlURL="classpath:org/kie/camel/component/soap.wsdl"
+             wsdlURL="classpath:org/kie/camel/embedded/camel/component/soap.wsdl"
              endpointName="ns:CommandExecutorPort"
           xmlns:ns="http://soap.jax.drools.org/" >
     <cxf:properties>
@@ -52,7 +52,7 @@
     </cxf:properties>
   </cxf:cxfEndpoint>
 
-  <bean id="kiePolicy" class="org.kie.camel.component.KiePolicy" />
+  <bean id="kiePolicy" class="org.kie.camel.embedded.component.KiePolicy" />
 
   <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
 
@@ -62,7 +62,7 @@
       <from uri="cxf://bean://soapServer"/>
       <policy ref="kiePolicy">
         <unmarshal ref="xstream" />       
-        <to uri="kie:ksession1" />
+        <to uri="kie-local:ksession1" />
         <marshal ref="xstream" />
       </policy>
     </route>
