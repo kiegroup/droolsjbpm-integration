@@ -15,6 +15,12 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,19 +37,18 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
-
-import static org.junit.Assert.*;
-import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
@@ -655,6 +660,10 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
                 System.out.println("********" + pi.getState().intValue());
                 Thread.sleep(100);
             }
+
+            List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(0, errors.size());
 
             assertNotNull(pi);
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, pi.getState().intValue());
