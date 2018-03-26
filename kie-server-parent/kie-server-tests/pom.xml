@@ -606,6 +606,7 @@
                        cargo.resource.id=mail|
                        cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
                     </cargo.resource.resource.mail>
+                    <cargo.wildfly.script.cli.embedded>${project.build.testOutputDirectory}/logging.cli</cargo.wildfly.script.cli.embedded>
                   </properties>
                   <datasources>
                     <datasource>
