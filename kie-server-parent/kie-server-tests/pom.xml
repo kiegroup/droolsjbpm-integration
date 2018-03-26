@@ -163,6 +163,11 @@
         <artifactId>kie-tomcat-integration</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
+         <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>1.4.196</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
 
