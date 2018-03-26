@@ -215,7 +215,6 @@
                 <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
                 <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}</org.kie.server.persistence.dialect>
               </systemProperties>
-              <output>./server.log</output>
             </container>
             <deployables>
               <deployable>
