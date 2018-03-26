@@ -82,6 +82,12 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
