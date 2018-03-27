@@ -664,6 +664,14 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
             System.out.println("------ Signals " + availableSignals);
 
+            if (!availableSignals.isEmpty()) {
+                processClient.signal(CONTAINER_ID, "Signal1", person);
+                processClient.signal(CONTAINER_ID, "Signal2", "My custom string event - debug2");
+
+                availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+                System.out.println("------ Signals after retrigger " + availableSignals);
+            }
+
             List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
