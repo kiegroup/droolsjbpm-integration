@@ -661,6 +661,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
                 Thread.sleep(100);
             }
 
+            List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+            System.out.println("------ Signals " + availableSignals);
+
             List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
