@@ -35,7 +35,6 @@ public class CxfRestTestWithImport extends CamelSpringTestSupport {
     }
 
     @Test
-    @Ignore("error in spring xml")
     public void test1() throws Exception {
         KieSession kieSession = (KieSession)applicationContext.getBean("ksession1");
         kieSession.setGlobal("out", System.out);

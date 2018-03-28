@@ -37,7 +37,6 @@ public class CxfSoapTest extends CamelSpringTestSupport {
     }
 
     @Test
-    @Ignore("error in spring xml")
     public void test1() throws Exception {
         SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
         SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();

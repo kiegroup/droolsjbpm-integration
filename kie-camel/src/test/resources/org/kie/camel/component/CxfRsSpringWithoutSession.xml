@@ -57,7 +57,7 @@
        </cxf:providers>
   </cxf:rsServer>  
   
-  <bean id="kiePolicy" class="org.kie.camel.component.KiePolicy" />
+  <bean id="kiePolicy" class="org.kie.camel.embedded.component.KiePolicy" />
     
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
     
@@ -65,7 +65,7 @@
        <from uri="cxfrs://bean://rsServer"/>
        <policy ref="kiePolicy">
          <unmarshal ref="xstream" />
-         <to uri="kie:ksession1" />
+         <to uri="kie-local:ksession1" />
          <marshal ref="xstream" />
        </policy>
     </route>
