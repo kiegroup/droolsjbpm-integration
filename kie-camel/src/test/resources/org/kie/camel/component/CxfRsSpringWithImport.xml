@@ -28,7 +28,8 @@
 ">
 
   <!-- Imports the KieBase and KieSessions from the classpath dependencies -->
-  <kie:import />
+  <kie:import releaseId-ref="rId" />
+  <kie:releaseId groupId="org.drools" artifactId="named-kiesession" version="7.7.0-SNAPSHOT" id="rId" />
 
   <!-- Defined the server endpoint to create the cxf-rs consumer -->
   <cxf:rsServer id="rsServer" 
@@ -39,7 +40,7 @@
        </cxf:providers>
   </cxf:rsServer>  
   
-  <bean id="kiePolicy" class="org.kie.camel.component.KiePolicy" />
+  <bean id="kiePolicy" class="org.kie.camel.embedded.component.KiePolicy" />
     
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
     
@@ -47,7 +48,7 @@
        <from uri="cxfrs://bean://rsServer"/>
        <policy ref="kiePolicy">
          <unmarshal ref="xstream" />
-         <to uri="kie:ksession1" />
+         <to uri="kie-local:ksession1" />
          <marshal ref="xstream" />
        </policy>
     </route>
