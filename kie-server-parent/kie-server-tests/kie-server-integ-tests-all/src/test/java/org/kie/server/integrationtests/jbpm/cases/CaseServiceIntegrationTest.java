@@ -485,6 +485,22 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         Assertions.assertThat(caseData).isNotNull();
         Assertions.assertThat(caseData).hasSize(0);
     }
+
+    @Test
+    public void testRetrievalOfNonExistingCaseData() {
+        String caseId = startCarInsuranceClaimCaseWithEmptyData(USER_YODA, USER_JOHN, USER_YODA);
+        assertNotNull(caseId);
+
+        Map<String, Object> data = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(data).isEmpty();
+        Object nonExistingData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "NonExistingData");
+        Assertions.assertThat(nonExistingData).isNull();
+
+        assertClientException(
+                () -> caseClient.getCaseInstanceData(CONTAINER_ID, "NonExistingCaseId"),
+                404,
+                "Could not find case instance \"NonExistingCaseId\"");
+    }
     
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
         Assertions.assertThat(caseInstance).isNotNull();
@@ -502,6 +518,10 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private String startCarInsuranceClaimCase(String insured, String insuranceRep, String assessor) {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
+        return startCarInsuranceClaimCase(insured, insuranceRep, assessor, data);
+    }
+
+    private String startCarInsuranceClaimCase(String insured, String insuranceRep, String assessor, Map<String, Object> data) {
         CaseFile caseFile = CaseFile.builder()
                 .addUserAssignments(CASE_INSURED_ROLE, insured)
                 .addUserAssignments(CASE_INS_REP_ROLE, insuranceRep)
@@ -512,5 +532,9 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
         assertNotNull(caseId);
         return caseId;
+    }
+
+    private String startCarInsuranceClaimCaseWithEmptyData(String insured, String insuranceRep, String assessor) {
+        return startCarInsuranceClaimCase(insured, insuranceRep, assessor, new HashMap<>());
     }
 }
