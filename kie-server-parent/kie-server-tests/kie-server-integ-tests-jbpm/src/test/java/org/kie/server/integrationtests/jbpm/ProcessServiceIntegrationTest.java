@@ -229,6 +229,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             fail(e.getMessage());
         }
 
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test
@@ -248,6 +250,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             fail(e.getMessage());
         }
 
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test
@@ -307,6 +311,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             fail(e.getMessage());
         }
 
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test
@@ -343,7 +349,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
-
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test
@@ -393,6 +400,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
 
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test
@@ -414,6 +423,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
 
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test
@@ -457,6 +468,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
 
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test(expected = KieServicesException.class)
@@ -687,6 +700,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             fail(e.getMessage());
         }
 
+        List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+        System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
     }
 
     @Test
@@ -983,6 +998,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         } finally {
             processClient.abortProcessInstances(CONTAINER_ID, processInstanceIds);
         }
+
+        for (Long processInstanceId : processInstanceIds) {
+            List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+            System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
+        }
     }
 
     @Test
@@ -1022,6 +1042,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             }
         } finally {
             processClient.abortProcessInstances(CONTAINER_ID, processInstanceIds);
+        }
+
+        for (Long processInstanceId : processInstanceIds) {
+            List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, processInstanceId);
+            System.out.println("------ Signals after test " + name.getMethodName() + " are " + availableSignals);
         }
     }
 
