@@ -105,7 +105,14 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = createQueryDefinition("PROCESS");
         try {
 
-            queryClient.registerQuery(query);
+            QueryDefinition registered = queryClient.registerQuery(query);
+            assertNotNull(registered);
+            assertEquals(query.getName(), registered.getName());
+            assertEquals(query.getSource(), registered.getSource());
+            assertEquals(query.getExpression(), registered.getExpression());
+            assertEquals(query.getTarget(), registered.getTarget());
+            assertNotNull(registered.getColumns());
+            assertEquals(registered.getColumns().size(), 18);
 
             List<QueryDefinition> queries = queryClient.getQueries(0, 100);
 
@@ -392,7 +399,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             query.setExpression("select * from AuditTaskImpl where status = 'InProgress'");
 
-            queryClient.replaceQuery(query);
+            QueryDefinition replaced = queryClient.replaceQuery(query);
+            
+            assertNotNull(replaced);
+            assertEquals(query.getName(), replaced.getName());
+            assertEquals(query.getSource(), replaced.getSource());
+            assertEquals(query.getExpression(), replaced.getExpression());
+            assertEquals(query.getTarget(), replaced.getTarget());
+            assertNotNull(replaced.getColumns());
+            assertEquals(replaced.getColumns().size(), 18);
 
             tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
             assertNotNull(tasks);
