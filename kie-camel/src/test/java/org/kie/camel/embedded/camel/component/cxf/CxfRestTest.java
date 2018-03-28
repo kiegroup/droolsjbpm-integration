@@ -34,7 +34,6 @@ public class CxfRestTest extends CamelSpringTestSupport {
     }
 
     @Test
-    @Ignore("error in spring xml")
     public void test1() throws Exception {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";

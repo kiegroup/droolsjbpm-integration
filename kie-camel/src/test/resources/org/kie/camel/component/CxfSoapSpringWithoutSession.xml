@@ -52,15 +52,15 @@
              address="http://localhost:58002/soap"
              serviceName="ns:CommandExecutor"
              endpointName="ns:CommandExecutorPort"
-          wsdlURL="src/test/resources/org/kie/camel/component/soap.wsdl"
+          wsdlURL="src/test/resources/org/kie/camel/embedded/camel/component/soap.wsdl"
           xmlns:ns="http://soap.jax.drools.org/" >
     <cxf:properties>
       <entry key="dataFormat" value="MESSAGE"/>
       <entry key="defaultOperationName" value="execute"/>
     </cxf:properties>
   </cxf:cxfEndpoint>
-
-  <bean id="kiePolicy" class="org.kie.camel.component.KiePolicy" />
+f
+  <bean id="kiePolicy" class="org.kie.camel.embedded.component.KiePolicy" />
 
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
 
@@ -68,7 +68,7 @@
       <from uri="cxf://bean://soapServer"/>
       <policy ref="kiePolicy">
         <unmarshal ref="xstream" />       
-        <to uri="kie:ksession1" />
+        <to uri="kie-local:ksession1" />
         <marshal ref="xstream" />
       </policy>
     </route>
