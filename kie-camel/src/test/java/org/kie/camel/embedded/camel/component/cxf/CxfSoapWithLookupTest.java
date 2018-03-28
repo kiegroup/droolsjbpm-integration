@@ -29,7 +29,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @Ignore
-public class CxfSoapTestWithLookup extends CamelSpringTestSupport {
+public class CxfSoapWithLookupTest extends CamelSpringTestSupport {
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {

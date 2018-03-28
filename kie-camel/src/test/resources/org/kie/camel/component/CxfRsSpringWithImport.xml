@@ -29,7 +29,7 @@
 
   <!-- Imports the KieBase and KieSessions from the classpath dependencies -->
   <kie:import releaseId-ref="rId" />
-  <kie:releaseId groupId="org.drools" artifactId="named-kiesession" version="7.7.0-SNAPSHOT" id="rId" />
+  <kie:releaseId groupId="org.drools" artifactId="named-kiesession" version="7.5.0.Final" id="rId" />
 
   <!-- Defined the server endpoint to create the cxf-rs consumer -->
   <cxf:rsServer id="rsServer" 

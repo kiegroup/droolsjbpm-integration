@@ -17,41 +17,50 @@
 package org.kie.camel.embedded.camel.component.cxf;
 
 import org.apache.camel.test.spring.CamelSpringTestSupport;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class CxfRestTestWithImport extends CamelSpringTestSupport {
+public class CxfRestWithLookupTest extends CamelSpringTestSupport {
 
-    private static final Logger logger = LoggerFactory.getLogger(CxfRestTestWithImport.class);
+    private static final Logger logger = LoggerFactory.getLogger(CxfRestWithLookupTest.class);
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfRsSpringWithImport.xml");
+        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfRsSpringWithoutSession.xml");
     }
 
     @Test
     public void test1() throws Exception {
-        KieSession kieSession = (KieSession)applicationContext.getBean("ksession1");
-        kieSession.setGlobal("out", System.out);
-
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
-        cmd += "  <insert out-identifier=\"vkiran\">\n";
-        cmd += "      <org.drools.example.api.namedkiesession.Message>\n";
-        cmd += "         <name>HAL</name>\n";
-        cmd += "         <text>Hello, HAL. Do you read me, HAL?</text>\n";
-        cmd += "      </org.drools.example.api.namedkiesession.Message>\n";
+        cmd += "  <insert out-identifier=\"salaboy\">\n";
+        cmd += "      <org.kie.pipeline.camel.Person>\n";
+        cmd += "         <name>salaboy</name>\n";
+        cmd += "      </org.kie.pipeline.camel.Person>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
 
         Object object = this.context.createProducerTemplate().requestBody("direct://http", cmd);
-        logger.debug(object.toString());
+        logger.debug("{}", object);
+
+        assertTrue(object.toString().contains("fact-handle identifier=\"salaboy\""));
+        String cmd2 = "";
+        cmd2 += "<batch-execution lookup=\"ksession2\">\n";
+        cmd2 += "  <insert out-identifier=\"salaboy\">\n";
+        cmd2 += "      <org.kie.pipeline.camel.Person>\n";
+        cmd2 += "         <name>salaboy</name>\n";
+        cmd2 += "      </org.kie.pipeline.camel.Person>\n";
+        cmd2 += "   </insert>\n";
+        cmd2 += "   <fire-all-rules/>\n";
+        cmd2 += "</batch-execution>\n";
+
+        Object object2 = this.context.createProducerTemplate().requestBody("direct://http", cmd2);
+        logger.debug("{}", object2);
+        assertTrue(object2.toString().contains("fact-handle identifier=\"salaboy\""));
     }
 
 }

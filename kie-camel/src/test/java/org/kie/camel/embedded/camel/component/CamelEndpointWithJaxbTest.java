@@ -20,19 +20,16 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import javax.naming.NamingException;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
+import javax.naming.NamingException;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
-import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
@@ -42,9 +39,7 @@ import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.ModifyCommand;
 import org.drools.core.command.runtime.rule.QueryCommand;
 import org.drools.core.common.DefaultFactHandle;
-import org.drools.core.common.DisconnectedFactHandle;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -60,11 +55,9 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.camel.embedded.component.KiePolicy;
-import org.kie.internal.runtime.helper.BatchExecutionHelper;
-import org.kie.pipeline.camel.Person;
 import org.kie.internal.builder.JaxbConfiguration;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.server.client.KieServicesFactory;
+import org.kie.pipeline.camel.Person;
 
 import static java.util.Collections.singletonList;
 
@@ -136,14 +129,6 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
 
     @Test
     public void testSessionModify() throws Exception {
-//        String cmd = "";
-//        cmd += "<batch-execution lookup='ksession1'>\n";
-//        cmd += "   <modify>\n";
-//        cmd += "      <fact-handle external-form=\"" + handle + "\"></fact-handle>\n";
-//        cmd += "      <setters accessor='name' value='salaboy' />\n";
-//        cmd += "   </modify>\n";
-//        cmd += "</batch-execution>\n";
-
         final DefaultFactHandle handleFact = DefaultFactHandle.createFromExternalFormat(this.handle);
         final ModifyCommand.SetterImpl setterImpl = new ModifyCommand.SetterImpl("name", "salaboy");
         final List<Setter> setters = new ArrayList<>();
@@ -161,12 +146,6 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
         expectedXml += "</execution-results>\n";
 
         assertXMLEqual(expectedXml, outXml);
-
-//        cmd = "<batch-execution lookup='ksession1'>\n";
-//        cmd += "   <get-object out-identifier='rider'>\n";
-//        cmd += "     <fact-handle>" + this.handle + "</fact-handle>\n";
-//        cmd += "   </get-object>\n";
-//        cmd += "</batch-execution>\n";
 
         final GetObjectCommand getObjectCommand = new GetObjectCommand(handleFact, "rider");
         final BatchExecutionCommand getCommandBatch = new BatchExecutionCommandImpl(singletonList(getObjectCommand), "ksession1");
