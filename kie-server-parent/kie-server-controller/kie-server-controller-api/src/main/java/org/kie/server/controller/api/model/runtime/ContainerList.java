@@ -16,6 +16,7 @@
 
 package org.kie.server.controller.api.model.runtime;
 
+import java.util.Arrays;
 import java.util.Collection;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -46,5 +47,12 @@ public class ContainerList {
 
     public void setContainers(Container[] containers) {
         this.containers = containers;
+    }
+
+    @Override
+    public String toString() {
+        return "ContainerList{" +
+                "containers=" + Arrays.toString(containers) +
+                '}';
     }
 }
