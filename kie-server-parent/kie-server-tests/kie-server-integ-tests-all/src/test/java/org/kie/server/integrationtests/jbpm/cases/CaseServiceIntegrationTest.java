@@ -18,8 +18,12 @@ package org.kie.server.integrationtests.jbpm.cases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +32,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
-import org.kie.api.runtime.process.ProcessInstance;
+
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CaseServicesClient;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
@@ -61,6 +66,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private static final String CAR_PRODUCER_REPORT_PARAMETER = "carId";
     private static final String CAR_PRODUCER_REPORT_OUTPUT = "carProducerReport";
 
+    private static final String DATA_VERIFICATION_DEF_ID = "DataVerification";
+
     private static final String NON_EXISTENT_STAGE_ID = "I don't exist stage";
     private static final String NON_EXISTENT_CASE_ID = "I don't exist case";
     private static final String BAD_CONTAINER_ID = "not-existing-container";
@@ -68,6 +75,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     private static final String TWO_STAGES_CASE_P_ID = "CaseWithTwoStages";
     private static final String ACCIDENT_TASK_NAME = "Provide accident information";
+
+    private static final String STAGE_ACTIVE_STATE = "Active";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -380,7 +389,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                         "Contact car producer",
                         USER_JOHN,
                         null,
-                        null),
+                        Collections.emptyMap()),
                 404, "No stage found with id " + NON_EXISTENT_STAGE_ID);
     }
 
@@ -389,7 +398,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 50);
         Assertions.assertThat(caseStages).isNotEmpty();
-        String inactiveStageId = caseStages.stream().filter(stage -> stage.getActiveNodes().isEmpty())
+        String inactiveStageId = caseStages.stream().filter(stage -> !STAGE_ACTIVE_STATE.equals(stage.getStatus()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No inactive stage found."))
                 .getIdentifier();
@@ -403,7 +412,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                         "Contact car producer",
                         USER_JOHN,
                         "mygroup",
-                        null),
+                        Collections.emptyMap()),
                 404,
                 "No stage found"
         );
@@ -414,7 +423,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 50);
         Assertions.assertThat(caseStages).isNotEmpty();
-        String activeStageId = caseStages.stream().filter(stage -> stage.getActiveNodes().size() > 0)
+        String activeStageId = caseStages.stream().filter(stage -> STAGE_ACTIVE_STATE.equals(stage.getStatus()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No active stage found."))
                 .getIdentifier();
@@ -428,14 +437,14 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                 "Contact car producer",
                 USER_JOHN,
                 "mygroup",
-                null);
+                Collections.emptyMap());
 
         TaskSummary currentTask;
         do {
             List<TaskSummary> activeTasks = taskClient.findTasksAssignedAsPotentialOwner(USER_JOHN,0, 50);
             Assertions.assertThat(activeTasks).isNotEmpty();
             currentTask = activeTasks.get(0);
-            taskClient.completeAutoProgress(CONTAINER_ID, currentTask.getId(), USER_JOHN, new HashMap<>());
+            taskClient.completeAutoProgress(CONTAINER_ID, currentTask.getId(), USER_JOHN, Collections.emptyMap());
             System.out.println(currentTask);
         } while (currentTask.getName() != taskName);
     }
@@ -455,7 +464,75 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                 () -> caseClient.addDynamicTaskToStage(BAD_CONTAINER_ID, caseId, firstStageId,
                         "ContactCarProducer", "Contact car producer", null), 404, BAD_CONTAINER_ID);
     }
-    
+
+    @Test
+    public void testAddDynamicSubProcessToStage() {
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        Assertions.assertThat(caseId).isNotNull();
+        List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 50);
+        String activeStageId = caseStages.stream().filter(stage -> STAGE_ACTIVE_STATE.equals(stage.getStatus()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No active stage found."))
+                .getIdentifier();
+
+        List<ProcessInstance> instances =
+                caseClient.getProcessInstances(CONTAINER_ID, caseId, Arrays.asList(1, 2, 3), 0, 10);
+        Assertions.assertThat(instances).hasSize(1);
+        final long originalCaseProcessInstanceId = instances.get(0).getId();
+
+        caseClient.addDynamicSubProcessToStage(
+                CONTAINER_ID,
+                caseId,
+                activeStageId,
+                DATA_VERIFICATION_DEF_ID,
+                Collections.emptyMap());
+        instances =
+                caseClient.getProcessInstances(CONTAINER_ID, caseId, Arrays.asList(1, 2, 3), 0, 10);
+        Assertions.assertThat(instances).hasSize(2);
+
+        final ProcessInstance newlyCreatedProcessInstance =
+                instances.stream().filter((pi) -> pi.getId() != originalCaseProcessInstanceId)
+                .findFirst()
+                .get();
+
+        Assertions.assertThat(newlyCreatedProcessInstance.getProcessId()).isEqualTo(DATA_VERIFICATION_DEF_ID);
+        Assertions.assertThat(newlyCreatedProcessInstance.getState()).isEqualTo(STATE_COMPLETED);
+    }
+
+    @Test
+    public void testAddDynamicSubProcessToNonExistingStage() {
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        assertClientException(
+                () -> caseClient.addDynamicSubProcessToStage(
+                        CONTAINER_ID,
+                        caseId,
+                        NON_EXISTENT_STAGE_ID,
+                        DATA_VERIFICATION_DEF_ID,
+                        Collections.emptyMap()),
+                404, "No stage found with id " + NON_EXISTENT_STAGE_ID);
+    }
+
+    @Test
+    public void testAddDynamicSubProcessToInactiveStage() {
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 50);
+        Assertions.assertThat(caseStages).isNotEmpty();
+        String inactiveStageId = caseStages.stream().filter(stage -> !STAGE_ACTIVE_STATE.equals(stage.getStatus()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No inactive stage found."))
+                .getIdentifier();
+
+        assertClientException(
+                () -> caseClient.addDynamicSubProcessToStage(
+                        CONTAINER_ID,
+                        caseId,
+                        inactiveStageId,
+                        DATA_VERIFICATION_DEF_ID,
+                        Collections.emptyMap()),
+                404, "No stage found with id " + NON_EXISTENT_STAGE_ID
+        );
+    }
+
     @Test
     public void testCreateCloseAndReopenCaseWithEmptyCaseFile() {
         String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
@@ -580,7 +657,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         Assertions.assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(CLAIM_CASE_DEF_ID);
         Assertions.assertThat(caseInstance.getCaseDescription()).isEqualTo(CLAIM_CASE_DESRIPTION);
         Assertions.assertThat(caseInstance.getCaseOwner()).isEqualTo(owner);
-        Assertions.assertThat(caseInstance.getCaseStatus().intValue()).isEqualTo(ProcessInstance.STATE_ACTIVE);
+        Assertions.assertThat(caseInstance.getCaseStatus().intValue()).isEqualTo(STATE_ACTIVE);
         Assertions.assertThat(caseInstance.getStartedAt()).isNotNull();
         Assertions.assertThat(caseInstance.getCompletedAt()).isNull();
         Assertions.assertThat(caseInstance.getCompletionMessage()).isEqualTo("");
