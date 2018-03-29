@@ -646,11 +646,20 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         Assertions.assertThat(nonExistingData).isNull();
 
         assertClientException(
-                () -> caseClient.getCaseInstanceData(CONTAINER_ID, "NonExistingCaseId"),
+                () -> caseClient.getCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID),
                 404,
-                "Could not find case instance \"NonExistingCaseId\"");
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"");
     }
-    
+
+    @Test
+    public void testRetrievalOfRoleAssignmentsOfNonExistingCase() {
+        assertClientException(
+                () -> caseClient.getRoleAssignments(CONTAINER_ID, NON_EXISTENT_CASE_ID),
+                404,
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"");
+
+    }
+
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
         Assertions.assertThat(caseInstance).isNotNull();
         Assertions.assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
