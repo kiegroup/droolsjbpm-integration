@@ -369,7 +369,79 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     }
 
     @Test
-    public void testAddDynamicTaskToStageInvalidContainer() throws Exception {
+    public void testAddDynamicUserTaskToNonExistingStage() {
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        assertClientException(
+                () -> caseClient.addDynamicUserTaskToStage(
+                        CONTAINER_ID,
+                        caseId,
+                        NON_EXISTENT_STAGE_ID,
+                        "ContactCarProducer",
+                        "Contact car producer",
+                        USER_JOHN,
+                        null,
+                        null),
+                404, "No stage found with id " + NON_EXISTENT_STAGE_ID);
+    }
+
+    @Test
+    public void testAddDynamicUserTaskToInactiveStage() {
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 50);
+        Assertions.assertThat(caseStages).isNotEmpty();
+        String inactiveStageId = caseStages.stream().filter(stage -> stage.getActiveNodes().isEmpty())
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No inactive stage found."))
+                .getIdentifier();
+
+        assertClientException(
+                () -> caseClient.addDynamicUserTaskToStage(
+                        CONTAINER_ID,
+                        caseId,
+                        inactiveStageId,
+                        "ContactCarProducer",
+                        "Contact car producer",
+                        USER_JOHN,
+                        "mygroup",
+                        null),
+                404,
+                "No stage found"
+        );
+    }
+
+    @Test
+    public void testAddDynamicUserTaskToActiveStage() {
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 50);
+        Assertions.assertThat(caseStages).isNotEmpty();
+        String activeStageId = caseStages.stream().filter(stage -> stage.getActiveNodes().size() > 0)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No active stage found."))
+                .getIdentifier();
+
+        final String taskName = "ContactCarProducer";
+        caseClient.addDynamicUserTaskToStage(
+                CONTAINER_ID,
+                caseId,
+                activeStageId,
+                taskName,
+                "Contact car producer",
+                USER_JOHN,
+                "mygroup",
+                null);
+
+        TaskSummary currentTask;
+        do {
+            List<TaskSummary> activeTasks = taskClient.findTasksAssignedAsPotentialOwner(USER_JOHN,0, 50);
+            Assertions.assertThat(activeTasks).isNotEmpty();
+            currentTask = activeTasks.get(0);
+            taskClient.completeAutoProgress(CONTAINER_ID, currentTask.getId(), USER_JOHN, new HashMap<>());
+            System.out.println(currentTask);
+        } while (currentTask.getName() != taskName);
+    }
+
+    @Test
+    public void testAddDynamicTaskToStageInvalidContainer() {
         String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         Assertions.assertThat(caseId).isNotNull();
 
