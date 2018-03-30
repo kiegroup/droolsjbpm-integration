@@ -45,23 +45,26 @@ public class WebSocketNotificationService implements NotificationService {
         final KieServerControllerNotification notification = new KieServerControllerNotification(event);
 
         LOGGER.debug("Sending notification to all Web Socket sessions");
-        WebSocketNotificationSessionManager.getInstance().getSessions().forEach(
-                session -> {
-                    LOGGER.debug("Sending notification to Web Socket session with id: {}",
-                                 session.getId());
-                    session.getAsyncRemote().sendObject(notification,
-                                                        result -> {
-                                                            if (result.isOK()) {
-                                                                LOGGER.debug("Notification sent to session with id: {}",
-                                                                             session.getId());
-                                                            } else {
-                                                                LOGGER.warn("Failed to send notification, error: {}",
-                                                                            result.getException().getMessage(),
-                                                                            result.getException());
-                                                            }
-                                                        });
-                }
-        );
+        final WebSocketNotificationSessionManager manager = WebSocketNotificationSessionManager.getInstance();
+        synchronized (manager) {
+            manager.getSessions().forEach(
+                    session -> {
+                        LOGGER.debug("Sending notification to Web Socket session with id: {}",
+                                     session.getId());
+                        session.getAsyncRemote().sendObject(notification,
+                                                            result -> {
+                                                                if (result.isOK()) {
+                                                                    LOGGER.debug("Notification sent to session with id: {}",
+                                                                                 session.getId());
+                                                                } else {
+                                                                    LOGGER.warn("Failed to send notification, error: {}",
+                                                                                result.getException().getMessage(),
+                                                                                result.getException());
+                                                                }
+                                                            });
+                    }
+            );
+        }
     }
 
     @Override
