@@ -68,17 +68,17 @@
   </properties>
 
   <modules>
-    <module>kie-server-integ-tests-common</module>
-    <module>kie-server-integ-tests-drools</module>
+<!--     <module>kie-server-integ-tests-common</module> -->
+<!--     <module>kie-server-integ-tests-drools</module> -->
     <module>kie-server-integ-tests-jbpm</module>
-    <module>kie-server-integ-tests-optaplanner</module>
-    <module>kie-server-integ-tests-all</module>
-    <module>kie-server-integ-tests-controller</module>
-    <module>kie-server-integ-tests-policy</module>
-    <module>kie-server-integ-tests-router</module>
-    <module>kie-server-integ-tests-case-id-generator</module>
-    <module>kie-server-integ-tests-dmn</module>
-    <module>kie-server-integ-tests-custom-extension</module>
+<!--     <module>kie-server-integ-tests-optaplanner</module> -->
+<!--     <module>kie-server-integ-tests-all</module> -->
+<!--     <module>kie-server-integ-tests-controller</module> -->
+<!--     <module>kie-server-integ-tests-policy</module> -->
+<!--     <module>kie-server-integ-tests-router</module> -->
+<!--     <module>kie-server-integ-tests-case-id-generator</module> -->
+<!--     <module>kie-server-integ-tests-dmn</module> -->
+<!--     <module>kie-server-integ-tests-custom-extension</module> -->
   </modules>
 
   <dependencyManagement>
@@ -163,6 +163,11 @@
         <artifactId>kie-tomcat-integration</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
+         <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>1.4.196</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -227,7 +232,7 @@
                   <context>${kie.server.context}</context>
                 </properties>
                 <pingURL>${kie.server.base.http.url}</pingURL>
-                <pingTimeout>30000</pingTimeout>
+                <pingTimeout>60000</pingTimeout>
               </deployable>
             </deployables>
             <configuration>
@@ -597,13 +602,15 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+<!--                     <cargo.jvmargs>-Xmx2g -XX:MaxMetaspaceSize=512m</cargo.jvmargs> -->
+                    <cargo.jvmargs>-Xmx1536m -XX:MaxMetaspaceSize=512m</cargo.jvmargs>
                     <cargo.resource.resource.mail>
                        cargo.resource.name=mail/Session|
                        cargo.resource.type=javax.mail.Session|
                        cargo.resource.id=mail|
                        cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
                     </cargo.resource.resource.mail>
+                    <cargo.wildfly.script.cli.embedded>${project.build.testOutputDirectory}/logging.cli</cargo.wildfly.script.cli.embedded>
                   </properties>
                   <datasources>
                     <datasource>

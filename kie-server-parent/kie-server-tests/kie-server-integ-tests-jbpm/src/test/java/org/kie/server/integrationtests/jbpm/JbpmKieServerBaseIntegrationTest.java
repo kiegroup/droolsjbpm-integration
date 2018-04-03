@@ -24,7 +24,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.rules.ExternalResource;
+import org.junit.rules.TestName;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.type.JaxbDate;
@@ -42,6 +44,9 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
+    
+    @Rule
+    public TestName name = new TestName();
 
     protected static final String USER_YODA = "yoda";
     protected static final String USER_JOHN = "john";
@@ -93,12 +98,16 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
 
     @After
     public void abortAllProcesses() {
+        System.out.println("Aborting test method " + name.getMethodName());
         List<Integer> status = new ArrayList<Integer>();
         status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
         List<ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
         if (activeInstances != null) {
             for (ProcessInstance instance : activeInstances) {
                 processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
+                
+                List<String> availableSignals = processClient.getAvailableSignals(CONTAINER_ID, instance.getId());
+                System.out.println("------ Signals after delete of " + instance.getId() + " are " + availableSignals);
             }
         }
     }
