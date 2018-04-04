@@ -15,6 +15,8 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.junit.Assume.assumeFalse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,7 @@ import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.util.ProcessInstanceQueryFilterSpecBuilder;
 import org.kie.server.client.JobServicesClient;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -93,6 +96,10 @@ public class ProcessSearchServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
     @Test
     public void testFindProcessWithIncompatibleTypeFilter() throws Exception {
+        // Skip for MySQL and MariaDB until JBPM-6390 is fixed
+        assumeFalse(TestConfig.isMySqlDataSource());
+        assumeFalse(TestConfig.isMariaDbDataSource());
+
         assertClientException(
                                () -> queryClient.findProcessInstancesWithFilters( QUERY_NAME, createQueryFilterGreaterThanOrEqualsTo( ProcessInstanceField.START_DATE,
                                                                                                                                    "incompatible data type" ),

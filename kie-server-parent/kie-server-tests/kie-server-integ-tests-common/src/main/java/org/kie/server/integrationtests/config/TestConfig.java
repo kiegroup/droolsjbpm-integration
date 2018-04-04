@@ -461,6 +461,20 @@ public class TestConfig {
         return getKieServerDataSourceDriverClass().startsWith("com.sybase");
     }
 
+    /**
+     * @return True if MySQL DB is currently used
+     */
+    public static boolean isMySqlDataSource() {
+        return getKieServerDataSourceDriverClass().startsWith("com.mysql");
+    }
+
+    /**
+     * @return True if Maria DB is currently used
+     */
+    public static boolean isMariaDbDataSource() {
+        return getKieServerDataSourceDriverClass().startsWith("org.mariadb");
+    }
+
     // Used for printing all configuration values at the beginning of first test run.
     static {
         TreeMap<String, String> params = new TreeMap<String, String>();
