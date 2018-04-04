@@ -15,6 +15,8 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.junit.Assume.assumeFalse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +37,7 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
 import org.kie.server.client.JobServicesClient;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -94,6 +97,10 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testFindTaskWithIncompatibleTypeFilter() throws Exception {
+        // Skip for MySQL and MariaDB until JBPM-6390 is fixed
+        assumeFalse(TestConfig.isMySqlDataSource());
+        assumeFalse(TestConfig.isMariaDbDataSource());
+
         assertClientException(
                                () -> queryClient.findHumanTasksWithFilters( QUERY_NAME, createQueryFilterGreaterThanOrEqualsTo( TaskField.CREATEDON,
                                                                                                                              "invalid data type" ),
