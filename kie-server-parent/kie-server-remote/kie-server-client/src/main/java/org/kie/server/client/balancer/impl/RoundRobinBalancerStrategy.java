@@ -43,10 +43,11 @@ public class RoundRobinBalancerStrategy extends AbstractBalancerStrategy {
 
     @Override
     public String markAsOffline(String url) {
+        checkEmpty(availableEndpoints);
         synchronized (availableEndpoints) {
+            checkEmpty(availableEndpoints);
             String baseUrl = locateUrl(availableEndpoints, url);
             availableEndpoints.remove(baseUrl);
-            
             return baseUrl;
         }
     }
