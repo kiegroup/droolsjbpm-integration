@@ -378,9 +378,8 @@ public class KieServerInstanceManager {
 
     public List<Container> getContainers(ServerInstanceKey serverInstanceKey) {
 
-        List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
+        List<Container> containers = new ArrayList<>();
         if (serverInstanceKey == null || serverInstanceKey.getUrl() == null) {
-
             return containers;
         }
         try {
@@ -395,7 +394,7 @@ public class KieServerInstanceManager {
 
                     Container container = new Container();
                     container.setContainerSpecId(containerResource.getContainerId());
-                    container.setContainerName(containerResource.getContainerId());
+                    container.setContainerName(containerResource.getContainerAlias());
                     container.setServerInstanceId(serverInstanceKey.getServerInstanceId());
                     container.setUrl(serverInstanceKey.getUrl() + CONTAINERS_URI_PART + containerResource.getContainerId());
                     container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
@@ -425,7 +424,6 @@ public class KieServerInstanceManager {
         List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
 
         if (serverTemplate.getServerInstanceKeys() == null || serverTemplate.getServerInstanceKeys().isEmpty() || containerSpec == null) {
-
             return containers;
         }
 
