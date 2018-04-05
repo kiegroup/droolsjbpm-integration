@@ -75,7 +75,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     }
 
     @Before
-    public void printTestName() {
+    public void printTestName() throws Exception {
+        System.out.println("Running container signal");
+
+        testSignalContainer();
+
         System.out.println("-----------" + name.getMethodName());
     }
 
