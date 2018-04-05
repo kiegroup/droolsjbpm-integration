@@ -663,6 +663,30 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     }
 
+    @Test
+    public void testPutDataToNonExistingCase() {
+        assertClientException(
+                () -> caseClient.putCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID, "someKey", "data"),
+                404,
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\""
+        );
+
+        assertClientException(
+                () -> caseClient.putCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID, Collections.EMPTY_MAP),
+                404,
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\""
+        );
+    }
+
+    @Test
+    public void testRemoveDataFromNonExistingCase() {
+        assertClientException(
+                () -> caseClient.removeCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID, "someKey"),
+                404,
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\""
+        );
+    }
+
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
         Assertions.assertThat(caseInstance).isNotNull();
         Assertions.assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
