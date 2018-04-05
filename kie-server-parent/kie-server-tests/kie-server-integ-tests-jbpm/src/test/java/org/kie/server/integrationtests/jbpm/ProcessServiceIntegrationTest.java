@@ -22,9 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TestName;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.internal.KieInternalServices;
@@ -52,6 +55,9 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
+    @Rule
+    public TestName name= new TestName();
+
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
@@ -66,6 +72,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
         createContainer(CONTAINER_ID, releaseId);
+    }
+
+    @Before
+    public void printTestName() {
+        System.out.println("-----------" + name.getMethodName());
     }
 
     @Override
