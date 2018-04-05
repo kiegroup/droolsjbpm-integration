@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
@@ -435,18 +436,20 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                 activeStageId,
                 taskName,
                 "Contact car producer",
-                USER_JOHN,
-                "mygroup",
+                USER_YODA,
+                "NO GROUP",
                 Collections.emptyMap());
 
-        TaskSummary currentTask;
-        do {
-            List<TaskSummary> activeTasks = taskClient.findTasksAssignedAsPotentialOwner(USER_JOHN,0, 50);
+
+            List<TaskSummary> activeTasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA,0, 50);
             Assertions.assertThat(activeTasks).isNotEmpty();
-            currentTask = activeTasks.get(0);
-            taskClient.completeAutoProgress(CONTAINER_ID, currentTask.getId(), USER_JOHN, Collections.emptyMap());
-            System.out.println(currentTask);
-        } while (currentTask.getName() != taskName);
+            Optional<TaskSummary> addedTask = activeTasks
+                    .stream()
+                    .filter(task -> taskName.equals(task.getName()))
+                    .findFirst();
+            Assertions.assertThat(addedTask).isNotEmpty();
+
+            taskClient.completeAutoProgress(CONTAINER_ID, addedTask.get().getId(), USER_YODA, Collections.emptyMap());
     }
 
     @Test
