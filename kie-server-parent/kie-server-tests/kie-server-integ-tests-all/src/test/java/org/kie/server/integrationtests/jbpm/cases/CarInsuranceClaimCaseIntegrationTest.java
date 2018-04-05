@@ -20,11 +20,13 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.jbpm.document.Document;
 import org.jbpm.document.service.impl.DocumentImpl;
 import org.junit.After;
@@ -32,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseFile;
@@ -166,6 +169,20 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
     
     @Test
     public void testCarInsuranceClaimCaseTriggerInStage() throws Exception {
+        carInsuranceClaimCaseTriggerInStage(true, true);
+    }
+
+    @Test
+    public void testCarInsuranceClaimCaseTriggerInNotExistingStage() throws Exception {
+        carInsuranceClaimCaseTriggerInStage(false, true);
+    }
+
+    @Test
+    public void testCarInsuranceClaimCaseTriggerNotExistingTaskInStage() throws Exception {
+        carInsuranceClaimCaseTriggerInStage(true, false);
+    }
+
+    private void carInsuranceClaimCaseTriggerInStage(boolean useExistingStageId, boolean useExistingAdHocName) throws Exception{
         // start case with users assigned to roles
         String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
         // let's verify case is created
@@ -189,14 +206,38 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         // let's trigger claim offer calculation
         CaseDefinition definition = caseClient.getCaseDefinition(CONTAINER_ID, CLAIM_CASE_DEF_ID);
         CaseStageDefinition stage = definition.getCaseStages().stream().filter(s -> s.getName().equals("Claim assesment")).findFirst().get();
-        
-        caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stage.getIdentifier(), "Calculate claim", null);
-        // now we have another task for insured as claim was calculated
-        // let's accept the calculated claim
-        assertAndAcceptClaimOffer(USER_YODA);
-        // there should be no process instances for the case
-        Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10);
-        assertEquals(0, caseProcesInstances.size());
+
+        List<Integer> activeStatusList = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+        if (!useExistingStageId) {
+            String stageId = "non existing stage id";
+
+            Assertions.assertThatExceptionOfType(KieServicesException.class).isThrownBy(() ->
+                    caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stageId, "Calculate claim", null))
+                    .withMessageContaining("No stage found with id " + stageId);
+
+            // there should be still process instances for the case
+            Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, activeStatusList, 0, 10);
+            assertEquals(1, caseProcesInstances.size());
+        } else if (!useExistingAdHocName) {
+            String adHocName = "non existing ad hoc fragment";
+
+            Assertions.assertThatExceptionOfType(KieServicesException.class).isThrownBy(() ->
+                    caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stage.getIdentifier(), adHocName, null))
+                    .withMessageContaining("AdHoc fragment '" + adHocName + "' not found in case " + caseId + " and stage " + stage.getIdentifier());
+
+            // there should be still process instances for the case
+            Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, activeStatusList, 0, 10);
+            assertEquals(1, caseProcesInstances.size());
+        } else {
+            caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stage.getIdentifier(), "Calculate claim", null);
+            // now we have another task for insured as claim was calculated
+            // let's accept the calculated claim
+            assertAndAcceptClaimOffer(USER_YODA);
+            // there should be no process instances for the case
+            Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, activeStatusList, 0, 10);
+            assertEquals(0, caseProcesInstances.size());
+        }
     }
 
     private void assertTask(TaskSummary task, String actor, String name, String status) {

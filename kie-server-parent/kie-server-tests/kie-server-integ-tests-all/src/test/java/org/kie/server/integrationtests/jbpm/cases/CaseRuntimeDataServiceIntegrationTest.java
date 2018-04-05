@@ -1838,7 +1838,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         List<CaseFileDataItem> dataItems = caseClient.getCaseInstanceDataItems(caseClaimId, 0, 10);
         assertNotNull(dataItems);
-        assertEquals(0, dataItems.size());
+        assertEquals(1, dataItems.size());
 
         List<CaseStage> stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
         assertEquals(1, stages.size());
@@ -1852,7 +1852,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         dataItems = caseClient.getCaseInstanceDataItems(caseClaimId, 0, 10);
         assertNotNull(dataItems);
-        assertEquals(1, dataItems.size());
+        assertEquals(2, dataItems.size());
 
         CaseFileDataItem dataItem = dataItems.get(0);
         assertEquals(caseClaimId, dataItem.getCaseId());
@@ -1867,7 +1867,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         dataItems = caseClient.getCaseInstanceDataItemsByType(caseClaimId, Arrays.asList(String.class.getName()), 0, 10);
         assertNotNull(dataItems);
-        assertEquals(0, dataItems.size());
+        assertEquals(1, dataItems.size());
 
         dataItems = caseClient.getCaseInstanceDataItemsByName(caseClaimId, Arrays.asList("claimReportDone"), 0, 10);
         assertNotNull(dataItems);
