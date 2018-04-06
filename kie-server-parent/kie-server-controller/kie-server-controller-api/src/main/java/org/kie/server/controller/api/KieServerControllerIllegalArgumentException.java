@@ -15,13 +15,13 @@
 
 package org.kie.server.controller.api;
 
-public class KieServerControllerNotFoundException extends RuntimeException {
+public class KieServerControllerIllegalArgumentException extends RuntimeException {
 
-    public KieServerControllerNotFoundException(String message) {
+    public KieServerControllerIllegalArgumentException(String message) {
         super(message);
     }
 
-    public KieServerControllerNotFoundException(String message, Throwable cause) {
+    public KieServerControllerIllegalArgumentException(String message, Throwable cause) {
         super(message, cause);
     }
 }
