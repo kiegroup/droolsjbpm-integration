@@ -32,7 +32,6 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
-import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -52,9 +51,6 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class WebSocketKieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0");
-
-    private static final String CONTAINER_ID = "kie-concurrent";
     private String origControllerUrl;
 
     @Override
@@ -195,13 +191,13 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         ServerTemplate serverTemplate = new ServerTemplate(kieServerInfo.getResult().getServerId(), kieServerInfo.getResult().getName());
         controllerClient.saveServerTemplate(serverTemplate);
 
-        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
+        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, RELEASE_ID, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
         controllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
         ContainerSpec deployedContainer = controllerClient.getContainerInfo(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         assertNotNull(deployedContainer);
         assertEquals(CONTAINER_ID, deployedContainer.getId());
-        assertEquals(releaseId, deployedContainer.getReleasedId());
+        assertEquals(RELEASE_ID, deployedContainer.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, deployedContainer.getStatus());
 
         controllerClient.startContainer(containerSpec);
@@ -227,7 +223,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         ServerTemplate serverTemplate = new ServerTemplate(kieServerInfo.getResult().getServerId(), kieServerInfo.getResult().getName());
         serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), kieServerInfo.getResult().getLocation()));
         controllerClient.saveServerTemplate(serverTemplate);
-        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
+        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, RELEASE_ID, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
         controllerClient.saveContainerSpec(kieServerInfo.getResult().getServerId(), containerSpec);
         controllerClient.startContainer(containerSpec);
 

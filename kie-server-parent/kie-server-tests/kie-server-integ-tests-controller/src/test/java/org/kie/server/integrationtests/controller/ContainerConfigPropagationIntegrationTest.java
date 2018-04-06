@@ -47,13 +47,6 @@ import static org.junit.Assume.assumeThat;
 
 public class ContainerConfigPropagationIntegrationTest extends KieControllerManagementBaseTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0");
-    private static ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.1");
-    private static ReleaseId releaseIdLatest = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "LATEST");
-
-    private static final String CONTAINER_ID = "kie-concurrent";
-    private static final String CONTAINER_NAME = "containerName";
-
     private KieServerInfo kieServerInfo;
 
     @BeforeClass
@@ -81,7 +74,7 @@ public class ContainerConfigPropagationIntegrationTest extends KieControllerMana
         ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
         containerConfigMap.put(Capability.PROCESS, processConfig);
 
-        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, RELEASE_ID, KieContainerStatus.STARTED, containerConfigMap);
         controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
 
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);
