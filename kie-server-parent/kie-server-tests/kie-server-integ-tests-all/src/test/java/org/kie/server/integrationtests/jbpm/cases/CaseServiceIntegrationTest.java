@@ -532,7 +532,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                         inactiveStageId,
                         DATA_VERIFICATION_DEF_ID,
                         Collections.emptyMap()),
-                404, "No stage found with id " + NON_EXISTENT_STAGE_ID
+                404, "No stage found with id " + inactiveStageId
         );
     }
 
@@ -647,11 +647,6 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         Assertions.assertThat(data).isEmpty();
         Object nonExistingData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "NonExistingData");
         Assertions.assertThat(nonExistingData).isNull();
-
-        assertClientException(
-                () -> caseClient.getCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID),
-                404,
-                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"");
     }
 
     @Test
