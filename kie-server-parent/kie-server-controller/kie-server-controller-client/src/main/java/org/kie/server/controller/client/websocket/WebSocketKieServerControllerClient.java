@@ -74,21 +74,24 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
                                  .password(password)
                                  .token(token)
                                  .build());
-        if(notificationClient != null){
+        if (notificationClient != null) {
             this.notificationClient = notificationClient;
             this.notificationClient.init(WebSocketClientConfiguration.builder()
-                                     .controllerUrl(controllerUrl + "/notification")
-                                     .userName(userName)
-                                     .password(password)
-                                     .token(token)
-                                     .decoders(KieServerControllerNotificationDecoder.class)
-                                     .build());
+                                                 .controllerUrl(controllerUrl + "/notification")
+                                                 .userName(userName)
+                                                 .password(password)
+                                                 .token(token)
+                                                 .decoders(KieServerControllerNotificationDecoder.class)
+                                                 .build());
         }
     }
 
     @Override
     public void close() throws IOException {
         client.close();
+        if (notificationClient != null) {
+            notificationClient.close();
+        }
     }
 
     private <T> T sendCommand(final String service,
@@ -115,8 +118,9 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
             } else {
                 return (T) response.getResult();
             }
-        } catch (KieServerControllerClientException e){
-            LOGGER.warn("Received Web Socket service error with message: {}", e.getMessage());
+        } catch (KieServerControllerClientException e) {
+            LOGGER.warn("Received Web Socket service error with message: {}",
+                        e.getMessage());
             throw e;
         } catch (Exception e) {
             LOGGER.error("Error trying to send message to kie server controller",
