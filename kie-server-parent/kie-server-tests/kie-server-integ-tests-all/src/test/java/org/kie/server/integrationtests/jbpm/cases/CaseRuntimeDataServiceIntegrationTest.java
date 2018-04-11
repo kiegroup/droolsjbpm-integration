@@ -1701,7 +1701,8 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertClientException(
                 () -> caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP),
                 404,
-                "Could not trigger Fragment for Completed stage " + stage.getName());
+                "No stage found with id " + stage.getIdentifier()
+        );
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseClaimId);
     }
@@ -1823,11 +1824,12 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(milestones);
         assertEquals(0, milestones.size());
 
+        final String nonExistingAdHocFragment = "not existing";
         assertClientException(
-                () -> caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "not existing", Collections.EMPTY_MAP),
+                () -> caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, nonExistingAdHocFragment, Collections.EMPTY_MAP),
                 404,
-                "Could not find case instance \"" + caseId + "\"",
-                "Case with id " + caseId + " was not found");
+                "AdHoc fragment '" + nonExistingAdHocFragment + "' not found in case " + caseId
+        );
     }
 
     @Test

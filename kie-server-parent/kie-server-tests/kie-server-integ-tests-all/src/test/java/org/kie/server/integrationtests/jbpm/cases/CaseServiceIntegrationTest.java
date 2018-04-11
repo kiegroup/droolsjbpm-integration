@@ -98,8 +98,12 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testStartNonExistingCaseDefinition() {
-        assertClientException(() -> caseClient.startCase(CONTAINER_ID, "NonExistingCaseDefinition"), 404,
-                              "Could not find case definition \"NonExistingCaseDefinition\" in container \"insurance\"");
+        final String nonExistingCaseDefinition = "NonExistingCaseDefinition";
+        assertClientException(() -> caseClient.startCase(CONTAINER_ID, nonExistingCaseDefinition),
+                              404,
+                              "Could not find case definition \"" + nonExistingCaseDefinition + "\" in container \"insurance\"",
+                              "Unable to find case '" + nonExistingCaseDefinition + "' in container insurance"
+        );
     }
 
     @Test
@@ -654,7 +658,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertClientException(
                 () -> caseClient.getRoleAssignments(CONTAINER_ID, NON_EXISTENT_CASE_ID),
                 404,
-                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"");
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"",
+                "Case with id " + NON_EXISTENT_CASE_ID + " not found");
 
     }
 
@@ -663,13 +668,15 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertClientException(
                 () -> caseClient.putCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID, "someKey", "data"),
                 404,
-                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\""
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"",
+                "Case with id " + NON_EXISTENT_CASE_ID + " not found"
         );
 
         assertClientException(
                 () -> caseClient.putCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID, Collections.EMPTY_MAP),
                 404,
-                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\""
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"",
+                "Case with id " + NON_EXISTENT_CASE_ID + " not found"
         );
     }
 
@@ -678,7 +685,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertClientException(
                 () -> caseClient.removeCaseInstanceData(CONTAINER_ID, NON_EXISTENT_CASE_ID, "someKey"),
                 404,
-                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\""
+                "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"",
+                "Case with id " + NON_EXISTENT_CASE_ID + " not found"
         );
     }
 
