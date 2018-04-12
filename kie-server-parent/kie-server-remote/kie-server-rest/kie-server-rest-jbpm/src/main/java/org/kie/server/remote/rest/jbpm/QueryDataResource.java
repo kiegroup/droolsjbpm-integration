@@ -118,7 +118,7 @@ public class QueryDataResource {
     }
 
     @ApiOperation(value="Registers new query definition in the system with given queryName",
-            response=Void.class, code=201)
+            response=QueryDefinition.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 409, message = "Query with given name already exists")})
     @POST
@@ -135,16 +135,16 @@ public class QueryDataResource {
                                                                  context,
                                                                  headers );
         try {
-            queryDataServiceBase.registerQuery( queryName,
+            QueryDefinition def = queryDataServiceBase.registerQuery( queryName,
                                                 payload,
                                                 type );
 
             logger.debug( "Returning CREATED response after registering query with name {}",
                           queryName );
-            return createResponse( "",
-                                   v,
-                                   Response.Status.CREATED,
-                                   conversationIdHeader );
+            return createCorrectVariant( def,
+                                         headers,
+                                         Response.Status.CREATED,
+                                         conversationIdHeader );
         } catch ( QueryAlreadyRegisteredException e ) {
             return alreadyExists( MessageFormat.format( QUERY_ALREADY_EXISTS,
                                                         queryName ),
@@ -162,7 +162,7 @@ public class QueryDataResource {
     }
 
     @ApiOperation(value="Replaces existing query definition or registers new if not exists in the system with given queryName",
-            response=Void.class, code=201)
+            response=QueryDefinition.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @PUT
     @Path(REPLACE_QUERY_DEF_PUT_URI)
@@ -178,15 +178,15 @@ public class QueryDataResource {
                                                                  context,
                                                                  headers );
         try {
-            queryDataServiceBase.replaceQuery( queryName,
+            QueryDefinition def = queryDataServiceBase.replaceQuery( queryName,
                                                payload,
                                                type );
             logger.debug( "Returning CREATED response after registering query with name {}",
-                          queryName );
-            return createResponse( "",
-                                   v,
-                                   Response.Status.CREATED,
-                                   conversationIdHeader );
+                          queryName );            
+            return createCorrectVariant( def,
+                                  headers,
+                                  Response.Status.CREATED,
+                                  conversationIdHeader );
         } catch ( Exception e ) {
             logger.error( "Unexpected error during processing {}",
                           e.getMessage(),

@@ -15,6 +15,8 @@
 
 package org.kie.server.api.model.definition;
 
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -32,6 +34,9 @@ public class QueryDefinition {
     private String expression;
     @XmlElement(name="query-target")
     private String target;
+    
+    @XmlElement(name="query-columns")
+    private Map<String, String> columns;
 
     public QueryDefinition() {
 
@@ -72,6 +77,14 @@ public class QueryDefinition {
     public void setTarget(String target) {
         this.target = target;
     }
+    
+    public Map<String, String> getColumns() {
+        return columns;
+    }
+    
+    public void setColumns(Map<String, String> columns) {
+        this.columns = columns;
+    }
 
     public static class Builder {
 
@@ -101,6 +114,12 @@ public class QueryDefinition {
 
         public Builder target(String target) {
             definition.setTarget(target);
+
+            return this;
+        }
+        
+        public Builder columns(Map<String, String> columns) {
+            definition.setColumns(columns);
 
             return this;
         }

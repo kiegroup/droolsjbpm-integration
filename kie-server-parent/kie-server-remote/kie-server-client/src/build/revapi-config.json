@@ -339,15 +339,39 @@
            "elementKind": "method",
            "justification": "Return comment id when comment is added"
          },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method <T> java.util.List<T> org.kie.server.client.QueryServicesClient::query(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>, java.lang.Integer, java.lang.Integer, java.lang.Class<T>)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "QueryServicesClient",
-          "methodName": "query",
-          "elementKind": "method",
-          "justification": "JBPM-6891 - Added support to pass container id when executing advanced query"
-        }
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method <T> java.util.List<T> org.kie.server.client.QueryServicesClient::query(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>, java.lang.Integer, java.lang.Integer, java.lang.Class<T>)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "QueryServicesClient",
+           "methodName": "query",
+           "elementKind": "method",
+           "justification": "JBPM-6891 - Added support to pass container id when executing advanced query"
+         },
+         {
+           "code": "java.method.returnTypeChanged",
+           "old": "method void org.kie.server.client.QueryServicesClient::registerQuery(org.kie.server.api.model.definition.QueryDefinition)",
+           "new": "method org.kie.server.api.model.definition.QueryDefinition org.kie.server.client.QueryServicesClient::registerQuery(org.kie.server.api.model.definition.QueryDefinition)",
+           "oldType": "void",
+           "newType": "org.kie.server.api.model.definition.QueryDefinition",
+           "package": "org.kie.server.client",
+           "classSimpleName": "QueryServicesClient",
+           "methodName": "registerQuery",
+           "elementKind": "method",
+           "justification": "Expose query definition resolved columns"
+         },
+         {
+           "code": "java.method.returnTypeChanged",
+           "old": "method void org.kie.server.client.QueryServicesClient::replaceQuery(org.kie.server.api.model.definition.QueryDefinition)",
+           "new": "method org.kie.server.api.model.definition.QueryDefinition org.kie.server.client.QueryServicesClient::replaceQuery(org.kie.server.api.model.definition.QueryDefinition)",
+           "oldType": "void",
+           "newType": "org.kie.server.api.model.definition.QueryDefinition",
+           "package": "org.kie.server.client",
+           "classSimpleName": "QueryServicesClient",
+           "methodName": "replaceQuery",
+           "elementKind": "method",
+           "justification": "Expose query definition resolved columns"
+         }
 
       ]
     }

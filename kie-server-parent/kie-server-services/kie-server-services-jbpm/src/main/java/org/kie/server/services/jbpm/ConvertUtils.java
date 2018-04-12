@@ -473,6 +473,7 @@ public class ConvertUtils {
                                 .expression(queryDefinition.getExpression())
                                 .source(queryDefinition.getSource())
                                 .target(queryDefinition.getTarget().toString())
+                                .columns(queryDefinition.getColumns())
                                 .build();
         return query;
     }
