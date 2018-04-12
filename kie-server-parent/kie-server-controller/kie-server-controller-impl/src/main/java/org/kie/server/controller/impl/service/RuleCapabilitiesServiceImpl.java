@@ -20,6 +20,7 @@ import java.util.List;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
@@ -43,10 +44,13 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
     public void scanNow(final ContainerSpecKey containerSpecKey) {
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
-            throw new RuntimeException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
         ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId());
+        }
 
         List<Container> containers = kieServerInstanceManager.scanNow(serverTemplate,
                                                                       containerSpec);
@@ -62,10 +66,13 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
-            throw new RuntimeException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
         ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId());
+        }
 
         ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
         if (containerConfig == null) {
@@ -92,16 +99,23 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
     public void stopScanner(final ContainerSpecKey containerSpecKey) {
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
-            throw new RuntimeException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
         ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId());
+        }
 
         ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
         if (containerConfig == null) {
             containerConfig = new RuleConfig();
             containerSpec.getConfigs().put(Capability.RULE,
                                            containerConfig);
+        }
+
+        if(((RuleConfig) containerConfig).getScannerStatus() == KieScannerStatus.STOPPED){
+            return;
         }
 
         ((RuleConfig) containerConfig).setPollInterval(null);
@@ -122,10 +136,13 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
                                  ReleaseId releaseId) {
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
-            throw new RuntimeException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
         ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId());
+        }
         if (releaseId.getGroupId() == null) {
             releaseId.setGroupId(containerSpec.getReleasedId().getGroupId());
         }
