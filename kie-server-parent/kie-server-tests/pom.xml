@@ -1048,6 +1048,27 @@
       </build>
     </profile>
     <profile>
+      <!-- Skip unstable tests on Jenkins PR builder. -->
+      <id>jenkins-pr-builder</id>
+      <activation>
+        <property>
+          <name>ghprbGhRepository</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder</excludedGroups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <!-- Integration tests are skipped by default. They are activated when specific container profile is used. -->
       <id>skipITs-by-default</id>
       <activation>
