@@ -84,6 +84,17 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
         });
     }
 
+    @Test
+    public void testGetContainersFromNotExistingServerInstance() {
+        ServerInstanceKey serverInstance = new ServerInstanceKey("not-existing", "not-existing", "not-existing", "not-existing");
+        try {
+            controllerClient.getContainers(serverInstance);
+            fail("Should throw exception about the server instance not existing.");
+        } catch (KieServerControllerClientException e) {
+            assertNotFoundException((T) e);
+        }
+    }
+
     protected ServerTemplate createServerTemplate() {
         return createServerTemplate(kieServerInfo.getServerId(), kieServerInfo.getName(), kieServerInfo.getLocation());
     }

@@ -29,7 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.kie.server.controller.api.KieServerControllerException;
-import org.kie.server.controller.api.KieServerControllerNotFoundException;
+import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpecKey;
@@ -65,7 +65,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             super.saveContainerSpec(serverTemplateId, containerSpec);
             logger.debug("Returning response for save container spec request for server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -90,7 +90,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             super.updateContainerSpec(serverTemplateId, containerId, containerSpec);
             logger.debug("Returning response for update container spec request for server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -118,7 +118,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             super.saveServerTemplate(serverTemplate);
             logger.debug("Returning response for save server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -140,7 +140,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             logger.debug("Returning response for get server template with id '{}': {}", serverTemplateId, response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -164,7 +164,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             logger.debug("Returning response for get server templates: {}", response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -187,7 +187,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             logger.debug("Returning response for get containers for server templates with id {}: {}", serverTemplateId, response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -213,7 +213,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             logger.debug("Returning response for get container {} for server templates with id {}: {}", containerId, serverTemplateId, response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -233,7 +233,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             super.deleteContainerSpec(serverTemplateId, containerSpecId);
             // return null to produce 204
             return null;
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -251,7 +251,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             super.deleteServerTemplate(serverTemplateId);
             // return null to produce 204
             return null;
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -289,7 +289,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             super.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
             logger.debug("Returning response for update container (with id {}) config '{}': CREATED", containerSpecId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
@@ -313,7 +313,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
 
             logger.debug("Returning response for stop container with id {} server instance: {}", containerId, serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.OK);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (Exception e) {
             logger.error("Stop container failed due to {}", e.getMessage(), e);
@@ -335,7 +335,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
 
             logger.debug("Returning response for start container with id {} server instance: {}", containerId, serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.OK);
-        } catch (KieServerControllerNotFoundException e) {
+        } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (Exception e) {
             logger.error("Start container failed due to {}", e.getMessage(), e);

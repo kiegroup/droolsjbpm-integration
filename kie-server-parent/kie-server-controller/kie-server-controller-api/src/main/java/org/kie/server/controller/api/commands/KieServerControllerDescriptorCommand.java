@@ -54,6 +54,7 @@ public class KieServerControllerDescriptorCommand implements KieServerCommand {
             @XmlElement(name = "release-id", type = ReleaseId.class),
             @XmlElement(name = "capability", type = Capability.class),
             @XmlElement(name = "arguments", type = String.class),
+            @XmlElement(name = "long", type = Long.class)
     })
     private List<Object> arguments;
 

@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.controller.api.KieServerControllerNotFoundException;
+import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
@@ -528,7 +528,7 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         doReturn(null).when(templateStorage).load(serverTemplateId);
 
-        expectedException.expect(KieServerControllerNotFoundException.class);
+        expectedException.expect(KieServerControllerIllegalArgumentException.class);
         expectedException.expectMessage("No server template found for id serverTemplateId");
 
         specManagementService.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
@@ -549,7 +549,7 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         doReturn(serverTemplate).when(templateStorage).load(serverTemplateId);
         doReturn(null).when(serverTemplate).getContainersSpec();
 
-        expectedException.expect(KieServerControllerNotFoundException.class);
+        expectedException.expect(KieServerControllerIllegalArgumentException.class);
         expectedException.expectMessage("No container spec found for id containerSpecId within server template with id serverTemplateId");
 
         specManagementService.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);

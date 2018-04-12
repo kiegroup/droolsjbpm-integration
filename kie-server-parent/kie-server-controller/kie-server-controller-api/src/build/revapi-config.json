@@ -138,6 +138,14 @@
           "methodName": "deleteServerInstance",
           "elementKind": "method",
           "justification": "New method for excluding a server instance from a template"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.kie.server.controller.api.KieServerControllerNotFoundException",
+          "package": "org.kie.server.controller.api",
+          "classSimpleName": "KieServerControllerNotFoundException",
+          "elementKind": "class",
+          "justification": "Renamed class to KieServerControllerIllegalArgumentException to better represent its goal"
         }
       ]
     }

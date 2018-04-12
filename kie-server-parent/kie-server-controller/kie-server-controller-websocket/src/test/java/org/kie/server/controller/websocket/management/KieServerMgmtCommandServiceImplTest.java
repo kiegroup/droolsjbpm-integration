@@ -20,7 +20,12 @@ import org.junit.Test;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
-import org.kie.server.controller.api.model.spec.*;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ContainerSpecKey;
+import org.kie.server.controller.api.model.spec.ProcessConfig;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
@@ -92,7 +97,7 @@ public class KieServerMgmtCommandServiceImplTest {
 
         final String content = WebSocketUtils.marshal(command);
 
-        LOGGER.info("JSON content\n{}", content);
+        LOGGER.debug("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
                                                                                                       KieServerControllerDescriptorCommand.class));
 
@@ -138,7 +143,7 @@ public class KieServerMgmtCommandServiceImplTest {
                                                                                                 "templateId",
                                                                                                 containerSpec);
         final String content = WebSocketUtils.marshal(command);
-        LOGGER.info("JSON content\n{}", content);
+        LOGGER.debug("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
                                                                                                       KieServerControllerDescriptorCommand.class));
 
@@ -163,7 +168,7 @@ public class KieServerMgmtCommandServiceImplTest {
                                                                                                 serverTemplate,
                                                                                                 releaseId);
         final String content = WebSocketUtils.marshal(command);
-        LOGGER.info("JSON content\n{}", content);
+        LOGGER.debug("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
                                                                                                       KieServerControllerDescriptorCommand.class));
 
@@ -185,7 +190,31 @@ public class KieServerMgmtCommandServiceImplTest {
                                                                                                 Capability.PROCESS,
                                                                                                 new ProcessConfig());
         final String content = WebSocketUtils.marshal(command);
-        LOGGER.info("JSON content\n{}", content);
+        LOGGER.debug("JSON content\n{}", content);
+        KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
+                                                                                                      KieServerControllerDescriptorCommand.class));
+
+        assertNotNull(response);
+        assertEquals(FAILURE,
+                     response.getType());
+        assertEquals("No server template found for id serverTemplateId", response.getMsg());
+        assertNull(response.getResult());
+    }
+
+    @Test
+    public void testStartScanner() {
+        final ContainerSpecKey containerSpecKey = new ContainerSpecKey("id",
+                                                                       "name",
+                                                                       new ServerTemplateKey("serverTemplateId",
+                                                                                             "stname"));
+        KieServerControllerDescriptorCommand command = new KieServerControllerDescriptorCommand(RuleCapabilitiesService.class.getName(),
+                                                                                                "startScanner",
+                                                                                                null,
+                                                                                                null,
+                                                                                                containerSpecKey,
+                                                                                                new Long(1));
+        final String content = WebSocketUtils.marshal(command);
+        LOGGER.debug("JSON content\n{}", content);
         KieServerControllerServiceResponse response = service.executeCommand(WebSocketUtils.unmarshal(content,
                                                                                                       KieServerControllerDescriptorCommand.class));
 

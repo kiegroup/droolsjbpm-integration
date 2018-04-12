@@ -20,15 +20,9 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerResourceList;
-import org.kie.server.api.model.KieScannerResource;
-import org.kie.server.api.model.KieScannerStatus;
-import org.kie.server.api.model.KieServerConfigItem;
-import org.kie.server.api.model.Message;
-import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.*;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
@@ -409,6 +403,7 @@ public class KieServerInstanceManager {
             logger.warn("Unable to get list of containers from remote server at url {} due to {}",
                         serverInstanceKey.getUrl(),
                         e.getMessage());
+            throw e;
         }
         return containers;
     }
@@ -467,9 +462,14 @@ public class KieServerInstanceManager {
         return alive;
     }
 
-    protected KieServicesClient getClient(String url) {
-        KieServicesClient client = clientProviders.stream().filter(provider -> provider.supports(url)).findFirst().get().get(url);
+    protected KieServicesClient getClient(final String url) {
+        KieServicesClientProvider clientProvider = clientProviders.stream().filter(provider -> provider.supports(url)).findFirst().orElseThrow(() -> new KieServerControllerIllegalArgumentException("Kie Services Client Provider not found for url: " + url));
+        logger.debug("Using client provider {}", clientProvider);
+        KieServicesClient client = clientProvider.get(url);
         logger.debug("Using client {}", client);
+        if(client == null){
+            throw new KieServerControllerIllegalArgumentException("Kie Services Client not found for url: " + url);
+        }
         return client;
     }
 

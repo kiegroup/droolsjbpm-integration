@@ -113,8 +113,10 @@ public class KieServerInfo {
         return "KieServerInfo{" +
                 "serverId='" + serverId + '\'' +
                 ", version='" + version + '\'' +
+                ", name='" + name + '\'' +
                 ", location='" + location + '\'' +
-                ", capabilities=" + capabilities  +
+                ", capabilities=" + capabilities +
+                ", messages=" + messages +
                 '}';
     }
 }
