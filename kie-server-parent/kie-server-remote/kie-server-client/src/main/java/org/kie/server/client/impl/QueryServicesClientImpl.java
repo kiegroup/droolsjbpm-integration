@@ -86,6 +86,7 @@ import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.QueryServicesClient;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class QueryServicesClientImpl extends AbstractKieServicesClientImpl implements QueryServicesClient {
 
     public QueryServicesClientImpl(KieServicesConfiguration config) {
@@ -795,39 +796,53 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
         return Collections.emptyList();
     }
 
-    // QueryDataService related
+    // QueryDataService related    
     @Override
-    public void registerQuery(QueryDefinition queryDefinition) {
+    public QueryDefinition registerQuery(QueryDefinition queryDefinition) {
+        QueryDefinition result = null;
         if (config.isRest()) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(QUERY_NAME, queryDefinition.getName());
 
-            makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + CREATE_QUERY_DEF_POST_URI, valuesMap), queryDefinition, Object.class);
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + CREATE_QUERY_DEF_POST_URI, valuesMap), queryDefinition, QueryDefinition.class);
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "registerQuery", serialize(queryDefinition), marshaller.getFormat().getType(), new Object[]{queryDefinition.getName()})));
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+            ServiceResponse<QueryDefinition> response = (ServiceResponse<QueryDefinition>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
         }
+
+        return result;
     }
 
     @Override
-    public void replaceQuery(QueryDefinition queryDefinition) {
+    public QueryDefinition replaceQuery(QueryDefinition queryDefinition) {
+        QueryDefinition result = null;
         if (config.isRest()) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(QUERY_NAME, queryDefinition.getName());
 
-            makeHttpPutRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + REPLACE_QUERY_DEF_PUT_URI, valuesMap), queryDefinition, Object.class, new HashMap<String, String>());
+            result = makeHttpPutRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + REPLACE_QUERY_DEF_PUT_URI, valuesMap), queryDefinition, QueryDefinition.class, new HashMap<String, String>());
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "replaceQuery", serialize(queryDefinition), marshaller.getFormat().getType(), new Object[]{queryDefinition.getName()})));
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+            ServiceResponse<QueryDefinition> response = (ServiceResponse<QueryDefinition>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
         }
+
+        return result;
     }
 
     @Override

@@ -78,7 +78,7 @@ public class QueryDataServiceBase {
         this.marshallerHelper = new MarshallerHelper(context);
     }
 
-    public void registerQuery(String queryName, String payload, String marshallingType) throws QueryAlreadyRegisteredException {
+    public QueryDefinition registerQuery(String queryName, String payload, String marshallingType) throws QueryAlreadyRegisteredException {
         logger.debug("About to unmarshal queryDefinition from payload: '{}'", payload);
         QueryDefinition queryDefinition = marshallerHelper.unmarshal(payload, marshallingType, QueryDefinition.class);
         queryDefinition.setName(queryName);
@@ -86,9 +86,11 @@ public class QueryDataServiceBase {
         SqlQueryDefinition actualDefinition = build(context, queryDefinition);
         logger.debug("Built sql query definition for {} with content {}", queryName, actualDefinition);
         queryService.registerQuery(actualDefinition);
+        
+        return convertQueryDefinition(actualDefinition);
     }
 
-    public void replaceQuery(String queryName, String payload, String marshallingType) {
+    public QueryDefinition replaceQuery(String queryName, String payload, String marshallingType) {
 
         logger.debug("About to unmarshal queryDefinition from payload: '{}'", payload);
         QueryDefinition queryDefinition = marshallerHelper.unmarshal(payload, marshallingType, QueryDefinition.class);
@@ -98,6 +100,8 @@ public class QueryDataServiceBase {
         logger.debug("Built sql query definition for {} with content {}", queryName, actualDefinition);
 
         queryService.replaceQuery(actualDefinition);
+        
+        return convertQueryDefinition(actualDefinition);
     }
 
     public void unregisterQuery(String uniqueQueryName) throws QueryNotFoundException {

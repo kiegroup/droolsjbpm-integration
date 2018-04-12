@@ -120,9 +120,9 @@ public interface QueryServicesClient {
     List<VariableInstance> findVariableHistory(Long processInstanceId, String variableName, Integer page, Integer pageSize);
 
     // QueryDataService related
-    void registerQuery(QueryDefinition queryDefinition);
+    QueryDefinition registerQuery(QueryDefinition queryDefinition);
 
-    void replaceQuery(QueryDefinition queryDefinition);
+    QueryDefinition replaceQuery(QueryDefinition queryDefinition);
 
     void unregisterQuery(String queryName);
 

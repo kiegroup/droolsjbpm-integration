@@ -107,18 +107,20 @@ public class WebSocketKieServerClient implements KieServicesClient {
                 }
                 
                 @Override
-                public void replaceQuery(QueryDefinition queryDefinition) {
+                public QueryDefinition replaceQuery(QueryDefinition queryDefinition) {
                     CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "replaceQuery",
                                                                                                                                 WebSocketUtils.marshal(queryDefinition), MarshallingFormat.JSON.toString(), new Object[]{queryDefinition.getName()})));
                     sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
                         WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
                         return null;
-                    })).getResponses();    
+                    })).getResponses();  
+                    
+                    return queryDefinition;
                 }
                 
                 @Override
-                public void registerQuery(QueryDefinition queryDefinition) {
-                    throwUnsupportedException();
+                public QueryDefinition registerQuery(QueryDefinition queryDefinition) {
+                    return throwUnsupportedException();
                 }
                 
                 @Override
