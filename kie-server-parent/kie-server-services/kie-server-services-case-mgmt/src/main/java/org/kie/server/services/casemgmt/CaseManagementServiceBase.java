@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
@@ -100,7 +101,7 @@ public class CaseManagementServiceBase {
 
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
         if( caseDef == null ) {
-            throw new IllegalStateException("Unable to find case '" + caseDefinitionId + "' in container " + containerId);
+            throw new CaseDefinitionNotFoundException("Unable to find case '" + caseDefinitionId + "' in container " + containerId);
         }
 
         logger.debug("About to unmarshal case file from payload: '{}'", payload);

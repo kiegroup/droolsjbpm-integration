@@ -1660,7 +1660,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
     }
 
-    @Ignore // test is ignore due JBPM-6001 and JBPM-6008
     @Test
     public void testTriggerTaskIntoStage() throws Exception {
         String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
@@ -1701,8 +1700,9 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         assertClientException(
                 () -> caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP),
-                400,
-                "Could not trigger Fragment for Completed stage " + stage.getName());
+                404,
+                "No stage found with id " + stage.getIdentifier()
+        );
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseClaimId);
     }
@@ -1823,12 +1823,13 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         List<CaseMilestone> milestones = caseClient.getMilestones(CONTAINER_ID, caseId, true, 0, 10);
         assertNotNull(milestones);
         assertEquals(0, milestones.size());
-        try {
-            caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "not existing", null);
-            fail("Should have failed because of not existing comment Id.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+
+        final String nonExistingAdHocFragment = "not existing";
+        assertClientException(
+                () -> caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, nonExistingAdHocFragment, Collections.EMPTY_MAP),
+                404,
+                "AdHoc fragment '" + nonExistingAdHocFragment + "' not found in case " + caseId
+        );
     }
 
     @Test
