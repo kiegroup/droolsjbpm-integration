@@ -48,8 +48,6 @@ public class RuntimeManagementServiceImpl implements RuntimeManagementService {
         return new ContainerList(containers);
     }
 
-
-
     public KieServerTemplateStorage getTemplateStorage() {
         return templateStorage;
     }
