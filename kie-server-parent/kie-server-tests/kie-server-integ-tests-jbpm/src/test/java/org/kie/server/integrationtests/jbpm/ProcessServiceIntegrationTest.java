@@ -40,6 +40,7 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
@@ -610,6 +611,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     }
 
     @Test
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testSignalContainer() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 

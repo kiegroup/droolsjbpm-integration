@@ -44,6 +44,8 @@
     <kie.server.router.url>http://localhost:${router.port}</kie.server.router.url>
     <!-- This property can be overridden to exclude specific test category according to specific needs. -->
     <failsafe.excluded.groups/>
+    <!-- This property can be overridden to exclude specific test category for Jenkins limitations. -->
+    <jenkins.excluded.groups/>
     <!-- Sybase driver leaks its Timestamp implementation. To correctly handle it we need to add driver as additional test classpath. -->
     <maven.jdbc.driver.jar/>
     <!-- Set to true if you want to skip JMS tests even for containers with available JMS. -->
@@ -296,7 +298,7 @@
                 <goal>verify</goal>
               </goals>
               <configuration>
-                <excludedGroups>${failsafe.excluded.groups}</excludedGroups>
+                <excludedGroups>${failsafe.excluded.groups}${jenkins.excluded.groups}</excludedGroups>
                 <additionalClasspathElements combine.children="append">
                   <additionalClasspathElement>${maven.jdbc.driver.jar}</additionalClasspathElement>
                 </additionalClasspathElements>
@@ -1035,6 +1037,18 @@
           </plugins>
         </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <!-- Skip unstable tests on Jenkins PR builder. -->
+      <id>jenkins-pr-builder</id>
+      <activation>
+        <property>
+          <name>ghprbGhRepository</name>
+        </property>
+      </activation>
+      <properties>
+        <jenkins.excluded.groups>,org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder</jenkins.excluded.groups>
+      </properties>
     </profile>
     <profile>
       <!-- Integration tests are skipped by default. They are activated when specific container profile is used. -->
