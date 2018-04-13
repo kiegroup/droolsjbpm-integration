@@ -1854,7 +1854,10 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(dataItems);
         assertEquals(2, dataItems.size());
 
-        CaseFileDataItem dataItem = dataItems.get(0);
+        CaseFileDataItem dataItem = dataItems.stream()
+                                             .filter(n -> "claimReportDone".equals(n.getName()))
+                                             .findAny()
+                                             .get();
         assertEquals(caseClaimId, dataItem.getCaseId());
         assertEquals("claimReportDone", dataItem.getName());
         assertEquals("true", dataItem.getValue());
