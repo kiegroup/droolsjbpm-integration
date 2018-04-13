@@ -66,10 +66,10 @@ public class ContainerBuilder {
             ProcessConfig processConfig = new ProcessConfig();
             configs.put(Capability.PROCESS, processConfig);
 
-            processConfig.setRuntimeStrategy(runtimeStrategy);
-            processConfig.setKBase(kbase);
-            processConfig.setKSession(ksession);
-            processConfig.setMergeMode(mergeMode);
+            processConfig.setRuntimeStrategy(runtimeStrategy == null ? "SINGLETON" : runtimeStrategy);
+            processConfig.setKBase(kbase == null ? "" : kbase);
+            processConfig.setKSession(ksession == null ? "" : ksession);
+            processConfig.setMergeMode(mergeMode == null ? "MERGE_COLLECTIONS" : mergeMode);
         }
 
         if (pollInterval != null || scannerStatus != null) {
