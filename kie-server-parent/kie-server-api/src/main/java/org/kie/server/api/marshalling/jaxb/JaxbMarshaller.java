@@ -400,6 +400,10 @@ public class JaxbMarshaller implements Marshaller {
 
     @Override
     public String marshall(Object input) {
+        if (input == null) {
+            return null;
+        }
+
         StringWriter writer = new StringWriter();
         try {
             getMarshaller().marshal(ModelWrapper.wrap(input), writer);

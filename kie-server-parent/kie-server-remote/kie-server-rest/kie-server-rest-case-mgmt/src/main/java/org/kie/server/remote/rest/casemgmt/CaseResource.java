@@ -84,6 +84,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.casemgmt.api.CaseCommentNotFoundException;
+import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
 import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
@@ -145,10 +146,15 @@ public class CaseResource extends AbstractCaseResource {
                 containerId,
                 null,
                 (Variant v, String type, Header... customHeaders) -> {
-                    String response = caseManagementServiceBase.startCase(containerId, caseDefId, payload, type);
-                    logger.debug("Returning CREATED response for start case with content '{}'", response);
+                    try {
+                        String response = caseManagementServiceBase.startCase(containerId, caseDefId, payload, type);
+                        logger.debug("Returning CREATED response for start case with content '{}'", response);
 
-                    return createResponse(response, v, Response.Status.CREATED, customHeaders);
+                        return createResponse(response, v, Response.Status.CREATED, customHeaders);
+                    } catch (CaseDefinitionNotFoundException e) {
+                        return notFound(
+                                MessageFormat.format(CASE_DEFINITION_NOT_FOUND, caseDefId, containerId), v, customHeaders);
+                    }
                 });
     }
 
