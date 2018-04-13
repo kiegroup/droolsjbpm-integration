@@ -24,6 +24,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieControllerNotConnectedException;
+import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.ContainerManager;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
@@ -39,19 +40,22 @@ public class ControllerConnectRunnable implements Runnable {
     private KieServerState currentState;
     private ContainerManager containerManager;
     private KieServerImpl kieServer;
+    private StartupStrategy startupStrategy;
 
     public ControllerConnectRunnable(AtomicBoolean kieServerActive,
                                      KieServerController kieController,
                                      KieServerInfo kieServerInfo,
                                      KieServerState currentState,
                                      ContainerManager containerManager,
-                                     KieServerImpl kieServer) {
+                                     KieServerImpl kieServer,
+                                     StartupStrategy startupStrategy) {
         this.kieServerActive = kieServerActive;
         this.kieController = kieController;
         this.kieServerInfo = kieServerInfo;
         this.currentState = currentState;
         this.containerManager = containerManager;
         this.kieServer = kieServer;
+        this.startupStrategy = startupStrategy;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class ControllerConnectRunnable implements Runnable {
                 logger.debug("Attempting to connect to one of the controllers...");
                 KieServerSetup kieServerSetup = kieController.connect(kieServerInfo);
                 logger.debug("Connected to controller and retrieved setup details {}", kieServerSetup);
-                Set<KieContainerResource> containers = kieServerSetup.getContainers();
+                Set<KieContainerResource> containers = startupStrategy.prepareContainers(kieServerSetup.getContainers());
                 // add status message when connected
                 kieServer.addServerStatusMessage(kieServerInfo);
 

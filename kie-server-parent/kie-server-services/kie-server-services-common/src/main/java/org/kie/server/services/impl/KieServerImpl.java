@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,15 +55,12 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
-import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieContainerInstance;
-import org.kie.server.services.api.KieControllerNotConnectedException;
-import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieServerRegistryAware;
-import org.kie.server.services.impl.controller.ControllerConnectRunnable;
+import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.policy.PolicyManager;
@@ -151,51 +147,9 @@ public class KieServerImpl implements KieServer {
 
         startTimestamp = System.currentTimeMillis();
         
-        boolean readyToRun = false;
-        KieServerController kieController = getController();
-        // try to load container information from available controllers if any...
-        KieServerInfo kieServerInfo = getInfoInternal();
-        Set<KieContainerResource> containers = null;
-        KieServerSetup kieServerSetup = null;
-        try {
-            kieServerSetup = kieController.connect(kieServerInfo);
-
-            containers = kieServerSetup.getContainers();
-            readyToRun = true;
-        } catch (KieControllerNotDefinedException e) {
-            // if no controllers use local storage
-            containers = currentState.getContainers();
-            kieServerSetup = new KieServerSetup();
-            readyToRun = true;
-        } catch (KieControllerNotConnectedException e) {
-            // if controllers are defined but cannot be reached schedule connection and disable until it gets connection to one of them
-            readyToRun = false;
-            logger.warn("Unable to connect to any controllers, delaying container installation until connection can be established");
-            Thread connectToControllerThread = new Thread(new ControllerConnectRunnable(kieServerActive,
-                                                                                        kieController,
-                                                                                        kieServerInfo,
-                                                                                        currentState,
-                                                                                        containerManager,
-                                                                                        this), "KieServer-ControllerConnect");
-            connectToControllerThread.start();
-            if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "false"))) {
-                logger.info("Containers were requested to be deployed synchronously, holding application start...");
-                try {
-                    connectToControllerThread.join();
-                } catch (InterruptedException e1) {
-                    logger.debug("Interrupt exception when waiting for deployments");
-                }
-            }
-        }
-
-        if (readyToRun) {
-            addServerStatusMessage(kieServerInfo);
-            if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "false"))) {
-                containerManager.installContainersSync(this, containers, currentState, kieServerSetup);
-            } else {
-                containerManager.installContainers(this, containers, currentState, kieServerSetup);
-            }
-        }        
+        StartupStrategy startupStrategy = StartupStrategyProvider.get().getStrategy();
+        logger.info("Selected startup strategy {}", startupStrategy);
+        startupStrategy.startup(this, containerManager, currentState, kieServerActive);
         
         eventSupport.fireAfterServerStarted(this);
     }
