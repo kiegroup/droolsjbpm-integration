@@ -18,8 +18,10 @@ package org.kie.server.integrationtests.shared;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 import org.kie.api.command.Command;
 import org.kie.api.executor.STATUS;
@@ -35,6 +37,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -302,6 +305,31 @@ public class KieServerSynchronization {
 
             return false;
         });
+    }
+
+    public static void waitForProcessInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId) throws Exception {
+        waitForProcessInstanceSLAViolated(queryClient, processInstanceId, SERVICE_TIMEOUT);
+    }
+
+    public static void waitForProcessInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId, final Long timeOut) throws Exception {
+        waitForCondition(() -> {
+            ProcessInstance pi = queryClient.findProcessInstanceById(processInstanceId);
+            return pi.getSlaCompliance() == org.kie.api.runtime.process.ProcessInstance.SLA_VIOLATED;
+        }, timeOut);
+    }
+
+    public static void waitForNodeInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId, final Long workItemId) throws Exception {
+        waitForNodeInstanceSLAViolated(queryClient, processInstanceId, workItemId, SERVICE_TIMEOUT);
+    }
+
+    public static void waitForNodeInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId, final Long nodeId, final Long timeOut) throws Exception {
+        waitForCondition(() -> {
+            List<NodeInstance> nodes = queryClient.findActiveNodeInstances(processInstanceId, 0, 0);
+            Optional<NodeInstance> ni = nodes.stream()
+                    .filter(nInstance -> nInstance.getId().equals(nodeId))
+                    .findFirst();
+            return ni.isPresent() && (ni.get().getSlaCompliance() == org.kie.api.runtime.process.ProcessInstance.SLA_VIOLATED);
+        }, timeOut);
     }
 
     /**
