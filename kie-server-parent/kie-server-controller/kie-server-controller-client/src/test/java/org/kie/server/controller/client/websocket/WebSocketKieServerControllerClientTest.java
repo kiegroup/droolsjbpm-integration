@@ -26,6 +26,7 @@ import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
+import org.kie.server.controller.websocket.common.KieServerControllerNotificationWebSocketClient;
 import org.kie.server.controller.websocket.common.KieServerMessageHandlerWebSocketClient;
 import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
@@ -45,6 +46,9 @@ public class WebSocketKieServerControllerClientTest {
 
     @Mock
     private KieServerMessageHandlerWebSocketClient client;
+
+    @Mock
+    private KieServerControllerNotificationWebSocketClient notificationClient;
 
     @InjectMocks
     @Spy
@@ -82,7 +86,7 @@ public class WebSocketKieServerControllerClientTest {
                                                        any(InternalMessageHandler.class));
 
             final DescriptorCommand command = WebSocketUtils.unmarshal(contentCaptor.getValue(),
-                                                                 DescriptorCommand.class);
+                                                                       DescriptorCommand.class);
             assertNotNull(command);
             assertEquals(name,
                          command.getService());
@@ -91,5 +95,13 @@ public class WebSocketKieServerControllerClientTest {
 
             reset(client);
         }
+    }
+
+    @Test
+    public void testClose() throws Exception {
+        controllerClient.close();
+
+        verify(client).close();
+        verify(notificationClient).close();
     }
 }

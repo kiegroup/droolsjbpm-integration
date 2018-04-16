@@ -33,17 +33,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WebSocketNotificationServiceTest {
 
+    private static long TIMEOUT = 5 * 1000;
+
     @Mock
     Session session;
 
     @Mock
-    RemoteEndpoint.Async async;
+    RemoteEndpoint.Basic endpoint;
 
     @InjectMocks
     WebSocketNotificationService notificationService;
@@ -51,66 +52,67 @@ public class WebSocketNotificationServiceTest {
     @Before
     public void setUp() {
         when(session.getId()).thenReturn("id");
-        when(session.getAsyncRemote()).thenReturn(async);
+        when(session.getBasicRemote()).thenReturn(endpoint);
+        when(session.isOpen()).thenReturn(true);
         WebSocketNotificationSessionManager.getInstance().addSession(session);
     }
 
     @Test
-    public void testServerInstanceConnected() {
+    public void testServerInstanceConnected() throws Exception {
         final ServerInstanceConnected event = new ServerInstanceConnected(new ServerInstance());
         notificationService.notify(event);
 
-        verify(async).sendObject(eq(new KieServerControllerNotification(event)),
-                                 any());
+        verify(endpoint,
+               timeout(TIMEOUT)).sendObject(new KieServerControllerNotification(event));
     }
 
     @Test
-    public void testServerInstanceDisconnected() {
+    public void testServerInstanceDisconnected() throws Exception {
         final ServerInstanceDisconnected event = new ServerInstanceDisconnected("serverId");
         notificationService.notify(event);
 
-        verify(async).sendObject(eq(new KieServerControllerNotification(event)),
-                                 any());
+        verify(endpoint,
+               timeout(TIMEOUT)).sendObject(new KieServerControllerNotification(event));
     }
 
     @Test
-    public void testServerInstanceDeleted() {
+    public void testServerInstanceDeleted() throws Exception {
         final ServerInstanceDeleted event = new ServerInstanceDeleted("serverId");
         notificationService.notify(event);
 
-        verify(async).sendObject(eq(new KieServerControllerNotification(event)),
-                                 any());
+        verify(endpoint,
+               timeout(TIMEOUT)).sendObject(new KieServerControllerNotification(event));
     }
 
     @Test
-    public void testServerInstanceUpdated() {
+    public void testServerInstanceUpdated() throws Exception {
         final ServerInstanceUpdated event = new ServerInstanceUpdated(new ServerInstance());
         notificationService.notify(event);
 
-        verify(async).sendObject(eq(new KieServerControllerNotification(event)),
-                                 any());
+        verify(endpoint,
+               timeout(TIMEOUT)).sendObject(new KieServerControllerNotification(event));
     }
 
     @Test
-    public void testServerTemplateUpdated() {
+    public void testServerTemplateUpdated() throws Exception {
         final ServerTemplateUpdated event = new ServerTemplateUpdated(new ServerTemplate());
         notificationService.notify(event);
 
-        verify(async).sendObject(eq(new KieServerControllerNotification(event)),
-                                 any());
+        verify(endpoint,
+               timeout(TIMEOUT)).sendObject(new KieServerControllerNotification(event));
     }
 
     @Test
-    public void testServerTemplateDeleted() {
+    public void testServerTemplateDeleted() throws Exception {
         final ServerTemplateDeleted event = new ServerTemplateDeleted("serverTemplateId");
         notificationService.notify(event);
 
-        verify(async).sendObject(eq(new KieServerControllerNotification(event)),
-                                 any());
+        verify(endpoint,
+               timeout(TIMEOUT)).sendObject(new KieServerControllerNotification(event));
     }
 
     @Test
-    public void testContainerSpecUpdated() {
+    public void testContainerSpecUpdated() throws Exception {
         final ServerTemplate serverTemplate = new ServerTemplate();
         final ContainerSpec containerSpec = new ContainerSpec();
         final ArrayList<Container> containers = new ArrayList<>();
@@ -122,7 +124,7 @@ public class WebSocketNotificationServiceTest {
                                    containerSpec,
                                    containers);
 
-        verify(async).sendObject(eq(new KieServerControllerNotification(event)),
-                                 any());
+        verify(endpoint,
+               timeout(TIMEOUT)).sendObject(new KieServerControllerNotification(event));
     }
 }

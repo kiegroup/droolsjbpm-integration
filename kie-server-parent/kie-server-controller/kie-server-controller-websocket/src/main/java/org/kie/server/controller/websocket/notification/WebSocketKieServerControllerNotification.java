@@ -41,9 +41,7 @@ public class WebSocketKieServerControllerNotification {
     public void onNotificationClientConnect(final Session session) {
         LOGGER.debug("New Web Socket Notification Client session: {}",
                      session.getId());
-        synchronized (manager) {
-            manager.addSession(session);
-        }
+        manager.addSession(session);
     }
 
     @OnClose
@@ -52,9 +50,7 @@ public class WebSocketKieServerControllerNotification {
         LOGGER.debug("Web Socket Notification Client session: {}, disconnected, reason: {}",
                      session.getId(),
                      closeReason);
-        synchronized (manager) {
-            manager.removeSession(session);
-        }
+        manager.removeSession(session);
     }
 
     @OnError

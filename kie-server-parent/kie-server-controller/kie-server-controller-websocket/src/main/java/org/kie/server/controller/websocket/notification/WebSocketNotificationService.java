@@ -33,6 +33,8 @@ public class WebSocketNotificationService implements NotificationService {
 
     private static WebSocketNotificationService INSTANCE = new WebSocketNotificationService();
 
+    private final WebSocketNotificationSessionManager manager = WebSocketNotificationSessionManager.getInstance();
+
     protected WebSocketNotificationService() {
         LOGGER.info("WebSocket Notification Service started.");
     }
@@ -43,28 +45,8 @@ public class WebSocketNotificationService implements NotificationService {
 
     private void notifySessions(final KieServerControllerEvent event) {
         final KieServerControllerNotification notification = new KieServerControllerNotification(event);
-
         LOGGER.debug("Sending notification to all Web Socket sessions");
-        final WebSocketNotificationSessionManager manager = WebSocketNotificationSessionManager.getInstance();
-        synchronized (manager) {
-            manager.getSessions().forEach(
-                    session -> {
-                        LOGGER.debug("Sending notification to Web Socket session with id: {}",
-                                     session.getId());
-                        session.getAsyncRemote().sendObject(notification,
-                                                            result -> {
-                                                                if (result.isOK()) {
-                                                                    LOGGER.debug("Notification sent to session with id: {}",
-                                                                                 session.getId());
-                                                                } else {
-                                                                    LOGGER.warn("Failed to send notification, error: {}",
-                                                                                result.getException().getMessage(),
-                                                                                result.getException());
-                                                                }
-                                                            });
-                    }
-            );
-        }
+        manager.broadcastObject(notification);
     }
 
     @Override
