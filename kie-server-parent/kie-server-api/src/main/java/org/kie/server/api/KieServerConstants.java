@@ -45,6 +45,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_CONTAINER_LOCATOR = "org.kie.server.container.locator";
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
     public static final String KIE_SERVER_MGMT_API_DISABLED = "org.kie.server.mgmt.api.disabled";
+    public static final String KIE_SERVER_STARTUP_STRATEGY = "org.kie.server.startup.strategy";
 
     // configuration parameters
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";
