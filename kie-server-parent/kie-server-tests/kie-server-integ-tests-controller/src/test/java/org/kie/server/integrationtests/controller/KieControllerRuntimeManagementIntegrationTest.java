@@ -40,15 +40,15 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
 
     private KieServerInfo kieServerInfo;
 
-    protected abstract void assertNotFoundException(T exception);
-
-    protected abstract void assertBadRequestException(T exception);
-
     @BeforeClass
     public static void initialize() throws Exception {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
     }
+
+    protected abstract void assertNotFoundException(T exception);
+
+    protected abstract void assertBadRequestException(T exception);
 
     @Before
     public void getKieServerInfo() {
@@ -65,8 +65,11 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
         ServerTemplate serverTemplate = createServerTemplate();
 
         // Deploy container for kie server template.
-        createContainerSpec(serverTemplate, RELEASE_ID, KieContainerStatus.STARTED);
-        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        createContainerSpec(serverTemplate,
+                            RELEASE_ID,
+                            KieContainerStatus.STARTED);
+        KieServerSynchronization.waitForKieServerSynchronization(client,
+                                                                 1);
 
         ServerInstanceKeyList serverInstances = controllerClient.getServerInstances(serverTemplate.getId());
         ServerInstanceKey serverInstance = serverInstances.getServerInstanceKeys()[0];
@@ -86,17 +89,22 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
 
     @Test
     public void testGetContainersFromNotExistingServerInstance() {
-        ServerInstanceKey serverInstance = new ServerInstanceKey("not-existing", "not-existing", "not-existing", "not-existing");
+        ServerInstanceKey serverInstance = new ServerInstanceKey("not-existing",
+                                                                 "not-existing",
+                                                                 "not-existing",
+                                                                 "not-existing");
         try {
             controllerClient.getContainers(serverInstance);
             fail("Should throw exception about the server instance not existing.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("Kie Services Client Provider not found for url: not-existing");
         }
     }
 
     protected ServerTemplate createServerTemplate() {
-        return createServerTemplate(kieServerInfo.getServerId(), kieServerInfo.getName(), kieServerInfo.getLocation());
+        return createServerTemplate(kieServerInfo.getServerId(),
+                                    kieServerInfo.getName(),
+                                    kieServerInfo.getLocation());
     }
-
 }

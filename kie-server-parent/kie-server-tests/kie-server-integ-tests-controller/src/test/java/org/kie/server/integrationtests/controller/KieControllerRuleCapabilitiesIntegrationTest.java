@@ -78,20 +78,25 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No container spec found for id not-existing");
         }
     }
 
     @Test
     public void testStartAndStopScanner() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
-        ContainerSpec container = startContainerWithVersion(RELEASE_ID, serverTemplate);
+        ContainerSpec container = startContainerWithVersion(RELEASE_ID,
+                                                            serverTemplate);
 
-        checkKieContainerResource(RELEASE_ID, RELEASE_ID);
+        checkKieContainerResource(RELEASE_ID,
+                                  RELEASE_ID);
 
-        controllerClient.startScanner(container, 5L);
+        controllerClient.startScanner(container,
+                                      5L);
         controllerClient.stopScanner(container);
 
-        checkKieContainerResource(RELEASE_ID, RELEASE_ID);
+        checkKieContainerResource(RELEASE_ID,
+                                  RELEASE_ID);
     }
 
     @Test
@@ -110,6 +115,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No container spec found for id not-existing");
         }
     }
 
@@ -127,6 +133,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No container spec found for id not-existing");
         }
     }
 
@@ -141,6 +148,25 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
 
         controllerClient.stopContainer(container);
         controllerClient.stopScanner(container);
+    }
+
+    @Test
+    public void testUpgradeNotExistingContainer() {
+        ServerTemplate serverTemplate = createServerTemplate();
+        ContainerSpec container = new ContainerSpec("not-existing",
+                                                    "not-existing",
+                                                    serverTemplate,
+                                                    RELEASE_ID,
+                                                    KieContainerStatus.STARTED,
+                                                    null);
+        try {
+            controllerClient.upgradeContainer(container,
+                                              RELEASE_ID_101);
+            fail("Should throw exception about container not found.");
+        } catch (KieServerControllerClientException e) {
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No container spec found for id not-existing");
+        }
     }
 
     private ContainerSpec startContainerWithVersion(ReleaseId releaseId,
