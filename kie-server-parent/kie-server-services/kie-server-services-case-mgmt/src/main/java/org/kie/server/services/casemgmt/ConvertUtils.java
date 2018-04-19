@@ -18,6 +18,7 @@ package org.kie.server.services.casemgmt;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -184,10 +185,12 @@ public class ConvertUtils {
 
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize) {
+        checkPagination(page, pageSize);
         return new QueryContext(page * pageSize, pageSize);
     }
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize, String orderBy, boolean asc) {
+        checkPagination(page, pageSize);
         if (orderBy != null && !orderBy.isEmpty()) {
             return new QueryContext(page * pageSize, pageSize, orderBy, asc);
         }
@@ -371,7 +374,18 @@ public class ConvertUtils {
 
         return caseFileDataItem;
     }
-    
+
+    private static void checkPagination(final Integer page, final Integer pageSize) {
+        if (page < 0) {
+            throw new IllegalArgumentException(MessageFormat.format(Messages.ILLEGAL_PAGE, page));
+        }
+
+        if (pageSize < 0) {
+            throw new IllegalArgumentException(MessageFormat.format(Messages.ILLEGAL_PAGE_SIZE, pageSize));
+        }
+    }
+
+
     public static  MigrationReportInstanceList convertMigrationReports(List<MigrationReport> reports) {
 
         if (reports == null) {
@@ -403,7 +417,7 @@ public class ConvertUtils {
 
         return reportInstance;
     }
-    
+
 
     public static  List<String> convertLogs(List<MigrationEntry> entries) {
 
@@ -415,7 +429,7 @@ public class ConvertUtils {
         }
         return logs;
     }
-    
+
     public static  CaseMigrationReportInstance convertCaseMigrationReport(String caseId, CaseMigrationReport report) {
         if (report == null) {
             return null;
@@ -430,7 +444,7 @@ public class ConvertUtils {
 
         return reportInstance;
     }
-    
+
     public static MigrationReportInstance[] convertReports(List<MigrationReport> entries) {
         MigrationReportInstance[] reports = new MigrationReportInstance[entries.size()];
         int counter = 0;
