@@ -85,6 +85,8 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             @XmlElement(name = "process-definitions", type = ProcessDefinitionList.class),
             @XmlElement(name = "process-instance", type = ProcessInstance.class),
             @XmlElement(name = "process-instance-list", type = ProcessInstanceList.class),
+            @XmlElement(name = "process-instance-custom", type = ProcessInstanceCustomVars.class),
+            @XmlElement(name = "process-instance-custom-list", type = ProcessInstanceCustomVarsList.class),
             @XmlElement(name = "node-instance", type = NodeInstance.class),
             @XmlElement(name = "node-instance-list", type = NodeInstanceList.class),
             @XmlElement(name = "variable-instance", type = VariableInstance.class),

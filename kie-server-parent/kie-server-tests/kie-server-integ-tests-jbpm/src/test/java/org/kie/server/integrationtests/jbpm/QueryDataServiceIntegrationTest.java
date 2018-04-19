@@ -37,6 +37,7 @@ import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskWithProcessDescription;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
@@ -895,6 +896,43 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             queryClient.unregisterQuery(query.getName());
             changeUser(USER_YODA);
         }
+    }
+    
+    @Test
+    public void testGetProcessInstanceCustomMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
+
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmProcessSearch");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select p. PROCESSINSTANCEID, p.PROCESSID,  p.PROCESSNAME, p.PROCESSVERSION, p.STATUS,  " +
+                            "p.EXTERNALID, pr.STARTDATE as START_DATE,   p.USER_IDENTITY, p.PROCESSINSTANCEDESCRIPTION, " +
+                            "p.CORRELATIONKEY, p.PARENTPROCESSINSTANCEID, pr.LASTMODIFICATIONDATE, var.variableId, var.value " +
+                            "from PROCESSINSTANCELOG p inner join PROCESSINSTANCEINFO pr on p.PROCESSINSTANCEID = pr.INSTANCEID " +
+                            "inner join (select v.processInstanceId, v.variableId, v.value from VariableInstanceLog v " +
+                            "where v.id = (select MAX(vil.id) from VariableInstanceLog vil " +
+                            "where v.variableId = vil.variableId and v.processInstanceId = vil.processInstanceId)) var " +
+                            "on  p.PROCESSINSTANCEID = var.PROCESSINSTANCEID");
+
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<ProcessInstanceCustomVars> instance = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_CUSTOM, 0, 10, ProcessInstanceCustomVars.class);
+            assertNotNull(instance);
+            assertEquals(1, instance.size());
+            
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
     }
 
     protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {

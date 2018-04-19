@@ -150,6 +150,8 @@ import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
@@ -252,6 +254,8 @@ public class JaxbMarshaller implements Marshaller {
 
                 ProcessInstance.class,
                 ProcessInstanceList.class,
+                ProcessInstanceCustomVars.class,
+                ProcessInstanceCustomVarsList.class,
 
                 NodeInstance.class,
                 NodeInstanceList.class,
