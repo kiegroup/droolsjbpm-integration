@@ -214,33 +214,44 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
         response = clientRequest.request(getMediaType(format)).get();
 
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-            return deserialize(response, resultType);
-        } else {
-            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
+        try {
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                return deserialize(response,
+                                   resultType);
+            } else {
+                throw createExceptionForUnexpectedResponseCode(clientRequest,
+                                                               response);
+            }
+        } finally {
+            response.close();
         }
     }
 
     private void makeDeleteRequest(String uri) {
         WebTarget clientRequest = httpClient.target(uri);
-        Response response;
 
+        Response response;
         try {
             response = clientRequest.request(getMediaType(format)).delete();
-            response.close();
         } catch (Exception e) {
-            throw createExceptionForUnexpectedFailure(clientRequest, e);
+            throw createExceptionForUnexpectedFailure(clientRequest,
+                                                      e);
         }
 
-        if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() ) {
-            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
+        try {
+            if (response.getStatus() != Response.Status.NO_CONTENT.getStatusCode()) {
+                throw createExceptionForUnexpectedResponseCode(clientRequest,
+                                                               response);
+            }
+        } finally {
+            response.close();
         }
     }
 
     private <T> T makePutRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
         WebTarget clientRequest = httpClient.target(uri);
-        Response response;
 
+        Response response;
         try {
             Entity<String> requestEntity = Entity.entity(serialize(bodyObject), getMediaType(format));
             response = clientRequest.request(getMediaType(format)).put(requestEntity);
@@ -248,36 +259,46 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
             throw createExceptionForUnexpectedFailure(clientRequest, e);
         }
 
-        if ( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
-            return deserialize(response, resultType);
-        } else {
-            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
+        try {
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+                return deserialize(response,
+                                   resultType);
+            } else {
+                throw createExceptionForUnexpectedResponseCode(clientRequest,
+                                                               response);
+            }
+        } finally {
+            response.close();
         }
     }
 
     private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
         WebTarget clientRequest = httpClient.target(uri);
-        Response response;
 
+        Response response;
         try {
             Entity<String> requestEntity = Entity.entity(serialize(bodyObject), getMediaType(format));
             response = clientRequest.request(getMediaType(format)).post(requestEntity);
-
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
         }
 
-        if ( response.getStatus() == Response.Status.CREATED.getStatusCode() ||
-              response.getStatus() == Response.Status.OK.getStatusCode() ) {
-            return deserialize(response, resultType);
-        } else {
-            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
+        try {
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode() ||
+                    response.getStatus() == Response.Status.OK.getStatusCode()) {
+                return deserialize(response,
+                                   resultType);
+            } else {
+                throw createExceptionForUnexpectedResponseCode(clientRequest,
+                                                               response);
+            }
+        } finally {
+            response.close();
         }
     }
 
-    private RuntimeException createExceptionForUnexpectedResponseCode(
-            WebTarget request,
-            Response response) {
+    private RuntimeException createExceptionForUnexpectedResponseCode(WebTarget request,
+                                                                      Response response) {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Unexpected HTTP response code when requesting URI '");
         stringBuffer.append(getClientRequestUri(request));
@@ -288,29 +309,25 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
             stringBuffer.append(" Response message: ");
             stringBuffer.append(responseEntity);
         } catch (IllegalStateException e) {
-            response.close();
-            // Exception while reading response - most probably empty response and closed input stream
+            logger.warn("Error trying to read response entity: {}", e.getMessage(), e);
         }
 
-        logger.debug( stringBuffer.toString());
+        logger.debug(stringBuffer.toString());
         return new KieServerControllerHTTPClientException(response.getStatus(), stringBuffer.toString());
     }
 
-    private RuntimeException createExceptionForUnexpectedFailure(
-            WebTarget request, Exception e) {
+    private RuntimeException createExceptionForUnexpectedFailure(WebTarget request, Exception e) {
         String summaryMessage = "Unexpected exception when requesting URI '" + getClientRequestUri(request) + "'!";
-        logger.debug( summaryMessage);
+        logger.debug(summaryMessage);
         return new RuntimeException(summaryMessage, e);
     }
 
     private String getClientRequestUri(WebTarget clientRequest) {
-        String uri;
         try {
-            uri = clientRequest.getUri().toString();
+            return clientRequest.getUri().toString();
         } catch (Exception e) {
             throw new RuntimeException("Malformed client URL was specified!", e);
         }
-        return uri;
     }
 
     public void close() {
@@ -395,8 +412,6 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
             return deserialize(content, type);
         } catch ( MarshallingException e ) {
             throw new RuntimeException( "Error while deserializing data received from server!", e );
-        } finally {
-            response.close();
         }
     }
 

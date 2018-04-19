@@ -17,21 +17,21 @@
 package org.kie.server.gateway;
 
 import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.common.rest.Authenticator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class KieServerGateway {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KieServerGateway.class);
-
+ 
     private final ResteasyClient client;
+    private final JSONMarshaller jsonMarshaller;
 
     public KieServerGateway(String username, String password, Integer connectionTimeout, Integer socketTimeout) {
 
@@ -42,7 +42,9 @@ public class KieServerGateway {
             .register(new Authenticator(username, password))
             .register(new ErrorResponseFilter())
             .build();
-
+        
+        // using kie marshaller
+        jsonMarshaller = new JSONMarshaller(null, Thread.currentThread().getContextClassLoader());
     }
 
     /**
@@ -52,16 +54,18 @@ public class KieServerGateway {
      * @param container     container id
      * @return KieContainerResource with status or null if the container in not instantiated
      */
+    @SuppressWarnings("unchecked")
     public KieContainerResource getContainer(String serverUrl, String container) {
 
         // in case of container is not instantiated the response doesn't parse ServiceResponse
-        ServiceResponse<KieContainerResource> response = client.target(serverUrl)
+        String response = client.target(serverUrl)
             .path("containers")
             .path(container)
             .request(MediaType.APPLICATION_JSON)
-            .get(ServiceResponse.class);
-
-        return response.getResult();
+            .get(String.class);
+        
+        ServiceResponse<KieContainerResource> result = jsonMarshaller.unmarshall(response, ServiceResponse.class);
+        return result.getResult();
 
     }
 

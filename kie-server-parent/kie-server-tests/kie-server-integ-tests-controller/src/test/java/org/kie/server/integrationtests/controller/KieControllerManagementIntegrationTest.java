@@ -32,14 +32,15 @@ import org.kie.server.api.model.*;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.*;
-import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
+import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class KieControllerManagementIntegrationTest<T extends KieServerControllerClientException> extends KieControllerManagementBaseTest {
 
@@ -104,10 +105,11 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
     public void testDeleteNotExistingServerTemplate() {
         try {
             // Try to delete not existing server template.
-            controllerClient.deleteServerTemplate("not existing");
-            fail("Should throw exception about kie server instance not existing.");
+            controllerClient.deleteServerTemplate("not-existing");
+            fail("Should throw exception about server template not existing.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id not-existing");
         }
     }
 
@@ -185,7 +187,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.getServerTemplate(kieServerInfo.getServerId());
             fail("Should throw exception about kie server instance not existing.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
     }
 
@@ -240,10 +243,12 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
 
         // Check that container is disposed.
         try {
-            controllerClient.getContainerInfo(serverTemplate.getId(), CONTAINER_ID);
+            controllerClient.getContainerInfo(serverTemplate.getId(),
+                                              CONTAINER_ID);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("Server template " + serverTemplate.getId() + " does not have container with id " + CONTAINER_ID);
         }
     }
 
@@ -394,7 +399,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
 
         createServerTemplate();
@@ -403,7 +409,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("Server template " + kieServerInfo.getServerId() + " does not have container with id " + CONTAINER_ID);
         }
     }
 
@@ -468,9 +475,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         try {
 
             controllerClient.saveContainerSpec(kieServerInfo.getServerId(), containerToDeploy);
-            fail("Should throw exception about kie server instance not found.");
+            fail("Should throw exception about server template not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
     }
 
@@ -488,7 +496,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
             fail("Should throw exception about container being created already.");
         } catch (KieServerControllerClientException e) {
-            assertBadRequestException((T)e);
+            assertBadRequestException((T) e);
+            assertThat(e.getMessage()).endsWith("Server template with id " + serverTemplate.getId() + " associated already with container " + CONTAINER_ID);
         }
     }
 
@@ -499,7 +508,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.deleteContainerSpec(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about kie server instance not exists.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
 
         createServerTemplate();
@@ -508,7 +518,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.deleteContainerSpec(kieServerInfo.getServerId(), CONTAINER_ID);
             fail("Should throw exception about container not exists.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("Container " + CONTAINER_ID + " not found");
         }
     }
 
@@ -520,9 +531,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         // Try to start not existing container using kie controller without created kie server instance.
         try {
             controllerClient.startContainer(containerSpec);
-            fail("Should throw exception about container not found.");
+            fail("Should throw exception about server template not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
 
         createServerTemplate();
@@ -531,7 +543,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.startContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No container spec found for id " + CONTAINER_ID + " within server template with id " + kieServerInfo.getServerId());
         }
     }
 
@@ -543,9 +556,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         // Try to stop not existing container using kie controller without created kie server instance.
         try {
             controllerClient.stopContainer(containerSpec);
-            fail("Should throw exception about container not found.");
+            fail("Should throw exception about server template not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
 
         createServerTemplate();
@@ -554,17 +568,19 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.stopContainer(containerSpec);
             fail("Should throw exception about container not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No container spec found for id " + CONTAINER_ID + " within server template with id " + kieServerInfo.getServerId());
         }
     }
 
     @Test
     public void testEmptyListContainers() {
         try {
-            ContainerSpecList emptyList = controllerClient.listContainerSpec(kieServerInfo.getServerId());
-            fail("Should throw exception about kie server instance not existing.");
+            controllerClient.listContainerSpec(kieServerInfo.getServerId());
+            fail("Should throw exception about server template not existing.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
 
         // Create kie server instance connection in controller.
@@ -579,9 +595,10 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         ProcessConfig config = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
         try {
             controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
-            fail("Should throw exception about kie server instance not existing.");
+            fail("Should throw exception about server template not existing.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No server template found for id " + kieServerInfo.getServerId());
         }
 
         // Create kie server instance connection in controller.
@@ -591,7 +608,8 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
             controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
             fail("Should throw exception about container info not found.");
         } catch (KieServerControllerClientException e) {
-            assertNotFoundException((T)e);
+            assertNotFoundException((T) e);
+            assertThat(e.getMessage()).endsWith("No container spec found for id " + CONTAINER_ID + " within server template with id " + kieServerInfo.getServerId());
         }
     }
 
