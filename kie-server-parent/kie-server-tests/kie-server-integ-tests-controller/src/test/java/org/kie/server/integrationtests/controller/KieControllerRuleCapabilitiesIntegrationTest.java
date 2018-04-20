@@ -64,6 +64,28 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
         KieServerDeployer.removeLocalArtifact(RELEASE_ID_101);
     }
 
+    @Test //RHPAM-479
+    public void testScanNow() throws Exception {
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        ContainerSpec container = createContainerSpec(serverTemplate,
+                                                      RELEASE_ID_LATEST,
+                                                      KieContainerStatus.STARTED);
+        KieServerSynchronization.waitForContainerWithReleaseId(client,
+                                                               RELEASE_ID);
+
+        checkKieContainerResource(RELEASE_ID_LATEST,
+                                  RELEASE_ID);
+
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar101").getFile());
+        controllerClient.scanNow(container);
+
+        KieServerSynchronization.waitForContainerWithReleaseId(client,
+                                                               RELEASE_ID_101);
+        checkKieContainerResource(RELEASE_ID_101,
+                                  RELEASE_ID_101);
+    }
+
     @Test
     public void testScanNowNotExistingContainer() {
         ServerTemplate serverTemplate = createServerTemplate();
