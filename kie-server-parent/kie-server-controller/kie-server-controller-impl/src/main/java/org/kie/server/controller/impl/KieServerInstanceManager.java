@@ -358,7 +358,7 @@ public class KieServerInstanceManager {
 
                 if (response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     container.setContainerSpecId(containerResource.getContainerId());
-                    container.setContainerName(containerResource.getContainerId());
+                    container.setContainerName(containerResource.getContainerAlias());
                     container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
                     container.setServerTemplateId(serverTemplate.getId());
                     container.setStatus(containerResource.getStatus());

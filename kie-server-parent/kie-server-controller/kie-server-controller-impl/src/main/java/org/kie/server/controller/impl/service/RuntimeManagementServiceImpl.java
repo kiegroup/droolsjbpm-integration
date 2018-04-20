@@ -21,6 +21,7 @@ import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -40,6 +41,13 @@ public class RuntimeManagementServiceImpl implements RuntimeManagementService {
         }
 
         return new ServerInstanceKeyList(serverTemplate.getServerInstanceKeys());
+    }
+
+    @Override
+    public ContainerList getContainers(ServerTemplate serverTemplate,
+                                       ContainerSpec containerSpec) {
+        Collection<Container> containers = kieServerInstanceManager.getContainers(serverTemplate, containerSpec);
+        return new ContainerList(containers);
     }
 
     @Override
