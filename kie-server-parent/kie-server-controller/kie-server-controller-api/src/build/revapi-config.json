@@ -146,6 +146,15 @@
           "classSimpleName": "KieServerControllerNotFoundException",
           "elementKind": "class",
           "justification": "Renamed class to KieServerControllerIllegalArgumentException to better represent its goal"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.controller.api.model.runtime.ContainerList org.kie.server.controller.api.service.RuntimeManagementService::getContainers(org.kie.server.controller.api.model.spec.ServerTemplate, org.kie.server.controller.api.model.spec.ContainerSpec)",
+          "package": "org.kie.server.controller.api.service",
+          "classSimpleName": "RuntimeManagementService",
+          "methodName": "getContainers",
+          "elementKind": "method",
+          "justification": "New method for getting list of containers by server template"
         }
       ]
     }

@@ -311,6 +311,15 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
     }
 
     @Override
+    public ContainerList getContainers(final ServerTemplate serverTemplate,
+                                       final ContainerSpec containerSpec) {
+        return sendCommand(RuntimeManagementService.class.getName(),
+                           "getContainers",
+                           serverTemplate,
+                           containerSpec);
+    }
+
+    @Override
     public ServerInstanceKeyList getServerInstances(final String serverTemplateId) {
         return sendCommand(RuntimeManagementService.class.getName(),
                            "getServerInstances",

@@ -27,6 +27,7 @@ import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
@@ -60,7 +61,7 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
     }
 
     @Test
-    public void testGetContainers() throws Exception {
+    public void testGetContainersByInstance() throws Exception {
         // Create kie server template connection in controller.
         ServerTemplate serverTemplate = createServerTemplate();
 
@@ -68,13 +69,39 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
         createContainerSpec(serverTemplate,
                             RELEASE_ID,
                             KieContainerStatus.STARTED);
-        KieServerSynchronization.waitForKieServerSynchronization(client,
-                                                                 1);
+        KieServerSynchronization.waitForContainerWithReleaseId(client,
+                                                               RELEASE_ID);
 
         ServerInstanceKeyList serverInstances = controllerClient.getServerInstances(serverTemplate.getId());
         ServerInstanceKey serverInstance = serverInstances.getServerInstanceKeys()[0];
 
         ContainerList containers = controllerClient.getContainers(serverInstance);
+        assertContainerList(serverTemplate,
+                            serverInstance,
+                            containers);
+    }
+
+    @Test
+    public void testGetContainersByTemplate() throws Exception {
+        // Create kie server template connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server template.
+        ContainerSpec containerSpec = createContainerSpec(serverTemplate, RELEASE_ID, KieContainerStatus.STARTED);
+        KieServerSynchronization.waitForContainerWithReleaseId(client, RELEASE_ID);
+
+        ServerInstanceKeyList serverInstances = controllerClient.getServerInstances(serverTemplate.getId());
+        ServerInstanceKey serverInstance = serverInstances.getServerInstanceKeys()[0];
+
+        ContainerList containers = controllerClient.getContainers(serverTemplate, containerSpec);
+        assertContainerList(serverTemplate,
+                            serverInstance,
+                            containers);
+    }
+
+    protected void assertContainerList(ServerTemplate serverTemplate,
+                                       ServerInstanceKey serverInstance,
+                                       ContainerList containers) {
         assertThat(containers.getContainers()).hasSize(1);
         Container container = containers.getContainers()[0];
         SoftAssertions.assertSoftly(softly -> {

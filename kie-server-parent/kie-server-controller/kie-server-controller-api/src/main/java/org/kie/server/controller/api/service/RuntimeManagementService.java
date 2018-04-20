@@ -18,10 +18,15 @@ package org.kie.server.controller.api.service;
 import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
 
 public interface RuntimeManagementService {
 
     ServerInstanceKeyList getServerInstances(String serverTemplateId);
+
+    ContainerList getContainers(ServerTemplate serverTemplate,
+                                ContainerSpec containerSpec);
 
     ContainerList getContainers(ServerInstanceKey serverInstanceKey);
 }

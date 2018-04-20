@@ -198,6 +198,12 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
     }
 
     @Override
+    public ContainerList getContainers(ServerTemplate serverTemplate,
+                                       ContainerSpec containerSpec) {
+        return throwUnsupportedException();
+    }
+
+    @Override
     public void upgradeContainer(ContainerSpecKey containerSpecKey,
                                  ReleaseId releaseId) {
         throwUnsupportedException();
