@@ -35,6 +35,7 @@ import org.jbpm.services.task.commands.GetUserTaskCommand;
 import org.kie.api.task.model.Task;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.kie.server.services.jbpm.ui.api.UIFormProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +143,9 @@ public class FormServiceBase {
                                      String lang,
                                      boolean filterContent,
                                      String formType) {
+
+        containerId = registry.getContainerId(containerId, new ByTaskIdContainerLocator(taskId));
+
         Task task = userTaskService.execute(containerId, new GetUserTaskCommand(registry.getIdentityProvider().getName(), taskId));
         if (task == null) {
             throw new IllegalStateException("No task with id " + taskId + " found");
