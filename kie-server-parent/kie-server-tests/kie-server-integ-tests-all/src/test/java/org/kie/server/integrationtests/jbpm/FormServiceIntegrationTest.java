@@ -129,7 +129,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         }
     }
 
-    @Test(expected = KieServicesException.class)
+    @Test
     public void testGetTaskFormWithoutPermissioneViaUIClientTest() throws Exception {
         changeUser(USER_YODA);
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
@@ -143,13 +143,15 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         changeUser(USER_JOHN);
 
-        assertClientException(
-                () -> uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en"),
-                401,
-                MessageFormat.format(TASK_PERMISSION_ERROR, taskId));
-
-        changeUser(USER_YODA);
-        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        try {
+            assertClientException(
+                    () -> uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en"),
+                    401,
+                    MessageFormat.format(TASK_PERMISSION_ERROR, taskId));
+        } finally {
+            changeUser(USER_YODA);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
     }
 
     @Test
