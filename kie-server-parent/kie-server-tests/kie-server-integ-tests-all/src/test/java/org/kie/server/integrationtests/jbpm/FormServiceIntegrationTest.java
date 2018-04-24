@@ -11,16 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +33,18 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.kie.server.remote.rest.jbpm.ui.FormResource.TASK_PERMISSION_ERROR;
+
 public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
-            "1.0.0.Final");
+                                                       "1.0.0.Final");
     private static final ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "definition-project",
-            "1.0.1.Final");
+                                                                "1.0.1.Final");
 
     protected static final String CONTAINER_ALIAS = "project";
     private static final String CONTAINER_ID = "definition-project";
@@ -109,10 +110,10 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test
     public void testGetTaskFormInPackageViaUIClientTest() throws Exception {
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
-        runGetTaskFormTest( processInstanceId );
+        runGetTaskFormTest(processInstanceId);
     }
 
-    protected void runGetTaskFormTest( long processInstanceId ) {
+    protected void runGetTaskFormTest(long processInstanceId) {
         assertThat(processInstanceId).isGreaterThan(0);
         try {
             List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
@@ -133,21 +134,22 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         changeUser(USER_YODA);
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
         assertTrue(processInstanceId > 0);
-        try {
-            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
-            assertNotNull(tasks);
-            assertEquals(1, tasks.size());
 
-            Long taskId = tasks.get(0).getId();
+        List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
 
-            changeUser(USER_JOHN);
+        Long taskId = tasks.get(0).getId();
 
-            uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en");
+        changeUser(USER_JOHN);
 
-            fail();
-        } finally {
-            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-        }
+        assertClientException(
+                () -> uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en"),
+                401,
+                MessageFormat.format(TASK_PERMISSION_ERROR, taskId));
+
+        changeUser(USER_YODA);
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
     }
 
     @Test
@@ -160,7 +162,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
             Long taskId = tasks.get(0).getId();
 
-            String result = uiServicesClient.getTaskRawForm( CONTAINER_ID, taskId );
+            String result = uiServicesClient.getTaskRawForm(CONTAINER_ID, taskId);
             logger.debug("Form content is '{}'", result);
             assertThat(result).isNotNull().isNotEmpty();
         } finally {
@@ -178,7 +180,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testGetProcessRawFormViaUIClient() throws Exception {
-        String result = uiServicesClient.getProcessRawForm( CONTAINER_ID, HIRING_PROCESS_ID );
+        String result = uiServicesClient.getProcessRawForm(CONTAINER_ID, HIRING_PROCESS_ID);
         logger.debug("Form content is '{}'", result);
         assertThat(result).isNotNull().isNotEmpty();
     }
@@ -233,7 +235,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testGetProcessWithSubFormRawFormViaUIClient() throws Exception {
-        String result = uiServicesClient.getProcessRawForm( CONTAINER_ID, HIRING_SUBFORM_PROCESS_ID );
+        String result = uiServicesClient.getProcessRawForm(CONTAINER_ID, HIRING_SUBFORM_PROCESS_ID);
         logger.debug("Form content is '{}'", result);
         assertThat(result).isNotNull().isNotEmpty();
 
@@ -297,7 +299,6 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertThat(newResultViaAlias).doesNotContain("Candidate Name");
 
         assertThat(oldResultViaAlias).isNotEqualTo(newResultViaAlias);
-
     }
 
     @Test
@@ -351,9 +352,8 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertThat(newResultViaAlias).doesNotContain("Candidate Name");
 
         assertThat(oldResultViaAlias).isNotEqualTo(newResultViaAlias);
-
     }
-    
+
     @Test
     public void testGetTaskFormWithWrongContainerId() throws Exception {
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_SUBFORM_PROCESS_ID);
@@ -362,20 +362,18 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
             assertThat(tasks).isNotNull().hasSize(1);
 
-            Long taskId = tasks.get(0).getId();            
+            Long taskId = tasks.get(0).getId();
             // create another container with different id to make sure it cannot be used to stop task
             createContainer(CONTAINER_ID_V2, releaseId, "custom-alias");
-            
+
             assertClientException(
-                                  () -> uiServicesClient.getTaskRawForm(CONTAINER_ID_V2, taskId),
-                                  404,
-                                  "Could not find task instance",
-                                  "Task with id " + taskId + " is not associated with " + CONTAINER_ID_V2);
-            
+                    () -> uiServicesClient.getTaskRawForm(CONTAINER_ID_V2, taskId),
+                    404,
+                    "Could not find task instance",
+                    "Task with id " + taskId + " is not associated with " + CONTAINER_ID_V2);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             KieServerAssert.assertSuccess(client.disposeContainer(CONTAINER_ID_V2));
         }
     }
-
 }
