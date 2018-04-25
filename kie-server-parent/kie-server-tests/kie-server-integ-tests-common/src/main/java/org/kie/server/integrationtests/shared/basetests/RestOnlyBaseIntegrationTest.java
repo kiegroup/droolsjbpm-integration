@@ -24,6 +24,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
+import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,23 +38,25 @@ import org.kie.server.integrationtests.config.TestConfig;
 @RunWith(Parameterized.class)
 public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrationTest {
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters(name = "{index}: {0} {1}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{MarshallingFormat.JAXB}, {MarshallingFormat.JSON}});
+        KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
+
+        return Arrays.asList(new Object[][]{{MarshallingFormat.JAXB, restConfiguration}, {MarshallingFormat.JSON, restConfiguration}});
     }
 
-    @Parameterized.Parameter
+    @Parameterized.Parameter(0)
     public MarshallingFormat marshallingFormat;
+
+    @Parameterized.Parameter(1)
+    public KieServicesConfiguration configuration;
 
     @Override
     protected KieServicesClient createDefaultClient() throws Exception {
-        KieServicesConfiguration config;
         if (TestConfig.isLocalServer()) {
-            config = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);
-        } else {
-            config = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
+            configuration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);
         }
-        return createDefaultClient(config, marshallingFormat);
+        return createDefaultClient(configuration, marshallingFormat);
     }
 
     protected MediaType getMediaType() {
@@ -69,10 +72,26 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
         }
     }
 
+    /**
+     * Change user used by client.
+     *
+     * @param username Name of user, default user taken from TestConfig in case of null parameter.
+     */
+    protected void changeUser(String username, String password) throws Exception {
+        if(username == null) {
+            username = TestConfig.getUsername();
+        }
+        if(password == null) {
+            password = TestConfig.getPassword();
+        }
+        configuration.setUserName(username);
+        configuration.setPassword(password);
+        client = createDefaultClient();
+    }
+
     private static Client httpClient;
 
     protected WebTarget newRequest(String uriString) {
-
         if(httpClient == null) {
             httpClient = new ResteasyClientBuilder()
                     .establishConnectionTimeout(10, TimeUnit.SECONDS)
@@ -80,10 +99,16 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
                     .register(new Authenticator(TestConfig.getUsername(), TestConfig.getPassword()))
                     .build();
         }
-        return httpClient.target(uriString);
+        WebTarget webTarget = httpClient.target(uriString);
+        webTarget.register(new BasicAuthentication(configuration.getUserName(), configuration.getPassword()));
+        return webTarget;
     }
 
     protected <T> Entity<T> createEntity(T requestObject) {
         return Entity.entity(requestObject, getMediaType());
+    }
+
+    protected static KieServicesConfiguration createKieServicesRestConfiguration() {
+        return KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
     }
 }
