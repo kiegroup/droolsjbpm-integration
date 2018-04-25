@@ -122,6 +122,7 @@ public class FormServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationT
 
         valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
 
+        changeUser(USER_JOHN, DEFAULT_PASSWORD);
         clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap));
         logger.info("[GET] " + clientRequest.getUri());
 

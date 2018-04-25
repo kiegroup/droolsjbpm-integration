@@ -37,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.kie.server.remote.rest.jbpm.ui.FormResource.TASK_PERMISSION_ERROR;
 
 public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -54,6 +53,9 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private static final String HIRING_PROCESS_ID = "hiring";
     private static final String HIRING_2_PROCESS_ID = "hiring2";
     private static final String HIRING_SUBFORM_PROCESS_ID = "hiringSubform";
+
+    private static final String TASK_PERMISSION_REST_ERROR = "User has no permission to see task instance with id \"{0}\"";
+    private static final String TASK_PERMISSION_JMS_ERROR = "User {0} isn''t allowed to see the task {1}";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -113,9 +115,10 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         runGetTaskFormTest(processInstanceId);
     }
 
-    protected void runGetTaskFormTest(long processInstanceId) {
+    protected void runGetTaskFormTest(long processInstanceId) throws Exception {
         assertThat(processInstanceId).isGreaterThan(0);
         try {
+            changeUser(USER_JOHN);
             List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
             assertThat(tasks).isNotNull().hasSize(1);
 
@@ -125,13 +128,13 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             logger.debug("Form content is '{}'", result);
             assertThat(result).isNotNull().isNotEmpty();
         } finally {
+            changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
 
     @Test
     public void testGetTaskFormWithoutPermissioneViaUIClientTest() throws Exception {
-        changeUser(USER_YODA);
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
         assertTrue(processInstanceId > 0);
 
@@ -141,15 +144,13 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         Long taskId = tasks.get(0).getId();
 
-        changeUser(USER_JOHN);
-
         try {
             assertClientException(
                     () -> uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en"),
                     401,
-                    MessageFormat.format(TASK_PERMISSION_ERROR, taskId));
+                    MessageFormat.format(TASK_PERMISSION_REST_ERROR, taskId),
+                    MessageFormat.format(TASK_PERMISSION_JMS_ERROR, USER_YODA, taskId));
         } finally {
-            changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
@@ -163,11 +164,12 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             assertThat(tasks).isNotNull().hasSize(1);
 
             Long taskId = tasks.get(0).getId();
-
+            changeUser(USER_JOHN);
             String result = uiServicesClient.getTaskRawForm(CONTAINER_ID, taskId);
             logger.debug("Form content is '{}'", result);
             assertThat(result).isNotNull().isNotEmpty();
         } finally {
+            changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
@@ -230,6 +232,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             logger.debug("Form content is '{}'", result);
             assertThat(result).isNotNull().isNotEmpty();
         } finally {
+            changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             changeUser(TestConfig.getUsername());
         }
@@ -258,6 +261,8 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
             Long taskId = tasks.get(0).getId();
 
+            changeUser(USER_JOHN);
+
             String result = uiServicesClient.getTaskRawForm(CONTAINER_ID, taskId);
             logger.debug("Form content is '{}'", result);
             assertThat(result).isNotNull().isNotEmpty();
@@ -268,6 +273,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             // check there is content from multi subform
             assertThat(result).contains("unitPrice").withFailMessage("Missing multi subform content");
         } finally {
+            changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
@@ -315,6 +321,8 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertThat(tasks).isNotNull().hasSize(1);
 
         Long taskId = tasks.get(0).getId();
+
+        changeUser(USER_JOHN);
 
         String oldResultViaContainerId = uiServicesClient.getTaskRawForm(CONTAINER_ID, taskId);
         logger.debug("Form content is '{}'", oldResultViaContainerId);
@@ -368,12 +376,15 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             // create another container with different id to make sure it cannot be used to stop task
             createContainer(CONTAINER_ID_V2, releaseId, "custom-alias");
 
+            changeUser(USER_JOHN);
+
             assertClientException(
                     () -> uiServicesClient.getTaskRawForm(CONTAINER_ID_V2, taskId),
                     404,
                     "Could not find task instance",
                     "Task with id " + taskId + " is not associated with " + CONTAINER_ID_V2);
         } finally {
+            changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             KieServerAssert.assertSuccess(client.disposeContainer(CONTAINER_ID_V2));
         }
