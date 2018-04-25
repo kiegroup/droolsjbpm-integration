@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.api.model.ProcessInstanceCustomDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
@@ -42,6 +43,8 @@ import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
@@ -129,6 +132,45 @@ public class ConvertUtils {
             }
             instance.setActiveUserTasks(new TaskSummaryList(tasks));
         }
+
+        return instance;
+    }
+    
+    public static ProcessInstanceCustomVarsList convertToProcessInstanceCustomVarsList(Collection<ProcessInstanceCustomDesc> instances) {
+        if (instances == null) {
+            return new ProcessInstanceCustomVarsList(new org.kie.server.api.model.instance.ProcessInstanceCustomVars[0]);
+        }
+
+        List<ProcessInstanceCustomVars> processInstances = new ArrayList<ProcessInstanceCustomVars>(instances.size());
+        for (ProcessInstanceCustomDesc pi : instances) {
+            org.kie.server.api.model.instance.ProcessInstanceCustomVars instance = convertToProcessInstanceCustomVars(pi);
+
+            processInstances.add(instance);
+        }
+
+        return new ProcessInstanceCustomVarsList(processInstances);
+    }
+    
+    public static org.kie.server.api.model.instance.ProcessInstanceCustomVars convertToProcessInstanceCustomVars(ProcessInstanceCustomDesc pi) {
+        if (pi == null) {
+            return null;
+        }
+
+        org.kie.server.api.model.instance.ProcessInstanceCustomVars instance = org.kie.server.api.model.instance.ProcessInstanceCustomVars.builder()
+                .id(pi.getId())
+                .processId(pi.getProcessId())
+                .processName(pi.getProcessName())
+                .processVersion(pi.getProcessVersion())
+                .containerId(pi.getDeploymentId())
+                .processInstanceDescription(pi.getProcessInstanceDescription())
+                .correlationKey(pi.getCorrelationKey())
+                .parentInstanceId(pi.getParentId())
+                .date(pi.getDataTimeStamp())
+                .initiator(pi.getInitiator())
+                .state(pi.getState())
+                .lastModificationDate(pi.getLastModificationDate())
+                .variables(pi.getVariables())
+                .build();
 
         return instance;
     }

@@ -19,6 +19,7 @@ import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.convertQueryDefinition;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinitionList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
@@ -35,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
+import org.jbpm.services.api.model.ProcessInstanceCustomDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
@@ -251,7 +253,11 @@ public class QueryDataServiceBase {
         Object actualResult = null;
         if (result instanceof Collection) {
 
-            if (ProcessInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
+            if (ProcessInstanceCustomDesc.class.isAssignableFrom(resultMapper.getType())) {
+
+                logger.debug("Converting collection of ProcessInstanceCustomDesc to ProcessInstanceCustomList");
+                actualResult = convertToProcessInstanceCustomVarsList((Collection<ProcessInstanceCustomDesc>) result);
+            } else if (ProcessInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
 
                 logger.debug("Converting collection of ProcessInstanceWithVarsDesc to ProcessInstanceList");
                 actualResult = convertToProcessInstanceWithVarsList((Collection<ProcessInstanceWithVarsDesc>) result);
