@@ -230,9 +230,9 @@ public class CaseManagementRuntimeDataServiceBase {
 
         Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = null;
         if (dataItemValue != null && !dataItemValue.isEmpty()) {
-            caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDateItemAndValue(dataItemName, dataItemValue, caseStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+            caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDataItemAndValue(dataItemName, dataItemValue, caseStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
         } else {
-            caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDateItem(dataItemName, caseStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+            caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDataItem(dataItemName, caseStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
         }
 
         List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
