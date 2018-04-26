@@ -380,7 +380,7 @@ public class RuntimeDataResource {
     @Path(PROCESS_DEFINITIONS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessesByFilter(@Context HttpHeaders headers, 
-            @ApiParam(value = "process id or name to filter process definitions", required = true) @QueryParam("filter") String filter,
+            @ApiParam(value = "process id or name to filter process definitions", required = false) @QueryParam("filter") String filter,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
