@@ -358,7 +358,7 @@ public class KieServerInstanceManager {
 
                 if (response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     container.setContainerSpecId(containerResource.getContainerId());
-                    container.setContainerName(containerResource.getContainerId());
+                    container.setContainerName(containerResource.getContainerAlias());
                     container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
                     container.setServerTemplateId(serverTemplate.getId());
                     container.setStatus(containerResource.getStatus());
@@ -429,7 +429,6 @@ public class KieServerInstanceManager {
             container.setServerTemplateId(serverTemplate.getId());
             container.setServerInstanceId(instanceUrl.getServerInstanceId());
             container.setUrl(instanceUrl.getUrl() + "/containers/" + containerSpec.getId());
-            container.setResolvedReleasedId(containerSpec.getReleasedId());
             container.setStatus(containerSpec.getStatus());
 
             try {
@@ -480,7 +479,7 @@ public class KieServerInstanceManager {
         ServiceResponse<KieContainerResource> serviceResponse = client.getContainerInfo(containerSpec.getId());
         if (serviceResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
             KieContainerResource containerResource = serviceResponse.getResult();
-
+            container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
             container.setMessages(containerResource.getMessages());
         }
     }
