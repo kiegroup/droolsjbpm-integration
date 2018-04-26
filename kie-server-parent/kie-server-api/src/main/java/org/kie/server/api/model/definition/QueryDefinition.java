@@ -105,4 +105,14 @@ public class QueryDefinition {
             return this;
         }
     }
+
+    @Override
+    public String toString() {
+        return "QueryDefinition{" +
+                "name='" + name + '\'' +
+                ", source='" + source + '\'' +
+                ", expression='" + expression + '\'' +
+                ", target='" + target + '\'' +
+                '}';
+    }
 }
