@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.controller.api.KieServerControllerException;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
@@ -50,9 +51,11 @@ public class WebSocketKieControllerManagementIntegrationTest extends KieControll
         assertNotNull(e.getMessage());
     }
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters(name = "{index}: {0} {1}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{MarshallingFormat.JSON}});
+        KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
+
+        return Arrays.asList(new Object[][]{{MarshallingFormat.JSON, restConfiguration}});
     }
 
     @Before
