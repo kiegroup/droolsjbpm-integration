@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.services.jbpm.ui;
 
@@ -31,6 +31,7 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.task.commands.GetUserTaskCommand;
 import org.kie.api.task.model.Task;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
@@ -53,13 +54,12 @@ public class FormServiceBase {
 
     private Set<UIFormProvider> providers = new LinkedHashSet<UIFormProvider>();
 
-
     public enum FormType {
 
         FORM_MODELLER_TYPE("FORM", "xml"),
         FORM_TYPE("FRM", "json"),
         FREE_MARKER_TYPE("FTL", "xml"),
-        ANY( "ANY", null );
+        ANY("ANY", null);
 
         private String name;
         private String contentType;
@@ -84,7 +84,7 @@ public class FormServiceBase {
                 return FORM_TYPE;
             } else if (FREE_MARKER_TYPE.getName().equals(name)) {
                 return FREE_MARKER_TYPE;
-            } else if ( ANY.getName().equals( name ) ) {
+            } else if (ANY.getName().equals(name)) {
                 return ANY;
             } else {
                 throw new IllegalArgumentException("No FormType enum value for " + name);
@@ -100,7 +100,6 @@ public class FormServiceBase {
 
         providers.addAll(collectFormProviders(formManagerService));
     }
-
 
     public String getFormDisplayProcess(String containerId, String processId, String lang, boolean filterContent, String formType) {
         containerId = registry.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
@@ -124,8 +123,8 @@ public class FormServiceBase {
         for (UIFormProvider provider : providers) {
 
             // if there's no formType or formType is ANY the first provider able to generate the formContent wins
-            if ( !FormType.ANY.getName().equals( formType ) && !provider.getType().equals( formType ) ) {
-                logger.debug( "Provider {} does not support {} form type", provider, formType );
+            if (!FormType.ANY.getName().equals(formType) && !provider.getType().equals(formType)) {
+                logger.debug("Provider {} does not support {} form type", provider, formType);
                 continue;
             }
             String template = provider.render(processDesc.getName(), processDesc, renderContext);
@@ -139,9 +138,15 @@ public class FormServiceBase {
         throw new IllegalStateException("No form for process with id " + processDesc.getName() + " found");
     }
 
-    public String getFormDisplayTask(String containerId, long taskId, String lang, boolean filterContent, String formType) {
+    public String getFormDisplayTask(String containerId,
+                                     long taskId,
+                                     String lang,
+                                     boolean filterContent,
+                                     String formType) {
+
         containerId = registry.getContainerId(containerId, new ByTaskIdContainerLocator(taskId));
-        Task task = userTaskService.getTask(taskId);
+
+        Task task = userTaskService.execute(containerId, new GetUserTaskCommand(registry.getIdentityProvider().getName(), taskId));
         if (task == null) {
             throw new IllegalStateException("No task with id " + taskId + " found");
         }
@@ -163,7 +168,7 @@ public class FormServiceBase {
             renderContext.put(outputVar.getKey(), outputVar.getValue());
         }
         outputDef.forEach((k, v) -> {
-            if ( !renderContext.containsKey( k ) ) {
+            if (!renderContext.containsKey(k)) {
                 renderContext.put(k, "");
             }
         });
@@ -173,8 +178,8 @@ public class FormServiceBase {
 
         for (UIFormProvider provider : providers) {
             // if there's no formType or formType is ANY the first provider able to generate the formContent wins
-            if ( !FormType.ANY.getName().equals( formType ) && !provider.getType().equals( formType ) ) {
-                logger.debug( "Provider {} does not support {} form type", provider, formType );
+            if (!FormType.ANY.getName().equals(formType) && !provider.getType().equals(formType)) {
+                logger.debug("Provider {} does not support {} form type", provider, formType);
                 continue;
             }
 
