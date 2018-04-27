@@ -38,6 +38,8 @@ public abstract class RestJbpmBaseIntegrationTest extends RestOnlyBaseIntegratio
     protected static final String USER_YODA = "yoda";
     protected static final String USER_JOHN = "john";
 
+    protected static final String DEFAULT_PASSWORD = "usetheforce123@";
+
     protected ProcessServicesClient processClient;
     protected QueryServicesClient queryClient;
     protected CaseServicesClient caseClient;

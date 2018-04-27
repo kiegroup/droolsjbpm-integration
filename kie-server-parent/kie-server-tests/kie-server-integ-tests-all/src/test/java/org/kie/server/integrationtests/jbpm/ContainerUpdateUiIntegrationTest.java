@@ -73,6 +73,7 @@ public class ContainerUpdateUiIntegrationTest extends JbpmKieServerBaseIntegrati
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
         assertTrue(processInstanceId > 0);
         try {
+            changeUser(USER_JOHN);
             String result = getFirstTaskForm(processInstanceId);
             assertNotNull(result);
             assertTrue("Form doesn't contain original label!", result.contains("Candidate Name"));
@@ -86,6 +87,7 @@ public class ContainerUpdateUiIntegrationTest extends JbpmKieServerBaseIntegrati
             assertNotNull(result);
             assertTrue("Form doesn't contain updated label!", result.contains("Candidate Whole Name"));
         } finally {
+            changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }

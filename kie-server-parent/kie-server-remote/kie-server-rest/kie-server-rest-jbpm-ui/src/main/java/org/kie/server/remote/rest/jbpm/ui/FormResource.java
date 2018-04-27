@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessDefinitionNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
+import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,6 +61,7 @@ public class FormResource {
     private static int PRETTY_PRINT_INDENT_FACTOR = 4;
     public static final String CONTAINER_NOT_FOUND = "Could not find container \"{0}\"";
     public static final String PROCESS_DEFINITION_NOT_FOUND = "Could not find process definition \"{0}\" in container \"{1}\"";
+    public static final String TASK_PERMISSION_ERROR = "User has no permission to see task instance with id \"{0}\"";
     public static final String TASK_INSTANCE_NOT_FOUND = "Could not find task instance with id \"{0}\"";
 
     private FormServiceBase formServiceBase;
@@ -139,6 +141,8 @@ public class FormResource {
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, variant, Response.Status.OK, conversationIdHeader);
 
+        } catch (PermissionDeniedException e) {
+            return permissionDenied(MessageFormat.format(TASK_PERMISSION_ERROR, taskId), variant, conversationIdHeader);
         } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), variant, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {

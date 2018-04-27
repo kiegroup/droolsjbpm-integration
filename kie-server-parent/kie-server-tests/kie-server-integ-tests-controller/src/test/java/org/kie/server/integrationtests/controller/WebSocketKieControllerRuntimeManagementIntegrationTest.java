@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -37,9 +38,11 @@ public class WebSocketKieControllerRuntimeManagementIntegrationTest extends KieC
         assertThat(e.getMessage()).isNotNull();
     }
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters(name = "{index}: {0} {1}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{MarshallingFormat.JSON}});
+        KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
+
+        return Arrays.asList(new Object[][]{{MarshallingFormat.JSON, restConfiguration}});
     }
 
     @Before
