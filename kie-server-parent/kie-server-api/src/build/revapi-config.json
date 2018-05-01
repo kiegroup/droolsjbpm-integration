@@ -195,6 +195,108 @@
           "parameterIndex": "0",
           "elementKind": "parameter",
           "justification": ""
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::addGroupAssignments(java.lang.String, ===java.lang.String===)",
+          "new": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::addGroupAssignments(java.lang.String, ===java.lang.String[]===)",
+          "oldType": "java.lang.String",
+          "newType": "java.lang.String[]",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "Builder",
+          "methodName": "addGroupAssignments",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "Support multiple user and groups assignments to a role"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::addUserAssignments(java.lang.String, ===java.lang.String===)",
+          "new": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::addUserAssignments(java.lang.String, ===java.lang.String[]===)",
+          "oldType": "java.lang.String",
+          "newType": "java.lang.String[]",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "Builder",
+          "methodName": "addUserAssignments",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "Support multiple user and groups assignments to a role"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::groupAssignments(===java.util.Map<java.lang.String, java.lang.String>===)",
+          "new": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::groupAssignments(===java.util.Map<java.lang.String, java.lang.String[]>===)",
+          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+          "newType": "java.util.Map<java.lang.String, java.lang.String[]>",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "Builder",
+          "methodName": "groupAssignments",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "Support multiple user and groups assignments to a role"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::userAssignments(===java.util.Map<java.lang.String, java.lang.String>===)",
+          "new": "parameter org.kie.server.api.model.cases.CaseFile.Builder org.kie.server.api.model.cases.CaseFile.Builder::userAssignments(===java.util.Map<java.lang.String, java.lang.String[]>===)",
+          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+          "newType": "java.util.Map<java.lang.String, java.lang.String[]>",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "Builder",
+          "methodName": "userAssignments",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "Support multiple user and groups assignments to a role"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Map<java.lang.String, java.lang.String> org.kie.server.api.model.cases.CaseFile::getGroupAssignments()",
+          "new": "method java.util.Map<java.lang.String, java.lang.String[]> org.kie.server.api.model.cases.CaseFile::getGroupAssignments()",
+          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+          "newType": "java.util.Map<java.lang.String, java.lang.String[]>",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "CaseFile",
+          "methodName": "getGroupAssignments",
+          "elementKind": "method",
+          "justification": "Support multiple user and groups assignments to a role"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Map<java.lang.String, java.lang.String> org.kie.server.api.model.cases.CaseFile::getUserAssignments()",
+          "new": "method java.util.Map<java.lang.String, java.lang.String[]> org.kie.server.api.model.cases.CaseFile::getUserAssignments()",
+          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+          "newType": "java.util.Map<java.lang.String, java.lang.String[]>",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "CaseFile",
+          "methodName": "getUserAssignments",
+          "elementKind": "method",
+          "justification": "Support multiple user and groups assignments to a role"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter void org.kie.server.api.model.cases.CaseFile::setGroupAssignments(===java.util.Map<java.lang.String, java.lang.String>===)",
+          "new": "parameter void org.kie.server.api.model.cases.CaseFile::setGroupAssignments(===java.util.Map<java.lang.String, java.lang.String[]>===)",
+          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+          "newType": "java.util.Map<java.lang.String, java.lang.String[]>",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "CaseFile",
+          "methodName": "setGroupAssignments",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "Support multiple user and groups assignments to a role"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter void org.kie.server.api.model.cases.CaseFile::setUserAssignments(===java.util.Map<java.lang.String, java.lang.String>===)",
+          "new": "parameter void org.kie.server.api.model.cases.CaseFile::setUserAssignments(===java.util.Map<java.lang.String, java.lang.String[]>===)",
+          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+          "newType": "java.util.Map<java.lang.String, java.lang.String[]>",
+          "package": "org.kie.server.api.model.cases",
+          "classSimpleName": "CaseFile",
+          "methodName": "setUserAssignments",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "Support multiple user and groups assignments to a role"
         }
       ]
     }

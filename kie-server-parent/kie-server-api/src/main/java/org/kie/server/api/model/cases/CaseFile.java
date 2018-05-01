@@ -31,10 +31,10 @@ public class CaseFile {
     private Map<String, Object> data = new HashMap<>();
 
     @XmlElement(name="case-user-assignments")
-    private Map<String, String> userAssignments = new HashMap<>();
+    private Map<String, String[]> userAssignments = new HashMap<>();
 
     @XmlElement(name="case-group-assignments")
-    private Map<String, String> groupAssignments = new HashMap<>();
+    private Map<String, String[]> groupAssignments = new HashMap<>();
     
     @XmlElement(name="case-data-restrictions")
     private Map<String, String[]> accessRestrictions = new HashMap<>();
@@ -47,19 +47,19 @@ public class CaseFile {
         this.data = data;
     }
 
-    public Map<String, String> getUserAssignments() {
+    public Map<String, String[]> getUserAssignments() {
         return userAssignments;
     }
 
-    public void setUserAssignments(Map<String, String> userAssignments) {
+    public void setUserAssignments(Map<String, String[]> userAssignments) {
         this.userAssignments = userAssignments;
     }
 
-    public Map<String, String> getGroupAssignments() {
+    public Map<String, String[]> getGroupAssignments() {
         return groupAssignments;
     }
 
-    public void setGroupAssignments(Map<String, String> groupAssignments) {
+    public void setGroupAssignments(Map<String, String[]> groupAssignments) {
         this.groupAssignments = groupAssignments;
     }
         
@@ -88,23 +88,23 @@ public class CaseFile {
             return this;
         }
 
-        public Builder userAssignments(Map<String, String> data) {
+        public Builder userAssignments(Map<String, String[]> data) {
             caseFile.setUserAssignments(data);
             return this;
         }
 
-        public Builder groupAssignments(Map<String, String> data) {
+        public Builder groupAssignments(Map<String, String[]> data) {
             caseFile.setGroupAssignments(data);
             return this;
         }
 
-        public Builder addUserAssignments(String role, String user) {
-            caseFile.getUserAssignments().put(role, user);
+        public Builder addUserAssignments(String role, String... users) {
+            caseFile.getUserAssignments().put(role, users);
             return this;
         }
 
-        public Builder addGroupAssignments(String role, String group) {
-            caseFile.getGroupAssignments().put(role, group);
+        public Builder addGroupAssignments(String role, String... groups) {
+            caseFile.getGroupAssignments().put(role, groups);
             return this;
         }
         
@@ -136,6 +136,7 @@ public class CaseFile {
                 "data=" + data +
                 ", userAssignments=" + userAssignments +
                 ", groupAssignments=" + groupAssignments +
+                ", accessRestrictions=" + accessRestrictions +
                 '}';
     }
 }

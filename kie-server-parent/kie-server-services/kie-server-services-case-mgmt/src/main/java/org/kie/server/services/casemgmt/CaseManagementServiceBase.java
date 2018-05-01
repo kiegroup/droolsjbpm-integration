@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
@@ -114,20 +115,6 @@ public class CaseManagementServiceBase {
         } else {
             logger.debug("Case file provided {}", caseFile);
 
-            Map<String, OrganizationalEntity> roleAssignments = new HashMap<>();
-            if (caseFile.getUserAssignments() != null) {
-                caseFile.getUserAssignments()
-                        .entrySet()
-                        .stream()
-                        .forEach(entry -> roleAssignments.put(entry.getKey(), taskModelFactory.newUser(entry.getValue())));
-            }
-
-            if (caseFile.getGroupAssignments() != null) {
-                caseFile.getGroupAssignments()
-                        .entrySet()
-                        .stream()
-                        .forEach( entry -> roleAssignments.put(entry.getKey(), taskModelFactory.newGroup(entry.getValue())));
-            }
             Map<String, List<String>> accessRestrictions = null;
             if (caseFile.getAccessRestrictions() != null) {
                 accessRestrictions = new HashMap<>();
@@ -137,12 +124,39 @@ public class CaseManagementServiceBase {
                 }
             }
 
+            Map<String, OrganizationalEntity[]> roleAssignments = getRolesAssignments(caseFile);
             CaseFileInstance caseFileInstance = caseService.newCaseFileInstanceWithRestrictions(containerId, caseDefinitionId, caseFile.getData(), roleAssignments, accessRestrictions);
             caseId = caseService.startCase(containerId, caseDefinitionId, caseFileInstance);
         }
         logger.debug("New case instance started with case id {} for case definition {}", caseId, caseDefinitionId);
         // return response
         return marshallerHelper.marshal(containerId, marshallingType, caseId);
+    }
+
+    protected Map<String, OrganizationalEntity[]> getRolesAssignments(CaseFile caseFile) {
+        Map<String, OrganizationalEntity[]> roleAssignments = new HashMap<>();
+        if (caseFile.getUserAssignments() != null) {
+            caseFile.getUserAssignments()
+                    .entrySet()
+                    .stream()
+                    .forEach(entry -> {
+                        OrganizationalEntity[] users = Arrays.asList(entry.getValue()).stream().map(user -> taskModelFactory.newUser(user)).toArray(OrganizationalEntity[]::new);
+                        roleAssignments.put(entry.getKey(), users);
+                    });
+        }
+
+        if (caseFile.getGroupAssignments() != null) {
+            caseFile.getGroupAssignments()
+                    .entrySet()
+                    .stream()
+                    .forEach(entry -> {
+                        OrganizationalEntity[] groups = Arrays.asList(entry.getValue()).stream().map(group -> taskModelFactory.newGroup(group)).toArray(OrganizationalEntity[]::new);
+                        roleAssignments.compute(entry.getKey(), (k, v) ->
+                            v == null ? groups : ArrayUtils.addAll(groups, v)
+                        );
+                    });
+        }
+        return roleAssignments;
     }
 
     public String getCaseInstance(String containerId, String caseId, boolean withData, boolean withRoles, boolean withMilestones, boolean withStages, String marshallingType) {
