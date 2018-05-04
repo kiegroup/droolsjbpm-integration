@@ -149,7 +149,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                     () -> uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en"),
                     401,
                     MessageFormat.format(TASK_PERMISSION_REST_ERROR, taskId),
-                    MessageFormat.format(TASK_PERMISSION_JMS_ERROR, USER_YODA, taskId));
+                    MessageFormat.format(TASK_PERMISSION_JMS_ERROR, USER_YODA, taskId.toString()));
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
