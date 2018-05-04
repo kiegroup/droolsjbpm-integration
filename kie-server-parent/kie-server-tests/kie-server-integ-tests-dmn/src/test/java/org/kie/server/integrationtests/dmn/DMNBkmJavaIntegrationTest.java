@@ -29,17 +29,15 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class DMNBkmJavaModelTest
+public class DMNBkmJavaIntegrationTest
         extends DMNKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "bkm-java-model", "1.0.0.Final");
 
     private static final String CONTAINER_1_ID = "bkm-java-model";
-    private static final String CONTAINER_1_ALIAS = "bkm-java";
 
     @BeforeClass
     public static void deployArtifacts() {
@@ -47,7 +45,7 @@ public class DMNBkmJavaModelTest
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/bkm-java-model").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
-        createContainer(CONTAINER_1_ID, kjar1, CONTAINER_1_ALIAS);
+        createContainer(CONTAINER_1_ID, kjar1);
     }
 
     @Override
@@ -63,7 +61,7 @@ public class DMNBkmJavaModelTest
         dmnContext.set("Values", Arrays.asList(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3)));
 
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
-        assertEquals(ResponseType.SUCCESS, evaluateAll.getType());
+        assertThat(evaluateAll.getType(), is(ResponseType.SUCCESS));
         
         DMNResult dmnResult = evaluateAll.getResult();
         assertThat(dmnResult.getMessages().toString(), dmnResult.hasErrors(), is(false));
