@@ -24,9 +24,9 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
-import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.hamcrest.Matchers.is;
@@ -61,7 +61,7 @@ public class DMNBkmJavaIntegrationTest
         dmnContext.set("Values", Arrays.asList(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3)));
 
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
-        assertThat(evaluateAll.getType(), is(ResponseType.SUCCESS));
+        KieServerAssert.assertSuccess(evaluateAll);
         
         DMNResult dmnResult = evaluateAll.getResult();
         assertThat(dmnResult.getMessages().toString(), dmnResult.hasErrors(), is(false));
