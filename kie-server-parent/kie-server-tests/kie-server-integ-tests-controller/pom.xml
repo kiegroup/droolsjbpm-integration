@@ -30,14 +30,6 @@
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-controller-standalone</artifactId>
-        <classifier>ee6</classifier>
-        <type>war</type>
-        <scope>test</scope>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-standalone</artifactId>
         <classifier>webc</classifier>
         <type>war</type>
         <scope>test</scope>
@@ -163,13 +155,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
       <scope>test</scope>
@@ -185,13 +170,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>ee7</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-standalone</artifactId>
-      <classifier>ee6</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
