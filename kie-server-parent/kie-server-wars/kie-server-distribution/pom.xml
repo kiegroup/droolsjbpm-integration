@@ -27,12 +27,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
     </dependency>
@@ -40,12 +34,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>webc</classifier>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-standalone</artifactId>
-      <classifier>ee6</classifier>
       <type>war</type>
     </dependency>
     <dependency>
