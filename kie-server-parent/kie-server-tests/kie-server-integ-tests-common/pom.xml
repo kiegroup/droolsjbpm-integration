@@ -200,20 +200,13 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.kie.server</groupId>
-    	<artifactId>kie-server-controller-standalone-impl</artifactId>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-standalone-impl</artifactId>
     </dependency>
 
     <dependency>
