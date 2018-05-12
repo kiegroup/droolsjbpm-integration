@@ -19,7 +19,7 @@
     <userTask id="_2" name="Hello" >
       <extensionElements>
         <tns:metaData name="customSLADueDate">
-          <tns:metaValue>2s</tns:metaValue>
+          <tns:metaValue>4s</tns:metaValue>
         </tns:metaData>
       </extensionElements>
       <ioSpecification>
