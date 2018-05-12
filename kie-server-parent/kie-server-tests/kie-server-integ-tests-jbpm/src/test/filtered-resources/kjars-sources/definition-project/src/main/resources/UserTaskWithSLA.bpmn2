@@ -15,7 +15,7 @@
   <process processType="Private" isExecutable="true" id="definition-project.UserTaskWithSLA" name="User Task" >
     <extensionElements>
       <tns:metaData name="customSLADueDate">
-        <tns:metaValue>2s</tns:metaValue>
+        <tns:metaValue>4s</tns:metaValue>
       </tns:metaData>
     </extensionElements>
     <property id="s" itemSubjectRef="_sItem"/>

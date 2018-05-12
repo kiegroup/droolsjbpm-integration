@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,7 +30,6 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
-import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
@@ -100,7 +98,7 @@ public class CaseSLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrati
         Long caseProcessInstanceId = johnTask.getProcessInstanceId();
 
         // Wait for SLA to expire
-        KieServerSynchronization.waitForProcessInstanceSLAViolated(queryClient, caseProcessInstanceId, 3_000L);
+        KieServerSynchronization.waitForProcessInstanceSLAViolated(queryClient, caseProcessInstanceId, 6_000L);
 
         caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
         assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
