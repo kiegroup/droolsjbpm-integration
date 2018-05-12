@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Collectors;
 
 import org.kie.api.command.Command;
 import org.kie.api.executor.STATUS;
@@ -254,6 +253,14 @@ public class KieServerSynchronization {
                 return true;
             }
             return false;
+        });
+    }
+
+    public static void waitForServerTemplateSynchronization(final KieServerControllerClient controllerClient, final int numberOfExpectedServerTemplates) throws Exception {
+        waitForCondition(() -> {
+            ServerTemplate[] serverTemplates = controllerClient.listServerTemplates().getServerTemplates();
+            int numberOfServerTemplates = serverTemplates == null ? 0 : serverTemplates.length;
+            return numberOfServerTemplates == numberOfExpectedServerTemplates;
         });
     }
 

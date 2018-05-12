@@ -227,7 +227,7 @@
                   <context>${kie.server.context}</context>
                 </properties>
                 <pingURL>${kie.server.base.http.url}</pingURL>
-                <pingTimeout>30000</pingTimeout>
+                <pingTimeout>60000</pingTimeout>
               </deployable>
             </deployables>
             <configuration>

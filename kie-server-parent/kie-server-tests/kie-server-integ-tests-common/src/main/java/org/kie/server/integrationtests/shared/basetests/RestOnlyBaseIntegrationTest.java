@@ -87,6 +87,7 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
         configuration.setUserName(username);
         configuration.setPassword(password);
         client = createDefaultClient();
+        closeHttpClient();
     }
 
     private static Client httpClient;
@@ -96,12 +97,16 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
             httpClient = new ResteasyClientBuilder()
                     .establishConnectionTimeout(10, TimeUnit.SECONDS)
                     .socketTimeout(10, TimeUnit.SECONDS)
-                    .register(new Authenticator(TestConfig.getUsername(), TestConfig.getPassword()))
                     .build();
         }
         WebTarget webTarget = httpClient.target(uriString);
         webTarget.register(new BasicAuthentication(configuration.getUserName(), configuration.getPassword()));
         return webTarget;
+    }
+
+    private void closeHttpClient() {
+        httpClient.close();
+        httpClient = null;
     }
 
     protected <T> Entity<T> createEntity(T requestObject) {
