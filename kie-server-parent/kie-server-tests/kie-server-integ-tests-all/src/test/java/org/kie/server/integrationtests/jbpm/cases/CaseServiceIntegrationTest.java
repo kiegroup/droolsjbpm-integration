@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm.cases;
 
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -216,7 +217,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         caseClaimReport = caseData.get("report");
         Assertions.assertThat(caseClaimReport).isNotNull();
         Assertions.assertThat(caseClaimReport.getClass().getName()).isEqualTo(CLAIM_REPORT_CLASS_NAME);
-        
+
         caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, Arrays.asList("car", "owner"));
         Assertions.assertThat(caseData).isNotNull();
         Assertions.assertThat(caseData).hasSize(2);
@@ -688,6 +689,44 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                 "Could not find case instance \"" + NON_EXISTENT_CASE_ID + "\"",
                 "Case with id " + NON_EXISTENT_CASE_ID + " not found"
         );
+    }
+
+    @Test
+    public void testAddAndRemoveMultipleDataFromCaseFile() {
+        Map<String, Object> caseData = new HashMap<>();
+        caseData.put("car", "ford");
+        caseData.put("location", "prague");
+        CaseFile caseFile = CaseFile.builder()
+                .addUserAssignments(CASE_INSURED_ROLE, USER_YODA)
+                .addUserAssignments(CASE_INS_REP_ROLE, USER_JOHN)
+                .data(caseData)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
+
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseData).containsOnly(entry("car", "ford"), entry("location", "prague"));
+
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, Arrays.asList("car", "nonexisting"));
+        Assertions.assertThat(caseData).containsOnly(entry("car", "ford"));
+
+        caseData = new HashMap<>();
+        caseData.put("car", "fiat");
+        caseData.put("location", "brno");
+        caseData.put("conditions", "sunny");
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, caseData);
+
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseData).containsOnly(entry("car", "fiat"), entry("location", "brno"), entry("conditions", "sunny"));
+
+        caseClient.removeCaseInstanceData(CONTAINER_ID, caseId, "location", "conditions", "nonexisting");
+
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseData).containsOnly(entry("car", "fiat"));
     }
 
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
