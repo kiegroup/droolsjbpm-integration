@@ -15,6 +15,7 @@
 
 package org.kie.server.services.casemgmt;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -177,10 +178,12 @@ public class ConvertUtils {
 
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize) {
+        checkPagination(page, pageSize);
         return new QueryContext(page * pageSize, pageSize);
     }
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize, String orderBy, boolean asc) {
+        checkPagination(page, pageSize);
         if (orderBy != null && !orderBy.isEmpty()) {
             return new QueryContext(page * pageSize, pageSize, orderBy, asc);
         }
@@ -364,4 +367,15 @@ public class ConvertUtils {
 
         return caseFileDataItem;
     }
+
+    private static void checkPagination(final Integer page, final Integer pageSize) {
+        if (page < 0) {
+            throw new IllegalArgumentException(MessageFormat.format(Messages.ILLEGAL_PAGE, page));
+        }
+
+        if (pageSize < 0) {
+            throw new IllegalArgumentException(MessageFormat.format(Messages.ILLEGAL_PAGE_SIZE, pageSize));
+        }
+    }
+
 }
