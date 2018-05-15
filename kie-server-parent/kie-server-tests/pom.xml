@@ -58,8 +58,9 @@
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
 
     <version.tomcat8>8.5.12</version.tomcat8>
-    <version.wildfly11>11.0.0.Final</version.wildfly11>      
+    <version.wildfly11>11.0.0.Final</version.wildfly11>
     <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
+    <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
@@ -162,6 +163,11 @@
         <groupId>org.kie</groupId>
         <artifactId>kie-tomcat-integration</artifactId>
         <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${version.org.postgresql}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -420,6 +426,41 @@
         <dependency>
           <groupId>mysql</groupId>
           <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>postgresql</id>
+      <properties>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL82Dialect</org.kie.server.persistence.dialect>
+        <org.kie.server.datasource.driver.class>org.postgresql.xa.PGXADataSource</org.kie.server.datasource.driver.class>
+        <!-- Connection URL, format example: jdbc:postgresql://localhost:5432/mydb -->
+        <org.kie.server.datasource.connection.url>specify-postgresql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <dependency>
+                      <groupId>org.postgresql</groupId>
+                      <artifactId>postgresql</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
         </dependency>
       </dependencies>
     </profile>
