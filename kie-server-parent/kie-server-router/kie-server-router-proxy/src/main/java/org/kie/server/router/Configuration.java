@@ -25,9 +25,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.jboss.logging.Logger;
 import org.kie.server.router.utils.FailedHostInfo;
 
 public class Configuration {
+
+    private static final Logger log = Logger.getLogger(Configuration.class);
 
     private Map<String, List<String>> hostsPerServer = new ConcurrentHashMap<>();
     private Map<String, List<String>> hostsPerContainer = new ConcurrentHashMap<>();
@@ -105,6 +108,12 @@ public class Configuration {
 
     public void removeContainerInfo(ContainerInfo containerInfo) {
         List<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
+
+        if (containersById == null) {
+            log.warn("Container info with id '" + containerInfo.getContainerId() + "' is not found, nothing is removed.");
+            return;
+        }
+
         containersById.remove(containerInfo);
         
         List<String> hosts = hostsPerContainer.getOrDefault(containerInfo.getContainerId(), Collections.emptyList());

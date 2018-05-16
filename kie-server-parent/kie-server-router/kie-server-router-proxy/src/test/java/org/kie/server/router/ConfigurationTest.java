@@ -269,4 +269,20 @@ public class ConfigurationTest {
         assertEquals("http://localhost:8081/server", config.getHostsPerContainer().get("container1").get(1));        
         assertEquals("http://localhost:8081/server", config.getHostsPerServer().get("server1").get(1));
     }
+
+    @Test
+    public void testRemoveNotExistingContainerInfo() {
+
+        Configuration config = new Configuration();
+
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        assertEquals(2, config.getContainerInfosPerContainer().size());
+
+        ContainerInfo notExistingContainerInfo = new ContainerInfo("not-existing-test1.0", "not-existing-test", "org.kie:test:1.0");
+        config.removeContainerInfo(notExistingContainerInfo);
+
+        assertEquals(2, config.getContainerInfosPerContainer().size());
+    }
 }
