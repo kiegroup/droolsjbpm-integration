@@ -16,8 +16,10 @@
 package org.kie.server.client.admin;
 
 import java.util.List;
+import java.util.Map;
 
 import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 
 public interface CaseAdminServicesClient {
 
@@ -28,5 +30,9 @@ public interface CaseAdminServicesClient {
     List<CaseInstance> getCaseInstances(Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+    
+    CaseMigrationReportInstance migrateCaseInstance(String containerId, String caseId, String targetContainerId, Map<String, String> processMapping);
+    
+    CaseMigrationReportInstance migrateCaseInstance(String containerId, String caseId, String targetContainerId, Map<String, String> processMapping, Map<String, String> nodeMapping);
 
 }

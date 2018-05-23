@@ -195,6 +195,18 @@
           "parameterIndex": "0",
           "elementKind": "parameter",
           "justification": ""
+        },
+        {
+          "code": "java.field.constantValueChanged",
+          "old": "field org.kie.server.api.rest.RestURI.ADMIN_CASE_URI",
+          "new": "field org.kie.server.api.rest.RestURI.ADMIN_CASE_URI",
+          "oldValue": "admin\/cases",
+          "newValue": "admin",
+          "package": "org.kie.server.api.rest",
+          "classSimpleName": "RestURI",
+          "fieldName": "ADMIN_CASE_URI",
+          "elementKind": "field",
+          "justification": "Refactored case admin URI to allow fine grained control while keeping backward compatibility on existing endpoints"
         }
       ]
     }

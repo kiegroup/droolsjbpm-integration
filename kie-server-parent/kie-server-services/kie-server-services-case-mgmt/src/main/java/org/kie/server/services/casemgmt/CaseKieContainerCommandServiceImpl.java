@@ -40,13 +40,15 @@ public class CaseKieContainerCommandServiceImpl implements KieContainerCommandSe
 
     private CaseManagementServiceBase caseManagementServiceBase;
     private CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService;
+    private CaseAdminServiceBase caseAdminServiceBase;
 
 
-    public CaseKieContainerCommandServiceImpl(KieServerRegistry context, CaseManagementServiceBase caseManagementServiceBase, CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService) {
+    public CaseKieContainerCommandServiceImpl(KieServerRegistry context, CaseManagementServiceBase caseManagementServiceBase, CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService, CaseAdminServiceBase caseAdminServiceBase) {
 
         this.context = context;
         this.caseManagementServiceBase = caseManagementServiceBase;
         this.caseManagementRuntimeDataService = caseManagementRuntimeDataService;
+        this.caseAdminServiceBase = caseAdminServiceBase;
     }
 
     @Override
@@ -73,6 +75,8 @@ public class CaseKieContainerCommandServiceImpl implements KieContainerCommandSe
                     handler = caseManagementServiceBase;
                 } else if ("CaseQueryService".equals(descriptorCommand.getService())) {
                     handler = caseManagementRuntimeDataService;
+                } else if ("CaseAdminService".equals(descriptorCommand.getService())) {
+                    handler = caseAdminServiceBase;
                 } else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }

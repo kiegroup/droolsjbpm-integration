@@ -20,10 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
 import org.jbpm.casemgmt.impl.CaseServiceImpl;
+import org.jbpm.casemgmt.impl.admin.CaseInstanceMigrationServiceImpl;
 import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
 import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -31,6 +33,7 @@ import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.admin.ProcessInstanceMigrationService;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.Message;
@@ -63,6 +66,7 @@ public class CaseKieServerExtension implements KieServerExtension {
 
     protected CaseManagementServiceBase caseManagementServiceBase;
     protected CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService;
+    protected CaseAdminServiceBase caseAdminServiceBase;
 
     protected KieContainerCommandService kieContainerCommandService;
 
@@ -92,7 +96,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         this.services.add(this.caseManagementServiceBase);
         this.services.add(this.caseManagementRuntimeDataService);
 
-        this.kieContainerCommandService = new CaseKieContainerCommandServiceImpl(registry, caseManagementServiceBase, caseManagementRuntimeDataService);
+        this.kieContainerCommandService = new CaseKieContainerCommandServiceImpl(registry, caseManagementServiceBase, caseManagementRuntimeDataService, caseAdminServiceBase);
 
         initialized = true;
     }
@@ -104,6 +108,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         RuntimeDataService runtimeDataService = null;
         ProcessService processService = null;
         DeploymentService deploymentService = null;
+        ProcessInstanceMigrationService processInstanceMigrationService = null;
 
 
         for( Object object : jbpmServices ) {
@@ -119,6 +124,9 @@ public class CaseKieServerExtension implements KieServerExtension {
                 continue;
             } else if( DeploymentService.class.isAssignableFrom(object.getClass()) ) {
                 deploymentService = (DeploymentService) object;
+                continue;
+            } else if( ProcessInstanceMigrationService.class.isAssignableFrom(object.getClass()) ) {
+                processInstanceMigrationService = (ProcessInstanceMigrationService) object;
                 continue;
             }
         }
@@ -149,9 +157,16 @@ public class CaseKieServerExtension implements KieServerExtension {
         // configure case mgmt services as listeners
         ((KModuleDeploymentService)deploymentService).addListener((CaseRuntimeDataServiceImpl) caseRuntimeDataService);
         ((KModuleDeploymentService)deploymentService).addListener(configurationListener);
+        
+        CaseInstanceMigrationService caseInstanceMigrationService = new CaseInstanceMigrationServiceImpl();
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setCaseRuntimeDataService(caseRuntimeDataService);
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setCommandService(new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName)));
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setProcessInstanceMigrationService(processInstanceMigrationService);
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setProcessService(processService);
 
         this.caseManagementServiceBase = new CaseManagementServiceBase(caseService, caseRuntimeDataService, registry);
         this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, registry);
+        this.caseAdminServiceBase = new CaseAdminServiceBase(caseInstanceMigrationService, registry);
         
     }
 
@@ -220,6 +235,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         Object [] services = {
                 caseManagementServiceBase,
                 caseManagementRuntimeDataService,
+                caseAdminServiceBase,
                 registry
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {

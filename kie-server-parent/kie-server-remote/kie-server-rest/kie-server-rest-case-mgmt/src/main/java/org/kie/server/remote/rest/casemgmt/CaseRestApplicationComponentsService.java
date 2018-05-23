@@ -23,6 +23,7 @@ import java.util.List;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.casemgmt.CaseAdminServiceBase;
 import org.kie.server.services.casemgmt.CaseKieServerExtension;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.kie.server.services.casemgmt.CaseManagementServiceBase;
@@ -39,6 +40,7 @@ public class CaseRestApplicationComponentsService implements KieServerApplicatio
         }
         CaseManagementServiceBase caseManagementServiceBase = null;
         CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataServiceBase = null;
+        CaseAdminServiceBase caseAdminServiceBase = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
@@ -52,6 +54,9 @@ public class CaseRestApplicationComponentsService implements KieServerApplicatio
             } else if( CaseManagementRuntimeDataServiceBase.class.isAssignableFrom(object.getClass()) ) {
                 caseManagementRuntimeDataServiceBase = (CaseManagementRuntimeDataServiceBase) object;
                 continue;
+            } else if( CaseAdminServiceBase.class.isAssignableFrom(object.getClass()) ) {
+                caseAdminServiceBase = (CaseAdminServiceBase) object;
+                continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
@@ -62,7 +67,7 @@ public class CaseRestApplicationComponentsService implements KieServerApplicatio
 
         components.add(new CaseResource(caseManagementServiceBase, caseManagementRuntimeDataServiceBase, context));
         components.add(new CaseQueryResource(caseManagementRuntimeDataServiceBase, context));
-        components.add(new CaseAdminResource(caseManagementRuntimeDataServiceBase, context));
+        components.add(new CaseAdminResource(caseManagementRuntimeDataServiceBase, caseAdminServiceBase, context));
 
         return components;
     }

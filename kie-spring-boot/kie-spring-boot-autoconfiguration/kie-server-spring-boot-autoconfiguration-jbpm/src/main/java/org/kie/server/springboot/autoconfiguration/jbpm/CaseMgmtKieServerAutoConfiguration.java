@@ -18,6 +18,7 @@ package org.kie.server.springboot.autoconfiguration.jbpm;
 
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
+import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.springboot.autoconfiguration.KieServerProperties;
@@ -39,11 +40,13 @@ public class CaseMgmtKieServerAutoConfiguration {
     private KieServerProperties properties;
     private CaseService caseService;
     private CaseRuntimeDataService caseRuntimeDataService;
+    private CaseInstanceMigrationService caseInstanceMigrationService;
   
-    public CaseMgmtKieServerAutoConfiguration(KieServerProperties properties, CaseService caseService, CaseRuntimeDataService caseRuntimeDataService) {
+    public CaseMgmtKieServerAutoConfiguration(KieServerProperties properties, CaseService caseService, CaseRuntimeDataService caseRuntimeDataService, CaseInstanceMigrationService caseInstanceMigrationService) {
         this.properties = properties;  
         this.caseService = caseService;
         this.caseRuntimeDataService = caseRuntimeDataService;
+        this.caseInstanceMigrationService = caseInstanceMigrationService;
     }
 
     @Bean
@@ -51,7 +54,7 @@ public class CaseMgmtKieServerAutoConfiguration {
     @ConditionalOnProperty(name = "kieserver.casemgmt.enabled")
     public KieServerExtension caseMgmtServerExtension() {
 
-        return new SpringBootCaseKieServerExtension(caseService, caseRuntimeDataService);
+        return new SpringBootCaseKieServerExtension(caseService, caseRuntimeDataService, caseInstanceMigrationService);
 
     }
 }
