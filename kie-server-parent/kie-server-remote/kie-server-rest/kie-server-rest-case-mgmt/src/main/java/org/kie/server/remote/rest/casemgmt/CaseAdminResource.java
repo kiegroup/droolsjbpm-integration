@@ -107,7 +107,7 @@ public class CaseAdminResource extends AbstractCaseResource {
                                    });
     }
     
-    @ApiOperation(value="Migrates case instance to new container and case definition with required process mapping to migrate all process isntances belonging to a case instance with optional node mapping",
+    @ApiOperation(value="Migrates case instance to new container and case definition with required process mapping to migrate all process instances belonging to a case instance with optional node mapping",
             response=CaseMigrationReportInstance.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance or Container Id not found") })
