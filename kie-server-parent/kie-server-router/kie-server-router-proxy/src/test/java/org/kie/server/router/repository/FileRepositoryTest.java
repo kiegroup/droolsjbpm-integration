@@ -17,7 +17,6 @@ package org.kie.server.router.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.util.UUID;
@@ -36,6 +35,7 @@ public class FileRepositoryTest {
     @After
     public void cleanup() {
         System.clearProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED);
+        System.clearProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL);
     }
     
     @Test
@@ -110,6 +110,7 @@ public class FileRepositoryTest {
         repo.persist(config);
         
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
         
         FileRepository repoWithWatcher = new FileRepository(repositoryDirectory);
         Configuration loaded = repoWithWatcher.load();

@@ -15,17 +15,12 @@
 
 package org.kie.server.controller.impl.storage;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-
-import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.util.concurrent.TimeUnit;
+import java.nio.file.attribute.FileTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -35,11 +30,15 @@ import org.slf4j.LoggerFactory;
 public class ControllerStorageFileWatcher implements Runnable {
     
     private static final Logger log = LoggerFactory.getLogger(ControllerStorageFileWatcher.class);
+    public static final String STORAGE_FILE_WATCHER_INTERVAL = "org.kie.server.controller.templatefile.watcher.interval";
+    
+    private long sleepTime = Long.parseLong(System.getProperty(STORAGE_FILE_WATCHER_INTERVAL, "30000"));
 
-    private WatchService watcher;
     private Path toWatch;
     private AtomicBoolean active = new AtomicBoolean(true);
     private String templateFileName;
+    
+    private long lastUpdate = -1;
     
     private FileBasedKieServerTemplateStorage storage;
    
@@ -50,14 +49,11 @@ public class ControllerStorageFileWatcher implements Runnable {
         if (!Files.isDirectory(this.toWatch)) {
             this.toWatch = Paths.get(configFilePath).getParent();
         }
-        
+        this.toWatch = Paths.get(toWatch.toString(), templateFileName);
         try {
-            this.watcher = toWatch.getFileSystem().newWatchService();
-            log.debug("About to start watching " + toWatch.toString());
-            toWatch.register(watcher, ENTRY_MODIFY);
-        } catch (Exception e) {
-            log.error("Error when setting up config file watcher :: " + e.getMessage(), e);
-            this.active.set(false);
+            lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
+        } catch (IOException e) {
+            log.error("Unable to read last modified date of controller template file", e);
         }
     }
 
@@ -69,26 +65,27 @@ public class ControllerStorageFileWatcher implements Runnable {
     public void run() {
         try{
             while(active.get()) {
-                WatchKey key = watcher.poll(5, TimeUnit.SECONDS);
-                if (key != null) {
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        Path updatedFile = (Path) event.context();
-                        File modifiedFile = updatedFile.toFile();
-                        if (modifiedFile.getName().equals(templateFileName)) {
-                            log.debug("Received template file update event, reloading...");
-                            try (FileReader reader = new FileReader(new File(toWatch.toFile(), templateFileName))){                                                                
-                                this.storage.loadTemplateMapsFromFile();
-                                log.info("Successfully reloaded server templates from file");
-                            } catch (Exception e) {
-                                log.error("Unexpected exception while reading updated template file :: " + e.getMessage(), e);
-                            }
-                        }
+                
+                FileTime lastModified = Files.getLastModifiedTime(toWatch);
+                log.debug("Config file " + toWatch + " last modified " + lastModified);
+                if (lastModified.toMillis() > lastUpdate) {
+               
+                    log.debug("Template file updated, reloading...");
+                    try (FileReader reader = new FileReader(toWatch.toFile())){                                                                
+                        this.storage.loadTemplateMapsFromFile();
+                        log.info("Successfully reloaded server templates from file");
+                    } catch (Exception e) {
+                        log.error("Unexpected exception while reading updated template file :: " + e.getMessage(), e);
                     }
-                    key.reset();
+                    lastUpdate = lastModified.toMillis();
                 }
+                
+                Thread.sleep(sleepTime);             
             }
         } catch (InterruptedException e) {
             log.debug("Interrupted exception received...");
+        } catch (IOException e1) {
+            log.warn("Unexpected exception while watching template file", e1);
         }
     }
 }

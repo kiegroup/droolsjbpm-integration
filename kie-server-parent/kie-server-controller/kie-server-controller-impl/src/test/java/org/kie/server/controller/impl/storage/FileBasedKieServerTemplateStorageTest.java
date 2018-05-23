@@ -300,6 +300,7 @@ public class FileBasedKieServerTemplateStorageTest {
         FileBasedKieServerTemplateStorage secondStorage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath());
         
         System.setProperty(FileBasedKieServerTemplateStorage.STORAGE_FILE_WATCHER_ENABLED, "true");
+        System.setProperty(ControllerStorageFileWatcher.STORAGE_FILE_WATCHER_INTERVAL, "1000");
         CountDownLatch waitForReload = new CountDownLatch(2);
         storage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath()) {
 
