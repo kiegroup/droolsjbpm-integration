@@ -600,7 +600,7 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Retrieves process isntances that compose complete case instance",
+    @ApiOperation(value="Retrieves process instances that compose complete case instance",
             response=ProcessInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found") })
