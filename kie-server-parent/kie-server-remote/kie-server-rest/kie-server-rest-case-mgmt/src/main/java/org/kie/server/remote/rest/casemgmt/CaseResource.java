@@ -184,7 +184,7 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Cancels case instance with given identifier (case id) it can also when intructed permanently destroy the case instance",
+    @ApiOperation(value="Cancels case instance with given identifier (case id) and has optional flag to permanently destroy the case instance",
             response=Void.class, code=204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found") })
