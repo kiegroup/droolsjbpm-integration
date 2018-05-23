@@ -233,6 +233,7 @@ public class ProcessAdminServiceBase {
                 .startDate(report.getStartDate())
                 .endDate(report.getEndDate())
                 .logs(convertLogs(report.getEntries()))
+                .processInstanceId(report.getProcessInstanceId())
                 .build();
 
         return reportInstance;

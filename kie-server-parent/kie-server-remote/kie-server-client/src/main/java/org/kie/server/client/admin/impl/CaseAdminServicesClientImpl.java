@@ -27,6 +27,7 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.admin.CaseAdminServicesClient;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
@@ -70,7 +71,7 @@ public class CaseAdminServicesClientImpl extends AbstractKieServicesClientImpl i
             queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_CASE_URI + "/" + CASE_ALL_INSTANCES_GET_URI, valuesMap) + queryString, CaseInstanceList.class);
+                    build(loadBalancer.getUrl(), ADMIN_CASE_URI + "/" + ADMIN_CASE_ALL_INSTANCES_GET_URI, valuesMap) + queryString, CaseInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -90,5 +91,48 @@ public class CaseAdminServicesClientImpl extends AbstractKieServicesClientImpl i
         }
 
         return Collections.emptyList();
+    }
+
+    @Override
+    public CaseMigrationReportInstance migrateCaseInstance(String containerId, String caseId, String targetContainerId, Map<String, String> processMapping) {
+        
+        return migrateCaseInstance(containerId, caseId, targetContainerId, processMapping, new HashMap<>());
+    }
+
+    @Override
+    public CaseMigrationReportInstance migrateCaseInstance(String containerId, String caseId, String targetContainerId, Map<String, String> processMapping, Map<String, String> nodeMapping) {
+        CaseMigrationReportInstance report = null;
+        
+        Map<String, Object> mappings = new HashMap<>();
+        mappings.put("ProcessMapping", processMapping);
+        mappings.put("NodeMapping", nodeMapping);
+        
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(CASE_ID, caseId);
+            
+            String queryString = "?targetContainerId=" + targetContainerId;
+
+            report = makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_CASE_URI + "/" + MIGRATE_CASE_INST_PUT_URI, valuesMap) + queryString, serialize(mappings), CaseMigrationReportInstance.class, new HashMap<>());
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("CaseAdminService", "migrateCaseInstance",  serialize(safeMap(mappings)), marshaller.getFormat().getType(), new Object[]{containerId, caseId, targetContainerId})) );
+            ServiceResponse<CaseMigrationReportInstance> response = (ServiceResponse<CaseMigrationReportInstance>)
+                    executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            report = response.getResult();
+        }
+
+
+        return report;
+
+
     }
 }

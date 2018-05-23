@@ -72,7 +72,7 @@ public class RestURI {
     // admin URIs
     public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
     public static final String ADMIN_TASK_URI = "admin/containers/{" + CONTAINER_ID + "}/tasks";
-    public static final String ADMIN_CASE_URI = "admin/cases";
+    public static final String ADMIN_CASE_URI = "admin";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -298,6 +298,8 @@ public class RestURI {
     public static final String CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/processes/{" + PROCESS_ID + "}";
     public static final String CASE_DYNAMIC_TASK_PUT_URI = "instances/{" + CASE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
     public static final String CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
+    
+    public static final String MIGRATE_CASE_INST_PUT_URI = "containers/{" + CONTAINER_ID + "}/cases/instances/{" + CASE_ID + "}";
 
     // case queries
     public static final String CASE_ALL_INSTANCES_GET_URI = "instances";
@@ -309,6 +311,7 @@ public class RestURI {
     public static final String CASE_INSTANCES_BY_ROLE_GET_URI = "{" + CASE_ROLE_NAME + "}/instances";
     public static final String CASE_ALL_PROCESSES_INSTANCES_GET_URI = "processes";
     public static final String CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI = "{" + CONTAINER_ID + "}/processes";
+    public static final String ADMIN_CASE_ALL_INSTANCES_GET_URI = "cases/instances";
 
     public static String build(String baseUrl,
                                String template,

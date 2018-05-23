@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,40 +13,46 @@
  * limitations under the License.
 */
 
-package org.kie.server.api.model.admin;
+package org.kie.server.api.model.cases;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "migration-report-instance")
-public class MigrationReportInstance {
+import org.kie.server.api.model.admin.MigrationReportInstance;
 
-    @XmlElement(name="migration-successful")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "case-migration-report-instance")
+public class CaseMigrationReportInstance {
+
+    @XmlElement(name = "case-id")
+    private String caseId;
+
+    @XmlElement(name = "case-migration-successful")
     private boolean successful;
 
-    @XmlElement(name="migration-start")
+    @XmlElement(name = "case-migration-start")
     private Date startDate;
 
-    @XmlElement(name="migration-end")
+    @XmlElement(name = "case-migration-end")
     private Date endDate;
 
-    @XmlElement(name="migration-logs")
-    private List<String> logs;
-    
-    @XmlElement(name="migration-process-instance")
-    private Long processInstanceId;
-
-    public MigrationReportInstance() {
-    }
+    @XmlElement(name = "case-migration-reports")
+    private MigrationReportInstance[] reports;
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public String getCaseId() {
+        return caseId;
+    }
+
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
     }
 
     public boolean isSuccessful() {
@@ -73,31 +79,25 @@ public class MigrationReportInstance {
         this.endDate = endDate;
     }
 
-    public List<String> getLogs() {
-        if (logs == null) {
-            this.logs = new ArrayList<String>();
-        }
-        return logs;
+    public MigrationReportInstance[] getReports() {
+        return reports;
     }
 
-    public void setLogs(List<String> logs) {
-        this.logs = logs;
-    }
-    
-    public Long getProcessInstanceId() {
-        return processInstanceId;
-    }
-    
-    public void setProcessInstanceId(Long processInstanceId) {
-        this.processInstanceId = processInstanceId;
+    public void setReports(MigrationReportInstance[] reports) {
+        this.reports = reports;
     }
 
     public static class Builder {
 
-        private MigrationReportInstance reportInstance = new MigrationReportInstance();
+        private CaseMigrationReportInstance reportInstance = new CaseMigrationReportInstance();
 
-        public MigrationReportInstance build() {
+        public CaseMigrationReportInstance build() {
             return reportInstance;
+        }
+
+        public Builder caseId(String caseId) {
+            reportInstance.setCaseId(caseId);
+            return this;
         }
 
         public Builder successful(boolean successful) {
@@ -115,29 +115,16 @@ public class MigrationReportInstance {
             return this;
         }
 
-        public Builder logs(List<String> logs) {
-            reportInstance.setLogs(logs);
+        public Builder reports(MigrationReportInstance[] reports) {
+            reportInstance.setReports(reports);
             return this;
         }
 
-        public Builder addLog(String log) {
-            reportInstance.getLogs().add(log);
-            return this;
-        }
-        
-        public Builder processInstanceId(Long processInstanceId) {
-            reportInstance.setProcessInstanceId(processInstanceId);
-            return this;
-        }
     }
 
     @Override
     public String toString() {
-        return "MigrationReportInstance{" +
-                "successful=" + successful +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", processInstanceId=" + processInstanceId +
-                '}';
+        return "CaseMigrationReportInstance [caseId=" + caseId + ", successful=" + successful + ", startDate=" + startDate + ", endDate=" + endDate + "]";
     }
+
 }

@@ -153,6 +153,7 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             @XmlElement(name = "case-milestone-def", type = CaseMilestoneDefinition.class),
             @XmlElement(name = "case-file-data-item", type = CaseFileDataItem.class),
             @XmlElement(name = "case-file-data-item-list", type = CaseFileDataItemList.class),
+            @XmlElement(name = "case-migration-report-instance", type = CaseMigrationReportInstance.class),
 
             // Kie DMN
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),

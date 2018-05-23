@@ -371,6 +371,24 @@
            "methodName": "replaceQuery",
            "elementKind": "method",
            "justification": "Expose query definition resolved columns"
+         },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method org.kie.server.api.model.cases.CaseMigrationReportInstance org.kie.server.client.admin.CaseAdminServicesClient::migrateCaseInstance(java.lang.String, java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.String>)",
+           "package": "org.kie.server.client.admin",
+           "classSimpleName": "CaseAdminServicesClient",
+           "methodName": "migrateCaseInstance",
+           "elementKind": "method",
+           "justification": "Added support for case instance migration"
+         },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method org.kie.server.api.model.cases.CaseMigrationReportInstance org.kie.server.client.admin.CaseAdminServicesClient::migrateCaseInstance(java.lang.String, java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.String>, java.util.Map<java.lang.String, java.lang.String>)",
+           "package": "org.kie.server.client.admin",
+           "classSimpleName": "CaseAdminServicesClient",
+           "methodName": "migrateCaseInstance",
+           "elementKind": "method",
+           "justification": "Added support for case instance migration"
          }
 
       ]
