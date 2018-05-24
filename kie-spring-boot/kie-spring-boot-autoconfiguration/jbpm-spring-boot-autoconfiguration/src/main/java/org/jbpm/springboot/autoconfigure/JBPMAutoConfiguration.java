@@ -30,10 +30,12 @@ import org.drools.core.impl.EnvironmentFactory;
 import org.drools.persistence.api.TransactionManager;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
+import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
 import org.jbpm.casemgmt.impl.CaseServiceImpl;
+import org.jbpm.casemgmt.impl.admin.CaseInstanceMigrationServiceImpl;
 import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
 import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
 import org.jbpm.executor.ExecutorServiceFactory;
@@ -369,5 +371,18 @@ public class JBPMAutoConfiguration {
         ((KModuleDeploymentService)deploymentService).addListener(configurationListener);
         
         return caseService;
+    }
+    
+    @Bean
+    @ConditionalOnClass({ CaseInstanceMigrationServiceImpl.class })
+    @ConditionalOnMissingBean(name = "caseInstanceMigrationService")
+    public CaseInstanceMigrationService caseInstanceMigrationService(EntityManagerFactory entityManagerFactory, CaseRuntimeDataService caseRuntimeDataService, ProcessService processService, ProcessInstanceMigrationService processInstanceMigrationService) {
+        CaseInstanceMigrationServiceImpl caseInstanceMigrationService = new CaseInstanceMigrationServiceImpl();
+        caseInstanceMigrationService.setCaseRuntimeDataService(caseRuntimeDataService);
+        caseInstanceMigrationService.setCommandService(new TransactionalCommandService(entityManagerFactory));
+        caseInstanceMigrationService.setProcessInstanceMigrationService(processInstanceMigrationService);
+        caseInstanceMigrationService.setProcessService(processService);
+        
+        return caseInstanceMigrationService;
     }
 }

@@ -201,6 +201,45 @@
           "methodName": "updateComment",
           "elementKind": "method",
           "justification": "Added support for optional restriction on comments"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.kie.server.remote.rest.casemgmt.CaseAdminResource::<init>(org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
+          "new": "method void org.kie.server.remote.rest.casemgmt.CaseAdminResource::<init>(org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase, org.kie.server.services.casemgmt.CaseAdminServiceBase, org.kie.server.services.api.KieServerRegistry)",
+          "package": "org.kie.server.remote.rest.casemgmt",
+          "classSimpleName": "CaseAdminResource",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Added support for case instance migration"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseAdminResource::getCaseInstances(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseAdminResource::getCaseInstances(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "annotationType": "javax.ws.rs.Path",
+          "annotation": "@javax.ws.rs.Path(\"cases\/instances\")",
+          "attribute": "value",
+          "oldValue": "\"instances\"",
+          "newValue": "\"cases\/instances\"",
+          "package": "org.kie.server.remote.rest.casemgmt",
+          "classSimpleName": "CaseAdminResource",
+          "methodName": "getCaseInstances",
+          "elementKind": "method",
+          "justification": "Refactored case admin URI to allow fine grained control while keeping backward compatibility on existing endpoints"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "class org.kie.server.remote.rest.casemgmt.CaseAdminResource",
+          "new": "class org.kie.server.remote.rest.casemgmt.CaseAdminResource",
+          "annotationType": "javax.ws.rs.Path",
+          "annotation": "@javax.ws.rs.Path(\"server\/admin\")",
+          "attribute": "value",
+          "oldValue": "\"server\/admin\/cases\"",
+          "newValue": "\"server\/admin\"",
+          "package": "org.kie.server.remote.rest.casemgmt",
+          "classSimpleName": "CaseAdminResource",
+          "elementKind": "class",
+          "justification": "Refactored case admin URI to allow fine grained control while keeping backward compatibility on existing endpoints"
         }
       ]
     }

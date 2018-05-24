@@ -1,0 +1,13 @@
+package org.kie.server.testing;
+
+import org.kie.api.runtime.process.CaseData;
+import org.kie.server.testing.ClaimReport;
+
+rule "classify-claim" ruleflow-group "claims"
+
+when 
+    $caseData : CaseData()
+    $claim : ClaimReport( ) from $caseData.getData("claimReport")      
+then 
+    System.out.println("Classified claim " + $claim);
+end

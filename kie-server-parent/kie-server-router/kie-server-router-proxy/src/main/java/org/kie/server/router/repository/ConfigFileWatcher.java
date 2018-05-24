@@ -15,33 +15,32 @@
 
 package org.kie.server.router.repository;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-
-import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.util.concurrent.TimeUnit;
+import java.nio.file.attribute.FileTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jboss.logging.Logger;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.KieServerRouter;
+import org.kie.server.router.KieServerRouterConstants;
 
 public class ConfigFileWatcher implements Runnable {
     
     private static final Logger log = Logger.getLogger(KieServerRouter.class);
+    
+    private long sleepTime = Long.parseLong(System.getProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "30000"));
 
-    private WatchService watcher;
     private Path toWatch;
     private AtomicBoolean active = new AtomicBoolean(true);
     
     private ConfigurationMarshaller marshaller;    
     private Configuration configuration;
+    
+    private long lastUpdate = -1;
     
     public ConfigFileWatcher(String configFilePath, ConfigurationMarshaller marshaller, Configuration configuration) {
         this.marshaller = marshaller;
@@ -50,14 +49,11 @@ public class ConfigFileWatcher implements Runnable {
         if (!Files.isDirectory(this.toWatch)) {
             this.toWatch = Paths.get(configFilePath).getParent();
         }
-        
+        this.toWatch = Paths.get(toWatch.toString(), "kie-server-router.json");
         try {
-            this.watcher = toWatch.getFileSystem().newWatchService();
-            log.debug("About to start watching " + toWatch.toString());
-            toWatch.register(watcher, ENTRY_MODIFY);
-        } catch (Exception e) {
-            log.error("Error when setting up config file watcher :: " + e.getMessage(), e);
-            this.active.set(false);
+            lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
+        } catch (IOException e) {
+            log.error("Unable to read last modified date of routers config file", e);
         }
     }
 
@@ -69,26 +65,27 @@ public class ConfigFileWatcher implements Runnable {
     public void run() {
         try{
             while(active.get()) {
-                WatchKey key = watcher.poll(5, TimeUnit.SECONDS);
-                if (key != null) {
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        Path updatedFile = (Path) event.context();
-                        File modifiedFile = updatedFile.toFile();
-                        if (modifiedFile.getName().equals("kie-server-router.json")) {
-                            log.debug("Received config file update event, reloading...");
-                            try (FileReader reader = new FileReader(new File(toWatch.toFile(), "kie-server-router.json"))){                                
-                                Configuration updated = marshaller.unmarshall(reader);
-                                this.configuration.reloadFrom(updated);
-                            } catch (Exception e) {
-                                log.error("Unexpected exception while reading updated configuration file :: " + e.getMessage(), e);
-                            }
-                        }
+                
+                FileTime lastModified = Files.getLastModifiedTime(toWatch);
+                log.debug("Config file " + toWatch + " last modified " + lastModified);
+                if (lastModified.toMillis() > lastUpdate) {
+               
+                    log.debug("Config file updated, reloading...");
+                    try (FileReader reader = new FileReader(toWatch.toFile())){                                
+                        Configuration updated = marshaller.unmarshall(reader);
+                        this.configuration.reloadFrom(updated);
+                    } catch (Exception e) {
+                        log.error("Unexpected exception while reading updated configuration file :: " + e.getMessage(), e);
                     }
-                    key.reset();
+                    lastUpdate = lastModified.toMillis();
                 }
+                
+                Thread.sleep(sleepTime);
             }
         } catch (InterruptedException e) {
             log.debug("Interrupted exception received...");
+        } catch (IOException e1) {
+            log.warn("Unexpected exception while watching config file", e1);
         }
     }
 }

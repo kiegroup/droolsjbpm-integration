@@ -89,7 +89,6 @@
         </executions>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assembly/assembly-ee6-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-ee7-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-servlet-container.xml</descriptor>
           </descriptors>

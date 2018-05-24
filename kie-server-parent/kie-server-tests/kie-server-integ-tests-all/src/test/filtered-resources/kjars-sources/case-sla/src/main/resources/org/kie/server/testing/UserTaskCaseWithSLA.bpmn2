@@ -14,7 +14,7 @@
         <tns:metaValue>HR</tns:metaValue>
       </tns:metaData>    
       <tns:metaData name="customSLADueDate">
-        <tns:metaValue>2s</tns:metaValue>
+        <tns:metaValue>4s</tns:metaValue>
       </tns:metaData>
     </bpmn2:extensionElements>
     <bpmn2:property id="s" itemSubjectRef="_sItem" name="s"/>

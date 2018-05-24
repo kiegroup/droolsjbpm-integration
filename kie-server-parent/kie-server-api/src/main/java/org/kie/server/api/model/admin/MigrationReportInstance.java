@@ -38,6 +38,9 @@ public class MigrationReportInstance {
 
     @XmlElement(name="migration-logs")
     private List<String> logs;
+    
+    @XmlElement(name="migration-process-instance")
+    private Long processInstanceId;
 
     public MigrationReportInstance() {
     }
@@ -80,6 +83,14 @@ public class MigrationReportInstance {
     public void setLogs(List<String> logs) {
         this.logs = logs;
     }
+    
+    public Long getProcessInstanceId() {
+        return processInstanceId;
+    }
+    
+    public void setProcessInstanceId(Long processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
     public static class Builder {
 
@@ -113,6 +124,11 @@ public class MigrationReportInstance {
             reportInstance.getLogs().add(log);
             return this;
         }
+        
+        public Builder processInstanceId(Long processInstanceId) {
+            reportInstance.setProcessInstanceId(processInstanceId);
+            return this;
+        }
     }
 
     @Override
@@ -121,6 +137,7 @@ public class MigrationReportInstance {
                 "successful=" + successful +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", processInstanceId=" + processInstanceId +
                 '}';
     }
 }
