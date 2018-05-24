@@ -29,11 +29,14 @@ import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
@@ -41,7 +44,6 @@ import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
@@ -2171,7 +2173,202 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comments);
         assertEquals(0, comments.size());
     }
-    
+
+    @Test
+    public void testProcessDefinitionsPagination() {
+        PaginatingRecordsProvider<ProcessDefinition> paginatingProcessDefinitionsProvider =
+                (page, pageSize)-> caseClient.findProcesses(page, pageSize);
+        assertPagination(paginatingProcessDefinitionsProvider, 2);
+    }
+
+    @Test
+    public void testActiveNodesOnNonExistingContainer() {
+        assertSearchOperationOnNonExistingContainer(
+                (containerId) -> caseClient.getActiveNodes(containerId, "someCaseId", 0, 10)
+        );
+    }
+
+    @Test
+    public void testCompletedNodesOnNonExistingContainer() {
+        assertSearchOperationOnNonExistingContainer(
+                (containerId) -> caseClient.getCompletedNodes(containerId, "someCaseId", 0, 10)
+        );
+    }
+
+    @Test
+    public void testActiveNodesOnNonExistingCaseId() {
+        assertSearchOperationOnNonExistingCaseId(
+                (caseId) -> caseClient.getActiveNodes(CONTAINER_ID, caseId, 0, 10)
+        );
+    }
+
+    @Test
+    public void testCompletedNodesOnNonExistingCaseId() {
+        assertSearchOperationOnNonExistingCaseId(
+                (caseId) -> caseClient.getCompletedNodes(CONTAINER_ID, caseId, 0, 10)
+        );
+    }
+
+    @Test
+    public void testGetCaseInstancesByDataPagination() {
+        final String dataEntryName = "claimReportDone";
+        final boolean dataEntryValue = Boolean.TRUE;
+        final int numberOfItems = 3;
+
+        for (int i = 0; i < numberOfItems; i++) {
+            String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+            caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, dataEntryName, dataEntryValue);
+        }
+
+        final List<String> statusFilter = Arrays.asList(CaseStatus.OPEN.getName());
+        assertPagination(
+                (page, pageSize) -> caseClient.getCaseInstancesByData(
+                        dataEntryName,
+                        String.valueOf(dataEntryValue),
+                        statusFilter,
+                        page,
+                        pageSize
+                ),
+                2
+        );
+    }
+
+    @Test
+    public void testProcessDefinitionsSorting() {
+        final List<ProcessDefinition> processesSortByNameDesc =
+                caseClient.findProcesses(0, 10, CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, false);
+        final String [] expectedProcessNamesDesc = {"User Task", "Hiring a Developer", "DataVerification"};
+        Assertions.assertThat(processesSortByNameDesc)
+                .extracting(ProcessDefinition::getName)
+                .containsExactly(expectedProcessNamesDesc);
+
+        final List<ProcessDefinition> processesSortByNameAsc =
+                caseClient.findProcesses(0, 10, CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, true);
+        final String [] expectedProcessNamesAsc = {"DataVerification", "Hiring a Developer", "User Task"};
+        Assertions.assertThat(processesSortByNameAsc)
+                .extracting(ProcessDefinition::getName)
+                .containsExactly(expectedProcessNamesAsc);
+
+        //order should be preserved also with pagination
+        final List<ProcessDefinition> processesSortByNameDescFirstPage =
+                caseClient.findProcesses(0, 1,  CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, false);
+        Assertions.assertThat(processesSortByNameDescFirstPage)
+                .extracting(ProcessDefinition::getName)
+                .containsExactly("User Task");
+
+        final List<ProcessDefinition> processesSortByNameAscFirstPage =
+                caseClient.findProcesses(0, 1,  CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, true);
+        Assertions.assertThat(processesSortByNameAscFirstPage)
+                .extracting(ProcessDefinition::getName)
+                .containsExactly("DataVerification");
+    }
+
+    @Test
+    public void testProcessDefinitionsByContainerPagination() {
+        PaginatingRecordsProvider<ProcessDefinition> paginatingProcessDefinitionsByContainerProvider =
+                (page, pageSize)-> caseClient.findProcesses(page, pageSize);
+        assertPagination(paginatingProcessDefinitionsByContainerProvider, 2);
+    }
+
+    @Test
+    public void testActiveProcessInstancesPagination() {
+        final String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, DATA_VERIFICATION_DEF_ID, Collections.emptyMap());
+        caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, USER_TASK_DEF_ID, Collections.emptyMap());
+
+        PaginatingRecordsProvider<ProcessInstance> paginatingProcessInstancesProvider =
+                (page, pageSize)-> caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, page, pageSize);
+        assertPagination(paginatingProcessInstancesProvider, 2);
+    }
+
+    @Test
+    public void testGetCaseInstanceDataItemsOnNonExistingCaseId() {
+        assertSearchOperationOnNonExistingCaseId(
+                (caseId) -> caseClient.getCaseInstanceDataItems(caseId, 0, 10)
+        );
+    }
+
+    @Test
+    public void testGetCaseInstanceDataItemsPagination() {
+        final String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "first", "one");
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "second", "two");
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "third", "three");
+        assertPagination((page, pageSize) -> caseClient.getCaseInstanceDataItems(caseId, page, pageSize), 2);
+    }
+
+
+    @Test
+    public void testFindCaseTasksAssignedAsBusinessAdministratorOnNonExistingCaseId() {
+        assertSearchOperationOnNonExistingCaseId(
+                (caseId) -> caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_YODA, 0, 10)
+        );
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsBusinessAdminPagination() throws Exception {
+        final String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskOne", "desc", USER_YODA, "", Collections.emptyMap());
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskTwo", "desc", USER_YODA, "", Collections.emptyMap());
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskThree", "desc", USER_YODA, "", Collections.emptyMap());
+        changeUser(USER_ADMINISTRATOR);
+
+        assertPagination(
+                (page, pageSize) -> caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, page,  pageSize),
+                2
+        );
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsStakeholderOnNonExistingCaseId() {
+        assertSearchOperationOnNonExistingCaseId(
+                (caseId) -> caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, 0, 10)
+        );
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsStakeholderPagination() {
+        final String caseId = startUserTaskCase(USER_JOHN, USER_YODA);
+        final int tasksToAdd = 3;
+        for (int i = 0; i < tasksToAdd; i++) {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("input", "text data");
+            parameters.put("TaskStakeholderId", USER_YODA);
+            caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "Task" + (i + 1), "desc", USER_JOHN, "", parameters);
+        }
+
+        assertPagination((page, pageSize) -> caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, page, pageSize), 2);
+    }
+
+    private <T> void assertSearchOperationOnNonExistingContainer(Function<String, Collection<T>> operation) {
+        final String nonExistingContainerId = "NON_EXISTING_CONTAINER_ID";
+        Assertions.assertThat(operation.apply(nonExistingContainerId)).isEmpty();
+    }
+
+    private <T> void assertSearchOperationOnNonExistingCaseId(Function<String, Collection<T>> operation) {
+        final String nonExistingCaseId = "NON_EXISTING_CASE_ID";
+        Assertions.assertThat(operation.apply(nonExistingCaseId)).isEmpty();
+    }
+
+    private <T> void assertPagination(final PaginatingRecordsProvider<T> paginatingProcessProvider, final int pageSize) {
+        final List<T> all = paginatingProcessProvider.apply(0, Integer.MAX_VALUE);
+        final int mod = all.size() % pageSize;
+        final int lastPageIndex = mod == 0? (all.size() / pageSize) - 1 : all.size() / pageSize;
+        final int firstPageExpectedCount = Math.min(all.size(), pageSize);
+        final int lastPageExpectedCount = mod == 0 ? pageSize : mod;
+
+        final List<T> firstPage = paginatingProcessProvider.apply(0, pageSize);
+        final List<T> lastPage = paginatingProcessProvider.apply(lastPageIndex, pageSize);
+        final List<T> nonExistingPage = paginatingProcessProvider.apply(lastPageIndex + 1, pageSize);
+
+        Assertions.assertThat(nonExistingPage).isEmpty();
+        Assertions.assertThat(firstPage).hasSize(firstPageExpectedCount).doesNotContainAnyElementsOf(lastPage);
+        Assertions.assertThat(lastPage).hasSize(lastPageExpectedCount).doesNotContainAnyElementsOf(firstPage);
+
+        // what if we use negative page number or page size?
+        assertClientException(() -> paginatingProcessProvider.apply(-1, pageSize), 400, "-1");
+        assertClientException(() -> paginatingProcessProvider.apply(0, -1), 400, "-1");
+    }
 
     private String startUserTaskCase(String owner, String contact) {
         Map<String, Object> data = new HashMap<>();
@@ -2396,5 +2593,10 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comment);
         assertEquals(comment.getAuthor(), author);
         assertEquals(comment.getText(), text);
+    }
+
+    @FunctionalInterface
+    private interface PaginatingRecordsProvider<T> extends BiFunction<Integer, Integer, List<T>> {
+        //just for type safety
     }
 }
