@@ -106,7 +106,7 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Retrieves case instances where given user is involed in given role and applies pagination, allows to filter by case instance status",
+    @ApiOperation(value="Retrieves case instances where user is involved in given role and applies pagination, allows to filter by case instance status",
             response=CaseInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
