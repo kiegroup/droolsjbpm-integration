@@ -70,7 +70,7 @@ public class CaseAdminResource extends AbstractCaseResource {
         this.caseAdminServiceBase = caseAdminServiceBase;
     }
 
-    @ApiOperation(value="Retrieves case instances without authntication checks and applies pagination",
+    @ApiOperation(value="Retrieves case instances without authentication checks and applies pagination",
             response=CaseInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
