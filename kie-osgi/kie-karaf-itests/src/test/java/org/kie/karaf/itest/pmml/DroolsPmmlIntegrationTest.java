@@ -16,8 +16,6 @@
 
 package org.kie.karaf.itest.pmml;
 
-import static java.util.Collections.singletonList;
-
 import java.util.List;
 
 import org.junit.Test;
@@ -25,6 +23,8 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+
+import static java.util.Collections.singletonList;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -44,6 +44,6 @@ public class DroolsPmmlIntegrationTest extends AbstractPmmlIntegrationTest {
 
     @Override
     protected List<String> getKiePmmlFeatures() {
-        return singletonList("drools-pmml");
+        return singletonList("kie-pmml");
     }
 }
