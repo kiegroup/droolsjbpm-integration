@@ -30,7 +30,7 @@
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-persistence-api</include>
         <include>org.drools:drools-persistence-jpa</include>
-        <include>org.drools:drools-pmml</include>
+        <include>org.drools:kie-pmml</include>
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
         <include>org.drools:drools-workbench-models-commons</include>

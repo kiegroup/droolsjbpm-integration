@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.kie.maven.plugin.SerializeMojoIntegrationTest;
 
 @Ignore("The test takes insane amount of time (minutes) to complete, because the serialization takes into account" +
-        "also huge amount of DRLs coming from drools-pmml. Will be investigated and fixed by psiroky.")
+        "also huge amount of DRLs coming from kie-pmml. Will be investigated and fixed by psiroky.")
 public class SerializeMojoIntegrationTakariTest extends SerializeMojoIntegrationTest {
 
     private String projectName = "kjar-1-with-serialize";

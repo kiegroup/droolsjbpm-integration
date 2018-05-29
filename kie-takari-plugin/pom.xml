@@ -158,7 +158,7 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-pmml</artifactId>
+      <artifactId>kie-pmml</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
