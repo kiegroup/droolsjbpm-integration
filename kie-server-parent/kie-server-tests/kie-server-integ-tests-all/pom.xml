@@ -340,7 +340,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>tomcat8</id>
+      <id>tomcat9</id>
     </profile>
     <profile>
       <id>wildfly10</id>
