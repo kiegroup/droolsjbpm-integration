@@ -18,6 +18,11 @@ package org.kie.server.integrationtests.jbpm.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INST_DEL_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_PARENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_NODE_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_VAR_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
@@ -85,6 +90,254 @@ public class ProcessServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrati
             // abort process instance again
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap));
             logger.debug( "[DELETE] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).delete();
+            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testProcessWhichBelongsToAContainer() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_USERTASK);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            Long result = response.readEntity(JaxbLong.class).unwrap();
+            assertNotNull(result);
+
+            // find process instance which is deployed in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, result);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_BY_PARENT_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).get();
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            // find process instance which doesn't exist in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, "processIdNotFound");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_BY_PARENT_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).delete();
+            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testProcessVariablesWhichBelongsToAContainer() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_USERTASK);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            Long result = response.readEntity(JaxbLong.class).unwrap();
+            assertNotNull(result);
+
+            // find process instance which is deployed in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, result);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_INSTANCES_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).get();
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            // find process instance which doesn't exist in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, "processIdNotFound");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_INSTANCES_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).delete();
+            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testProcessVariablesHistoryWhichBelongsToAContainer() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_USERTASK);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            Long result = response.readEntity(JaxbLong.class).unwrap();
+            assertNotNull(result);
+
+            // find process instance which is deployed in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, result);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).get();
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            // find process instance which doesn't exist in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, "processIdNotFound");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).delete();
+            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testProcessDefinitionWhichBelongsToAContainer() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_USERTASK);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            Long result = response.readEntity(JaxbLong.class).unwrap();
+            assertNotNull(result);
+
+            // find process instance which is deployed in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, result);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).get();
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            // find process instance which doesn't exist in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, "processIdNotFound");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).delete();
+            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testNodeInstancesWhichBelongsToAProcess() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_USERTASK);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            Long result = response.readEntity(JaxbLong.class).unwrap();
+            assertNotNull(result);
+
+            // find process instance which is deployed in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, result);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_NODE_INSTANCES_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).get();
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            // find process instance which doesn't exist in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, "processIdNotFound");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_NODE_INSTANCES_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).delete();
+            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testAbortWorkItemWhichBelongsToAProcess() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_USERTASK);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            Long result = response.readEntity(JaxbLong.class).unwrap();
+            assertNotNull(result);
+
+                        // find process instance which doesn't exist in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, "processIdNotFound");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI, valuesMap));
+            logger.debug( "[PUT] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).delete();
             assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
