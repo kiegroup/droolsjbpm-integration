@@ -38,7 +38,7 @@ import org.kie.server.integrationtests.shared.KieServerReflections;
  */
 public class GuidedDecisionTableIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "gdst-project", "1.0.0-SNAPSHOT");
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "gdst-project", "1.0.0");
 
     private static final String CONTAINER_ID = "gdst";
     private static final String PERSON_CLASS_NAME = "org.kie.server.testing.Person";

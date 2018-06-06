@@ -51,7 +51,7 @@ import org.osgi.framework.Constants;
 public class KieBlueprintScannerReimportIntegrationTest extends AbstractKarafIntegrationTest {
 
     private static final String BLUEPRINT_XML_LOCATION = "/org/kie/karaf/itest/blueprint/kie-scanner-reimport-blueprint.xml";
-    private static final ReleaseId RELEASE_ID = KieServices.Factory.get().newReleaseId("org.kie.karaf.itest", "import-scanner-test-jar", "1.0.0-SNAPSHOT");
+    private static final ReleaseId RELEASE_ID = KieServices.Factory.get().newReleaseId("org.kie.karaf.itest", "import-scanner-test-jar", "1.0.0");
 
     private KieScannerTestUtils kieScannerTestUtils = new KieScannerTestUtils();
 

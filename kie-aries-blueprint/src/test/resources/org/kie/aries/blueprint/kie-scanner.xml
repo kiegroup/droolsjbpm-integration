@@ -23,7 +23,7 @@
 
   <kie:import releaseId-ref="blueprint-scanner-releaseId" enableScanner="true" scannerInterval="1000"/>
 
-  <kie:releaseId id="blueprint-scanner-releaseId" groupId="org.kie.blueprint" artifactId="blueprint-scanner-test" version="1.0-SNAPSHOT"/>
+  <kie:releaseId id="blueprint-scanner-releaseId" groupId="org.kie.blueprint" artifactId="blueprint-scanner-test" version="1.0"/>
 
 
 

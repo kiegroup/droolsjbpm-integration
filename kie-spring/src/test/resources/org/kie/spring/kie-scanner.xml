@@ -23,6 +23,6 @@
 
   <kie:import releaseId-ref="spring-scanner-releaseId" enableScanner="true" scannerInterval="1000"/>
 
-  <kie:releaseId id="spring-scanner-releaseId" groupId="org.kie.spring" artifactId="spring-scanner-test" version="1.0-SNAPSHOT"/>
+  <kie:releaseId id="spring-scanner-releaseId" groupId="org.kie.spring" artifactId="spring-scanner-test" version="1.0"/>
 
 </beans>
