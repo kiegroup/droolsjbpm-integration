@@ -18,6 +18,7 @@ package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
@@ -44,8 +46,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KieServerInstanceManagerTest {
@@ -468,6 +480,58 @@ public class KieServerInstanceManagerTest {
         instanceManager.upgradeAndStartContainer(serverTemplate, containerSpec);
 
         verify(instanceManager).callRemoteKieServerOperation(serverTemplate, containerSpec, operation);
+    }
+
+    @Test
+    public void testCallRemoteKieServerOperationWhenContainerSpecIsNull() {
+
+        final List<Container> containers = instanceManager.callRemoteKieServerOperation(serverTemplate, null, operation);
+
+        assertTrue(containers.isEmpty());
+    }
+
+    @Test
+    public void testCallRemoteKieServerOperationWhenServerTemplateHasZeroServerInstanceKeys() {
+
+        final Collection<ServerInstanceKey> serverInstanceKeys = Collections.emptyList();
+
+        when(serverTemplate.getServerInstanceKeys()).thenReturn(serverInstanceKeys);
+
+        doReturn(client).when(instanceManager).getClient(any());
+
+        final List<Container> containers = instanceManager.callRemoteKieServerOperation(serverTemplate, containerSpec, operation);
+
+        assertTrue(containers.isEmpty());
+    }
+
+    @Test
+    public void testCallRemoteKieServerOperationWhenGetClientThrowsAnException() {
+
+        final ServerInstanceKey serverInstanceKey = mock(ServerInstanceKey.class);
+        final Collection<ServerInstanceKey> serverInstanceKeys = Collections.singletonList(serverInstanceKey);
+
+        when(serverTemplate.getServerInstanceKeys()).thenReturn(serverInstanceKeys);
+
+        doThrow(new NullPointerException()).when(instanceManager).getClient(any());
+
+        final List<Container> containers = instanceManager.callRemoteKieServerOperation(serverTemplate, containerSpec, operation);
+
+        assertTrue(containers.isEmpty());
+    }
+
+    @Test
+    public void testCallRemoteKieServerOperationWhenServerTemplateHasMoreThanZeroServerInstanceKeys() {
+
+        final ServerInstanceKey serverInstanceKey = mock(ServerInstanceKey.class);
+        final Collection<ServerInstanceKey> serverInstanceKeys = Collections.singletonList(serverInstanceKey);
+
+        when(serverTemplate.getServerInstanceKeys()).thenReturn(serverInstanceKeys);
+
+        doReturn(client).when(instanceManager).getClient(any());
+
+        final List<Container> containers = instanceManager.callRemoteKieServerOperation(serverTemplate, containerSpec, operation);
+
+        assertEquals(1, containers.size());
     }
 
     private KieServerConfigItem configItem(final String capabilityBpm,
