@@ -6,7 +6,7 @@
            http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
            http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
 
-  <kie:releaseId id="blueprint-scanner-releaseId" groupId="org.kie.karaf.itest" artifactId="import-scanner-test-jar" version="1.0.0-SNAPSHOT"/>
+  <kie:releaseId id="blueprint-scanner-releaseId" groupId="org.kie.karaf.itest" artifactId="import-scanner-test-jar" version="1.0.0"/>
 
   <kie:import releaseId-ref="blueprint-scanner-releaseId" enableScanner="true" scannerInterval="1000"/>
 

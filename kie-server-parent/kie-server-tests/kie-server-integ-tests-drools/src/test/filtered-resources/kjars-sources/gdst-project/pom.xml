@@ -11,7 +11,7 @@
 
   <artifactId>gdst-project</artifactId>
   <name>gdst-project</name>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>kjar</packaging>
 
   <build>

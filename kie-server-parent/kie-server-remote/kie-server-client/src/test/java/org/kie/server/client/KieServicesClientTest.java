@@ -111,18 +111,18 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
                                 "    <release-id>\n" +
                                 "      <group-id>org.kie.server.testing</group-id>\n" +
                                 "      <artifact-id>kjar2</artifact-id>\n" +
-                                "      <version>1.0-SNAPSHOT</version>\n" +
+                                "      <version>1.0</version>\n" +
                                 "    </release-id>\n" +
                                 "    <resolved-release-id>\n" +
                                 "      <group-id>org.kie.server.testing</group-id>\n" +
                                 "      <artifact-id>kjar2</artifact-id>\n" +
-                                "      <version>1.0-SNAPSHOT</version>\n" +
+                                "      <version>1.0</version>\n" +
                                 "    </resolved-release-id>\n" +
                                 "  </kie-container>\n" +
                                 "</response>")));
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
-        ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar2", "1.0-SNAPSHOT");
+        ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar2", "1.0");
         KieContainerResource resource = new KieContainerResource("kie1", releaseId);
         ServiceResponse<KieContainerResource> response = client.createContainer("kie1", resource);
         assertSuccess(response);

@@ -36,7 +36,7 @@ import org.kie.server.integrationtests.shared.KieServerReflections;
 public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "classes-included-kjar",
-            "1.0.0-SNAPSHOT");
+            "1.0.0");
 
     private static final String CONTAINER_ID = "stateful-session";
     private static final String KIE_SESSION = "kbase1.stateful";

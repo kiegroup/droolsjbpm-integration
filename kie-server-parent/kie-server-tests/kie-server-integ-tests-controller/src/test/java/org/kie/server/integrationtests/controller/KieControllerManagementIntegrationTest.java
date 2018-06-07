@@ -773,7 +773,7 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         assertEquals(RELEASE_ID, containerResource.getReleaseId());
 
         // Update container with non valid ReleaseId
-        ReleaseId nonValidReleaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "2.0.0-SNAPSHOT");
+        ReleaseId nonValidReleaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "2.0.0");
         containerToDeploy.setReleasedId(nonValidReleaseId);
 
         // We can update container to new version, but if can't be found, then deployed container is not changed.
