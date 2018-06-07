@@ -20,7 +20,14 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.*;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.runtime.Container;
@@ -432,16 +439,13 @@ public class KieServerInstanceManager {
             container.setStatus(containerSpec.getStatus());
 
             try {
-                KieServicesClient client = getClient(instanceUrl.getUrl());
-
-                operation.doOperation(client,
-                                      container);
+                final KieServicesClient client = getClient(instanceUrl.getUrl());
+                operation.doOperation(client, container);
+                containers.add(container);
             } catch (Exception e) {
                 logger.debug("Unable to connect to {}",
                              instanceUrl);
             }
-
-            containers.add(container);
         }
 
         return containers;
