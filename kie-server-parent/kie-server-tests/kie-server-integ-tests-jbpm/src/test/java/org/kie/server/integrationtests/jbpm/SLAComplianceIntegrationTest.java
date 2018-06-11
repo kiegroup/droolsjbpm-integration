@@ -30,11 +30,13 @@ import java.util.stream.Collectors;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -54,6 +56,7 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
     }
 
     @Test
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testSLAonProcessViolated() throws Exception {
         Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_WITH_SLA, new HashMap<>());
         assertProcessInstance(pid, STATE_ACTIVE, SLA_PENDING);
@@ -119,6 +122,7 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
     }
 
     @Test
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testSLAonUserTaskViolated() throws Exception {
         Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_WITH_SLA_ON_TASK, new HashMap<>());
         assertProcessInstance(pid, STATE_ACTIVE, SLA_NA);
