@@ -129,8 +129,9 @@ public class AdminHttpHandler implements HttpHandler {
                 
                 if (path.startsWith("/add")) {
                     log.infof("Added %s as server location for container %s ", serverUrl, containerId);
-                    
-                    synchronized (configuration) {                
+                    synchronized (configuration) {  
+                        configuration.reloadFromRepository(repository);
+                        
                         configuration.addContainerHost(containerId, serverUrl);
                         configuration.addContainerHost(alias, serverUrl);
                         configuration.addServerHost(serverId, serverUrl);
@@ -144,10 +145,11 @@ public class AdminHttpHandler implements HttpHandler {
     
                     ResponseCodeHandler.HANDLE_200.handleRequest(exchange);
                 
-                } else if (path.startsWith("/remove")) {
-    
+                } else if (path.startsWith("/remove")) {                    
                     log.infof("Removed %s as server location for container %s ", serverUrl, containerId);
                     synchronized (configuration) {
+                        configuration.reloadFromRepository(repository);
+                        
                         configuration.removeContainerHost(containerId, serverUrl);
                         configuration.removeContainerHost(alias, serverUrl);
                         configuration.removeServerHost(serverId, serverUrl);
@@ -189,6 +191,8 @@ public class AdminHttpHandler implements HttpHandler {
     }
     public void removeUnavailableServer(String url) {
         synchronized (configuration) {
+            configuration.reloadFromRepository(repository);
+            
             FailedHostInfo failedHost = configuration.removeUnavailableServer(url);
             repository.persist(configuration);
             
@@ -212,6 +216,7 @@ public class AdminHttpHandler implements HttpHandler {
                         failedHostsReconnects.cancel(false);
                         
                         synchronized (configuration) {
+                            configuration.reloadFromRepository(repository);
                             for (String containerId : fHost.getContainers()) {
                                 configuration.addContainerHost(containerId, fHost.getServerUrl());
                             }
