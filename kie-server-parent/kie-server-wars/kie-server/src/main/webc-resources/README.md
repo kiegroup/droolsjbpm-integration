@@ -1,6 +1,6 @@
-Installing KIE Server on Tomcat 8
+Installing KIE Server on Tomcat 9
 
-This instruction describes all steps to install KIE Server on Tomcat 8 standalone distribution - this means it's Tomcat downloaded as zip/tar.
+This instruction describes all steps to install KIE Server on Tomcat 9 standalone distribution - this means it's Tomcat downloaded as zip/tar.
 
  1. Extract Tomcat archive into desired location - TOMCAT_HOME
  2. Copy following libraries into TOMCAT_HOME/lib
