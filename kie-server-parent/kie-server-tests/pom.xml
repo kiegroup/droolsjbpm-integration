@@ -52,7 +52,7 @@
     <!-- Kie server datasource configuration. -->
     <!--  <org.kie.server.persistence.ds/> Defined in container profiles.-->
     <org.kie.server.persistence.dialect>org.hibernate.dialect.H2Dialect</org.kie.server.persistence.dialect>
-    <org.kie.server.datasource.connection.url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</org.kie.server.datasource.connection.url>
+    <org.kie.server.datasource.connection.url>jdbc:h2:mem:test</org.kie.server.datasource.connection.url>
     <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
     <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
