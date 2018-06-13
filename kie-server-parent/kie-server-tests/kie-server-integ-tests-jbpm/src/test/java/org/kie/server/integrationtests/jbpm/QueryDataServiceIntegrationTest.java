@@ -922,7 +922,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
 
         QueryDefinition query = new QueryDefinition();
-        query.setName("jbpmProcessSearch");
+        query.setName("jbpmProcessWithVarsSearch");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select p. PROCESSINSTANCEID, p.PROCESSID,  p.PROCESSNAME, p.PROCESSVERSION, p.STATUS,  " +
                             "p.EXTERNALID, pr.STARTDATE as START_DATE,   p.USER_IDENTITY, p.PROCESSINSTANCEDESCRIPTION, " +
@@ -943,6 +943,49 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             assertNotNull(instance);
             assertEquals(1, instance.size());
             
+            final Map<String, Object> variables = instance.get(0).getVariables();
+            assertNotNull(variables);
+            assertEquals(3, variables.size());
+
+            assertEquals(TestConfig.getUsername(), variables.get("initiator"));
+            assertEquals("waiting for signal", variables.get("stringData"));
+            assertEquals(parameters.get("personData").toString(), variables.get("personData"));
+            
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+    
+    @Test
+    public void testGetProcessInstanceCustomWithoutVarsMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
+
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmProcessSearch");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select p.PROCESSINSTANCEID, p.PROCESSID,  p.PROCESSNAME, p.PROCESSVERSION, p.STATUS,  p.EXTERNALID, " +
+                            "pr.STARTDATE as START_DATE,   p.USER_IDENTITY, p.PROCESSINSTANCEDESCRIPTION, p.CORRELATIONKEY, " +
+                            "p.PARENTPROCESSINSTANCEID, pr.LASTMODIFICATIONDATE from PROCESSINSTANCELOG p " +
+                            "inner join PROCESSINSTANCEINFO pr on p.PROCESSINSTANCEID = pr.INSTANCEID");
+
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<ProcessInstanceCustomVars> instance = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_CUSTOM, 0, 10, ProcessInstanceCustomVars.class);
+            assertNotNull(instance);
+            assertEquals(1, instance.size());
+            
+            assertNull(instance.get(0).getVariables());
+
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, pid);
             queryClient.unregisterQuery(query.getName());
