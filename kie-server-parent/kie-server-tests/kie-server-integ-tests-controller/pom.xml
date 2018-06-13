@@ -270,7 +270,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>tomcat8</id>
+      <id>tomcat9</id>
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>

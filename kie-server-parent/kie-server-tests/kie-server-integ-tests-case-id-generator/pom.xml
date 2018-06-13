@@ -165,7 +165,7 @@
 
   <profiles>
     <profile>
-      <id>tomcat8</id>
+      <id>tomcat9</id>
       <build>
         <pluginManagement>
           <plugins>
