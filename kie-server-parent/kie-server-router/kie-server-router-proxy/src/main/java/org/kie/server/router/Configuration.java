@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jboss.logging.Logger;
+import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.FailedHostInfo;
 
 public class Configuration {
@@ -284,5 +285,14 @@ public class Configuration {
         });
         
         this.listeners.forEach(l -> l.onConfigurationReloaded());
+    }
+    
+    public synchronized void reloadFromRepository(ConfigRepository repository) {
+        
+        Configuration loaded = repository.load();
+        
+        this.containerInfosPerContainer = loaded.getContainerInfosPerContainer();
+        this.hostsPerContainer = loaded.getHostsPerContainer();
+        this.hostsPerServer = loaded.getHostsPerServer();
     }
 }
