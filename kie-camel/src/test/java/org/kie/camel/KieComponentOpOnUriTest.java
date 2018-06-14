@@ -19,6 +19,7 @@ package org.kie.camel;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
@@ -27,7 +28,12 @@ import org.junit.Test;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.kie.camel.KieCamelUtils.asCamelKieName;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
 
@@ -58,6 +64,21 @@ public class KieComponentOpOnUriTest extends BaseKieComponentTest {
 
             @Override
             public DMNContext clone() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void pushScope(String name, String namespace) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void popScope() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Optional<String> scopeNamespace() {
                 throw new UnsupportedOperationException();
             }
         };
