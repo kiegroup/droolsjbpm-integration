@@ -17,6 +17,7 @@ package org.kie.server.controller.impl.service;
 
 import java.util.Collection;
 
+import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
@@ -34,26 +35,58 @@ public class RuntimeManagementServiceImpl implements RuntimeManagementService {
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
 
     @Override
-    public ServerInstanceKeyList getServerInstances(String serverTemplateId) {
-        ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
-        if (serverTemplate == null) {
-            throw new RuntimeException("No server template found for id " + serverTemplateId);
-        }
-
+    public ServerInstanceKeyList getServerInstances(final String serverTemplateId) {
+        ServerTemplate serverTemplate = getServerTemplate(serverTemplateId);
         return new ServerInstanceKeyList(serverTemplate.getServerInstanceKeys());
     }
 
     @Override
-    public ContainerList getContainers(ServerTemplate serverTemplate,
-                                       ContainerSpec containerSpec) {
-        Collection<Container> containers = kieServerInstanceManager.getContainers(serverTemplate, containerSpec);
+    public ContainerList getContainers(final ServerTemplate serverTemplate,
+                                       final ContainerSpec containerSpec) {
+        return getServerTemplateContainers(serverTemplate.getId(),
+                             containerSpec.getId());
+    }
+
+    protected ContainerList getServerTemplateContainers(final String serverTemplateId,
+                                                        final String containerSpecId) {
+        final ServerTemplate serverTemplate = getServerTemplate(serverTemplateId);
+
+        if (serverTemplate.hasContainerSpec(containerSpecId) == false) {
+            throw new KieServerControllerIllegalArgumentException("Server template with id " + serverTemplateId + " has no container with id " + containerSpecId);
+        }
+
+        final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecId);
+
+        Collection<Container> containers = kieServerInstanceManager.getContainers(serverTemplate,
+                                                                                  containerSpec);
+        return new ContainerList(containers);
+    }
+
+    protected ServerTemplate getServerTemplate(final String serverTemplateId){
+        final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
+        }
+        return serverTemplate;
+    }
+
+    protected ContainerList getServerInstanceContainers(final String serverTemplateId,
+                                                        final String serverInstanceId) {
+        final ServerTemplate serverTemplate = getServerTemplate(serverTemplateId);
+        if (serverTemplate.hasServerInstanceId(serverInstanceId) == false) {
+            throw new KieServerControllerIllegalArgumentException("Server template with id " + serverTemplateId + " has no instance with id " + serverInstanceId);
+        }
+
+        final ServerInstanceKey serverInstanceKey = serverTemplate.getServerInstance(serverInstanceId);
+
+        Collection<Container> containers = kieServerInstanceManager.getContainers(serverInstanceKey);
         return new ContainerList(containers);
     }
 
     @Override
     public ContainerList getContainers(ServerInstanceKey serverInstanceKey) {
-        Collection<Container> containers = kieServerInstanceManager.getContainers(serverInstanceKey);
-        return new ContainerList(containers);
+        return getServerInstanceContainers(serverInstanceKey.getServerTemplateId(),
+                                           serverInstanceKey.getServerInstanceId());
     }
 
     public KieServerTemplateStorage getTemplateStorage() {

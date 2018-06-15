@@ -77,7 +77,7 @@ public class RuntimeManagementServiceImplTest extends AbstractServiceImplTest {
     public void testGetContainersByInstance() {
         when(kieServerInstanceManager.getContainers(any(ServerInstanceKey.class))).thenReturn(singletonList(container));
 
-        org.kie.server.controller.api.model.runtime.ServerInstanceKey instanceKey = new ServerInstanceKey("instanceId", "test server", serverTemplate.getId(), "http://fake.url.org");
+        org.kie.server.controller.api.model.runtime.ServerInstanceKey instanceKey = new ServerInstanceKey(serverTemplate.getId(), "test server", "instanceId", "http://fake.url.org");
         serverTemplate.addServerInstance(instanceKey);
         specManagementService.saveServerTemplate(serverTemplate);
 

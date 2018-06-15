@@ -55,9 +55,13 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
     private static final String MANAGEMENT_LAST_URI_PART = "/management/servers";
     private static final String CONTAINERS_LAST_URI_PART = "/containers";
+    private static final String RUNTIME_LAST_URI_PART = "/runtime/servers";
+    private static final String INSTANCES_LAST_URI_PART = "/instances";
 
     private static final String MANAGEMENT_URI_PART = MANAGEMENT_LAST_URI_PART + "/";
     private static final String CONTAINERS_URI_PART = CONTAINERS_LAST_URI_PART + "/";
+    private static final String RUNTIME_URI_PART = RUNTIME_LAST_URI_PART + "/";
+    private static final String INSTANCES_URI_PART = INSTANCES_LAST_URI_PART + "/";
 
     private static final String STARTED_STATUS_URI_PART = "/status/started";
     private static final String STOPPED_STATUS_URI_PART = "/status/stopped";
@@ -184,7 +188,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
     @Override
     public ServerInstanceKeyList getServerInstances(String serverTemplateId) {
-        return throwUnsupportedException();
+        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + RUNTIME_URI_PART + serverTemplateId + INSTANCES_URI_PART, ServerInstanceKeyList.class);
     }
 
     @Override
@@ -194,13 +198,13 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
     @Override
     public ContainerList getContainers(ServerInstanceKey serverInstanceKey) {
-        return throwUnsupportedException();
+        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + RUNTIME_URI_PART + serverInstanceKey.getServerTemplateId() + INSTANCES_URI_PART + serverInstanceKey.getServerInstanceId() + CONTAINERS_URI_PART, ContainerList.class);
     }
 
     @Override
     public ContainerList getContainers(ServerTemplate serverTemplate,
                                        ContainerSpec containerSpec) {
-        return throwUnsupportedException();
+        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + RUNTIME_URI_PART + serverTemplate.getId() + CONTAINERS_URI_PART + containerSpec.getId() + INSTANCES_LAST_URI_PART, ContainerList.class);
     }
 
     @Override
@@ -359,6 +363,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
         controllerClasses.add(ServerInstance.class);
         controllerClasses.add(ServerInstanceKey.class);
+        controllerClasses.add(ServerInstanceKeyList.class);
         controllerClasses.add(ServerTemplate.class);
         controllerClasses.add(ServerTemplateKey.class);
         controllerClasses.add(ServerConfig.class);
@@ -367,6 +372,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
         controllerClasses.add(ContainerSpec.class);
         controllerClasses.add(ContainerSpecKey.class);
         controllerClasses.add(Container.class);
+        controllerClasses.add(ContainerList.class);
         controllerClasses.add(ContainerKey.class);
         controllerClasses.add(ServerTemplateList.class);
         controllerClasses.add(ContainerSpecList.class);
