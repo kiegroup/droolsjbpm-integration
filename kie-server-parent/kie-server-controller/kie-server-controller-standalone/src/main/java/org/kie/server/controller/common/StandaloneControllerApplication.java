@@ -15,8 +15,6 @@
 package org.kie.server.controller.common;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -24,6 +22,7 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
+import org.kie.server.controller.service.StandaloneRuntimeManagementServiceImpl;
 import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
 
 
@@ -38,6 +37,7 @@ public class StandaloneControllerApplication extends Application {
             {                
                 add(new StandaloneKieServerControllerImpl());
                 add(new StandaloneSpecManagementServiceImpl());
+                add(new StandaloneRuntimeManagementServiceImpl());
             }
         };
     }

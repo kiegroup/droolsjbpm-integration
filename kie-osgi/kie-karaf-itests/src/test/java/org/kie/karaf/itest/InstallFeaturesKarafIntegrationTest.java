@@ -56,7 +56,7 @@ public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegratio
         return Arrays.asList(new Object[][]{
                 {"drools-common"},
                 {"drools-module"},
-                {"drools-pmml"},
+                {"kie-pmml"},
                 {"drools-templates"},
                 {"drools-decisiontable"},
                 {"drools-wb-guided-decisiontables"},

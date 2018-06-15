@@ -37,7 +37,7 @@ import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegra
 
 public class CustomExtensionIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0");
 
     private static final String CONTAINER_ID = "stateless-kjar1";
     private static final String KIE_SESSION = "stateless";

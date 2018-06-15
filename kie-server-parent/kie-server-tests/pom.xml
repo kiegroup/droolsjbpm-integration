@@ -57,7 +57,7 @@
     <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
 
-    <version.tomcat8>8.5.12</version.tomcat8>
+    <version.tomcat9>9.0.8</version.tomcat9>
     <version.wildfly11>11.0.0.Final</version.wildfly11>
     <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
     <version.org.postgresql>42.1.1</version.org.postgresql>
@@ -494,12 +494,12 @@
       </build>
     </profile>
     <profile>
-      <id>tomcat8</id>
+      <id>tomcat9</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>webc</kie.server.classifier>
         <kie.server.war.path>${org.kie.server:kie-server:war:webc}</kie.server.war.path>
-        <cargo.container.id>tomcat8x</cargo.container.id>
+        <cargo.container.id>tomcat9x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
       </properties>
       <build>
@@ -514,10 +514,10 @@
                   <artifactInstaller>
                     <groupId>org.apache.tomcat</groupId>
                     <artifactId>tomcat</artifactId>
-                    <version>${version.tomcat8}</version>
+                    <version>${version.tomcat9}</version>
                   </artifactInstaller>
                   <systemProperties>
-                    <tomcat.home>${project.build.directory}/cargo/configurations/tomcat8x</tomcat.home>
+                    <tomcat.home>${project.build.directory}/cargo/configurations/tomcat9x</tomcat.home>
                     <conf.directory>${project.build.testOutputDirectory}</conf.directory>
                     <tmp.directory>${project.build.directory}</tmp.directory>
                     <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
@@ -578,7 +578,7 @@
         </pluginManagement>
       </build>
       <dependencies>
-        <!-- Deps needed by Tomcat 8 -->
+        <!-- Deps needed by Tomcat 9 -->
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>

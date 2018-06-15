@@ -166,9 +166,9 @@
     <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/${karaf.version.org.apache.geronimo.specs.servlet}</bundle>
   </feature>
 
-  <feature name="drools-pmml" version="${project.version}">
+  <feature name="kie-pmml" version="${project.version}">
     <feature version="${project.version}">drools-module</feature>
-    <bundle start-level="100">mvn:org.drools/drools-pmml/${version.org.drools}</bundle>
+    <bundle start-level="100">mvn:org.drools/kie-pmml/${version.org.drools}</bundle>
   </feature>
 
   <feature name="kie-pmml" version="${project.version}">

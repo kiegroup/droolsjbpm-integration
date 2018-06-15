@@ -44,7 +44,7 @@ public class AbstractKieSpringDynamicModuleTest {
         this.fileManager = new FileManager();
         this.fileManager.setUp();
 
-        releaseId = KieServices.Factory.get().newReleaseId("org.kie.spring", "spring-scanner-test", "1.0-SNAPSHOT");
+        releaseId = KieServices.Factory.get().newReleaseId("org.kie.spring", "spring-scanner-test", "1.0");
         File kPom = createKPom(releaseId);
         InternalKieModule kJar1 = createKieJarWithClass(ks, releaseId, FIRST_VALUE);
 

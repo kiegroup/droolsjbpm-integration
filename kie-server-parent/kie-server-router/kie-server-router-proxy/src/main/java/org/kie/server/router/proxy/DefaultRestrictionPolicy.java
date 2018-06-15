@@ -11,20 +11,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.router.proxy;
 
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HttpString;
 import org.kie.server.router.spi.RestrictionPolicy;
 
 public class DefaultRestrictionPolicy implements RestrictionPolicy {
 
     @Override
-    public boolean restrictedEndpoint(HttpServerExchange exchange, String containerId) {
-        String relativePath = exchange.getRelativePath();
+    public boolean restrictedEndpoint(final HttpServerExchange exchange,
+                                      final String containerId) {
 
-        if (relativePath.endsWith("/containers/" + containerId) || relativePath.endsWith("/scanner") || relativePath.endsWith("/release-id")) {
+        final String relativePath = exchange.getRelativePath();
+        final boolean isReadOnlyRequest = isGet(exchange.getRequestMethod());
+        final boolean isContainerResource = relativePath.endsWith("/containers/" + containerId);
+        final boolean isScannerResource = relativePath.endsWith("/scanner");
+        final boolean isReleaseIdResource = relativePath.endsWith("/release-id");
+
+        if (!isReadOnlyRequest && (isContainerResource || isScannerResource || isReleaseIdResource)) {
             // disallow requests that modify the container as that can lead to inconsistent setup
             return true;
         }
@@ -35,5 +42,9 @@ public class DefaultRestrictionPolicy implements RestrictionPolicy {
     @Override
     public String toString() {
         return "Default restriction policy (disabled management endpoints)";
+    }
+
+    private boolean isGet(final HttpString requestMethod) {
+        return requestMethod.equals(HttpString.tryFromString("GET"));
     }
 }
