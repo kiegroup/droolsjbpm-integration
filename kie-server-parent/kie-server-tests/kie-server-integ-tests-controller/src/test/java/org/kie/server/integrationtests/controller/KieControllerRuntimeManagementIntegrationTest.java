@@ -116,7 +116,9 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
 
     @Test
     public void testGetContainersFromNotExistingServerInstance() {
-        ServerInstanceKey serverInstance = new ServerInstanceKey("not-existing",
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        ServerInstanceKey serverInstance = new ServerInstanceKey(serverTemplate.getId(),
                                                                  "not-existing",
                                                                  "not-existing",
                                                                  "not-existing");
@@ -125,7 +127,7 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
             fail("Should throw exception about the server instance not existing.");
         } catch (KieServerControllerClientException e) {
             assertNotFoundException((T) e);
-            assertThat(e.getMessage()).endsWith("Kie Services Client Provider not found for url: not-existing");
+            assertThat(e.getMessage()).endsWith("Server template with id " + serverTemplate.getId() +" has no instance with id not-existing");
         }
     }
 
