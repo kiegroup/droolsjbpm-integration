@@ -17,5 +17,5 @@ package org.kie.server.controller.api.model.spec;
 
 
 public enum Capability {
-    PROCESS, RULE, PLANNING
+    PROCESS, RULE, PLANNING, SWAGGER
 }

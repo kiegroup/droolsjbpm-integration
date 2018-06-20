@@ -179,6 +179,9 @@ public abstract class KieServerControllerImpl implements KieServerController {
             if (serverInfo.getCapabilities().contains(KieServerConstants.CAPABILITY_BRP)) {
                 capabilities.add(Capability.PLANNING.toString());
             }
+            if (serverInfo.getCapabilities().contains(KieServerConstants.CAPABILITY_SWAGGER)) {
+                capabilities.add(Capability.SWAGGER.toString());
+            }
             serverTemplate.setCapabilities(capabilities);
 
             // add newly connected server instance
