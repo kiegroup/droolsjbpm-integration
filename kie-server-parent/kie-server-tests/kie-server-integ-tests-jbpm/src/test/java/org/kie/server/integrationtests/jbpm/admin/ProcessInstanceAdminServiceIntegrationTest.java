@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
@@ -30,7 +29,6 @@ import org.kie.server.api.model.admin.TimerInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
@@ -220,6 +218,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             // expected as the variable to configure timer duration is invalid
         }
         List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        errors = filterErrorsByProcessId(errors, PROCESS_ID_TIMER);
         assertNotNull(errors);
         assertEquals(1, errors.size());
 
@@ -241,6 +240,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
         processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
 
         errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        errors = filterErrorsByProcessId(errors, PROCESS_ID_TIMER);
         assertNotNull(errors);
         assertEquals(0, errors.size());
 
@@ -253,7 +253,6 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
     }
 
     @Test
-    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testErrorHandlingFailedToSignal() throws Exception {
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -262,7 +261,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters);
 
-            List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            List<ExecutionErrorInstance> errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
 
@@ -299,7 +298,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
 
             processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
 
-            errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
 
@@ -338,6 +337,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             // expected as the variable to configure timer duration is invalid
         }
         List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        errors = filterErrorsByProcessId(errors, PROCESS_ID_TIMER);
         assertNotNull(errors);
         assertEquals(2, errors.size());
 
@@ -356,6 +356,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
         processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId(), errorInstance2.getErrorId());
 
         errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        errors = filterErrorsByProcessId(errors, PROCESS_ID_TIMER);
         assertNotNull(errors);
         assertEquals(0, errors.size());
 

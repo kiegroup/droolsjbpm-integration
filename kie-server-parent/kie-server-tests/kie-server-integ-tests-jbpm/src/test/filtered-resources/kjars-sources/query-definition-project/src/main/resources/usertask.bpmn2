@@ -9,6 +9,11 @@
   <bpmn2:itemDefinition id="__87C563E0-EB8C-4184-BDB0-219E05780A0E_string2_InputXItem" structureRef="String"/>
   <bpmn2:itemDefinition id="__87C563E0-EB8C-4184-BDB0-219E05780A0E_person2_InputXItem" structureRef="org.jbpm.data.Person"/>
   <bpmn2:process id="definition-project.usertask" drools:packageName="org.jbpm" drools:version="1.0" name="usertask" isExecutable="true">
+    <bpmn2:extensionElements>
+      <drools:metaData name="customDescription">
+        <drools:metaValue>Very nice process description</drools:metaValue>
+      </drools:metaData>
+    </bpmn2:extensionElements>
     <bpmn2:property id="stringData" itemSubjectRef="_stringDataItem"/>
     <bpmn2:property id="personData" itemSubjectRef="_personDataItem"/>
     <bpmn2:startEvent id="processStartEvent" drools:selectable="true" color:background-color="#9acd32" color:border-color="#000000" color:color="#000000" name="start">

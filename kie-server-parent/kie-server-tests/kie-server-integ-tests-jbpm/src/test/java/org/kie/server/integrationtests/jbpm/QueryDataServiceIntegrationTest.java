@@ -26,7 +26,6 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
-import org.kie.api.task.model.TaskSummary;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
@@ -754,7 +753,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             queryClient.registerQuery(query);
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters);
 
-            List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            List<ExecutionErrorInstance> errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId , false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
 
@@ -766,6 +765,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             }
 
             errors = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_ERROR, 0, 10, ExecutionErrorInstance.class);
+            errors = filterErrorsByProcessInstanceId(errors, processInstanceId);
             assertNotNull(errors);
             assertEquals(1, errors.size());
             ExecutionErrorInstance errorInstance = errors.get(0);
@@ -791,7 +791,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
 
-            errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
 
@@ -828,7 +828,8 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
                 "po.entity_id as POTOWNER, t.FORMNAME AS FORMNAME, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.subject as SUBJECT, t.deploymentid as DEPLOYMENTID " +
                 "from TASK t " +
                 "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
-                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid");
+                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid " +
+                "WHERE t.processinstanceid = " + pid);
         query.setTarget("CUSTOM");
         
         try {
@@ -838,6 +839,12 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_PO, 0, 10, TaskWithProcessDescription.class);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
+
+            TaskWithProcessDescription task = tasks.get(0);
+            assertEquals("First task", task.getName());
+            assertEquals(1, task.getPotentialOwners().size());
+            assertEquals("yoda", task.getPotentialOwners().get(0));
+            assertEquals("Very nice process description", task.getProcessInstanceDescription());
             
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, pid);
@@ -867,7 +874,8 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
                 "from TASK t " +
                 "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
                 "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid " +
-                "inner join TASKVARIABLEIMPL d on t.id=d.taskid");
+                "inner join TASKVARIABLEIMPL d on t.id=d.taskid " +
+                "WHERE t.processinstanceid = " + pid);
         query.setTarget("CUSTOM");
         
         try {
@@ -877,7 +885,18 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_MODIF, 0, 10, TaskWithProcessDescription.class);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
-            
+
+            TaskWithProcessDescription task = tasks.get(0);
+            assertEquals("First task", task.getName());
+            assertEquals(1, task.getPotentialOwners().size());
+            assertEquals("yoda", task.getPotentialOwners().get(0));
+            assertEquals("Very nice process description", task.getProcessInstanceDescription());
+            assertEquals("waiting for signal", task.getInputData().get("_string"));
+            Object person = task.getInputData().get("_person");
+            assertEquals(person, "Person{name='" + CONTAINER_ID + "'}");
+            assertNotNull(task.getLastModificationDate());
+            assertNotNull(task.getLastModificationUser());
+
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, pid);
             queryClient.unregisterQuery(query.getName());
