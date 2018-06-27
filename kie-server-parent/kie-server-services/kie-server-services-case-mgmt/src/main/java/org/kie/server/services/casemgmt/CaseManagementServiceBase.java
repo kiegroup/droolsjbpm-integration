@@ -420,7 +420,7 @@ public class CaseManagementServiceBase {
             return CommentSortBy.Author;
         }
 
-        logger.warn("Unexpected sort option for case comments '{}', returning default one - by date");
+        logger.warn("Unexpected sort option for case comments '{}', returning default one - by date", sort);
         return CommentSortBy.Date;
     }
     
