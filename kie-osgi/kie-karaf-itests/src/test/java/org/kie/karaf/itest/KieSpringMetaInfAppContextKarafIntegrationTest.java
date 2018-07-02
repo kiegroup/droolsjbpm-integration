@@ -69,6 +69,7 @@ public class KieSpringMetaInfAppContextKarafIntegrationTest extends AbstractKara
 
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
                         .add("META-INF/spring/kie-beans-service.xml",
                                 KieSpringMetaInfAppContextKarafIntegrationTest.class.getResource(SPRING_APP_CONTEXT_LOCATION))
                         .set(Constants.IMPORT_PACKAGE, "*")
