@@ -78,6 +78,7 @@ public class KieSpringDependencyKarafIntegrationTest extends AbstractKarafIntegr
 
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
                         .add("META-INF/spring/kie-beans-dependency.xml",
                                 KieSpringDependencyKarafIntegrationTest.class.getResource(SPRING_XML_LOCATION))
                         .add("drl_kiesample_dependency/Hal1.drl",

@@ -91,6 +91,7 @@ public class KieBlueprintProcessDependencyKarafIntegrationTest extends AbstractK
 
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
                         .add("OSGI-INF/blueprint/kie-beans-blueprint-process-dep.xml",
                                 KieBlueprintProcessDependencyKarafIntegrationTest.class.getResource(BLUEPRINT_XML_LOCATION))
                         .add("blueprint_process_dep/sampleRule.drl",
