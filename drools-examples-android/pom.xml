@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.8.0-SNAPSHOT</version>
+    <version>7.8.0.Final</version>
   </parent>
 
   <artifactId>drools-examples-android</artifactId>
