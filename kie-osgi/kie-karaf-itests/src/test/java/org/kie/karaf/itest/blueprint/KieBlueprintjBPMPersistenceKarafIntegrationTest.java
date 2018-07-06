@@ -102,6 +102,7 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
 
                 // Create Datasource for the test
                 streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
                         .add("OSGI-INF/blueprint/datasource.xml",
                                 KieBlueprintjBPMPersistenceKarafIntegrationTest.class.getResource(DATASOURCE_XML_LOCATION))
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Datasource-Bundle")
@@ -113,6 +114,7 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
 
                 // Create a bundle with META-INF/blueprint/kie-beans-?.xml - this should be processed automatically by Blueprint
                 streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
                         .add("OSGI-INF/blueprint/kie-beans-blueprint-process-persistence.xml",
                                 KieBlueprintjBPMPersistenceKarafIntegrationTest.class.getResource(BLUEPRINT_XML_LOCATION))
 
