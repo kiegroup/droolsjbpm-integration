@@ -67,7 +67,7 @@ public class RestRuntimeManagementServiceImpl extends RuntimeManagementServiceIm
     public Response getServerInstanceContainers(@Context HttpHeaders headers, @PathParam("id") String serverTemplateId, @PathParam("instanceId") String instanceId) {
         String contentType = getContentType(headers);
         try {
-            logger.debug("Received get container {} for server template with id {} and instance id {}", serverTemplateId, instanceId);
+            logger.debug("Received get containers for server template with id {} and instance id {}", serverTemplateId, instanceId);
 
             ContainerList containers = super.getServerInstanceContainers(serverTemplateId, instanceId);
             String response = marshal(contentType, containers);

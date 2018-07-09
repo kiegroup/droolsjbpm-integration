@@ -287,7 +287,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             logger.debug("Container configuration is {}", containerConfig);
 
             super.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
-            logger.debug("Returning response for update container (with id {}) config '{}': CREATED", containerSpecId);
+            logger.debug("Returning response for update container (with id {}) config '{}': CREATED", containerSpecId, containerConfig);
             return createCorrectVariant("", headers, Response.Status.CREATED);
         } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
