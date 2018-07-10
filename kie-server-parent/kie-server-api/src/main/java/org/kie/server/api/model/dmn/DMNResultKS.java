@@ -294,8 +294,8 @@ public class DMNResultKS implements DMNResult {
             }
             return MapBackedDMNContext.of(stubbedContextValues);
         } else if ( result instanceof Map<?, ?> ) {
-            Map<String, Object> stubbedValues = new HashMap<>();
-            for (Entry<String, Object> kv : ((DMNContext) result).getAll().entrySet()) {
+            Map<Object, Object> stubbedValues = new HashMap<>();
+            for (Entry<?, ?> kv : ((Map<?, ?>) result).entrySet()) {
                 stubbedValues.put(kv.getKey(), stubDMNResult(kv.getValue()));
             }
             return stubbedValues;
