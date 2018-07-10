@@ -16,6 +16,7 @@
 package org.kie.server.router;
 
 import org.junit.Test;
+import org.kie.server.router.spi.ConfigRepository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -284,5 +285,51 @@ public class ConfigurationTest {
         config.removeContainerInfo(notExistingContainerInfo);
 
         assertEquals(2, config.getContainerInfosPerContainer().size());
+    }
+    
+    @Test
+    public void testReloadFromRepository() {
+
+        Configuration config = new Configuration();
+
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addContainerHost("container2", "http://localhost:8180/server");
+
+        config.addServerHost("server1", "http://localhost:8080/server");
+        config.addServerHost("server2", "http://localhost:8180/server");
+
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        assertEquals(2, config.getHostsPerContainer().size());
+        assertEquals(2, config.getHostsPerServer().size());
+
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());
+        assertEquals(1, config.getHostsPerContainer().get("container2").size());
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
+        assertEquals(1, config.getHostsPerServer().get("server2").size());
+
+        config.reloadFromRepository(new ConfigRepository() {
+            
+            
+            @Override
+            public void persist(Configuration configuration) {
+                
+            }
+            
+            @Override
+            public Configuration load() {
+                return new Configuration();
+            }
+            
+            @Override
+            public void clean() {
+                
+            }
+        });
+
+        assertEquals(0, config.getHostsPerContainer().size());
+        assertEquals(0, config.getHostsPerServer().size());
+        
     }
 }
