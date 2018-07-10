@@ -2,13 +2,13 @@ package org.kie.server.api.model.dmn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -122,8 +122,10 @@ public class DMNResultKS implements DMNResult {
 
     
     public void setDmnContext(Map<String, Object> dmnContext) {
-        dmnContext.replaceAll( (k, v) -> stubDMNResult(v) );
-        this.dmnContext = dmnContext;
+        this.dmnContext = new HashMap<>();
+        for (Entry<String, Object> kv : dmnContext.entrySet()) {
+            this.dmnContext.put(kv.getKey(), stubDMNResult(kv.getValue()));
+        }
     }
     public void setMessages(List<DMNMessage> messages) {
         // wrap for serialization:
@@ -286,19 +288,23 @@ public class DMNResultKS implements DMNResult {
      
     public static Object stubDMNResult(Object result) {
         if ( result instanceof DMNContext ) {
-            ((DMNContext) result).getAll().replaceAll( (k, v) -> stubDMNResult(v) );
-            return MapBackedDMNContext.of(((DMNContext) result).getAll());
+            Map<String, Object> stubbedContextValues = new HashMap<>();
+            for (Entry<String, Object> kv : ((DMNContext) result).getAll().entrySet()) {
+                stubbedContextValues.put(kv.getKey(), stubDMNResult(kv.getValue()));
+            }
+            return MapBackedDMNContext.of(stubbedContextValues);
         } else if ( result instanceof Map<?, ?> ) {
-            ((Map) result).replaceAll( (k, v) -> stubDMNResult(v) );
+            Map<String, Object> stubbedValues = new HashMap<>();
+            for (Entry<String, Object> kv : ((DMNContext) result).getAll().entrySet()) {
+                stubbedValues.put(kv.getKey(), stubDMNResult(kv.getValue()));
+            }
+            return stubbedValues;
         } else if ( result instanceof List<?> ) {
-            ((List<Object>) result).replaceAll( DMNResultKS::stubDMNResult );
-            return result;
+            List<?> stubbedValues = ((List<?>) result).stream().map(DMNResultKS::stubDMNResult).collect(Collectors.toList());
+            return stubbedValues;
         } else if ( result instanceof Set<?> ) {
-            Set<?> originalSet = (Set<?>) result;
-            Collection mappedSet = originalSet.stream().map( DMNResultKS::stubDMNResult ).collect(Collectors.toSet());
-            originalSet.clear();
-            originalSet.addAll(mappedSet);
-            return result;
+            Set<?> stubbedValues = ((Set<?>) result).stream().map(DMNResultKS::stubDMNResult).collect(Collectors.toSet());
+            return stubbedValues;
         } else if ( result != null && result.getClass().getPackage().getName().startsWith("org.kie.dmn") ) {
             return DMNNodeStub.of(result);
         }
