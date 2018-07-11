@@ -40,284 +40,8 @@
   },
   "ignores": {
     "revapi": {
-      "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored.",
+      "_comment": "Changes between 7.5.0.Final and the current branch. These changes are desired and thus ignored.",
       "ignore": [
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::acknowledgeError(java.lang.String, java.lang.String[])",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "ProcessAdminServicesClient",
-          "methodName": "acknowledgeError",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method org.kie.server.api.model.admin.ExecutionErrorInstance org.kie.server.client.admin.ProcessAdminServicesClient::getError(java.lang.String, java.lang.String)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "ProcessAdminServicesClient",
-          "methodName": "getError",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getErrors(java.lang.String, boolean, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "ProcessAdminServicesClient",
-          "methodName": "getErrors",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getErrorsByProcessInstance(java.lang.String, java.lang.Long, boolean, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "ProcessAdminServicesClient",
-          "methodName": "getErrorsByProcessInstance",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getErrorsByProcessInstanceAndNode(java.lang.String, java.lang.Long, java.lang.String, boolean, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "ProcessAdminServicesClient",
-          "methodName": "getErrorsByProcessInstanceAndNode",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.UserTaskAdminServicesClient::getErrorsByTaskId(java.lang.String, java.lang.Long, boolean, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "UserTaskAdminServicesClient",
-          "methodName": "getErrorsByTaskId",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.UserTaskAdminServicesClient::getErrorsByTaskInfo(java.lang.String, java.lang.Long, java.lang.String, boolean, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "UserTaskAdminServicesClient",
-          "methodName": "getErrorsByTaskInfo",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.UserTaskAdminServicesClient::getTaskErrors(java.lang.String, boolean, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "UserTaskAdminServicesClient",
-          "methodName": "getTaskErrors",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstances(java.lang.String, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "ProcessServicesClient",
-          "methodName": "findProcessInstances",
-          "elementKind": "method",
-          "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstances(java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "ProcessServicesClient",
-          "methodName": "findProcessInstances",
-          "elementKind": "method",
-          "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.cases.CaseComment> org.kie.server.client.CaseServicesClient::getComments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "CaseServicesClient",
-          "methodName": "getComments",
-          "elementKind": "method",
-          "justification": "Added new method to support case instance comments basic sorting"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::acknowledgeError(java.lang.String, java.lang.String[])",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "UserTaskAdminServicesClient",
-          "methodName": "acknowledgeError",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method org.kie.server.api.model.admin.ExecutionErrorInstance org.kie.server.client.admin.UserTaskAdminServicesClient::getError(java.lang.String, java.lang.String)",
-          "package": "org.kie.server.client.admin",
-          "classSimpleName": "UserTaskAdminServicesClient",
-          "methodName": "getError",
-          "elementKind": "method",
-          "justification": "JBPM-5851 Technical Error Events"
-        },
-        {
-          "code": "java.method.returnTypeChanged",
-          "old": "method void org.kie.server.client.balancer.BalancerStrategy::markAsOffline(java.lang.String)",
-          "new": "method java.lang.String org.kie.server.client.balancer.BalancerStrategy::markAsOffline(java.lang.String)",
-          "oldType": "void",
-          "newType": "java.lang.String",
-          "package": "org.kie.server.client.balancer",
-          "classSimpleName": "BalancerStrategy",
-          "methodName": "markAsOffline",
-          "elementKind": "method",
-          "justification": "Fixed handling of urls within load balancer to take into account base url"
-        },
-        {
-          "code": "java.method.returnTypeChanged",
-          "old": "method void org.kie.server.client.balancer.BalancerStrategy::markAsOnline(java.lang.String)",
-          "new": "method java.lang.String org.kie.server.client.balancer.BalancerStrategy::markAsOnline(java.lang.String)",
-          "oldType": "void",
-          "newType": "java.lang.String",
-          "package": "org.kie.server.client.balancer",
-          "classSimpleName": "BalancerStrategy",
-          "methodName": "markAsOnline",
-          "elementKind": "method",
-          "justification": "Fixed handling of urls within load balancer to take into account base url"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method void org.kie.server.client.SolverServicesClient::addProblemFactChange(java.lang.String, java.lang.String, org.optaplanner.core.impl.solver.ProblemFactChange)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "SolverServicesClient",
-          "methodName": "addProblemFactChange",
-          "elementKind": "method",
-          "justification": "PLANNER-815 Support real-time planning"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method void org.kie.server.client.SolverServicesClient::addProblemFactChanges(java.lang.String, java.lang.String, java.util.List<org.optaplanner.core.impl.solver.ProblemFactChange>)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "SolverServicesClient",
-          "methodName": "addProblemFactChanges",
-          "elementKind": "method",
-          "justification": "PLANNER-815 Support real-time planning"
-        },
-        {
-          "code": "java.method.addedToInterface",
-          "new": "method java.lang.Boolean org.kie.server.client.SolverServicesClient::isEveryProblemFactChangeProcessed(java.lang.String, java.lang.String)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "SolverServicesClient",
-          "methodName": "isEveryProblemFactChangeProcessed",
-          "elementKind": "method",
-          "justification": "PLANNER-815 Support real-time planning"
-        },
-        {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.JobServicesClient::cancelRequest(java.lang.String, long)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "JobServicesClient",
-		  "methodName": "cancelRequest",
-		  "elementKind": "method",
-		  "justification": "added support for jobs over kie server router"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.JobServicesClient::requeueRequest(java.lang.String, long)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "JobServicesClient",
-		  "methodName": "requeueRequest",
-		  "elementKind": "method",
-		  "justification": "added support for jobs over kie server router"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method org.kie.server.api.model.instance.RequestInfoInstance org.kie.server.client.JobServicesClient::getRequestById(java.lang.String, java.lang.Long, boolean, boolean)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "JobServicesClient",
-		  "methodName": "getRequestById",
-		  "elementKind": "method",
-		  "justification": "added support for jobs over kie server router"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.UserTaskServicesClient::updateTask(java.lang.String, java.lang.Long, java.lang.String, org.kie.server.api.model.instance.TaskInstance)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "UserTaskServicesClient",
-		  "methodName": "updateTask",
-		  "elementKind": "method",
-		  "justification": "Added support for update task operation"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.CaseServicesClient::closeCaseInstance(java.lang.String, java.lang.String, java.lang.String)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "CaseServicesClient",
-		  "methodName": "closeCaseInstance",
-		  "elementKind": "method",
-		  "justification": "Added support for close case operation"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method java.util.Map<java.lang.String, java.lang.Object> org.kie.server.client.CaseServicesClient::getCaseInstanceData(java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "CaseServicesClient",
-		  "methodName": "getCaseInstanceData",
-		  "elementKind": "method",
-		  "justification": "Added support to filter case file data items by name"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "CaseServicesClient",
-		  "methodName": "addComment",
-		  "elementKind": "method",
-		  "justification": "Added support for optional restriction on comments"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.CaseServicesClient::putCaseInstanceData(java.lang.String, java.lang.String, java.lang.String, java.lang.Object, java.util.List<java.lang.String>)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "CaseServicesClient",
-		  "methodName": "putCaseInstanceData",
-		  "elementKind": "method",
-		  "justification": "Added support for optional restriction on case file data"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.CaseServicesClient::putCaseInstanceData(java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>, java.util.List<java.lang.String>)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "CaseServicesClient",
-		  "methodName": "putCaseInstanceData",
-		  "elementKind": "method",
-		  "justification": "Added support for optional restriction on case file data"
-		 },
-		 {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.client.CaseServicesClient::updateComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
-		  "package": "org.kie.server.client",
-		  "classSimpleName": "CaseServicesClient",
-		  "methodName": "updateComment",
-		  "elementKind": "method",
-		  "justification": "Added support for optional restriction on comments"
-		 },
-		 {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.instance.TaskInstance> org.kie.server.client.QueryServicesClient::findHumanTasksWithFilters(java.lang.String, org.kie.server.api.model.definition.TaskQueryFilterSpec, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "QueryServicesClient",
-          "methodName": "findHumanTasksWithFilters",
-          "elementKind": "method",
-          "justification": ""
-         },
-         {
-          "code": "java.method.addedToInterface",
-          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.QueryServicesClient::findProcessInstancesWithFilters(java.lang.String, org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec, java.lang.Integer, java.lang.Integer)",
-          "package": "org.kie.server.client",
-          "classSimpleName": "QueryServicesClient",
-          "methodName": "findProcessInstancesWithFilters",
-          "elementKind": "method",
-          "justification": ""
-         },
          {
            "code": "java.method.returnTypeChanged",
            "old": "method void org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
@@ -329,6 +53,18 @@
            "methodName": "addComment",
            "elementKind": "method",
            "justification": "Return comment id when comment is added"
+         },
+         {
+          "code": "java.method.returnTypeChanged",
+          "old": "method void org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
+          "new": "method java.lang.String org.kie.server.client.CaseServicesClient::addComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List<java.lang.String>)",
+          "oldType": "void",
+          "newType": "java.lang.String",
+          "package": "org.kie.server.client",
+          "classSimpleName": "CaseServicesClient",
+          "methodName": "addComment",
+          "elementKind": "method",
+          "justification": "Return comment id when comment is added"
          },
          {
            "code": "java.method.addedToInterface",
@@ -390,7 +126,6 @@
            "elementKind": "method",
            "justification": "Added support for case instance migration"
          }
-
       ]
     }
   }
