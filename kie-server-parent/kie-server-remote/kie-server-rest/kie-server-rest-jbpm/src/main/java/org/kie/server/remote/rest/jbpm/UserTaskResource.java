@@ -1000,7 +1000,8 @@ public class UserTaskResource {
 
     @ApiOperation(value="Retrieves task events for given task id and applies pagination",
             response=TaskEventInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+                            @ApiResponse(code = 404, message = "Task with given id not found")})
     @GET
     @Path(TASK_INSTANCE_EVENTS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
