@@ -86,8 +86,8 @@ public class JSONMarshaller implements Marshaller {
 
     private static final Logger logger = LoggerFactory.getLogger( MarshallerFactory.class );
 
-    private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
-    private static String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+    private boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
+    private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
     private ThreadLocal<Boolean> stripped = new ThreadLocal<Boolean>() {
         @Override
@@ -141,7 +141,9 @@ public class JSONMarshaller implements Marshaller {
         }
         // add byte array handling support to allow byte[] to be send as payload
         classes.add(JaxbByteArray.class);
-        classes.add(Date.class);
+        if (!formatDate) {
+            classes.add(Date.class);
+        }
 
         List<NamedType> customClasses = prepareCustomClasses(classes);
         // this is needed because we need better control of serialization and deserialization
