@@ -1,25 +1,35 @@
 package org.kie.server.api.marshalling;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
+import org.junit.After;
 import org.junit.Test;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class JSONMarshallerTest {
+    
+    @After
+    public void cleanup() {
+        System.clearProperty("org.kie.server.json.format.date");
+    }
 
     @Test
     public void testMarshallDateObject() {
@@ -113,6 +123,21 @@ public class JSONMarshallerTest {
         
         assertEquals( "verify that Ref.r is not being serialized with JSONMarshaller.WrappingObjectSerializer, but with the specified one in @JsonSerialize",
                 mu_innerMap.entrySet(), ((Map)mu_ref.getR()).entrySet() );
+    }
+    
+    @Test
+    public void testMarshallFormatDateObject() throws ParseException {
+        System.setProperty("org.kie.server.json.format.date", "true");
+        Date date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSZ").parse("2018-01-01T10:00:00.000+0100");
+        String expectedString = "\"2018-01-01T10:00:00.000+0100\"";
+
+        Marshaller marshaller = MarshallerFactory.getMarshaller( MarshallingFormat.JSON, getClass().getClassLoader() );
+        
+        String dateObjectString = marshaller.marshall( date );
+        assertNotNull( dateObjectString );
+
+        assertEquals( expectedString, dateObjectString );
+                
     }
 
 }
