@@ -9,12 +9,12 @@
       <configuration>
         <phases>
           <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <compile>io.takari.maven.plugins:takari-lifecycle-plugin:compile,org.kie:kie-takari-plugin:build</compile>
+          <compile>kie.io.takari.maven.plugins:kie-takari-lifecycle-plugin:compile,org.kie:kie-takari-plugin:build</compile>
           <!-- proces-classes does not have a default plug-in binding for JAR/KJAR, accordingly to https://maven.apache.org/ref/3-LATEST/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging
                so can directly declare the inject reactive bytecode goal -->
           <process-classes>org.kie:kie-takari-plugin:injectreactive</process-classes>
           <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-          <test-compile>io.takari.maven.plugins:takari-lifecycle-plugin:testCompile</test-compile>
+          <test-compile>kie.io.takari.maven.plugins:kie-takari-lifecycle-plugin:testCompile</test-compile>
           <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
           <package>org.apache.maven.plugins:maven-jar-plugin:jar</package>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
