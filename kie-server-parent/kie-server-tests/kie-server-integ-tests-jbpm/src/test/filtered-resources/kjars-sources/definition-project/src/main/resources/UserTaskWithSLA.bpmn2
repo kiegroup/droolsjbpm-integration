@@ -12,7 +12,7 @@
              xmlns:tns="http://www.jboss.org/drools">
 
   <itemDefinition id="_sItem" structureRef="String" />
-  <process processType="Private" isExecutable="true" id="definition-project.UserTaskWithSLA" name="User Task" >
+  <process processType="Private" isExecutable="true" id="definition-project.UserTaskWithSLA" name="User Task with SLA" >
     <extensionElements>
       <tns:metaData name="customSLADueDate">
         <tns:metaValue>4s</tns:metaValue>

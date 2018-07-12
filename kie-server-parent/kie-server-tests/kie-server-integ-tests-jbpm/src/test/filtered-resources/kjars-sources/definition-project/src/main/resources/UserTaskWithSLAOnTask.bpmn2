@@ -12,7 +12,7 @@
              xmlns:tns="http://www.jboss.org/drools">
 
   <itemDefinition id="_sItem" structureRef="String" />
-  <process processType="Private" isExecutable="true" id="definition-project.UserTaskWithSLAOnTask" name="User Task" >
+  <process processType="Private" isExecutable="true" id="definition-project.UserTaskWithSLAOnTask" name="User Task with SLA on task" >
     <property id="s" itemSubjectRef="_sItem"/>
     <!-- nodes -->
     <startEvent id="_1" name="StartProcess" />

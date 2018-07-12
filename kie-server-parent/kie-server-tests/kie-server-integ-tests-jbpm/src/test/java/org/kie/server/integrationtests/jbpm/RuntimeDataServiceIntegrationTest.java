@@ -94,24 +94,16 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcesses(0, 5);
+        List<ProcessDefinition> definitionsFirstPage = queryClient.findProcesses(0, 5);
+        List<String> processIdsFirstPage = collectDefinitions(definitionsFirstPage);
+        Assertions.assertThat(processIdsFirstPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsFirstPage);
 
-        assertNotNull(definitions);
-        assertEquals(5, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
-
-        definitions = queryClient.findProcesses(1, 5);
-        assertNotNull(definitions);
-
-        assertEquals(5, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
-        assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
-        assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
-
+        List<ProcessDefinition> definitionsSecondPage = queryClient.findProcesses(1, 5);
+        List<String> processIdsSecondPage = collectDefinitions(definitionsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).doesNotContainAnyElementsOf(processIdsFirstPage);
     }
 
     @Test
@@ -124,24 +116,15 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<ProcessDefinition> definitionsAscOrder = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<String> processIdsAscOrder = collectDefinitions(definitionsAscOrder);
+        Assertions.assertThat(processIdsAscOrder).hasSize(3);
+        Assertions.assertThat(processIdsAscOrder).contains(PROCESS_ID_BOUNDARY_SIGNAL_PROCESS, PROCESS_ID_BOUNDARY_SIGNAL_EXPRESSION_PROCESS, PROCESS_ID_CALL_EVALUATION);
 
-        assertNotNull(definitions);
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
-
-        definitions = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, false);
-        assertNotNull(definitions);
-
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_XYZ_TRANSLATIONS));
-        assertTrue(processIds.contains(PROCESS_ID_USERTASK));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_PROCESS));
-
+        List<ProcessDefinition> definitionsDescOrder = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, false);
+        List<String> processIdsDescOrder = collectDefinitions(definitionsDescOrder);
+        Assertions.assertThat(processIdsDescOrder).hasSize(3);
+        Assertions.assertThat(processIdsDescOrder).contains(PROCESS_ID_XYZ_TRANSLATIONS, PROCESS_ID_USERTASK, PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
     }
 
     @Test
@@ -202,30 +185,20 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 5);
+        List<ProcessDefinition> definitionsFirstPage = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 5);
+        List<String> processIdsFirstPage = collectDefinitions(definitionsFirstPage);
+        Assertions.assertThat(processIdsFirstPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsFirstPage);
 
-        assertNotNull(definitions);
-        assertEquals(5, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
-
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 1, 5);
-        assertNotNull(definitions);
-
-        assertEquals(5, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
-        assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
-        assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
+        List<ProcessDefinition> definitionsSecondPage = queryClient.findProcessesByContainerId(CONTAINER_ID, 1, 5);
+        List<String> processIdsSecondPage = collectDefinitions(definitionsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).doesNotContainAnyElementsOf(processIdsFirstPage);
 
         // last check if there are process def for not existing project
-        definitions = queryClient.findProcessesByContainerId("not-existing-project", 0, 10);
-        assertNotNull(definitions);
-
-        assertEquals(0, definitions.size());
-
+        List<ProcessDefinition> definitionsNotExistingProject = queryClient.findProcessesByContainerId("not-existing-project", 0, 10);
+        Assertions.assertThat(definitionsNotExistingProject).hasSize(0);
     }
 
     @Test
@@ -238,23 +211,16 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<ProcessDefinition> definitionsAscOrder = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<String> processIdsAscOrder = collectDefinitions(definitionsAscOrder);
+        Assertions.assertThat(processIdsAscOrder).hasSize(3);
+        Assertions.assertThat(processIdsAscOrder).contains(PROCESS_ID_BOUNDARY_SIGNAL_PROCESS, PROCESS_ID_BOUNDARY_SIGNAL_EXPRESSION_PROCESS, PROCESS_ID_CALL_EVALUATION);
 
-        assertNotNull(definitions);
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
+        List<ProcessDefinition> definitionsDescOrder = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, false);
+        List<String> processIdsDescOrder = collectDefinitions(definitionsDescOrder);
+        Assertions.assertThat(processIdsDescOrder).hasSize(3);
+        Assertions.assertThat(processIdsDescOrder).contains(PROCESS_ID_XYZ_TRANSLATIONS, PROCESS_ID_USERTASK, PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
 
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, false);
-        assertNotNull(definitions);
-
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_XYZ_TRANSLATIONS));
-        assertTrue(processIds.contains(PROCESS_ID_USERTASK));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_PROCESS));
     }
 
     @Test
