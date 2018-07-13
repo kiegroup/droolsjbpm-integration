@@ -133,64 +133,63 @@ public class WebSocketKieControllerNotificationIntegrationTest extends KieServer
 
     @Test(timeout = 60 * 1000)
     public void testKieServerEvents() throws Exception {
-        runAsync(() -> {
-            // Check that there are no kie servers deployed in controller.
-            ServerTemplateList instanceList = controllerClient.listServerTemplates();
-            assertNotNull(instanceList);
-            KieServerAssert.assertNullOrEmpty("Active kie server instance found!",
-                                              instanceList.getServerTemplates());
+        // Check that there are no kie servers deployed in controller.
+        ServerTemplateList instanceList = controllerClient.listServerTemplates();
+        assertNotNull(instanceList);
+        KieServerAssert.assertNullOrEmpty("Active kie server instance found!",
+                                          instanceList.getServerTemplates());
 
-            // Turn on new kie server.
-            server = new KieServerExecutor();
-            server.startKieServer();
+        // Turn on new kie server.
+        server = new KieServerExecutor();
+        server.startKieServer();
 
-            // Check that kie server is registered in controller.
-            instanceList = controllerClient.listServerTemplates();
-            assertNotNull(instanceList);
-            assertEquals(1,
-                         instanceList.getServerTemplates().length);
+        // Check that kie server is registered in controller.
+        instanceList = controllerClient.listServerTemplates();
+        assertNotNull(instanceList);
+        assertEquals(1,
+                     instanceList.getServerTemplates().length);
 
-            ServerTemplate template = instanceList.getServerTemplates()[0];
+        // Verify instance creation events
+        verify(eventHandler, timeout(2000L)).onServerTemplateUpdated(any());
+        verify(eventHandler, timeout(2000L)).onServerInstanceUpdated(any());
+        verify(eventHandler, timeout(2000L)).onServerInstanceConnected(any());
 
-            //Deploy container to Kie Server
-            ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID,
-                                                            CONTAINER_NAME,
-                                                            template,
-                                                            releaseId,
-                                                            KieContainerStatus.STOPPED,
-                                                            Collections.emptyMap());
-            controllerClient.saveContainerSpec(template.getId(),
-                                               containerSpec);
-            controllerClient.startContainer(containerSpec);
+        // Deploy container to Kie Server
+        ServerTemplate template = instanceList.getServerTemplates()[0];
+        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID,
+                                                        CONTAINER_NAME,
+                                                        template,
+                                                        releaseId,
+                                                        KieContainerStatus.STOPPED,
+                                                        Collections.emptyMap());
+        controllerClient.saveContainerSpec(template.getId(),
+                                           containerSpec);
 
-            controllerClient.stopContainer(containerSpec);
+        // Verify create container event
+        verify(eventHandler, timeout(2000L).times(2)).onServerTemplateUpdated(any());
 
-            controllerClient.deleteContainerSpec(template.getId(),
-                                                 containerSpec.getId());
+        controllerClient.startContainer(containerSpec);
 
-            server.stopKieServer();
-        });
+        // Verify start container event
+        verify(eventHandler, timeout(2000L)).onContainerSpecUpdated(any());
 
-        InOrder inOrder = inOrder(eventHandler);
-        //Connect
-        inOrder.verify(eventHandler).onServerTemplateUpdated(any());
-        inOrder.verify(eventHandler).onServerInstanceUpdated(any());
-        inOrder.verify(eventHandler).onServerInstanceConnected(any());
+        controllerClient.stopContainer(containerSpec);
 
-        //Create container
-        inOrder.verify(eventHandler).onServerTemplateUpdated(any());
+        // Verify stop container event
+        verify(eventHandler, timeout(2000L).times(2)).onContainerSpecUpdated(any());
 
-        //Start and stop container
-        inOrder.verify(eventHandler,
-                       times(2)).onContainerSpecUpdated(any());
+        controllerClient.deleteContainerSpec(template.getId(),
+                                             containerSpec.getId());
 
-        //Delete container
-        inOrder.verify(eventHandler).onServerTemplateUpdated(any());
+        // Verify delete container
+        verify(eventHandler, timeout(2000L).times(3)).onServerTemplateUpdated(any());
 
-        //Disconnect
-        inOrder.verify(eventHandler).onServerInstanceDeleted(any());
-        inOrder.verify(eventHandler).onServerTemplateUpdated(any());
-        inOrder.verify(eventHandler).onServerInstanceDisconnected(any());
+        server.stopKieServer();
+
+        // Verify disconnect
+        verify(eventHandler, timeout(2000L)).onServerInstanceDeleted(any());
+        verify(eventHandler, timeout(2000L).times(4)).onServerTemplateUpdated(any());
+        verify(eventHandler, timeout(2000L)).onServerInstanceDisconnected(any());
 
         verifyNoMoreInteractions(eventHandler);
     }
