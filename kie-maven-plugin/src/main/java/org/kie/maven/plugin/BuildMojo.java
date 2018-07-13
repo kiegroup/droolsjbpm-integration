@@ -180,10 +180,11 @@ public class BuildMojo extends AbstractKieMojo {
                 Optional<Map<String, Object>> optionalKieMap = getKieMap();
                 if (optionalKieMap.isPresent()) {
                     Map<String, Object> kieMap = optionalKieMap.get();
-                    String compilationID = getCompilationID(kieMap);
-                    shareKieObjectsWithMap(kModule, compilationID, kieMap);
-                    shareStoreWithMap(kModule.getModuleClassLoader(), compilationID, kieMap);
-                    shareTypesMetaInfoWithMap(kModule, compilationID, kieMap);
+                    CompilerHelper helper = new CompilerHelper();
+                    String compilationID = helper.getCompilationID(kieMap, getLog());
+                    helper.shareKieObjectsWithMap(kModule, compilationID, kieMap, getLog());
+                    helper.shareStoreWithMap(kModule.getModuleClassLoader(), compilationID, kieMap,getLog());
+                    helper.shareTypesMetaInfoWithMap(kModule, compilationID, kieMap, getLog());
                 }else{
                     getLog().info("Kie Map not present");
                 }
@@ -251,64 +252,8 @@ public class BuildMojo extends AbstractKieMojo {
         }
     }
 
-    private String getCompilationID(Map<String, Object> optionalKieMap) {
-        Object compilationIDObj = optionalKieMap.get("compilation.ID");
-        if(compilationIDObj != null){
-            return compilationIDObj.toString();
-        }else{
-            getLog().error("compilation.ID key not present in the shared map using thread name:"
-                                   + Thread.currentThread().getName());
-            return Thread.currentThread().getName();
-        }
-    }
 
-    private void shareKieObjectsWithMap(InternalKieModule kModule, String compilationID, Map<String, Object> kieMap) {
-        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
-        KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
 
-        /*Standard for the kieMap keys -> compilationID + dot + class name */
-        StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(KieModuleMetaInfo.class.getName());
-        StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
-
-        if (modelMetaInfo != null) {
-            kieMap.put(sbModelMetaInfo.toString(), modelMetaInfo);
-            getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedder with key:" +sbModelMetaInfo.toString());
-        }
-        if (kModule != null) {
-            kieMap.put(sbkModule.toString(), kModule);
-            getLog().info("KieModule available in the map shared with the Maven Embedder with key:"+sbkModule.toString());
-        }
-    }
-
-    private void shareStoreWithMap(ClassLoader classLoader, String compilationID, Map<String, Object> kieMap) {
-        if (classLoader instanceof ProjectClassLoader) {
-            ProjectClassLoader projectClassloder = (ProjectClassLoader) classLoader;
-            Map<String, byte[]> types = projectClassloder.getStore();
-            if (projectClassloder.getStore() != null) {
-                StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
-                kieMap.put(sbTypes.toString(), types);
-                getLog().info("ProjectClassloader Store available in the map shared with the Maven Embedder");
-            }
-        }
-    }
-
-    private void shareTypesMetaInfoWithMap(InternalKieModule kModule, String compilationID, Map<String, Object> kieMap) {
-        KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
-        KieModuleMetaInfo info = kb.generateKieModuleMetaInfo(null);
-        Map<String, TypeMetaInfo> typesMetaInfos = info.getTypeMetaInfos();
-
-        if (typesMetaInfos != null) {
-            StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append(TypeMetaInfo.class.getName());
-            Set<String> eventClasses = new HashSet<>();
-            for (Map.Entry<String, TypeMetaInfo> item : typesMetaInfos.entrySet()) {
-                if (item.getValue().isEvent()) {
-                    eventClasses.add(item.getKey());
-                }
-            }
-            kieMap.put(sbTypes.toString(), eventClasses);
-            getLog().info("TypesMetaInfo keys available in the map shared with the Maven Embedder");
-        }
-    }
 
     private Optional<Map<String, Object>> getKieMap() {
         try {
