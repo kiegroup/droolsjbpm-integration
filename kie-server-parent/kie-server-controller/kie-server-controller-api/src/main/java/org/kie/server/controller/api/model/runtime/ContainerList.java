@@ -18,6 +18,7 @@ package org.kie.server.controller.api.model.runtime;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -31,6 +32,7 @@ public class ContainerList {
     private Container[] containers;
 
     public ContainerList() {
+        this(Collections.emptyList());
     }
 
     public ContainerList(Container[] containers) {
