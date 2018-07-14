@@ -562,6 +562,8 @@ public class ProcessResource  {
 
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
 
+        } catch (WorkItemNotFoundException e) {
+            return notFound(MessageFormat.format(WORK_ITEM_NOT_FOUND, workItemId), v, conversationIdHeader);
         } catch (ProcessInstanceNotFoundException e) {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
