@@ -177,14 +177,19 @@ public class BuildMojo extends AbstractKieMojo {
             List<Message> errors = messages != null ? messages.filterMessages( Message.Level.ERROR): Collections.emptyList();
 
             if (container != null) {
-                Optional<Map<String, Object>> optionalKieMap = getKieMap();
-                if (optionalKieMap.isPresent()) {
-                    Map<String, Object> kieMap = optionalKieMap.get();
+                Map<String, Object> kieMap = getKieMap();
+                if (!kieMap.isEmpty()) {
                     CompilerHelper helper = new CompilerHelper();
                     String compilationID = helper.getCompilationID(kieMap, getLog());
-                    helper.shareKieObjectsWithMap(kModule, compilationID, kieMap, getLog());
+                    shareKieObjects(kModule,
+                                    kieMap,
+                                    helper,
+                                    compilationID);
                     helper.shareStoreWithMap(kModule.getModuleClassLoader(), compilationID, kieMap,getLog());
-                    helper.shareTypesMetaInfoWithMap(kModule, compilationID, kieMap, getLog());
+                    shareTypesMetaInfo(kModule,
+                                       kieMap,
+                                       helper,
+                                       compilationID);
                 }else{
                     getLog().info("Kie Map not present");
                 }
@@ -204,6 +209,24 @@ public class BuildMojo extends AbstractKieMojo {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         getLog().info("KieModule successfully built!");
+    }
+
+    private void shareKieObjects(InternalKieModule kModule,
+                                 Map<String, Object> kieMap,
+                                 CompilerHelper helper,
+                                 String compilationID) {
+        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
+        KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
+        helper.shareKieObjectsWithMap(kModule, modelMetaInfo, compilationID, kieMap, getLog());
+    }
+
+    private void shareTypesMetaInfo(InternalKieModule kModule,
+                                    Map<String, Object> kieMap,
+                                    CompilerHelper helper,
+                                    String compilationID) {
+        KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
+        KieModuleMetaInfo info = kb.generateKieModuleMetaInfo(null);
+        helper.shareTypesMetaInfoWithMap(info.getTypeMetaInfos(), compilationID, kieMap, getLog());
     }
 
     private List<File> getResourceFiles(File parent) {
@@ -255,7 +278,7 @@ public class BuildMojo extends AbstractKieMojo {
 
 
 
-    private Optional<Map<String, Object>> getKieMap() {
+    private Map<String, Object> getKieMap() {
         try {
             /**
              * Retrieve the map passed into the Plexus container by the MavenEmbedder from the MavenIncrementalCompiler in the kie-wb-common
@@ -263,10 +286,10 @@ public class BuildMojo extends AbstractKieMojo {
             Map<String, Object> kieMap = (Map) container.lookup(Map.class,
                                                                 "java.util.HashMap",
                                                                 "kieMap");
-            return Optional.of(kieMap);
+            return Optional.ofNullable(kieMap).orElse(Collections.emptyMap());
         } catch (ComponentLookupException cle) {
             getLog().info("kieMap not present with compilationID and container present");
-            return Optional.empty();
+            return Collections.emptyMap();
         }
     }
 

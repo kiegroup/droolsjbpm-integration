@@ -21,12 +21,9 @@ import java.util.Set;
 import org.apache.maven.plugin.logging.Log;
 import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
-import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.core.common.ProjectClassLoader;
 import org.drools.core.rule.KieModuleMetaInfo;
 import org.drools.core.rule.TypeMetaInfo;
-
-//Contains the logic used by the Maven compiler in the BuildMojo to permits better tests
 
 class CompilerHelper {
 
@@ -41,19 +38,17 @@ class CompilerHelper {
         }
     }
 
-    public void shareKieObjectsWithMap(InternalKieModule kModule, String compilationID, Map<String, Object> kieMap, Log log) {
-        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
-        KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
-
-        /*Standard for the kieMap keys -> compilationID + dot + class name */
-        StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(KieModuleMetaInfo.class.getName());
-        StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
+    public void shareKieObjectsWithMap(InternalKieModule kModule, KieModuleMetaInfo modelMetaInfo, String compilationID, Map<String, Object> kieMap, Log log) {
 
         if (modelMetaInfo != null) {
+            /*Standard for the kieMap keys -> compilationID + dot + class name */
+            StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(KieModuleMetaInfo.class.getName());
             kieMap.put(sbModelMetaInfo.toString(), modelMetaInfo);
             log.info("KieModelMetaInfo available in the map shared with the Maven Embedder with key:" +sbModelMetaInfo.toString());
         }
         if (kModule != null) {
+            /*Standard for the kieMap keys -> compilationID + dot + class name */
+            StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
             kieMap.put(sbkModule.toString(), kModule);
             log.info("KieModule available in the map shared with the Maven Embedder with key:"+sbkModule.toString());
         }
@@ -71,10 +66,7 @@ class CompilerHelper {
         }
     }
 
-    public void shareTypesMetaInfoWithMap(InternalKieModule kModule, String compilationID, Map<String, Object> kieMap, Log log) {
-        KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
-        KieModuleMetaInfo info = kb.generateKieModuleMetaInfo(null);
-        Map<String, TypeMetaInfo> typesMetaInfos = info.getTypeMetaInfos();
+    public void shareTypesMetaInfoWithMap(Map<String, TypeMetaInfo> typesMetaInfos, String compilationID, Map<String, Object> kieMap, Log log) {
 
         if (typesMetaInfos != null) {
             StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append(TypeMetaInfo.class.getName());
@@ -84,8 +76,11 @@ class CompilerHelper {
                     eventClasses.add(item.getKey());
                 }
             }
-            kieMap.put(sbTypes.toString(), eventClasses);
-            log.info("TypesMetaInfo keys available in the map shared with the Maven Embedder");
+            if(!eventClasses.isEmpty()) {
+                kieMap.put(sbTypes.toString(),
+                           eventClasses);
+                log.info("TypesMetaInfo keys available in the map shared with the Maven Embedder");
+            }
         }
     }
 
