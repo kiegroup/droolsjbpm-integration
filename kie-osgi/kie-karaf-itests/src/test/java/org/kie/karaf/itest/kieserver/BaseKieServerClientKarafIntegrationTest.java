@@ -16,10 +16,15 @@
 
 package org.kie.karaf.itest.kieserver;
 
-import org.drools.core.command.impl.ExecutableCommand;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -41,13 +46,11 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**
  * These tests aims at verifying if KieServerClient can run on Karaf.

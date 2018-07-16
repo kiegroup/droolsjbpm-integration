@@ -15,20 +15,20 @@
 
 package org.jbpm.simulation.impl;
 
-import org.drools.core.command.impl.ExecutableCommand;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.event.DefaultProcessEventListener;
 import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationInfo;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.event.process.ProcessStartedEvent;
 import org.kie.api.runtime.Context;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SimulateProcessPathCommand implements ExecutableCommand<KieSession> {
 
