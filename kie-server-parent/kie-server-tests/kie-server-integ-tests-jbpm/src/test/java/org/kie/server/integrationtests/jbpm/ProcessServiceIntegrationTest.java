@@ -177,6 +177,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         processClient.abortProcessInstance(CONTAINER_ID, 9999l);
     }
 
+    @Test
+    public void testAbortProcessInNonExistingContainer() {
+        assertClientException(() -> processClient.abortProcessInstance(BAD_CONTAINER_ID, 9999L), 404, BAD_CONTAINER_ID);
+    }
+
     @Test(expected = KieServicesException.class)
     public void testStartCheckNonExistingVariables() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
