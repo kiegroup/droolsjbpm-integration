@@ -316,7 +316,7 @@
       </build>
     </profile>
     <profile>
-      <id>fuse700</id>
+      <id>fuse71</id>
       <properties>
         <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
       </properties>
@@ -327,8 +327,8 @@
             <configuration>
               <systemPropertyVariables>
                 <kie.features.classifier>features-fuse</kie.features.classifier>
-                <additional.features.url>mvn:org.jboss.fuse.features/brms-features/7.1.0.redhat-SNAPSHOT/xml/features</additional.features.url>
-                <karaf.version>4.2.0.fuse-000237</karaf.version>
+                <!--<additional.features.url>mvn:org.jboss.fuse.features/brms-features/VERSION/xml/features</additional.features.url>-->
+                <!--<karaf.version>4.2.0.fuse-BUILDNUMBER</karaf.version>-->
               </systemPropertyVariables>
             </configuration>
           </plugin>
