@@ -129,7 +129,7 @@ abstract public class AbstractKarafIntegrationTest {
         throw new RuntimeException("Bundle " + symbolicName + " does not exist");
     }
 
-    private static String getKarafVersion() {
+    protected static String getKarafVersion() {
         String karafVersion = System.getProperty(PROP_KARAF_VERSION);
         if (karafVersion == null) {
             if(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) != null) {
