@@ -17,13 +17,13 @@ package org.drools.persistence.infinispan;
 
 import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.AbstractInterceptor;
-import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.fluent.impl.InternalExecutable;
 import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.api.PersistenceContext;
 import org.drools.persistence.api.PersistenceContextManager;
 import org.drools.persistence.api.SessionMarshallingHelper;
 import org.drools.persistence.info.SessionInfo;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.Context;
 import org.kie.api.runtime.Executable;
 import org.kie.api.runtime.KieSession;

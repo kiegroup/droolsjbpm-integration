@@ -15,9 +15,11 @@
 
 package org.kie.server.services.drools;
 
-import org.drools.core.command.impl.ExecutableCommand;
+import java.util.Arrays;
+
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.command.Command;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
@@ -28,8 +30,6 @@ import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 public class DroolsKieContainerCommandServiceImpl extends KieContainerCommandServiceImpl {
 
