@@ -15,9 +15,15 @@
 
 package org.kie.server.services.impl;
 
-import org.drools.core.command.impl.ExecutableCommand;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.command.Command;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -42,12 +48,6 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class KieContainerCommandServiceImpl implements KieContainerCommandService<ExecutionResults> {
 

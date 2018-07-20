@@ -35,10 +35,10 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.impl.DefaultProducer;
-import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.command.Command;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
 

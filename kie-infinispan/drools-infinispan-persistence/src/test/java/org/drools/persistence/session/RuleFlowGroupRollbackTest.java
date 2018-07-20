@@ -15,8 +15,11 @@
  */
 package org.drools.persistence.session;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.common.InternalAgenda;
 import org.drools.core.impl.InternalKnowledgeBase;
@@ -26,6 +29,7 @@ import org.drools.persistence.util.PersistenceUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.Context;
 import org.kie.api.runtime.Environment;
@@ -33,10 +37,6 @@ import org.kie.api.runtime.KieSession;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
 import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
