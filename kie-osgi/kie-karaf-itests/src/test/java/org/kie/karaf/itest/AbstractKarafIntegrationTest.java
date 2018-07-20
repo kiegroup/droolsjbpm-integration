@@ -195,6 +195,7 @@ abstract public class AbstractKarafIntegrationTest {
                         "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public" +
                         additionalMavenRepositories
             ));
+        options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
 
         if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
             options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));

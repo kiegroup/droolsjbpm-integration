@@ -113,6 +113,7 @@
                 org.kie.api.builder.model,
                 org.kie.spring;resolution:=optional,
                 org.osgi.framework,
+                org.osgi.framework.wiring,
                 org.springframework.beans.factory.config;resolution:=optional,
                 org.springframework.context;resolution:=optional,
                 org.springframework.osgi.context.support;resolution:=optional
