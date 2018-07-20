@@ -35,7 +35,7 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
@@ -71,6 +71,7 @@ public class KieSpringDependencyKarafIntegrationTest extends AbstractKarafIntegr
 
                 // Load Kie-Spring
                 loadKieFeatures("kie-spring"),
+                features(getFeaturesUrl("org.apache.karaf.features", "spring-legacy", getKarafVersion()), "aries-blueprint-spring"),
 
                 // wrap and install junit bundle - the DRL imports a class from it
                 // (simulates for instance a bundle with domain classes used in rules)
