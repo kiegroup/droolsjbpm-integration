@@ -195,6 +195,21 @@
           "methodName": "getTaskEvents",
           "elementKind": "method",
           "justification": "JBPM-7330: Enrich error messages from API REST"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getAllAuditTask(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getAllAuditTask(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "annotationType": "io.swagger.annotations.ApiOperation",
+          "annotation": "@io.swagger.annotations.ApiOperation(value = \"Retrieves tasks with applied pagination\", response = org.kie.server.api.model.instance.TaskSummaryList.class, code = 200)",
+          "attribute": "value",
+          "oldValue": "\"Retrieves tasks, optionally filters by status and applies pagination\"",
+          "newValue": "\"Retrieves tasks with applied pagination\"",
+          "package": "org.kie.server.remote.rest.jbpm",
+          "classSimpleName": "RuntimeDataResource",
+          "methodName": "getAllAuditTask",
+          "elementKind": "method",
+          "justification": "Removed incorrect description of endpoint"
         }
       ]
     }
