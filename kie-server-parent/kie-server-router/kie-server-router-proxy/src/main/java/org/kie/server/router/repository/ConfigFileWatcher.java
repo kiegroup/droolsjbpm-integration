@@ -49,9 +49,14 @@ public class ConfigFileWatcher implements Runnable {
         if (!Files.isDirectory(this.toWatch)) {
             this.toWatch = Paths.get(configFilePath).getParent();
         }
+
         this.toWatch = Paths.get(toWatch.toString(), "kie-server-router.json");
         try {
-            lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
+            if(toWatch.toFile().exists()) {
+                lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
+            } else {
+                log.warnv("configuration file does not exists {0} ", this.toWatch);
+            }
         } catch (IOException e) {
             log.error("Unable to read last modified date of routers config file", e);
         }
@@ -65,27 +70,32 @@ public class ConfigFileWatcher implements Runnable {
     public void run() {
         try{
             while(active.get()) {
-                
-                FileTime lastModified = Files.getLastModifiedTime(toWatch);
-                log.debug("Config file " + toWatch + " last modified " + lastModified);
-                if (lastModified.toMillis() > lastUpdate) {
-               
-                    log.debug("Config file updated, reloading...");
-                    try (FileReader reader = new FileReader(toWatch.toFile())){                                
-                        Configuration updated = marshaller.unmarshall(reader);
-                        this.configuration.reloadFrom(updated);
-                    } catch (Exception e) {
-                        log.error("Unexpected exception while reading updated configuration file :: " + e.getMessage(), e);
+                try {
+                    if(!toWatch.toFile().exists()) {
+                       log.warnv("configuration file does not exists {0} ", this.toWatch);
+                       Thread.sleep(sleepTime);
+                       continue;
                     }
-                    lastUpdate = lastModified.toMillis();
+                    FileTime lastModified = Files.getLastModifiedTime(toWatch);
+                    log.debug("Config file " + toWatch + " last modified " + lastModified);
+                    if (lastModified.toMillis() > lastUpdate) {
+                   
+                        log.debug("Config file updated, reloading...");
+                        try (FileReader reader = new FileReader(toWatch.toFile())){                                
+                            Configuration updated = marshaller.unmarshall(reader);
+                            this.configuration.reloadFrom(updated);
+                        } catch (Exception e) {
+                            log.error("Unexpected exception while reading updated configuration file :: " + e.getMessage(), e);
+                        }
+                        lastUpdate = lastModified.toMillis();
+                    }
+                } catch(IOException ioe) {
+                    log.warn("Unexpected exception while watching config file, maybe file does not exist ?", ioe);
                 }
-                
                 Thread.sleep(sleepTime);
             }
         } catch (InterruptedException e) {
             log.debug("Interrupted exception received...");
-        } catch (IOException e1) {
-            log.warn("Unexpected exception while watching config file", e1);
         }
     }
 }
