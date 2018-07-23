@@ -21,6 +21,8 @@ import org.kie.server.router.spi.ConfigRepository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.assertj.core.api.Assertions;
+
 public class ConfigurationTest {
 
 
@@ -331,5 +333,43 @@ public class ConfigurationTest {
         assertEquals(0, config.getHostsPerContainer().size());
         assertEquals(0, config.getHostsPerServer().size());
         
+    }
+
+    @Test
+    public void testReloadFromMultipleServersWithSameUrl() {
+
+        Configuration config = new Configuration();
+
+        // add two server with same host url for container
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        // add two server with same host url for alias
+        config.addContainerHost("container", "http://localhost:8080/server");
+        config.addContainerHost("container", "http://localhost:8080/server");
+        // add two server with same host url
+        config.addServerHost("server1", "http://localhost:8080/server");
+        config.addServerHost("server1", "http://localhost:8080/server");
+        // add two containers info each for every server
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+        ContainerInfo containerInfo2 = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo2);
+
+        Configuration updated = new Configuration();
+
+        // add one server with same host url for container
+        updated.addContainerHost("container1", "http://localhost:8080/server");
+        // add one server with same host url
+        updated.addServerHost("server1", "http://localhost:8080/server");
+        // add one container info
+        containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        updated.addContainerInfo(containerInfo);
+
+        config.reloadFrom(updated);
+
+        Assertions.assertThat(config.getHostsPerContainer()).hasSize(1);
+        Assertions.assertThat(config.getHostsPerServer()).hasSize(1);
+        Assertions.assertThat(config.getHostsPerContainer().get("container1")).hasSize(1);
+        Assertions.assertThat(config.getHostsPerServer().get("server1")).hasSize(1);
     }
 }
