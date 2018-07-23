@@ -21,13 +21,13 @@
     <bundle>mvn:org.jboss.spec.javax.el/jboss-el-api_3.0_spec/${karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec}</bundle>
     <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/${karaf.version.org.jboss.spec.javax.interceptor}</bundle>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
   </feature>
 
   <feature name="drools-decisiontable" description="Drools Decision Tables" version="${project.version}">
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-templates</feature>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
-    <bundle>mvn:org.apache.commons/commons-collections4/${karaf.version.commons-collections4}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>
     <bundle>mvn:org.apache.commons/commons-collections4/${karaf.version.org.apache.commons-collections4}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
@@ -80,6 +80,7 @@
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-persistence-api/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-core/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${version.org.jbpm}</bundle>

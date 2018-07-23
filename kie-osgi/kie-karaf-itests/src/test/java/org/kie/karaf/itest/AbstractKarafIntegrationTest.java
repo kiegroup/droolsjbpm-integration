@@ -16,6 +16,7 @@
 
 package org.kie.karaf.itest;
 
+import org.apache.commons.io.FileUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.configs.CustomProperties;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -41,6 +43,8 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfi
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
+
 import org.ops4j.pax.exam.options.MavenUrlReference.VersionResolver;
 
 abstract public class AbstractKarafIntegrationTest {
@@ -196,6 +200,11 @@ abstract public class AbstractKarafIntegrationTest {
                         additionalMavenRepositories
             ));
         options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
+        options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.5.4/jar/uber", "5"));
+        options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
+                "featuresRepositories", "mvn:org.apache.karaf.features/spring-legacy/" + karafVersion + "/xml/features"));
+        options.add(editConfigurationFilePut("etc/org.apache.karaf.features.cfg", "featuresBoot", "aries-blueprint"));
+        options.add(replaceConfigurationFile("etc/org.apache.karaf.features.xml", new File("target/test-classes/org.apache.karaf.features.xml")));
 
         if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
             options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));
