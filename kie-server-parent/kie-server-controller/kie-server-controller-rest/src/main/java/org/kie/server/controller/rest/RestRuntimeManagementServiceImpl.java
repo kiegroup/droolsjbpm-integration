@@ -33,10 +33,12 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.controller.rest.ControllerUtils.*;
 
 @Path("/controller/runtime")
-public class RestRuntimeManagementServiceImpl extends RuntimeManagementServiceImpl {
+public class RestRuntimeManagementServiceImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(RestRuntimeManagementServiceImpl.class);
     private static final String REQUEST_FAILED_TOBE_PROCESSED = "Request failed to be processed due to: ";
+
+    private RuntimeManagementServiceImpl runtimeManagementService;
 
     @GET
     @Path("servers/{id}/instances")
@@ -45,7 +47,7 @@ public class RestRuntimeManagementServiceImpl extends RuntimeManagementServiceIm
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get server template with id {}", serverTemplateId);
-            final ServerInstanceKeyList instances = super.getServerInstances(serverTemplateId);
+            final ServerInstanceKeyList instances = runtimeManagementService.getServerInstances(serverTemplateId);
             String response = marshal(contentType, instances);
             logger.debug("Returning response for get server instance with server template id '{}': {}", serverTemplateId, response);
 
@@ -69,7 +71,7 @@ public class RestRuntimeManagementServiceImpl extends RuntimeManagementServiceIm
         try {
             logger.debug("Received get containers for server template with id {} and instance id {}", serverTemplateId, instanceId);
 
-            ContainerList containers = super.getServerInstanceContainers(serverTemplateId, instanceId);
+            ContainerList containers = runtimeManagementService.getServerInstanceContainers(serverTemplateId, instanceId);
             String response = marshal(contentType, containers);
             logger.debug("Returning response for get containers for server template with id {} and instance id {}: {}", serverTemplateId, instanceId, response);
 
@@ -92,7 +94,7 @@ public class RestRuntimeManagementServiceImpl extends RuntimeManagementServiceIm
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
 
-            ContainerList containers = super.getServerTemplateContainers(serverTemplateId, containerId);
+            ContainerList containers = runtimeManagementService.getServerTemplateContainers(serverTemplateId, containerId);
             String response = marshal(contentType, containers);
             logger.debug("Returning response for get containers for server template with id {} and container id {}: {}", serverTemplateId, containerId, response);
 
@@ -107,4 +109,7 @@ public class RestRuntimeManagementServiceImpl extends RuntimeManagementServiceIm
         }
     }
 
+    public void setRuntimeManagementService(final RuntimeManagementServiceImpl runtimeManagementService) {
+        this.runtimeManagementService = runtimeManagementService;
+    }
 }
