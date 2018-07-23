@@ -38,6 +38,7 @@
 
   <feature name="kie-dmn" description="Kie DMN" version="${project.version}">
     <feature version="${project.version}">drools-module</feature>
+    <bundle>mvn:org.drools/drlx-parser/${version.org.kie}</bundle>
     <bundle>mvn:org.kie/kie-dmn-model/${version.org.kie}</bundle>
     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>
     <bundle>mvn:org.kie/kie-dmn-backend/${version.org.kie}</bundle>
@@ -114,6 +115,11 @@
 
   <feature name="servlet-api-kie" version="${project.version}">
     <feature>servlet-api-dependencies</feature>
+  </feature>
+
+  <feature name="kie-pmml" version="${project.version}">
+    <feature version="${project.version}">drools-module</feature>
+    <bundle start-level="100">mvn:org.drools/kie-pmml/${version.org.drools}</bundle>
   </feature>
 
 </features>

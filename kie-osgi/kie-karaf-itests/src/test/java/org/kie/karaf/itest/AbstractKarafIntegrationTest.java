@@ -200,11 +200,14 @@ abstract public class AbstractKarafIntegrationTest {
                         additionalMavenRepositories
             ));
         options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
-        options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.5.4/jar/uber", "5"));
-        options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
-                "featuresRepositories", "mvn:org.apache.karaf.features/spring-legacy/" + karafVersion + "/xml/features"));
-        options.add(editConfigurationFilePut("etc/org.apache.karaf.features.cfg", "featuresBoot", "aries-blueprint"));
-        options.add(replaceConfigurationFile("etc/org.apache.karaf.features.xml", new File("target/test-classes/org.apache.karaf.features.xml")));
+        if (!"features-fuse".equals(System.getProperty("kie.features.classifier"))) {
+            // when not running on Fuse, we have to configure overrides and add some missing features
+            options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.5.4/jar/uber", "5"));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
+                    "featuresRepositories", "mvn:org.apache.karaf.features/spring-legacy/" + karafVersion + "/xml/features"));
+            options.add(replaceConfigurationFile("etc/org.apache.karaf.features.xml", new File("target/test-classes/org.apache.karaf.features.xml")));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "aries-blueprint"));
+        }
 
         if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
             options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));
