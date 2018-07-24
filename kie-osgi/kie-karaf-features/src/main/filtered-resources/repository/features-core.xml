@@ -20,8 +20,8 @@
 
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
     <feature version="${project.version}">drools-module</feature>
-    <feature version="[3.1,4.0)">spring-orm</feature>
-    <feature version="[${karaf.version.org.apache.aries.jpa},2.0)">jpa</feature>
+    <feature version="[4,5)">spring-orm</feature>
+    <feature>jpa</feature>
     <bundle>mvn:org.drools/drools-persistence-api/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
   </feature>
@@ -48,12 +48,9 @@
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm</feature>
     <feature version="${project.version}">jbpm-human-task</feature>
-    <feature version="[3.1,4.0)">spring</feature>
-    <feature version="[3.1,4.0)">spring-jdbc</feature>
-    <feature version="[3.1,4.0)">spring-orm</feature>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-extender/${version.org.springframework.osgi}</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-core/${version.org.springframework.osgi}</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-io/${version.org.springframework.osgi}</bundle>
+    <feature version="[4,5)">spring</feature>
+    <feature version="[4,5)">spring-jdbc</feature>
+    <feature version="[4,5)">spring-orm</feature>
     <bundle>mvn:org.kie/kie-spring/${version.org.drools}</bundle>
   </feature>
 
@@ -77,7 +74,6 @@
 
   <feature name="jbpm-spring-persistent" version="${project.version}" description="jBPM Spring Persistence support">
     <feature version="${project.version}">jbpm</feature>
-    <feature>spring-dm</feature>
     <feature version="${project.version}">kie-spring</feature>
     <feature>droolsjbpm-hibernate</feature>
     <feature version="${h2.version}">h2</feature>

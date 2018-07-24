@@ -15,6 +15,8 @@
  */
 package org.kie.aries.blueprint.namespace;
 
+import java.util.ArrayList;
+
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
@@ -131,7 +133,11 @@ public class KieSessionElementParser extends AbstractElementParser {
                 return beanMetadata;
             }
         }
-        return createNullMetadata();
+
+        MutableCollectionMetadata collectionMetadata = context.createMetadata(MutableCollectionMetadata.class);
+        collectionMetadata.setCollectionClass(ArrayList.class);
+
+        return collectionMetadata;
     }
 
 

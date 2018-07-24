@@ -7,16 +7,16 @@
   <repository>mvn:org.kie/kie-karaf-features/${project.version}/xml/features-core</repository>
 
   <!--
-   In order to install the below features into Fuse 6.2.1/6.3, target runtime needs to provide these features:
-    - drools-dependencies
-    - jbpm-dependencies
+   In order to install the below features into Fuse 7, target runtime needs to provide these features:
+    - drools7-dependencies
+    - jbpm7-dependencies
     - optaplanner-dependencies
-    - kie-remote-dependencies
+    - kie7-remote-dependencies
     - db-dependencies
     - hibernate-dependencies
     - hibernate-validator-dependencies
    These features are contained in some repository not referenced explicitly with <repository> (loose coupling).
-   Fuse 6.2.1/6.3 specific repository is 'mvn:org.apache.karaf.assemblies.features/brms-features/VERSION/xml/features'
+   Fuse 7 specific repository is 'mvn:org.jboss.fuse.features/brms-features/VERSION/xml/features'
   -->
 
   <feature name="drools-common" version="${project.version}" description="Drools Commons">
@@ -57,6 +57,7 @@
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-persistence-api/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-core/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${version.org.jbpm}</bundle>
@@ -88,15 +89,11 @@
   </feature>
 
   <feature name="droolsjbpm-hibernate" version="${version.org.hibernate}" description="Hibernate 4.2.x JPA persistence engine support">
-    <details>Enable Hibernate 4.2.x as persistence engine.</details>
+    <details>Enable Hibernate 5.x as persistence engine.</details>
     <feature>transaction</feature>
-    <feature>jpa</feature>
+    <feature version="[2,3)">jpa</feature>
     <feature version="${project.version}">servlet-api-kie</feature>
     <feature>hibernate-dependencies</feature>
-  </feature>
-
-  <feature name="hibernate-validator" version="${version.org.hibernate.validator}" description="Hibernate Validator">
-    <feature>hibernate-validator-dependencies</feature>
   </feature>
 
   <feature name="h2" version="${h2.version}" description="H2 database">
