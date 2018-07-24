@@ -160,10 +160,8 @@ public class CompilerHelperTest {
     public void shareWrongStoreWithMapTest() throws Exception {
         //prepare
         CompilerHelper helper = new CompilerHelper();
-        Map<String, Object> kieMap = new HashMap<>();
         String compilationID = UUID.randomUUID().toString();
-        kieMap.put("compilation.ID",
-                   compilationID);
+        Map<String,Object> kieMap = Collections.singletonMap("compilation.ID", compilationID);
 
         File dir = new File(System.getProperty("user.dir")
                                     + File.separator + "dir" + File.separator);
@@ -389,16 +387,6 @@ public class CompilerHelperTest {
         kieBaseModel2.newKieSessionModel(namespace + ".KSession3")
                 .setType(KieSessionModel.KieSessionType.STATEFUL)
                 .setClockType(ClockTypeOption.get("pseudo"));
-/*
-        KieBaseModel kieBaseModel3 = kproj.newKieBaseModel(namespace + ".KBase3")
-                .addInclude(kieBaseModel1.getName())
-                .addInclude(kieBaseModel2.getName())
-                .setEqualsBehavior(EqualityBehaviorOption.IDENTITY)
-                .setEventProcessingMode(EventProcessingOption.CLOUD);
-
-        kieBaseModel3.newKieSessionModel(namespace + ".KSession4")
-                .setType(KieSessionModel.KieSessionType.STATELESS)
-                .setClockType(ClockTypeOption.get("pseudo"));*/
 
         KieServices ks = KieServices.Factory.get();
 

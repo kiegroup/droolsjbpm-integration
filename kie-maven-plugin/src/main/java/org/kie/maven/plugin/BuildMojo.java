@@ -191,7 +191,7 @@ public class BuildMojo extends AbstractKieMojo {
                                        helper,
                                        compilationID);
                 }else{
-                    getLog().info("Kie Map not present");
+                    getLog().info("Kie Map empty");
                 }
             } else {
                 new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
@@ -288,7 +288,7 @@ public class BuildMojo extends AbstractKieMojo {
                                                                 "kieMap");
             return Optional.ofNullable(kieMap).orElse(Collections.emptyMap());
         } catch (ComponentLookupException cle) {
-            getLog().info("kieMap not present with compilationID and container present");
+            getLog().info("kieMap not present");
             return Collections.emptyMap();
         }
     }

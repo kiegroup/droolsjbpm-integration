@@ -27,8 +27,8 @@ import org.drools.core.rule.TypeMetaInfo;
 
 class CompilerHelper {
 
-    public String getCompilationID(Map<String, Object> optionalKieMap, Log log) {
-        Object compilationIDObj = optionalKieMap.get("compilation.ID");
+    public String getCompilationID(Map<String, Object> kieMap, Log log) {
+        Object compilationIDObj = kieMap.get("compilation.ID");
         if(compilationIDObj != null){
             return compilationIDObj.toString();
         }else{
