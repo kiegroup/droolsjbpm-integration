@@ -172,9 +172,4 @@
     <bundle start-level="100">mvn:org.drools/kie-pmml/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie-pmml" version="${project.version}">
-    <feature version="${project.version}">drools-module</feature>
-    <bundle start-level="100">mvn:org.drools/kie-pmml/${version.org.drools}</bundle>
-  </feature>
-
 </features>
