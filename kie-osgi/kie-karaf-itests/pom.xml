@@ -315,6 +315,26 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>fuse71</id>
+      <properties>
+        <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <kie.features.classifier>features-fuse</kie.features.classifier>
+                <!--<additional.features.url>mvn:org.jboss.fuse.features/brms-features/VERSION/xml/features</additional.features.url>-->
+                <!--<karaf.version>4.2.0.fuse-BUILDNUMBER</karaf.version>-->
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 </project>

@@ -1,5 +1,6 @@
 /target
 /local
+*.db
 
 # Eclipse, Netbeans and IntelliJ files
 /.*

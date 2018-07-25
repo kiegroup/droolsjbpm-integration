@@ -129,7 +129,7 @@ abstract public class AbstractKarafIntegrationTest {
         throw new RuntimeException("Bundle " + symbolicName + " does not exist");
     }
 
-    private static String getKarafVersion() {
+    protected static String getKarafVersion() {
         String karafVersion = System.getProperty(PROP_KARAF_VERSION);
         if (karafVersion == null) {
             if(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) != null) {
@@ -195,6 +195,7 @@ abstract public class AbstractKarafIntegrationTest {
                         "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public" +
                         additionalMavenRepositories
             ));
+        options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
 
         if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
             options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));
