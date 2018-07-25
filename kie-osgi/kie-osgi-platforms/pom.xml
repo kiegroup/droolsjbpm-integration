@@ -17,6 +17,7 @@
   <modules>
     <!--<module>fuse-6.2</module>-->
     <module>osgi-platform-fuse-6.3</module>
+    <module>osgi-platform-fuse-7.0</module>
   </modules>
 
   <profiles>

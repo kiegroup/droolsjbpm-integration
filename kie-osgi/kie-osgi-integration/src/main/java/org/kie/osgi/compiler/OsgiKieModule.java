@@ -22,6 +22,7 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.wiring.BundleWiring;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,11 @@ public class OsgiKieModule extends AbstractKieModule {
             url = bundle.getResource(WEB_INF_CLASSES_PATH + pResourceName);
         }
         return url == null ? null : readUrlAsBytes(url);
+    }
+
+    @Override
+    public ClassLoader getModuleClassLoader() {
+        return bundle == null ? null : bundle.adapt(BundleWiring.class).getClassLoader();
     }
 
     @Override

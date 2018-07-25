@@ -17,6 +17,7 @@
 package org.kie.spring;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -272,7 +273,15 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 kModuleRootUrl = tryGetRootUrlFromContextFile(applicationContext);
             }
             if (kModuleRootUrl == null) {
-                kModuleRootUrl = applicationContext.getResource("classpath:/").getURL();
+                try {
+                    kModuleRootUrl = applicationContext.getResource("classpath:/").getURL();
+                } catch (FileNotFoundException e) {
+                    // a special case for aries-blueprint-spring, where there are no spring-dm resource helpers
+                    kModuleRootUrl = applicationContext.getResource("classpath:/META-INF/MANIFEST.MF").getURL();
+                    if (kModuleRootUrl != null && "bundle".equals(kModuleRootUrl.getProtocol())) {
+                        kModuleRootUrl = new URL(kModuleRootUrl, "..");
+                    }
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("Error while trying to get root URL for the application context " +

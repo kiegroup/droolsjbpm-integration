@@ -82,7 +82,7 @@ public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegr
         configuration.setMarshallingFormat(marshallingFormat);
 //        configuration.addJaxbClasses(extraClasses);
 //        KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
-        KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
+        KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, this.getClass().getClassLoader());
 
         ServiceResponse<KieContainerResourceList> containersResponse = kieServicesClient.listContainers();
         assertNotNull(containersResponse);
@@ -103,7 +103,7 @@ public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegr
         configuration.setMarshallingFormat(marshallingFormat);
 //        configuration.addJaxbClasses(extraClasses);
 //        KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
-        KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
+        KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, this.getClass().getClassLoader());
 
         // query for all available process definitions
         QueryServicesClient queryClient = kieServicesClient.getServicesClient(QueryServicesClient.class);

@@ -16,6 +16,7 @@
 
 package org.kie.karaf.itest;
 
+import org.apache.commons.io.FileUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.configs.CustomProperties;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -41,6 +43,8 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfi
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
+
 import org.ops4j.pax.exam.options.MavenUrlReference.VersionResolver;
 
 abstract public class AbstractKarafIntegrationTest {
@@ -129,7 +133,7 @@ abstract public class AbstractKarafIntegrationTest {
         throw new RuntimeException("Bundle " + symbolicName + " does not exist");
     }
 
-    private static String getKarafVersion() {
+    protected static String getKarafVersion() {
         String karafVersion = System.getProperty(PROP_KARAF_VERSION);
         if (karafVersion == null) {
             if(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) != null) {
@@ -195,6 +199,15 @@ abstract public class AbstractKarafIntegrationTest {
                         "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public" +
                         additionalMavenRepositories
             ));
+        options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
+        if (!"features-fuse".equals(System.getProperty("kie.features.classifier"))) {
+            // when not running on Fuse, we have to configure overrides and add some missing features
+            options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.5.4/jar/uber", "5"));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
+                    "featuresRepositories", "mvn:org.apache.karaf.features/spring-legacy/" + karafVersion + "/xml/features"));
+            options.add(replaceConfigurationFile("etc/org.apache.karaf.features.xml", new File("target/test-classes/org.apache.karaf.features.xml")));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "aries-blueprint"));
+        }
 
         if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
             options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));

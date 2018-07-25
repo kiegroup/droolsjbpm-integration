@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 /**
@@ -86,9 +87,11 @@ public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegratio
                 // Force the log level to INFO so we have more details during the test.  It defaults to WARN.
                 logLevel(LogLevelOption.LogLevel.WARN),
 
-                loadKieFeaturesRepo()
+                loadKieFeaturesRepo(),
                 // Option to be used to do remote debugging
                 //  debugConfiguration("5005", true),
+
+                mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.javax-inject").versionAsInProject()
         };
     }
 

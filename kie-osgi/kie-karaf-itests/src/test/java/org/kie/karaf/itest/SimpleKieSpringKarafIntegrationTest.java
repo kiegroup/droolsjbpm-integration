@@ -16,6 +16,8 @@
 
 package org.kie.karaf.itest;
 
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,19 +30,33 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.ops4j.pax.exam.util.Filter;
+import org.osgi.framework.Constants;
+import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class SimpleKieSpringKarafIntegrationTest extends AbstractKieSpringKarafIntegrationTest {
 
+    private static final String SPRING_XML_LOCATION = "/org/kie/karaf/itest/kie-beans.xml";
+    private static final String SPRING_APPLICATION_CONTEXT_ID = "." + ApplicationContext.class.getName();
+
+    // this is the way to get actual Spring Application Context through "bridging" Blueprint Container
+    @Inject
+    @Filter("(osgi.blueprint.container.symbolicname=Test-Kie-Spring-Bundle)")
+    private BlueprintContainer container;
+
     @Before
     public void init() {
-        applicationContext = createApplicationContext();
+        applicationContext = (ConfigurableApplicationContext) container.getComponentInstance(SPRING_APPLICATION_CONTEXT_ID);
         assertNotNull("Should have created a valid spring context", applicationContext);
     }
 
@@ -82,12 +98,21 @@ public class SimpleKieSpringKarafIntegrationTest extends AbstractKieSpringKarafI
                 //  debugConfiguration("5005", true),
 
                 // Load Kie-Spring
-                loadKieFeatures("kie-spring")
-        };
-    }
+                loadKieFeatures("kie-spring"),
+                features(getFeaturesUrl("org.apache.karaf.features", "spring-legacy", getKarafVersion()), "aries-blueprint-spring"),
 
-    protected OsgiBundleXmlApplicationContext createApplicationContext() {
-        return new OsgiBundleXmlApplicationContext(new String[]{"org/kie/karaf/itest/kie-beans.xml"});
+                // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
+                streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
+                        .add("META-INF/spring/kie-beans.xml",
+                                SimpleKieSpringKarafIntegrationTest.class.getResource(SPRING_XML_LOCATION))
+                        .set(Constants.IMPORT_PACKAGE, "org.kie.osgi.spring," +
+                                "org.kie.api," +
+                                "org.kie.api.runtime," +
+                                "*")
+                        .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Kie-Spring-Bundle")
+                        .build()).start()
+        };
     }
 
 }

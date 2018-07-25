@@ -17,19 +17,18 @@
 package org.kie.karaf.itest;
 
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.inject.Inject;
 
 abstract public class AbstractKieSpringKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
-    protected OsgiBundleXmlApplicationContext applicationContext;
+    protected ConfigurableApplicationContext applicationContext;
 
     @Inject
     protected BundleContext bc;
 
     protected void refresh() {
-        applicationContext.setBundleContext(bc);
         applicationContext.refresh();
     }
 
