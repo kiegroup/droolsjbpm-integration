@@ -180,16 +180,7 @@ public class BuildMojo extends AbstractKieMojo {
                 Map<String, Object> kieMap = getKieMap();
                 if (!kieMap.isEmpty()) {
                     CompilerHelper helper = new CompilerHelper();
-                    String compilationID = helper.getCompilationID(kieMap, getLog());
-                    shareKieObjects(kModule,
-                                    kieMap,
-                                    helper,
-                                    compilationID);
-                    helper.shareStoreWithMap(kModule.getModuleClassLoader(), compilationID, kieMap,getLog());
-                    shareTypesMetaInfo(kModule,
-                                       kieMap,
-                                       helper,
-                                       compilationID);
+                    helper.share(kieMap, kModule, getLog());
                 }else{
                     getLog().info("Kie Map empty");
                 }
@@ -209,24 +200,6 @@ public class BuildMojo extends AbstractKieMojo {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         getLog().info("KieModule successfully built!");
-    }
-
-    private void shareKieObjects(InternalKieModule kModule,
-                                 Map<String, Object> kieMap,
-                                 CompilerHelper helper,
-                                 String compilationID) {
-        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
-        KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
-        helper.shareKieObjectsWithMap(kModule, modelMetaInfo, compilationID, kieMap, getLog());
-    }
-
-    private void shareTypesMetaInfo(InternalKieModule kModule,
-                                    Map<String, Object> kieMap,
-                                    CompilerHelper helper,
-                                    String compilationID) {
-        KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
-        KieModuleMetaInfo info = kb.generateKieModuleMetaInfo(null);
-        helper.shareTypesMetaInfoWithMap(info.getTypeMetaInfos(), compilationID, kieMap, getLog());
     }
 
     private List<File> getResourceFiles(File parent) {
@@ -274,9 +247,6 @@ public class BuildMojo extends AbstractKieMojo {
             throw new MojoFailureException("Unable to write file", iox);
         }
     }
-
-
-
 
     private Map<String, Object> getKieMap() {
         try {

@@ -17,6 +17,7 @@ package org.kie.maven.plugin;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +28,6 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieFileSystemImpl;
-import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.core.common.ProjectClassLoader;
@@ -61,8 +61,6 @@ public class CompilerHelperTest {
 
     private static Log log;
     protected FileManager fileManager;
-
-
 
     @Before
     public void setUp() {
@@ -193,10 +191,7 @@ public class CompilerHelperTest {
                                               "1.0-SNAPSHOT");
 
         //method to test
-        KieMetaInfoBuilder builder = new KieMetaInfoBuilder((InternalKieModule) kieModule);
-        KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
         helper.shareKieObjectsWithMap((InternalKieModule) kieModule,
-                                      modelMetaInfo,
                                       compilationID,
                                       kieMap,
                                       log);
@@ -223,7 +218,6 @@ public class CompilerHelperTest {
         //method to test
         helper.shareKieObjectsWithMap(null,
                                       null,
-                                      compilationID,
                                       kieMap,
                                       log);
 
@@ -270,8 +264,8 @@ public class CompilerHelperTest {
 
         //call the class under test
         helper.shareTypesMetaInfoWithMap(typesMetaInfos,
-                                         compilationID,
                                          kieMap,
+                                         compilationID,
                                          log);
 
         //verify
@@ -315,8 +309,8 @@ public class CompilerHelperTest {
 
         //call the class under test
         helper.shareTypesMetaInfoWithMap(typesMetaInfos,
-                                         compilationID,
                                          kieMap,
+                                         compilationID,
                                          log);
 
         //verify
@@ -344,8 +338,8 @@ public class CompilerHelperTest {
 
         //call the class under test
         helper.shareTypesMetaInfoWithMap(null,
-                                         compilationID,
                                          kieMap,
+                                         compilationID,
                                          log);
 
         //verify
