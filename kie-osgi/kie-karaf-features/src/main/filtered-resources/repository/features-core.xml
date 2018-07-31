@@ -7,6 +7,9 @@
   <feature name="drools-module" version="${project.version}" description="Drools Core">
     <feature version="${project.version}">drools-common</feature>
     <feature version="${project.version}">kie</feature>
+    <bundle>mvn:org.drools/drlx-parser/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-canonical-model/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-model-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-cdi/${version.org.drools}</bundle>
