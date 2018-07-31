@@ -15,9 +15,10 @@
 
 package org.jbpm.persistence;
 
+import java.util.Collection;
+
 import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.AbstractInterceptor;
-import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -34,12 +35,11 @@ import org.jbpm.persistence.api.ProcessPersistenceContextManager;
 import org.jbpm.persistence.processinstance.ProcessInstanceInfo;
 import org.jbpm.process.instance.ProcessInstance;
 import org.kie.api.command.Command;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.Context;
 import org.kie.api.runtime.Executable;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.RequestContext;
-
-import java.util.Collection;
 
 public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 

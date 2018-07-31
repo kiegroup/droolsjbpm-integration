@@ -113,6 +113,7 @@ public class JBPMAutoConfiguration {
     }
     
     @Bean
+    @ConditionalOnMissingBean(name = "entityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(JpaProperties jpaProperties){
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setPersistenceUnitName(PERSISTENCE_UNIT_NAME);

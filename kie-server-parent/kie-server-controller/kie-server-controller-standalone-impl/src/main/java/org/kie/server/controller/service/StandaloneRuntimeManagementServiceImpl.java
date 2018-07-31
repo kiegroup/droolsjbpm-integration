@@ -19,6 +19,7 @@ package org.kie.server.controller.service;
 import java.util.ServiceLoader;
 
 import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
+import org.kie.server.controller.impl.service.RuntimeManagementServiceImpl;
 import org.kie.server.controller.rest.RestRuntimeManagementServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,17 +30,18 @@ public class StandaloneRuntimeManagementServiceImpl extends RestRuntimeManagemen
 
     public StandaloneRuntimeManagementServiceImpl() {
         super();
+        RuntimeManagementServiceImpl runtimeManagementService = new RuntimeManagementServiceImpl();
         ServiceLoader<PersistingServerTemplateStorageService> templateStorageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
-
         if (templateStorageServices != null && templateStorageServices.iterator().hasNext()) {
 
             PersistingServerTemplateStorageService storageService = templateStorageServices.iterator().next();
-            this.setTemplateStorage(storageService.getTemplateStorage());
+            runtimeManagementService.setTemplateStorage(storageService.getTemplateStorage());
 
             logger.debug("Setting template storage for RuntimeManagementService to {}",
                          storageService.getTemplateStorage().toString());
         } else {
             logger.warn("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
         }
+        this.setRuntimeManagementService(runtimeManagementService);
     }
 }
