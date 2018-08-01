@@ -124,7 +124,7 @@ public class CompilerHelperTest {
         kieMap.get(sbTypes.toString());
         Map store = (Map) kieMap.get(sbTypes.toString());
         assertThat(store).isNotNull();
-        assertThat(store.size()).isEqualTo(1);
+        assertThat(store).hasSize(1);
         byte[] bytez = (byte[]) store.get(className + ".class");
         assertThat(bytez).isNotNull();
         String hex = toHexString(bytez);
@@ -272,7 +272,7 @@ public class CompilerHelperTest {
         StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append(TypeMetaInfo.class.getName());
         Set<String> typesMetaInfosSet = (Set) kieMap.get(sbTypes.toString());
         assertThat(typesMetaInfosSet).isNotNull();
-        assertThat(typesMetaInfosSet.size()).isEqualTo(1);
+        assertThat(typesMetaInfosSet).hasSize(1);
         assertThat(typesMetaInfosSet.iterator().next()).isEqualTo("idk");
     }
 
