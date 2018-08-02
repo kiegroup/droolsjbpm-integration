@@ -33,7 +33,7 @@
       </plugin>
     </plugins>
   </build>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
@@ -221,6 +221,17 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
