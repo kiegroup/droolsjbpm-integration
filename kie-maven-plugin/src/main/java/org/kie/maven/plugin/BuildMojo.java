@@ -101,12 +101,7 @@ public class BuildMojo extends AbstractKieMojo {
     @Parameter(required = false, defaultValue = "no")
     private String usesPMML;
 
-    /**
-     * Param passed by the Maven Incremental compiler to identify the value used in the kieMap to identify the
-     * KieModuleMetaInfo from the current complation
-     */
-    @Parameter(required = false, defaultValue = "${compilation.ID}")
-    private String compilationID;
+
 
     /**
      * This container is the same accessed in the KieMavenCli in the kie-wb-common
@@ -127,7 +122,7 @@ public class BuildMojo extends AbstractKieMojo {
     private void buildDrl() throws MojoFailureException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        List<InternalKieModule> kmoduleDeps = new ArrayList<InternalKieModule>();
+        List<InternalKieModule> kmoduleDeps = new ArrayList<>();
 
         try {
             Set<URL> urls = new HashSet<URL>();
@@ -180,6 +175,19 @@ public class BuildMojo extends AbstractKieMojo {
             ResultsImpl messages = (ResultsImpl)kieBuilder.getResults();
 
             List<Message> errors = messages != null ? messages.filterMessages( Message.Level.ERROR): Collections.emptyList();
+
+            if (container != null) {
+                Map<String, Object> kieMap = getKieMap();
+                if (!kieMap.isEmpty()) {
+                    CompilerHelper helper = new CompilerHelper();
+                    helper.share(kieMap, kModule, getLog());
+                }else{
+                    getLog().info("Kie Map empty");
+                }
+            } else {
+                new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
+            }
+
             if (!errors.isEmpty()) {
                 for (Message error : errors) {
                     getLog().error(error.toString());
@@ -187,13 +195,6 @@ public class BuildMojo extends AbstractKieMojo {
                 throw new MojoFailureException("Build failed!");
             } else {
                 writeClassFiles( kModule );
-                if (container != null && compilationID != null) {
-                    shareKieObjectsWithMap(kModule);
-                    shareStoreWithMap(kModule.getModuleClassLoader());
-                    shareTypesMetaInfoWithMap(kModule);
-                } else {
-                    new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
-                }
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -247,76 +248,18 @@ public class BuildMojo extends AbstractKieMojo {
         }
     }
 
-    private void shareKieObjectsWithMap(InternalKieModule kModule) {
-        Optional<Map<String, Object>> optionalKieMap = getKieMap();
-        if (optionalKieMap.isPresent()) {
-            KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
-            KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
-
-            /*Standard for the kieMap keys -> compilationID + dot + class name */
-            StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(KieModuleMetaInfo.class.getName());
-            StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
-
-            if (modelMetaInfo != null) {
-                optionalKieMap.get().put(sbModelMetaInfo.toString(),
-                        modelMetaInfo);
-                getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedder");
-            }
-            if (kModule != null) {
-                optionalKieMap.get().put(sbkModule.toString(),
-                        kModule);
-                getLog().info("KieModule available in the map shared with the Maven Embedder");
-            }
-        }
-    }
-
-    private void shareStoreWithMap(ClassLoader classLoader) {
-        Optional<Map<String, Object>> optionalKieMap = getKieMap();
-        if (optionalKieMap.isPresent() && classLoader instanceof ProjectClassLoader) {
-            ProjectClassLoader projectClassloder = (ProjectClassLoader) classLoader;
-            Map<String, byte[]> types = projectClassloder.getStore();
-            if (projectClassloder.getStore() != null) {
-                StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
-                optionalKieMap.get().put(sbTypes.toString(), types);
-                getLog().info("ProjectClassloader Store available in the map shared with the Maven Embedder");
-            }
-        }
-    }
-
-    private void shareTypesMetaInfoWithMap(InternalKieModule kModule) {
-        Optional<Map<String, Object>> optionalKieMap = getKieMap();
-        if (optionalKieMap.isPresent()) {
-            KieMetaInfoBuilder kb = new KieMetaInfoBuilder(kModule);
-            KieModuleMetaInfo info = kb.getKieModuleMetaInfo();
-            Map <String, TypeMetaInfo> typesMetaInfos =  info.getTypeMetaInfos();
-
-            if(typesMetaInfos != null){
-                StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append(TypeMetaInfo.class.getName());
-                Set<String> eventClasses = new HashSet<>();
-                for(Map.Entry<String,TypeMetaInfo> item :typesMetaInfos.entrySet()) {
-                    if (item.getValue().isEvent()){
-                        eventClasses.add(item.getKey());
-                    }
-                }
-                optionalKieMap.get().put(sbTypes.toString(), eventClasses);
-                getLog().info("TypesMetaInfo keys available in the map shared with the Maven Embedder");
-            }
-        }
-    }
-
-
-    private Optional<Map<String, Object>> getKieMap() {
+    private Map<String, Object> getKieMap() {
         try {
             /**
              * Retrieve the map passed into the Plexus container by the MavenEmbedder from the MavenIncrementalCompiler in the kie-wb-common
              */
             Map<String, Object> kieMap = (Map) container.lookup(Map.class,
-                    "java.util.HashMap",
-                    "kieMap");
-            return Optional.of(kieMap);
+                                                                "java.util.HashMap",
+                                                                "kieMap");
+            return Optional.ofNullable(kieMap).orElse(Collections.emptyMap());
         } catch (ComponentLookupException cle) {
-            getLog().info("kieMap not present with compilationID and container present");
-            return Optional.empty();
+            getLog().info("kieMap not present");
+            return Collections.emptyMap();
         }
     }
 
