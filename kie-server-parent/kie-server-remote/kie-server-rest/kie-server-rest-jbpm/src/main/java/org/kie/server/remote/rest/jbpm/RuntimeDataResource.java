@@ -613,7 +613,7 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Retrieves tasks, optionally filters by status and applies pagination",
+    @ApiOperation(value="Retrieves tasks with applied pagination",
             response=TaskSummaryList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
