@@ -15,6 +15,10 @@
  */
 package org.kie.server.integrationtests.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
@@ -22,19 +26,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends KieServerControllerClientException> extends KieControllerManagementBaseTest {
 
@@ -107,18 +111,31 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
     @Test
     public void testStartAndStopScanner() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
-        ContainerSpec container = startContainerWithVersion(RELEASE_ID,
-                                                            serverTemplate);
+        ContainerSpec container = createContainerSpec(serverTemplate,
+                                                      RELEASE_ID_LATEST,
+                                                      KieContainerStatus.STARTED);
+        KieServerSynchronization.waitForContainerWithReleaseId(client,
+                                                               RELEASE_ID);
 
-        checkKieContainerResource(RELEASE_ID,
+        checkKieContainerResource(RELEASE_ID_LATEST,
                                   RELEASE_ID);
 
         controllerClient.startScanner(container,
-                                      5L);
+                                      1000L);
+
+        RuleConfig containerConfig = (RuleConfig) controllerClient.getContainerInfo(serverTemplate.getId(), CONTAINER_ID).getConfigs().get(Capability.RULE);
+        Assertions.assertThat(containerConfig.getScannerStatus()).isEqualTo(KieScannerStatus.STARTED);
+        Assertions.assertThat(containerConfig.getPollInterval()).isEqualTo(1000L);
+
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar101").getFile());
+
+        KieServerSynchronization.waitForContainerWithReleaseId(client, RELEASE_ID_101);
+        checkKieContainerResource(RELEASE_ID_101, RELEASE_ID_101);
+
         controllerClient.stopScanner(container);
 
-        checkKieContainerResource(RELEASE_ID,
-                                  RELEASE_ID);
+        containerConfig = (RuleConfig) controllerClient.getContainerInfo(serverTemplate.getId(), CONTAINER_ID).getConfigs().get(Capability.RULE);
+        Assertions.assertThat(containerConfig.getScannerStatus()).isEqualTo(KieScannerStatus.STOPPED);
     }
 
     @Test
