@@ -471,6 +471,41 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertNotNull(instances);
         assertEquals(originalAborted + 1, instances.size());
     }
+    
+    @Test
+    public void testGetProcessInstancesByProcessIdAndStatusAndInitiator() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Integer> abortedStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED);
+        List<Integer> activeStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+        List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        int originalAborted = instances.size();
+
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(0, instances.size());
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+        assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
+
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(originalAborted + 1, instances.size());
+        
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_JOHN, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(0, instances.size());
+    }
 
     @Test
     public void testGetProcessInstancesByProcessIdSortedByInstanceId() throws Exception {

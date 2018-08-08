@@ -125,6 +125,24 @@
            "methodName": "migrateCaseInstance",
            "elementKind": "method",
            "justification": "Added support for case instance migration"
+         },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.QueryServicesClient::findProcessInstancesByProcessIdAndInitiator(java.lang.String, java.lang.String, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "QueryServicesClient",
+           "methodName": "findProcessInstancesByProcessIdAndInitiator",
+           "elementKind": "method",
+           "justification": "Added additional methods for quering process instances by both process and initiator"
+         },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.QueryServicesClient::findProcessInstancesByProcessIdAndInitiator(java.lang.String, java.lang.String, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "QueryServicesClient",
+           "methodName": "findProcessInstancesByProcessIdAndInitiator",
+           "elementKind": "method",
+           "justification":  "Added additional methods for quering process instances by both process and initiator"
          }
       ]
     }
