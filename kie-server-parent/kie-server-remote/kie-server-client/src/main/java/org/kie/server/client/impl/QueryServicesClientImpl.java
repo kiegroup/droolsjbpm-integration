@@ -264,6 +264,11 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize) {
         return findProcessInstancesByProcessId(processId, status, page, pageSize, "", true);
     }
+    
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessIdAndInitiator(String processId, String initiator, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByProcessIdAndInitiator(processId, initiator, status, page, pageSize, "", true);
+    }
 
     @Override
     public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize) {
@@ -366,6 +371,36 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessInstancesByProcessId", new Object[]{processId, safeList(status), "", page, pageSize, sort, sortOrder})));
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getProcessInstances() != null) {
+            return Arrays.asList(result.getProcessInstances());
+        }
+
+        return Collections.emptyList();
+    }
+    
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessIdAndInitiator(String processId, String initiator, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        ProcessInstanceList result = null;
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_ID, processId);
+
+            String statusQueryString = getAdditionalParams("?initiator=" + initiator + "&sort=" + sort + "&sortOrder=" + sortOrder, "status", status);
+            String queryString = getPagingQueryString(statusQueryString, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessInstancesByProcessId", new Object[]{processId, safeList(status), initiator, page, pageSize, sort, sortOrder})));
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
 
             throwExceptionOnFailure(response);
