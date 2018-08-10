@@ -59,6 +59,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
@@ -82,6 +83,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.TaskNotFoundException;
+import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
@@ -151,7 +153,9 @@ public class UserTaskResource {
 
     @ApiOperation(value="Claims task with given id that belongs to given container",
             response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+                            @ApiResponse(code = 404, message = "Task with given id not found"), 
+                            @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_CLAIM_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -168,6 +172,8 @@ public class UserTaskResource {
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (PermissionDeniedException e){
+            return forbidden(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -176,7 +182,9 @@ public class UserTaskResource {
 
     @ApiOperation(value="Completes task with given id that belongs to given container, optionally it can claim and start task when auto-progress is used",
             response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+                            @ApiResponse(code = 404, message = "Task with given id not found"), 
+                            @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_COMPLETE_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -199,6 +207,8 @@ public class UserTaskResource {
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (PermissionDeniedException e){
+            return forbidden(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -207,7 +217,9 @@ public class UserTaskResource {
 
     @ApiOperation(value="Delegates task with given id that belongs to given container",
             response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+                            @ApiResponse(code = 404, message = "Task with given id not found"), 
+                            @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_DELEGATE_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -226,6 +238,8 @@ public class UserTaskResource {
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (PermissionDeniedException e){
+            return forbidden(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -288,7 +302,9 @@ public class UserTaskResource {
 
     @ApiOperation(value="Forwards task with given id that belongs to given container",
             response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+                            @ApiResponse(code = 404, message = "Task with given id not found"), 
+                            @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_FORWARD_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -307,6 +323,8 @@ public class UserTaskResource {
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (PermissionDeniedException e){
+            return forbidden(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -315,7 +333,9 @@ public class UserTaskResource {
 
     @ApiOperation(value="Releases task with given id that belongs to given container",
             response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+                            @ApiResponse(code = 404, message = "Task with given id not found"), 
+                            @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_RELEASE_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -331,6 +351,8 @@ public class UserTaskResource {
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (PermissionDeniedException e){
+            return forbidden(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -464,7 +486,9 @@ public class UserTaskResource {
 
     @ApiOperation(value="Nominates task with given id that belongs to given container",
             response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+                            @ApiResponse(code = 404, message = "Task with given id not found"), 
+                            @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_NOMINATE_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -483,6 +507,8 @@ public class UserTaskResource {
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (PermissionDeniedException e){
+            return forbidden(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);

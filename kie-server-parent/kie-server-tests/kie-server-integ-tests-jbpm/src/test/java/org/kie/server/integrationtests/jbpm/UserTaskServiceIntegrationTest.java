@@ -63,6 +63,8 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
+    private static final String USER_WITHOUT_PERMISSIONS = "noPermissionsUser";
+    
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -145,17 +147,15 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         taskOutcome.put("carOutput", "Skoda");
 
         taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, taskOutcome);
-
+        
         try {
             taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, taskOutcome);
-            fail("Completing of already completed task should throw an exception.");
-
+           fail("Completing of already completed task should throw an exception.");
         } catch(KieServicesHttpException e) {
-            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), e.getHttpCode().intValue());
-            // expected for REST
-
+           assertEquals(Response.Status.FORBIDDEN.getStatusCode(), e.getHttpCode().intValue());
+           // expected for REST
         } catch(KieServicesException e) {
-            // expected for JMS
+           // expected for JMS
         }
     }
 
@@ -234,6 +234,13 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(1, taskList.size());
             taskSummary = taskList.get(0);
             checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+            
+            //Try to claim task which is already reserved (Code 403)
+            Long taskId = taskList.get(0).getId();
+            assertClientException(
+                                  () -> taskClient.claimTask(CONTAINER_ID, taskId, USER_JOHN),
+                                  403,
+                                  "User '[UserImpl:'"+ USER_JOHN +"']' was unable to execute operation 'Claim' on task id "+ taskId +" due to a no 'current status' match");
 
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -639,6 +646,13 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // forwarded task change state to Ready and is assigned to john as potential owner
             changeUser(USER_JOHN);
             checkTaskStatusAndOwners(CONTAINER_ID, taskSummary.getId(), Status.Ready, "", USER_JOHN);
+        
+            // forwarding task in Ready state to a user without permissions (Code 403)
+            assertClientException(
+                                  () -> taskClient.forwardTask(CONTAINER_ID, taskSummary.getId(), USER_WITHOUT_PERMISSIONS, USER_YODA),
+                                  403,
+                                  "User '[UserImpl:'"+ USER_WITHOUT_PERMISSIONS +"']' does not have permissions to execute operation 'Forward' on task id "+ taskSummary.getId());
+            
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             changeUser(TestConfig.getUsername());
@@ -704,12 +718,49 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // delegated task change state to Reserved and is assigned to john as actual owner
             changeUser(USER_JOHN);
             checkTaskStatusAndActualOwner(CONTAINER_ID, taskSummary.getId(), Status.Reserved, USER_JOHN);
+            
+            // delegating task in Reserved state (Code 403)
+            assertClientException(
+                                  () -> taskClient.delegateTask(CONTAINER_ID, taskSummary.getId(), USER_WITHOUT_PERMISSIONS, USER_YODA),
+                                  403,
+                                  "User '[UserImpl:'"+ USER_WITHOUT_PERMISSIONS +"']' does not have permissions to execute operation 'Delegate' on task id "+ taskSummary.getId());
+            
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             changeUser(TestConfig.getUsername());
         }
     }
 
+    @Test
+    public void testNominateUserTask() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            checkTaskStatusAndActualOwner(CONTAINER_ID, taskSummary.getId(), Status.Reserved, USER_YODA);
+
+            // Nomitated task with status different to Created (403)
+            List<String> listPotOwners = new ArrayList<String>();
+            listPotOwners.add(USER_YODA);
+            listPotOwners.add(USER_JOHN);
+            assertClientException(
+                                  () -> taskClient.nominateTask(CONTAINER_ID, taskSummary.getId(), USER_WITHOUT_PERMISSIONS, listPotOwners),
+                                  403,
+                                  "User '[UserImpl:'"+ USER_WITHOUT_PERMISSIONS +"']' was unable to execute operation 'Nominate' on task id "+ taskSummary.getId() +" due to a no 'current status' match");
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            changeUser(TestConfig.getUsername());
+        }
+    }
+    
     @Test
     public void testUserTaskSetTaskProperties() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
@@ -960,13 +1011,12 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(Status.Ready.toString(), taskSummary.getStatus());
 
             // User yoda isn't in group "engineering", can't claim task.
-            try {
-                taskClient.claimTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
-                fail("User yoda shouldn't be able to claim task as he doesn't belong to group which task is assigned to.");
-            } catch (KieServicesException e) {
-                // expected
-            }
-
+            Long taskId = taskList.get(0).getId();
+            assertClientException(
+                                  () -> taskClient.claimTask(CONTAINER_ID, taskId, USER_YODA),
+                                  403,
+                                  "User '[UserImpl:'"+ USER_YODA +"']' does not have permissions to execute operation 'Claim' on task id "+ taskId);
+            
             // User john is in group "engineering", can work with task.
             changeUser(USER_JOHN);
             taskClient.claimTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN);
@@ -1269,9 +1319,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testFindTaskEventsForNotExistingTask() {
-        String invalidId = "-9,999";
+        String invalidId = "-999";
         try {
-            taskClient.findTaskEvents(CONTAINER_ID, -9999L, 0, 10);
+            taskClient.findTaskEvents(CONTAINER_ID, -999L, 0, 10);
             fail("KieServicesException should be thrown when task not found");
         } catch (KieServicesException e) {
             if(configuration.isRest()) {
