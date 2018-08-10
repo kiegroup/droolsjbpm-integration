@@ -38,6 +38,7 @@ import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.jaxrs.config.JaxrsScanner;
 import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.jaxrs.config.SwaggerScannerLocator;
+import io.swagger.models.Info;
 
 public class SwaggerKieServerExtension implements KieServerExtension {
 
@@ -69,26 +70,34 @@ public class SwaggerKieServerExtension implements KieServerExtension {
     	this.context = registry;
     	
     	JaxrsScanner jaxrsScanner = new DefaultJaxrsScanner();
-		jaxrsScanner.setPrettyPrint(true);
-		/*
-		 * Set our JAX-RS Scanner with SCANNER_ID_DEFAULT.
-		 * We need to do this before creating the BeanConfig, as this prevents the BeanConfig to register itself as the default scanner.
-		 * The first one wins.
-		 */
-		SwaggerScannerLocator.getInstance()	.putScanner((SwaggerContextService.SCANNER_ID_DEFAULT), jaxrsScanner);
+    	jaxrsScanner.setPrettyPrint(true);
+    	/*
+    	 * Set our JAX-RS Scanner with SCANNER_ID_DEFAULT.
+    	 * We need to do this before creating the BeanConfig, as this prevents the BeanConfig to register itself as the default scanner.
+    	 * The first one wins.
+    	 */
+    	SwaggerScannerLocator.getInstance().putScanner((SwaggerContextService.SCANNER_ID_DEFAULT), jaxrsScanner);
 
-		BeanConfig beanConfig = new BeanConfig();
-		// TODO: Set the API version (or retrieve it from somewhere ...)
-		// beanConfig.setVersion("1.0.2");
-
-		String contextRoot = KieServerEnvironment.getContextRoot();
-		if (contextRoot != null) {
-			beanConfig.setBasePath(contextRoot + "/services/rest");
-		}
-
-		beanConfig.setScan(true);
-    	
+    	BeanConfig beanConfig = new BeanConfig();
+		
+    	String contextRoot = KieServerEnvironment.getContextRoot();
+    	if (contextRoot != null) {
+    		beanConfig.setBasePath(contextRoot + "/services/rest");
+    	}
+		
+    	//Set the Info on the Swagger object, not on the BeanConfig ... otherwise the Info on Swagger (which will be 'null') will override the Info we set on the BeanConfig.
+    	beanConfig.getSwagger().setInfo(getInfo());
+    	beanConfig.setScan(true);
+		
     	initialized = true;
+    }
+    
+    private Info getInfo() {
+    	Info info = new Info();
+    	// version in general refers to major version of the project (kie server) though it uses minor as well to allow emergency type of changesinfo.setTitle("KIE-Server API");
+    	// must be updated with every major release
+    	info.setVersion("7.0"); 
+    	return info;
     }
 
     @Override
