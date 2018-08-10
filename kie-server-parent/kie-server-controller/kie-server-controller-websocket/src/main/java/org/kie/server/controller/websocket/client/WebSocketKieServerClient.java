@@ -342,6 +342,16 @@ public class WebSocketKieServerClient implements KieServicesClient {
                 public List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
                     return throwUnsupportedException();
                 }
+
+                @Override
+                public List<ProcessInstance> findProcessInstancesByProcessIdAndInitiator(String processId, String initiator, List<Integer> status, Integer page, Integer pageSize) {
+                    return throwUnsupportedException();
+                }
+
+                @Override
+                public List<ProcessInstance> findProcessInstancesByProcessIdAndInitiator(String processId, String initiator, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+                    return throwUnsupportedException();
+                }
             };
         }
 
