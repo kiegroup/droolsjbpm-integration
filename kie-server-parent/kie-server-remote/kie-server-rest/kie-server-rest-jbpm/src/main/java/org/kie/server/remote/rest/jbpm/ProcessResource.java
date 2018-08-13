@@ -562,6 +562,8 @@ public class ProcessResource  {
 
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
 
+        } catch (WorkItemNotFoundException e) {
+            return notFound(MessageFormat.format(WORK_ITEM_NOT_FOUND, workItemId), v, conversationIdHeader);
         } catch (ProcessInstanceNotFoundException e) {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
@@ -636,7 +638,8 @@ public class ProcessResource  {
 
     @ApiOperation(value="Retrieves process instances that belong to given container",
             response=ProcessInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+                            @ApiResponse(code = 404, message = "Container Id not found")})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -648,17 +651,25 @@ public class ProcessResource  {
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
             @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
+        Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize, sort, sortOrder);
-        logger.debug("Returning result of process instance search: {}", processInstanceList);
-
-        return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        try {
+            ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize, sort, sortOrder);
+            logger.debug("Returning result of process instance search: {}", processInstanceList);
+    
+            return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
     }
 
     @ApiOperation(value="Retrieves process definitions that belong to given container",
             response=ProcessDefinitionList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+                            @ApiResponse(code = 404, message = "Container Id not found")})
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessesByDeploymentId(@Context HttpHeaders headers, 
@@ -668,18 +679,26 @@ public class ProcessResource  {
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
             @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
+        Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-
-        ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize, sort, sortOrder);
-        logger.debug("Returning result of process definition search: {}", processDefinitionList);
-
-        return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
-
+        try {
+            ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize, sort, sortOrder);
+            logger.debug("Returning result of process definition search: {}", processDefinitionList);
+    
+            return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
+            
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
     }
 
     @ApiOperation(value="Retrieves node instances for given process instance. Depending on provided query parameters (activeOnly or completedOnly) will return active and/or completes nodes",
             response=NodeInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found")})
     @GET
     @Path(PROCESS_INSTANCES_NODE_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -690,17 +709,27 @@ public class ProcessResource  {
             @ApiParam(value = "instructs if completed nodes only should be collected, defaults to false", required = false) @QueryParam("completedOnly")Boolean completed,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
-
+        
+        Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-
-        NodeInstanceList nodeInstanceList = runtimeDataServiceBase.getProcessInstanceHistory(processInstanceId, active, completed, page, pageSize);
-        logger.debug("Returning result of node instances search: {}", nodeInstanceList);
-        return createCorrectVariant(nodeInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        try {
+            NodeInstanceList nodeInstanceList = runtimeDataServiceBase.getProcessInstanceHistory(processInstanceId, active, completed, page, pageSize);
+            logger.debug("Returning result of node instances search: {}", nodeInstanceList);
+            return createCorrectVariant(nodeInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        }  catch (ProcessInstanceNotFoundException e) {
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
     }
 
     @ApiOperation(value="Retrieves variables last value (from audit logs) for given process instance",
             response=VariableInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found")})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -708,17 +737,27 @@ public class ProcessResource  {
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
             @ApiParam(value = "identifier of the process instance that variables state should be collected for", required = true) @PathParam("pInstanceId") long processInstanceId) {
 
+        Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-
-        VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariablesCurrentState(processInstanceId);
-        logger.debug("Returning result of variables search: {}", variableInstanceList);
-
-        return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        try {
+            VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariablesCurrentState(processInstanceId);
+            logger.debug("Returning result of variables search: {}", variableInstanceList);
+    
+            return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        }  catch (ProcessInstanceNotFoundException e) {
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
     }
 
     @ApiOperation(value="Retrieves variable history (from audit logs) for given variable name that belongs to process instance",
             response=VariableInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found")})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -730,11 +769,20 @@ public class ProcessResource  {
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-
-        VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariableHistory(processInstanceId, variableName, page, pageSize);
-        logger.debug("Returning result of variable '{}; history search: {}", variableName, variableInstanceList);
-
-        return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        Variant v = getVariant(headers);
+        try {
+            VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariableHistory(processInstanceId, variableName, page, pageSize);
+            logger.debug("Returning result of variable '{}; history search: {}", variableName, variableInstanceList);
+    
+            return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        }  catch (ProcessInstanceNotFoundException e) {
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
     }
 
     @ApiOperation(value="Retrieves process instances that belong to given container and have given parent process instance, optionally allow to filter by process instance state.",

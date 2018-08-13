@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.9.0-SNAPSHOT</version>
+    <version>7.10.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -30,6 +30,7 @@
     <!-- Path to Kie server WAR file. Used for referencing WAR file in on-demand deployment/undeployment. -->
     <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
     <org.kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml</org.kie.server.controller.templatefile>
+    <webservice.http.url>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</webservice.http.url>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
     <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/rest/controller</kie.server.controller.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
@@ -69,6 +70,7 @@
   </properties>
 
   <modules>
+    <module>kie-server-test-web-service</module>
     <module>kie-server-integ-tests-common</module>
     <module>kie-server-integ-tests-drools</module>
     <module>kie-server-integ-tests-jbpm</module>
@@ -79,7 +81,7 @@
     <module>kie-server-integ-tests-router</module>
     <module>kie-server-integ-tests-case-id-generator</module>
     <module>kie-server-integ-tests-dmn</module>
-    <module>kie-server-integ-tests-custom-extension</module>
+    <module>kie-server-integ-tests-custom-extension</module>    
   </modules>
 
   <dependencyManagement>
@@ -163,6 +165,12 @@
         <groupId>org.kie</groupId>
         <artifactId>kie-tomcat-integration</artifactId>
         <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-test-web-service</artifactId>
+        <version>${version.org.kie}</version>
+        <type>war</type>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
@@ -500,7 +508,7 @@
         <kie.server.classifier>webc</kie.server.classifier>
         <kie.server.war.path>${org.kie.server:kie-server:war:webc}</kie.server.war.path>
         <cargo.container.id>tomcat9x</cargo.container.id>
-        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>

@@ -233,39 +233,31 @@ public class Configuration {
         // update remaining items hosts per server
         this.hostsPerServer.keySet().forEach(server -> {
             
-            List<String> serverUrls = this.hostsPerServer.get(server);            
-            List<String> updatedServerUrls = updated.hostsPerServer.remove(server);            
-            Iterator<String> currentIt = serverUrls.iterator();
-            
-            while (currentIt.hasNext()) {
-                String url = currentIt.next();
-                
-                if (updatedServerUrls.contains(url)) {
-                    updatedServerUrls.remove(url);
+            List<String> serverUrls = new ArrayList<>(this.hostsPerServer.get(server));
+            List<String> updatedServerUrls = updated.hostsPerServer.remove(server);
+
+            for (String serverUrl : serverUrls) {
+                if (updatedServerUrls.contains(serverUrl)) {
+                    updatedServerUrls.remove(serverUrl);
                 } else {
-                    currentIt.remove();
-                    removeServerHost(server, url);
+                    removeServerHost(server, serverUrl);
                 }
             }
-            
+
             // all remaining from updated list add to this configuration
             updatedServerUrls.forEach(url -> addServerHost(server, url));
         });
         // update remaining items hosts per container
         this.hostsPerContainer.keySet().forEach(container -> {
             
-            List<String> serverUrls = this.hostsPerContainer.get(container);            
-            List<String> updatedServerUrls = updated.hostsPerContainer.remove(container);            
-            Iterator<String> currentIt = serverUrls.iterator();
-            
-            while (currentIt.hasNext()) {
-                String url = currentIt.next();
-                
-                if (updatedServerUrls.contains(url)) {
-                    updatedServerUrls.remove(url);
+            List<String> serverUrls = new ArrayList<>(this.hostsPerContainer.get(container));
+            List<String> updatedServerUrls = updated.hostsPerContainer.remove(container);
+
+            for (String serverUrl : serverUrls) {
+                if (updatedServerUrls.contains(serverUrl)) {
+                    updatedServerUrls.remove(serverUrl);
                 } else {
-                    currentIt.remove();
-                    removeContainerHost(container, url);
+                    removeContainerHost(container, serverUrl);
                 }
             }
             

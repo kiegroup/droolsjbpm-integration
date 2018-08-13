@@ -47,7 +47,7 @@ public class RuntimeManagementServiceImpl implements RuntimeManagementService {
                              containerSpec.getId());
     }
 
-    protected ContainerList getServerTemplateContainers(final String serverTemplateId,
+    public ContainerList getServerTemplateContainers(final String serverTemplateId,
                                                         final String containerSpecId) {
         final ServerTemplate serverTemplate = getServerTemplate(serverTemplateId);
 
@@ -70,7 +70,7 @@ public class RuntimeManagementServiceImpl implements RuntimeManagementService {
         return serverTemplate;
     }
 
-    protected ContainerList getServerInstanceContainers(final String serverTemplateId,
+    public ContainerList getServerInstanceContainers(final String serverTemplateId,
                                                         final String serverInstanceId) {
         final ServerTemplate serverTemplate = getServerTemplate(serverTemplateId);
         if (serverTemplate.hasServerInstanceId(serverInstanceId) == false) {

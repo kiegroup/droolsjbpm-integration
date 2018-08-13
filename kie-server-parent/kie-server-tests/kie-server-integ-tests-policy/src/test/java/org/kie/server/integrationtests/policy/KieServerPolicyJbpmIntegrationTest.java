@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
@@ -131,8 +132,15 @@ public class KieServerPolicyJbpmIntegrationTest extends KieServerPolicyBaseInteg
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         assertEquals(2, tasks.size());
 
-        // there are instances in both containers thus the older one cannot be disposed
-        processClient.abortProcessInstance(CONTAINER_ALIAS, processInstanceIdV1);
+        try {
+            // there are instances in both containers thus the older one cannot be disposed
+            processClient.abortProcessInstance(CONTAINER_ALIAS, processInstanceIdV1);
+        } catch (KieServicesException e) {
+            // In case we try to abort process belonging to currently disposed container then an exception is thrown (as process instance cannot be found in this case).
+            // Try to abort the process instance again after some time.
+            Thread.sleep(1000);
+            processClient.abortProcessInstance(CONTAINER_ALIAS, processInstanceIdV1);
+        }
 
         // In case of race condition when we abort process instance on container 
         // which is in process of dispose try by policy, we will wait and synchronize again.

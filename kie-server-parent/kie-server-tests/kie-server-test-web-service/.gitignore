@@ -1,0 +1,29 @@
+/target
+/local
+
+# Eclipse, Netbeans and IntelliJ files
+/.*
+!.gitignore
+/nbproject
+/*.ipr
+/*.iws
+/*.iml
+
+# Repository wide ignore mac DS_Store files
+.DS_Store
+
+# Original jbpm ignores
+bin/
+*~
+*.tlog
+
+# Test info
+bitronix-default-config.properties
+*.db
+
+# modules that don't exist (any more or yet) in this branch
+/jbpm-human-task-war/
+
+# files used for external db testing
+jdbc_driver.jar
+db-settings.xml

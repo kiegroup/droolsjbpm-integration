@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-osgi</artifactId>
-    <version>7.9.0-SNAPSHOT</version>
+    <version>7.10.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-karaf-itests</artifactId>
@@ -13,6 +13,9 @@
 
   <properties>
     <java.module.name>org.kie.karaf.itests.main</java.module.name>
+    <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
+    <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
+    <version.org.apache.servicemix.bundles.javax-inject>1_2</version.org.apache.servicemix.bundles.javax-inject>
   </properties>
 
   <dependencyManagement>
@@ -53,6 +56,28 @@
         <artifactId>org.apache.karaf.jndi.command</artifactId>
         <version>${version.org.apache.karaf}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.karaf.features</groupId>
+        <artifactId>standard</artifactId>
+        <version>${version.org.apache.karaf}</version>
+        <type>xml</type>
+        <classifier>features</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam-container-karaf</artifactId>
+        <version>${version.org.ops4j.pax.exam}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam-junit4</artifactId>
+        <version>${version.org.ops4j.pax.exam}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
+        <version>${version.org.apache.servicemix.bundles.javax-inject}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -113,7 +138,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.karaf.assemblies.features</groupId>
+      <groupId>org.apache.karaf.features</groupId>
       <artifactId>standard</artifactId>
       <type>xml</type>
       <classifier>features</classifier>
@@ -157,11 +182,6 @@
       <artifactId>org.apache.karaf.jndi.core</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.jndi</groupId>
-      <artifactId>org.apache.karaf.jndi.command</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
@@ -174,8 +194,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-atinject_1.0_spec</artifactId>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -309,6 +329,26 @@
               <systemPropertyVariables>
                 <kie.features.classifier>features-fuse</kie.features.classifier>
                 <additional.features.url>mvn:org.apache.karaf.assemblies.features/brms-features/${version.org.apache.karaf}/xml/features</additional.features.url>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>fuse71</id>
+      <properties>
+        <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <kie.features.classifier>features-fuse</kie.features.classifier>
+                <!--<additional.features.url>mvn:org.jboss.fuse.features/brms-features/VERSION/xml/features</additional.features.url>-->
+                <!--<karaf.version>4.2.0.fuse-BUILDNUMBER</karaf.version>-->
               </systemPropertyVariables>
             </configuration>
           </plugin>

@@ -28,6 +28,8 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.wiring.BundleWiring;
 
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
@@ -41,6 +43,9 @@ public class RuntimeManagerFeatureKarafIntegrationTest extends AbstractKarafInte
 
     @Test
     public void testJbpmRuntimeManager() throws Exception {
+        // pre-load BundleWiring.class - will be needed later
+        FrameworkUtil.getBundle(this.getClass()).adapt(BundleWiring.class);
+
         // use class loader that imports jbpm otherwise it will use kie api classloader
         ClassLoader classLoader = this.getClass().getClassLoader();
         // attempt to obtain RuntimeManagerFactory when KIE-API and Drools features are installed, but no jBPM
@@ -51,8 +56,21 @@ public class RuntimeManagerFeatureKarafIntegrationTest extends AbstractKarafInte
         featuresService.installFeature("jbpm");
 
         // attempt to obtain RuntimeManagerFactory once again, now jBPM is installed so it should succeed
-        runtimeManagerFactory = RuntimeManagerFactory.Factory.get(classLoader);
-        assertNotNull("KIE-API created null RuntimeManagerFactory after jBPM was installed.", runtimeManagerFactory);
+        RuntimeManagerFactory.Factory.reset();
+        // we can't use our bundle's classloader obtained above, because it's invalid after installing "jbpm" feature
+        // due to refresh operation performed by Karaf 4.resolver
+        // however we can get "fresh" classloader of our bundle
+        classLoader = FrameworkUtil.getBundle(this.getClass()).adapt(BundleWiring.class).getClassLoader();
+        // however, we can't even use RuntimeManagerFactory.Factory.class, because kie-api was also refreshed
+        //  - org.kie.api/7.7.1.201807101044 (Wired to org.drools.compiler/7.7.1.201807110808 which is being refreshed)
+        //  - org.drools.compiler/7.7.1.201807110808 (Wired to org.apache.servicemix.bundles.spring-context/4.3.16.RELEASE_1 which is being refreshed)
+        // even if we preinstall spring-orm (and jpa) features, drools-compiler will be refreshed anyway
+        // after installing jbpm feature eventually leading to refresh of kie-api too...
+//        runtimeManagerFactory = RuntimeManagerFactory.Factory.get(classLoader);
+        String className = System.getProperty("org.jbpm.runtime.manager.class",
+                "org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl");
+        Class<?> clazz = classLoader.loadClass(className);
+        assertNotNull("KIE-API created null RuntimeManagerFactory after jBPM was installed.", clazz.newInstance());
     }
 
     @Configuration

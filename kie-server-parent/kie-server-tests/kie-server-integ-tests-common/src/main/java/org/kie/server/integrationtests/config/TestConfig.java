@@ -53,6 +53,7 @@ public class TestConfig {
      * Property holding port number of embedded REST server router.
      */
     private static Integer ROUTER_ALLOCATED_PORT;
+    private static final StringTestParameter PROVIDED_WEBSERVICE_HTTP_URL = new StringTestParameter("webservice.http.url");
     private static final StringTestParameter PROVIDED_HTTP_URL = new StringTestParameter("kie.server.base.http.url");
     private static final StringTestParameter PROVIDED_CONTEXT = new StringTestParameter("kie.server.context");
     private static final StringTestParameter PROVIDED_CONTROLLER_HTTP_URL = new StringTestParameter("kie.server.controller.base.http.url");
@@ -86,6 +87,13 @@ public class TestConfig {
      */
     private static final StringTestParameter ORG_KIE_SERVER_DATASOURCE_DRIVER_CLASS = new StringTestParameter("org.kie.server.datasource.driver.class", "org.h2.Driver");
 
+    /**
+     * @return webservice http url.
+     */
+    public static String getWebServiceHttpURL() {
+        return TestConfig.PROVIDED_WEBSERVICE_HTTP_URL.getParameterValue();
+    }
+    
     /**
      * Get kie-server URL for HTTP services - like REST.
      *

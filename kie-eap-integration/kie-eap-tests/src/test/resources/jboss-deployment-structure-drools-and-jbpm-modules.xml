@@ -4,6 +4,7 @@
     <dependencies>
       <module name="org.drools" export="true" meta-inf="export"/>
       <module name="org.jbpm" export="true" meta-inf="export"/>
+      <module name="org.kie.api" export="true" meta-inf="export"/>
     </dependencies>
   </deployment>
 

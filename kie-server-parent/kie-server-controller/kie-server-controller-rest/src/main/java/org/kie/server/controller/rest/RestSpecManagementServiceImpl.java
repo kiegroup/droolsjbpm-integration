@@ -45,10 +45,12 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.controller.rest.ControllerUtils.*;
 
 @Path("/controller/management")
-public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
+public class RestSpecManagementServiceImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(RestSpecManagementServiceImpl.class);
     private static final String REQUEST_FAILED_TOBE_PROCESSED = "Request failed to be processed due to: ";
+
+    private SpecManagementServiceImpl specManagementService;
 
     @PUT
     @Path("servers/{id}/containers/{containerId}")
@@ -62,7 +64,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             ContainerSpec containerSpec = unmarshal(containerSpecPayload, contentType, ContainerSpec.class);
             logger.debug("Container spec is {}", containerSpec);
 
-            super.saveContainerSpec(serverTemplateId, containerSpec);
+            specManagementService.saveContainerSpec(serverTemplateId, containerSpec);
             logger.debug("Returning response for save container spec request for server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
         } catch (KieServerControllerIllegalArgumentException e) {
@@ -87,7 +89,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             ContainerSpec containerSpec = unmarshal(containerSpecPayload, contentType, ContainerSpec.class);
             logger.debug("Container spec is {}", containerSpec);
 
-            super.updateContainerSpec(serverTemplateId, containerId, containerSpec);
+            specManagementService.updateContainerSpec(serverTemplateId, containerId, containerSpec);
             logger.debug("Returning response for update container spec request for server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
         } catch (KieServerControllerIllegalArgumentException e) {
@@ -115,7 +117,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             }
             logger.debug("Server template is {}", serverTemplate);
 
-            super.saveServerTemplate(serverTemplate);
+            specManagementService.saveServerTemplate(serverTemplate);
             logger.debug("Returning response for save server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
         } catch (KieServerControllerIllegalArgumentException e) {
@@ -135,7 +137,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get server template with id {}", serverTemplateId);
-            final ServerTemplate serverTemplate = super.getServerTemplate(serverTemplateId);
+            final ServerTemplate serverTemplate = specManagementService.getServerTemplate(serverTemplateId);
             String response = marshal(contentType, serverTemplate);
             logger.debug("Returning response for get server template with id '{}': {}", serverTemplateId, response);
 
@@ -160,7 +162,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         try {
             logger.debug("Received get server templates");
 
-            String response = marshal(contentType, super.listServerTemplates());
+            String response = marshal(contentType, specManagementService.listServerTemplates());
             logger.debug("Returning response for get server templates: {}", response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);
@@ -183,7 +185,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         try {
             logger.debug("Received get containers for server template with id {}", serverTemplateId);
 
-            String response = marshal(contentType, super.listContainerSpec(serverTemplateId));
+            String response = marshal(contentType, specManagementService.listContainerSpec(serverTemplateId));
             logger.debug("Returning response for get containers for server templates with id {}: {}", serverTemplateId, response);
 
             return createCorrectVariant(response, headers, Response.Status.OK);
@@ -205,7 +207,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
 
-            ContainerSpec containerSpec = super.getContainerInfo(serverTemplateId, containerId);
+            ContainerSpec containerSpec = specManagementService.getContainerInfo(serverTemplateId, containerId);
             // set it as server template key only to avoid cyclic references between containers and templates
             containerSpec.setServerTemplateKey(new ServerTemplateKey(containerSpec.getServerTemplateKey().getId(), containerSpec.getServerTemplateKey().getName()));
 
@@ -230,7 +232,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
 
         try {
 
-            super.deleteContainerSpec(serverTemplateId, containerSpecId);
+            specManagementService.deleteContainerSpec(serverTemplateId, containerSpecId);
             // return null to produce 204
             return null;
         } catch (KieServerControllerIllegalArgumentException e) {
@@ -248,7 +250,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteServerTemplate(@Context HttpHeaders headers, @PathParam("id") String serverTemplateId) {
         try {
-            super.deleteServerTemplate(serverTemplateId);
+            specManagementService.deleteServerTemplate(serverTemplateId);
             // return null to produce 204
             return null;
         } catch (KieServerControllerIllegalArgumentException e) {
@@ -286,8 +288,8 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             }
             logger.debug("Container configuration is {}", containerConfig);
 
-            super.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
-            logger.debug("Returning response for update container (with id {}) config '{}': CREATED", containerSpecId);
+            specManagementService.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
+            logger.debug("Returning response for update container (with id {}) config '{}': CREATED", containerSpecId, containerConfig);
             return createCorrectVariant("", headers, Response.Status.CREATED);
         } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
@@ -309,7 +311,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
             containerSpecKey.setId(containerId);
             containerSpecKey.setServerTemplateKey(new ServerTemplateKey(serverTemplateId, ""));
-            super.stopContainer(containerSpecKey);
+            specManagementService.stopContainer(containerSpecKey);
 
             logger.debug("Returning response for stop container with id {} server instance: {}", containerId, serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.OK);
@@ -331,7 +333,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
             containerSpecKey.setId(containerId);
             containerSpecKey.setServerTemplateKey(new ServerTemplateKey(serverTemplateId, ""));
-            super.startContainer(containerSpecKey);
+            specManagementService.startContainer(containerSpecKey);
 
             logger.debug("Returning response for start container with id {} server instance: {}", containerId, serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.OK);
@@ -341,5 +343,9 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             logger.error("Start container failed due to {}", e.getMessage(), e);
             return createCorrectVariant("Unknown error " + e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public void setSpecManagementService(final SpecManagementServiceImpl specManagementService) {
+        this.specManagementService = specManagementService;
     }
 }

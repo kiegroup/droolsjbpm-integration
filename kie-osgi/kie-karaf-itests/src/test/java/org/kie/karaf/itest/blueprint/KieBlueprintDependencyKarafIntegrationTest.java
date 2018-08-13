@@ -77,6 +77,7 @@ public class KieBlueprintDependencyKarafIntegrationTest extends AbstractKarafInt
 
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
                         .add("OSGI-INF/blueprint/kie-beans-blueprint.xml",
                                 KieBlueprintDependencyKarafIntegrationTest.class.getResource(BLUEPRINT_XML_LOCATION))
                         .add("drl_kiesample_dependency/Hal1.drl",

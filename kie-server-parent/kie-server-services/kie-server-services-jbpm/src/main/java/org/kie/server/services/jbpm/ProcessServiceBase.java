@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
@@ -121,9 +122,13 @@ public class ProcessServiceBase {
 
 
     public Object abortProcessInstance(String containerId, Number processInstanceId) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
-        processService.abortProcessInstance(containerId, processInstanceId.longValue());
-        return null;
+        try {
+            containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+            processService.abortProcessInstance(containerId, processInstanceId.longValue());
+            return null;
+        } catch (IllegalArgumentException e) {
+            throw new DeploymentNotFoundException(e.getMessage());
+        }
     }
 
 

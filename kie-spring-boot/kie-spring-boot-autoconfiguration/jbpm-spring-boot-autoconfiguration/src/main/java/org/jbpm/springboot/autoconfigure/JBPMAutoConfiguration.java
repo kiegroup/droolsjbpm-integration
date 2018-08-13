@@ -113,6 +113,7 @@ public class JBPMAutoConfiguration {
     }
     
     @Bean
+    @ConditionalOnMissingBean(name = "entityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(JpaProperties jpaProperties){
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
@@ -256,11 +257,12 @@ public class JBPMAutoConfiguration {
     
     @Bean
     @ConditionalOnMissingBean(name = "queryService")
-    public QueryService queryService(TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider) {
+    public QueryService queryService(TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider, DeploymentService deploymentService, UserGroupCallback userGroupCallback) {
         
         QueryServiceImpl queryService = new QueryServiceImpl();
         queryService.setIdentityProvider(identityProvider);
-        queryService.setCommandService(transactionalCommandService);        
+        queryService.setCommandService(transactionalCommandService);
+        queryService.setUserGroupCallback(userGroupCallback);
         // override data source locator to not use JNDI
         SQLDataSetProvider sqlDataSetProvider = SQLDataSetProvider.get();
         sqlDataSetProvider.setDataSourceLocator(new SQLDataSourceLocator() {
@@ -272,6 +274,7 @@ public class JBPMAutoConfiguration {
         });
         
         queryService.init();
+        ((KModuleDeploymentService) deploymentService).addListener(queryService);
         
         return queryService;
     }
