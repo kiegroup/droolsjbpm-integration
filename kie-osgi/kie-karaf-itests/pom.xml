@@ -128,6 +128,16 @@
       <artifactId>kie-dmn-core</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-camel</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Features XML Dependencies used by pax-exam to resolve features to be deployed during test -->
     <dependency>

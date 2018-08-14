@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:kie="http://drools.org/schema/kie-aries-blueprint/1.0.0"
+           xsi:schemaLocation="
+           http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+           http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
+
+    <!-- Beans used by camel in the example -->
+    <bean id="droolsCommandHelper" class="org.kie.karaf.itest.camel.kiecamel.tools.DroolsCommandHelper"/>
+
+    <!-- Allows to inject the camel context into the test -->
+    <service id="sampleCamelContextService" ref="sampleCamelContext" interface="org.apache.camel.CamelContext"/>
+
+    <!-- Camel Route -->
+    <camelContext id="sampleCamelContext" xmlns="http://camel.apache.org/schema/blueprint">
+
+        <!-- cannot use because of https://issues.apache.org/jira/browse/CAMEL-5956 -->
+        <!--
+        <proxy id="ageVerificationProxy"
+               serviceInterface="org.kie.karaf.itest.camel.kiecamel.proxy.AgeVerificationService"
+               serviceUrl="direct://start"/>
+        -->
+
+        <route trace="true" id="testRoute">
+            <description>This route shows an example of passing (inserting) the Body of the message as a POJO to Drools
+                for execution
+            </description>
+            <from uri="direct://startAgeVerification"/>
+            <to uri="kie-local:example-ksession?action=insertBody" id="AgeVerification"/>
+            <choice>
+                <when id="CanDrink">
+                    <simple>${body.canDrink}</simple>
+                    <log logName="Bar" message="Person ${body.name} can go to the bar"/>
+                </when>
+                <otherwise>
+                    <log logName="Home" message="Person ${body.name} is staying home"/>
+                </otherwise>
+            </choice>
+        </route>
+
+        <!-- Decision Table Routes -->
+        <route trace="false" id="testRouteDecisionTable">
+            <description>This route shows an example of passing (inserting) the Body of the message as a POJO to Drools
+                for execution
+            </description>
+            <from uri="direct://startCheeseAssessment"/>
+            <to uri="kie-local:example-dt-ksession?action=insertBody" id="CheeseCost"/>
+            <choice>
+                <when id="CheeseType">
+                    <simple>${body.type}</simple>
+                    <log logName="Chilton" message="Cheese ${body.type} costs ${body.price} EUR."/>
+                </when>
+                <otherwise>
+                    <log logName="Cheddar" message="Cheese ${body.type} costs ${body.price} EUR."/>
+                </otherwise>
+            </choice>
+        </route>
+
+        <!-- Example of Drools command execution -->
+        <route trace="false" id="ruleOnCommand">
+            <description>This route shows an example of creating a Drools Command wrapping the Body of the message with
+                the help of the custom DroolsCommandHelperBean (included in this project), and passing this Drools
+                Command to the ruleset for execution.
+            </description>
+            <from uri="direct://ruleOnCommand"/>
+            <bean method="insertAndFireAll" ref="droolsCommandHelper"/>
+            <to uri="kie-local:example-command-ksession?action=execute"/>
+        </route>
+    </camelContext>
+
+</blueprint>

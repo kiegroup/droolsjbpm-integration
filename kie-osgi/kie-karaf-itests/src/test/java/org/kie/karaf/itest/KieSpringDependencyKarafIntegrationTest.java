@@ -64,7 +64,7 @@ public class KieSpringDependencyKarafIntegrationTest extends AbstractKarafIntegr
                 // Don't bother with local console output as it just ends up cluttering the logs
                 configureConsole().ignoreLocalConsole(),
                 // Force the log level to INFO so we have more details during the test.  It defaults to WARN.
-                logLevel(LogLevelOption.LogLevel.WARN),
+                logLevel(LogLevelOption.LogLevel.DEBUG),
 
                 // Option to be used to do remote debugging
                 //  debugConfiguration("5005", true),

@@ -67,7 +67,7 @@
 
   <feature name="jbpm-workitems" version="${project.version}" description="jBPM Work Items">
     <feature version="${project.version}">jbpm</feature>
-    <bundle>wrap:mvn:org.jbpm/jbpm-workitems/${version.org.jbpm}</bundle>
+    <bundle>wrap:mvn:org.jbpm/jbpm-workitems-core/${version.org.jbpm}</bundle>
   </feature>
 
   <feature name="jbpm-executor" version="${project.version}" description="jBPM Executor">
@@ -80,6 +80,26 @@
     <feature version="${project.version}">kie-spring</feature>
     <feature>droolsjbpm-hibernate</feature>
     <feature version="${h2.version}">h2</feature>
+  </feature>
+
+  <feature name="kie-camel" version="${project.version}">
+    <feature version="${project.version}">kie-spring</feature>
+    <feature version="${project.version}">jbpm</feature>
+    <feature version="${project.version}">kie-server-client</feature>
+    <feature>camel-core</feature>
+    <feature>camel-spring</feature>
+    <feature>camel-cxf</feature>
+    <feature>cxf-specs</feature>
+    <feature>cxf-core</feature>
+    <feature>cxf-jaxrs</feature>
+    <bundle>mvn:org.kie/kie-camel/${project.version}</bundle>
+  </feature>
+
+  <feature name="jbpm-workitems-camel" version="${project.version}">
+    <feature version="${project.version}">jbpm</feature>
+    <feature version="${project.version}">jbpm-workitems</feature>
+    <feature>camel-core</feature>
+    <bundle>mvn:org.jbpm.contrib/camel-workitem/${project.version}</bundle>
   </feature>
 
 </features>
