@@ -1,0 +1,10 @@
+package org.kie.karaf.itest.camel.kiecamel.drl;
+
+import org.kie.karaf.itest.camel.kiecamel.model.Person;
+
+rule "CanDrink"
+when
+    p : Person( age >= 21 )
+then
+	p.setCanDrink(true);
+end
