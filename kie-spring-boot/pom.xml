@@ -8,7 +8,8 @@
   OF ANY KIND, either express or implied. ~ See the License for the specific 
   language governing permissions and ~ limitations under the License. -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,8 +33,8 @@
   </modules>
 
   <properties>
-    <version.spring-boot>1.5.9.RELEASE</version.spring-boot>
-    <version.jersey>2.25.1</version.jersey>
+    <version.spring-boot>1.5.12.RELEASE</version.spring-boot>
+    <version.cxf.jaxrs>3.1.11</version.cxf.jaxrs>
   </properties>
 
   <dependencyManagement>
@@ -111,17 +112,23 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- jersey version comes from spring-boot-dependencies -->
+      <!-- cxf jaxrs version comes from spring-boot-dependencies -->
       <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>${version.jersey}</version>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-spring-boot-starter-jaxrs</artifactId>
+        <version>${version.cxf.jaxrs}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet-core</artifactId>
-        <version>${version.jersey}</version>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-core</artifactId>
+        <version>${version.cxf.jaxrs}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        <version>${version.cxf.jaxrs}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 </project>
