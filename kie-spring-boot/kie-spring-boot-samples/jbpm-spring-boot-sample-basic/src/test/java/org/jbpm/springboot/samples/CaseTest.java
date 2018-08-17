@@ -17,23 +17,18 @@
 package org.jbpm.springboot.samples;
 
 import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.appformer.maven.integration.MavenRepository;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
-import org.jbpm.services.api.RuntimeDataService;
-import org.jbpm.services.api.UserTaskService;
-import org.jbpm.springboot.samples.JBPMApplication;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -42,9 +37,6 @@ import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.api.task.model.Status;
-import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.query.QueryFilter;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -69,11 +61,6 @@ public class CaseTest {
     @Autowired
     private DeploymentService deploymentService;
     
-    @Autowired
-    private UserTaskService userTaskService;
-    
-    @Autowired
-    private RuntimeDataService runtimeDataService;
     
     @BeforeClass
     public static void generalSetup() {
