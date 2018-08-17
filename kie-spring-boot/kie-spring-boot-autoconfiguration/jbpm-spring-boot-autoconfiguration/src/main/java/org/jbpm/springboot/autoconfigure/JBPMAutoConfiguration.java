@@ -17,6 +17,9 @@
 package org.jbpm.springboot.autoconfigure;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +34,7 @@ import org.drools.persistence.api.TransactionManager;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
 import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
+import org.jbpm.casemgmt.api.event.CaseEventListener;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
@@ -67,13 +71,21 @@ import org.jbpm.services.task.identity.DefaultUserInfo;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.jbpm.springboot.security.SpringSecurityIdentityProvider;
 import org.jbpm.springboot.security.SpringSecurityUserGroupCallback;
+import org.jbpm.springboot.services.SpringKModuleDeploymentService;
+import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.executor.ExecutorService;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
+import org.kie.api.runtime.process.WorkItemHandler;
+import org.kie.api.task.TaskLifeCycleEventListener;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.identity.IdentityProvider;
+import org.kie.internal.runtime.conf.ObjectModelResolver;
+import org.kie.internal.runtime.conf.ObjectModelResolverProvider;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.spring.jbpm.services.SpringTransactionalCommandService;
 import org.kie.spring.manager.SpringRuntimeManagerFactoryImpl;
@@ -83,6 +95,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -106,10 +120,20 @@ public class JBPMAutoConfiguration {
  
     public JBPMAutoConfiguration(DataSource dataSource, 
                                  PlatformTransactionManager transactionManager,
-                                 JBPMProperties properties) {
+                                 JBPMProperties properties,
+                                 ApplicationContext applicationContext) {
         this.dataSource = dataSource;
         this.transactionManager = transactionManager;
         this.properties = properties;
+        // init any spring based ObjectModelResolvers
+        List<ObjectModelResolver> resolvers = ObjectModelResolverProvider.getResolvers();
+        if (resolvers != null) {
+            for (ObjectModelResolver resolver : resolvers) {
+                if (resolver instanceof ApplicationContextAware) {
+                    ((ApplicationContextAware) resolver).setApplicationContext(applicationContext);
+                }
+            }
+        }
     }
     
     @Bean
@@ -185,19 +209,34 @@ public class JBPMAutoConfiguration {
         return new SpringTransactionalCommandService(entityManagerFactory, kieTransactionManager, (AbstractPlatformTransactionManager) transactionManager);
     }
     
+    @SuppressWarnings("unchecked")
     @Bean
     @ConditionalOnMissingBean(name = "deploymentService")
-    public DeploymentService deploymentService(DefinitionService definitionService, RuntimeManagerFactory runtimeManagerFactory, FormManagerService formService, EntityManagerFactory entityManagerFactory, IdentityProvider identityProvider) {
+    public DeploymentService deploymentService(DefinitionService definitionService, RuntimeManagerFactory runtimeManagerFactory, FormManagerService formService, EntityManagerFactory entityManagerFactory, IdentityProvider identityProvider, 
+            Optional<List<WorkItemHandler>> handlers,
+            Optional<List<ProcessEventListener>> processEventListeners,
+            Optional<List<AgendaEventListener>> agendaEventListeners,
+            Optional<List<RuleRuntimeEventListener>> ruleRuntimeEventListeners,
+            Optional<List<TaskLifeCycleEventListener>> taskListeners,
+            Optional<List<CaseEventListener>> caseEventListeners
+            ) {
         EntityManagerFactoryManager.get().addEntityManagerFactory(PERSISTENCE_UNIT_NAME, entityManagerFactory);
         
-        KModuleDeploymentService deploymentService = new KModuleDeploymentService();
-        ((KModuleDeploymentService) deploymentService).setBpmn2Service(definitionService);
-        ((KModuleDeploymentService) deploymentService).setEmf(entityManagerFactory);
-        ((KModuleDeploymentService) deploymentService).setIdentityProvider(identityProvider);
-        ((KModuleDeploymentService) deploymentService).setManagerFactory(runtimeManagerFactory);
-        ((KModuleDeploymentService) deploymentService).setFormManagerService(formService);
+        SpringKModuleDeploymentService deploymentService = new SpringKModuleDeploymentService();
+        ((SpringKModuleDeploymentService) deploymentService).setBpmn2Service(definitionService);
+        ((SpringKModuleDeploymentService) deploymentService).setEmf(entityManagerFactory);
+        ((SpringKModuleDeploymentService) deploymentService).setIdentityProvider(identityProvider);
+        ((SpringKModuleDeploymentService) deploymentService).setManagerFactory(runtimeManagerFactory);
+        ((SpringKModuleDeploymentService) deploymentService).setFormManagerService(formService);
         
-        ((KModuleDeploymentService) deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
+        ((SpringKModuleDeploymentService) deploymentService).registerWorkItemHandlers((List<WorkItemHandler>) extractFromOptional(handlers));        
+        ((SpringKModuleDeploymentService) deploymentService).registerAgendaEventListeners((List<AgendaEventListener>) extractFromOptional(agendaEventListeners));        
+        ((SpringKModuleDeploymentService) deploymentService).registerCaseEventListeners((List<CaseEventListener>) extractFromOptional(caseEventListeners));
+        ((SpringKModuleDeploymentService) deploymentService).registerProcessEventListeners((List<ProcessEventListener>) extractFromOptional(processEventListeners));
+        ((SpringKModuleDeploymentService) deploymentService).registerRuleRuntimeEventListeners((List<RuleRuntimeEventListener>) extractFromOptional(ruleRuntimeEventListeners));
+        ((SpringKModuleDeploymentService) deploymentService).registerTaskListeners((List<TaskLifeCycleEventListener>) extractFromOptional(taskListeners));        
+        
+        ((SpringKModuleDeploymentService) deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
         
         return deploymentService;
     }
@@ -387,5 +426,13 @@ public class JBPMAutoConfiguration {
         caseInstanceMigrationService.setProcessService(processService);
         
         return caseInstanceMigrationService;
+    }
+    
+    protected Object extractFromOptional(Optional<?> optionalList) {
+        if (optionalList.isPresent()) {
+            return optionalList.get();
+        }
+        
+        return Collections.emptyList();
     }
 }
