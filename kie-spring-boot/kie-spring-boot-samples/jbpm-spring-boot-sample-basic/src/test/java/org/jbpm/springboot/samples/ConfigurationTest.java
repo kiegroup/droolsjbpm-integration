@@ -27,6 +27,7 @@ import org.appformer.maven.integration.MavenRepository;
 import org.drools.core.command.impl.RegistryContext;
 import org.drools.persistence.jpa.processinstance.JPAWorkItemManager;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
+import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.springboot.samples.handlers.CustomWorkItemHandler;
 import org.jbpm.springboot.samples.listeners.CustomProcessEventListener;
@@ -50,12 +51,15 @@ import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {JBPMApplication.class, TestAutoConfiguration.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-test.properties")
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class ConfigurationTest {
     
     static final String ARTIFACT_ID = "evaluation";
@@ -77,6 +81,7 @@ public class ConfigurationTest {
         MavenRepository repository = getMavenRepository();
         repository.installArtifact(releaseId, kjar, pom);
 
+        EntityManagerFactoryManager.get().clear();
     }
     
     
