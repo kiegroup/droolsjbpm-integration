@@ -58,6 +58,7 @@ import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.KieServicesClient;
@@ -350,6 +351,16 @@ public class WebSocketKieServerClient implements KieServicesClient {
 
                 @Override
                 public List<ProcessInstance> findProcessInstancesByProcessIdAndInitiator(String processId, String initiator, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+                    return throwUnsupportedException();
+                }
+
+                @Override
+                public TaskInstance findHumanTaskById(Long humanTaskId) {
+                    return throwUnsupportedException();
+                }
+
+                @Override
+                public List<TaskComment> findHumanTaskCommentsByTaskId(Long taskId, Integer page, Integer pageSize) {
                     return throwUnsupportedException();
                 }
             };

@@ -26,6 +26,7 @@ import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.jms.ResponseHandler;
@@ -148,6 +149,10 @@ public interface QueryServicesClient {
     List<ProcessInstance> findProcessInstancesWithFilters(String queryName, ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize);
     
     List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
-    
+
+    TaskInstance findHumanTaskById(Long humanTaskId);
+
+    List<TaskComment> findHumanTaskCommentsByTaskId(Long taskId, Integer page, Integer pageSize);
+
     void setResponseHandler(ResponseHandler responseHandler);
 }

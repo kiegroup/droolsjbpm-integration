@@ -143,6 +143,24 @@
            "methodName": "findProcessInstancesByProcessIdAndInitiator",
            "elementKind": "method",
            "justification":  "Added additional methods for quering process instances by both process and initiator"
+         },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method java.util.List<org.kie.server.api.model.instance.TaskComment> org.kie.server.client.QueryServicesClient::findHumanTaskCommentsByTaskId(java.lang.Long, java.lang.Integer, java.lang.Integer)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "QueryServicesClient",
+           "methodName": "findHumanTaskCommentsByTaskId",
+           "elementKind": "method",
+           "justification": "JBPM-7427 - Display task comments for completed tasks"
+         },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method org.kie.server.api.model.instance.TaskInstance org.kie.server.client.QueryServicesClient::findHumanTaskById(java.lang.Long)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "QueryServicesClient",
+           "methodName": "findHumanTaskById",
+           "elementKind": "method",
+           "justification": "JBPM-7427 - Display task comments for completed tasks"
          }
       ]
     }

@@ -99,6 +99,8 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             @XmlElement(name = "task-summary-list", type = TaskSummaryList.class),
             @XmlElement(name = "task-event-instance", type = TaskEventInstance.class),
             @XmlElement(name = "task-event-instance-list", type = TaskEventInstanceList.class),
+            @XmlElement(name = "task-comment", type = TaskComment.class),
+            @XmlElement(name = "task-comment-list", type = TaskCommentList.class),
             @XmlElement(name = "work-item-instance", type = WorkItemInstance.class),
             @XmlElement(name = "work-item-instance-list", type = WorkItemInstanceList.class),
             @XmlElement(name = "request-info-instance", type = RequestInfoInstance.class),
