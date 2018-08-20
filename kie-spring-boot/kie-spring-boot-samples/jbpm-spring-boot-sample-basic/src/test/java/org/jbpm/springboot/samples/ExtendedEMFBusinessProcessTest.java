@@ -29,6 +29,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.appformer.maven.integration.MavenRepository;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
+import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.springboot.samples.entities.Person;
@@ -42,12 +43,15 @@ import org.kie.api.builder.ReleaseId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {JBPMApplication.class, ExtendedEntityManagerFactory.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations="classpath:application-test.properties")
+@SpringBootTest(classes = {JBPMApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations="classpath:application-jpa.properties")
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class ExtendedEMFBusinessProcessTest {
     
     static final String ARTIFACT_ID = "evaluation";
@@ -74,6 +78,7 @@ public class ExtendedEMFBusinessProcessTest {
         MavenRepository repository = getMavenRepository();
         repository.installArtifact(releaseId, kjar, pom);
 
+        EntityManagerFactoryManager.get().clear();
     }
     
     

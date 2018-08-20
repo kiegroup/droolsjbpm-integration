@@ -25,67 +25,145 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JBPMProperties implements InitializingBean {
 
     private Executor executor = new Executor();
-   
+    private Quartz quartz = new Quartz();
+
     public Executor getExecutor() {
         return executor;
     }
-    
+
     public void setExecutor(Executor executor) {
         this.executor = executor;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        
+    public Quartz getQuartz() {
+        return quartz;
     }
 
+    public void setQuartz(Quartz quartz) {
+        this.quartz = quartz;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+    }
 
     public static class Executor {
+
         private int interval = 0;
         private int threadPoolSize = 1;
         private int retries = 3;
         private String timeUnit = TimeUnit.SECONDS.name();
-        
+
         private boolean enabled;
-        
+
         public int getInterval() {
             return interval;
         }
-        
+
         public void setInterval(int interval) {
             this.interval = interval;
         }
-        
+
         public int getThreadPoolSize() {
             return threadPoolSize;
         }
-        
+
         public void setThreadPoolSize(int threadPoolSize) {
             this.threadPoolSize = threadPoolSize;
         }
-        
+
         public int getRetries() {
             return retries;
         }
-        
+
         public void setRetries(int retries) {
             this.retries = retries;
         }
-        
+
         public String getTimeUnit() {
             return timeUnit;
         }
-        
+
         public void setTimeUnit(String timeUnit) {
             this.timeUnit = timeUnit;
         }
-        
+
         public boolean isEnabled() {
             return enabled;
         }
-        
+
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }  
+        }
+    }
+
+    public static class Quartz {
+
+        private int startDelay = 2;
+        private int rescheduleDelay = 500;
+        private int failedJobRetry = 5;
+        private int failedJobDelay = 1000;
+
+        private boolean enabled = false;
+        private boolean db = false;
+        private String configuration = "quartz.properties";
+
+        public int getStartDelay() {
+            return startDelay;
+        }
+
+        public void setStartDelay(int startDelay) {
+            this.startDelay = startDelay;
+        }
+
+        public int getRescheduleDelay() {
+            return rescheduleDelay;
+        }
+
+        public void setRescheduleDelay(int rescheduleDelay) {
+            this.rescheduleDelay = rescheduleDelay;
+        }
+
+        public int getFailedJobRetry() {
+            return failedJobRetry;
+        }
+
+        public void setFailedJobRetry(int failedJobRetry) {
+            this.failedJobRetry = failedJobRetry;
+        }
+
+        public int getFailedJobDelay() {
+            return failedJobDelay;
+        }
+
+        public void setFailedJobDelay(int failedJobDelay) {
+            this.failedJobDelay = failedJobDelay;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public boolean isDb() {
+            return db;
+        }
+
+        public void setDb(boolean db) {
+            this.db = db;
+        }
+
+        public String getConfiguration() {
+            return configuration;
+        }
+
+        public void setConfiguration(String configuration) {
+            this.configuration = configuration;
+        }
+
     }
 }
