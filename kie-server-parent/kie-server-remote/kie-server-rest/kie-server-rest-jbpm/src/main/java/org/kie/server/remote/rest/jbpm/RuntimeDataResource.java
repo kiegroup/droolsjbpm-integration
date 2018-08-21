@@ -15,31 +15,7 @@
 
 package org.kie.server.remote.rest.jbpm;
 
-import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_INSTANCE_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_BY_VAR_NAME_GET_URI;
-import static org.kie.server.api.rest.RestURI.QUERY_URI;
-import static org.kie.server.api.rest.RestURI.TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASKS_ASSIGN_POT_OWNERS_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASKS_BY_VAR_NAME_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASKS_EVENTS_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASKS_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASKS_OWNED_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASK_BY_PROCESS_INST_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASK_BY_WORK_ITEM_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASK_GET_URI;
-import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_INSTANCE_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
@@ -73,14 +49,7 @@ import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.instance.NodeInstance;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.TaskEventInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.*;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
@@ -658,6 +627,29 @@ public class RuntimeDataResource {
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
             TaskEventInstanceList result = runtimeDataServiceBase.getTaskEvents(taskId, page, pageSize, sort, sortOrder);
+            return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
+        } catch (TaskNotFoundException e) {
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @ApiOperation(value = "Retrieves task comments for given task id and applies pagination", response = TaskCommentList.class, code = 200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @GET
+    @Path(TASKS_COMMENTS_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getTaskComments(@Context HttpHeaders headers,
+                                    @ApiParam(value = "task id to load task comments for", required = true) @PathParam("tInstanceId") Long taskId,
+                                    @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+                                    @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+        Variant v = getVariant(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        try {
+            TaskCommentList result = runtimeDataServiceBase.getTaskComments(taskId, page, pageSize);
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
         } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);

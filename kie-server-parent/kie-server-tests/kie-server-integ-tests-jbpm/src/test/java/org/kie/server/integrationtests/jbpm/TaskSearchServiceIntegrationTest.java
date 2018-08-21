@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.jbpm;
 import static org.junit.Assume.assumeFalse;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.TaskField;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.JobRequestInstance;
+import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
@@ -319,6 +321,75 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
                                                                                         -2,
                                                                                         -1 ),
                                                task.getId() );
+    }
+
+    @Test
+    public void testFindHumanTaskById() {
+        Long processInstanceId = processClient.startProcess( CONTAINER_ID, PROCESS_ID_USERTASK );
+        Assertions.assertThat( processInstanceId ).isNotNull();
+
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner( USER_YODA, 0, 10 );
+        Assertions.assertThat( tasks ).isNotEmpty();
+        TaskSummary task = tasks.get( 0 );
+
+        TaskInstance instance = queryClient.findHumanTaskById(task.getId());
+
+        Assertions.assertThat( instance ).isNotNull();
+        Assertions.assertThat( instance.getId() ).isEqualTo( task.getId() );
+        Assertions.assertThat( instance.getContainerId() ).isEqualTo( CONTAINER_ID );
+        Assertions.assertThat( instance.getProcessInstanceId() ).isEqualTo( processInstanceId );
+        Assertions.assertThat( instance.getName() ).isEqualTo( FIRST_TASK_NAME );
+        Assertions.assertThat( instance.getActualOwner() ).isEqualTo( USER_YODA );
+        Assertions.assertThat( instance.getCreatedBy() ).isEqualTo( USER_YODA );
+        Assertions.assertThat( instance.getDescription() ).isEqualTo( task.getDescription() );
+        Assertions.assertThat( instance.getExpirationDate() ).isEqualTo( task.getExpirationTime() );
+        Assertions.assertThat( instance.getPriority() ).isEqualTo( task.getPriority() );
+        Assertions.assertThat( instance.getStatus() ).isEqualTo( task.getStatus() );
+    }
+
+    @Test
+    public void testFindHumanTaskByIdUsingInvalidId() {
+        assertClientException(
+                () -> queryClient.findHumanTaskById(-999l),
+                404,
+                "Could not find task instance with id \"-999\"",
+                "No task found with id -999");
+    }
+
+    @Test
+    public void testFindHumanTaskCommentsByTaskId() {
+        Long processInstanceId = processClient.startProcess( CONTAINER_ID, PROCESS_ID_USERTASK );
+        Assertions.assertThat( processInstanceId ).isNotNull();
+
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner( USER_YODA, 0, 10 );
+        Assertions.assertThat( tasks ).isNotEmpty();
+        TaskSummary task = tasks.get( 0 );
+
+        List<TaskComment> comments = queryClient.findHumanTaskCommentsByTaskId(task.getId(), 0, 10);
+        Assertions.assertThat( comments ).isEmpty();
+
+        final Date addedOn = new Date();
+        final String commentText = "comment";
+        taskClient.addTaskComment(CONTAINER_ID, task.getId(), commentText, USER_YODA, addedOn);
+
+        comments = queryClient.findHumanTaskCommentsByTaskId(task.getId(), 0, 10);
+        Assertions.assertThat( comments ).isNotEmpty();
+
+        TaskComment comment = comments.get( 0 );
+        Assertions.assertThat( comment ).isNotNull();
+        Assertions.assertThat( comment.getId() ).isNotNull();
+        Assertions.assertThat( comment.getText() ).isEqualTo( commentText );
+        Assertions.assertThat( comment.getAddedAt() ).isEqualTo( addedOn );
+        Assertions.assertThat( comment.getAddedBy() ).isEqualTo( USER_YODA );
+    }
+
+    @Test
+    public void testFindHumanTaskCommentsByTaskIdUsingInvalidId() {
+        assertClientException(
+                () -> queryClient.findHumanTaskCommentsByTaskId(-999l, 0, 10),
+                404,
+                "Could not find task instance with id \"-999\"",
+                "No task found with id -999");
     }
 
     @Test

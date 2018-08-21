@@ -15,39 +15,6 @@
 
 package org.kie.server.client.impl;
 
-import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
-import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
-import static org.kie.server.api.rest.RestURI.CREATE_QUERY_DEF_POST_URI;
-import static org.kie.server.api.rest.RestURI.DROP_QUERY_DEF_DELETE_URI;
-import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_INSTANCE_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_ID;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_BY_VAR_NAME_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
-import static org.kie.server.api.rest.RestURI.QUERY_DEF_GET_URI;
-import static org.kie.server.api.rest.RestURI.QUERY_DEF_URI;
-import static org.kie.server.api.rest.RestURI.QUERY_NAME;
-import static org.kie.server.api.rest.RestURI.QUERY_URI;
-import static org.kie.server.api.rest.RestURI.REPLACE_QUERY_DEF_PUT_URI;
-import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI;
-import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_POST_URI;
-import static org.kie.server.api.rest.RestURI.RUN_QUERY_DEF_GET_URI;
-import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_INSTANCE_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI;
-import static org.kie.server.api.rest.RestURI.VAR_NAME;
-import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
-import static org.kie.server.api.rest.RestURI.build;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,22 +38,11 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
-import org.kie.server.api.model.instance.NodeInstance;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
-import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskInstanceList;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.api.model.instance.TaskWithProcessDescription;
-import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
-import org.kie.server.api.model.instance.VariableInstance;
-import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.*;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.QueryServicesClient;
+
+import static org.kie.server.api.rest.RestURI.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class QueryServicesClientImpl extends AbstractKieServicesClientImpl implements QueryServicesClient {
@@ -1163,6 +1119,50 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
         } else {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public TaskInstance findHumanTaskById(Long taskId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = Collections.singletonMap(TASK_INSTANCE_ID, taskId);
+
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASK_GET_URI, valuesMap), TaskInstance.class);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "QueryService", "getTaskById", new Object[]{taskId}) ) );
+            ServiceResponse<TaskInstance> response = (ServiceResponse<TaskInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            return response.getResult();
+        }
+    }
+
+    @Override
+    public List<TaskComment> findHumanTaskCommentsByTaskId(Long taskId, Integer page, Integer pageSize) {
+        TaskCommentList taskCommentList = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = Collections.singletonMap(TASK_INSTANCE_ID, taskId);
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            taskCommentList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_COMMENTS_GET_URI, valuesMap) + queryString , TaskCommentList.class);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                                                                                         new DescriptorCommand( "QueryService", "getTaskComments", new Object[]{taskId, page, pageSize}) ) );
+            ServiceResponse<TaskCommentList> response = (ServiceResponse<TaskCommentList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            taskCommentList = response.getResult();
+        }
+
+        return taskCommentList.getItems();
     }
 
     protected Class<?> getResultTypeList(Class<?> resultType) {

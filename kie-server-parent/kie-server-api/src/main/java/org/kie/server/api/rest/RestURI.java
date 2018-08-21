@@ -136,6 +136,7 @@ public class RestURI {
     public static final String TASKS_GET_URI = "tasks/instances";
     public static final String TASKS_EVENTS_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}/events";
     public static final String TASK_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}";
+    public static final String TASKS_COMMENTS_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}/comments";
     public static final String TASK_BY_WORK_ITEM_ID_GET_URI = "tasks/instances/workitem/{" + WORK_ITEM_ID + "}";
     public static final String TASK_BY_PROCESS_INST_ID_GET_URI = "tasks/instances/process/{" + PROCESS_INST_ID + "}";
     public static final String TASKS_BY_VAR_NAME_GET_URI = "tasks/instances/variables/{" + VAR_NAME + "}";

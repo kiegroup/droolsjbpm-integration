@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
@@ -31,6 +32,7 @@ import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.VariableDesc;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.task.model.Comment;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.KieInternalServices;
@@ -42,14 +44,7 @@ import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.instance.NodeInstance;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.TaskEventInstance;
-import org.kie.server.api.model.instance.TaskEventInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.*;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
@@ -552,6 +547,23 @@ public class RuntimeDataServiceBase {
 
         return result;
 
+    }
+
+    public TaskCommentList getTaskComments(long taskId, Integer page, Integer pageSize) {
+        logger.debug("About to search for task {} comments", taskId);
+        List<Comment> comments = runtimeDataService.getTaskComments(taskId, buildQueryFilter(page, pageSize));
+
+        logger.debug("Found {} task comments available for task '{}'", comments.size(), taskId);
+
+        List<TaskComment> taskComments = comments.stream().map(comment ->
+            TaskComment.builder()
+                    .id(comment.getId())
+                    .text(comment.getText())
+                    .addedAt(comment.getAddedAt())
+                    .addedBy(comment.getAddedBy().getId())
+                    .build()
+        ).collect(Collectors.toList());
+        return new TaskCommentList(taskComments);
     }
 
     public TaskSummaryList getTasksByVariables(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
