@@ -31,6 +31,7 @@ import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerContainerExtension;
 import org.kie.server.services.impl.KieServerImpl;
@@ -38,6 +39,7 @@ import org.kie.server.springboot.SpringBootKieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -57,6 +59,8 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     
     @Value("${cxf.jaxrs.classes-scan:false}")
     private boolean jaxrsComponentScanEnabled;
+    
+    private SpringBootKieServerImpl kieServer;
 
     public KieServerAutoConfiguration(KieServerProperties properties, Optional<IdentityProvider> identityProvider) {
         this.properties = properties;
@@ -88,7 +92,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
             KieServerEnvironment.setServerName(serverName);
         }
         logger.info("KieServer (id {} (name {})) started initialization process", KieServerEnvironment.getServerId(), KieServerEnvironment.getServerName());
-        SpringBootKieServerImpl kieServer = new SpringBootKieServerImpl(extensions, identityProvider);        
+        kieServer = new SpringBootKieServerImpl(extensions, identityProvider);        
         kieServer.init();
         
         KieServerRestImpl kieServerResource = new KieServerRestImpl(kieServer);
@@ -105,6 +109,13 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
         logger.info("KieServer (id {}) started successfully", KieServerEnvironment.getServerId());
         return kieServer;
     }
+    
+    @Bean
+    @ConditionalOnBean(name="kieServer")
+    public KieServerRegistry kieServerRegistry() {
+        return kieServer.getServerRegistry();
+    }
+
 
     @Override
     protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
