@@ -35,6 +35,9 @@
   <properties>
     <version.spring-boot>1.5.12.RELEASE</version.spring-boot>
     <version.cxf.jaxrs>3.1.11</version.cxf.jaxrs>
+    <version.me.snowdrop.narayana>1.0.1</version.me.snowdrop.narayana>
+    <version.org.jboss.narayana.tomcat>5.8.0.Final</version.org.jboss.narayana.tomcat>
+    <version.org.apache.commons-dbcp2>2.4.0</version.org.apache.commons-dbcp2>
   </properties>
 
   <dependencyManagement>
@@ -127,6 +130,17 @@
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxrs</artifactId>
         <version>${version.cxf.jaxrs}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>me.snowdrop</groupId>
+        <artifactId>narayana-spring-boot-starter</artifactId>
+        <version>${version.me.snowdrop.narayana}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-dbcp2</artifactId>
+        <version>${version.org.apache.commons-dbcp2}</version>
       </dependency>
 
     </dependencies>
