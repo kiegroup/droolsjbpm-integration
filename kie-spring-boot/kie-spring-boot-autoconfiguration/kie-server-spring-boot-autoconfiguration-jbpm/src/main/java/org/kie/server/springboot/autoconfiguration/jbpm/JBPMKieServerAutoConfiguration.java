@@ -31,9 +31,11 @@ import org.jbpm.services.api.query.QueryService;
 import org.jbpm.springboot.autoconfigure.JBPMAutoConfiguration;
 import org.kie.api.executor.ExecutorService;
 import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.springboot.autoconfiguration.KieServerProperties;
 import org.kie.server.springboot.autoconfiguration.jbpm.extensions.SpringBootJBPMKieServerExtension;
+import org.kie.server.springboot.jbpm.ContainerAliasResolver;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -105,5 +107,12 @@ public class JBPMKieServerAutoConfiguration {
         return new SpringBootJBPMKieServerExtension(deploymentService, definitionService, processService, userTaskService, runtimeDataService, formManagerService, processInstanceMigrationService,
                                                     processInstanceAdminService, userTaskAdminService, executorService, queryService);
 
+    }
+    
+    
+    @Bean
+    @ConditionalOnMissingBean(name = "containerAliasResolver")
+    public ContainerAliasResolver containerAliasResolver(KieServerRegistry kieServerRegistry) {
+        return new ContainerAliasResolver(kieServerRegistry);
     }
 }
