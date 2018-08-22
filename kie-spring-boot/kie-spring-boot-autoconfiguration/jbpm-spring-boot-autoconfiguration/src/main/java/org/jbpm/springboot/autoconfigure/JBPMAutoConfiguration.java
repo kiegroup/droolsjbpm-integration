@@ -18,8 +18,10 @@ package org.jbpm.springboot.autoconfigure;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -103,7 +105,6 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.bind.RelaxedDataBinder;
@@ -150,19 +151,16 @@ public class JBPMAutoConfiguration {
     private XADataSourceWrapper wrapper;
     
     private JBPMProperties properties;
-    private DataSourceProperties dataSourceProperties;
     
     private PlatformTransactionManager transactionManager;
  
     public JBPMAutoConfiguration(XADataSourceWrapper wrapper, 
                                  PlatformTransactionManager transactionManager,
-                                 DataSourceProperties dataSourceProperties,
                                  JBPMProperties properties,
                                  ApplicationContext applicationContext) {
         
         this.wrapper = wrapper;
         this.transactionManager = transactionManager;
-        this.dataSourceProperties = dataSourceProperties;
         this.properties = properties;
         // init any spring based ObjectModelResolvers
         List<ObjectModelResolver> resolvers = ObjectModelResolverProvider.getResolvers();
@@ -176,7 +174,14 @@ public class JBPMAutoConfiguration {
         if (properties.getQuartz().isEnabled()) {
             SpringConnectionProvider.setApplicationContext(applicationContext);
         }
-    }    
+    }  
+    
+    @Bean
+    @Primary
+    @ConfigurationProperties("spring.datasource")
+    public DataSourceProperties dataSourceProperties() {
+        return new DataSourceProperties();
+    }
 
     @Bean
     @Primary
@@ -552,17 +557,35 @@ public class JBPMAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "quartzDataSource")
     @ConditionalOnProperty(name = {"jbpm.quartz.enabled", "jbpm.quartz.db"}, havingValue="true")
-    @ConfigurationProperties("quartz.datasource")
     public DataSource quartzDataSource(DataSource dataSource) {
         return dataSource;
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean(name = "quartzDatasourceProperties")
+    @ConfigurationProperties("quartz.datasource")
+    public DataSourceProperties quartzDatasourceProperties() {
+        return new DataSourceProperties();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean(name = "quartzPoolProperties")
+    @ConfigurationProperties("quartz.datasource.dbcp2")
+    public Map<String, Object> quartzPoolProperties() {
+        return new HashMap<>();
     }
 
     @Bean
     @ConditionalOnMissingBean(name = "quartzNotManagedDataSource")
     @ConditionalOnProperty(name = {"jbpm.quartz.enabled", "jbpm.quartz.db"}, havingValue="true")
-    @ConfigurationProperties("quartz.datasource")
     public DataSource quartzNotManagedDataSource() {
-        return DataSourceBuilder.create().build();
+        DataSource ds = quartzDatasourceProperties().initializeDataSourceBuilder().build();
+        Map<String, Object> poolProperties = quartzPoolProperties();
+        
+        MutablePropertyValues properties = new MutablePropertyValues(poolProperties);
+        new RelaxedDataBinder(ds).bind(properties);
+        
+        return ds;
     }
     
     /*
@@ -570,6 +593,8 @@ public class JBPMAutoConfiguration {
      */
 
     private XADataSource createXaDataSource() {
+        DataSourceProperties dataSourceProperties = dataSourceProperties();
+        
         String className = dataSourceProperties.getXa().getDataSourceClassName();
         if (!StringUtils.hasLength(className)) {
             className = DatabaseDriver.fromJdbcUrl(dataSourceProperties.determineUrl())
@@ -597,9 +622,9 @@ public class JBPMAutoConfiguration {
 
     private void bindXaProperties(XADataSource target, DataSourceProperties properties) {
         MutablePropertyValues values = new MutablePropertyValues();
-        values.add("user", dataSourceProperties.determineUsername());
-        values.add("password", dataSourceProperties.determinePassword());
-        values.add("url", dataSourceProperties.determineUrl());
+        values.add("user", properties.determineUsername());
+        values.add("password", properties.determinePassword());
+        values.add("url", properties.determineUrl());
         values.addPropertyValues(properties.getXa().getProperties());
         new RelaxedDataBinder(target).withAlias("user", "username").bind(values);
     }
