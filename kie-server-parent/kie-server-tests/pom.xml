@@ -59,7 +59,7 @@
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
 
     <version.tomcat9>9.0.8</version.tomcat9>
-    <version.wildfly11>11.0.0.Final</version.wildfly11>
+    <version.wildfly13>13.0.0.Final</version.wildfly13>
     <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
     <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
@@ -607,14 +607,15 @@
           <artifactId>kie-tomcat-integration</artifactId>
         </dependency>
       </dependencies>
-    </profile>    
+    </profile>  
     <profile>
+      <!-- temporary hack to let it test on jenkins id>wildfly13</id-->
       <id>wildfly11</id>
       <properties>        
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
-        <cargo.container.id>wildfly11x</cargo.container.id>
+        <cargo.container.id>wildfly13x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -628,7 +629,7 @@
                   <artifactInstaller>
                     <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-dist</artifactId>
-                    <version>${version.wildfly11}</version>
+                    <version>${version.wildfly13}</version>
                   </artifactInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
@@ -687,11 +688,18 @@
             there is nothing like wildfly-bom, so this is the closest thing I could find. 
             Important: this overrides lots of the versions coming from kie-p-w-d -->
           <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-parent</artifactId>
-            <version>${version.wildfly11}</version>
+            <groupId>org.wildfly.bom</groupId>
+            <artifactId>wildfly</artifactId>
+            <version>${version.wildfly13}</version>
             <type>pom</type>
             <scope>import</scope>
+          </dependency>
+          <dependency>
+            <groupId>org.wildfly.bom</groupId>
+            <artifactId>jms-client-bom</artifactId>
+            <version>${version.wildfly13}</version>
+            <type>pom</type>
+            <scope>test</scope>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -702,13 +710,13 @@
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-jms-client-bom</artifactId>
+          <groupId>org.wildfly.bom</groupId>
+          <artifactId>jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
         </dependency>
       </dependencies>
-    </profile>
+    </profile>      
     <profile>
       <id>eap7</id>
       <properties>
