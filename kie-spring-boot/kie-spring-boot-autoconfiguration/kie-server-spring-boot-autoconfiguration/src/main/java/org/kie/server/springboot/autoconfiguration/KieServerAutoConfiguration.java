@@ -133,7 +133,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     @Override
     public List<Feature> getFeatures() {
         List<Feature> features = new ArrayList<>(super.getFeatures());
-        if (properties.isSwagger()) {
+        if (properties.getSwagger().isEnabled()) {
             try {
                 features.add((Feature) Class.forName("org.apache.cxf.jaxrs.swagger.Swagger2Feature").newInstance());
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
