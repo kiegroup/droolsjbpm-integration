@@ -40,12 +40,6 @@
     <dependency>
       <groupId>me.snowdrop</groupId>
       <artifactId>narayana-spring-boot-starter</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>jms</artifactId>
-          <groupId>org.jboss.narayana.jta</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>

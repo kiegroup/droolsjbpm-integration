@@ -93,7 +93,7 @@ public class TimerProcessTest {
         deploymentService.undeploy(unit);
     }
  
-    @Test(timeout=10000)
+    @Test(timeout=60000)
     public void testProcessStartWithTimer() throws Exception {
         countDownListener.configure("timerprocess", 1);
         

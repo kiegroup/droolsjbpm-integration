@@ -27,9 +27,7 @@ public class KieServerProperties implements InitializingBean {
     private String serverId = "SpringBoot";
     private String serverName = "KieServer-SpringBoot";
 
-    private String restContextPath = "/rest";
-
-    private boolean swagger = false;
+    private Swagger swagger = new Swagger();
 
     public String getServerId() {
         return serverId;
@@ -45,14 +43,6 @@ public class KieServerProperties implements InitializingBean {
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
-    }
-
-    public String getRestContextPath() {
-        return restContextPath;
-    }
-
-    public void setRestContextPath(String restContextPath) {
-        this.restContextPath = restContextPath;
     }
 
     public String getLocation() {
@@ -71,17 +61,30 @@ public class KieServerProperties implements InitializingBean {
         this.controllers = controllers;
     }
 
-    public boolean isSwagger() {
+    public Swagger getSwagger() {
         return swagger;
     }
 
-    public void setSwagger(boolean swagger) {
+    public void setSwagger(Swagger swagger) {
         this.swagger = swagger;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
 
+    }
+
+    public static class Swagger {
+
+        private boolean enabled = false;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 
 }
