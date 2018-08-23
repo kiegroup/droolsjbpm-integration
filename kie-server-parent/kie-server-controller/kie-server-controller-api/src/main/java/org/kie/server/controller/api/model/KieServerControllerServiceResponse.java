@@ -34,6 +34,8 @@ import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateKeyList;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @XmlRootElement(name = "controller-response")
 @XmlAccessorType(XmlAccessType.NONE)
 public class KieServerControllerServiceResponse<T> implements KieServiceResponse<T> {
@@ -56,6 +58,7 @@ public class KieServerControllerServiceResponse<T> implements KieServiceResponse
             @XmlElement(name = "server-instance-key", type = ServerInstanceKey.class),
             @XmlElement(name = "container-details-list", type = ContainerList.class)
     })
+    @JsonProperty
     private T result;
 
     public KieServerControllerServiceResponse() {
