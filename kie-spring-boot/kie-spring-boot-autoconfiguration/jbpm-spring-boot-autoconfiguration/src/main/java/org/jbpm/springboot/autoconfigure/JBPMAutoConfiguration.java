@@ -146,6 +146,12 @@ public class JBPMAutoConfiguration {
     
     private static final String CLASS_RESOURCE_PATTERN = "/**/*.class"; 
     private static final String PACKAGE_INFO_SUFFIX = ".package-info";
+    
+    private static final String QUARTZ_PROPS = "org.quartz.properties";
+    private static final String QUARTZ_FAILED_DELAY = "org.jbpm.timer.quartz.delay";
+    private static final String QUARTZ_FAILED_RETRIES = "org.jbpm.timer.quartz.retries";
+    private static final String QUARTZ_RESECHEDULE_DELAY = "org.jbpm.timer.quartz.reschedule.delay";
+    private static final String QUARTZ_START_DELAY = "org.jbpm.timer.delay";
 
     private XADataSource xaDataSource;
     private XADataSourceWrapper wrapper;
@@ -306,17 +312,17 @@ public class JBPMAutoConfiguration {
         runtimeManager.setUserInfo(userInfo);
         
         if (properties.getQuartz().isEnabled()) {
-            System.setProperty("org.quartz.properties", properties.getQuartz().getConfiguration());
-            System.setProperty("org.jbpm.timer.quartz.delay", String.valueOf(properties.getQuartz().getFailedJobDelay()));
-            System.setProperty("org.jbpm.timer.quartz.retries", String.valueOf(properties.getQuartz().getFailedJobRetry()));
-            System.setProperty("org.jbpm.timer.quartz.reschedule.delay", String.valueOf(properties.getQuartz().getRescheduleDelay()));
-            System.setProperty("org.jbpm.timer.delay", String.valueOf(properties.getQuartz().getStartDelay()));
+            System.setProperty(QUARTZ_PROPS, properties.getQuartz().getConfiguration());
+            System.setProperty(QUARTZ_FAILED_DELAY, String.valueOf(properties.getQuartz().getFailedJobDelay()));
+            System.setProperty(QUARTZ_FAILED_RETRIES, String.valueOf(properties.getQuartz().getFailedJobRetry()));
+            System.setProperty(QUARTZ_RESECHEDULE_DELAY, String.valueOf(properties.getQuartz().getRescheduleDelay()));
+            System.setProperty(QUARTZ_START_DELAY, String.valueOf(properties.getQuartz().getStartDelay()));
         } else {
-            System.clearProperty("org.quartz.properties");
-            System.clearProperty("org.jbpm.timer.quartz.delay");
-            System.clearProperty("org.jbpm.timer.quartz.retries");
-            System.clearProperty("org.jbpm.timer.quartz.reschedule.delay");
-            System.clearProperty("org.jbpm.timer.delay");
+            System.clearProperty(QUARTZ_PROPS);
+            System.clearProperty(QUARTZ_FAILED_DELAY);
+            System.clearProperty(QUARTZ_FAILED_RETRIES);
+            System.clearProperty(QUARTZ_RESECHEDULE_DELAY);
+            System.clearProperty(QUARTZ_START_DELAY);
         }
         
         return runtimeManager;
@@ -616,7 +622,7 @@ public class JBPMAutoConfiguration {
         }
         catch (Exception ex) {
             throw new IllegalStateException(
-                    "Unable to create XADataSource instance from '" + className + "'");
+                    "Unable to create XADataSource instance from '" + className + "'", ex);
         }
     }
 

@@ -141,6 +141,10 @@
           <groupId>javax.transaction</groupId>
           <artifactId>jta</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>c3p0</groupId>
+          <artifactId>c3p0</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
