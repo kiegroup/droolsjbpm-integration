@@ -234,8 +234,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(1, taskList.size());
             taskSummary = taskList.get(0);
             checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
-            
-            //Try to claim task which is already reserved (Code 403)
+
+            //Try to claim task which is already reserved by different user (Code 403)
+            changeUser(USER_JOHN);
             Long taskId = taskList.get(0).getId();
             assertClientException(
                                   () -> taskClient.claimTask(CONTAINER_ID, taskId, USER_JOHN),
@@ -243,6 +244,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
                                   "User '[UserImpl:'"+ USER_JOHN +"']' was unable to execute operation 'Claim' on task id "+ taskId +" due to a no 'current status' match");
 
         } finally {
+            changeUser(TestConfig.getUsername());
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
@@ -646,12 +648,13 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // forwarded task change state to Ready and is assigned to john as potential owner
             changeUser(USER_JOHN);
             checkTaskStatusAndOwners(CONTAINER_ID, taskSummary.getId(), Status.Ready, "", USER_JOHN);
-        
-            // forwarding task in Ready state to a user without permissions (Code 403)
+
+            // forwarding task in Ready state by a user who isn't potential owner (Code 403)
+            changeUser(USER_YODA);
             assertClientException(
-                                  () -> taskClient.forwardTask(CONTAINER_ID, taskSummary.getId(), USER_WITHOUT_PERMISSIONS, USER_YODA),
+                                  () -> taskClient.forwardTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, USER_WITHOUT_PERMISSIONS),
                                   403,
-                                  "User '[UserImpl:'"+ USER_WITHOUT_PERMISSIONS +"']' does not have permissions to execute operation 'Forward' on task id "+ taskSummary.getId());
+                                  "User '[UserImpl:'"+ USER_YODA +"']' does not have permissions to execute operation 'Forward' on task id "+ taskSummary.getId());
             
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -718,12 +721,13 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // delegated task change state to Reserved and is assigned to john as actual owner
             changeUser(USER_JOHN);
             checkTaskStatusAndActualOwner(CONTAINER_ID, taskSummary.getId(), Status.Reserved, USER_JOHN);
-            
-            // delegating task in Reserved state (Code 403)
+
+            // delegating task in Reserved state by a user who isn't potential owner (Code 403)
+            changeUser(USER_YODA);
             assertClientException(
-                                  () -> taskClient.delegateTask(CONTAINER_ID, taskSummary.getId(), USER_WITHOUT_PERMISSIONS, USER_YODA),
+                                  () -> taskClient.delegateTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, USER_WITHOUT_PERMISSIONS),
                                   403,
-                                  "User '[UserImpl:'"+ USER_WITHOUT_PERMISSIONS +"']' does not have permissions to execute operation 'Delegate' on task id "+ taskSummary.getId());
+                                  "User '[UserImpl:'"+ USER_YODA +"']' does not have permissions to execute operation 'Delegate' on task id "+ taskSummary.getId());
             
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -746,14 +750,15 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             checkTaskStatusAndActualOwner(CONTAINER_ID, taskSummary.getId(), Status.Reserved, USER_YODA);
 
-            // Nomitated task with status different to Created (403)
+            // Nominated task with status different to Created by a user who isn't potential owner (403)
+            changeUser(USER_JOHN);
             List<String> listPotOwners = new ArrayList<String>();
             listPotOwners.add(USER_YODA);
             listPotOwners.add(USER_JOHN);
             assertClientException(
-                                  () -> taskClient.nominateTask(CONTAINER_ID, taskSummary.getId(), USER_WITHOUT_PERMISSIONS, listPotOwners),
+                                  () -> taskClient.nominateTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN, listPotOwners),
                                   403,
-                                  "User '[UserImpl:'"+ USER_WITHOUT_PERMISSIONS +"']' was unable to execute operation 'Nominate' on task id "+ taskSummary.getId() +" due to a no 'current status' match");
+                                  "User '[UserImpl:'"+ USER_JOHN +"']' was unable to execute operation 'Nominate' on task id "+ taskSummary.getId() +" due to a no 'current status' match");
 
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);

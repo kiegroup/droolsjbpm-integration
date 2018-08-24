@@ -389,7 +389,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
         userTask = taskClient.getTaskInstance(CONTAINER_ALIAS, taskSummary.getId());
         assertThat(userTask).isNotNull();
         assertThat(userTask.getContainerId()).isEqualTo(CONTAINER_ID_101);
-        assertThat(userTask.getName()).isEqualTo("Evaluate items");
+        assertThat(userTask.getName()).isEqualTo("Evaluate items?");
         assertThat(userTask.getStatus()).isEqualTo(Status.Completed.toString());
 
         //Second one - Approve
