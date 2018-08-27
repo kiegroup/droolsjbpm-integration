@@ -196,7 +196,7 @@ abstract public class AbstractKarafIntegrationTest {
         }
         options.add(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
                         "http://repo1.maven.org/maven2@id=central," +
-                        "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public" +
+                        "https://repository.jboss.org/nexus/content/groups/public@snapshots@id=jboss-public" +
                         additionalMavenRepositories
             ));
         options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
