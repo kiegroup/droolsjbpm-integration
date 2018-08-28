@@ -62,7 +62,6 @@
     <module>jbpm-simulation</module>
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
-    <module>kie-eap-integration</module>
     <module>kie-infinispan</module>
     <module>drools-jboss-integration</module>
     <module>kie-server-parent</module>
