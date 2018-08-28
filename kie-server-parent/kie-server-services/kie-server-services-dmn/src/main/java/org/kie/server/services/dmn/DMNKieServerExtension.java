@@ -16,6 +16,8 @@
 package org.kie.server.services.dmn;
 
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.api.*;
 import org.kie.server.services.impl.KieServerImpl;
 import org.slf4j.Logger;
@@ -144,4 +146,13 @@ public class DMNKieServerExtension
         return EXTENSION_NAME + " KIE Server extension";
     }
 
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        if (report) {
+            messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+        }        
+        return messages;
+    }
 }

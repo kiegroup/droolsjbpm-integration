@@ -48,6 +48,8 @@ public interface CaseServicesClient {
 
     public static final String COMMENT_SORT_BY_AUTHOR = "Author";
     public static final String COMMENT_SORT_BY_DATE = "Date";
+    
+    public static final String ACCESS_PUBLIC_GROUP = "_public_";
 
     String startCase(String containerId, String caseDefinitionId);
 
@@ -76,6 +78,10 @@ public interface CaseServicesClient {
     void putCaseInstanceData(String containerId, String caseId, Map<String, Object> data);
 
     void putCaseInstanceData(String containerId, String caseId, String name, Object data);
+    
+    void putCaseInstanceData(String containerId, String caseId, Map<String, Object> data, List<String> restrictions);
+
+    void putCaseInstanceData(String containerId, String caseId, String name, Object data, List<String> restrictions);
 
     void removeCaseInstanceData(String containerId, String caseId, String... names);
 
@@ -127,9 +133,13 @@ public interface CaseServicesClient {
 
     List<CaseComment> getComments(String containerId, String caseId, String sortBy, Integer page, Integer pageSize);
 
-    void addComment(String containerId, String caseId, String author, String text);
+    String addComment(String containerId, String caseId, String author, String text);
 
     void updateComment(String containerId, String caseId, String commentId, String author, String text);
+    
+    String addComment(String containerId, String caseId, String author, String text, List<String> restrictions);
+
+    void updateComment(String containerId, String caseId, String commentId, String author, String text, List<String> restrictions);
 
     void removeComment(String containerId, String caseId, String commentId);    
 

@@ -51,7 +51,7 @@ import org.osgi.framework.Constants;
 public class KieBlueprintScannerReimportIntegrationTest extends AbstractKarafIntegrationTest {
 
     private static final String BLUEPRINT_XML_LOCATION = "/org/kie/karaf/itest/blueprint/kie-scanner-reimport-blueprint.xml";
-    private static final ReleaseId RELEASE_ID = KieServices.Factory.get().newReleaseId("org.kie.karaf.itest", "import-scanner-test-jar", "1.0.0-SNAPSHOT");
+    private static final ReleaseId RELEASE_ID = KieServices.Factory.get().newReleaseId("org.kie.karaf.itest", "import-scanner-test-jar", "1.0.0");
 
     private KieScannerTestUtils kieScannerTestUtils = new KieScannerTestUtils();
 
@@ -154,6 +154,7 @@ public class KieBlueprintScannerReimportIntegrationTest extends AbstractKarafInt
 
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
+                        .set(Constants.BUNDLE_MANIFESTVERSION, "2")
                         .add("OSGI-INF/blueprint/kie-scanner-import-blueprint.xml",
                                 KieBlueprintDependencyKarafIntegrationTest.class.getResource(BLUEPRINT_XML_LOCATION))
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Bundle")

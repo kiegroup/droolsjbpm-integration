@@ -23,7 +23,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("The test takes insane amount of time (minutes) to complete, because the serialization takes into account" +
-        "also huge amount of DRLs coming from drools-pmml. Will be investigated and fixed by psiroky.")
+        "also huge amount of DRLs coming from kie-pmml. Will be investigated and fixed by psiroky.")
 public class SerializeMojoIntegrationTest extends KieMavenPluginBaseIntegrationTest {
 
     public SerializeMojoIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {

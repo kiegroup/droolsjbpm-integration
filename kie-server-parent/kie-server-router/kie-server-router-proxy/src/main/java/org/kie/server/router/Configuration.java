@@ -25,9 +25,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.jboss.logging.Logger;
+import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.FailedHostInfo;
 
 public class Configuration {
+
+    private static final Logger log = Logger.getLogger(Configuration.class);
 
     private Map<String, List<String>> hostsPerServer = new ConcurrentHashMap<>();
     private Map<String, List<String>> hostsPerContainer = new ConcurrentHashMap<>();
@@ -105,6 +109,12 @@ public class Configuration {
 
     public void removeContainerInfo(ContainerInfo containerInfo) {
         List<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
+
+        if (containersById == null) {
+            log.warn("Container info with id '" + containerInfo.getContainerId() + "' is not found, nothing is removed.");
+            return;
+        }
+
         containersById.remove(containerInfo);
         
         List<String> hosts = hostsPerContainer.getOrDefault(containerInfo.getContainerId(), Collections.emptyList());
@@ -223,39 +233,31 @@ public class Configuration {
         // update remaining items hosts per server
         this.hostsPerServer.keySet().forEach(server -> {
             
-            List<String> serverUrls = this.hostsPerServer.get(server);            
-            List<String> updatedServerUrls = updated.hostsPerServer.remove(server);            
-            Iterator<String> currentIt = serverUrls.iterator();
-            
-            while (currentIt.hasNext()) {
-                String url = currentIt.next();
-                
-                if (updatedServerUrls.contains(url)) {
-                    updatedServerUrls.remove(url);
+            List<String> serverUrls = new ArrayList<>(this.hostsPerServer.get(server));
+            List<String> updatedServerUrls = updated.hostsPerServer.remove(server);
+
+            for (String serverUrl : serverUrls) {
+                if (updatedServerUrls.contains(serverUrl)) {
+                    updatedServerUrls.remove(serverUrl);
                 } else {
-                    currentIt.remove();
-                    removeServerHost(server, url);
+                    removeServerHost(server, serverUrl);
                 }
             }
-            
+
             // all remaining from updated list add to this configuration
             updatedServerUrls.forEach(url -> addServerHost(server, url));
         });
         // update remaining items hosts per container
         this.hostsPerContainer.keySet().forEach(container -> {
             
-            List<String> serverUrls = this.hostsPerContainer.get(container);            
-            List<String> updatedServerUrls = updated.hostsPerContainer.remove(container);            
-            Iterator<String> currentIt = serverUrls.iterator();
-            
-            while (currentIt.hasNext()) {
-                String url = currentIt.next();
-                
-                if (updatedServerUrls.contains(url)) {
-                    updatedServerUrls.remove(url);
+            List<String> serverUrls = new ArrayList<>(this.hostsPerContainer.get(container));
+            List<String> updatedServerUrls = updated.hostsPerContainer.remove(container);
+
+            for (String serverUrl : serverUrls) {
+                if (updatedServerUrls.contains(serverUrl)) {
+                    updatedServerUrls.remove(serverUrl);
                 } else {
-                    currentIt.remove();
-                    removeContainerHost(container, url);
+                    removeContainerHost(container, serverUrl);
                 }
             }
             
@@ -275,5 +277,14 @@ public class Configuration {
         });
         
         this.listeners.forEach(l -> l.onConfigurationReloaded());
+    }
+    
+    public synchronized void reloadFromRepository(ConfigRepository repository) {
+        
+        Configuration loaded = repository.load();
+        
+        this.containerInfosPerContainer = loaded.getContainerInfosPerContainer();
+        this.hostsPerContainer = loaded.getHostsPerContainer();
+        this.hostsPerServer = loaded.getHostsPerServer();
     }
 }

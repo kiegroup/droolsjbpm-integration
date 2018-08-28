@@ -188,17 +188,21 @@ public class ExecutorServiceBase {
     // instance details
     public String getRequestById(long requestId, boolean withErrors, boolean withData, String marshallingType) {
 
-        RequestInfo request = executorService.getRequestById(requestId);
-
-        RequestInfoInstance requestInstance = convertToRequestInfo(request, withErrors, withData);
-
         String result = null;
 
-        String deploymentId = ((org.jbpm.executor.entities.RequestInfo) request).getDeploymentId();
-        if (deploymentId != null && context.getContainer(deploymentId) != null) {
-            result = marshallerHelper.marshal(deploymentId, marshallingType, requestInstance);
+        RequestInfo request = executorService.getRequestById(requestId);
+
+        if (request == null) {
+            throw new IllegalArgumentException("Request with id: " + requestId + " doesn't exist");
         } else {
-            result = marshallerHelper.marshal(marshallingType, requestInstance);
+            RequestInfoInstance requestInstance = convertToRequestInfo(request, withErrors, withData);
+
+            String deploymentId = ((org.jbpm.executor.entities.RequestInfo) request).getDeploymentId();
+            if (deploymentId != null && context.getContainer(deploymentId) != null) {
+                result = marshallerHelper.marshal(deploymentId, marshallingType, requestInstance);
+            } else {
+                result = marshallerHelper.marshal(marshallingType, requestInstance);
+            }
         }
 
         return result;

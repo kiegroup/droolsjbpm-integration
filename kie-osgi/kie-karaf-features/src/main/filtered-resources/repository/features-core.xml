@@ -7,6 +7,9 @@
   <feature name="drools-module" version="${project.version}" description="Drools Core">
     <feature version="${project.version}">drools-common</feature>
     <feature version="${project.version}">kie</feature>
+    <bundle>mvn:org.drools/drlx-parser/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-canonical-model/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-model-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-cdi/${version.org.drools}</bundle>
@@ -20,18 +23,18 @@
 
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
     <feature version="${project.version}">drools-module</feature>
-    <feature version="[3.1,4.0)">spring-orm</feature>
-    <feature version="[${karaf.version.org.apache.aries.jpa},2.0)">jpa</feature>
+    <feature version="[4,5)">spring-orm</feature>
+    <feature version="[2,3)">jpa</feature>
     <bundle>mvn:org.drools/drools-persistence-api/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie" version="${project.version}" description="KIE API">
+  <feature name="kie" version="${project.version}" description="KIE API" start-level="70">
     <feature version="${project.version}">drools-common</feature>
     <bundle>mvn:org.kie.soup/kie-soup-commons/${version.org.kie}</bundle>
     <bundle>mvn:org.kie.soup/kie-soup-project-datamodel-api/${version.org.kie}</bundle>
     <bundle>mvn:org.kie.soup/kie-soup-project-datamodel-commons/${version.org.kie}</bundle>
-    <bundle>mvn:org.uberfire/uberfire-maven-support/${version.org.uberfire}</bundle>
+    <bundle>mvn:org.kie.soup/kie-soup-maven-support/${version.org.kie}</bundle>
     <bundle>mvn:org.kie/kie-api/${version.org.drools}</bundle>
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
@@ -48,12 +51,9 @@
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm</feature>
     <feature version="${project.version}">jbpm-human-task</feature>
-    <feature version="[3.1,4.0)">spring</feature>
-    <feature version="[3.1,4.0)">spring-jdbc</feature>
-    <feature version="[3.1,4.0)">spring-orm</feature>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-extender/${version.org.springframework.osgi}</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-core/${version.org.springframework.osgi}</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-io/${version.org.springframework.osgi}</bundle>
+    <feature version="[4,5)">spring</feature>
+    <feature version="[4,5)">spring-jdbc</feature>
+    <feature version="[4,5)">spring-orm</feature>
     <bundle>mvn:org.kie/kie-spring/${version.org.drools}</bundle>
   </feature>
 
@@ -67,7 +67,7 @@
 
   <feature name="jbpm-workitems" version="${project.version}" description="jBPM Work Items">
     <feature version="${project.version}">jbpm</feature>
-    <bundle>wrap:mvn:org.jbpm/jbpm-workitems/${version.org.jbpm}</bundle>
+    <bundle>wrap:mvn:org.jbpm/jbpm-workitems-core/${version.org.jbpm}</bundle>
   </feature>
 
   <feature name="jbpm-executor" version="${project.version}" description="jBPM Executor">
@@ -77,10 +77,29 @@
 
   <feature name="jbpm-spring-persistent" version="${project.version}" description="jBPM Spring Persistence support">
     <feature version="${project.version}">jbpm</feature>
-    <feature>spring-dm</feature>
     <feature version="${project.version}">kie-spring</feature>
     <feature>droolsjbpm-hibernate</feature>
     <feature version="${h2.version}">h2</feature>
+  </feature>
+
+  <feature name="kie-camel" version="${project.version}">
+    <feature version="${project.version}">kie-spring</feature>
+    <feature version="${project.version}">jbpm</feature>
+    <feature version="${project.version}">kie-server-client</feature>
+    <feature>camel-core</feature>
+    <feature>camel-spring</feature>
+    <feature>camel-cxf</feature>
+    <feature>cxf-specs</feature>
+    <feature>cxf-core</feature>
+    <feature>cxf-jaxrs</feature>
+    <bundle>mvn:org.kie/kie-camel/${project.version}</bundle>
+  </feature>
+
+  <feature name="jbpm-workitems-camel" version="${project.version}">
+    <feature version="${project.version}">jbpm</feature>
+    <feature version="${project.version}">jbpm-workitems</feature>
+    <feature>camel-core</feature>
+    <bundle>mvn:org.jbpm.contrib/camel-workitem/${project.version}</bundle>
   </feature>
 
 </features>

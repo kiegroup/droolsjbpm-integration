@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-controller-plugin</artifactId>
   <packaging>maven-plugin</packaging>
@@ -128,6 +128,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
     </dependency>
 
     <!-- JAR-RS 2 client -->

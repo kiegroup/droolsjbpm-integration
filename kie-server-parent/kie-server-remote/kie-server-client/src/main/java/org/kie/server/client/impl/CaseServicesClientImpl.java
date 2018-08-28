@@ -328,19 +328,31 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
         }
         return result;
     }
-
+    
     @Override
     public void putCaseInstanceData(String containerId, String caseId, Map<String, Object> data) {
+        putCaseInstanceData(containerId, caseId, data, null);
+    }
+    
+    @Override
+    public void putCaseInstanceData(String containerId, String caseId, String name, Object data) {
+        putCaseInstanceData(containerId, caseId, name, data, null);
+    }
+
+    @Override
+    public void putCaseInstanceData(String containerId, String caseId, Map<String, Object> data, List<String> restrictions) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(CASE_ID, caseId);
+            
+            String queryString = getAdditionalParams("", "restrictedTo", restrictions);
 
             makeHttpPostRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_FILE_POST_URI, valuesMap), data, null);
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_FILE_POST_URI, valuesMap) + queryString, data, null);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseService", "putCaseFileData", serialize(safeMap(data)), marshaller.getFormat().getType(), new Object[]{containerId, caseId})) );
+                    (KieServerCommand) new DescriptorCommand("CaseService", "putCaseFileData", serialize(safeMap(data)), marshaller.getFormat().getType(), new Object[]{containerId, caseId, safeList(restrictions)})) );
             ServiceResponse<?> response = (ServiceResponse<?>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -349,18 +361,20 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public void putCaseInstanceData(String containerId, String caseId, String name, Object data) {
+    public void putCaseInstanceData(String containerId, String caseId, String name, Object data, List<String> restrictions) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(CASE_ID, caseId);
             valuesMap.put(CASE_FILE_ITEM, name);
+            
+            String queryString = getAdditionalParams("", "restrictedTo", restrictions);
 
             makeHttpPostRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_FILE_BY_NAME_POST_URI, valuesMap), data, null);
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_FILE_BY_NAME_POST_URI, valuesMap) + queryString, data, null);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseService", "putCaseFileDataByName", serialize(data), marshaller.getFormat().getType(), new Object[]{containerId, caseId, name})) );
+                    (KieServerCommand) new DescriptorCommand("CaseService", "putCaseFileDataByName", serialize(data), marshaller.getFormat().getType(), new Object[]{containerId, caseId, name, safeList(restrictions)})) );
             ServiceResponse<?> response = (ServiceResponse<?>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -757,28 +771,49 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public void addComment(String containerId, String caseId, String author, String text) {
+    public String addComment(String containerId, String caseId, String author, String text) {
+        return addComment(containerId, caseId, author, text, null);
+    }
+    
+    @Override
+    public void updateComment(String containerId, String caseId, String commentId, String author, String text) {
+        updateComment(containerId, caseId, commentId, author, text, null);
+    }
+    
+    @Override
+    public String addComment(String containerId, String caseId, String author, String text, List<String> restrictions) {
+        Object result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(CASE_ID, caseId);
 
             String queryString = "?author="+ author;
+            queryString = getAdditionalParams(queryString, "restrictedTo", restrictions);
 
-            makeHttpPostRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_COMMENTS_POST_URI, valuesMap) + queryString, text, null);
+            result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_COMMENTS_POST_URI, valuesMap) + queryString, text, String.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseService", "addCommentToCase", serialize(text), marshaller.getFormat().getType(), new Object[]{containerId, caseId, author})) );
-            ServiceResponse<?> response = (ServiceResponse<?>)
+                    (KieServerCommand) new DescriptorCommand("CaseService", "addCommentToCase", serialize(text), marshaller.getFormat().getType(), new Object[]{containerId, caseId, author, safeList(restrictions)})) );
+            ServiceResponse<String> response = (ServiceResponse<String>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = deserialize(response.getResult(), Object.class);
         }
+
+        if (result instanceof Wrapped) {
+            return (String) ((Wrapped) result).unwrap();
+        }
+        return (String) result;
     }
 
     @Override
-    public void updateComment(String containerId, String caseId, String commentId, String author, String text) {
+    public void updateComment(String containerId, String caseId, String commentId, String author, String text, List<String> restrictions) {
 
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -787,12 +822,13 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             valuesMap.put(CASE_COMMENT_ID, commentId);
 
             String queryString = "?author="+ author;
+            queryString = getAdditionalParams(queryString, "restrictedTo", restrictions);
 
             makeHttpPutRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_COMMENTS_PUT_URI, valuesMap) + queryString, serialize(text), null, new HashMap<String, String>());
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseService", "updateCommentInCase", serialize(text), marshaller.getFormat().getType(), new Object[]{containerId, caseId, commentId, author})) );
+                    (KieServerCommand) new DescriptorCommand("CaseService", "updateCommentInCase", serialize(text), marshaller.getFormat().getType(), new Object[]{containerId, caseId, commentId, author, safeList(restrictions)})) );
             ServiceResponse<?> response = (ServiceResponse<?>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 

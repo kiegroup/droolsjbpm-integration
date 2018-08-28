@@ -25,12 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.naming.InitialContext;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.appformer.maven.support.DependencyFilter;
 import org.drools.core.impl.InternalKieContainer;
 import org.kie.api.KieServices;
@@ -48,20 +49,18 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
-import org.kie.server.controller.api.model.KieServerSetup;
-import org.kie.server.services.api.KieControllerNotConnectedException;
-import org.kie.server.services.api.KieControllerNotDefinedException;
+import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieServerRegistryAware;
-import org.kie.server.services.impl.controller.ControllerConnectRunnable;
+import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.policy.PolicyManager;
@@ -79,12 +78,13 @@ public class KieServerImpl implements KieServer {
     private static final ServiceLoader<KieServerExtension> serverExtensions = ServiceLoader.load(KieServerExtension.class);
 
     private static final ServiceLoader<KieServerController> kieControllers = ServiceLoader.load(KieServerController.class);
-    private final KieServerRegistry context;
-    private final PolicyManager policyManager;
+    private KieServerRegistry context;
+    private PolicyManager policyManager;
     private final KieServerStateRepository repository;
     // TODO figure out how to get actual URL of the kie server
     private String kieServerLocation = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION, "http://localhost:8230/kie-server/services/rest/server");
     private volatile AtomicBoolean kieServerActive = new AtomicBoolean(false);
+    private volatile AtomicBoolean kieServerReady = new AtomicBoolean(false);
 
     private List<Message> serverMessages = new ArrayList<Message>();
     private Map<String, List<Message>> containerMessages = new ConcurrentHashMap<String, List<Message>>();
@@ -92,14 +92,20 @@ public class KieServerImpl implements KieServer {
     private KieServerEventSupport eventSupport = new KieServerEventSupport();
 
     private KieServices ks = KieServices.Factory.get();
+    
+    private long startTimestamp;
+    
+    private boolean managementDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "false"));
 
     public KieServerImpl() {
         this(new KieServerStateFileRepository());
     }
 
     public KieServerImpl(KieServerStateRepository stateRepository) {
-        this.repository = stateRepository;
-
+        this.repository = stateRepository;    
+    }
+    
+    public void init() {
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
         this.context.registerStateRepository(repository);
@@ -139,53 +145,15 @@ public class KieServerImpl implements KieServer {
         kieServerActive.set(true);
         eventSupport.fireBeforeServerStarted(this);
 
-        boolean readyToRun = false;
-        KieServerController kieController = getController();
-        // try to load container information from available controllers if any...
-        KieServerInfo kieServerInfo = getInfoInternal();
-        Set<KieContainerResource> containers = null;
-        KieServerSetup kieServerSetup = null;
-        try {
-            kieServerSetup = kieController.connect(kieServerInfo);
-
-            containers = kieServerSetup.getContainers();
-            readyToRun = true;
-        } catch (KieControllerNotDefinedException e) {
-            // if no controllers use local storage
-            containers = currentState.getContainers();
-            kieServerSetup = new KieServerSetup();
-            readyToRun = true;
-        } catch (KieControllerNotConnectedException e) {
-            // if controllers are defined but cannot be reached schedule connection and disable until it gets connection to one of them
-            readyToRun = false;
-            logger.warn("Unable to connect to any controllers, delaying container installation until connection can be established");
-            Thread connectToControllerThread = new Thread(new ControllerConnectRunnable(kieServerActive,
-                                                                                        kieController,
-                                                                                        kieServerInfo,
-                                                                                        currentState,
-                                                                                        containerManager,
-                                                                                        this), "KieServer-ControllerConnect");
-            connectToControllerThread.start();
-            if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "false"))) {
-                logger.info("Containers were requested to be deployed synchronously, holding application start...");
-                try {
-                    connectToControllerThread.join();
-                } catch (InterruptedException e1) {
-                    logger.debug("Interrupt exception when waiting for deployments");
-                }
-            }
-        }
-
-        if (readyToRun) {
-            addServerStatusMessage(kieServerInfo);
-            if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "false"))) {
-                containerManager.installContainersSync(this, containers, currentState, kieServerSetup);
-            } else {
-                containerManager.installContainers(this, containers, currentState, kieServerSetup);
-            }
-        }
+        startTimestamp = System.currentTimeMillis();
+        
+        StartupStrategy startupStrategy = StartupStrategyProvider.get().getStrategy();
+        logger.info("Selected startup strategy {}", startupStrategy);
+        startupStrategy.startup(this, containerManager, currentState, kieServerActive);
+        
         eventSupport.fireAfterServerStarted(this);
     }
+    
 
     public KieServerRegistry getServerRegistry() {
         return context;
@@ -354,6 +322,11 @@ public class KieServerImpl implements KieServer {
             return new ServiceResponse<KieContainerResourceList>(ServiceResponse.ResponseType.FAILURE, "Error listing containers: " +
                     e.getClass().getName() + ": " + e.getMessage());
         }
+    }
+    
+    protected List<KieContainerInstanceImpl> getContainers() {
+        
+        return context.getContainers();
     }
 
     private List<KieContainerResource> getContainersWithMessages() {
@@ -766,6 +739,7 @@ public class KieServerImpl implements KieServer {
                 repository.store(KieServerEnvironment.getServerId(), currentState);
 
                 logger.info("Container {} successfully updated to release id {}", id, releaseId);
+                ks.getRepository().removeKieModule(originalReleaseId);
 
                 messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + id));
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
@@ -917,7 +891,80 @@ public class KieServerImpl implements KieServer {
     public PolicyManager getPolicyManager() {
         return this.policyManager;
     }
+    
+    public boolean isKieServerReady() {
+        return kieServerReady.get();
+    }
 
+    public void markAsReady() {
+        kieServerReady.set(true);
+        logger.info("KieServer {} is ready to receive requests", KieServerEnvironment.getServerId());
+        
+        for (KieServerExtension extension : context.getServerExtensions()) {
+
+            try {
+                extension.serverStarted();
+            } catch (Exception e) {
+                logger.error("Error when destroying server extension of type {}", extension, e);
+            }
+        }
+    }
+    
+    public List<Message> healthCheck(boolean report) throws IllegalStateException {
+        List<Message> healthMessages = new ArrayList<>();
+        long start = System.currentTimeMillis();
+        if (!isKieServerReady()) {
+            healthMessages.add(new Message(Severity.ERROR, String.format("KIE Server '%s' is not ready to serve requests",
+                                                                         KieServerEnvironment.getServerId())));
+        }
+        
+        if (report) {
+            List<String> mainInfo = new ArrayList<>();
+            mainInfo.add(String.format("KIE Server '%s' is ready to serve requests %s", 
+                                       KieServerEnvironment.getServerId(), 
+                                       isKieServerReady()));
+            mainInfo.add("Server is up for " + calculateUptime());
+            
+            Message header = new Message(Severity.INFO, mainInfo);
+            healthMessages.add(header);
+        }
+        // first check of KIE Server's containers if any of them is in failed state
+        for (KieContainerInstance container : getContainers()) {
+            if (container.getStatus().equals(KieContainerStatus.FAILED)) {
+                healthMessages.add(new Message(Severity.ERROR, String.format("KIE Container '%s' is in FAILED state",
+                                                                             container.getContainerId()) ));
+            }
+        }
+        // next check all extensions for their health
+        for (KieServerExtension extension : getServerExtensions()) {
+            List<Message> extensionMessages = extension.healthCheck(report);
+            healthMessages.addAll(extensionMessages);        
+        }
+        
+        if (report) {           
+            Message footer = new Message(Severity.INFO, "Health check done in " + (System.currentTimeMillis() - start) + " ms");
+            healthMessages.add(footer);
+        }
+        
+        return healthMessages;
+ 
+    }
+    
+    private String calculateUptime() {
+
+        long different = System.currentTimeMillis() - startTimestamp;
+        return DurationFormatUtils.formatDurationWords(different, false, false);
+
+    }
+    
+    public ServiceResponse<?> checkAccessability() {
+        if (managementDisabled) {
+            return new ServiceResponse<Void>(ServiceResponse.ResponseType.FAILURE, "KIE Server management api is disabled");
+        }
+        
+        return null;
+    }
+    
     @Override
     public String toString() {
         return "KieServer{" +
@@ -927,4 +974,5 @@ public class KieServerImpl implements KieServer {
                 "location='" + kieServerLocation + '\'' +
                 '}';
     }
+
 }

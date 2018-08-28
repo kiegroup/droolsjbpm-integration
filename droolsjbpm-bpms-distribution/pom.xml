@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>droolsjbpm-bpms-distribution</artifactId>
@@ -214,10 +214,6 @@
       <artifactId>drools-scorecards</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-verifier</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-aries-blueprint</artifactId>
     </dependency>
@@ -266,14 +262,6 @@
           <artifactId>jta</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz-oracle</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz-weblogic</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>

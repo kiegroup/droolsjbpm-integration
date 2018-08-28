@@ -15,16 +15,19 @@
 
 package org.kie.server.api.model.dmn;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -43,12 +46,14 @@ public class DMNContextKS {
     private String modelName;
 
     @XmlElement(name="decision-name")
-    @XStreamAlias("decision-name")
-    private String decisionName;
+    @XStreamImplicit(itemFieldName = "decision-name")
+    @JsonFormat(with = { JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED })
+    private List<String> decisionNames = new ArrayList<>();
     
     @XmlElement(name="decision-id")
-    @XStreamAlias("decision-id")
-    private String decisionId;
+    @XStreamImplicit(itemFieldName = "decision-id")
+    @JsonFormat(with = { JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED })
+    private List<String> decisionIds = new ArrayList<>();
 
     @XmlElement(name="dmn-context")
     @XStreamAlias("dmn-context")
@@ -85,20 +90,20 @@ public class DMNContextKS {
         this.modelName = modelName;
     }
 
-    public String getDecisionName() {
-        return decisionName;
+    public List<String> getDecisionNames() {
+        return decisionNames;
     }
     
-    public void setDecisionName(String decisionName) {
-        this.decisionName = decisionName;
+    public void setDecisionNames(List<String> decisionName) {
+        this.decisionNames = decisionName;
     }
 
-    public String getDecisionId() {
-        return decisionId;
+    public List<String> getDecisionIds() {
+        return decisionIds;
     }
     
-    public void setDecisionId(String decisionId) {
-        this.decisionId = decisionId;
+    public void setDecisionIds(List<String> decisionId) {
+        this.decisionIds = decisionId;
     }
 
     public Map<String, Object> getDmnContext() {
@@ -111,8 +116,12 @@ public class DMNContextKS {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("DMNContextKS [namespace=").append(namespace).append(", modelName=").append(modelName).append(", decisionName=").append(decisionName).append(", dmnContext=").append(dmnContext).append("]");
-        return builder.toString();
+        return new StringBuilder("DMNContextKS [")
+               .append("namespace=").append(namespace)
+               .append(", modelName=").append(modelName)
+               .append(", decisionNames=").append(decisionNames)
+               .append(", decisionIds=").append(decisionIds)
+               .append(", dmnContext=").append(dmnContext)
+               .append("]").toString();
     }
 }

@@ -16,9 +16,8 @@
 
 package org.kie.server.gateway;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,10 +25,9 @@ import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
+import org.kie.server.common.rest.Authenticator;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ContainerSpecList;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 
@@ -56,12 +54,9 @@ public class KieControllerGateway {
             .register(new ErrorResponseFilter())
             .build();
 
-        Set<Class<?>> classes = new HashSet<>();
-        classes.add(ProcessConfig.class);
-        classes.add(RuleConfig.class);
 
         // using kie marshaller
-        jsonMarshaller = new JSONMarshaller(classes, Thread.currentThread().getContextClassLoader());
+        jsonMarshaller = new JSONMarshaller(null, Thread.currentThread().getContextClassLoader());
 
     }
 

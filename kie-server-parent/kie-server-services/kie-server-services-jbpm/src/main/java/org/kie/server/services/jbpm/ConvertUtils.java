@@ -23,10 +23,12 @@ import java.util.Map;
 
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.api.model.ProcessInstanceCustomDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
+import org.jbpm.services.api.model.UserTaskInstanceWithPotOwnerDesc;
 import org.jbpm.services.api.model.VariableDesc;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
@@ -41,10 +43,14 @@ import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 
@@ -99,6 +105,8 @@ public class ConvertUtils {
                 .date(pi.getDataTimeStamp())
                 .initiator(pi.getInitiator())
                 .state(pi.getState())
+                .slaCompliance(pi.getSlaCompliance())
+                .slaDueDate(pi.getSlaDueDate())
                 .build();
 
         if (pi.getActiveTasks() != null && !pi.getActiveTasks().isEmpty()) {
@@ -125,6 +133,45 @@ public class ConvertUtils {
             instance.setActiveUserTasks(new TaskSummaryList(tasks));
         }
 
+        return instance;
+    }
+    
+    public static ProcessInstanceCustomVarsList convertToProcessInstanceCustomVarsList(Collection<ProcessInstanceCustomDesc> instances) {
+        if (instances == null) {
+            return new ProcessInstanceCustomVarsList(new org.kie.server.api.model.instance.ProcessInstanceCustomVars[0]);
+        }
+
+        List<ProcessInstanceCustomVars> processInstances = new ArrayList<ProcessInstanceCustomVars>(instances.size());
+        for (ProcessInstanceCustomDesc pi : instances) {
+            org.kie.server.api.model.instance.ProcessInstanceCustomVars instance = convertToProcessInstanceCustomVars(pi);
+
+            processInstances.add(instance);
+        }
+
+        return new ProcessInstanceCustomVarsList(processInstances);
+    }
+    
+    public static org.kie.server.api.model.instance.ProcessInstanceCustomVars convertToProcessInstanceCustomVars(ProcessInstanceCustomDesc pi) {
+        if (pi == null) {
+            return null;
+        }
+
+        org.kie.server.api.model.instance.ProcessInstanceCustomVars instance = org.kie.server.api.model.instance.ProcessInstanceCustomVars.builder()
+                .id(pi.getId())
+                .processId(pi.getProcessId())
+                .processName(pi.getProcessName())
+                .processVersion(pi.getProcessVersion())
+                .containerId(pi.getDeploymentId())
+                .processInstanceDescription(pi.getProcessInstanceDescription())
+                .correlationKey(pi.getCorrelationKey())
+                .parentInstanceId(pi.getParentId())
+                .date(pi.getDataTimeStamp())
+                .initiator(pi.getInitiator())
+                .state(pi.getState())
+                .lastModificationDate(pi.getLastModificationDate())
+                .variables(pi.getVariables())
+                .build();
+        
         return instance;
     }
 
@@ -275,6 +322,8 @@ public class ConvertUtils {
                 .connection(nodeInstanceDesc.getConnection())
                 .date(nodeInstanceDesc.getDataTimeStamp())
                 .referenceId(nodeInstanceDesc.getReferenceId())
+                .slaCompliance(nodeInstanceDesc.getSlaCompliance())
+                .slaDueDate(nodeInstanceDesc.getSlaDueDate())
                 .build();
 
         return nodeInstance;
@@ -374,6 +423,50 @@ public class ConvertUtils {
 
         return instance;
     }
+    
+    public static TaskWithProcessDescriptionList convertToTaskInstanceListPO(Collection<UserTaskInstanceWithPotOwnerDesc> instances) {
+        if (instances == null) {
+            return new TaskWithProcessDescriptionList(new org.kie.server.api.model.instance.TaskWithProcessDescription[0]);
+        }
+
+        List<TaskWithProcessDescription> taskInstances = new ArrayList<TaskWithProcessDescription>(instances.size());
+        for (UserTaskInstanceWithPotOwnerDesc task : instances) {
+            org.kie.server.api.model.instance.TaskWithProcessDescription instance = convertToTaskPO(task);
+            taskInstances.add(instance);
+        }
+
+        return new TaskWithProcessDescriptionList(taskInstances);
+    }
+    
+    public static TaskWithProcessDescription convertToTaskPO(UserTaskInstanceWithPotOwnerDesc userTask) {
+
+        TaskWithProcessDescription instance = TaskWithProcessDescription.builder()
+                .id(userTask.getTaskId())
+                .name(userTask.getName())
+                .processInstanceId(userTask.getProcessInstanceId())
+                .processId(userTask.getProcessId())
+                .activationTime(userTask.getActivationTime())
+                .actualOwner(userTask.getActualOwner())
+                .containerId(userTask.getDeploymentId())
+                .createdBy(userTask.getCreatedBy())
+                .createdOn(userTask.getCreatedOn())
+                .description(userTask.getDescription())
+                .formName(userTask.getFormName())
+                .expirationTime(userTask.getDueDate())
+                .status(userTask.getStatus())
+                .priority(userTask.getPriority())
+                .subject(userTask.getSubject())
+                .potentialOwners(userTask.getPotentialOwners())
+                .correlationKey(userTask.getCorrelationKey())
+                .lastModificationDate(userTask.getLastModificationDate())
+                .lastModificationUser(userTask.getLastModificationUser())
+                .inputData(userTask.getInputdata())
+                .outputData(userTask.getOutputdata())
+                .processInstanceDescription(userTask.getProcessInstanceDescription())
+                .build();
+
+        return instance;
+    }
 
     public static TaskSummaryList convertToTaskSummaryList(Collection<TaskSummary> tasks) {
         if (tasks == null) {
@@ -422,6 +515,7 @@ public class ConvertUtils {
                                 .expression(queryDefinition.getExpression())
                                 .source(queryDefinition.getSource())
                                 .target(queryDefinition.getTarget().toString())
+                                .columns(queryDefinition.getColumns())
                                 .build();
         return query;
     }

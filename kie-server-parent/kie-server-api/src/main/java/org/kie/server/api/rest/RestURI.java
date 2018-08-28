@@ -72,7 +72,7 @@ public class RestURI {
     // admin URIs
     public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
     public static final String ADMIN_TASK_URI = "admin/containers/{" + CONTAINER_ID + "}/tasks";
-    public static final String ADMIN_CASE_URI = "admin/cases";
+    public static final String ADMIN_CASE_URI = "admin";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -111,7 +111,6 @@ public class RestURI {
 
     // runtime data related prefixed by QUERY_URI
     public static final String PROCESS_INSTANCES_GET_URI = "processes/instances";
-    public static final String PROCESS_INSTANCES_GET_FILTERED_URI = "processes/instances/filtered-data";
     public static final String PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI = "processes/{" + PROCESS_ID + "}/instances";
     public static final String PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instances";
     public static final String PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI = "processes/instance/correlation/{" + CORRELATION_KEY + "}";
@@ -135,7 +134,6 @@ public class RestURI {
     public static final String TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI = "tasks/instances/admins";
     public static final String TASKS_OWNED_GET_URI = "tasks/instances/owners";
     public static final String TASKS_GET_URI = "tasks/instances";
-    public static final String TASKS_GET_FILTERED_URI = "tasks/instances/filtered-data";
     public static final String TASKS_EVENTS_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}/events";
     public static final String TASK_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}";
     public static final String TASK_BY_WORK_ITEM_ID_GET_URI = "tasks/instances/workitem/{" + WORK_ITEM_ID + "}";
@@ -211,6 +209,7 @@ public class RestURI {
     public static final String QUERY_DEF_GET_URI = "{" + QUERY_NAME + "}";
     public static final String RUN_QUERY_DEF_GET_URI = "{" + QUERY_NAME + "}/data";
     public static final String RUN_FILTERED_QUERY_DEF_POST_URI = "{" + QUERY_NAME + "}/filtered-data";
+    public static final String RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI = "containers/{" + CONTAINER_ID + "}/query/{" + QUERY_NAME + "}/filtered-data";
 
     // optaplanner URI
     public static final String SOLVER_URI = "containers/{" + CONTAINER_ID + "}/solvers";
@@ -299,6 +298,8 @@ public class RestURI {
     public static final String CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/processes/{" + PROCESS_ID + "}";
     public static final String CASE_DYNAMIC_TASK_PUT_URI = "instances/{" + CASE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
     public static final String CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
+    
+    public static final String MIGRATE_CASE_INST_PUT_URI = "containers/{" + CONTAINER_ID + "}/cases/instances/{" + CASE_ID + "}";
 
     // case queries
     public static final String CASE_ALL_INSTANCES_GET_URI = "instances";
@@ -310,6 +311,7 @@ public class RestURI {
     public static final String CASE_INSTANCES_BY_ROLE_GET_URI = "{" + CASE_ROLE_NAME + "}/instances";
     public static final String CASE_ALL_PROCESSES_INSTANCES_GET_URI = "processes";
     public static final String CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI = "{" + CONTAINER_ID + "}/processes";
+    public static final String ADMIN_CASE_ALL_INSTANCES_GET_URI = "cases/instances";
 
     public static String build(String baseUrl,
                                String template,

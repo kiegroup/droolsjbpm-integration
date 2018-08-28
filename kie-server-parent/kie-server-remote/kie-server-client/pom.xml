@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-remote</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-client</artifactId>
@@ -14,7 +14,7 @@
   <description>KIE Execution Server Client</description>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.server.client</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.server.client</java.module.name>
   </properties>
 
   <dependencyManagement>
@@ -67,16 +67,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-common</artifactId>
-    </dependency>
-
-    <!-- JSON (un)marshalling -->
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-xc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
 
     <dependency>
@@ -180,7 +170,6 @@
             </Export-Package>
             <Import-Package>
               javax.jms;resolution:=optional,
-              org.codehaus.jackson;resolution:=optional,
               com.thoughtworks.xstream;resolution:=optional,
               org.xmlpull;resolution:=optional,
               javax.security.jacc;resolution:=optional,

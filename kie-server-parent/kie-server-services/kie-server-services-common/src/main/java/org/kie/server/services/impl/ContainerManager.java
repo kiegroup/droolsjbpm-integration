@@ -36,6 +36,7 @@ public class ContainerManager {
     public void installContainersSync(KieServerImpl kieServer, Set<KieContainerResource> containers, KieServerState currentState, KieServerSetup kieServerSetup) {
         logger.info("About to install containers '{}' on kie server '{}'", containers, kieServer);
         if (containers == null) {
+            kieServer.markAsReady();
             return;
         }
         for (KieContainerResource containerResource : containers) {
@@ -48,5 +49,6 @@ public class ContainerManager {
             currentState.setConfiguration(kieServerSetup.getServerConfig());
         }
         kieServer.getServerRegistry().getStateRepository().store(KieServerEnvironment.getServerId(), currentState);
+        kieServer.markAsReady();
     }
 }

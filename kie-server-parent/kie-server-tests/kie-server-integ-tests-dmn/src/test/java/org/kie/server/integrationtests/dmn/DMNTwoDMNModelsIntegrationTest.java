@@ -16,14 +16,13 @@
 package org.kie.server.integrationtests.dmn;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 
@@ -43,6 +42,7 @@ public class DMNTwoDMNModelsIntegrationTest
             "1.0.0.Final" );
 
     private static final String CONTAINER_1_ID  = "two-dmn-models";
+    private static final String CONTAINER_1_ALIAS  = "models";
 
     @BeforeClass
     public static void deployArtifacts() {
@@ -50,7 +50,7 @@ public class DMNTwoDMNModelsIntegrationTest
         KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/two-dmn-models" ).getFile() );
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
-        createContainer(CONTAINER_1_ID, kjar1);
+        createContainer(CONTAINER_1_ID, kjar1, CONTAINER_1_ALIAS);
     }
 
     @Override
@@ -67,7 +67,28 @@ public class DMNTwoDMNModelsIntegrationTest
         assertEquals(ResponseType.SUCCESS, getModels.getType());
         
         List<DMNModelInfo> models = getModels.getResult().getModels();
-        System.out.println(models);
+        assertThat( models, hasSize( 2 ) );
+        
+        DMNModelInfo fdModel = models.stream().filter(mi -> mi.getName().equals("function-definition")).findFirst().orElse(null);
+        assertThat( fdModel, notNullValue() );
+        assertThat( fdModel.getNamespace(), is("https://www.drools.org/kie-dmn/function-definition") );
+        assertThat( fdModel.getDecisions(), hasSize(1) );
+        assertThat( fdModel.getDecisions().iterator().next().getName(), is("Math") );
+        
+        DMNModelInfo idsModel = models.stream().filter(mi -> mi.getName().equals("input-data-string")).findFirst().orElse(null);
+        assertThat( idsModel, notNullValue() );
+        assertThat( idsModel.getNamespace(), is("https://github.com/kiegroup/kie-dmn/input-data-string") );
+        assertThat( idsModel.getDecisions(), hasSize(1) );
+        assertThat( idsModel.getDecisions().iterator().next().getName(), is("Greeting Message") );
+    }
+    
+    @Test
+    public void test_getModelsWithAlias() {
+        ServiceResponse<DMNModelInfoList> getModels = dmnClient.getModels(CONTAINER_1_ALIAS);
+        
+        assertEquals(ResponseType.SUCCESS, getModels.getType());
+        
+        List<DMNModelInfo> models = getModels.getResult().getModels();
         assertThat( models, hasSize( 2 ) );
         
         DMNModelInfo fdModel = models.stream().filter(mi -> mi.getName().equals("function-definition")).findFirst().orElse(null);

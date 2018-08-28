@@ -28,6 +28,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,7 +102,7 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.request().post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(getMediaType().toString());
 
             JaxbLong pId = response.readEntity(JaxbLong.class);
             valuesMap.put(PROCESS_INST_ID, pId.unwrap());
@@ -147,7 +148,7 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.request(getMediaType()).post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(getMediaType().toString());
 
             JaxbLong pId = response.readEntity(JaxbLong.class);
             valuesMap.put(PROCESS_INST_ID, pId.unwrap());
@@ -182,7 +183,7 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.request(acceptHeadersByFormat.get(marshallingFormat)).post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(getMediaType().toString());
 
             JaxbLong pId = response.readEntity(JaxbLong.class);
             valuesMap.put(PROCESS_INST_ID, pId.unwrap());
@@ -271,6 +272,33 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             int okStatusCode = Response.Status.OK.getStatusCode();
             assertTrue("Wrong status code returned: " + response.getStatus(),
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
+
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testContentTypeOnErrorResponse() throws Exception {
+        Map<String, Object> empty = new HashMap<>();
+        Response response = null;
+        try {
+            // create document
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI, empty));
+           
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(DOCUMENT_ID, "not-existing-doc");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI +"/"+ DOCUMENT_INSTANCE_GET_URI, valuesMap));
+            logger.info( "[GET] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).get();
+            Assertions.assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
+            Assertions.assertThat((String)response.getHeaders().getFirst("Content-Type")).startsWith(MediaType.TEXT_PLAIN);
+            
+            String responseBody = response.readEntity(String.class);
+            Assertions.assertThat(responseBody).isEqualTo("\"Document with id not-existing-doc not found\"");
+           
 
         } finally {
             if(response != null) {

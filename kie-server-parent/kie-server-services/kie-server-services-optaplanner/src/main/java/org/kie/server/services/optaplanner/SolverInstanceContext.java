@@ -48,5 +48,4 @@ public class SolverInstanceContext {
     public void setSolver(Solver<Object> solver) {
         this.solver = solver;
     }
-
 }

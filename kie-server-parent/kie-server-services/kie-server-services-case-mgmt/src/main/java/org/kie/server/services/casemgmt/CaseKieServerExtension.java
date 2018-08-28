@@ -20,24 +20,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.jbpm.casemgmt.api.CaseRuntimeDataService;
+import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
 import org.jbpm.casemgmt.impl.CaseServiceImpl;
+import org.jbpm.casemgmt.impl.admin.CaseInstanceMigrationServiceImpl;
 import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
-import org.jbpm.casemgmt.impl.generator.InMemoryCaseIdGenerator;
 import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
-import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
-import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
-import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.admin.ProcessInstanceMigrationService;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -57,17 +57,18 @@ public class CaseKieServerExtension implements KieServerExtension {
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_CASE_SERVER_EXT_DISABLED, "false"));
     private static final Boolean jbpmDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
-    private String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
+    protected String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
 
-    private List<Object> services = new ArrayList<Object>();
-    private boolean initialized = false;
+    protected List<Object> services = new ArrayList<Object>();
+    protected boolean initialized = false;
 
-    private KieServerRegistry registry;
+    protected KieServerRegistry registry;
 
-    private CaseManagementServiceBase caseManagementServiceBase;
-    private CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService;
+    protected CaseManagementServiceBase caseManagementServiceBase;
+    protected CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService;
+    protected CaseAdminServiceBase caseAdminServiceBase;
 
-    private KieContainerCommandService kieContainerCommandService;
+    protected KieContainerCommandService kieContainerCommandService;
 
     @Override
     public boolean isInitialized() {
@@ -88,10 +89,26 @@ public class CaseKieServerExtension implements KieServerExtension {
             logger.warn("jBPM extension not found, Case Management cannot work without jBPM extension, disabling itself");
             return;
         }
+        
+        configureServices(kieServer, registry);
+        
+
+        this.services.add(this.caseManagementServiceBase);
+        this.services.add(this.caseManagementRuntimeDataService);
+
+        this.kieContainerCommandService = new CaseKieContainerCommandServiceImpl(registry, caseManagementServiceBase, caseManagementRuntimeDataService, caseAdminServiceBase);
+
+        initialized = true;
+    }
+    
+    protected void configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
+        
+        KieServerExtension jbpmExtension = registry.getServerExtension("jBPM");
         List<Object> jbpmServices = jbpmExtension.getServices();
         RuntimeDataService runtimeDataService = null;
         ProcessService processService = null;
         DeploymentService deploymentService = null;
+        ProcessInstanceMigrationService processInstanceMigrationService = null;
 
 
         for( Object object : jbpmServices ) {
@@ -107,6 +124,9 @@ public class CaseKieServerExtension implements KieServerExtension {
                 continue;
             } else if( DeploymentService.class.isAssignableFrom(object.getClass()) ) {
                 deploymentService = (DeploymentService) object;
+                continue;
+            } else if( ProcessInstanceMigrationService.class.isAssignableFrom(object.getClass()) ) {
+                processInstanceMigrationService = (ProcessInstanceMigrationService) object;
                 continue;
             }
         }
@@ -137,19 +157,20 @@ public class CaseKieServerExtension implements KieServerExtension {
         // configure case mgmt services as listeners
         ((KModuleDeploymentService)deploymentService).addListener((CaseRuntimeDataServiceImpl) caseRuntimeDataService);
         ((KModuleDeploymentService)deploymentService).addListener(configurationListener);
+        
+        CaseInstanceMigrationService caseInstanceMigrationService = new CaseInstanceMigrationServiceImpl();
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setCaseRuntimeDataService(caseRuntimeDataService);
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setCommandService(new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName)));
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setProcessInstanceMigrationService(processInstanceMigrationService);
+        ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setProcessService(processService);
 
         this.caseManagementServiceBase = new CaseManagementServiceBase(caseService, caseRuntimeDataService, registry);
         this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, registry);
-
-        this.services.add(this.caseManagementServiceBase);
-        this.services.add(this.caseManagementRuntimeDataService);
-
-        this.kieContainerCommandService = new CaseKieContainerCommandServiceImpl(registry, caseManagementServiceBase, caseManagementRuntimeDataService);
-
-        initialized = true;
+        this.caseAdminServiceBase = new CaseAdminServiceBase(caseInstanceMigrationService, registry);
+        
     }
 
-    private CaseIdGenerator getCaseIdGenerator() {
+    protected CaseIdGenerator getCaseIdGenerator() {
         String selectedGenerator = System.getProperty(KieServerConstants.CFG_CASE_ID_GENERATOR);
 
         if (selectedGenerator == null) {
@@ -214,6 +235,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         Object [] services = {
                 caseManagementServiceBase,
                 caseManagementRuntimeDataService,
+                caseAdminServiceBase,
                 registry
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
@@ -256,5 +278,16 @@ public class CaseKieServerExtension implements KieServerExtension {
     @Override
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
+    }
+    
+
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        
+        if (report) {
+            messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
+        }        
+        return messages;
     }
 }

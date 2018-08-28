@@ -15,9 +15,7 @@
 
 package org.kie.server.api.model.definition;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,7 +25,7 @@ import org.kie.server.api.model.Wrapped;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-query-filter-spec")
-public class TaskQueryFilterSpec extends BaseQueryFilterSpec implements Wrapped<TaskQueryFilterSpec> {
+public class TaskQueryFilterSpec extends QueryFilterSpec implements Wrapped<TaskQueryFilterSpec> {
 
 	public TaskQueryFilterSpec() {
 	}

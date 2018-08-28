@@ -3,13 +3,17 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-router</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-router-client</artifactId>
   <packaging>jar</packaging>
 
   <name>KIE :: Execution Server :: Router :: Client</name>
   <description>KIE Execution Server Router Client</description>
+
+  <properties>
+    <java.module.name>org.kie.server.router.client</java.module.name>
+  </properties>
 
   <dependencyManagement>
     <dependencies>

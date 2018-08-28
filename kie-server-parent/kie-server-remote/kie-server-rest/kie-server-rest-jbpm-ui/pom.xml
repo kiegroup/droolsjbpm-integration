@@ -5,7 +5,7 @@
   <parent>
     <artifactId>kie-server-rest</artifactId>
     <groupId>org.kie.server</groupId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -13,6 +13,10 @@
 
   <name>KIE :: Execution Server :: Remote :: REST :: jBPM UI</name>
   <description>KIE jBPM UI Execution Server Extension</description>
+
+  <properties>
+    <java.module.name>org.kie.server.rest.jbpm.ui</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -27,6 +31,12 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -40,6 +50,11 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-services-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
     </dependency>
 
     <dependency>

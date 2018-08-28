@@ -86,8 +86,8 @@ public class JSONMarshaller implements Marshaller {
 
     private static final Logger logger = LoggerFactory.getLogger( MarshallerFactory.class );
 
-    private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
-    private static String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+    private boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
+    private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
     private ThreadLocal<Boolean> stripped = new ThreadLocal<Boolean>() {
         @Override
@@ -141,7 +141,9 @@ public class JSONMarshaller implements Marshaller {
         }
         // add byte array handling support to allow byte[] to be send as payload
         classes.add(JaxbByteArray.class);
-        classes.add(Date.class);
+        if (!formatDate) {
+            classes.add(Date.class);
+        }
 
         List<NamedType> customClasses = prepareCustomClasses(classes);
         // this is needed because we need better control of serialization and deserialization
@@ -155,6 +157,7 @@ public class JSONMarshaller implements Marshaller {
 
         deserializeObjectMapper.setConfig(objectMapper.getDeserializationConfig()
                 .with(introspectorPair)
+                .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
 
 
@@ -187,7 +190,6 @@ public class JSONMarshaller implements Marshaller {
 
             for (Class<?> clazz : classes) {
                 mod.addSerializer(clazz, customObjectSerializer);
-
             }
 
             objectMapper.registerModule(mod);
@@ -210,7 +212,7 @@ public class JSONMarshaller implements Marshaller {
                         TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
                         switch (_includeAs) {
                             case WRAPPER_OBJECT:
-                                return new CustomAsWrapperTypeDeserializer(baseType, idRes, _typeProperty, true, _defaultImpl);
+                                return new CustomAsWrapperTypeDeserializer(baseType, idRes, _typeProperty, true, baseType);
 
                         }
                     }
@@ -223,6 +225,7 @@ public class JSONMarshaller implements Marshaller {
             typer2 = typer2.init(JsonTypeInfo.Id.CLASS, null);
             typer2 = typer2.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
             deserializeObjectMapper.setDefaultTyping(typer2);
+            
 
             SimpleModule modDeser = new SimpleModule("custom-object-unmapper", Version.unknownVersion());
             modDeser.addDeserializer(Object.class, new CustomObjectDeserializer(classes));
@@ -754,7 +757,7 @@ public class JSONMarshaller implements Marshaller {
 
     class CustomAsWrapperTypeDeserializer extends AsWrapperTypeDeserializer {
 
-        public CustomAsWrapperTypeDeserializer(JavaType bt, TypeIdResolver idRes, String typePropertyName, boolean typeIdVisible, Class<?> defaultImpl) {
+        public CustomAsWrapperTypeDeserializer(JavaType bt, TypeIdResolver idRes, String typePropertyName, boolean typeIdVisible, JavaType defaultImpl) {
             super(bt, idRes, typePropertyName, typeIdVisible, defaultImpl);
         }
 

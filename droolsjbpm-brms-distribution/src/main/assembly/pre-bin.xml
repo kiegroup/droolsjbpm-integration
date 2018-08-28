@@ -27,11 +27,10 @@
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
         <include>org.drools:drools-persistence-jpa</include>
-        <include>org.drools:drools-pmml</include>
+        <include>org.drools:kie-pmml</include>
         <include>org.drools:drools-rhq-plugin</include>
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
-        <include>org.drools:drools-verifier</include>
       </includes>
       <outputDirectory/>
       <useTransitiveFiltering>false</useTransitiveFiltering>
@@ -57,11 +56,10 @@
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
-        <exclude>org.drools:drools-pmml</exclude>
+        <exclude>org.drools:kie-pmml</exclude>
         <exclude>org.drools:drools-rhq-plugin</exclude>
         <exclude>org.drools:drools-scorecards</exclude>
         <exclude>org.drools:drools-templates</exclude>
-        <exclude>org.drools:drools-verifier</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
       <useTransitiveFiltering>false</useTransitiveFiltering>

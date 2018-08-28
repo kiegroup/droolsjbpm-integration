@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-controller</artifactId>
@@ -23,6 +23,7 @@
     <module>kie-server-controller-websocket</module>
     <module>kie-server-controller-websocket-client</module>
     <module>kie-server-controller-websocket-common</module>
+    <module>kie-server-controller-client</module>
   </modules>
 
 </project>

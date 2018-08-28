@@ -41,6 +41,7 @@
         <include>org.jbpm:jbpm-document</include>
         <include>org.jbpm:jbpm-case-mgmt-api</include>
         <include>org.jbpm:jbpm-case-mgmt-impl</include>
+        <include>org.jbpm:jbpm-case-mgmt-cmmn</include>
         <include>org.kie:kie-api</include>
         <include>org.kie:kie-aries-blueprint</include>
         <include>org.kie:kie-internal</include>
@@ -61,8 +62,7 @@
         <include>org.drools:drools-rhq-plugin</include>
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
-        <include>org.drools:drools-verifier</include>
-        <include>org.drools:drools-pmml</include>
+        <include>org.drools:kie-pmml</include>
       </includes>
       <outputDirectory/>
       <useTransitiveFiltering>false</useTransitiveFiltering>
@@ -97,6 +97,7 @@
         <exclude>org.jbpm:jbpm-document</exclude>
         <exclude>org.jbpm:jbpm-case-mgmt-api</exclude>
         <exclude>org.jbpm:jbpm-case-mgmt-impl</exclude>
+        <exclude>org.jbpm:jbpm-case-mgmt-cmmn</exclude>
         <exclude>org.kie:kie-api</exclude>
         <exclude>org.kie:kie-aries-blueprint</exclude>
         <exclude>org.kie:kie-internal</exclude>
@@ -117,8 +118,7 @@
         <exclude>org.drools:drools-rhq-plugin</exclude>
         <exclude>org.drools:drools-scorecards</exclude>
         <exclude>org.drools:drools-templates</exclude>
-        <exclude>org.drools:drools-verifier</exclude>
-        <exclude>org.drools:drools-pmml</exclude>
+        <exclude>org.drools:kie-pmml</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
       <useTransitiveFiltering>false</useTransitiveFiltering>

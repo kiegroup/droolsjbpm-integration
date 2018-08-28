@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-case-id-generator</artifactId>
@@ -13,6 +13,7 @@
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration to run on different supported containers.</description>
 
   <properties>
+    <java.module.name>org.kie.server.itests.caseidgenerator</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
     <org.jbpm.case.server.ext.disabled>false</org.jbpm.case.server.ext.disabled>
@@ -46,13 +47,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
       <classifier>webc</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -171,7 +165,7 @@
 
   <profiles>
     <profile>
-      <id>tomcat8</id>
+      <id>tomcat9</id>
       <build>
         <pluginManagement>
           <plugins>

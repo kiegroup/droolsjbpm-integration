@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-wars</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server</artifactId>
@@ -12,6 +12,10 @@
 
   <name>KIE :: Execution Server :: Wars :: Distribution Wars</name>
   <description>KIE Execution Server Distribution Wars. Name of the module is just 'kie-server' so that the final WARs have nicer names.</description>
+
+  <properties>
+    <java.module.name>org.kie.server.distribution.wars</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -48,6 +52,12 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-drools</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>uberfire-commons</artifactId>
+          <groupId>org.uberfire</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -66,10 +76,6 @@
           <artifactId>jboss-el-api_3.0_spec</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-jbpm-search</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -141,10 +147,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-jbpm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-jbpm-search</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -313,7 +315,6 @@
         <configuration>
           <finalName>kie-server-${project.version}</finalName>
           <descriptors>
-            <descriptor>src/main/assembly/assembly-ee6-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-ee7-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-servlet-container.xml</descriptor>
           </descriptors>
@@ -322,6 +323,7 @@
             <!-- special manifest entries to allow usage of CXF on WebSphere -->
             <manifestEntries>
               <Ignore-Scanning-Archives>cxf-api-${version.org.apache.cxf}.jar,cxf-rt-bindings-soap-${version.org.apache.cxf}.jar,cxf-rt-bindings-xml-${version.org.apache.cxf}.jar,cxf-rt-core-${version.org.apache.cxf}.jar,cxf-rt-databinding-jaxb-${version.org.apache.cxf}.jar,cxf-rt-frontend-jaxws-${version.org.apache.cxf}.jar,cxf-rt-frontend-simple-${version.org.apache.cxf}.jar,cxf-rt-transports-http-${version.org.apache.cxf}.jar,cxf-rt-ws-addr-${version.org.apache.cxf}.jar,cxf-rt-ws-policy-${version.org.apache.cxf}.jar</Ignore-Scanning-Archives>
+              <DisableIBMJAXWSEngine>true</DisableIBMJAXWSEngine>
             </manifestEntries>
           </archive>
         </configuration>

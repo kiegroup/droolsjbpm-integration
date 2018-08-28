@@ -27,7 +27,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
@@ -99,7 +101,7 @@ public class CaseManagementServiceBase {
 
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
         if( caseDef == null ) {
-            throw new IllegalStateException("Unable to find case '" + caseDefinitionId + "' in container " + containerId);
+            throw new CaseDefinitionNotFoundException("Unable to find case '" + caseDefinitionId + "' in container " + containerId);
         }
 
         logger.debug("About to unmarshal case file from payload: '{}'", payload);
@@ -126,8 +128,16 @@ public class CaseManagementServiceBase {
                         .stream()
                         .forEach( entry -> roleAssignments.put(entry.getKey(), taskModelFactory.newGroup(entry.getValue())));
             }
+            Map<String, List<String>> accessRestrictions = null;
+            if (caseFile.getAccessRestrictions() != null) {
+                accessRestrictions = new HashMap<>();
+                
+                for (Entry<String, String[]> entry : caseFile.getAccessRestrictions().entrySet()) {
+                    accessRestrictions.put(entry.getKey(), Arrays.asList(entry.getValue()));
+                }
+            }
 
-            CaseFileInstance caseFileInstance = caseService.newCaseFileInstance(containerId, caseDefinitionId, caseFile.getData(), roleAssignments);
+            CaseFileInstance caseFileInstance = caseService.newCaseFileInstanceWithRestrictions(containerId, caseDefinitionId, caseFile.getData(), roleAssignments, accessRestrictions);
             caseId = caseService.startCase(containerId, caseDefinitionId, caseFileInstance);
         }
         logger.debug("New case instance started with case id {} for case definition {}", caseId, caseDefinitionId);
@@ -232,20 +242,20 @@ public class CaseManagementServiceBase {
 
     }
 
-    public void putCaseFileData(String containerId, String caseId, String payload, String marshallingType) {
+    public void putCaseFileData(String containerId, String caseId, List<String> restrictions, String payload, String marshallingType) {
     	verifyContainerId(containerId, caseId);
         logger.debug("About to unmarshal case file data from payload: '{}'", payload);
         Map<String, Object> caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
-        logger.debug("Unmarshalled case file data {} for case with id '{}'", caseFileData, caseId);
-        caseService.addDataToCaseFile(caseId, caseFileData);
+        logger.debug("Unmarshalled case file data {} for case with id '{}' with restrictions", caseFileData, caseId, restrictions);
+        caseService.addDataToCaseFile(caseId, caseFileData, restrictions.toArray(new String[restrictions.size()]));
     }
 
-    public void putCaseFileDataByName(String containerId, String caseId, String name, String payload, String marshallingType) {
+    public void putCaseFileDataByName(String containerId, String caseId, String name, List<String> restrictions, String payload, String marshallingType) {
     	verifyContainerId(containerId, caseId);
         logger.debug("About to unmarshal case file data from payload: '{}'", payload);
         Object caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Object.class, new ByCaseIdContainerLocator(caseId));
-        logger.debug("Unmarshalled case file data {} for case with id '{}' will be stored under {}", caseFileData, caseId, name);
-        caseService.addDataToCaseFile(caseId, name, caseFileData);
+        logger.debug("Unmarshalled case file data {} for case with id '{}' will be stored under {} with restrictions", caseFileData, caseId, name, restrictions);
+        caseService.addDataToCaseFile(caseId, name, caseFileData, restrictions.toArray(new String[restrictions.size()]));
     }
 
     public void removeCaseFileDataByName(String containerId, String caseId, List<String> names) {
@@ -311,7 +321,7 @@ public class CaseManagementServiceBase {
 
         logger.debug("AdHoc task {} will be triggered with data = {}", adHocName, adHocTaskData);
         if (stageId != null && !stageId.isEmpty()) {
-            // todo add support for trigger within given stage
+            caseService.triggerAdHocFragment(caseId, stageId, adHocName, adHocTaskData);
         } else {
             caseService.triggerAdHocFragment(caseId, adHocName, adHocTaskData);
         }
@@ -359,22 +369,23 @@ public class CaseManagementServiceBase {
         }
     }
 
-    public void addCommentToCase(String containerId, String caseId, String author, String comment, String marshallingType) {
+    public String addCommentToCase(String containerId, String caseId, String author, List<String> restrictions, String comment, String marshallingType) {
     	verifyContainerId(containerId, caseId);
     	author = getUser(author);
         String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class, new ByCaseIdContainerLocator(caseId));
 
-        logger.debug("Adding comment to case {} by {} with text '{}'", caseId, author, actualComment);
-        caseService.addCaseComment(caseId, author, actualComment);
+        logger.debug("Adding comment to case {} by {} with text '{}' with restrictions {}", caseId, author, actualComment, restrictions);
+        String commentId = caseService.addCaseComment(caseId, author, actualComment, restrictions.toArray(new String[restrictions.size()]));
+        return marshallerHelper.marshal(containerId, marshallingType, commentId);
     }
 
-    public void updateCommentInCase(String containerId, String caseId, String commentId, String author, String comment, String marshallingType) {
+    public void updateCommentInCase(String containerId, String caseId, String commentId, String author, List<String> restrictions, String comment, String marshallingType) {
     	verifyContainerId(containerId, caseId);
         author = getUser(author);
         String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class, new ByCaseIdContainerLocator(caseId));
 
-        logger.debug("Updating comment {} in case {} by {} with text '{}'", commentId, caseId, author, actualComment);
-        caseService.updateCaseComment(caseId, commentId, author, actualComment);
+        logger.debug("Updating comment {} in case {} by {} with text '{}' with restrictions {}", commentId, caseId, author, actualComment, restrictions);
+        caseService.updateCaseComment(caseId, commentId, author, actualComment, restrictions.toArray(new String[restrictions.size()]));
     }
 
     public void removeCommentFromCase(String containerId, String caseId, String commentId) {
@@ -409,7 +420,7 @@ public class CaseManagementServiceBase {
             return CommentSortBy.Author;
         }
 
-        logger.warn("Unexpected sort option for case comments '{}', returning default one - by date");
+        logger.warn("Unexpected sort option for case comments '{}', returning default one - by date", sort);
         return CommentSortBy.Date;
     }
     

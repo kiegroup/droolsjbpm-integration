@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>kie-server-controller</artifactId>
+    <groupId>org.kie.server</groupId>
+    <version>7.11.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-server-controller-client</artifactId>
+  <name>KIE :: Execution Server :: Controller :: Client</name>
+  <description>KIE Execution Server Controller Client</description>
+
+  <properties>
+    <java.module.name>org.kie.server.controller.client</java.module.name>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-websocket-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.spec.javax.websocket</groupId>
+      <artifactId>jboss-websocket-api_1.1_spec</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.spec.javax.ws.rs</groupId>
+      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-client</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+  </dependencies>
+
+</project>

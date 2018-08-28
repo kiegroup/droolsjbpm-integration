@@ -17,7 +17,7 @@ package org.kie.server.controller.api.model.events;
 
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 
-public class ServerTemplateUpdated {
+public class ServerTemplateUpdated implements KieServerControllerEvent {
 
     private ServerTemplate serverTemplate;
 

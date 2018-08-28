@@ -21,6 +21,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.credentials.EnteredTokenCredentialsProvider;
+import org.kie.server.common.KeyStoreHelperUtil;
 
 public class RestKieServicesClientProvider implements KieServicesClientProvider {
 
@@ -52,7 +53,7 @@ public class RestKieServicesClientProvider implements KieServicesClientProvider 
     }
 
     protected String getPassword() {
-        return System.getProperty(KieServerConstants.CFG_KIE_PASSWORD, "kieserver1!");
+        return KeyStoreHelperUtil.loadServerPassword();
     }
 
     protected String getToken() {

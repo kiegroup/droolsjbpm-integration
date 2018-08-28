@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-api</artifactId>
@@ -14,7 +14,7 @@
   <description>KIE Execution Server API</description>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.server.api</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.server.api</java.module.name>
   </properties>
 
   <dependencies>
@@ -30,6 +30,10 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-commons</artifactId>
     </dependency>
 
     <!-- we need to find a way to remove the following 2 dependencies from this jar -->

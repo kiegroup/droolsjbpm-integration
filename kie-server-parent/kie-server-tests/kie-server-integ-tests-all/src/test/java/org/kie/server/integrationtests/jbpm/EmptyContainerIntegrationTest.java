@@ -33,10 +33,10 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class EmptyContainerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static final ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
+    private static final ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "empty-container",
             "1.0.0.Final");
 
-    private static final String CONTAINER_ID = "definition-project";
+    private static final String CONTAINER_ID = "empty-container";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {

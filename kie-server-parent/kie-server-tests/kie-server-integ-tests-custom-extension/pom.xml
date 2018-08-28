@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-custom-extension</artifactId>
@@ -26,7 +26,7 @@
          parallel build (otherwise the tests fail because of conflicting port binding) -->
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-integ-tests-jbpm-search</artifactId>
+      <artifactId>kie-server-integ-tests-dmn</artifactId>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -36,4 +36,32 @@
       </exclusions>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>ban-duplicated-classes</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <banDuplicateClasses>
+                    <ignoreClasses combine.children="append">
+                      <ignoreClass>io.netty.*</ignoreClass>
+                    </ignoreClasses>
+                  </banDuplicateClasses>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

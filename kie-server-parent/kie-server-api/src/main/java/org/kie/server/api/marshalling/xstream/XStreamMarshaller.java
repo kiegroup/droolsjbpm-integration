@@ -26,8 +26,6 @@ import java.util.Set;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
-import com.thoughtworks.xstream.security.WildcardTypePermission;
-import org.apache.commons.lang3.StringUtils;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
@@ -66,6 +64,8 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
+import org.kie.server.api.model.dmn.DMNInputDataInfo;
+import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNMessageKS;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
@@ -76,13 +76,10 @@ import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConvert
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.internal.xstream.XStreamUtils.createXStream;
-import static org.kie.server.api.KieServerConstants.SYSTEM_XSTREAM_ENABLED_PACKAGES;
+import static org.kie.soup.commons.xstream.XStreamUtils.createNonTrustingXStream;
 
 public class XStreamMarshaller
-        implements Marshaller {
-
-    public static final String DEFAULT_PACKAGES_WILDCARD = "**";
+        implements Marshaller {    
 
     private static final Logger logger = LoggerFactory.getLogger(XStreamMarshaller.class);
     protected XStream xstream;
@@ -90,7 +87,7 @@ public class XStreamMarshaller
     protected Map<String, Class> classNames = new HashMap<String, Class>();
 
     // Optional marshaller extensions to handle new types / configure custom behavior
-    private static final List<XStreamMarshallerExtension> EXTENSIONS;
+    private static final List<XStreamMarshallerExtension> EXTENSIONS;        
 
     static {
         logger.debug("XStreamMarshaller extensions init");
@@ -118,7 +115,7 @@ public class XStreamMarshaller
 
     protected void buildMarshaller(Set<Class<?>> classes,
                                    final ClassLoader classLoader) {
-        this.xstream = XStreamXML.newXStreamMarshaller(createXStream(new PureJavaReflectionProvider(),
+        this.xstream = XStreamXML.newXStreamMarshaller(createNonTrustingXStream(new PureJavaReflectionProvider(),
                                                                      next -> {
                                                                          return new MapperWrapper(chainMapperWrappers(new ArrayList<>(EXTENSIONS),
                                                                                                                       next)) {
@@ -152,18 +149,7 @@ public class XStreamMarshaller
         String[] voidDeny = {"void.class", "Void.class"};
         this.xstream.denyTypes(voidDeny);
 
-        String packageList = System.getProperty(SYSTEM_XSTREAM_ENABLED_PACKAGES,
-                                                DEFAULT_PACKAGES_WILDCARD);
-
-        String[] filter;
-
-        if (StringUtils.isEmpty(packageList)) {
-            filter = new String[]{DEFAULT_PACKAGES_WILDCARD};
-        } else {
-            filter = packageList.split(",");
-        }
-
-        this.xstream.addPermission(new WildcardTypePermission(filter));
+        this.xstream.addPermission(new KieServerTypePermission(classes));
 
         AbstractScoreXStreamConverter.registerScoreConverters(xstream);
 
@@ -211,6 +197,8 @@ public class XStreamMarshaller
         this.xstream.processAnnotations(DMNModelInfoList.class);
         this.xstream.processAnnotations(DMNModelInfo.class);
         this.xstream.processAnnotations(DMNDecisionInfo.class);
+        this.xstream.processAnnotations(DMNInputDataInfo.class);
+        this.xstream.processAnnotations(DMNItemDefinitionInfo.class);
 
         if (classes != null) {
             for (Class<?> clazz : classes) {

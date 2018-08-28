@@ -14,38 +14,44 @@
 */
 package org.kie.server.controller.impl.storage;
 
-import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
+import org.kie.soup.commons.xstream.XStreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.io.StreamException;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 
 public class FileBasedKieServerTemplateStorage implements KieServerTemplateStorage {
 	private static FileBasedKieServerTemplateStorage INSTANCE; 
+	
+    public static final String STORAGE_FILE_WATCHER_ENABLED = "org.kie.server.controller.templatefile.watcher.enabled";
     public static final String SERVER_TEMPLATE_FILE_NAME_PROP = "org.kie.server.controller.templatefile";
     public static final String DEFAULT_SERVER_TEMPLATE_FILENAME = System.getProperty("java.io.tmpdir")+
     		System.getProperty("file.separator")
     		+"template_store.xml";
+    
     private static Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorage.class);
     private Map<String, ServerTemplate> templateMap = new ConcurrentHashMap<>();
     private Map<String, ServerTemplateKey> templateKeyMap = new ConcurrentHashMap<>();
     private String templatesLocation;
-    private Marshaller templateMarshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM,ServerTemplate.class.getClassLoader());
+  
+    private XStream xstream;
+    
+    private boolean configWatcherEnabled = Boolean.parseBoolean(System.getProperty(STORAGE_FILE_WATCHER_ENABLED, "false"));
+    private ControllerStorageFileWatcher watcher;
     
     public static synchronized FileBasedKieServerTemplateStorage getInstance() {
     	if (INSTANCE == null) {
@@ -85,23 +91,31 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     protected synchronized void init(String templatesLocation) {
     	this.templateMap = new ConcurrentHashMap<>();
     	this.templateKeyMap = new ConcurrentHashMap<>();
+    	this.xstream = XStreamUtils.createTrustingXStream();
     	if (templatesLocation != null && !templatesLocation.trim().isEmpty()) {
     		this.templatesLocation = templatesLocation;
     	} else {
     		this.templatesLocation = System.getProperty(SERVER_TEMPLATE_FILE_NAME_PROP, DEFAULT_SERVER_TEMPLATE_FILENAME);
     	}
-    	loadTemplateMapsFromFile();
+        loadTemplateMapsFromFile();
+    	
+    	// setup template file watcher to be updated when changes are discovered
+        if (configWatcherEnabled ) {
+            this.watcher = new ControllerStorageFileWatcher(this.templatesLocation, this);
+            Thread watcherThread = new Thread(watcher, "Kie Controller File Storage Watch Thread");
+            watcherThread.start();
+        }
     }
 
     /**
      * Writes the map of server templates to the file pointed at by templatesLocation
      */
     private synchronized void writeTemplateMap() {
-        try (FileWriter writer = new FileWriter(templatesLocation)) {
-            ((XStreamMarshaller)templateMarshaller).getXstream()
-            	.toXML(new ArrayList<ServerTemplate>(templateMap.values()), writer);
-        } catch (Throwable e) {
-            logger.error("Unable to write template maps for standalone controller",e);
+        String xml = this.xstream.toXML(new ArrayList<ServerTemplate>(templateMap.values()));
+        try {
+            Files.write(Paths.get(templatesLocation), xml.getBytes());
+        } catch (IOException e) {
+            logger.error("Unable to write template maps for standalone controller", e);
         }
     }
 
@@ -109,26 +123,30 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
      * Loads the map of server templates from the file pointed at by the templatesLocation
      */
     @SuppressWarnings("unchecked")
-    private synchronized void loadTemplateMapsFromFile() {
+    public synchronized void loadTemplateMapsFromFile() {
         ArrayList<ServerTemplate> templates = null;
+        Map<String, ServerTemplate> newTemplateMap = new ConcurrentHashMap<>();
+        Map<String, ServerTemplateKey> newTemplateKeyMap = new ConcurrentHashMap<>();
+
         try (FileReader reader = new FileReader(templatesLocation)) {
-            templates = (ArrayList<ServerTemplate>)((XStreamMarshaller)templateMarshaller).getXstream().fromXML(reader);
-        } catch (StreamException se) {
-        	if (se.getCause() instanceof EOFException) {
-        		logger.warn("Unable to read server template maps from file {}. File does not exist or is empty",templatesLocation);
-        	} else {
-        		logger.error("Unable to read server template maps from file due to stream error",se);
-        	}
+            templates = (ArrayList<ServerTemplate>)this.xstream.fromXML(reader);
+
+            if (templates != null && !templates.isEmpty()) {
+                templates.forEach(template -> {
+                    newTemplateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
+                    newTemplateMap.put(template.getId(),template);
+                });
+            }
+            templateKeyMap = newTemplateKeyMap;
+            templateMap = newTemplateMap;
+
         } catch (FileNotFoundException e) {
             logger.warn("Unable to read server template maps from file {}. File does not exist.", templatesLocation);
+            writeTemplateMap();
+        } catch (XStreamException e) {
+            logger.warn("Unable to read server template maps from file {}. File corrupted. Possible concurrent update in progress.", templatesLocation);
         } catch (Throwable e) {
             logger.error("Unable to read server template maps from file",e);
-        }
-        if (templates != null && !templates.isEmpty()) {
-            templates.forEach(template -> {
-                templateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
-                templateMap.put(template.getId(),template);
-            });
         }
     }
 
@@ -206,11 +224,6 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
             templateMap.entrySet().clear();
         }
     }
-    
-    public void reloadTemplateMaps() {
-        this.clearTemplateMaps();
-        loadTemplateMapsFromFile();
-    }
 
     public void setTemplatesLocation(String templatesLocation) {
         this.templatesLocation = templatesLocation;
@@ -223,5 +236,12 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     @Override
     public String toString() {
         return "FileBasedKieServerTemplateStorage: { templatesLocation = " + templatesLocation + "}";
+    }
+    
+    @Override
+    public void close() {
+        if (watcher != null) {
+            watcher.stop();
+        }
     }
 }

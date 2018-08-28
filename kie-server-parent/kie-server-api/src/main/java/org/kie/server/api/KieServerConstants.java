@@ -44,6 +44,8 @@ public class KieServerConstants {
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "org.kie.server.container.deployment";
     public static final String KIE_SERVER_CONTAINER_LOCATOR = "org.kie.server.container.locator";
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
+    public static final String KIE_SERVER_MGMT_API_DISABLED = "org.kie.server.mgmt.api.disabled";
+    public static final String KIE_SERVER_STARTUP_STRATEGY = "org.kie.server.startup.strategy";
 
     // configuration parameters
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";
@@ -112,7 +114,6 @@ public class KieServerConstants {
     public static final String CAPABILITY_BRP = "BRP"; // Business Resource Planning
     public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
     public static final String CAPABILITY_DMN = "DMN"; // DMN
-    public static final String CAPABILITY_BPM_QUERIES = "BPMQueries"; // BPM Queries
     public static final String CAPABILITY_SWAGGER = "Swagger"; // Swagger
 
     public static final String FAILURE_REASON_PROP = "failure-reason";

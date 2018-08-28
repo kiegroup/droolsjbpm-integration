@@ -26,12 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
+import org.kie.soup.commons.xstream.XStreamUtils;
 
 public class KieServerStateFileRepository implements KieServerStateRepository {
 
@@ -43,7 +45,7 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
 
     public KieServerStateFileRepository(File repositoryDir) {
         this.repositoryDir = repositoryDir;
-        xs = new XStream(new PureJavaReflectionProvider());
+        xs = XStreamUtils.createTrustingXStream(new PureJavaReflectionProvider());
         String[] voidDeny = {"void.class", "Void.class"};
         xs.denyTypes(voidDeny);
         xs.alias("kie-server-state", KieServerState.class);
@@ -89,7 +91,7 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
                 kieServerState = (KieServerState) xs.fromXML(serverStateFile);
                 // override controllers if given as system property
                 String defaultController = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
-                if (defaultController != null) {
+                if (defaultController != null && !defaultController.trim().isEmpty()) {
                     String[] controllerList = defaultController.split(",");
                     Set<String> controllers = new HashSet<String>();
                     for (String controller : controllerList) {

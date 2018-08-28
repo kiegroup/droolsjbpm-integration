@@ -17,11 +17,13 @@ package org.kie.server.api.marshalling;
 
 import java.util.Set;
 
-import com.thoughtworks.xstream.XStream;
+import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
+import org.kie.soup.commons.xstream.XStreamUtils;
+
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
-import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
 
 public class CustomXstreamMarshallerBuilder extends BaseMarshallerBuilder {
 
@@ -33,7 +35,8 @@ public class CustomXstreamMarshallerBuilder extends BaseMarshallerBuilder {
             return new XStreamMarshaller(classes, classLoader) {
                 @Override
                 protected void buildMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
-                    xstream = new XStream(new PureJavaReflectionProvider(), new DomDriver("UTF-8", new XmlFriendlyNameCoder("_-", "_")));
+                    xstream = XStreamUtils.createNonTrustingXStream(new PureJavaReflectionProvider(), new DomDriver("UTF-8", new XmlFriendlyNameCoder("_-", "_")));
+                    xstream.addPermission(new WildcardTypePermission(new String[]{"org.kie.server.api.**"}));
                     String[] voidDeny = {"void.class", "Void.class"};
                     xstream.denyTypes(voidDeny);
                 }

@@ -15,10 +15,20 @@
 
 package org.kie.server.services.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
@@ -32,18 +42,37 @@ import org.kie.api.builder.KieModule;
 import org.kie.scanner.KieMavenRepository;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DisposeContainerCommand;
+import org.kie.server.api.commands.UpdateReleaseIdCommand;
+import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
+import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.api.model.Severity;
+import org.kie.server.controller.api.KieServerController;
+import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.services.api.KieContainerInstance;
+import org.kie.server.services.api.KieControllerNotConnectedException;
+import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
-
-import static org.junit.Assert.*;
 
 public class KieServerImplTest {
 
@@ -65,6 +94,7 @@ public class KieServerImplTest {
         FileUtils.deleteDirectory(REPOSITORY_DIR);
         FileUtils.forceMkdir(REPOSITORY_DIR);
         kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+        kieServer.init();
     }
 
     @After
@@ -73,6 +103,247 @@ public class KieServerImplTest {
             kieServer.destroy();
         }
         KieServerEnvironment.setServerId(origServerId);
+    }
+    
+    @Test
+    public void testReadinessCheck() {
+        
+        assertTrue(kieServer.isKieServerReady());
+    }
+    
+    @Test(timeout=10000)
+    public void testReadinessCheckDelayedStart() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        CountDownLatch startedlatch = new CountDownLatch(1);
+        kieServer.destroy();
+        kieServer = delayedKieServer(latch, startedlatch);
+        
+        assertFalse(kieServer.isKieServerReady());
+        latch.countDown();
+        
+        startedlatch.await();        
+        assertTrue(kieServer.isKieServerReady());
+    }
+    
+    @Test
+    public void testHealthCheck() {
+        
+        List<Message> healthMessages = kieServer.healthCheck(false);
+        
+        assertEquals(healthMessages.size(), 0);
+    }
+    
+    @Test
+    public void testHealthCheckWithReport() {
+        
+        List<Message> healthMessages = kieServer.healthCheck(true);
+        
+        assertEquals(healthMessages.size(), 2);
+        Message header = healthMessages.get(0);
+        assertEquals(Severity.INFO, header.getSeverity());
+        assertEquals(2, header.getMessages().size());
+        
+        Message footer = healthMessages.get(1);
+        assertEquals(Severity.INFO, footer.getSeverity());
+        assertEquals(1, footer.getMessages().size());
+    }
+    
+    @Test(timeout=10000)
+    public void testHealthCheckDelayedStart() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        CountDownLatch startedlatch = new CountDownLatch(1);
+        kieServer.destroy();
+        kieServer = delayedKieServer(latch, startedlatch);
+        
+        assertFalse(kieServer.isKieServerReady());        
+        
+        List<Message> healthMessages = kieServer.healthCheck(false);
+        assertEquals(healthMessages.size(), 1);
+        
+        Message notReady = healthMessages.get(0);
+        assertEquals(Severity.ERROR, notReady.getSeverity());
+        assertEquals(1, notReady.getMessages().size());
+        
+        latch.countDown();
+        startedlatch.await();        
+        assertTrue(kieServer.isKieServerReady());
+        
+        healthMessages = kieServer.healthCheck(false);
+        
+        assertEquals(healthMessages.size(), 0);
+    }
+    
+    @Test
+    public void testHealthCheckFailedContainer() {
+        kieServer.destroy();
+        kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR)) {
+
+            @Override
+            protected List<KieContainerInstanceImpl> getContainers() {
+                List<KieContainerInstanceImpl> containers = new ArrayList<>();
+                KieContainerInstanceImpl container = new KieContainerInstanceImpl("test", KieContainerStatus.FAILED);
+                containers.add(container);
+                return containers;
+            }
+            
+        };
+        kieServer.init();
+        List<Message> healthMessages = kieServer.healthCheck(false);
+        
+        assertEquals(healthMessages.size(), 1);
+        Message failedContainer = healthMessages.get(0);
+        assertEquals(Severity.ERROR, failedContainer.getSeverity());
+        assertEquals(1, failedContainer.getMessages().size());
+        assertEquals("KIE Container 'test' is in FAILED state", failedContainer.getMessages().iterator().next());
+    }
+    
+    @Test
+    public void testHealthCheckFailedExtension() {
+        kieServer.destroy();
+        kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR)) {
+
+            @Override
+            public List<KieServerExtension> getServerExtensions() {
+                List<KieServerExtension> extensions = new ArrayList<>();
+                extensions.add(new KieServerExtension() {
+                    
+                    @Override
+                    public List<Message> healthCheck(boolean report) {
+                        List<Message> messages = KieServerExtension.super.healthCheck(report);
+                        messages.add(new Message(Severity.ERROR, "TEST extension is unhealthy"));
+                        return messages;
+                    }
+
+                    @Override
+                    public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {                        
+                    }
+                    
+                    @Override
+                    public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+                        return false;
+                    }
+                    
+                    @Override
+                    public boolean isInitialized() {
+                        return true;
+                    }
+                    
+                    @Override
+                    public boolean isActive() {
+                        return true;
+                    }
+                    
+                    @Override
+                    public void init(KieServerImpl kieServer, KieServerRegistry registry) {                        
+                    }
+                    
+                    @Override
+                    public Integer getStartOrder() {
+                        return 10;
+                    }
+                    
+                    @Override
+                    public List<Object> getServices() {
+                        return null;
+                    }
+                    
+                    @Override
+                    public String getImplementedCapability() {
+                        return "TEST";
+                    }
+                    
+                    @Override
+                    public String getExtensionName() {
+                        return "TEST";
+                    }
+                    
+                    @Override
+                    public <T> T getAppComponents(Class<T> serviceType) {
+                        return null;
+                    }
+                    
+                    @Override
+                    public List<Object> getAppComponents(SupportedTransports type) {
+                        return null;
+                    }
+                    
+                    @Override
+                    public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+                    }
+                    
+                    @Override
+                    public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
+                    }
+                    
+                    @Override
+                    public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+                    }
+                });
+                return extensions;
+            }
+            
+        };
+        kieServer.init();
+        List<Message> healthMessages = kieServer.healthCheck(false);
+        
+        assertEquals(healthMessages.size(), 1);
+        Message failedContainer = healthMessages.get(0);
+        assertEquals(Severity.ERROR, failedContainer.getSeverity());
+        assertEquals(1, failedContainer.getMessages().size());
+        assertEquals("TEST extension is unhealthy", failedContainer.getMessages().iterator().next());
+    }
+    
+    @Test
+    public void testManagementDisabledDefault() {
+        
+        assertNull(kieServer.checkAccessability());
+    }
+    
+    @Test
+    public void testManagementDisabledConfigured() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "true");
+        try {
+            kieServer.destroy();
+            kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+            kieServer.init();
+            ServiceResponse<?> forbidden = kieServer.checkAccessability();
+            assertForbiddenResponse(forbidden);
+        } finally {
+            System.clearProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED);
+        }
+    }
+    
+    @Test
+    public void testManagementDisabledConfiguredViaCommandService() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "true");
+        try {
+            kieServer.destroy();
+            kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+            kieServer.init();
+            
+            KieContainerCommandServiceImpl commandService = new KieContainerCommandServiceImpl(kieServer, kieServer.getServerRegistry());
+            List<KieServerCommand> commands = new ArrayList<>();
+            
+            commands.add(new CreateContainerCommand());
+            commands.add(new DisposeContainerCommand());
+            commands.add(new UpdateScannerCommand());
+            commands.add(new UpdateReleaseIdCommand());
+            
+            CommandScript commandScript = new CommandScript(commands);
+            ServiceResponsesList responseList = commandService.executeScript(commandScript, MarshallingFormat.JAXB, null);
+            assertNotNull(responseList);
+            
+            List<ServiceResponse<?>> responses = responseList.getResponses();
+            assertEquals(4, responses.size());
+            
+            for (ServiceResponse<?> forbidden : responses) {
+            
+                assertForbiddenResponse(forbidden);
+            }
+            
+        } finally {
+            System.clearProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED);
+        }
     }
 
     @Test
@@ -236,6 +507,45 @@ public class KieServerImplTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private KieServerImpl delayedKieServer(CountDownLatch latch, CountDownLatch startedlatch) {
+        KieServerImpl server = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR)) {
+
+            @Override
+            public void markAsReady() {
+                super.markAsReady();
+                startedlatch.countDown();
+            }
+
+            @Override
+            protected KieServerController getController() {
+                return new DefaultRestControllerImpl(getServerRegistry()) {                    
+                    @Override
+                    public KieServerSetup connect(KieServerInfo serverInfo) {
+                        try {
+                            if (latch.await(10, TimeUnit.MILLISECONDS)) {
+                                return new KieServerSetup();
+                            }
+                            throw new KieControllerNotConnectedException("Unable to connect to any controller");
+                        } catch (InterruptedException e) {
+                            throw new KieControllerNotConnectedException("Unable to connect to any controller");
+                        }
+                    }
+                    
+                };
+            }
+            
+        };
+        server.init();
+        return server;
+    }
+    
+    private void assertForbiddenResponse(ServiceResponse<?> forbidden) {        
+        assertNotNull(forbidden);
+        
+        assertEquals(ResponseType.FAILURE, forbidden.getType());
+        assertEquals("KIE Server management api is disabled", forbidden.getMsg());
     }
 
 }

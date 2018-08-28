@@ -39,7 +39,7 @@ import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationT
 public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "state-is-kept-for-stateful-session",
-            "1.0.0-SNAPSHOT");
+            "1.0.0");
 
     private static final String CONTAINER_ID = "stateful-session";
 

@@ -4,14 +4,18 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-router</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-router-proxy</artifactId>
   <packaging>jar</packaging>
     
   <name>KIE :: Execution Server :: Router :: Proxy</name>
   <description>KIE Execution Server Router Proxy</description>
-  
+
+  <properties>
+    <java.module.name>org.kie.server.router.proxy</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.undertow</groupId>
@@ -30,6 +34,11 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -39,6 +39,7 @@ import static org.kie.server.api.rest.RestURI.QUERY_DEF_URI;
 import static org.kie.server.api.rest.RestURI.QUERY_NAME;
 import static org.kie.server.api.rest.RestURI.QUERY_URI;
 import static org.kie.server.api.rest.RestURI.REPLACE_QUERY_DEF_PUT_URI;
+import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI;
 import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_POST_URI;
 import static org.kie.server.api.rest.RestURI.RUN_QUERY_DEF_GET_URI;
 import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_INSTANCE_ID_GET_URI;
@@ -65,22 +66,29 @@ import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.QueryServicesClient;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class QueryServicesClientImpl extends AbstractKieServicesClientImpl implements QueryServicesClient {
 
     public QueryServicesClientImpl(KieServicesConfiguration config) {
@@ -256,6 +264,11 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize) {
         return findProcessInstancesByProcessId(processId, status, page, pageSize, "", true);
     }
+    
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessIdAndInitiator(String processId, String initiator, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByProcessIdAndInitiator(processId, initiator, status, page, pageSize, "", true);
+    }
 
     @Override
     public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize) {
@@ -358,6 +371,36 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessInstancesByProcessId", new Object[]{processId, safeList(status), "", page, pageSize, sort, sortOrder})));
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getProcessInstances() != null) {
+            return Arrays.asList(result.getProcessInstances());
+        }
+
+        return Collections.emptyList();
+    }
+    
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessIdAndInitiator(String processId, String initiator, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        ProcessInstanceList result = null;
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_ID, processId);
+
+            String statusQueryString = getAdditionalParams("?initiator=" + initiator + "&sort=" + sort + "&sortOrder=" + sortOrder, "status", status);
+            String queryString = getPagingQueryString(statusQueryString, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessInstancesByProcessId", new Object[]{processId, safeList(status), initiator, page, pageSize, sort, sortOrder})));
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -790,39 +833,53 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
         return Collections.emptyList();
     }
 
-    // QueryDataService related
+    // QueryDataService related    
     @Override
-    public void registerQuery(QueryDefinition queryDefinition) {
+    public QueryDefinition registerQuery(QueryDefinition queryDefinition) {
+        QueryDefinition result = null;
         if (config.isRest()) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(QUERY_NAME, queryDefinition.getName());
 
-            makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + CREATE_QUERY_DEF_POST_URI, valuesMap), queryDefinition, Object.class);
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + CREATE_QUERY_DEF_POST_URI, valuesMap), queryDefinition, QueryDefinition.class);
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "registerQuery", serialize(queryDefinition), marshaller.getFormat().getType(), new Object[]{queryDefinition.getName()})));
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+            ServiceResponse<QueryDefinition> response = (ServiceResponse<QueryDefinition>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
         }
+
+        return result;
     }
 
     @Override
-    public void replaceQuery(QueryDefinition queryDefinition) {
+    public QueryDefinition replaceQuery(QueryDefinition queryDefinition) {
+        QueryDefinition result = null;
         if (config.isRest()) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(QUERY_NAME, queryDefinition.getName());
 
-            makeHttpPutRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + REPLACE_QUERY_DEF_PUT_URI, valuesMap), queryDefinition, Object.class, new HashMap<String, String>());
+            result = makeHttpPutRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + REPLACE_QUERY_DEF_PUT_URI, valuesMap), queryDefinition, QueryDefinition.class, new HashMap<String, String>());
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "replaceQuery", serialize(queryDefinition), marshaller.getFormat().getType(), new Object[]{queryDefinition.getName()})));
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+            ServiceResponse<QueryDefinition> response = (ServiceResponse<QueryDefinition>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
         }
+
+        return result;
     }
 
     @Override
@@ -1008,13 +1065,117 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
         return Collections.emptyList();
     }
 
+    @Override
+    public <T> List<T> query(String containerId, String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType) {
+        Object result = null;
+        Class<?> resultTypeList = getResultTypeList(resultType);
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(QUERY_NAME, queryName);
+
+            String queryString = getPagingQueryString("?mapper=" + mapper + "&builder=" + builder, page, pageSize);
+
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI, valuesMap) + queryString, parameters, resultTypeList);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "queryFilteredWithBuilder", serialize(safeMap(parameters)), marshaller.getFormat().getType(), new Object[]{containerId, queryName, mapper, builder, page, pageSize})));
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null) {
+
+            if (result instanceof ItemList) {
+                return ((ItemList<T>) result).getItems();
+            } else if (result instanceof List) {
+                return (List) result;
+            } else if (result instanceof Wrapped) {
+                return (List) ((Wrapped) result).unwrap();
+            }
+        }
+
+        return Collections.emptyList();
+    }
+    
+    @Override
+    public List<ProcessInstance> findProcessInstancesWithFilters(String queryName, ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
+        String mapper = "ProcessInstances";
+        ProcessInstanceList result = null;
+
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+            
+            String queryString = getPagingQueryString("?mapper=" + mapper, page, pageSize);
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_POST_URI, valuesMap) + queryString,
+                    filterSpec, ProcessInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "queryFiltered", serialize(filterSpec), marshaller.getFormat().getType(), new Object[]{queryName, mapper, page, pageSize})));
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();          
+        }
+
+        if (result != null) {
+            return result.getItems();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    
+    @Override
+    public List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
+        String mapper = "UserTasks";
+        TaskInstanceList result = null;
+
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+            
+            String queryString = getPagingQueryString("?mapper=" + mapper, page, pageSize);
+            result = makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_POST_URI, valuesMap) + queryString,
+                    filterSpec, TaskInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "queryFiltered", serialize(filterSpec), marshaller.getFormat().getType(), new Object[]{queryName, mapper, page, pageSize})));
+            ServiceResponse<TaskInstanceList> response = (ServiceResponse<TaskInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();  
+        }
+
+        if (result != null) {
+            return result.getItems();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     protected Class<?> getResultTypeList(Class<?> resultType) {
         if (TaskSummary.class.isAssignableFrom(resultType)) {
             return TaskSummaryList.class;
         } else if (ProcessInstance.class.isAssignableFrom(resultType)) {
             return ProcessInstanceList.class;
-        } else if (TaskInstance.class.isAssignableFrom(resultType)) {
+        } else if (ProcessInstanceCustomVars.class.isAssignableFrom(resultType)) {
+            return ProcessInstanceCustomVarsList.class;
+        }else if (TaskInstance.class.isAssignableFrom(resultType)) {
             return TaskInstanceList.class;
+        } else if (TaskWithProcessDescription.class.isAssignableFrom(resultType)) {
+            return TaskWithProcessDescriptionList.class;
         } else if (ExecutionErrorInstance.class.isAssignableFrom(resultType)) {
             return ExecutionErrorInstanceList.class;
         } else {

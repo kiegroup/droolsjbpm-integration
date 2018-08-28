@@ -16,10 +16,7 @@
 package org.kie.server.integrationtests.jbpm;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.NO_PROCESS_AVAILABLE_WITH_ID;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -309,8 +306,8 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
 
         assertClientException(() -> processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION_2),
                 404,
-                MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, PROCESS_ID_EVALUATION_2, CONTAINER_ALIAS),
-                MessageFormat.format(NO_PROCESS_AVAILABLE_WITH_ID, PROCESS_ID_EVALUATION_2));
+                "Could not find process definition \"" + PROCESS_ID_EVALUATION_2 + "\" in container \"" + CONTAINER_ALIAS + "\"",
+                "No process available with given id : " + PROCESS_ID_EVALUATION_2);
 
         // Instead the old one should be chosen, since it looks for containerId first
         oldPid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION);
@@ -392,7 +389,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
         userTask = taskClient.getTaskInstance(CONTAINER_ALIAS, taskSummary.getId());
         assertThat(userTask).isNotNull();
         assertThat(userTask.getContainerId()).isEqualTo(CONTAINER_ID_101);
-        assertThat(userTask.getName()).isEqualTo("Evaluate items");
+        assertThat(userTask.getName()).isEqualTo("Evaluate items?");
         assertThat(userTask.getStatus()).isEqualTo(Status.Completed.toString());
 
         //Second one - Approve

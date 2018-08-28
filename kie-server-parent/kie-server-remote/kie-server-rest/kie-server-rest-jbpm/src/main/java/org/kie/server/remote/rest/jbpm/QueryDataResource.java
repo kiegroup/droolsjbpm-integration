@@ -20,6 +20,7 @@ import static org.kie.server.api.rest.RestURI.DROP_QUERY_DEF_DELETE_URI;
 import static org.kie.server.api.rest.RestURI.QUERY_DEF_GET_URI;
 import static org.kie.server.api.rest.RestURI.QUERY_DEF_URI;
 import static org.kie.server.api.rest.RestURI.REPLACE_QUERY_DEF_PUT_URI;
+import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI;
 import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_POST_URI;
 import static org.kie.server.api.rest.RestURI.RUN_QUERY_DEF_GET_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.alreadyExists;
@@ -117,7 +118,7 @@ public class QueryDataResource {
     }
 
     @ApiOperation(value="Registers new query definition in the system with given queryName",
-            response=Void.class, code=201)
+            response=QueryDefinition.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 409, message = "Query with given name already exists")})
     @POST
@@ -134,16 +135,16 @@ public class QueryDataResource {
                                                                  context,
                                                                  headers );
         try {
-            queryDataServiceBase.registerQuery( queryName,
+            QueryDefinition def = queryDataServiceBase.registerQuery( queryName,
                                                 payload,
                                                 type );
 
             logger.debug( "Returning CREATED response after registering query with name {}",
                           queryName );
-            return createResponse( "",
-                                   v,
-                                   Response.Status.CREATED,
-                                   conversationIdHeader );
+            return createCorrectVariant( def,
+                                         headers,
+                                         Response.Status.CREATED,
+                                         conversationIdHeader );
         } catch ( QueryAlreadyRegisteredException e ) {
             return alreadyExists( MessageFormat.format( QUERY_ALREADY_EXISTS,
                                                         queryName ),
@@ -161,7 +162,7 @@ public class QueryDataResource {
     }
 
     @ApiOperation(value="Replaces existing query definition or registers new if not exists in the system with given queryName",
-            response=Void.class, code=201)
+            response=QueryDefinition.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @PUT
     @Path(REPLACE_QUERY_DEF_PUT_URI)
@@ -177,15 +178,15 @@ public class QueryDataResource {
                                                                  context,
                                                                  headers );
         try {
-            queryDataServiceBase.replaceQuery( queryName,
+            QueryDefinition def = queryDataServiceBase.replaceQuery( queryName,
                                                payload,
                                                type );
             logger.debug( "Returning CREATED response after registering query with name {}",
-                          queryName );
-            return createResponse( "",
-                                   v,
-                                   Response.Status.CREATED,
-                                   conversationIdHeader );
+                          queryName );            
+            return createCorrectVariant( def,
+                                  headers,
+                                  Response.Status.CREATED,
+                                  conversationIdHeader );
         } catch ( Exception e ) {
             logger.error( "Unexpected error during processing {}",
                           e.getMessage(),
@@ -339,6 +340,84 @@ public class QueryDataResource {
                                                                         type );
             } else {
                 result = queryDataServiceBase.queryFiltered( queryName,
+                                                             mapper,
+                                                             page,
+                                                             pageSize,
+                                                             payload,
+                                                             type );
+            }
+            logger.debug( "Returning result of process instance search: {}",
+                          result );
+
+            return createCorrectVariant( result,
+                                         headers,
+                                         Response.Status.OK,
+                                         conversationIdHeader );
+        } catch ( Exception e ) {
+            Throwable root = ExceptionUtils.getRootCause( e );
+            if ( root == null ) {
+                root = e;
+            }
+            if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) || e instanceof DataSetLookupException) {
+
+                logger.error( "{}",
+                              MessageFormat.format( BAD_REQUEST,
+                                                    root.getMessage() ),
+                              e );
+
+                return badRequest( MessageFormat.format( BAD_REQUEST,
+                                                         root.getMessage() ),
+                                   getVariant( headers ),
+                                   conversationIdHeader );
+            } else {
+                logger.error( "{}",
+                              MessageFormat.format( UNEXPECTED_ERROR,
+                                                    e.getMessage() ),
+                              e );
+
+                return internalServerError( MessageFormat.format( UNEXPECTED_ERROR,
+                                                                  e.getMessage() ),
+                                            getVariant( headers ),
+                                            conversationIdHeader );
+            }
+        }
+    }
+
+    @ApiOperation(value="Queries using query definition identified by queryName filtered by container. Maps the result to concrete objects based on provided mapper. Query is additional altered by the filter spec and/or builder",
+            response=Object.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions")})
+    @POST
+    @Path(RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response runQueryFilteredByDeploymentId( @Context HttpHeaders headers,
+                                                    @ApiParam(value = "container id to filter queries", required = true) @PathParam("id") String containerId,
+                                                    @ApiParam(value = "identifier of the query definition to be used for query", required = true) @PathParam("queryName") String queryName,
+                                                    @ApiParam(value = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
+                                                    @ApiParam(value = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
+                                                    @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+                                                    @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+                                                    @ApiParam(value = "optional query filter specification represented as QueryFilterSpec", required = false) String payload ) {
+
+        String type = getContentType( headers );
+        Header conversationIdHeader = buildConversationIdHeader( containerId,
+                                                                 context,
+                                                                 headers );
+        Object result = null;
+
+        try {
+            if ( builder != null && !builder.isEmpty() ) {
+                result = queryDataServiceBase.queryFilteredWithBuilder( containerId,
+                                                                        queryName,
+                                                                        mapper,
+                                                                        builder,
+                                                                        page,
+                                                                        pageSize,
+                                                                        payload,
+                                                                        type );
+            } else {
+                result = queryDataServiceBase.queryFiltered( containerId,
+                                                             queryName,
                                                              mapper,
                                                              page,
                                                              pageSize,

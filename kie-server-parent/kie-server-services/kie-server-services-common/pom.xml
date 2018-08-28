@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-common</artifactId>
@@ -12,6 +12,10 @@
 
   <name>KIE :: Execution Server :: Services :: Common</name>
   <description>KIE Execution Server Services</description>
+
+  <properties>
+    <java.module.name>org.kie.server.services.common</java.module.name>
+  </properties>
 
   <dependencies>
     <!-- kie server dependencies -->
@@ -34,8 +38,16 @@
       <artifactId>kie-internal</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-commons</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -49,10 +61,6 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
       <!--<scope>runtime</scope>-->
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-common</artifactId>
     </dependency>
     <!-- needed for ruleflow processes -->
     <dependency>
@@ -137,6 +145,11 @@
       <artifactId>xstream</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
     <!-- log -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -179,8 +192,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-maven-support</artifactId>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-maven-support</artifactId>
     </dependency>
 
   </dependencies>

@@ -16,6 +16,7 @@
 package org.kie.server.api.model.instance;
 
 import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -47,6 +48,10 @@ public class NodeInstance {
     private Boolean completed;
     @XmlElement(name="reference-id")
     private Long referenceId;
+    @XmlElement(name="sla-compliance")
+    private Integer slaCompliance;   
+    @XmlElement(name="sla-due-date")
+    private Date slaDueDate;
 
     public NodeInstance() {
     }
@@ -143,6 +148,22 @@ public class NodeInstance {
         this.referenceId = referenceId;
     }
 
+    public Integer getSlaCompliance() {
+        return slaCompliance;
+    }
+    
+    public void setSlaCompliance(Integer slaCompliance) {
+        this.slaCompliance = slaCompliance;
+    }
+    
+    public Date getSlaDueDate() {
+        return slaDueDate;
+    }
+    
+    public void setSlaDueDate(Date slaDueDate) {
+        this.slaDueDate = slaDueDate;
+    }
+
     @Override
     public String toString() {
         return "NodeInstance{" +
@@ -159,64 +180,73 @@ public class NodeInstance {
     }
 
     public static class Builder {
-        private NodeInstance processInstance = new NodeInstance();
+        private NodeInstance nodeInstance = new NodeInstance();
 
         public NodeInstance build() {
-            return processInstance;
+            return nodeInstance;
         }
 
         public Builder id(Long id) {
-            processInstance.setId(id);
+            nodeInstance.setId(id);
             return this;
         }
 
         public Builder nodeId(String nodeId) {
-            processInstance.setNodeId(nodeId);
+            nodeInstance.setNodeId(nodeId);
             return this;
         }
 
         public Builder name(String name) {
-            processInstance.setName(name);
+            nodeInstance.setName(name);
             return this;
         }
 
         public Builder processInstanceId(Long processInstanceId) {
-            processInstance.setProcessInstanceId(processInstanceId);
+            nodeInstance.setProcessInstanceId(processInstanceId);
             return this;
         }
 
         public Builder workItemId(Long workItemId) {
-            processInstance.setWorkItemId(workItemId);
+            nodeInstance.setWorkItemId(workItemId);
             return this;
         }
 
         public Builder containerId(String containerId) {
-            processInstance.setContainerId(containerId);
+            nodeInstance.setContainerId(containerId);
             return this;
         }
 
         public Builder nodeType(String nodeType) {
-            processInstance.setNodeType(nodeType);
+            nodeInstance.setNodeType(nodeType);
             return this;
         }
 
         public Builder date(Date date) {
-            processInstance.setDate(date == null ? date : new Date(date.getTime()));
+            nodeInstance.setDate(date == null ? date : new Date(date.getTime()));
             return this;
         }
 
         public Builder connection(String connection) {
-            processInstance.setConnection(connection);
+            nodeInstance.setConnection(connection);
             return this;
         }
 
         public Builder completed(Boolean completed) {
-            processInstance.setCompleted(completed);
+            nodeInstance.setCompleted(completed);
             return this;
         }
 
         public Builder referenceId(Long referenceId) {
-            processInstance.setReferenceId(referenceId);
+            nodeInstance.setReferenceId(referenceId);
+            return this;
+        }
+        public Builder slaDueDate(Date slaDueDate) {
+            nodeInstance.setSlaDueDate(slaDueDate);
+            return this;
+        }
+        
+        public Builder slaCompliance(Integer slaCompliance) {
+            nodeInstance.setSlaCompliance(slaCompliance);
             return this;
         }
 

@@ -40,6 +40,7 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
@@ -176,6 +177,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         processClient.abortProcessInstance(CONTAINER_ID, 9999l);
     }
 
+    @Test
+    public void testAbortProcessInNonExistingContainer() {
+        assertClientException(() -> processClient.abortProcessInstance(BAD_CONTAINER_ID, 9999L), 404, BAD_CONTAINER_ID);
+    }
+
     @Test(expected = KieServicesException.class)
     public void testStartCheckNonExistingVariables() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -219,9 +225,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal1", person);
 
             processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal2", "My custom string event");
-        } catch (Exception e){
+        } catch (Exception e) {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-            e.printStackTrace();
             fail(e.getMessage());
         }
 
@@ -239,13 +244,40 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal1", null);
 
             processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal2", null);
-        } catch (Exception e){
+        } catch (Exception e) {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-            e.printStackTrace();
             fail(e.getMessage());
         }
 
     }
+
+    @Test
+    public void testBoundarySignalProcessInstance() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_BOUNDARY_SIGNAL_PROCESS);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+
+        try {
+            checkAvailableBoundarySignals(CONTAINER_ID, processInstanceId);
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testBoundarySignalWithExpressionProcessInstance() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_BOUNDARY_SIGNAL_EXPRESSION_PROCESS);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+
+        try {
+            checkAvailableBoundarySignals(CONTAINER_ID, processInstanceId);
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+
 
     @Test
     public void testSignalProcessInstances() throws Exception {
@@ -270,10 +302,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.signalProcessInstances(CONTAINER_ID, processInstanceIds, "Signal1", person);
 
             processClient.signalProcessInstances(CONTAINER_ID, processInstanceIds, "Signal2", "My custom string event");
-        } catch (Exception e){
+        } catch (Exception e) {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
-            e.printStackTrace();
             fail(e.getMessage());
         }
 
@@ -610,6 +641,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     }
 
     @Test
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testSignalContainer() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 
@@ -627,9 +659,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
             assertNotNull(pi);
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, pi.getState().intValue());
-        } catch (Exception e){
+        } catch (Exception e) {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-            e.printStackTrace();
             fail(e.getMessage());
         }
 
@@ -655,7 +686,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals(initial + 1, processInstances.size());
 
         } catch (Exception e){
-            e.printStackTrace();
             fail(e.getMessage());
         }
 
@@ -1059,5 +1089,12 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         assertEquals(2, availableSignals.size());
         assertTrue(availableSignals.contains("Signal1"));
         assertTrue(availableSignals.contains("Signal2"));
+    }
+
+    private void checkAvailableBoundarySignals(String containerId, Long processInstanceId) {
+        List<String> availableSignals = processClient.getAvailableSignals(containerId, processInstanceId);
+        assertNotNull(availableSignals);
+        assertEquals(1, availableSignals.size());
+        assertTrue(availableSignals.contains("MySignal"));
     }
 }

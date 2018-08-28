@@ -214,6 +214,8 @@ public class KSessionFactoryBean
             kSession = helper.internalGetObject();
             attachLoggers((KieRuntimeEventManager) kSession);
             attachListeners((KieRuntimeEventManager) kSession);
+            helper.executeBatch();
+
         } else {
             if ("stateless".equalsIgnoreCase(type)) {
                 helper = new StatelessKSessionFactoryBeanHelper(this, null);

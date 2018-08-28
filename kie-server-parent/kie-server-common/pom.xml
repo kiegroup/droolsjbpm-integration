@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-common</artifactId>
@@ -14,10 +14,19 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.server.common</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.server.common</java.module.name>
   </properties>
 
   <dependencies>
+    <!-- KIE -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
     <!-- REST -->
     <dependency>
       <groupId>org.jboss.spec.javax.ws.rs</groupId>

@@ -45,6 +45,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVari
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.NODE_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
@@ -67,6 +68,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.kie.server.api.model.definition.ProcessDefinition;
@@ -158,7 +160,8 @@ public class RuntimeDataResource {
 
     @ApiOperation(value="Retrieves process instances filtered by container. Applies pagination by default and allows to specify sorting",
             response=ProcessInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+                            @ApiResponse(code = 404, message = "Container Id not found")})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -172,11 +175,19 @@ public class RuntimeDataResource {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Variant v = getVariant(headers);
+        try {
+            ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize, sort, sortOrder);
+            logger.debug("Returning result of process instance search: {}", processInstanceList);
 
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize, sort, sortOrder);
-        logger.debug("Returning result of process instance search: {}", processInstanceList);
-
-        return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
+            return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
     }
 
     @ApiOperation(value="Retrieves process instance by exactly matched correlation key",
@@ -380,7 +391,7 @@ public class RuntimeDataResource {
     @Path(PROCESS_DEFINITIONS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessesByFilter(@Context HttpHeaders headers, 
-            @ApiParam(value = "process id or name to filter process definitions", required = true) @QueryParam("filter") String filter,
+            @ApiParam(value = "process id or name to filter process definitions", required = false) @QueryParam("filter") String filter,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -520,7 +531,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTasksAssignedAsPotentialOwner(@Context HttpHeaders headers,
             @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,  
-            @ApiParam(value = "optional group names to include in the query", required = true, allowMultiple=true) @QueryParam("groups") List<String> groupIds,
+            @ApiParam(value = "optional group names to include in the query", required = false, allowMultiple=true) @QueryParam("groups") List<String> groupIds,
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -602,7 +613,7 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Retrieves tasks, optionally filters by status and applies pagination",
+    @ApiOperation(value="Retrieves tasks with applied pagination",
             response=TaskSummaryList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET

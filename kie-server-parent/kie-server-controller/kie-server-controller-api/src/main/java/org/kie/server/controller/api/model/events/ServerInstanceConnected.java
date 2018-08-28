@@ -17,7 +17,7 @@ package org.kie.server.controller.api.model.events;
 
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 
-public class ServerInstanceConnected {
+public class ServerInstanceConnected implements KieServerControllerEvent {
 
     private ServerInstance serverInstance;
 

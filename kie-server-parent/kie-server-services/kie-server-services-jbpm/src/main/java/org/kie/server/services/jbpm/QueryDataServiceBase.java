@@ -19,10 +19,12 @@ import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.convertQueryDefinition;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinitionList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceListPO;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
 
 import java.util.ArrayList;
@@ -34,9 +36,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
+import org.jbpm.services.api.model.ProcessInstanceCustomDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
+import org.jbpm.services.api.model.UserTaskInstanceWithPotOwnerDesc;
 import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
 import org.jbpm.services.api.query.QueryAlreadyRegisteredException;
 import org.jbpm.services.api.query.QueryMapperRegistry;
@@ -76,7 +80,7 @@ public class QueryDataServiceBase {
         this.marshallerHelper = new MarshallerHelper(context);
     }
 
-    public void registerQuery(String queryName, String payload, String marshallingType) throws QueryAlreadyRegisteredException {
+    public QueryDefinition registerQuery(String queryName, String payload, String marshallingType) throws QueryAlreadyRegisteredException {
         logger.debug("About to unmarshal queryDefinition from payload: '{}'", payload);
         QueryDefinition queryDefinition = marshallerHelper.unmarshal(payload, marshallingType, QueryDefinition.class);
         queryDefinition.setName(queryName);
@@ -84,9 +88,11 @@ public class QueryDataServiceBase {
         SqlQueryDefinition actualDefinition = build(context, queryDefinition);
         logger.debug("Built sql query definition for {} with content {}", queryName, actualDefinition);
         queryService.registerQuery(actualDefinition);
+        
+        return convertQueryDefinition(actualDefinition);
     }
 
-    public void replaceQuery(String queryName, String payload, String marshallingType) {
+    public QueryDefinition replaceQuery(String queryName, String payload, String marshallingType) {
 
         logger.debug("About to unmarshal queryDefinition from payload: '{}'", payload);
         QueryDefinition queryDefinition = marshallerHelper.unmarshal(payload, marshallingType, QueryDefinition.class);
@@ -96,6 +102,8 @@ public class QueryDataServiceBase {
         logger.debug("Built sql query definition for {} with content {}", queryName, actualDefinition);
 
         queryService.replaceQuery(actualDefinition);
+        
+        return convertQueryDefinition(actualDefinition);
     }
 
     public void unregisterQuery(String uniqueQueryName) throws QueryNotFoundException {
@@ -141,6 +149,10 @@ public class QueryDataServiceBase {
     }
 
     public Object queryFiltered(String queryName, String mapper, Integer page, Integer pageSize, String payload, String marshallingType) {
+        return queryFiltered(null, queryName, mapper, page, pageSize, payload, marshallingType);
+    }
+
+    public Object queryFiltered(String containerId, String queryName, String mapper, Integer page, Integer pageSize, String payload, String marshallingType) {
         QueryParam[] params = new QueryParam[0];
         Map<String, String> columnMapping = null;
 
@@ -149,7 +161,11 @@ public class QueryDataServiceBase {
 
         if (payload != null && !payload.isEmpty()) {
             logger.debug("About to unmarshal queryDefinition from payload: '{}'", payload);
-            filterSpec = marshallerHelper.unmarshal(payload, marshallingType, QueryFilterSpec.class);
+            if(containerId != null) {
+                filterSpec = marshallerHelper.unmarshal(containerId, payload, marshallingType, QueryFilterSpec.class);
+            } else {
+                filterSpec = marshallerHelper.unmarshal(payload, marshallingType, QueryFilterSpec.class);
+            }
 
             // build parameters for filtering the query
             if (filterSpec.getParameters() != null) {
@@ -181,6 +197,10 @@ public class QueryDataServiceBase {
     }
 
     public Object queryFilteredWithBuilder(String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {
+        return queryFilteredWithBuilder(null, queryName, mapper, builder, page, pageSize, payload, marshallingType);
+    }
+
+    public Object queryFilteredWithBuilder(String containerId, String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {
         Map<String, String> columnMapping = null;
         QueryContext queryContext = buildQueryContext(page, pageSize);
         Map<String, Object> queryParameters = new HashMap<String, Object>();
@@ -190,7 +210,11 @@ public class QueryDataServiceBase {
 
         if (payload != null && !payload.isEmpty()) {
             logger.debug("About to unmarshal query params from payload: '{}'", payload);
-            queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
+            if(containerId != null) {
+                queryParameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+            } else {
+                queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
+            }
             orderBy = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY);
             ascending = (Boolean) queryParameters.remove(KieServerConstants.QUERY_ASCENDING);
             orderByClause = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY_CLAUSE);
@@ -229,7 +253,11 @@ public class QueryDataServiceBase {
         Object actualResult = null;
         if (result instanceof Collection) {
 
-            if (ProcessInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
+            if (ProcessInstanceCustomDesc.class.isAssignableFrom(resultMapper.getType())) {
+
+                logger.debug("Converting collection of ProcessInstanceCustomDesc to ProcessInstanceCustomList");
+                actualResult = convertToProcessInstanceCustomVarsList((Collection<ProcessInstanceCustomDesc>) result);
+            } else if (ProcessInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
 
                 logger.debug("Converting collection of ProcessInstanceWithVarsDesc to ProcessInstanceList");
                 actualResult = convertToProcessInstanceWithVarsList((Collection<ProcessInstanceWithVarsDesc>) result);
@@ -241,6 +269,10 @@ public class QueryDataServiceBase {
 
                 logger.debug("Converting collection of UserTaskInstanceWithVarsDesc to TaskInstanceList");
                 actualResult = convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) result);
+            } else if (UserTaskInstanceWithPotOwnerDesc.class.isAssignableFrom(resultMapper.getType())) {
+
+                logger.debug("Converting collection of UserTaskInstanceWithPotOwnerDesc to TaskInstanceList");
+                actualResult = convertToTaskInstanceListPO((Collection<UserTaskInstanceWithPotOwnerDesc>) result);
             } else if (UserTaskInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
 
                 logger.debug("Converting collection of UserTaskInstanceDesc to TaskInstanceList");
@@ -257,7 +289,7 @@ public class QueryDataServiceBase {
 
                 logger.debug("Converting collection of List to ArrayList");
                 actualResult = new ArrayList((Collection) result);
-            } else {
+            }else {
 
                 logger.debug("Convert not supported for custom type {}", resultMapper.getType());
                 actualResult = result;

@@ -6,18 +6,27 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-controller</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-controller-api</artifactId>
   <name>KIE :: Execution Server :: Controller :: API</name>
   <description>KIE Execution Server Controller API</description>
 
+  <properties>
+    <java.module.name>org.kie.server.controller.api</java.module.name>
+  </properties>
+
   <dependencies>
 
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
     </dependency>
 
   </dependencies>

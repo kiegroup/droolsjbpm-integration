@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -45,6 +46,7 @@ import org.drools.core.command.runtime.rule.GetFactHandlesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.drools.core.common.DefaultFactHandle;
+import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -64,10 +66,10 @@ import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
 import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
 import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
@@ -114,6 +116,7 @@ import org.kie.server.api.model.cases.CaseFileDataItem;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseMilestoneDefinition;
 import org.kie.server.api.model.cases.CaseMilestoneList;
@@ -133,6 +136,8 @@ import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
+import org.kie.server.api.model.dmn.DMNInputDataInfo;
+import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNMessageKS;
 import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
@@ -146,6 +151,8 @@ import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
@@ -162,6 +169,8 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
@@ -246,6 +255,8 @@ public class JaxbMarshaller implements Marshaller {
 
                 ProcessInstance.class,
                 ProcessInstanceList.class,
+                ProcessInstanceCustomVars.class,
+                ProcessInstanceCustomVarsList.class,
 
                 NodeInstance.class,
                 NodeInstanceList.class,
@@ -257,6 +268,8 @@ public class JaxbMarshaller implements Marshaller {
                 TaskInstanceList.class,
                 TaskSummary.class,
                 TaskSummaryList.class,
+                TaskWithProcessDescription.class,
+                TaskWithProcessDescriptionList.class,
 
                 TaskEventInstance.class,
                 TaskEventInstanceList.class,
@@ -266,6 +279,7 @@ public class JaxbMarshaller implements Marshaller {
                 TaskAttachment.class,
                 TaskAttachmentList.class,
 
+                WorkItemImpl.class,
                 WorkItemInstance.class,
                 WorkItemInstanceList.class,
 
@@ -342,6 +356,7 @@ public class JaxbMarshaller implements Marshaller {
                 CaseStageDefinition.class,
                 CaseFileDataItem.class,
                 CaseFileDataItemList.class,
+                CaseMigrationReportInstance.class,
 
                 // Kie DMN
                 DMNContextKS.class,
@@ -351,7 +366,9 @@ public class JaxbMarshaller implements Marshaller {
                 DMNDecisionResultKS.class,
                 DMNModelInfoList.class,
                 DMNModelInfo.class,
-                DMNDecisionInfo.class
+                DMNDecisionInfo.class,
+                DMNInputDataInfo.class,
+                DMNItemDefinitionInfo.class
         };
     }
 
@@ -389,6 +406,10 @@ public class JaxbMarshaller implements Marshaller {
 
     @Override
     public String marshall(Object input) {
+        if (input == null) {
+            return null;
+        }
+
         StringWriter writer = new StringWriter();
         try {
             getMarshaller().marshal(ModelWrapper.wrap(input), writer);

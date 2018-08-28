@@ -235,7 +235,7 @@ public class TaskInstance {
     public void setProcessId(String processId) {
         this.processId = processId;
     }
-
+    
     public String getContainerId() {
         return containerId;
     }
@@ -243,7 +243,7 @@ public class TaskInstance {
     public void setContainerId(String containerId) {
         this.containerId = containerId;
     }
-
+    
     public List<String> getPotentialOwners() {
         return potentialOwners;
     }
@@ -395,7 +395,7 @@ public class TaskInstance {
             taskInstance.setProcessId(processId);
             return this;
         }
-
+        
         public Builder containerId(String containerId) {
             taskInstance.setContainerId(containerId);
             return this;
@@ -425,5 +425,6 @@ public class TaskInstance {
             taskInstance.setOutputData(outputData);
             return this;
         }
+        
     }
 }

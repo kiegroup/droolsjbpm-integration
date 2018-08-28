@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<featuresProcessing xmlns="http://karaf.apache.org/xmlns/features-processing/v1.0.0">
+
+    <!-- A list of blacklisted feature identifiers that can't be installed in Karaf and are not part of the distribution -->
+    <blacklistedFeatures>
+        <feature version="[3,4.3)">spring*</feature>
+        <feature version="[4,4.3)">aries-blueprint-spring</feature>
+    </blacklistedFeatures>
+
+</featuresProcessing>

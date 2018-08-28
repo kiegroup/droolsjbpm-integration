@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-jbpm</artifactId>
@@ -13,6 +13,7 @@
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration to run on different supported containers.</description>
 
   <properties>
+    <java.module.name>org.kie.server.itests.jbpm.core</java.module.name>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
   </properties>
 
@@ -22,7 +23,7 @@
       <artifactId>kie-server-integ-tests-common</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- core deps -->
     <dependency>
       <groupId>org.drools</groupId>
@@ -34,50 +35,22 @@
       <artifactId>kie-ci</artifactId>
       <scope>test</scope>
     </dependency>
-    
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-document</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- kie server deps -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-common</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-jbpm</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-jbpm</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-case-mgmt-impl</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -93,7 +66,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- REST --> 
+    <!-- REST -->
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_3.1_spec</artifactId>
@@ -111,7 +84,8 @@
       </exclusions>
     </dependency>
 
-   <!--  Stay with httpcomponents: it will save us pain (as opposed to changing from resteasy to cxf to cxf 3.0, etc. --> 
+    <!-- Stay with httpcomponents: it will save us pain (as opposed to changing 
+      from resteasy to cxf to cxf 3.0, etc. -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
@@ -146,11 +120,17 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- persistence --> 
+    <!-- persistence -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -177,7 +157,7 @@
       <artifactId>jbpm-test-util</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-embedder</artifactId>
@@ -194,14 +174,14 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
+      <classifier>ee7</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
-      <classifier>ee7</classifier>
+      <artifactId>kie-server-test-web-service</artifactId>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -212,8 +192,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.dashbuilder</groupId>
-      <artifactId>dashbuilder-dataset-api</artifactId>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-dataset-api</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -229,8 +209,9 @@
       </exclusions>
     </dependency>
 
-    <!-- This is an artificial dependency to make sure the kie-server-tests modules are executed one at a time during
-         parallel build (otherwise the tests fail because of conflicting port binding) -->
+    <!-- This is an artificial dependency to make sure the kie-server-tests 
+      modules are executed one at a time during parallel build (otherwise the tests 
+      fail because of conflicting port binding) -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-integ-tests-drools</artifactId>
@@ -265,6 +246,7 @@
               <kie.server.war.path>${kie.server.war.path}</kie.server.war.path>
               <weblogic.home>${weblogic.home}</weblogic.home>
               <kie.server.remoting.url>${kie.server.remoting.url}</kie.server.remoting.url>
+              <webservice.http.url>${webservice.http.url}</webservice.http.url>
               <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
               <kie.server.context.factory>${kie.server.context.factory}</kie.server.context.factory>
               <kie.server.connection.factory>${kie.server.connection.factory}</kie.server.connection.factory>
@@ -277,7 +259,8 @@
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
-              <!-- Some tests need to know which DB they are currently run with -->
+              <!-- Some tests need to know which DB they are currently run 
+                with -->
               <org.kie.server.datasource.driver.class>${org.kie.server.datasource.driver.class}</org.kie.server.datasource.driver.class>
               <org.jbpm.document.storage>${org.jbpm.document.storage}</org.jbpm.document.storage>
             </systemPropertyVariables>
@@ -316,7 +299,7 @@
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
-              <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
+              <!-- UserInfo properties for UserTaskEscalationIntegrationTest -->
               <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
               <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
             </systemProperties>
@@ -325,4 +308,266 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>local-test-run</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-common</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis' -->
+              <groupId>javax.xml.stream</groupId>
+              <artifactId>stax-api</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-jbpm</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.codehaus.woodstox</groupId>
+              <artifactId>woodstox-core-asl</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-common</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-jbpm</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jbpm</groupId>
+          <artifactId>jbpm-case-mgmt-impl</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>tomcat9</id>
+    </profile>
+    <profile>
+      <id>wildfly10</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <deployables>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server</artifactId>
+                    <!-- default, may be overridden in container specific 
+                      profiles -->
+                    <classifier>${kie.server.classifier}</classifier>
+                    <type>war</type>
+                    <properties>
+                      <context>${kie.server.context}</context>
+                    </properties>
+                    <pingURL>${kie.server.base.http.url}</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server-test-web-service</artifactId>                    
+                    <type>war</type>
+                    <properties>
+                      <context>kie-server-test-web-service</context>
+                    </properties>
+                    <pingURL>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>wildfly11</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <deployables>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server</artifactId>
+                    <!-- default, may be overridden in container specific 
+                      profiles -->
+                    <classifier>${kie.server.classifier}</classifier>
+                    <type>war</type>
+                    <properties>
+                      <context>${kie.server.context}</context>
+                    </properties>
+                    <pingURL>${kie.server.base.http.url}</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server-test-web-service</artifactId>                    
+                    <type>war</type>
+                    <properties>
+                      <context>kie-server-test-web-service</context>
+                    </properties>
+                    <pingURL>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>eap7</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <deployables>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server</artifactId>
+                    <!-- default, may be overridden in container specific 
+                      profiles -->
+                    <classifier>${kie.server.classifier}</classifier>
+                    <type>war</type>
+                    <properties>
+                      <context>${kie.server.context}</context>
+                    </properties>
+                    <pingURL>${kie.server.base.http.url}</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server-test-web-service</artifactId>                    
+                    <type>war</type>
+                    <properties>
+                      <context>kie-server-test-web-service</context>
+                    </properties>
+                    <pingURL>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>oracle-wls-12</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <deployables>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server</artifactId>
+                    <!-- default, may be overridden in container specific 
+                      profiles -->
+                    <classifier>${kie.server.classifier}</classifier>
+                    <type>war</type>
+                    <properties>
+                      <context>${kie.server.context}</context>
+                    </properties>
+                    <pingURL>${kie.server.base.http.url}</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server-test-web-service</artifactId>                    
+                    <type>war</type>
+                    <properties>
+                      <context>kie-server-test-web-service</context>
+                    </properties>
+                    <pingURL>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>      
+    </profile>
+    <profile>
+      <id>websphere9</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+          <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <webservice.http.url>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface/AcmeDemoService.wsdl</webservice.http.url>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <deployables>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server</artifactId>
+                    <!-- default, may be overridden in container specific 
+                      profiles -->
+                    <classifier>${kie.server.classifier}</classifier>
+                    <type>war</type>
+                    <properties>
+                      <context>${kie.server.context}</context>
+                    </properties>
+                    <pingURL>${kie.server.base.http.url}</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                  <deployable>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>kie-server-test-web-service</artifactId>                    
+                    <type>war</type>
+                    <properties>
+                      <context>kie-server-test-web-service</context>
+                    </properties>
+                    <pingURL>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface/AcmeDemoService.wsdl</pingURL>
+                    <pingTimeout>60000</pingTimeout>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>

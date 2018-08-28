@@ -15,11 +15,16 @@
 
 package org.kie.server.services.casemgmt;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jbpm.casemgmt.api.admin.CaseMigrationReport;
 import org.jbpm.casemgmt.api.model.CaseDefinition;
 import org.jbpm.casemgmt.api.model.CaseFileItem;
 import org.jbpm.casemgmt.api.model.CaseRole;
@@ -28,18 +33,23 @@ import org.jbpm.casemgmt.api.model.instance.CaseMilestoneInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseRoleInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseStageInstance;
 import org.jbpm.casemgmt.api.model.instance.CommentInstance;
+import org.jbpm.services.api.admin.MigrationEntry;
+import org.jbpm.services.api.admin.MigrationReport;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
-import org.kie.api.runtime.query.QueryContext;
+import org.kie.server.api.model.admin.MigrationReportInstance;
+import org.kie.server.api.model.admin.MigrationReportInstanceList;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseComment;
 import org.kie.server.api.model.cases.CaseFileDataItem;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
+import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseMilestoneDefinition;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
@@ -49,8 +59,6 @@ import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
-
-import static java.util.stream.Collectors.*;
 
 public class ConvertUtils {
 
@@ -125,6 +133,8 @@ public class ConvertUtils {
                 .startedAt(actualCaseInstance.getStartedAt())
                 .completedAt(actualCaseInstance.getCompletedAt())
                 .completionMessage(actualCaseInstance.getCompletionMessage())
+                .slaCompliance(actualCaseInstance.getSlaCompliance())
+                .slaDueDate(actualCaseInstance.getSlaDueDate())
                 .build();
     }
 
@@ -132,13 +142,19 @@ public class ConvertUtils {
         List<CaseComment> comments = new ArrayList<>();
 
         if (caseComments != null) {
-            caseComments.forEach(c ->
+            caseComments.forEach(c -> {
+                String[] restrictions = new String[0];
+                if (c.getRestrictedTo() != null) {
+                    restrictions = c.getRestrictedTo().toArray(new String[c.getRestrictedTo().size()]);
+                }
                 comments.add(CaseComment.builder()
                         .id(c.getId())
                         .author(c.getAuthor())
                         .addedAt(c.getCreatedAt())
                         .text(c.getComment())
-                        .build())
+                        .restrictedTo(restrictions)
+                        .build());
+            }
             );
         }
         return comments;
@@ -161,16 +177,20 @@ public class ConvertUtils {
                         .processInstanceId(an.getProcessInstanceId())
                         .workItemId(an.getWorkItemId())
                         .referenceId(an.getReferenceId())
+                        .slaCompliance(an.getSlaCompliance())
+                        .slaDueDate(an.getSlaDueDate())
                         .build())
                 .collect(toList());
     }
 
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize) {
+        checkPagination(page, pageSize);
         return new QueryContext(page * pageSize, pageSize);
     }
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize, String orderBy, boolean asc) {
+        checkPagination(page, pageSize);
         if (orderBy != null && !orderBy.isEmpty()) {
             return new QueryContext(page * pageSize, pageSize, orderBy, asc);
         }
@@ -196,6 +216,8 @@ public class ConvertUtils {
                         .date(pi.getDataTimeStamp())
                         .initiator(pi.getInitiator())
                         .state(pi.getState())
+                        .slaCompliance(pi.getSlaCompliance())
+                        .slaDueDate(pi.getSlaDueDate())
                         .build()
         )
         .collect(toList());
@@ -351,5 +373,86 @@ public class ConvertUtils {
                 .build();
 
         return caseFileDataItem;
+    }
+
+    private static void checkPagination(final Integer page, final Integer pageSize) {
+        if (page < 0) {
+            throw new IllegalArgumentException(MessageFormat.format(Messages.ILLEGAL_PAGE, page));
+        }
+
+        if (pageSize < 0) {
+            throw new IllegalArgumentException(MessageFormat.format(Messages.ILLEGAL_PAGE_SIZE, pageSize));
+        }
+    }
+
+
+    public static  MigrationReportInstanceList convertMigrationReports(List<MigrationReport> reports) {
+
+        if (reports == null) {
+            return new MigrationReportInstanceList();
+        }
+        MigrationReportInstance[] reportInstances = new MigrationReportInstance[reports.size()];
+        int index = 0;
+        for (MigrationReport report : reports) {
+
+            MigrationReportInstance instance = convertMigrationReport(report);
+            reportInstances[index] = instance;
+
+            index++;
+        }
+        return new MigrationReportInstanceList(reportInstances);
+    }
+
+    public static  MigrationReportInstance convertMigrationReport(MigrationReport report) {
+        if (report == null) {
+            return null;
+        }
+        MigrationReportInstance reportInstance = MigrationReportInstance.builder()
+                .successful(report.isSuccessful())
+                .startDate(report.getStartDate())
+                .endDate(report.getEndDate())
+                .logs(convertLogs(report.getEntries()))
+                .processInstanceId(report.getProcessInstanceId())
+                .build();
+
+        return reportInstance;
+    }
+
+
+    public static  List<String> convertLogs(List<MigrationEntry> entries) {
+
+        List<String> logs = new ArrayList<String>();
+        if (entries != null) {
+            for (MigrationEntry entry : entries) {
+                logs.add(entry.getType() + " " + entry.getTimestamp() + " " + entry.getMessage());
+            }
+        }
+        return logs;
+    }
+
+    public static  CaseMigrationReportInstance convertCaseMigrationReport(String caseId, CaseMigrationReport report) {
+        if (report == null) {
+            return null;
+        }
+        CaseMigrationReportInstance reportInstance = CaseMigrationReportInstance.builder()
+                .successful(report.isSuccessful())
+                .startDate(report.getStartDate())
+                .endDate(report.getEndDate())
+                .reports(convertReports(report.getReports()))
+                .caseId(caseId)
+                .build();
+
+        return reportInstance;
+    }
+
+    public static MigrationReportInstance[] convertReports(List<MigrationReport> entries) {
+        MigrationReportInstance[] reports = new MigrationReportInstance[entries.size()];
+        int counter = 0;
+        if (entries != null) {
+            for (MigrationReport entry : entries) {
+                reports[counter++] = convertMigrationReport(entry);
+            }
+        }
+        return reports;
     }
 }

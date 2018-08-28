@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -245,11 +246,15 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleAndRequeueJob() throws Exception {
-        String command = "org.jbpm.executor.commands.DelayedPrintOutCommand";
+        String command = "org.jbpm.executor.commands.LogCleanupCommand";
 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", BUSINESS_KEY);
-        data.put("delay", "wrong-value");
+        data.put("DateFormat", "wrong-value");
+        data.put("SkipProcessLog", "true");
+        data.put("SkipTaskLog", "true");
+        data.put("SkipExecutorLog", "true");
+        data.put("SingleRun", "true");
         data.put("retries", 0);
 
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
@@ -277,12 +282,20 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
         assertRequestInfoInstance(expected, jobRequest);
+        
+        data.put("DateFormat", "yyyy-MM-dd");
+        jobServicesClient.updateRequestData(jobId, null, data);
 
         jobServicesClient.requeueRequest(jobId);
+        
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
-        expected.setStatus(STATUS.QUEUED.toString());
-        assertRequestInfoInstance(expected, jobRequest);
+        assertNotNull(jobRequest);
+        assertEquals(expected.getId(), jobRequest.getId());
+        assertEquals(expected.getBusinessKey(), jobRequest.getBusinessKey());
+        assertEquals(STATUS.DONE.toString(), jobRequest.getStatus());
+        assertEquals(expected.getCommandName(), jobRequest.getCommandName());
     }
 
     @Test
@@ -496,6 +509,47 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertEquals(jobId, jobRequest.getId());
         assertEquals(STATUS.DONE.toString(), jobRequest.getStatus());
         assertEquals(PRINT_OUT_COMMAND, jobRequest.getCommandName());
+    }
 
+    @Test
+    public void testScheduleAndRunJobWithWorkItem() throws Exception {
+        JobRequestInstance jobRequestInstance = createJobRequestInstance();
+        final WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setId(1);
+        workItem.setName("testWorkItemName");
+        workItem.setDeploymentId("test-1.0.0");
+        workItem.setState(1);
+        jobRequestInstance.getData().put("workItem",
+                                         workItem);
+
+        Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue(jobId.longValue() > 0);
+
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient,
+                                                    jobId);
+
+        final RequestInfoInstance jobRequest = jobServicesClient.getRequestById(jobId,
+                                                                                true,
+                                                                                true);
+        assertNotNull(jobRequest);
+        assertEquals(jobId,
+                     jobRequest.getId());
+        assertEquals(STATUS.DONE.toString(),
+                     jobRequest.getStatus());
+        assertEquals(PRINT_OUT_COMMAND,
+                     jobRequest.getCommandName());
+        assertNotNull(jobRequest.getData().get("workItem"));
+    }
+
+    @Test
+    public void testGetNonExistentJob() {
+        final long jobId = -1L;
+
+        assertClientException(() -> jobServicesClient.getRequestById(jobId,
+                                                                     false,
+                                                                     false),
+                              404,
+                              "Request with id: " + jobId + " doesn't exist");
     }
 }

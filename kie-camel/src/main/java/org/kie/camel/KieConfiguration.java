@@ -32,6 +32,8 @@ public class KieConfiguration implements Cloneable {
     @UriParam(label = "security", secret = true)
     private String password;
 
+    private KieServicesConfigurationCustomizer kieServicesConfigurationCustomizer;
+
     private Map<String, String> bodyParams = new HashMap<>();
 
     public KieConfiguration() {
@@ -86,6 +88,14 @@ public class KieConfiguration implements Cloneable {
 
     public void setPassword( String password ) {
         this.password = password;
+    }
+
+    public KieServicesConfigurationCustomizer getKieServicesConfigurationCustomizer() {
+        return kieServicesConfigurationCustomizer;
+    }
+
+    public void setKieServicesConfigurationCustomizer(KieServicesConfigurationCustomizer kieServicesConfigurationCustomizer) {
+        this.kieServicesConfigurationCustomizer = kieServicesConfigurationCustomizer;
     }
 
     public KieConfiguration setBodyParam(String serviceName, String methodName, String paramName) {

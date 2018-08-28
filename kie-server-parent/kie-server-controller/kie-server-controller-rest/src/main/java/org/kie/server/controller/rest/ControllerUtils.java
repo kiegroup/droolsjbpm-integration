@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.kie.server.common.KeyStoreHelperUtil;
 import org.kie.server.common.rest.RestEasy960Util;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
@@ -36,21 +37,15 @@ import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.KieServerStatus;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ContainerKey;
+import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ContainerSpecKey;
-import org.kie.server.controller.api.model.spec.ContainerSpecList;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
+import org.kie.server.controller.api.model.spec.*;
 
 public class ControllerUtils {
 
-    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(getMinimalModelClasses(), MarshallingFormat.JSON, ControllerUtils.class.getClassLoader());
+    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(null, MarshallingFormat.JSON, ControllerUtils.class.getClassLoader());
     private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, ControllerUtils.class.getClassLoader());
 
     public static Set<Class<?>> getModelClasses() {
@@ -64,26 +59,20 @@ public class ControllerUtils {
 
         modelClasses.add(ServerInstance.class);
         modelClasses.add(ServerInstanceKey.class);
+        modelClasses.add(ServerInstanceKeyList.class);
         modelClasses.add(ServerTemplate.class);
         modelClasses.add(ServerTemplateKey.class);
+        modelClasses.add(ServerTemplateKeyList.class);
         modelClasses.add(ServerConfig.class);
         modelClasses.add(RuleConfig.class);
         modelClasses.add(ProcessConfig.class);
         modelClasses.add(ContainerSpec.class);
         modelClasses.add(ContainerSpecKey.class);
         modelClasses.add(Container.class);
+        modelClasses.add(ContainerList.class);
         modelClasses.add(ContainerKey.class);
         modelClasses.add(ServerTemplateList.class);
         modelClasses.add(ContainerSpecList.class);
-
-        return modelClasses;
-    }
-
-    public static Set<Class<?>> getMinimalModelClasses() {
-        Set<Class<?>> modelClasses = new HashSet<Class<?>>();
-
-        modelClasses.add(RuleConfig.class);
-        modelClasses.add(ProcessConfig.class);
 
         return modelClasses;
     }
@@ -227,6 +216,6 @@ public class ControllerUtils {
     }
 
     public static String getPassword() {
-        return System.getProperty(KieServerConstants.CFG_KIE_PASSWORD, "kieserver1!");
+        return KeyStoreHelperUtil.loadServerPassword();
     }
 }

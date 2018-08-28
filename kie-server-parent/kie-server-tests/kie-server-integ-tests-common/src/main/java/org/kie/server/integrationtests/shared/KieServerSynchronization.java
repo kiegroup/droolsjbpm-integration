@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.shared;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
 
@@ -35,6 +36,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -49,7 +51,7 @@ import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.SolverServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 
 public class KieServerSynchronization {
 
@@ -244,13 +246,21 @@ public class KieServerSynchronization {
         });
     }
 
-    public static void waitForServerInstanceSynchronization(final KieServerMgmtControllerClient controllerClient, String serverTemplateId, final int numberOfExpectedServerInstances) throws Exception {
+    public static void waitForServerInstanceSynchronization(final KieServerControllerClient controllerClient, String serverTemplateId, final int numberOfExpectedServerInstances) throws Exception {
         waitForCondition(() -> {
             ServerTemplate serverTemplate = controllerClient.getServerTemplate(serverTemplateId);
             if (serverTemplate != null && serverTemplate.getServerInstanceKeys().size() == numberOfExpectedServerInstances) {
                 return true;
             }
             return false;
+        });
+    }
+
+    public static void waitForServerTemplateSynchronization(final KieServerControllerClient controllerClient, final int numberOfExpectedServerTemplates) throws Exception {
+        waitForCondition(() -> {
+            ServerTemplate[] serverTemplates = controllerClient.listServerTemplates().getServerTemplates();
+            int numberOfServerTemplates = serverTemplates == null ? 0 : serverTemplates.length;
+            return numberOfServerTemplates == numberOfExpectedServerTemplates;
         });
     }
 
@@ -302,6 +312,31 @@ public class KieServerSynchronization {
 
             return false;
         });
+    }
+
+    public static void waitForProcessInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId) throws Exception {
+        waitForProcessInstanceSLAViolated(queryClient, processInstanceId, SERVICE_TIMEOUT);
+    }
+
+    public static void waitForProcessInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId, final Long timeOut) throws Exception {
+        waitForCondition(() -> {
+            ProcessInstance pi = queryClient.findProcessInstanceById(processInstanceId);
+            return pi.getSlaCompliance() == org.kie.api.runtime.process.ProcessInstance.SLA_VIOLATED;
+        }, timeOut);
+    }
+
+    public static void waitForNodeInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId, final Long workItemId) throws Exception {
+        waitForNodeInstanceSLAViolated(queryClient, processInstanceId, workItemId, SERVICE_TIMEOUT);
+    }
+
+    public static void waitForNodeInstanceSLAViolated(final QueryServicesClient queryClient, final Long processInstanceId, final Long nodeId, final Long timeOut) throws Exception {
+        waitForCondition(() -> {
+            List<NodeInstance> nodes = queryClient.findActiveNodeInstances(processInstanceId, 0, 0);
+            Optional<NodeInstance> ni = nodes.stream()
+                    .filter(nInstance -> nInstance.getId().equals(nodeId))
+                    .findFirst();
+            return ni.isPresent() && (ni.get().getSlaCompliance() == org.kie.api.runtime.process.ProcessInstance.SLA_VIOLATED);
+        }, timeOut);
     }
 
     /**

@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Before;
@@ -162,6 +163,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @After
     public void clean() {
+        System.clearProperty(FileBasedKieServerTemplateStorage.STORAGE_FILE_WATCHER_ENABLED);
         try {
             Files.deleteIfExists(tmpTemplateStore.toPath());
         } catch (IOException e) {
@@ -178,7 +180,7 @@ public class FileBasedKieServerTemplateStorageTest {
          * More in depth testing of the actual elements retrieve
          * happens in later tests
         */
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         assertEquals("Mismatched number of server templates",templateMap.keySet().size(),storage.loadKeys().size());
     }
     
@@ -189,7 +191,7 @@ public class FileBasedKieServerTemplateStorageTest {
          * that the code that checks for loading from
          * files is called
          */
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         List<ServerTemplateKey> keys = storage.loadKeys();
         /*
          * Now we check that both the number of keys retrieved is correct
@@ -204,7 +206,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @Test
     public void testLoadList() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         List<ServerTemplate> templates = storage.load();
         assertEquals("Mismatched number of server templates",templateMap.values().size(),templates.size());
         templateMap.values().forEach(value -> {
@@ -214,14 +216,14 @@ public class FileBasedKieServerTemplateStorageTest {
  
     @Test
     public void testLoadSingle() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         loadTemplateWithAssertEquals(toSearchFor);
     }
 
     @Test
     public void testLoadNotExisting() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         String notExists = "not-exists";
         ServerTemplate loadedTemplate = storage.load(notExists);
         assertNull(loadedTemplate);
@@ -229,14 +231,14 @@ public class FileBasedKieServerTemplateStorageTest {
 
     @Test
     public void testExists() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         assertTrue("Exists fails",storage.exists(toSearchFor.getId()));
     }
 
     @Test
     public void testNotExists() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         String notExists = "not-exists";
         assertFalse("Exists return true for not existing id: " + notExists, storage.exists(notExists));
     }
@@ -244,11 +246,11 @@ public class FileBasedKieServerTemplateStorageTest {
     @Test
     public void testUpdate() {
         final String testName = "Updated template Name";
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         ServerTemplate toUpdateTemplate = getFirstTemplateFromMap();
         toUpdateTemplate.setName(testName);
         storage.update(toUpdateTemplate);
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         loadTemplateWithAssertEquals(toUpdateTemplate);
     }
     
@@ -263,18 +265,67 @@ public class FileBasedKieServerTemplateStorageTest {
 
     @Test
     public void testDeleteNotExistingTemplate() {
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         List<ServerTemplate> templates = storage.load();
         assertEquals("Mismatched number of server templates", templateMap.values().size(), templates.size());
         storage.delete("not-exists");
-        storage.reloadTemplateMaps();
+        storage.loadTemplateMapsFromFile();
         templates = storage.load();
         assertEquals("Mismatched number of server templates", templateMap.values().size(), templates.size());
+    }
+
+    @Test
+    public void testLoadNotExistingTemplate() {
+        List<ServerTemplate> templates = storage.load();
+        assertEquals(3, templates.size());
+
+        // Delete template file
+        tmpTemplateStore.delete();
+
+        storage.loadTemplateMapsFromFile();
+
+        // Storage should still contain previously loaded templates
+        templates = storage.load();
+        assertEquals(3, templates.size());
     }
 
     @Test
     public void testGetStorageLocation() {
         String location = storage.getTemplatesLocation();
         assertEquals(tmpTemplateStore.getAbsolutePath(), location);
+    }
+    
+    @Test(timeout=30000)
+    public void testUpdatedStorageFromWatcher() throws Exception {
+        FileBasedKieServerTemplateStorage secondStorage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath());
+        
+        System.setProperty(FileBasedKieServerTemplateStorage.STORAGE_FILE_WATCHER_ENABLED, "true");
+        System.setProperty(ControllerStorageFileWatcher.STORAGE_FILE_WATCHER_INTERVAL, "1000");
+        CountDownLatch waitForReload = new CountDownLatch(2);
+        storage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath()) {
+
+            @Override
+            public void loadTemplateMapsFromFile() {
+                super.loadTemplateMapsFromFile();
+                waitForReload.countDown();
+            }
+            
+        };
+        List<ServerTemplate> templates = storage.load();
+        assertEquals(3, templates.size());
+        
+        // delay it a bit from the creation of the file
+        Thread.sleep(3000);        
+        
+        ServerTemplate serverTemplate = new ServerTemplate();
+
+        serverTemplate.setName("UpdateFromOtherController");
+        serverTemplate.setId(UUID.randomUUID().toString());
+        secondStorage.store(serverTemplate);
+        
+        waitForReload.await();
+        
+        templates = storage.load();
+        assertEquals(4, templates.size());
     }
 }

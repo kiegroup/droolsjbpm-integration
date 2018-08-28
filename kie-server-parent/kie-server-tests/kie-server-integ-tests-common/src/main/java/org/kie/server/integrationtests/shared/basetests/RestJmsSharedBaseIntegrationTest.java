@@ -18,6 +18,8 @@ package org.kie.server.integrationtests.shared.basetests;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
@@ -32,6 +34,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
@@ -78,6 +81,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
     protected static KieContainer kieContainer;
 
     protected static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
+    protected static final String CUSTOM_PARAM_CLASS_NAME = "org.jbpm.data.CustomParameter";
 
     @Override
     protected KieServicesClient createDefaultClient() throws Exception {
@@ -102,6 +106,10 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
 
     protected Object createPersonInstance(String name) {
         return createInstance(PERSON_CLASS_NAME, name);
+    }
+
+    protected Object createCustomParameterInstance(String name, long value) {
+        return createInstance(CUSTOM_PARAM_CLASS_NAME, name, value);
     }
 
     /**
@@ -154,5 +162,13 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
                     .isInstanceOf(KieServicesException.class)
                     .hasMessageContaining(jmsMessage);
         }
+    }
+
+    protected List<ExecutionErrorInstance> filterErrorsByProcessId(Collection<ExecutionErrorInstance> errors, String processId) {
+        return errors.stream().filter(error -> error.getProcessId().equals(processId)).collect(Collectors.toList());
+    }
+
+    protected List<ExecutionErrorInstance> filterErrorsByProcessInstanceId(Collection<ExecutionErrorInstance> errors, Long processInstanceId) {
+        return errors.stream().filter(error -> error.getProcessInstanceId().equals(processInstanceId)).collect(Collectors.toList());
     }
 }

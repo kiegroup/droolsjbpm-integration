@@ -16,12 +16,14 @@
 package org.kie.maven.plugin;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenRuntime;
 import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
@@ -39,6 +41,7 @@ abstract public class KieMavenPluginBaseIntegrationTest {
                 .forkedBuilder()
                 // To enable logging using slf4j-simple on the internal classes of the plug-in:
                 //.withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
+                .withEnvironment(System.getenv())
                 .build();
     }
 
@@ -48,13 +51,13 @@ abstract public class KieMavenPluginBaseIntegrationTest {
 
     protected void prepareTakariPom(String projectName) throws Exception {
         File basedir = getBasedir(projectName);
-        File pmTakari = new File(basedir + "/pom-takari.xml");
-        Assert.assertTrue(pmTakari.renameTo(new File(basedir + "/pom.xml")));
+        File pomTakari = new File(basedir, "pom-takari.xml");
+        Files.move(pomTakari.toPath(), new File(basedir, "pom.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     protected void restoreKiePom(String projectName) throws Exception {
         File basedir = getBasedir(projectName);
-        File pmTakari = new File(basedir + "/pom-kie.xml");
-        Assert.assertTrue(pmTakari.renameTo(new File(basedir + "/pom.xml")));
+        File pomKie = new File(basedir, "pom-kie.xml");
+        Files.move(pomKie.toPath(), new File(basedir, "pom.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 }

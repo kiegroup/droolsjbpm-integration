@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-parent</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
     <!-- relativePath causes out-of-date problems on hudson slaves -->
     <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
   </parent>
@@ -62,7 +62,6 @@
     <module>jbpm-simulation</module>
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
-    <module>kie-eap-integration</module>
     <module>kie-infinispan</module>
     <module>drools-jboss-integration</module>
     <module>kie-server-parent</module>
@@ -77,6 +76,7 @@
     <!-- <module>drools-examples-android</module> -->
     <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
+    <module>kie-spring-boot</module>
   </modules>
 
   <dependencyManagement>
@@ -113,6 +113,13 @@
         <groupId>org.uberfire</groupId>
         <artifactId>uberfire-bom</artifactId>
         <version>${version.org.uberfire}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-bom</artifactId>
+        <version>${version.org.kie}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

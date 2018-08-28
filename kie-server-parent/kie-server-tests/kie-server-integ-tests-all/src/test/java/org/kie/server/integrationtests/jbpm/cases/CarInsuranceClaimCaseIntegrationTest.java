@@ -20,20 +20,27 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
+import org.jbpm.document.Document;
+import org.jbpm.document.service.impl.DocumentImpl;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -52,6 +59,7 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
 
     private static final String CASE_INSURED_ROLE = "insured";
     private static final String CASE_INS_REP_ROLE = "insuranceRepresentative";
+    private static final String CASE_INS_ASSESSOR_ROLE = "assessor";
 
     private static final String CLAIM_CASE_DEF_ID = "insurance-claims.CarInsuranceClaimCase";
 
@@ -70,6 +78,7 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(CLAIM_REPORT_CLASS_NAME, Class.forName(CLAIM_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
         extraClasses.put(PROPERTY_DAMAGE_REPORT_CLASS_NAME, Class.forName(PROPERTY_DAMAGE_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
+        extraClasses.put(DocumentImpl.class.getName(), DocumentImpl.class);
     }
 
     @After
@@ -107,6 +116,128 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         // there should be no process instances for the case
         Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10);
         assertEquals(0, caseProcesInstances.size());
+    }
+    
+    @Test
+    public void testCarInsuranceClaimCaseWithDocument() throws Exception {
+        // start case with users assigned to roles
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        // let's verify case is created
+        assertCaseInstance(caseId);
+        // let's look at what stages are active
+        assertBuildClaimReportStage(caseId);
+        
+        String docContent = "just a test data";
+        byte[] content = docContent.getBytes();
+        // add document to a case
+        Document document = new DocumentImpl("test.txt", content.length, new Date());
+        document.setContent(content);
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "document", document);
+        
+        Map<String, Object> alldata = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        assertNotNull(alldata);
+        
+        Document caseDoc = (Document) alldata.get("document");
+        assertEquals("test.txt", caseDoc.getName());
+        assertNotNull(caseDoc.getContent());
+        
+        String storedContent = new String(caseDoc.getContent());
+        assertEquals("just a test data", storedContent);
+        // since the first task assigned to insured is with auto start it should be already active
+        // the same task can be claimed by insuranceRepresentative in case claim is reported over phone
+        long taskId = assertBuildClaimReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide claim report with initial data
+        // claim report should be stored in case file data
+        provideAndAssertClaimReport(caseId, taskId, USER_YODA);
+        // now we have another task for insured to provide property damage report
+        taskId = assertPropertyDamageReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide the property damage report
+        provideAndAssertPropertyDamageReport(caseId, taskId, USER_YODA);
+        // let's complete the stage by explicitly stating that claimReport is done
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "claimReportDone", Boolean.TRUE);
+        // we should be in another stage - Claim assessment
+        assertClaimAssesmentStage(caseId);
+        // let's trigger claim offer calculation
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Calculate claim", null);
+        // now we have another task for insured as claim was calculated
+        // let's accept the calculated claim
+        assertAndAcceptClaimOffer(USER_YODA);
+        // there should be no process instances for the case
+        Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10);
+        assertEquals(0, caseProcesInstances.size());
+    }
+    
+    @Test
+    public void testCarInsuranceClaimCaseTriggerInStage() throws Exception {
+        carInsuranceClaimCaseTriggerInStage(true, true);
+    }
+
+    @Test
+    public void testCarInsuranceClaimCaseTriggerInNotExistingStage() throws Exception {
+        carInsuranceClaimCaseTriggerInStage(false, true);
+    }
+
+    @Test
+    public void testCarInsuranceClaimCaseTriggerNotExistingTaskInStage() throws Exception {
+        carInsuranceClaimCaseTriggerInStage(true, false);
+    }
+
+    private void carInsuranceClaimCaseTriggerInStage(boolean useExistingStageId, boolean useExistingAdHocName) throws Exception{
+        // start case with users assigned to roles
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        // let's verify case is created
+        assertCaseInstance(caseId);
+        // let's look at what stages are active
+        assertBuildClaimReportStage(caseId);
+        // since the first task assigned to insured is with auto start it should be already active
+        // the same task can be claimed by insuranceRepresentative in case claim is reported over phone
+        long taskId = assertBuildClaimReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide claim report with initial data
+        // claim report should be stored in case file data
+        provideAndAssertClaimReport(caseId, taskId, USER_YODA);
+        // now we have another task for insured to provide property damage report
+        taskId = assertPropertyDamageReportAvailableForBothRoles(USER_YODA, USER_JOHN);
+        // let's provide the property damage report
+        provideAndAssertPropertyDamageReport(caseId, taskId, USER_YODA);
+        // let's complete the stage by explicitly stating that claimReport is done
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "claimReportDone", Boolean.TRUE);
+        // we should be in another stage - Claim assessment
+        assertClaimAssesmentStage(caseId);
+        // let's trigger claim offer calculation
+        CaseDefinition definition = caseClient.getCaseDefinition(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+        CaseStageDefinition stage = definition.getCaseStages().stream().filter(s -> s.getName().equals("Claim assesment")).findFirst().get();
+
+        List<Integer> activeStatusList = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+        if (!useExistingStageId) {
+            String stageId = "non existing stage id";
+
+            Assertions.assertThatExceptionOfType(KieServicesException.class).isThrownBy(() ->
+                    caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stageId, "Calculate claim", null))
+                    .withMessageContaining("No stage found with id " + stageId);
+
+            // there should be still process instances for the case
+            Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, activeStatusList, 0, 10);
+            assertEquals(1, caseProcesInstances.size());
+        } else if (!useExistingAdHocName) {
+            String adHocName = "non existing ad hoc fragment";
+
+            Assertions.assertThatExceptionOfType(KieServicesException.class).isThrownBy(() ->
+                    caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stage.getIdentifier(), adHocName, null))
+                    .withMessageContaining("AdHoc fragment '" + adHocName + "' not found in case " + caseId + " and stage " + stage.getIdentifier());
+
+            // there should be still process instances for the case
+            Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, activeStatusList, 0, 10);
+            assertEquals(1, caseProcesInstances.size());
+        } else {
+            caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseId, stage.getIdentifier(), "Calculate claim", null);
+            // now we have another task for insured as claim was calculated
+            // let's accept the calculated claim
+            assertAndAcceptClaimOffer(USER_YODA);
+            // there should be no process instances for the case
+            Collection<ProcessInstance> caseProcesInstances = caseClient.getProcessInstances(CONTAINER_ID, caseId, activeStatusList, 0, 10);
+            assertEquals(0, caseProcesInstances.size());
+        }
     }
 
     private void assertTask(TaskSummary task, String actor, String name, String status) {
@@ -222,6 +353,7 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         CaseFile caseFile = CaseFile.builder()
                 .addUserAssignments(CASE_INSURED_ROLE, insured)
                 .addUserAssignments(CASE_INS_REP_ROLE, insuranceRep)
+                .addUserAssignments(CASE_INS_ASSESSOR_ROLE, insuranceRep)
                 .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);

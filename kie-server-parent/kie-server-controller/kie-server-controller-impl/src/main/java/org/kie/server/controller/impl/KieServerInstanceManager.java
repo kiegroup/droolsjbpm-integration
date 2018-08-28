@@ -29,6 +29,7 @@ import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
@@ -364,7 +365,7 @@ public class KieServerInstanceManager {
 
                 if (response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     container.setContainerSpecId(containerResource.getContainerId());
-                    container.setContainerName(containerResource.getContainerId());
+                    container.setContainerName(containerResource.getContainerAlias());
                     container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
                     container.setServerTemplateId(serverTemplate.getId());
                     container.setStatus(containerResource.getStatus());
@@ -378,9 +379,8 @@ public class KieServerInstanceManager {
 
     public List<Container> getContainers(ServerInstanceKey serverInstanceKey) {
 
-        List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
+        List<Container> containers = new ArrayList<>();
         if (serverInstanceKey == null || serverInstanceKey.getUrl() == null) {
-
             return containers;
         }
         try {
@@ -395,7 +395,7 @@ public class KieServerInstanceManager {
 
                     Container container = new Container();
                     container.setContainerSpecId(containerResource.getContainerId());
-                    container.setContainerName(containerResource.getContainerId());
+                    container.setContainerName(containerResource.getContainerAlias());
                     container.setServerInstanceId(serverInstanceKey.getServerInstanceId());
                     container.setUrl(serverInstanceKey.getUrl() + CONTAINERS_URI_PART + containerResource.getContainerId());
                     container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
@@ -410,6 +410,7 @@ public class KieServerInstanceManager {
             logger.warn("Unable to get list of containers from remote server at url {} due to {}",
                         serverInstanceKey.getUrl(),
                         e.getMessage());
+            throw e;
         }
         return containers;
     }
@@ -425,7 +426,6 @@ public class KieServerInstanceManager {
         List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
 
         if (serverTemplate.getServerInstanceKeys() == null || serverTemplate.getServerInstanceKeys().isEmpty() || containerSpec == null) {
-
             return containers;
         }
 
@@ -436,20 +436,16 @@ public class KieServerInstanceManager {
             container.setServerTemplateId(serverTemplate.getId());
             container.setServerInstanceId(instanceUrl.getServerInstanceId());
             container.setUrl(instanceUrl.getUrl() + "/containers/" + containerSpec.getId());
-            container.setResolvedReleasedId(containerSpec.getReleasedId());
             container.setStatus(containerSpec.getStatus());
 
             try {
-                KieServicesClient client = getClient(instanceUrl.getUrl());
-
-                operation.doOperation(client,
-                                      container);
+                final KieServicesClient client = getClient(instanceUrl.getUrl());
+                operation.doOperation(client, container);
+                containers.add(container);
             } catch (Exception e) {
                 logger.debug("Unable to connect to {}",
                              instanceUrl);
             }
-
-            containers.add(container);
         }
 
         return containers;
@@ -469,9 +465,14 @@ public class KieServerInstanceManager {
         return alive;
     }
 
-    protected KieServicesClient getClient(String url) {
-        KieServicesClient client = clientProviders.stream().filter(provider -> provider.supports(url)).findFirst().get().get(url);
+    protected KieServicesClient getClient(final String url) {
+        KieServicesClientProvider clientProvider = clientProviders.stream().filter(provider -> provider.supports(url)).findFirst().orElseThrow(() -> new KieServerControllerIllegalArgumentException("Kie Services Client Provider not found for url: " + url));
+        logger.debug("Using client provider {}", clientProvider);
+        KieServicesClient client = clientProvider.get(url);
         logger.debug("Using client {}", client);
+        if(client == null){
+            throw new KieServerControllerIllegalArgumentException("Kie Services Client not found for url: " + url);
+        }
         return client;
     }
 
@@ -482,7 +483,7 @@ public class KieServerInstanceManager {
         ServiceResponse<KieContainerResource> serviceResponse = client.getContainerInfo(containerSpec.getId());
         if (serviceResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
             KieContainerResource containerResource = serviceResponse.getResult();
-
+            container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
             container.setMessages(containerResource.getMessages());
         }
     }

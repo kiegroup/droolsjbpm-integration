@@ -15,9 +15,15 @@
 
 package org.kie.server.services.impl;
 
-import org.drools.core.command.impl.ExecutableCommand;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.command.Command;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -42,12 +48,6 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class KieContainerCommandServiceImpl implements KieContainerCommandService<ExecutionResults> {
 
@@ -134,7 +134,14 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
         List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
         if( commands != null ) {
             for (KieServerCommand command : commands.getCommands()) {
-                if (command instanceof CreateContainerCommand) {
+                if (command instanceof CreateContainerCommand) {                    
+                    ServiceResponse<?> forbidden = this.kieServer.checkAccessability();
+                    if (forbidden != null) {
+                        logger.warn("Kie Server management api is disabled, skiping command execution {}", command);
+                        responses.add(forbidden);
+                        continue;
+                    }
+                    
                     responses.add(this.kieServer.createContainer(((CreateContainerCommand) command).getContainer().getContainerId(), ((CreateContainerCommand) command).getContainer()));
                 } else if (command instanceof GetServerInfoCommand) {
                     responses.add(this.kieServer.getInfo());
@@ -145,16 +152,36 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
 
                     responses.add(response);
                 } else if (command instanceof DisposeContainerCommand) {
+                    ServiceResponse<?> forbidden = this.kieServer.checkAccessability();
+                    if (forbidden != null) {
+                        logger.warn("Kie Server management api is disabled, skiping command execution {}", command);
+                        responses.add(forbidden);
+                        continue;
+                    }
+                    
                     responses.add(this.kieServer.disposeContainer(((DisposeContainerCommand) command).getContainerId()));
                 } else if (command instanceof GetContainerInfoCommand) {
                     responses.add(this.kieServer.getContainerInfo(((GetContainerInfoCommand) command).getContainerId()));
                 } else if (command instanceof GetScannerInfoCommand) {
                     responses.add(this.kieServer.getScannerInfo(((GetScannerInfoCommand) command).getContainerId()));
                 } else if (command instanceof UpdateScannerCommand) {
+                    ServiceResponse<?> forbidden = this.kieServer.checkAccessability();
+                    if (forbidden != null) {
+                        logger.warn("Kie Server management api is disabled, skiping command execution {}", command);
+                        responses.add(forbidden);
+                        continue;
+                    }
+                    
                     responses.add(this.kieServer.updateScanner(((UpdateScannerCommand) command).getContainerId(), ((UpdateScannerCommand) command).getScanner()));
                 } else if (command instanceof GetReleaseIdCommand) {
                     responses.add(this.kieServer.getContainerReleaseId(((GetReleaseIdCommand) command).getContainerId()));
                 } else if (command instanceof UpdateReleaseIdCommand) {
+                    ServiceResponse<?> forbidden = this.kieServer.checkAccessability();
+                    if (forbidden != null) {
+                        logger.warn("Kie Server management api is disabled, skiping command execution {}", command);
+                        responses.add(forbidden);
+                        continue;
+                    }
                     responses.add(this.kieServer.updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId()));
                 } else if (command instanceof GetServerStateCommand) {
                     responses.add(this.kieServer.getServerState());

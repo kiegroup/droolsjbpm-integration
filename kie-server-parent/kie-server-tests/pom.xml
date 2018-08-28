@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -30,6 +30,7 @@
     <!-- Path to Kie server WAR file. Used for referencing WAR file in on-demand deployment/undeployment. -->
     <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
     <org.kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml</org.kie.server.controller.templatefile>
+    <webservice.http.url>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</webservice.http.url>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
     <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/rest/controller</kie.server.controller.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
@@ -46,9 +47,21 @@
     <failsafe.excluded.groups/>
     <!-- Sybase driver leaks its Timestamp implementation. To correctly handle it we need to add driver as additional test classpath. -->
     <maven.jdbc.driver.jar/>
+    <!-- Set to true if you want to skip JMS tests even for containers with available JMS. -->
+    <jms.skip>false</jms.skip>
 
-    <version.tomcat8>8.5.12</version.tomcat8>
-    <version.wildfly10>10.1.0.Final</version.wildfly10>
+    <!-- Kie server datasource configuration. -->
+    <!--  <org.kie.server.persistence.ds/> Defined in container profiles.-->
+    <org.kie.server.persistence.dialect>org.hibernate.dialect.H2Dialect</org.kie.server.persistence.dialect>
+    <org.kie.server.datasource.connection.url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</org.kie.server.datasource.connection.url>
+    <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
+    <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
+    <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
+
+    <version.tomcat9>9.0.8</version.tomcat9>
+    <version.wildfly11>11.0.0.Final</version.wildfly11>
+    <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
+    <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
@@ -57,10 +70,10 @@
   </properties>
 
   <modules>
+    <module>kie-server-test-web-service</module>
     <module>kie-server-integ-tests-common</module>
     <module>kie-server-integ-tests-drools</module>
     <module>kie-server-integ-tests-jbpm</module>
-    <module>kie-server-integ-tests-jbpm-search</module>
     <module>kie-server-integ-tests-optaplanner</module>
     <module>kie-server-integ-tests-all</module>
     <module>kie-server-integ-tests-controller</module>
@@ -68,7 +81,7 @@
     <module>kie-server-integ-tests-router</module>
     <module>kie-server-integ-tests-case-id-generator</module>
     <module>kie-server-integ-tests-dmn</module>
-    <module>kie-server-integ-tests-custom-extension</module>
+    <module>kie-server-integ-tests-custom-extension</module>    
   </modules>
 
   <dependencyManagement>
@@ -153,6 +166,17 @@
         <artifactId>kie-tomcat-integration</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-test-web-service</artifactId>
+        <version>${version.org.kie}</version>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${version.org.postgresql}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -201,6 +225,9 @@
                 <java.security.egd>file:/dev/./urandom</java.security.egd>
                 <org.jbpm.document.storage>${org.jbpm.document.storage}</org.jbpm.document.storage>
                 <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
+                <!-- Persistence configuration -->
+                <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
+                <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}</org.kie.server.persistence.dialect>
               </systemProperties>
             </container>
             <deployables>
@@ -214,7 +241,7 @@
                   <context>${kie.server.context}</context>
                 </properties>
                 <pingURL>${kie.server.base.http.url}</pingURL>
-                <pingTimeout>30000</pingTimeout>
+                <pingTimeout>60000</pingTimeout>
               </deployable>
             </deployables>
             <configuration>
@@ -300,6 +327,7 @@
                 </additionalClasspathElements>
                 <systemPropertyVariables>
                   <kie.server.server.deployment.settings.xml>${kie.server.server.deployment.settings.xml}</kie.server.server.deployment.settings.xml>
+                  <jms.skip>${jms.skip}</jms.skip>
                 </systemPropertyVariables>
               </configuration>
             </execution>
@@ -375,13 +403,112 @@
 
   <profiles>
     <profile>
-      <id>tomcat8</id>
+      <id>mysql</id>
+      <properties>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</org.kie.server.persistence.dialect>
+        <org.kie.server.datasource.driver.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</org.kie.server.datasource.driver.class>
+        <!-- Connection URL, format example: jdbc:mysql://localhost:3306/mydb -->
+        <org.kie.server.datasource.connection.url>specify-mysql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <dependency>
+                      <groupId>mysql</groupId>
+                      <artifactId>mysql-connector-java</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>postgresql</id>
+      <properties>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL82Dialect</org.kie.server.persistence.dialect>
+        <org.kie.server.datasource.driver.class>org.postgresql.xa.PGXADataSource</org.kie.server.datasource.driver.class>
+        <!-- Connection URL, format example: jdbc:postgresql://localhost:5432/mydb -->
+        <org.kie.server.datasource.connection.url>specify-postgresql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <dependency>
+                      <groupId>org.postgresql</groupId>
+                      <artifactId>postgresql</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>oracle</id>
+      <properties>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.Oracle12cDialect</org.kie.server.persistence.dialect>
+        <org.kie.server.datasource.driver.class>oracle.jdbc.xa.client.OracleXADataSource</org.kie.server.datasource.driver.class>
+        <!-- Connection URL, format example: jdbc:oracle:thin:@localhost:1521:mydb  -->
+        <org.kie.server.datasource.connection.url>specify-oracle-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+        <org.kie.server.datasource.driver.path>specify-oracle-driver-path-in-org.kie.server.datasource.driver.path</org.kie.server.datasource.driver.path>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <dependency>
+                      <location>${org.kie.server.datasource.driver.path}</location>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>tomcat9</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>webc</kie.server.classifier>
         <kie.server.war.path>${org.kie.server:kie-server:war:webc}</kie.server.war.path>
-        <cargo.container.id>tomcat8x</cargo.container.id>
-        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
+        <cargo.container.id>tomcat9x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -395,16 +522,15 @@
                   <artifactInstaller>
                     <groupId>org.apache.tomcat</groupId>
                     <artifactId>tomcat</artifactId>
-                    <version>${version.tomcat8}</version>
+                    <version>${version.tomcat9}</version>
                   </artifactInstaller>
                   <systemProperties>
-                    <tomcat.home>${project.build.directory}/cargo/configurations/tomcat8x</tomcat.home>
+                    <tomcat.home>${project.build.directory}/cargo/configurations/tomcat9x</tomcat.home>
                     <conf.directory>${project.build.testOutputDirectory}</conf.directory>
                     <tmp.directory>${project.build.directory}</tmp.directory>
                     <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
                     <jbpm.tm.jndi.lookup>java:comp/env/TransactionManager</jbpm.tm.jndi.lookup>
                     <org.kie.server.persistence.tm>JBossTS</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
                     <hibernate.connection.release_mode>after_transaction</hibernate.connection.release_mode>
@@ -460,7 +586,7 @@
         </pluginManagement>
       </build>
       <dependencies>
-        <!-- Deps needed by Tomcat 8 -->
+        <!-- Deps needed by Tomcat 9 -->
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
@@ -481,13 +607,14 @@
           <artifactId>kie-tomcat-integration</artifactId>
         </dependency>
       </dependencies>
-    </profile>
+    </profile>    
     <profile>
-      <id>wildfly10</id>
-      <properties>
+      <id>wildfly11</id>
+      <properties>        
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
-        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-        <cargo.container.id>wildfly10x</cargo.container.id>
+        <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
+        <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
+        <cargo.container.id>wildfly11x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -501,7 +628,7 @@
                   <artifactInstaller>
                     <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-dist</artifactId>
-                    <version>${version.wildfly10}</version>
+                    <version>${version.wildfly11}</version>
                   </artifactInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
@@ -509,6 +636,12 @@
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
                     <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
                   </systemProperties>
+                  <dependencies>
+                    <dependency>
+                      <groupId>com.h2database</groupId>
+                      <artifactId>h2</artifactId>
+                    </dependency>
+                  </dependencies>
                 </container>
                 <configuration>
                   <properties>
@@ -521,6 +654,16 @@
                        cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
                     </cargo.resource.resource.mail>
                   </properties>
+                  <datasources>
+                    <datasource>
+                      <jndiName>${org.kie.server.persistence.ds}</jndiName>
+                      <driverClass>${org.kie.server.datasource.driver.class}</driverClass>
+                      <url>${org.kie.server.datasource.connection.url}</url>
+                      <username>${org.kie.server.datasource.username}</username>
+                      <password>${org.kie.server.datasource.password}</password>
+                      <transactionSupport>XA_TRANSACTION</transactionSupport>
+                    </datasource>
+                  </datasources>
                 </configuration>
               </configuration>
             </plugin>
@@ -540,94 +683,24 @@
       </build>
       <dependencyManagement>
         <dependencies>
-          <!-- This is far from ideal, as it is not designed as BOM. However, there is nothing like wildfly-bom,
-               so this is the closest thing I could find.
-               Important: this overrides lots of the versions coming from kie-p-w-d -->
+          <!-- This is far from ideal, as it is not designed as BOM. However, 
+            there is nothing like wildfly-bom, so this is the closest thing I could find. 
+            Important: this overrides lots of the versions coming from kie-p-w-d -->
           <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-parent</artifactId>
-            <version>${version.wildfly10}</version>
+            <version>${version.wildfly11}</version>
             <type>pom</type>
             <scope>import</scope>
-          </dependency>
-          <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${version.com.google.guava}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jackson-provider</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${version.org.apache.httpcomponents.httpclient}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>${version.org.apache.httpcomponents.httpcore}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-aether-provider</artifactId>
-            <version>${version.org.apache.maven}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-api</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-impl</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-connector-basic</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-spi</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-file</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-http</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${version.com.sun.xml.bind}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
         <dependency>
           <groupId>org.wildfly</groupId>
           <artifactId>wildfly-jms-client-bom</artifactId>
@@ -641,8 +714,8 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-        <!-- eap7 is basically wildfly10; until there is a EAP 7 specific containerId, 'wildfly10x' should work just fine -->
-        <cargo.container.id>wildfly10x</cargo.container.id>
+        <!-- eap7 is basically wildfly11; until there is a EAP 7 specific containerId, 'wildfly11x' should work just fine -->
+        <cargo.container.id>wildfly11x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -692,91 +765,16 @@
         </pluginManagement>
       </build>
       <dependencyManagement>
-        <dependencies>
-          <!-- This is far from ideal, as it is not designed as BOM. However, there is nothing like wildfly-bom,
-               so this is the closest thing I could find.
-               Important: this overrides lots of the versions coming from kie-p-w-d -->
+       <dependencies>
+          <!-- This is far from ideal, as it is not designed as BOM. However, 
+            there is nothing like wildfly-bom, so this is the closest thing I could find. 
+            Important: this overrides lots of the versions coming from kie-p-w-d -->
           <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-parent</artifactId>
-            <version>${version.wildfly10}</version>
+            <version>${version.wildfly11}</version>
             <type>pom</type>
             <scope>import</scope>
-          </dependency>
-          <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${version.com.google.guava}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jackson-provider</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${version.org.apache.httpcomponents.httpclient}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>${version.org.apache.httpcomponents.httpcore}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-aether-provider</artifactId>
-            <version>${version.org.apache.maven}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-api</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-impl</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-connector-basic</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-spi</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-file</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-http</artifactId>
-            <version>${version.org.eclipse.aether}</version>
-          </dependency>
-          <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${version.com.sun.xml.bind}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -813,7 +811,6 @@
                   <home>${weblogic.home}/wlserver</home>
                   <systemProperties>
                     <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WeblogicJtaPlatform</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.kie.server.domain>OracleDefaultLoginConfiguration</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
@@ -933,9 +930,7 @@
                   <home>${websphere.home}</home>
                   <timeout>240000</timeout>
                   <systemProperties>
-                    <!-- JtaPlatform doesn't work for new version of Hibernate, user needs to provide own implementation, see https://hibernate.atlassian.net/browse/HHH-11606 . -->
-                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WebSphereExtendedJtaPlatform</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
+                    <org.kie.server.persistence.tm>org.hibernate.engine.transaction.jta.platform.internal.WebSphereJtaPlatform</org.kie.server.persistence.tm>
                     <org.kie.server.domain>WSLogin</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
@@ -1095,6 +1090,27 @@
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
                 <groups>org.kie.server.integrationtests.category.Smoke</groups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <!-- Skip unstable tests on Jenkins PR builder. -->
+      <id>jenkins-pr-builder</id>
+      <activation>
+        <property>
+          <name>ghprbGhRepository</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder</excludedGroups>
               </configuration>
             </plugin>
           </plugins>

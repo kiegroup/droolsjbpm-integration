@@ -78,7 +78,7 @@ Alternatively every parameter could be set in configuration plugin
 <plugin>
 	<groupId>org.kie.server</groupId>
 	<artifactId>kie-server-maven-plugin</artifactId>
-	<version>8.0.0-SNAPSHOT</version>
+	<version>7.5.0-SNAPSHOT</version>
 	<configuration>
 		<username>${kieserver.username}</username>
 		<password>${kieserver.password}</password>

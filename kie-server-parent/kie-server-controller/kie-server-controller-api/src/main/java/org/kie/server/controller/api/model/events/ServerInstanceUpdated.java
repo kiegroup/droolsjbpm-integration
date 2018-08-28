@@ -17,7 +17,7 @@ package org.kie.server.controller.api.model.events;
 
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 
-public class ServerInstanceUpdated {
+public class ServerInstanceUpdated implements KieServerControllerEvent {
 
     private ServerInstance serverInstance;
 

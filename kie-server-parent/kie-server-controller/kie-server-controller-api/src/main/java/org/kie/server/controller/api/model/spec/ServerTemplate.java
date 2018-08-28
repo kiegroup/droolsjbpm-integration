@@ -141,6 +141,24 @@ public class ServerTemplate extends ServerTemplateKey {
         return false;
     }
 
+    public boolean hasServerInstanceId(String serverInstanceId) {
+        for (ServerInstanceKey instance : getServerInstanceKeys()) {
+            if (instance.getServerInstanceId().equals(serverInstanceId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ServerInstanceKey getServerInstance(String serverInstanceId) {
+        for (ServerInstanceKey instance : getServerInstanceKeys()) {
+            if (instance.getServerInstanceId().equals(serverInstanceId)) {
+                return instance;
+            }
+        }
+        return null;
+    }
+
     public void addServerInstance(ServerInstanceKey serverInstance) {
         if (serverInstances == null) {
             serverInstances = new ArrayList<ServerInstanceKey>();

@@ -84,6 +84,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.casemgmt.api.CaseCommentNotFoundException;
+import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
 import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
@@ -145,10 +146,15 @@ public class CaseResource extends AbstractCaseResource {
                 containerId,
                 null,
                 (Variant v, String type, Header... customHeaders) -> {
-                    String response = caseManagementServiceBase.startCase(containerId, caseDefId, payload, type);
-                    logger.debug("Returning CREATED response for start case with content '{}'", response);
+                    try {
+                        String response = caseManagementServiceBase.startCase(containerId, caseDefId, payload, type);
+                        logger.debug("Returning CREATED response for start case with content '{}'", response);
 
-                    return createResponse(response, v, Response.Status.CREATED, customHeaders);
+                        return createResponse(response, v, Response.Status.CREATED, customHeaders);
+                    } catch (CaseDefinitionNotFoundException e) {
+                        return notFound(
+                                MessageFormat.format(CASE_DEFINITION_NOT_FOUND, caseDefId, containerId), v, customHeaders);
+                    }
                 });
     }
 
@@ -178,7 +184,7 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Cancels case instance with given identifier (case id) it can also when intructed permanently destroy the case instance",
+    @ApiOperation(value="Cancels case instance with given identifier (case id) and has optional flag to permanently destroy the case instance",
             response=Void.class, code=204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found") })
@@ -302,6 +308,7 @@ public class CaseResource extends AbstractCaseResource {
     public Response putCaseInstanceData(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
+            @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "map of data to be placed in case file as Map", required = true) String payload) {
 
         return invokeCaseOperation(headers,
@@ -309,7 +316,7 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to put case file data of case {}", caseId);
-                    this.caseManagementServiceBase.putCaseFileData(containerId, caseId, payload, type);
+                    this.caseManagementServiceBase.putCaseFileData(containerId, caseId, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
                     return createResponse("", v, Response.Status.CREATED, customHeaders);
@@ -328,6 +335,7 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId, 
             @ApiParam(value = "name of the data item to be added to case file", required = true) @PathParam(CASE_FILE_ITEM) String caseDataName,
+            @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "data to be placed in case file, any type can be provided", required = true) String payload) {
 
         return invokeCaseOperation(headers,
@@ -335,7 +343,7 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to put case file data of case {}", caseId);
-                    this.caseManagementServiceBase.putCaseFileDataByName(containerId, caseId, caseDataName, payload, type);
+                    this.caseManagementServiceBase.putCaseFileDataByName(containerId, caseId, caseDataName, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
                     return createResponse("", v, Response.Status.CREATED, customHeaders);
@@ -592,7 +600,7 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Retrieves process isntances that compose complete case instance",
+    @ApiOperation(value="Retrieves process instances that compose complete case instance",
             response=ProcessInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found") })
@@ -766,16 +774,17 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author, 
+            @ApiParam(value = "optional role name(s) that given comment should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "actual content of the comment to be added as String", required = true) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to add comment to case {}", caseId);
-                    this.caseManagementServiceBase.addCommentToCase(containerId, caseId, author, payload, type);
+                    String commentId = this.caseManagementServiceBase.addCommentToCase(containerId, caseId, author, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
-                    return createResponse("", v, Response.Status.CREATED, customHeaders);
+                    return createResponse(commentId, v, Response.Status.CREATED, customHeaders);
                 });
     }
 
@@ -791,6 +800,7 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "identifier of the comment to be updated", required = true) @PathParam(CASE_COMMENT_ID) String commentId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author, 
+            @ApiParam(value = "optional role name(s) that given comment should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "actual content of the comment to be updated to as String", required = true) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
@@ -799,7 +809,7 @@ public class CaseResource extends AbstractCaseResource {
                     logger.debug("About to update comment {} in case {}", commentId, caseId);
 
                     try {
-                        this.caseManagementServiceBase.updateCommentInCase(containerId, caseId, commentId, author, payload, type);
+                        this.caseManagementServiceBase.updateCommentInCase(containerId, caseId, commentId, author, restrictions, payload, type);
 
                         logger.debug("Returning CREATED response");
                         return createResponse("", v, Response.Status.CREATED, customHeaders);

@@ -44,7 +44,7 @@ import org.kie.server.integrationtests.shared.KieServerReflections;
 public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "state-is-kept-for-stateful-session",
-            "1.0.0-SNAPSHOT");
+            "1.0.0");
 
     private static final String CONTAINER_ID = "stateful-session";
     private static final String KIE_SESSION = "kbase1.stateful";
@@ -98,7 +98,7 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
         assertTrue("Expected message about non-instantiated container. Got: " + reply.getMsg(),
-                reply.getMsg().contains(String.format("Container %s is not instantiated", CONTAINER_ID)));
+                reply.getMsg().contains(String.format("Container '%s' is not instantiated", CONTAINER_ID)));
     }
 
     @Test

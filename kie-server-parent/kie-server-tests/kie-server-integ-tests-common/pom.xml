@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-common</artifactId>
@@ -12,6 +12,9 @@
   <name>KIE :: Execution Server :: Tests :: Common Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS). Can be configured to run on different supported containers.</description>
 
+  <properties>
+    <java.module.name>org.kie.server.itests.common</java.module.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -40,7 +43,18 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis' -->
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -58,6 +72,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-client</artifactId>
     </dependency>
 
     <dependency>
@@ -182,29 +200,22 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.kie.server</groupId>
-    	<artifactId>kie-server-controller-standalone-impl</artifactId>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-standalone-impl</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-maven-support</artifactId>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-maven-support</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-maven-integration</artifactId>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-maven-integration</artifactId>
     </dependency>
   </dependencies>
 

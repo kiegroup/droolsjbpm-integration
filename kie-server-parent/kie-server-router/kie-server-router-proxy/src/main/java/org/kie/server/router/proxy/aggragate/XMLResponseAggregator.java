@@ -174,7 +174,9 @@ public abstract class XMLResponseAggregator implements ResponseAggregator {
 
     public Document newDoc(String xml) {
         try (ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes("UTF-8"))) {
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            Document doc = factory.newDocumentBuilder().parse(stream);
             return doc;
         } catch (Exception e) {
             log.errorf("Failed to create xml document of %s", xml, e);

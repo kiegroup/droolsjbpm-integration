@@ -25,19 +25,13 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.KieServerControllerException;
-import org.kie.server.controller.api.KieServerControllerNotFoundException;
+import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
+import org.kie.server.controller.api.model.events.ServerInstanceDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
-import org.kie.server.controller.api.model.spec.Capability;
-import org.kie.server.controller.api.model.spec.ContainerConfig;
-import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ContainerSpecKey;
-import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
-import org.kie.server.controller.api.model.spec.ServerConfig;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.spec.*;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -45,6 +39,8 @@ import org.kie.server.controller.impl.KieServerInstanceManager;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 public class SpecManagementServiceImpl implements SpecManagementService {
 
@@ -58,7 +54,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
                                                ContainerSpec containerSpec) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
         if (serverTemplate.hasContainerSpec(containerSpec.getId())) {
@@ -89,7 +85,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
 
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
         if (!containerSpec.getId().equals(containerId)) {
@@ -97,7 +93,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         }
 
         if (!serverTemplate.hasContainerSpec(containerSpec.getId())) {
-            throw new KieServerControllerNotFoundException("Server template with id " + serverTemplateId + " has no container with id " + containerSpec.getId());
+            throw new KieServerControllerIllegalArgumentException("Server template with id " + serverTemplateId + " has no container with id " + containerSpec.getId());
         }
 
         if (!serverTemplate.hasMatchingId(containerSpec.getServerTemplateKey())) {
@@ -146,27 +142,45 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
     @Override
     public ServerTemplate getServerTemplate(String serverTemplateId) {
-        return templateStorage.load(serverTemplateId);
+        final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
+        }
+        return serverTemplate;
     }
 
     @Override
-    public Collection<ServerTemplateKey> listServerTemplateKeys() {
-        return templateStorage.loadKeys();
+    public ServerTemplateKeyList listServerTemplateKeys() {
+        return new ServerTemplateKeyList(templateStorage.loadKeys());
     }
 
     @Override
-    public Collection<ServerTemplate> listServerTemplates() {
-        return templateStorage.load();
+    public ServerTemplateList listServerTemplates() {
+        return new ServerTemplateList(templateStorage.load());
     }
 
     @Override
-    public Collection<ContainerSpec> listContainerSpec(String serverTemplateId) {
+    public ContainerSpecList listContainerSpec(String serverTemplateId) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
-        return serverTemplate.getContainersSpec();
+        return new ContainerSpecList(serverTemplate.getContainersSpec());
+    }
+
+    @Override
+    public ContainerSpec getContainerInfo(String serverTemplateId,
+                                          String containerId) {
+        final ServerTemplate serverTemplate = getServerTemplate(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
+        }
+        final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerId);
+        if (containerSpec == null) {
+            throw new KieServerControllerIllegalArgumentException("Server template " + serverTemplateId + " does not have container with id " + containerId);
+        }
+        return containerSpec;
     }
 
     @Override
@@ -174,7 +188,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
                                                  String containerSpecId) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
         if (serverTemplate.hasContainerSpec(containerSpecId)) {
@@ -186,14 +200,14 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
             notificationService.notify(new ServerTemplateUpdated(serverTemplate));
         } else {
-            throw new KieServerControllerNotFoundException("Container " + containerSpecId + " not found");
+            throw new KieServerControllerIllegalArgumentException("Container " + containerSpecId + " not found");
         }
     }
 
     @Override
     public synchronized void deleteServerTemplate(String serverTemplateId) {
         if (!templateStorage.exists(serverTemplateId)) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
         templateStorage.delete(serverTemplateId);
@@ -207,7 +221,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
                                                 String newServerTemplateName) {
         final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
         final Map<Capability, ServerConfig> configMap = new HashMap<Capability, ServerConfig>(serverTemplate.getConfigs().size());
@@ -267,12 +281,12 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
         final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecId);
         if (containerSpec == null) {
-            throw new KieServerControllerNotFoundException("No container spec found for id " + containerSpecId + " within server template with id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecId + " within server template with id " + serverTemplateId);
         }
 
         final List<Container> affectedContainers = updateContainerConfig(capability, containerConfig, serverTemplate, containerSpec);
@@ -354,7 +368,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
                                                         ServerConfig serverTemplateConfig) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
         Map<Capability, ServerConfig> configs = serverTemplate.getConfigs();
@@ -370,12 +384,12 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     public synchronized void startContainer(ContainerSpecKey containerSpecKey) {
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
         final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
         if (containerSpec == null) {
-            throw new KieServerControllerNotFoundException("No container spec found for id " + containerSpecKey.getId()
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId()
                                                                    + " within server template with id " + serverTemplate.getId());
         }
         containerSpec.setStatus(KieContainerStatus.STARTED);
@@ -392,12 +406,12 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
-            throw new KieServerControllerNotFoundException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
         ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
         if (containerSpec == null) {
-            throw new KieServerControllerNotFoundException("No container spec found for id " + containerSpecKey.getId() + " within server template with id " + serverTemplate.getId());
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId() + " within server template with id " + serverTemplate.getId());
         }
         containerSpec.setStatus(KieContainerStatus.STOPPED);
 
@@ -406,6 +420,23 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         List<Container> containers = kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
 
         notificationService.notify(serverTemplate, containerSpec, containers);
+    }
+
+    @Override
+    public void deleteServerInstance(final ServerInstanceKey serverInstanceKey) {
+        checkNotNull("serverInstanceKey",
+                     serverInstanceKey);
+        if (getKieServerInstanceManager().isAlive(serverInstanceKey)) {
+            throw new RuntimeException("Can't delete live instance.");
+        } else {
+            final String serverInstanceId = serverInstanceKey.getServerInstanceId();
+            final ServerTemplate serverTemplate = getServerTemplate(serverInstanceKey.getServerTemplateId());
+            if (serverTemplate != null) {
+                serverTemplate.deleteServerInstance(serverInstanceId);
+                getTemplateStorage().update(serverTemplate);
+                getNotificationService().notify(new ServerInstanceDeleted(serverInstanceId));
+            }
+        }
     }
 
     public KieServerTemplateStorage getTemplateStorage() {

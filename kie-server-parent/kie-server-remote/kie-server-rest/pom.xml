@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-remote</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-rest</artifactId>
@@ -22,7 +22,6 @@
     <module>kie-server-rest-optaplanner</module>
     <module>kie-server-rest-case-mgmt</module>
     <module>kie-server-rest-dmn</module>
-    <module>kie-server-rest-jbpm-search</module>
     <module>kie-server-rest-swagger</module>
   </modules>
 

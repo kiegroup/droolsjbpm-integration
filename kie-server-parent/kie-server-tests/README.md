@@ -22,7 +22,7 @@ The following table lists all currently supported combinations of parameters:
 | -----------------   | --------------------- | ----------------------------------------- |
 |     WildFly10       | wildfly10             | *none*                                    |
 |     EAP 7           | eap7                  | eap7.download.url                         |
-|     Tomcat 8        | tomcat8               | *none*                                    |
+|     Tomcat 9        | tomcat9               | *none*                                    |
 | Oracle WebLogic 12  | oracle-wls-12         | weblogic.home                             |
 | IBM WebSphere 9*    | websphere9            | websphere.home                            |
 

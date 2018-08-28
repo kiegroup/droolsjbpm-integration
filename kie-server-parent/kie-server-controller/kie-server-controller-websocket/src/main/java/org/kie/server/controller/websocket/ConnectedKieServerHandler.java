@@ -17,7 +17,6 @@ package org.kie.server.controller.websocket;
 
 import javax.websocket.Session;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.events.ServerInstanceConnected;
@@ -26,6 +25,7 @@ import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.impl.KieServerControllerImpl;
+import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.handlers.InternalMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,14 +35,14 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
     
     private static final Logger logger = LoggerFactory.getLogger(ConnectedKieServerHandler.class);
 
-    private WebsocketSessionManager manager;
+    private WebSocketSessionManager manager;
     private Session session;
     private KieServerControllerImpl controller;
     private String serverId;    
     
     private KieServerInfo serverInfo;
     
-    public ConnectedKieServerHandler(WebsocketSessionManager manager, Session session, KieServerControllerImpl controller, String serverId) {
+    public ConnectedKieServerHandler(WebSocketSessionManager manager, Session session, KieServerControllerImpl controller, String serverId) {
         super();
         this.manager = manager;
         this.session = session;
@@ -52,16 +52,14 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
 
     @Override
     public String onMessage(String message) {
-        String contentType = MarshallingFormat.JSON.getType();
-        
-        serverInfo = WebsocketUtils.unmarshal(message, contentType, KieServerInfo.class);
+        serverInfo = WebSocketUtils.unmarshal(message, KieServerInfo.class);
         manager.addSession(serverInfo, session);
         
         logger.debug("Server info {}", serverInfo);
         KieServerSetup serverSetup = controller.connect(serverInfo);
 
         logger.info("Server with id '{}' connected", serverId);
-        String response = WebsocketUtils.marshal(contentType, serverSetup);
+        String response = WebSocketUtils.marshal(serverSetup);
         
         return response;
     }

@@ -39,6 +39,8 @@ import org.kie.server.services.impl.storage.KieServerState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.kie.server.common.KeyStoreHelperUtil.loadControllerPassword;
+
 public class DefaultRestControllerImpl implements KieServerController {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultRestControllerImpl.class);
@@ -183,7 +185,7 @@ public class DefaultRestControllerImpl implements KieServerController {
         String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
 
         String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-        String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+        String password = loadControllerPassword(config);
         String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
         try {
@@ -210,7 +212,7 @@ public class DefaultRestControllerImpl implements KieServerController {
             connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId()+"/?location="+ URLEncoder.encode(serverInfo.getLocation(), "UTF-8");
 
             String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-            String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+            String password = loadControllerPassword(config);
             String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
             makeHttpDeleteRequestAndCreateCustomResponse(connectAndSyncUrl, null, userName, password, token);
@@ -238,7 +240,7 @@ public class DefaultRestControllerImpl implements KieServerController {
                     String connectAndSyncUrl = controllerUrl + "/management/servers/" + KieServerEnvironment.getServerId() + "/containers/" + containerId + "/status/started";
 
                     String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                    String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                    String password = loadControllerPassword(config);
                     String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
                     try {
@@ -269,7 +271,7 @@ public class DefaultRestControllerImpl implements KieServerController {
                     String connectAndSyncUrl = controllerUrl + "/management/servers/" + KieServerEnvironment.getServerId() + "/containers/" + containerId + "/status/stopped";
 
                     String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                    String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                    String password = loadControllerPassword(config);
                     String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
                     try {

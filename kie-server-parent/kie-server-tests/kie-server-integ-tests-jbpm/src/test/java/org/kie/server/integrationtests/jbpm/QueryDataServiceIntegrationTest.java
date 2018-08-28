@@ -15,15 +15,8 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,12 +36,17 @@ import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
 import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -74,6 +72,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
+        extraClasses.put(CUSTOM_PARAMETER_CLASS_NAME, Class.forName(CUSTOM_PARAMETER_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
 
     @Test
@@ -106,7 +105,14 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = createQueryDefinition("PROCESS");
         try {
 
-            queryClient.registerQuery(query);
+            QueryDefinition registered = queryClient.registerQuery(query);
+            assertNotNull(registered);
+            assertEquals(query.getName(), registered.getName());
+            assertEquals(query.getSource(), registered.getSource());
+            assertEquals(query.getExpression(), registered.getExpression());
+            assertEquals(query.getTarget(), registered.getTarget());
+            assertNotNull(registered.getColumns());
+            assertEquals(registered.getColumns().size(), 18);
 
             List<QueryDefinition> queries = queryClient.getQueries(0, 100);
 
@@ -305,6 +311,35 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     }
 
     @Test
+    public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilderAndCustomParameters() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = createQueryDefinition("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("customparams",
+                       Arrays.asList(createCustomParameterInstance("min", processInstanceIds.get(4)),
+                                     createCustomParameterInstance("max", processInstanceIds.get(0))));
+
+            List<ProcessInstance> instances = queryClient.query(CONTAINER_ID, query.getName(), QueryServicesClient.QUERY_MAP_PI, "test", params, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
     public void testGetProcessInstancesWithQueryDataServiceRawMapper() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
@@ -322,7 +357,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             assertEquals(5, instances.size());
 
             for (List row : instances) {
-                assertEquals(16, row.size());
+                assertEquals(18, row.size());
             }
 
             instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_RAW, 0, 3, List.class);
@@ -364,7 +399,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             query.setExpression("select * from AuditTaskImpl where status = 'InProgress'");
 
-            queryClient.replaceQuery(query);
+            QueryDefinition replaced = queryClient.replaceQuery(query);
+            
+            assertNotNull(replaced);
+            assertEquals(query.getName(), replaced.getName());
+            assertEquals(query.getSource(), replaced.getSource());
+            assertEquals(query.getExpression(), replaced.getExpression());
+            assertEquals(query.getTarget(), replaced.getTarget());
+            assertNotNull(replaced.getColumns());
+            assertEquals(replaced.getColumns().size(), 18);
 
             tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
             assertNotNull(tasks);
@@ -710,7 +753,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             queryClient.registerQuery(query);
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters);
 
-            List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            List<ExecutionErrorInstance> errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId , false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
 
@@ -722,6 +765,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             }
 
             errors = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_ERROR, 0, 10, ExecutionErrorInstance.class);
+            errors = filterErrorsByProcessInstanceId(errors, processInstanceId);
             assertNotNull(errors);
             assertEquals(1, errors.size());
             ExecutionErrorInstance errorInstance = errors.get(0);
@@ -747,7 +791,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
 
-            errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, false, 0, 10);
             assertNotNull(errors);
             assertEquals(0, errors.size());
 
@@ -767,7 +811,206 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             }
         }
     }
+    
+    @Test
+    public void testGetTaskInstancesUsingUserTaskPOMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
 
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmHumanTasksPO");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select t.actualowner_id as actualowner, t.CREATEDBY_ID as createdby, t.CREATEDON as CREATEDON, t.EXPIRATIONTIME as expirationDate, " +
+                "t.id as TASKID, t.name as NAME, t.priority as PRIORITY, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, t.STATUS as STATUS,  " +
+                "po.entity_id as POTOWNER, t.FORMNAME AS FORMNAME, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.subject as SUBJECT, t.deploymentid as DEPLOYMENTID " +
+                "from TASK t " +
+                "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
+                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid " +
+                "WHERE t.processinstanceid = " + pid);
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_PO, 0, 10, TaskWithProcessDescription.class);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            TaskWithProcessDescription task = tasks.get(0);
+            assertEquals("First task", task.getName());
+            assertEquals(1, task.getPotentialOwners().size());
+            assertEquals("yoda", task.getPotentialOwners().get(0));
+            assertEquals("Very nice process description", task.getProcessInstanceDescription());
+            
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
+    public void testGetTaskInstancesUsingUserTaskWithModificationMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
+
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmGetTaskWithPO");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select t.id as TASKID, t.name as NAME,  t.FORMNAME AS FORMNAME, t.subject as SUBJECT, " +
+                "t.actualowner_id as ACTUALOWNER, po.entity_id as POTOWNER, p.processinstancedescription as PROCESSINSTANCEDESCRIPTION, t.CREATEDON as CREATEDON, " +
+                "t.CREATEDBY_ID as CREATEDBY, t.EXPIRATIONTIME as EXPIRATIONTIME, " +
+                "(select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id) as lastmodificationdate, " +
+                "(select userid from taskevent where logtime = (select max(logtime) from taskevent where processinstanceid = t.processinstanceid and taskid = t.id) and type = 'ADDED' and processinstanceid = t.processinstanceid and taskid = t.id) as lastmodificationuser, " +
+                "t.priority as PRIORITY, t.STATUS as STATUS, t.PROCESSINSTANCEID as PROCESSINSTANCEID, t.PROCESSID as PROCESSID, " +
+                "t.deploymentid as DEPLOYMENTID, d.name as TVNAME, d.type as TVTYPE, d.value as TVVALUE " +
+                "from TASK t " +
+                "inner join PEOPLEASSIGNMENTS_POTOWNERS po on t.id=po.task_id " +
+                "inner join PROCESSINSTANCELOG p on t.processinstanceid = p.processinstanceid " +
+                "inner join TASKVARIABLEIMPL d on t.id=d.taskid " +
+                "WHERE t.processinstanceid = " + pid);
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<TaskWithProcessDescription> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK_WITH_MODIF, 0, 10, TaskWithProcessDescription.class);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            TaskWithProcessDescription task = tasks.get(0);
+            assertEquals("First task", task.getName());
+            assertEquals(1, task.getPotentialOwners().size());
+            assertEquals("yoda", task.getPotentialOwners().get(0));
+            assertEquals("Very nice process description", task.getProcessInstanceDescription());
+            assertEquals("waiting for signal", task.getInputData().get("_string"));
+            Object person = task.getInputData().get("_person");
+            assertEquals(person, "Person{name='" + CONTAINER_ID + "'}");
+            assertNotNull(task.getLastModificationDate());
+            assertNotNull(task.getLastModificationUser());
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
+    public void testGetTasksWithPotentialOwnerDoubleGroup() throws Exception {
+        changeUser(USER_JOHN);
+        Long pidOne = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_DOUBLE_GROUP);
+        Long pidTwo = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_DOUBLE_GROUP);
+
+        QueryDefinition query = getTasksWithPotentialOwnerQueryDefinition();
+
+        try {
+            queryClient.registerQuery(query);
+            
+            List<org.kie.server.api.model.instance.TaskSummary> test = taskClient.findTasksAssignedAsPotentialOwner(USER_JOHN, 0, 10);
+            assertNotNull(test);
+            assertEquals(2, test.size());
+            
+            QueryFilterSpec filterSpec = new QueryFilterSpecBuilder().in("processInstanceId", Arrays.asList(pidOne, pidTwo)).get();
+            
+            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, filterSpec, 0, 10, TaskInstance.class);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pidOne);
+            processClient.abortProcessInstance(CONTAINER_ID, pidTwo);
+            queryClient.unregisterQuery(query.getName());
+            changeUser(USER_YODA);
+        }
+    }
+    
+    @Test
+    public void testGetProcessInstanceCustomMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
+
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmProcessWithVarsSearch");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select p. PROCESSINSTANCEID, p.PROCESSID,  p.PROCESSNAME, p.PROCESSVERSION, p.STATUS,  " +
+                            "p.EXTERNALID, pr.STARTDATE as START_DATE,   p.USER_IDENTITY, p.PROCESSINSTANCEDESCRIPTION, " +
+                            "p.CORRELATIONKEY, p.PARENTPROCESSINSTANCEID, pr.LASTMODIFICATIONDATE, var.variableId, var.value " +
+                            "from PROCESSINSTANCELOG p inner join PROCESSINSTANCEINFO pr on p.PROCESSINSTANCEID = pr.INSTANCEID " +
+                            "inner join (select v.processInstanceId, v.variableId, v.value from VariableInstanceLog v " +
+                            "where v.id = (select MAX(vil.id) from VariableInstanceLog vil " +
+                            "where v.variableId = vil.variableId and v.processInstanceId = vil.processInstanceId)) var " +
+                            "on  p.PROCESSINSTANCEID = var.PROCESSINSTANCEID");
+
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<ProcessInstanceCustomVars> instance = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_CUSTOM, 0, 10, ProcessInstanceCustomVars.class);
+            assertNotNull(instance);
+            assertEquals(1, instance.size());
+            
+            final Map<String, Object> variables = instance.get(0).getVariables();
+            assertNotNull(variables);
+            assertEquals(3, variables.size());
+
+            assertEquals(TestConfig.getUsername(), variables.get("initiator"));
+            assertEquals("waiting for signal", variables.get("stringData"));
+            assertEquals(parameters.get("personData").toString(), variables.get("personData"));
+            
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+    
+    @Test
+    public void testGetProcessInstanceCustomWithoutVarsMapper() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
+
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("jbpmProcessSearch");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select p.PROCESSINSTANCEID, p.PROCESSID,  p.PROCESSNAME, p.PROCESSVERSION, p.STATUS,  p.EXTERNALID, " +
+                            "pr.STARTDATE as START_DATE,   p.USER_IDENTITY, p.PROCESSINSTANCEDESCRIPTION, p.CORRELATIONKEY, " +
+                            "p.PARENTPROCESSINSTANCEID, pr.LASTMODIFICATIONDATE from PROCESSINSTANCELOG p " +
+                            "inner join PROCESSINSTANCEINFO pr on p.PROCESSINSTANCEID = pr.INSTANCEID");
+
+        query.setTarget("CUSTOM");
+        
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<ProcessInstanceCustomVars> instance = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_CUSTOM, 0, 10, ProcessInstanceCustomVars.class);
+            assertNotNull(instance);
+            assertEquals(1, instance.size());
+            
+            assertNull(instance.get(0).getVariables());
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
 
     protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
         final QueryDefinition query = new QueryDefinition();
@@ -775,6 +1018,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select pil.*, v.variableId, v.value " + "from ProcessInstanceLog pil " + "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " + "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " + "inner join VariableInstanceLog v " + "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " + "where pil.status = 1");
         query.setTarget("CUSTOM");
+        return query;
+    }
+
+    private QueryDefinition getTasksWithPotentialOwnerQueryDefinition() {
+        final QueryDefinition query = new QueryDefinition();
+        query.setName("getAllTasks");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select ti.taskId, ti.activationTime, ti.actualOwner, ti.createdBy, ti.createdOn, ti.deploymentId, ti.description, ti.dueDate, ti.name, ti.parentId, ti.priority, ti.processId, ti.processInstanceId, ti.processSessionId, ti.status, ti.workItemId, oe.id, eo.entity_id from AuditTaskImpl ti left join PeopleAssignments_PotOwners po on ti.taskId = po.task_id left join OrganizationalEntity oe on po.entity_id = oe.id left join PeopleAssignments_ExclOwners eo on ti.taskId = eo.task_id");
+        query.setTarget("PO_TASK");
         return query;
     }
 
@@ -786,7 +1038,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setTarget(target);
         return query;
     }
-
+    
     private QueryDefinition createErrorsQueryDefinition() {
         String queryExpression = "select * from ExecutionErrorInfo where ERROR_ACK = 0";
 

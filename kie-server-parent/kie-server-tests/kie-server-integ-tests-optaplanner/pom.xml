@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-optaplanner</artifactId>
@@ -13,6 +13,7 @@
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration options to run on different containers.</description>
 
   <properties>
+    <java.module.name>org.kie.server.itests.optaplanner</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.optaplanner.server.ext.disabled>false</org.optaplanner.server.ext.disabled>
   </properties>
@@ -42,40 +43,10 @@
       <artifactId>kie-server-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-drools</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-optaplanner</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-drools</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-optaplanner</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -154,13 +125,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
       <classifier>webc</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -257,4 +221,63 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>local-test-run</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-common</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-drools</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-optaplanner</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-common</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-drools</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-optaplanner</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>tomcat9</id>
+    </profile>
+    <profile>
+      <id>wildfly10</id>
+    </profile>
+    <profile>
+      <id>wildfly11</id>
+    </profile>
+    <profile>
+      <id>eap7</id>
+    </profile>
+    <profile>
+      <id>oracle-wls-12</id>
+    </profile>
+    <profile>
+      <id>websphere9</id>
+    </profile>
+  </profiles>
 </project>

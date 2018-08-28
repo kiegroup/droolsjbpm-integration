@@ -6,13 +6,17 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.drools</groupId>
   <artifactId>drools-jboss-integration</artifactId>
 
   <name>Drools :: JBoss Integration</name>
+
+  <properties>
+    <java.module.name>org.drools.integration.jboss</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

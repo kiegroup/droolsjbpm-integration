@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-router</artifactId>
@@ -13,6 +13,7 @@
   <description>KIE Execution Server Integration Tests (REST, JMS) with router.</description>
 
   <properties>
+    <java.module.name>org.kie.server.itests.router</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
   </properties>
@@ -52,52 +53,10 @@
       <artifactId>kie-server-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-common</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-drools</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-jbpm</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-drools</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-jbpm</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-case-mgmt-impl</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -183,6 +142,12 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -215,13 +180,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
       <classifier>webc</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
-      <classifier>ee6</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -330,4 +288,81 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>local-test-run</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-common</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>javax.xml.stream</groupId>
+              <artifactId>stax-api</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-drools</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-jbpm</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.codehaus.woodstox</groupId>
+              <artifactId>woodstox-core-asl</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-common</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-drools</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-jbpm</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jbpm</groupId>
+          <artifactId>jbpm-case-mgmt-impl</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>tomcat9</id>
+    </profile>
+    <profile>
+      <id>wildfly10</id>
+    </profile>
+    <profile>
+      <id>wildfly11</id>
+    </profile>
+    <profile>
+      <id>eap7</id>
+    </profile>
+    <profile>
+      <id>oracle-wls-12</id>
+    </profile>
+    <profile>
+      <id>websphere9</id>
+    </profile>
+  </profiles>
 </project>

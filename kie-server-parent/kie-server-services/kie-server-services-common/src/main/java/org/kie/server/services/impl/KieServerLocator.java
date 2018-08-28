@@ -18,6 +18,10 @@ package org.kie.server.services.impl;
 public class KieServerLocator {
 
     private static final KieServerImpl INSTANCE = new KieServerImpl();
+    
+    static {
+        INSTANCE.init();
+    }
 
     private KieServerLocator() {
     }

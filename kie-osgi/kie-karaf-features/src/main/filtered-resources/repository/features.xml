@@ -5,6 +5,7 @@
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
   <repository>mvn:org.kie/kie-karaf-features/${project.version}/xml/features-core</repository>
+  <repository>mvn:org.apache.camel.karaf/apache-camel/RELEASE/xml/features</repository>
 
   <feature name="drools-common" version="${project.version}" description="Drools Commons">
     <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
@@ -21,13 +22,13 @@
     <bundle>mvn:org.jboss.spec.javax.el/jboss-el-api_3.0_spec/${karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec}</bundle>
     <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/${karaf.version.org.jboss.spec.javax.interceptor}</bundle>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
   </feature>
 
   <feature name="drools-decisiontable" description="Drools Decision Tables" version="${project.version}">
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-templates</feature>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
-    <bundle>mvn:org.apache.commons/commons-collections4/${karaf.version.commons-collections4}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>
     <bundle>mvn:org.apache.commons/commons-collections4/${karaf.version.org.apache.commons-collections4}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
@@ -49,6 +50,7 @@
    <feature name="kie-dmn" description="Kie DMN" version="${project.version}">
      <feature version="${project.version}">drools-module</feature>
      <bundle>mvn:org.antlr/antlr4-runtime/${version.org.antlr4}</bundle>
+     <bundle>mvn:org.drools/drlx-parser/${version.org.kie}</bundle>
      <bundle>mvn:org.kie/kie-dmn-model/${version.org.kie}</bundle>
      <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>
      <bundle>mvn:org.kie/kie-dmn-backend/${version.org.kie}</bundle>
@@ -79,6 +81,7 @@
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-persistence-api/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-core/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${version.org.jbpm}</bundle>
@@ -136,14 +139,6 @@
     <bundle start-level="100">mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
   </feature>
 
-  <feature name="hibernate-validator" version="${version.org.hibernate.validator}" description="Hibernate Validator">
-    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.1.0/${karaf.version.org.apache.servicemix.specs.jsr303-api}</bundle>
-    <bundle>mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
-    <bundle>mvn:org.hibernate/hibernate-validator/${version.org.hibernate.validator}</bundle>
-    <bundle>mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
-    <bundle>mvn:com.fasterxml/classmate/${karaf.version.com.fasterxml.classmate}</bundle>
-  </feature>
-
   <feature name="h2" version="${h2.version}" description="H2 database">
     <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
@@ -172,6 +167,11 @@
 
   <feature name="servlet-api-kie" version="${project.version}">
     <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/${karaf.version.org.apache.geronimo.specs.servlet}</bundle>
+  </feature>
+
+  <feature name="kie-pmml" version="${project.version}">
+    <feature version="${project.version}">drools-module</feature>
+    <bundle start-level="100">mvn:org.drools/kie-pmml/${version.org.drools}</bundle>
   </feature>
 
 </features>

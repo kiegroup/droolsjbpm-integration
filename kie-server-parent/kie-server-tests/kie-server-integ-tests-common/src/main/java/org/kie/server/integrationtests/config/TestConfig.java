@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.config;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -52,6 +53,7 @@ public class TestConfig {
      * Property holding port number of embedded REST server router.
      */
     private static Integer ROUTER_ALLOCATED_PORT;
+    private static final StringTestParameter PROVIDED_WEBSERVICE_HTTP_URL = new StringTestParameter("webservice.http.url");
     private static final StringTestParameter PROVIDED_HTTP_URL = new StringTestParameter("kie.server.base.http.url");
     private static final StringTestParameter PROVIDED_CONTEXT = new StringTestParameter("kie.server.context");
     private static final StringTestParameter PROVIDED_CONTROLLER_HTTP_URL = new StringTestParameter("kie.server.controller.base.http.url");
@@ -60,7 +62,7 @@ public class TestConfig {
     private static final StringTestParameter USERNAME = new StringTestParameter("username", "yoda");
     private static final StringTestParameter PASSWORD = new StringTestParameter("password", "usetheforce123@");
 
-    private static final StringTestParameter INITIAL_CONTEXT_FACTORY = new StringTestParameter("kie.server.context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
+    private static final StringTestParameter INITIAL_CONTEXT_FACTORY = new StringTestParameter("kie.server.context.factory", "org.wildfly.naming.client.WildFlyInitialContextFactory");
     private static final StringTestParameter CONNECTION_FACTORY = new StringTestParameter("kie.server.connection.factory", "jms/RemoteConnectionFactory");
     private static final StringTestParameter REMOTING_URL = new StringTestParameter("kie.server.remoting.url");
     private static final StringTestParameter REQUEST_QUEUE_JNDI = new StringTestParameter("kie.server.jndi.request.queue", "jms/queue/KIE.SERVER.REQUEST");
@@ -78,11 +80,20 @@ public class TestConfig {
 
     private static final StringTestParameter WEBLOGIC_HOME = new StringTestParameter("weblogic.home");
 
+    private static final StringTestParameter JMS_SKIP = new StringTestParameter("jms.skip");
+
     /**
      * Property holding datasource driver class FQCN to determine which DB the tests are currently run with
      */
     private static final StringTestParameter ORG_KIE_SERVER_DATASOURCE_DRIVER_CLASS = new StringTestParameter("org.kie.server.datasource.driver.class", "org.h2.Driver");
 
+    /**
+     * @return webservice http url.
+     */
+    public static String getWebServiceHttpURL() {
+        return TestConfig.PROVIDED_WEBSERVICE_HTTP_URL.getParameterValue();
+    }
+    
     /**
      * Get kie-server URL for HTTP services - like REST.
      *
@@ -128,6 +139,23 @@ public class TestConfig {
         }
 
         return httpUrl;
+    }
+
+    /**
+     * Get kie-servers controller management URL for WebSocket service.
+     *
+     * @return controller management WS URL.
+     */
+    public static String getControllerWebSocketManagementUrl() {
+        try {
+            final URL controllerUrl = new URL(getControllerHttpUrl());
+            return String.format("ws://%s:%s/%s/websocket/controller",
+                                 controllerUrl.getHost(),
+                                 controllerUrl.getPort(),
+                                 getKieServerControllerContext());
+        } catch (Exception ex){
+            throw new RuntimeException("Failed to create controller Web Socket URL", ex);
+        }
     }
 
     /**
@@ -212,6 +240,9 @@ public class TestConfig {
     public static boolean skipJMS() {
         if (TestConfig.class.getResource("/jms.skip") != null) {
             return true;
+        } else if (JMS_SKIP.isParameterConfigured()) {
+            String jmsSkip = JMS_SKIP.getParameterValue();
+            return Boolean.parseBoolean(jmsSkip);
         }
 
         return false;
@@ -436,6 +467,20 @@ public class TestConfig {
      */
     public static boolean isSybaseDataSource() {
         return getKieServerDataSourceDriverClass().startsWith("com.sybase");
+    }
+
+    /**
+     * @return True if MySQL DB is currently used
+     */
+    public static boolean isMySqlDataSource() {
+        return getKieServerDataSourceDriverClass().startsWith("com.mysql");
+    }
+
+    /**
+     * @return True if Maria DB is currently used
+     */
+    public static boolean isMariaDbDataSource() {
+        return getKieServerDataSourceDriverClass().startsWith("org.mariadb");
     }
 
     // Used for printing all configuration values at the beginning of first test run.

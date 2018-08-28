@@ -17,7 +17,6 @@ package org.kie.server.router.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.util.UUID;
@@ -36,6 +35,7 @@ public class FileRepositoryTest {
     @After
     public void cleanup() {
         System.clearProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED);
+        System.clearProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL);
     }
     
     @Test
@@ -90,7 +90,7 @@ public class FileRepositoryTest {
     }
     
     @Test
-    public void testWathServiceOnConfigFile() throws Exception {
+    public void testWatchServiceOnConfigFile() throws Exception {
         Configuration config = new Configuration();
         
         config.addContainerHost("container1", "http://localhost:8080/server");
@@ -110,6 +110,7 @@ public class FileRepositoryTest {
         repo.persist(config);
         
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
         
         FileRepository repoWithWatcher = new FileRepository(repositoryDirectory);
         Configuration loaded = repoWithWatcher.load();
@@ -154,6 +155,61 @@ public class FileRepositoryTest {
             assertEquals(1, loaded.getHostsPerContainer().get("container1").size());
             assertEquals(0, loaded.getHostsPerContainer().get("container2").size());
         }
+        repoWithWatcher.close();
+        repoWithWatcher.clean();
+    }
+
+    @Test
+    public void testWatchServiceOnLatelyCreatedConfigFile() throws Exception {
+        // Start watcher service with not existing config file
+        File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
+        repositoryDirectory.mkdirs();
+
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
+
+        FileRepository repoWithWatcher = new FileRepository(repositoryDirectory);
+        Configuration loaded = repoWithWatcher.load();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        loaded.addListener(new ConfigurationListener() {
+
+            @Override
+            public void onConfigurationReloaded() {
+                latch.countDown();
+            }
+        });
+
+        // delay it a bit for the watcher to be triggered
+        Thread.sleep(3000);
+
+        // Create configuration file
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "false");
+
+        Configuration config = new Configuration();
+
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addContainerHost("container2", "http://localhost:8180/server");
+
+        config.addServerHost("server1", "http://localhost:8080/server");
+        config.addServerHost("server2", "http://localhost:8180/server");
+
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        FileRepository repo = new FileRepository(repositoryDirectory);
+        repo.persist(config);
+
+        latch.await(20, TimeUnit.SECONDS);
+        assertNotNull(loaded);
+        assertNotNull(loaded.getHostsPerContainer());
+        assertNotNull(loaded.getHostsPerServer());
+        assertEquals(2, loaded.getHostsPerContainer().size());
+        assertEquals(2, loaded.getHostsPerServer().size());
+        assertEquals(2, loaded.getContainerInfosPerContainer().size());
+        assertEquals(1, loaded.getHostsPerContainer().get("container1").size());
+        assertEquals(1, loaded.getHostsPerContainer().get("container2").size());
+
         repoWithWatcher.close();
         repoWithWatcher.clean();
     }

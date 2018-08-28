@@ -35,7 +35,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 public class DisposeCommandIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar-JBPM-5019",
-            "1.0.0-SNAPSHOT");
+            "1.0.0");
 
     private static final String CONTAINER_ID = "stateful-session";
     private static final String KIE_SESSION_1 = "kbase1.stateful1";

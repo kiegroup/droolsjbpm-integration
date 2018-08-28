@@ -15,14 +15,15 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.assertj.core.api.Assertions;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,8 +52,6 @@ import org.kie.server.integrationtests.config.TestConfig;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_NOT_FOUND;
 
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -90,29 +89,21 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        assertEquals(16, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcesses(0, 3);
+        List<ProcessDefinition> definitionsFirstPage = queryClient.findProcesses(0, 5);
+        List<String> processIdsFirstPage = collectDefinitions(definitionsFirstPage);
+        Assertions.assertThat(processIdsFirstPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsFirstPage);
 
-        assertNotNull(definitions);
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
-
-        definitions = queryClient.findProcesses(1, 3);
-        assertNotNull(definitions);
-
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
-        assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
-        assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
-
+        List<ProcessDefinition> definitionsSecondPage = queryClient.findProcesses(1, 5);
+        List<String> processIdsSecondPage = collectDefinitions(definitionsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).doesNotContainAnyElementsOf(processIdsFirstPage);
     }
 
     @Test
@@ -120,29 +111,20 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20, QueryServicesClient.SORT_BY_NAME, false);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        assertEquals(16, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<ProcessDefinition> definitionsAscOrder = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<String> processIdsAscOrder = collectDefinitions(definitionsAscOrder);
+        Assertions.assertThat(processIdsAscOrder).hasSize(3);
+        Assertions.assertThat(processIdsAscOrder).contains(PROCESS_ID_BOUNDARY_SIGNAL_PROCESS, PROCESS_ID_BOUNDARY_SIGNAL_EXPRESSION_PROCESS, PROCESS_ID_CALL_EVALUATION);
 
-        assertNotNull(definitions);
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
-
-        definitions = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, false);
-        assertNotNull(definitions);
-
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_XYZ_TRANSLATIONS));
-        assertTrue(processIds.contains(PROCESS_ID_USERTASK));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_PROCESS));
-
+        List<ProcessDefinition> definitionsDescOrder = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, false);
+        List<String> processIdsDescOrder = collectDefinitions(definitionsDescOrder);
+        Assertions.assertThat(processIdsDescOrder).hasSize(3);
+        Assertions.assertThat(processIdsDescOrder).contains(PROCESS_ID_XYZ_TRANSLATIONS, PROCESS_ID_USERTASK, PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
     }
 
     @Test
@@ -177,7 +159,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses("evaluation", 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        assertEquals(2, definitions.size());
+        Assertions.assertThat(definitions).hasSize(2);
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.get(0).equals(PROCESS_ID_CALL_EVALUATION));
         assertTrue(processIds.get(1).equals(PROCESS_ID_EVALUATION));
@@ -198,35 +180,25 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        Assertions.assertThat(definitions).hasSize(16);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3);
+        List<ProcessDefinition> definitionsFirstPage = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 5);
+        List<String> processIdsFirstPage = collectDefinitions(definitionsFirstPage);
+        Assertions.assertThat(processIdsFirstPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsFirstPage);
 
-        assertNotNull(definitions);
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
-
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 1, 3);
-        assertNotNull(definitions);
-
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
-        assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
-        assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
+        List<ProcessDefinition> definitionsSecondPage = queryClient.findProcessesByContainerId(CONTAINER_ID, 1, 5);
+        List<String> processIdsSecondPage = collectDefinitions(definitionsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).hasSize(5);
+        Assertions.assertThat(processIds).containsAll(processIdsSecondPage);
+        Assertions.assertThat(processIdsSecondPage).doesNotContainAnyElementsOf(processIdsFirstPage);
 
         // last check if there are process def for not existing project
-        definitions = queryClient.findProcessesByContainerId("not-existing-project", 0, 10);
-        assertNotNull(definitions);
-
-        assertEquals(0, definitions.size());
-
+        List<ProcessDefinition> definitionsNotExistingProject = queryClient.findProcessesByContainerId("not-existing-project", 0, 10);
+        Assertions.assertThat(definitionsNotExistingProject).hasSize(0);
     }
 
     @Test
@@ -234,28 +206,21 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        assertEquals(12, definitions.size());
+        Assertions.assertThat(definitions).hasSize(16);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
         // test paging of the result
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<ProcessDefinition> definitionsAscOrder = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, true);
+        List<String> processIdsAscOrder = collectDefinitions(definitionsAscOrder);
+        Assertions.assertThat(processIdsAscOrder).hasSize(3);
+        Assertions.assertThat(processIdsAscOrder).contains(PROCESS_ID_BOUNDARY_SIGNAL_PROCESS, PROCESS_ID_BOUNDARY_SIGNAL_EXPRESSION_PROCESS, PROCESS_ID_CALL_EVALUATION);
 
-        assertNotNull(definitions);
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
-        assertTrue(processIds.contains(PROCESS_ID_TIMER));
+        List<ProcessDefinition> definitionsDescOrder = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, false);
+        List<String> processIdsDescOrder = collectDefinitions(definitionsDescOrder);
+        Assertions.assertThat(processIdsDescOrder).hasSize(3);
+        Assertions.assertThat(processIdsDescOrder).contains(PROCESS_ID_XYZ_TRANSLATIONS, PROCESS_ID_USERTASK, PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
 
-        definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 3, QueryServicesClient.SORT_BY_NAME, false);
-        assertNotNull(definitions);
-
-        assertEquals(3, definitions.size());
-        processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_XYZ_TRANSLATIONS));
-        assertTrue(processIds.contains(PROCESS_ID_USERTASK));
-        assertTrue(processIds.contains(PROCESS_ID_SIGNAL_PROCESS));
     }
 
     @Test
@@ -263,7 +228,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesById(PROCESS_ID_USERTASK);
         assertNotNull(definitions);
 
-        assertEquals(1, definitions.size());
+        Assertions.assertThat(definitions).hasSize(1);
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains(PROCESS_ID_USERTASK));
 
@@ -505,6 +470,41 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, abortedStatus, 0, 10000);
         assertNotNull(instances);
         assertEquals(originalAborted + 1, instances.size());
+    }
+    
+    @Test
+    public void testGetProcessInstancesByProcessIdAndStatusAndInitiator() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Integer> abortedStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED);
+        List<Integer> activeStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+        List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        int originalAborted = instances.size();
+
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(0, instances.size());
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+        assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
+
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_YODA, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(originalAborted + 1, instances.size());
+        
+        instances = queryClient.findProcessInstancesByProcessIdAndInitiator(PROCESS_ID_USERTASK, USER_JOHN, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(0, instances.size());
     }
 
     @Test
@@ -1378,24 +1378,32 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 50, "processInstanceId", false);
             assertNotNull(tasks);
 
+            List<TaskSummary> reservedTasks = tasks.stream()
+                                                    .filter(n -> Status.Reserved.toString().equals(n.getStatus()))
+                                                    .collect(Collectors.toList());
+
+            TaskSummary firstTask = reservedTasks.get(0);
+            TaskSummary secondTask = reservedTasks.get(1);
+            Assertions.assertThat(firstTask.getProcessInstanceId())
+                .as("First reserved task should have bigger process instance id as results should be sorted in descending order.")
+                .isGreaterThan(secondTask.getProcessInstanceId());
+
             //latest task is from second process
-            TaskSummary task = tasks.get(0);
             TaskSummary expectedTaskSummary;
             if (processInstanceId2 > processInstanceId) {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
             } else {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
             }
-            assertTaskSummary(expectedTaskSummary, task);
+            assertTaskSummary(expectedTaskSummary, firstTask);
 
-            task = tasks.get(1);
             expectedTaskSummary = null;
             if (processInstanceId2 > processInstanceId) {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
             } else {
                 expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
             }
-            assertTaskSummary(expectedTaskSummary, task);
+            assertTaskSummary(expectedTaskSummary, secondTask);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
@@ -1529,14 +1537,14 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                 events = taskClient.findTaskEvents(taskInstance.getId(), 1, 3, SORT_BY_TASK_EVENTS_TYPE, true);
                 KieServerAssert.assertNullOrEmpty("Task events list is not empty.", events);
             } catch (TaskNotFoundException e) {
-                assertTrue(e.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+                assertTrue(e.getMessage().contains( "No task found with id " + taskInstance.getId() ));
             } catch (KieServicesException ee) {
                 if(configuration.isRest()) {
-                    KieServerAssert.assertResultContainsString(ee.getMessage(), MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskInstance.getId()));
+                    KieServerAssert.assertResultContainsString(ee.getMessage(), "Could not find task instance with id " + taskInstance.getId());
                     KieServicesHttpException httpEx = (KieServicesHttpException) ee;
                     assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
                 } else {
-                    assertTrue(ee.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+                    assertTrue(ee.getMessage().contains( "No task found with id " + taskInstance.getId() ));
                 }
             }
 
@@ -1791,20 +1799,20 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTaskEventsForNotExistingTask() {
-        long invalidId = -9999;
+        String invalidId = "-9,999";
         try {
             taskClient.findTaskEvents(-9999l, 0, 10);
             fail("KieServicesException should be thrown when task not found");
         } catch (KieServicesException e) {
             if(configuration.isRest()) {
-                KieServerAssert.assertResultContainsString(e.getMessage(), MessageFormat.format(TASK_INSTANCE_NOT_FOUND, invalidId));
+                KieServerAssert.assertResultContainsString(e.getMessage(), "Could not find task instance with id \"" + invalidId + "\"");
                 KieServicesHttpException httpEx = (KieServicesHttpException) e;
                 assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
             } else {
-                assertTrue(e.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+                assertTrue(e.getMessage().contains("No task found with id " + invalidId));
             }
         } catch (TaskNotFoundException tnfe) {
-            assertTrue(tnfe.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+            assertTrue(tnfe.getMessage().contains("No task found with id " + invalidId));
         }
     }
 

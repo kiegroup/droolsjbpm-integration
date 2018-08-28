@@ -14,19 +14,57 @@
       }
     }
   },
-
   "ignores": {
     "revapi": {
-      "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored. They should be removed when 7.1.0.Final is available.",
+      "_comment": "Changes between 7.5.0.Final and the current branch. These changes are desired and thus ignored.",
       "ignore": [
         {
+          "code": "java.annotation.added",
+          "old": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "new": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "annotationType": "com.fasterxml.jackson.annotation.JsonSubTypes",
+          "annotation": "@com.fasterxml.jackson.annotation.JsonSubTypes({@com.fasterxml.jackson.annotation.JsonSubTypes.Type(org.kie.server.controller.api.model.spec.ProcessConfig.class), @com.fasterxml.jackson.annotation.JsonSubTypes.Type(org.kie.server.controller.api.model.spec.RuleConfig.class)})",
+          "package": "org.kie.server.controller.api.model.spec",
+          "classSimpleName": "ContainerConfig",
+          "elementKind": "class",
+          "justification": "Handle JSON serialization of sub types"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "new": "class org.kie.server.controller.api.model.spec.ContainerConfig",
+          "annotationType": "com.fasterxml.jackson.annotation.JsonTypeInfo",
+          "annotation": "@com.fasterxml.jackson.annotation.JsonTypeInfo(use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS, include = com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT)",
+          "package": "org.kie.server.controller.api.model.spec",
+          "classSimpleName": "ContainerConfig",
+          "elementKind": "class",
+          "justification": "Handle JSON serialization of sub types"
+        },
+        {
           "code": "java.method.addedToInterface",
-          "new": "method void org.kie.server.controller.api.service.SpecManagementService::updateContainerSpec(java.lang.String, java.lang.String, org.kie.server.controller.api.model.spec.ContainerSpec)",
+          "new": "method void org.kie.server.controller.api.service.SpecManagementService::deleteServerInstance(org.kie.server.controller.api.model.runtime.ServerInstanceKey)",
           "package": "org.kie.server.controller.api.service",
           "classSimpleName": "SpecManagementService",
-          "methodName": "updateContainerSpec",
+          "methodName": "deleteServerInstance",
           "elementKind": "method",
-          "justification": "Allow to check container integrity when updating specification"
+          "justification": "New method for excluding a server instance from a template"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.kie.server.controller.api.KieServerControllerNotFoundException",
+          "package": "org.kie.server.controller.api",
+          "classSimpleName": "KieServerControllerNotFoundException",
+          "elementKind": "class",
+          "justification": "Renamed class to KieServerControllerIllegalArgumentException to better represent its goal"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.controller.api.model.runtime.ContainerList org.kie.server.controller.api.service.RuntimeManagementService::getContainers(org.kie.server.controller.api.model.spec.ServerTemplate, org.kie.server.controller.api.model.spec.ContainerSpec)",
+          "package": "org.kie.server.controller.api.service",
+          "classSimpleName": "RuntimeManagementService",
+          "methodName": "getContainers",
+          "elementKind": "method",
+          "justification": "New method for getting list of containers by server template"
         }
       ]
     }
