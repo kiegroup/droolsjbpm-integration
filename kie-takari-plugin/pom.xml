@@ -26,6 +26,7 @@
       <plugin>
         <groupId>io.takari.maven.plugins</groupId>
         <artifactId>takari-lifecycle-plugin</artifactId>
+        <version>${version.io.takari.maven.plugins.compiler}</version>
         <extensions>true</extensions>
         <configuration>
           <proc>none</proc>
@@ -39,7 +40,6 @@
       <dependency>
         <groupId>io.takari.maven.plugins</groupId>
         <artifactId>takari-plugin-testing</artifactId>
-        <version>${version.io.takari.maven.plugins.compiler}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
