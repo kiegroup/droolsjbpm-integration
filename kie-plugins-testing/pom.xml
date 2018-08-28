@@ -35,15 +35,6 @@
     </plugins>
   </build>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-plugin-testing</artifactId>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
