@@ -6,6 +6,9 @@
   <display-name>KieServer</display-name>
   <listener>
     <listener-class>org.jboss.narayana.tomcat.jta.NarayanaJtaServletContextListener</listener-class>
+  </listener>
+
+  <listener>
     <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
   </listener>
 
