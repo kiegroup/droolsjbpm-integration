@@ -111,7 +111,10 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    @Category(Unstable.class)
     public void testEscalation() throws InterruptedException, MessagingException, Exception {
+        // Unstable on slow DBs where completing of the task overlaps with escalation causing race conditions in Hibernate.
+        // Could be stabilized using specific transaction isolation.
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_ESCALATION, params);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId > 0);

@@ -33,6 +33,7 @@ import org.assertj.core.api.ThrowableAssert;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
@@ -43,6 +44,7 @@ import org.kie.server.api.model.admin.TaskNotification;
 import org.kie.server.api.model.admin.TaskReassignment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.integrationtests.category.Unstable;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -755,13 +757,18 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
+    @Category(Unstable.class)
     public void testReassignmentWhenNotStarted() throws Exception {
+        // Unstable on slow DBs where task operations overlaps with reassignment causing race conditions in Hibernate.
+        // Could be stabilized using specific transaction isolation.
         testReassignment(true);
     }
 
     @Test
+    @Category(Unstable.class)
     public void testReassignmentWhenNotCompleted() throws Exception {
-
+        // Unstable on slow DBs where task operations overlaps with reassignment causing race conditions in Hibernate.
+        // Could be stabilized using specific transaction isolation.
         testReassignment(false);
     }
 
