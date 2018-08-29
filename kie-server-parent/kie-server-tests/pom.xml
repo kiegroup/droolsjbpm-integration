@@ -58,7 +58,7 @@
     <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
 
-    <version.tomcat9>9.0.8</version.tomcat9>
+    <version.tomcat9>9.0.11</version.tomcat9>
     <version.wildfly11>11.0.0.Final</version.wildfly11>
     <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
     <version.org.postgresql>42.1.1</version.org.postgresql>
@@ -176,6 +176,12 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${version.org.postgresql}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.narayana.tomcat</groupId>
+        <artifactId>narayana-tomcat</artifactId>
+        <!-- TODO: delete when version is updated and artifact is added in parent pom. -->
+        <version>5.0.1.Final-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -504,7 +510,7 @@
     <profile>
       <id>tomcat9</id>
       <properties>
-        <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
+        <org.kie.server.persistence.ds>java:comp/env/jbpmDs</org.kie.server.persistence.ds>
         <kie.server.classifier>webc</kie.server.classifier>
         <kie.server.war.path>${org.kie.server:kie-server:war:webc}</kie.server.war.path>
         <cargo.container.id>tomcat9x</cargo.container.id>
@@ -552,6 +558,14 @@
                       <groupId>org.kie</groupId>
                       <artifactId>kie-tomcat-integration</artifactId>
                     </dependency>
+                    <dependency>
+                      <groupId>org.jboss.spec.javax.transaction</groupId>
+                      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.jboss.narayana.tomcat</groupId>
+                      <artifactId>narayana-tomcat</artifactId>
+                    </dependency>
                   </dependencies>
                 </container>
                 <configuration>
@@ -576,6 +590,26 @@
                         <loginTimeout>0</loginTimeout>
                         <testOnBorrow>false</testOnBorrow>
                         <factory>org.h2.jdbcx.JdbcDataSourceFactory</factory>
+                      </parameters>
+                    </resource>
+                    <resource>
+                      <name>jbpmDs</name>
+                      <type>javax.sql.XADataSource</type>
+                      <parameters>
+                        <uniqueName>jbpmDs</uniqueName>
+                        <factory>org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory</factory>
+                        <transactionSynchronizationRegistry>TransactionSynchronizationRegistry</transactionSynchronizationRegistry>
+                        <username>sa</username>
+                        <password>sa</password>
+                        <transactionManager>TransactionManager</transactionManager>
+                        <xaDataSource>sharedDataSource</xaDataSource>
+                        <initialSize>10</initialSize>
+                        <testOnBorrow>true</testOnBorrow>
+                        <maxAge>30000</maxAge>
+                        <description>Transactional Driver Data Source</description>
+                        <removeAbandoned>true</removeAbandoned>
+                        <remoteAbandonedTimeout>60</remoteAbandonedTimeout>
+                        <logAbandoned>true</logAbandoned>
                       </parameters>
                     </resource>
                   </resources>
@@ -605,6 +639,10 @@
         <dependency>
           <groupId>org.kie</groupId>
           <artifactId>kie-tomcat-integration</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.narayana.tomcat</groupId>
+          <artifactId>narayana-tomcat</artifactId>
         </dependency>
       </dependencies>
     </profile>    
