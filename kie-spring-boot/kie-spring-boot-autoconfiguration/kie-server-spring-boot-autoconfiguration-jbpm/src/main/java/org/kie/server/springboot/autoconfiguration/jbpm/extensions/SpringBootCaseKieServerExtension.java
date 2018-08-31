@@ -37,6 +37,7 @@ public class SpringBootCaseKieServerExtension extends CaseKieServerExtension {
                                             CaseInstanceMigrationService caseInstanceMigrationService) {
         this.caseService = caseService;
         this.caseRuntimeDataService = caseRuntimeDataService;
+        this.caseInstanceMigrationService = caseInstanceMigrationService;
     }
 
     @Override

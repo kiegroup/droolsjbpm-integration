@@ -40,6 +40,7 @@ import org.dashbuilder.dataprovider.sql.SQLDataSourceLocator;
 import org.dashbuilder.dataset.def.SQLDataSetDef;
 import org.drools.core.impl.EnvironmentFactory;
 import org.drools.persistence.api.TransactionManager;
+import org.drools.persistence.api.TransactionManagerFactory;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
 import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
@@ -100,6 +101,7 @@ import org.kie.internal.task.api.UserInfo;
 import org.kie.spring.jbpm.services.SpringTransactionalCommandService;
 import org.kie.spring.manager.SpringRuntimeManagerFactoryImpl;
 import org.kie.spring.persistence.KieSpringTransactionManager;
+import org.kie.spring.persistence.KieSpringTransactionManagerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -152,6 +154,10 @@ public class JBPMAutoConfiguration {
     private static final String QUARTZ_FAILED_RETRIES = "org.jbpm.timer.quartz.retries";
     private static final String QUARTZ_RESECHEDULE_DELAY = "org.jbpm.timer.quartz.reschedule.delay";
     private static final String QUARTZ_START_DELAY = "org.jbpm.timer.delay";
+    
+    private static final String TX_FACTORY_CLASS = "org.kie.txm.factory.class";
+    private static final String SPRING_TX_FACTORY_CLASS = "org.kie.spring.persistence.KieSpringTransactionManagerFactory";
+  
 
     private XADataSource xaDataSource;
     private XADataSourceWrapper wrapper;
@@ -168,6 +174,12 @@ public class JBPMAutoConfiguration {
         this.wrapper = wrapper;
         this.transactionManager = transactionManager;
         this.properties = properties;
+        System.setProperty(TX_FACTORY_CLASS, SPRING_TX_FACTORY_CLASS);
+        TransactionManagerFactory transactionManagerFactory = TransactionManagerFactory.get();
+        if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
+            ((KieSpringTransactionManagerFactory) transactionManagerFactory).setGlobalTransactionManager(applicationContext.getBean(AbstractPlatformTransactionManager.class));
+        }
+        
         // init any spring based ObjectModelResolvers
         List<ObjectModelResolver> resolvers = ObjectModelResolverProvider.getResolvers();
         if (resolvers != null) {
