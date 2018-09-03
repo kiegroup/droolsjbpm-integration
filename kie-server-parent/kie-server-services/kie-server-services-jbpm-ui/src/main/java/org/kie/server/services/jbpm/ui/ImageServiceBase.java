@@ -141,7 +141,7 @@ public class ImageServiceBase {
     protected void populateSubProcessLink(String containerId, NodeInstanceDesc node, Map<String, String> subProcessLinks) {
         if (node.getReferenceId() != null && node.getNodeType().endsWith("SubProcessNode")) {
 
-            String link = kieServerLocation + MessageFormat.format(processInstanceImageLink, containerId, node.getReferenceId());
+            String link = kieServerLocation + MessageFormat.format(processInstanceImageLink, containerId, node.getReferenceId().toString());
             subProcessLinks.put(node.getNodeId(), link);
         }
     }
