@@ -44,17 +44,17 @@ For PostgreSQL use following command to build the project:
 For H2 use following command to build the project:
 
 ```
-java -jar target/jbpm-spring-boot-sample-basic-7.11.0-SNAPSHOT.jar evaluation:evaluation:1.0.0-SNAPSHOT
+java -jar target/jbpm-spring-boot-sample-basic-7.12.0-SNAPSHOT.jar evaluation:evaluation:1.0.0-SNAPSHOT
 ```
 
 ```
-java -Dspring.profiles.active=postgres -jar target/jbpm-spring-boot-sample-basic-7.11.0-SNAPSHOT.jar evaluation:evaluation:1.0.0-SNAPSHOT
+java -Dspring.profiles.active=postgres -jar target/jbpm-spring-boot-sample-basic-7.12.0-SNAPSHOT.jar evaluation:evaluation:1.0.0-SNAPSHOT
 ```
 
 For MySQL use following command to build the project:
 
 ```
-java -Dspring.profiles.active=mysql -jar target/jbpm-spring-boot-sample-basic-7.11.0-SNAPSHOT.jar evaluation:evaluation:1.0.0-SNAPSHOT
+java -Dspring.profiles.active=mysql -jar target/jbpm-spring-boot-sample-basic-7.12.0-SNAPSHOT.jar evaluation:evaluation:1.0.0-SNAPSHOT
 ```
 
 last part is the kjar that you would like to deploy in GAV format: ** groupId:artifactId:version**
