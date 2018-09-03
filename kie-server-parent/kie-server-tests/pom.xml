@@ -181,6 +181,11 @@
         <artifactId>postgresql</artifactId>
         <version>${version.org.postgresql}</version>
       </dependency>
+      <dependency>
+        <groupId>org.jboss.narayana.tomcat</groupId>
+        <artifactId>narayana-tomcat</artifactId>
+        <version>5.0.1.Final-SNAPSHOT</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -600,7 +605,7 @@
                     </dependency>
                     <dependency>
                       <groupId>org.jboss.narayana.tomcat</groupId>
-                      <artifactId>tomcat-jta</artifactId>
+                      <artifactId>narayana-tomcat</artifactId>
                     </dependency>
                   </dependencies>
                 </container>
@@ -634,6 +639,7 @@
                       <parameters>
                         <uniqueName>jbpmDs</uniqueName>
                         <factory>org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory</factory>
+                        <transactionSynchronizationRegistry>TransactionSynchronizationRegistry</transactionSynchronizationRegistry>
                         <username>sa</username>
                         <password>sa</password>
                         <transactionManager>TransactionManager</transactionManager>
@@ -677,7 +683,7 @@
         </dependency>
         <dependency>
           <groupId>org.jboss.narayana.tomcat</groupId>
-          <artifactId>tomcat-jta</artifactId>
+          <artifactId>narayana-tomcat</artifactId>
         </dependency>
       </dependencies>
     </profile>    
