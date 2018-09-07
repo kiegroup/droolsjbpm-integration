@@ -35,7 +35,8 @@
   <modules>
     <module>jbpm-spring-boot-sample-basic</module>
     <module>kie-server-spring-boot-sample</module>
-    <module>keycloak-kie-server-spring-boot-sample</module>    
+    <module>keycloak-kie-server-spring-boot-sample</module>
+    <module>kie-server-spring-boot-integ-tests-sample</module>
   </modules>
 
   <build>
