@@ -213,6 +213,10 @@
         <directory>src/test/filtered-resources</directory>
         <filtering>true</filtering>
       </testResource>
+      <testResource>
+        <directory>../src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
@@ -291,6 +295,13 @@
     </profile>
     <profile>
       <id>websphere9</id>
+    </profile>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <kieserver.drools.enabled>true</kieserver.drools.enabled>
+        <kieserver.dmn.enabled>true</kieserver.dmn.enabled>
+      </properties>
     </profile>
   </profiles>
 </project>
