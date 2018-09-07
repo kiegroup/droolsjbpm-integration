@@ -286,6 +286,10 @@
         <directory>src/test/filtered-resources</directory>
         <filtering>true</filtering>
       </testResource>
+      <testResource>
+        <directory>../src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
@@ -568,6 +572,13 @@
           </plugins>
         </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
+        <jbpm.executor.enabled>true</jbpm.executor.enabled>
+      </properties>
     </profile>
   </profiles>
 </project>

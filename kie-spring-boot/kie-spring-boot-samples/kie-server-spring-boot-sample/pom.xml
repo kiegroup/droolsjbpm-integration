@@ -15,9 +15,9 @@
   <properties>
     <start-class>org.kie.server.springboot.samples.KieServerApplication</start-class>
   </properties>
-
+  
   <dependencyManagement>
-    <dependencies>
+    <dependencies>      
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>swagger-ui</artifactId>

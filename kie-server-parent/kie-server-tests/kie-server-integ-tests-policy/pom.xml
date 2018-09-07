@@ -239,6 +239,10 @@
         <directory>src/test/filtered-resources</directory>
         <filtering>true</filtering>
       </testResource>
+      <testResource>
+        <directory>../src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
@@ -330,6 +334,44 @@
     </profile>
     <profile>
       <id>websphere9</id>
+    </profile>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <kieserver.drools.enabled>true</kieserver.drools.enabled>
+        <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
+        <org.kie.server.policy.activate>KeepLatestOnly</org.kie.server.policy.activate>
+        <policy.klo.interval>5000</policy.klo.interval>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>com.bazaarvoice.maven.plugins</groupId>
+              <artifactId>process-exec-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>start-springboot</id>
+                  <configuration>
+                    <arguments>
+                      <argument>java</argument>
+                      <argument>-cp</argument>
+                      <argument>${springboot.app.jar.name}:${springboot.jdbc.driver.jar}</argument>
+                      <argument>-Dspring.config.location=${project.build.testOutputDirectory}/application.properties</argument>
+                      <argument>-Dkie.maven.settings.custom=${kie.server.server.deployment.settings.xml}</argument>
+                      <argument>-Dorg.kie.server.persistence.ds=${org.kie.server.persistence.ds}</argument>
+                      <!-- Policy based configuration -->
+                      <argument>-Dorg.kie.server.policy.activate=${org.kie.server.policy.activate}</argument>
+                      <argument>-Dpolicy.klo.interval=${policy.klo.interval}</argument>
+                      <argument>org.springframework.boot.loader.JarLauncher</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 </project>

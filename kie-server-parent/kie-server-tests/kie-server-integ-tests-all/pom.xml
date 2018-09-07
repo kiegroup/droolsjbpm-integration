@@ -250,6 +250,10 @@
         <directory>src/test/filtered-resources</directory>
         <filtering>true</filtering>
       </testResource>
+      <testResource>
+        <directory>../src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
@@ -368,6 +372,16 @@
     </profile>
     <profile>
       <id>websphere9</id>
+    </profile>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <kieserver.drools.enabled>true</kieserver.drools.enabled>
+        <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
+        <kieserver.jbpmui.enabled>true</kieserver.jbpmui.enabled>
+        <kieserver.casemgmt.enabled>true</kieserver.casemgmt.enabled>
+        <jbpm.executor.disabled>true</jbpm.executor.disabled>
+      </properties>
     </profile>
   </profiles>
 </project>
