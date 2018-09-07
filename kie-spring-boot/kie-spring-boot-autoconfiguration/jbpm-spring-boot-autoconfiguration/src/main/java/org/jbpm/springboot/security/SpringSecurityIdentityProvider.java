@@ -33,7 +33,7 @@ public class SpringSecurityIdentityProvider implements IdentityProvider {
         if (auth != null && auth.isAuthenticated()) {
             return auth.getName();
         }
-        return "system";
+        return "unknown";
     }
 
     public List<String> getRoles() {
