@@ -377,6 +377,7 @@
       <id>springboot</id>
       <properties>
         <kieserver.drools.enabled>true</kieserver.drools.enabled>
+        <kieserver.dmn.enabled>true</kieserver.dmn.enabled>
         <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
         <kieserver.jbpmui.enabled>true</kieserver.jbpmui.enabled>
         <kieserver.casemgmt.enabled>true</kieserver.casemgmt.enabled>
