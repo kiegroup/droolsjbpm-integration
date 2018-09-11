@@ -207,10 +207,6 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-rhq-plugin</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
       <artifactId>drools-scorecards</artifactId>
     </dependency>
     <dependency>
