@@ -57,16 +57,17 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     private IdentityProvider identityProvider;
     private List<Object> endpoints;
     
-    @Value("${cxf.jaxrs.classes-scan:false}")
     private boolean jaxrsComponentScanEnabled;
     
     private SpringBootKieServerImpl kieServer;
 
-    public KieServerAutoConfiguration(KieServerProperties properties, Optional<IdentityProvider> identityProvider) {
+    public KieServerAutoConfiguration(KieServerProperties properties, Optional<IdentityProvider> identityProvider,
+            @Value("${cxf.jaxrs.classes-scan:false}")boolean jaxrsComponentScanEnabled) {
         this.properties = properties;
+        this.jaxrsComponentScanEnabled = jaxrsComponentScanEnabled;
         if (identityProvider.isPresent()) {
             this.identityProvider = identityProvider.get();
-        }
+        }   
         if (!jaxrsComponentScanEnabled) {
             System.setProperty("cxf.jaxrs.classes-scan-packages", "");
         }
@@ -74,8 +75,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     
     @Bean
     @ConditionalOnMissingBean(name = "kieServerExtension")
-    public KieServerExtension kieServerExtension() {
-        
+    public KieServerExtension kieServerExtension() {        
         return new KieServerContainerExtension();
     }   
     
@@ -125,8 +125,8 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
         }
     }
     
-    @Bean
-    public Server jaxRsServer() {
+    @Bean    
+    public Server jaxRsServer(KieServer server) {
         return super.createJaxRsServer();
     }
 
