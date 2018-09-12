@@ -45,9 +45,6 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
         if( usePessLocking != null && usePessLocking ) { 
             this.pessimisticLocking = true;
         } 
-        
-        getApplicationScopedPersistenceContext(); // we create this on initialisation so that we own the EMF reference
-        // otherwise Spring will close it after the transaction finishes
     }
 
     public PersistenceContext getApplicationScopedPersistenceContext() {
