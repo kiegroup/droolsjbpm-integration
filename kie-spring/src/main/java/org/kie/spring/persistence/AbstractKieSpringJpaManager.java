@@ -64,18 +64,11 @@ public abstract class AbstractKieSpringJpaManager
             }
 
             if (this.appScopedEntityManager == null) {
-                EntityManagerHolder emHolder = (EntityManagerHolder) TransactionSynchronizationManager.getResource(this.emf);
-                if (emHolder == null) {
-                    this.appScopedEntityManager = this.emf.createEntityManager();
-                    emHolder = new EntityManagerHolder(this.appScopedEntityManager);
-                    TransactionSynchronizationManager.bindResource(this.emf, emHolder);
-                    internalAppScopedEntityManager = true;
-                } else {
-                    this.appScopedEntityManager = emHolder.getEntityManager();
-                }
-
+                
+                this.appScopedEntityManager = this.emf.createEntityManager();
+                internalAppScopedEntityManager = true;
                 this.env.set(EnvironmentName.APP_SCOPED_ENTITY_MANAGER,
-                        emHolder.getEntityManager());
+                        this.appScopedEntityManager);
             }
         }
         if (TransactionSynchronizationManager.isActualTransactionActive() && isJTA) {
@@ -108,8 +101,16 @@ public abstract class AbstractKieSpringJpaManager
     public void dispose() {
         logger.trace("Disposing KieSpringJpaManager");
         if (internalAppScopedEntityManager) {
-            //TransactionSynchronizationManager.unbindResource( "appEM" );
-            TransactionSynchronizationManager.unbindResource(this.emf);
+            resetApplicationScoped();
+            this.endCommandScopedEntityManager();
+        }  else {
+            logger.debug("Not cleaning application scoped manager em holder = {} em = {}", TransactionSynchronizationManager.getResource(this.emf), this.env.get(EnvironmentName.APP_SCOPED_ENTITY_MANAGER));
+        }
+    }
+    
+    
+    public void resetApplicationScoped() {
+        if (internalAppScopedEntityManager) {
             if (this.appScopedEntityManager != null && this.appScopedEntityManager.isOpen()) {
                 this.appScopedEntityManager.close();
                 this.internalAppScopedEntityManager = false;
@@ -117,8 +118,8 @@ public abstract class AbstractKieSpringJpaManager
                         null);
                 this.appScopedEntityManager = null;
             }
-            this.endCommandScopedEntityManager();
-        }  else {
+            
+        } else {
             logger.debug("Not cleaning application scoped manager em holder = {} em = {}", TransactionSynchronizationManager.getResource(this.emf), this.env.get(EnvironmentName.APP_SCOPED_ENTITY_MANAGER));
         }
     }
