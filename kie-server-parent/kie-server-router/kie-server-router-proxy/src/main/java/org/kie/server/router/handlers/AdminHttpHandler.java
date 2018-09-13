@@ -31,7 +31,6 @@ import org.jboss.logging.Logger;
 import org.json.JSONObject;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.ContainerInfo;
-import org.kie.server.router.KieServerRouterConstants;
 import org.kie.server.router.proxy.aggragate.JSONResponseAggregator;
 import org.kie.server.router.proxy.aggragate.JaxbXMLResponseAggregator;
 import org.kie.server.router.proxy.aggragate.ResponseAggregator;
@@ -46,13 +45,15 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.Headers;
 
+import static org.kie.server.router.KieServerRouterConstants.*;
+
 public class AdminHttpHandler implements HttpHandler {
     
     private static final Logger log = Logger.getLogger(AdminHttpHandler.class);
 
-    private String CONTROLLER = System.getProperty(KieServerRouterConstants.CONTROLLER);
-    private int interval = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "5"));
-    private int attemptsLimit = Integer.parseInt(System.getProperty(KieServerRouterConstants.KIE_SERVER_RECOVERY_ATTEMPT_LIMIT, "100"));
+    private String CONTROLLER = System.getProperty(KIE_CONTROLLER);
+    private int interval = Integer.parseInt(System.getProperty(KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "5"));
+    private int attemptsLimit = Integer.parseInt(System.getProperty(KIE_SERVER_RECOVERY_ATTEMPT_LIMIT, "100"));
     
 //    private KieServerProxyClient proxyClient;
     private Configuration configuration = new Configuration();
