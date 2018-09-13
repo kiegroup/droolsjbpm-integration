@@ -75,7 +75,7 @@ public class KieServerRouterControllerRecoveryTest {
     public void startStandaloneRouter(){
         mockKieServerPort = allocatePort();
         System.setProperty(KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "1");
-        System.setProperty(KieServerRouterConstants.CONTROLLER, "http://localhost:" + mockKieServerPort);
+        System.setProperty(KieServerRouterConstants.KIE_CONTROLLER, "http://localhost:" + mockKieServerPort);
         
         configureMockServer();
                 
@@ -98,7 +98,7 @@ public class KieServerRouterControllerRecoveryTest {
         // stop router and remove its config
         System.clearProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR);
         System.clearProperty(KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL);
-        System.clearProperty(KieServerRouterConstants.CONTROLLER);
+        System.clearProperty(KieServerRouterConstants.KIE_CONTROLLER);
         router.stop(true);
         router = null;
 
