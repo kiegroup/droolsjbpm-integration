@@ -223,7 +223,7 @@ public class KieServerImpl implements KieServer {
         container.setContainerId(containerId);
         ReleaseId releaseId = container.getReleaseId();
         try {
-            KieContainerInstanceImpl ci = new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId);
+            KieContainerInstanceImpl ci = new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId, this);
             ci.getResource().setContainerAlias(container.getContainerAlias());
             KieContainerInstanceImpl previous = null;
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
@@ -804,7 +804,7 @@ public class KieServerImpl implements KieServer {
         }
     }
 
-    private Map<String, Object> getContainerParameters(org.kie.api.builder.ReleaseId releaseId, List<Message> messages) {
+    protected Map<String, Object> getContainerParameters(org.kie.api.builder.ReleaseId releaseId, List<Message> messages) {
         KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
 
         Map<String, Object> parameters = new HashMap<String, Object>();

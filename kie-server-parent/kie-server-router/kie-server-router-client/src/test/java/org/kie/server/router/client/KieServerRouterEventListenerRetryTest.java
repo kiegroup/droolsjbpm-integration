@@ -46,7 +46,7 @@ public class KieServerRouterEventListenerRetryTest {
 
     private WireMockServer wireMockServer = null;
     private KieServerRouterEventListener client = null;
-    private KieContainerInstance containerInstance = new KieContainerInstanceImpl("test-container", KieContainerStatus.STARTED, null, new ReleaseId("org.test", "test-kjar", "1.0"));
+    private KieContainerInstance containerInstance = new KieContainerInstanceImpl("test-container", KieContainerStatus.STARTED, null, new ReleaseId("org.test", "test-kjar", "1.0"), null);
 
     public static int findFreePort() {
         int port = 0;
