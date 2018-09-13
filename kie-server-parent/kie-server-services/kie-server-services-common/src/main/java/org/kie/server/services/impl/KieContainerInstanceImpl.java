@@ -23,6 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.drools.core.impl.InternalKieContainer;
 import org.kie.api.KieServices;
+import org.kie.api.builder.Message.Level;
+import org.kie.api.event.kiescanner.KieScannerEventListener;
+import org.kie.api.event.kiescanner.KieScannerStatusChangeEvent;
+import org.kie.api.event.kiescanner.KieScannerUpdateResultsEvent;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -43,16 +47,18 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     private transient Map<String, Object> serviceContainer;
 
     private transient Set<Class<?>> extraClasses = new HashSet<Class<?>>();
+    
+    private transient KieServerScannerEventListener scannerListener;
 
     public KieContainerInstanceImpl(String containerId, KieContainerStatus status) {
         this(containerId, status, null);
     }
 
     public KieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer) {
-        this(containerId, status, kieContainer, null);
+        this(containerId, status, kieContainer, null, null);
     }
 
-    public KieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer, ReleaseId releaseId) {
+    public KieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer, ReleaseId releaseId, KieServerImpl kieServer) {
         super();
         this.kieContainer = kieContainer;
         this.resource = new KieContainerResource(containerId, releaseId, status);
@@ -62,6 +68,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         this.marshallers = new ConcurrentHashMap<MarshallingFormat, Marshaller>();
         this.serviceContainer = new ConcurrentHashMap<String, Object>();
         updateReleaseId();
+        this.scannerListener = new KieServerScannerEventListener(kieServer, this);
     }
 
     /**
@@ -141,6 +148,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
             throw new IllegalStateException("Can not start non-existing (null) scanner!");
         }
         this.scanner.start(pollingInterval);
+        this.scanner.addListener(scannerListener);
         this.getResource().setScanner(new KieScannerResource(KieScannerStatus.STARTED, pollingInterval));
     }
 
@@ -155,7 +163,8 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         if (this.scanner == null) {
             throw new IllegalStateException("Can not stop non-existing (null) scanner!");
         }
-        this.scanner.stop();
+        this.scanner.stop();  
+        this.scanner.removeListener(scannerListener);
         this.getResource().getScanner().setStatus(KieScannerStatus.STOPPED);
     }
 
@@ -229,20 +238,21 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         return resource.toString();
     }
 
-    protected void updateReleaseId() {
+    protected boolean updateReleaseId() {
         ReleaseId oldReleaseId = this.resource.getReleaseId();
         ReleaseId oldResolvedReleaseId = this.resource.getResolvedReleaseId();
         if ( kieContainer != null ) {
             this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
             this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
         }
-        // marshallers need to disposed in case the container was updated with different releaseId
-        // proper solution is to attach listener directly to the KieScanner and dispose the marshallers,
-        // but those listeners are not (yet) available, so this is a temporary hackish "solution"
+
         if (releaseIdUpdated(oldReleaseId, this.resource.getReleaseId())
                 || releaseIdUpdated(oldResolvedReleaseId, this.resource.getResolvedReleaseId())) {
             disposeMarshallers();
+            return true;
         }
+        
+        return false;
     }
 
     /**
