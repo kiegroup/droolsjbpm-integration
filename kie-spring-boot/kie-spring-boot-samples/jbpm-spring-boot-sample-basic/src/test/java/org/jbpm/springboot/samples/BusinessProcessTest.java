@@ -29,11 +29,11 @@ import java.util.Map;
 
 import org.appformer.maven.integration.MavenRepository;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
+import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
-import org.jbpm.springboot.samples.JBPMApplication;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,12 +48,15 @@ import org.kie.internal.query.QueryFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {JBPMApplication.class, TestAutoConfiguration.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-test.properties")
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class BusinessProcessTest {
     
     static final String ARTIFACT_ID = "evaluation";
@@ -83,6 +86,7 @@ public class BusinessProcessTest {
         MavenRepository repository = getMavenRepository();
         repository.installArtifact(releaseId, kjar, pom);
 
+        EntityManagerFactoryManager.get().clear();
     }
     
     

@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.11.0-SNAPSHOT</version>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-optaplanner</artifactId>
@@ -202,6 +202,10 @@
         <directory>src/test/filtered-resources</directory>
         <filtering>true</filtering>
       </testResource>
+      <testResource>
+        <directory>../src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
@@ -278,6 +282,13 @@
     </profile>
     <profile>
       <id>websphere9</id>
+    </profile>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <kieserver.drools.enabled>true</kieserver.drools.enabled>
+        <kieserver.optaplanner.enabled>true</kieserver.optaplanner.enabled>
+      </properties>
     </profile>
   </profiles>
 </project>

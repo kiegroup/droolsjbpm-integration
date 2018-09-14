@@ -48,6 +48,7 @@ import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.springboot.jbpm.ContainerAliasResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,6 +71,7 @@ public class KieServerTest {
     private String user = "john";
     private String password = "john@pwd1";
 
+    private String containerAlias = "eval";
     private String containerId = "evaluation";
     private String processId = "evaluation";
     
@@ -77,6 +79,9 @@ public class KieServerTest {
     
     @Autowired
     private KieServer kieServer;
+    
+    @Autowired
+    private ContainerAliasResolver aliasResolver;
     
     @BeforeClass
     public static void generalSetup() {
@@ -99,6 +104,7 @@ public class KieServerTest {
         this.kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
         
         KieContainerResource resource = new KieContainerResource(containerId, releaseId);
+        resource.setContainerAlias(containerAlias);
         kieServicesClient.createContainer(containerId, resource);
     }
     
@@ -178,6 +184,43 @@ public class KieServerTest {
 
         // at the end abort process instance
         processClient.abortProcessInstance(containerId, processInstanceId);
+
+        ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
+        assertNotNull(processInstance);
+        assertEquals(3, processInstance.getState().intValue());        
+    }
+    
+    @Test
+    public void testProcessStartAndAbortUsingAlias() {
+
+        // query for all available process definitions
+        QueryServicesClient queryClient = kieServicesClient.getServicesClient(QueryServicesClient.class);
+        List<ProcessDefinition> processes = queryClient.findProcesses(0, 10);
+        assertEquals(1, processes.size());
+
+        ProcessServicesClient processClient = kieServicesClient.getServicesClient(ProcessServicesClient.class);
+        // get details of process definition
+        ProcessDefinition definition = processClient.getProcessDefinition(containerId, processId);
+        assertNotNull(definition);
+        assertEquals(processId, definition.getId());
+
+        String resolvedContainerId = aliasResolver.latest(containerAlias);
+        
+        // start process instance
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("employee", "john");
+        params.put("reason", "test on spring boot");
+        Long processInstanceId = processClient.startProcess(resolvedContainerId, processId, params);
+        assertNotNull(processInstanceId);
+        
+        resolvedContainerId = aliasResolver.forProcessInstance(containerAlias, processInstanceId);
+       
+        // find active process instances
+        List<ProcessInstance> instances = queryClient.findProcessInstances(0, 10);
+        assertEquals(1, instances.size());
+
+        // at the end abort process instance
+        processClient.abortProcessInstance(resolvedContainerId, processInstanceId);
 
         ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
         assertNotNull(processInstance);

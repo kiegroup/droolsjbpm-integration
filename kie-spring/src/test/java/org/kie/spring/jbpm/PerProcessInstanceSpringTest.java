@@ -89,7 +89,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
 
         RuntimeManager manager = getManager();
         RuntimeEngine engine = getEngine();
-        KieSession ksession = getKieSession();
+        KieSession ksession = engine.getKieSession();
         long ksessionId = ksession.getIdentifier();
 
         ProcessInstance processInstance = ksession.startProcess(SAMPLE_HELLO_PROCESS_ID);

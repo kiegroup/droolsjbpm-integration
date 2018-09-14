@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.11.0-SNAPSHOT</version>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-all</artifactId>
@@ -250,6 +250,10 @@
         <directory>src/test/filtered-resources</directory>
         <filtering>true</filtering>
       </testResource>
+      <testResource>
+        <directory>../src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
@@ -368,6 +372,17 @@
     </profile>
     <profile>
       <id>websphere9</id>
+    </profile>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <kieserver.drools.enabled>true</kieserver.drools.enabled>
+        <kieserver.dmn.enabled>true</kieserver.dmn.enabled>
+        <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
+        <kieserver.jbpmui.enabled>true</kieserver.jbpmui.enabled>
+        <kieserver.casemgmt.enabled>true</kieserver.casemgmt.enabled>
+        <jbpm.executor.disabled>true</jbpm.executor.disabled>
+      </properties>
     </profile>
   </profiles>
 </project>

@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.11.0-SNAPSHOT</version>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -57,6 +57,10 @@
     <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
     <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
+
+    <!-- Springboot specific property which is overridden by production DBs profile -->
+    <!-- By default we use bundled H2 database jar -->
+    <springboot.jdbc.driver.jar/>
 
     <version.tomcat9>9.0.8</version.tomcat9>
     <version.wildfly11>11.0.0.Final</version.wildfly11>
@@ -358,7 +362,7 @@
             <goals>
               <goal>reserve-network-port</goal>
             </goals>
-            <phase>pre-integration-test</phase>
+            <phase>generate-resources</phase>
             <configuration>
               <portNames>
                 <portName>container.port</portName>
@@ -370,7 +374,7 @@
             <goals>
               <goal>reserve-network-port</goal>
             </goals>
-            <phase>pre-integration-test</phase>
+            <phase>generate-resources</phase>
             <configuration>
               <portNames>
                 <portName>router.port</portName>
@@ -409,6 +413,7 @@
         <org.kie.server.datasource.driver.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</org.kie.server.datasource.driver.class>
         <!-- Connection URL, format example: jdbc:mysql://localhost:3306/mydb -->
         <org.kie.server.datasource.connection.url>specify-mysql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+        <springboot.jdbc.driver.jar>${mysql:mysql-connector-java:jar}</springboot.jdbc.driver.jar>
       </properties>
       <build>
         <pluginManagement>
@@ -444,6 +449,7 @@
         <org.kie.server.datasource.driver.class>org.postgresql.xa.PGXADataSource</org.kie.server.datasource.driver.class>
         <!-- Connection URL, format example: jdbc:postgresql://localhost:5432/mydb -->
         <org.kie.server.datasource.connection.url>specify-postgresql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
+        <springboot.jdbc.driver.jar>${org.postgresql:postgresql:jar}</springboot.jdbc.driver.jar>
       </properties>
       <build>
         <pluginManagement>
@@ -1044,6 +1050,113 @@
           <artifactId>h2</artifactId>
         </dependency>
       </dependencies>
+    </profile>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <!-- By default disable everything, enable what is needed in child POMs-->
+        <kieserver.drools.enabled>false</kieserver.drools.enabled>
+        <kieserver.dmn.enabled>false</kieserver.dmn.enabled>
+        <kieserver.jbpm.enabled>false</kieserver.jbpm.enabled>
+        <kieserver.jbpmui.enabled>false</kieserver.jbpmui.enabled>
+        <kieserver.casemgmt.enabled>false</kieserver.casemgmt.enabled>
+        <kieserver.optaplanner.enabled>false</kieserver.optaplanner.enabled>
+        <kieserver.swagger.enabled>false</kieserver.swagger.enabled>
+        <jbpm.executor.enabled>false</jbpm.executor.enabled>
+        <!-- Springboot GAV -->
+        <springboot.app.group.id>org.kie</springboot.app.group.id>
+        <springboot.app.artifact.id>kie-server-spring-boot-integ-tests-sample</springboot.app.artifact.id>
+        <springboot.app.version>${project.version}</springboot.app.version>
+        <springboot.app.jar.name>${springboot.app.artifact.id}-${springboot.app.version}.jar</springboot.app.jar.name>
+        <!-- Dummy data source for QueryDataServiceIntegrationTest, they expect it to be set -->
+        <org.kie.server.persistence.ds>dummyDataSource</org.kie.server.persistence.ds>
+        <!-- Same groups as for Tomcat -->
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>unpack-spring-boot-integ-tests-sample</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                    <goal>copy</goal>
+                  </goals>
+                  <configuration>
+                    <artifactItems>
+                      <artifactItem>
+                        <groupId>${springboot.app.group.id}</groupId>
+                        <artifactId>${springboot.app.artifact.id}</artifactId>
+                        <version>${springboot.app.version}</version>
+                        <type>jar</type>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                      </artifactItem>
+                    </artifactItems>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <!-- Turn off cargo completely as we don't need it -->
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <skip>true</skip>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>com.bazaarvoice.maven.plugins</groupId>
+              <artifactId>process-exec-maven-plugin</artifactId>
+              <version>0.7</version>
+              <executions>
+                <execution>
+                  <id>start-springboot</id>
+                  <phase>pre-integration-test</phase>
+                  <goals>
+                    <goal>start</goal>
+                  </goals>
+                  <configuration>
+                    <name>SpringBoot</name>
+                    <waitForInterrupt>false</waitForInterrupt>
+                    <healthcheckUrl>${kie.server.base.http.url}/readycheck</healthcheckUrl>
+                    <waitAfterLaunch>300</waitAfterLaunch>
+                    <processLogFile>${project.build.directory}/springboot.log</processLogFile>
+                    <arguments>
+                      <argument>java</argument>
+                      <argument>-cp</argument>
+                      <argument>${springboot.app.jar.name}:${springboot.jdbc.driver.jar}</argument>
+                      <argument>-Dspring.config.location=${project.build.testOutputDirectory}/application.properties</argument>
+                      <argument>-Dkie.maven.settings.custom=${kie.server.server.deployment.settings.xml}</argument>
+                      <argument>-Dorg.kie.server.persistence.ds=${org.kie.server.persistence.ds}</argument>
+                      <argument>-Dorg.jbpm.document.storage=${org.jbpm.document.storage}</argument>
+                      <argument>-Dkie.server.base.http.url=${kie.server.base.http.url}</argument>
+                      <argument>org.springframework.boot.loader.JarLauncher</argument>
+                    </arguments>
+                  </configuration>
+                </execution>
+                <!-- Stop all processes in reverse order, in this case only SpringBoot process -->
+                <execution>
+                  <id>stop-springboot</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>stop-all</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>com.bazaarvoice.maven.plugins</groupId>
+            <artifactId>process-exec-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <!-- This profile basically disables any cargo related execution. It can be used when the tests should run on
          a container that has already been started and it is not managed by cargo. It can also be used when doing

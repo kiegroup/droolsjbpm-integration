@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.11.0-SNAPSHOT</version>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>droolsjbpm-bpms-distribution</artifactId>
@@ -204,10 +204,6 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-karaf-features</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-rhq-plugin</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

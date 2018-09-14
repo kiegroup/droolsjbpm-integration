@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-starters</artifactId>
-    <version>7.11.0-SNAPSHOT</version>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-starter-optaplanner</artifactId>
   
@@ -17,22 +17,8 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jersey</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>jersey-bean-validation</artifactId>
-          <groupId>org.glassfish.jersey.ext</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.glassfish.hk2.external</groupId>
-          <artifactId>javax.inject</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.glassfish.hk2.external</groupId>
-          <artifactId>aopalliance-repackaged</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-spring-boot-starter-jaxrs</artifactId>
     </dependency>
 
     <dependency>

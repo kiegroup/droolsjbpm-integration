@@ -16,53 +16,66 @@
 
 package org.kie.server.springboot.autoconfiguration;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletContainer;
-import org.glassfish.jersey.servlet.ServletProperties;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.feature.Feature;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.spring.AbstractJaxrsClassesScanServer;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerContainerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.springboot.SpringBootKieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass({ KieServerImpl.class })
 @EnableConfigurationProperties(KieServerProperties.class)
-public class KieServerAutoConfiguration extends ResourceConfig {
+public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     
     private static final Logger logger = LoggerFactory.getLogger(KieServerAutoConfiguration.class);
     
     private KieServerProperties properties;   
     private IdentityProvider identityProvider;
+    private List<Object> endpoints;
     
-    public KieServerAutoConfiguration(KieServerProperties properties, Optional<IdentityProvider> identityProvider) {
+    private boolean jaxrsComponentScanEnabled;
+    
+    private SpringBootKieServerImpl kieServer;
+
+    public KieServerAutoConfiguration(KieServerProperties properties, Optional<IdentityProvider> identityProvider,
+            @Value("${cxf.jaxrs.classes-scan:false}")boolean jaxrsComponentScanEnabled) {
         this.properties = properties;
+        this.jaxrsComponentScanEnabled = jaxrsComponentScanEnabled;
         if (identityProvider.isPresent()) {
             this.identityProvider = identityProvider.get();
+        }   
+        if (!jaxrsComponentScanEnabled) {
+            System.setProperty("cxf.jaxrs.classes-scan-packages", "");
         }
     }
     
     @Bean
     @ConditionalOnMissingBean(name = "kieServerExtension")
-    public KieServerExtension kieServerExtension() {
-        
+    public KieServerExtension kieServerExtension() {        
         return new KieServerContainerExtension();
     }   
     
@@ -79,28 +92,55 @@ public class KieServerAutoConfiguration extends ResourceConfig {
             KieServerEnvironment.setServerName(serverName);
         }
         logger.info("KieServer (id {} (name {})) started initialization process", KieServerEnvironment.getServerId(), KieServerEnvironment.getServerName());
-        SpringBootKieServerImpl kieServer = new SpringBootKieServerImpl(extensions, identityProvider);        
+        kieServer = new SpringBootKieServerImpl(extensions, identityProvider);        
         kieServer.init();
         
         KieServerRestImpl kieServerResource = new KieServerRestImpl(kieServer);
-        
-        registerInstances(kieServerResource);
+        this.endpoints = new ArrayList<>();
+        endpoints.add(kieServerResource);
         
         // next add any resources from server extensions
         List<KieServerExtension> activeExtensions = kieServer.getServerExtensions();
 
         for (KieServerExtension extension : activeExtensions) {
             LinkedHashSet<Object> resources = new LinkedHashSet<>(extension.getAppComponents(SupportedTransports.REST));
-            registerInstances(resources);
-        }
+            endpoints.addAll(resources);
+        }        
         logger.info("KieServer (id {}) started successfully", KieServerEnvironment.getServerId());
         return kieServer;
     }
     
     @Bean
-    public ServletRegistrationBean jerseyServlet() {
-        ServletRegistrationBean registration = new ServletRegistrationBean(new ServletContainer(), properties.getRestContextPath() + "/*");
-        registration.addInitParameter(ServletProperties.JAXRS_APPLICATION_CLASS, KieServerAutoConfiguration.class.getName());
-        return registration;
+    @ConditionalOnBean(name="kieServer")
+    public KieServerRegistry kieServerRegistry() {
+        return kieServer.getServerRegistry();
     }
+
+
+    @Override
+    protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
+        factory.setServiceBeans(endpoints);
+        if (jaxrsComponentScanEnabled) {
+            super.setJaxrsResources(factory);        
+        }
+    }
+    
+    @Bean    
+    public Server jaxRsServer(KieServer server) {
+        return super.createJaxRsServer();
+    }
+
+    @Override
+    public List<Feature> getFeatures() {
+        List<Feature> features = new ArrayList<>(super.getFeatures());
+        if (properties.getSwagger().isEnabled()) {
+            try {
+                features.add((Feature) Class.forName("org.apache.cxf.jaxrs.swagger.Swagger2Feature").newInstance());
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                logger.error("Swagger feature was enabled but cannot be created", e);
+            }
+        }
+        return features;
+    }    
+    
 }

@@ -41,6 +41,7 @@
         <include>org.jbpm:jbpm-document</include>
         <include>org.jbpm:jbpm-case-mgmt-api</include>
         <include>org.jbpm:jbpm-case-mgmt-impl</include>
+        <include>org.jbpm:jbpm-case-mgmt-cmmn</include>
         <include>org.kie:kie-api</include>
         <include>org.kie:kie-aries-blueprint</include>
         <include>org.kie:kie-internal</include>
@@ -58,7 +59,6 @@
         <include>org.drools:drools-jsr94</include>
         <include>org.drools:drools-persistence-api</include>
         <include>org.drools:drools-persistence-jpa</include>
-        <include>org.drools:drools-rhq-plugin</include>
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
         <include>org.drools:kie-pmml</include>
@@ -96,6 +96,7 @@
         <exclude>org.jbpm:jbpm-document</exclude>
         <exclude>org.jbpm:jbpm-case-mgmt-api</exclude>
         <exclude>org.jbpm:jbpm-case-mgmt-impl</exclude>
+        <exclude>org.jbpm:jbpm-case-mgmt-cmmn</exclude>
         <exclude>org.kie:kie-api</exclude>
         <exclude>org.kie:kie-aries-blueprint</exclude>
         <exclude>org.kie:kie-internal</exclude>
@@ -113,7 +114,6 @@
         <exclude>org.drools:drools-jsr94</exclude>
         <exclude>org.drools:drools-persistence-api</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
-        <exclude>org.drools:drools-rhq-plugin</exclude>
         <exclude>org.drools:drools-scorecards</exclude>
         <exclude>org.drools:drools-templates</exclude>
         <exclude>org.drools:kie-pmml</exclude>

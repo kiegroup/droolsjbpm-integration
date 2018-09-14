@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot</artifactId>
-    <version>7.11.0-SNAPSHOT</version>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-spring-boot-samples</artifactId>
@@ -35,20 +35,9 @@
   <modules>
     <module>jbpm-spring-boot-sample-basic</module>
     <module>kie-server-spring-boot-sample</module>
-    <module>keycloak-kie-server-spring-boot-sample</module>    
+    <module>keycloak-kie-server-spring-boot-sample</module>
+    <module>kie-server-spring-boot-integ-tests-sample</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-spring-boot-starters</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <build>
     <plugins>
