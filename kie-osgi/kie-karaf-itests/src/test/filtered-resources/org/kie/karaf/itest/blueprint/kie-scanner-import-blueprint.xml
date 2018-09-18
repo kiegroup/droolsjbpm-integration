@@ -24,7 +24,7 @@
 
   <kie:releaseId id="blueprint-scanner-releaseId" groupId="org.kie" artifactId="kie-karaf-itests-kjar" version="${version.org.kie}"/>
 
-  <kie:import releaseId-ref="blueprint-scanner-releaseId" enableScanner="true" scannerInterval="1000"/>
+  <kie:import releaseId-ref="blueprint-scanner-releaseId" enableScanner="false" scannerInterval="1000"/>
 
   <kie:import-session name="kie-scanner-test-ksession"/>
 
