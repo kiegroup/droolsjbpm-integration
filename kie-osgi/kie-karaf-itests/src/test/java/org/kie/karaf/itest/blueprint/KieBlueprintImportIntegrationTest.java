@@ -17,9 +17,7 @@ package org.kie.karaf.itest.blueprint;
  */
 
 import javax.inject.Inject;
-
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
@@ -37,8 +35,11 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.Constants;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.streamBundle;
+import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)
@@ -63,7 +64,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
         Assert.assertNotNull(kieScanner);
     }
 
-    @Test @Ignore
+    @Test
     public void kieSessionOldPersonTest() {
         Assert.assertNotNull(kieSession);
 
@@ -77,7 +78,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
         Assert.assertTrue(order.isApproved());
     }
 
-    @Test @Ignore
+    @Test
     public void kieSessionYoungPersonTest() {
         Assert.assertNotNull(kieSession);
 
@@ -133,7 +134,6 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                                 // junit is acting as a dependency for the rule
                                 "org.junit," +
                                 "*")
-                        .set(Constants.EXPORT_PACKAGE, "org.kie.karaf.itest.blueprint.domain")
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Bundle")
                         .build()).start()
 
