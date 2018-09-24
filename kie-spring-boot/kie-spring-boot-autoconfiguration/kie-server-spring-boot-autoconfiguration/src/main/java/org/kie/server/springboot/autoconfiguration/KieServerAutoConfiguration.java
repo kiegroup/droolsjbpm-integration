@@ -112,7 +112,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     
     @Bean
     @ConditionalOnBean(name="kieServer")
-    public KieServerRegistry kieServerRegistry() {
+    public KieServerRegistry kieServerRegistry(KieServer server) {
         return kieServer.getServerRegistry();
     }
 
