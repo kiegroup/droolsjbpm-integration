@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
