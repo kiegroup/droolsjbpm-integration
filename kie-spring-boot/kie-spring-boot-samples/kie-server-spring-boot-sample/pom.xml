@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-samples</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.12.0.t036</version>
   </parent>
   <artifactId>kie-server-spring-boot-sample</artifactId>
 
