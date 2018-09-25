@@ -26,9 +26,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
+import org.kie.server.client.KieServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
@@ -59,6 +62,8 @@ public class OptaplannerIntegrationTest
     private static final String CLASS_DELETE_COMPUTER_PROBLEM_FACT_CHANGE = "org.kie.server.testing.DeleteComputerProblemFactChange";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
 
+    private static final long EXTENDED_TIMEOUT = 300_000L;
+
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
@@ -66,8 +71,10 @@ public class OptaplannerIntegrationTest
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
-        createContainer(CONTAINER_1_ID,
-                        kjar1);
+        // Having timeout issues due to kjar dependencies -> raised timeout.
+        KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
+        ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1));
+        KieServerAssert.assertSuccess(reply);
     }
 
     @Override
