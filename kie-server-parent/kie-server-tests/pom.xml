@@ -332,6 +332,8 @@
                 <systemPropertyVariables>
                   <kie.server.server.deployment.settings.xml>${kie.server.server.deployment.settings.xml}</kie.server.server.deployment.settings.xml>
                   <jms.skip>${jms.skip}</jms.skip>
+                  <kie.server.testing.server.local.repo.dir>${kie.server.testing.server.local.repo.dir}</kie.server.testing.server.local.repo.dir>
+                  <kie.server.testing.remote.repo.dir>${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.dir>
                 </systemPropertyVariables>
               </configuration>
             </execution>

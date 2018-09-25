@@ -82,6 +82,9 @@ public class TestConfig {
 
     private static final StringTestParameter JMS_SKIP = new StringTestParameter("jms.skip");
 
+    private static final StringTestParameter KIE_SERVER_REMOTE_REPO_DIR = new StringTestParameter("kie.server.testing.remote.repo.dir");
+    private static final StringTestParameter KIE_SERVER_LOCAL_REPO_DIR = new StringTestParameter("kie.server.testing.server.local.repo.dir");
+
     /**
      * Property holding datasource driver class FQCN to determine which DB the tests are currently run with
      */
@@ -460,6 +463,20 @@ public class TestConfig {
      */
     public static String getKieServerMavenSettings() {
         return TestConfig.KIE_SERVER_MAVEN_SETTINGS.getParameterValue();
+    }
+
+    /**
+     * @return Location of Kie server remote repo directory.
+     */
+    public static String getKieServerRemoteRepoDir() {
+        return TestConfig.KIE_SERVER_REMOTE_REPO_DIR.getParameterValue();
+    }
+
+    /**
+     * @return Location of Kie server local repo directory.
+     */
+    public static String getKieServerLocalRepoDir() {
+        return TestConfig.KIE_SERVER_LOCAL_REPO_DIR.getParameterValue();
     }
 
     /**

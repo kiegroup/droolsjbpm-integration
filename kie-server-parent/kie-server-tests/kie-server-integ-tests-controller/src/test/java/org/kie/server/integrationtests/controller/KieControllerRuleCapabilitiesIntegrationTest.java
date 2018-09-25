@@ -18,11 +18,14 @@ package org.kie.server.integrationtests.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
@@ -36,6 +39,7 @@ import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
@@ -44,8 +48,8 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
 
     private KieServerInfo kieServerInfo;
 
-    @BeforeClass
-    public static void initialize() throws Exception {
+    @Before
+    public void initializeRemoteRepo() throws Exception {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
     }
@@ -64,8 +68,15 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
     }
 
     @After
-    public void removeNewContainer() {
-        KieServerDeployer.removeLocalArtifact(RELEASE_ID_101);
+    public void cleanAllRepos() throws IOException {
+        File kieServerRemoteRepoDir = new File(TestConfig.getKieServerRemoteRepoDir());
+        File kieServerLocalRepoDir = new File(TestConfig.getKieServerLocalRepoDir());
+
+        FileUtils.deleteDirectory(kieServerRemoteRepoDir);
+        FileUtils.deleteDirectory(kieServerLocalRepoDir);
+
+        kieServerRemoteRepoDir.mkdir();
+        kieServerLocalRepoDir.mkdir();
     }
 
     @Test //RHPAM-479
