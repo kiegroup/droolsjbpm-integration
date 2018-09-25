@@ -20,12 +20,19 @@
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.1">
   <deployment>
     <dependencies>
-      <!-- IMPORTANT: when adding dependency (module) here, make sure it is a public one.
-           Do not add private modules as there is no guarantee they won't be changed or
-           removed in future. EAP also generates warning(s) during the deployment if
-           the WAR depends on private modules. -->
+      <!-- IMPORTANT: when adding dependency (module) here, make sure it 
+        is a public one. Do not add private modules as there is no guarantee they 
+        won't be changed or removed in future. EAP also generates warning(s) during 
+        the deployment if the WAR depends on private modules. -->
       <!-- Keep the alphabetical order! -->
-      <module name="org.apache.xerces"/>
+      <module name="org.apache.xerces" />
+      <!-- required jdk dependencies for batik/svg transformation -->
+      <system export="true">
+        <paths>
+          <path name="org/w3c/dom/css" />
+          <path name="org/w3c/dom/xpath" />
+        </paths>
+      </system>
     </dependencies>
   </deployment>
 </jboss-deployment-structure>

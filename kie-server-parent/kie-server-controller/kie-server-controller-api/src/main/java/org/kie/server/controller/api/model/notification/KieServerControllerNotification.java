@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.controller.api.model.events.*;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @XmlRootElement(name = "notification")
 @XmlAccessorType(XmlAccessType.NONE)
 public class KieServerControllerNotification {
@@ -38,7 +40,7 @@ public class KieServerControllerNotification {
             @XmlElement(name = "server-instance-disconnected", type = ServerInstanceDisconnected.class),
             @XmlElement(name = "container-spec-updated", type = ContainerSpecUpdated.class)
     })
-
+    @JsonProperty
     private KieServerControllerEvent event;
 
     public KieServerControllerNotification() {

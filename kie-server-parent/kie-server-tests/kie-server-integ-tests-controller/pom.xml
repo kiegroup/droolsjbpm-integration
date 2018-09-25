@@ -290,6 +290,7 @@
       </dependencies>
     </profile>
     <profile>
+      <!-- temporary hack to let it test on jenkins id>wildfly13</id-->
       <id>wildfly11</id>
       <dependencies>
         <dependency>
