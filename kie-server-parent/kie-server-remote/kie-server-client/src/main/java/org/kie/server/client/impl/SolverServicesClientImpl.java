@@ -77,8 +77,8 @@ public class SolverServicesClientImpl
             }
             solverInstanceList = response.getResult();
         }
-        if (solverInstanceList != null && solverInstanceList.getContainers() != null) {
-            return new ArrayList<>(solverInstanceList.getContainers());
+        if (solverInstanceList != null && solverInstanceList.getSolverInstances() != null) {
+            return new ArrayList<>(solverInstanceList.getSolverInstances());
         }
 
         return Collections.emptyList();

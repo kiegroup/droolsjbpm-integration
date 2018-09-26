@@ -43,11 +43,11 @@ public class SolverInstanceList {
         this.solvers = solvers;
     }
 
-    public List<SolverInstance> getContainers() {
+    public List<SolverInstance> getSolverInstances() {
         return solvers;
     }
 
-    public void setContainers(List<SolverInstance> solvers) {
+    public void setSolverInstances(List<SolverInstance> solvers) {
         this.solvers = solvers;
     }
 

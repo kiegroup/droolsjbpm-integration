@@ -122,8 +122,8 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
         assertThat(solverInstanceList).isNull();
         SolverInstanceList solverList = responseCallback.get(SolverInstanceList.class);
         assertThat(solverList).isNotNull();
-        assertThat(solverList.getContainers()).isNotNull().isNotEmpty().hasSize(1);
-        solver = solverList.getContainers().get(0);
+        assertThat(solverList.getSolverInstances()).isNotNull().isNotEmpty().hasSize(1);
+        solver = solverList.getSolverInstances().get(0);
         assertThat(solver.getSolverId()).isEqualTo(SOLVER_1_ID);
         assertThat(solver.getStatus()).isEqualTo(SolverInstance.SolverStatus.NOT_SOLVING);
 
@@ -155,7 +155,7 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
         assertThat(response).isNull();
         solverList = responseCallback.get(SolverInstanceList.class);
         assertThat(solverList).isNotNull();
-        assertThat(solverList.getContainers()).isNullOrEmpty();
+        assertThat(solverList.getSolverInstances()).isNullOrEmpty();
     }
 
     @Test

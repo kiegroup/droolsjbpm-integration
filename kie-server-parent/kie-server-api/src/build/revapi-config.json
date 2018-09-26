@@ -203,6 +203,24 @@
           "methodName": "setLastModificationUser",
           "elementKind": "method",
           "justification": "JBPM-6890: Adding the customTaskID as a unique identifier for an active"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method java.util.List<org.kie.server.api.model.instance.SolverInstance> org.kie.server.api.model.instance.SolverInstanceList::getContainers()",
+          "package": "org.kie.server.api.model.instance",
+          "classSimpleName": "SolverInstanceList",
+          "methodName": "getContainers",
+          "elementKind": "method",
+          "justification": "PLANNER-614: Fix method name. Method renamed to getSolverInstances()"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.kie.server.api.model.instance.SolverInstanceList::setContainers(java.util.List<org.kie.server.api.model.instance.SolverInstance>)",
+          "package": "org.kie.server.api.model.instance",
+          "classSimpleName": "SolverInstanceList",
+          "methodName": "setContainers",
+          "elementKind": "method",
+          "justification": "PLANNER-614: Fix method name. Method renamed to setSolverInstances()"
         }
       ]
     }
