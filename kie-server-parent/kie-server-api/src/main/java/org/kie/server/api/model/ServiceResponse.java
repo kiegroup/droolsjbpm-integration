@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
@@ -161,6 +162,7 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             @XmlElement(name = "dmn-model-info-list" , type = DMNModelInfoList.class)
 
             })
+    @JsonProperty
     private T result;
 
     public ServiceResponse() {

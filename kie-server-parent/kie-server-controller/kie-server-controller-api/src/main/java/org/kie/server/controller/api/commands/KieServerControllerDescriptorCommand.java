@@ -30,6 +30,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.*;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @XmlRootElement(name = "controller-descriptor-command")
 @XmlAccessorType(XmlAccessType.NONE)
 public class KieServerControllerDescriptorCommand implements KieServerCommand {
@@ -56,6 +58,7 @@ public class KieServerControllerDescriptorCommand implements KieServerCommand {
             @XmlElement(name = "arguments", type = String.class),
             @XmlElement(name = "long", type = Long.class)
     })
+    @JsonProperty
     private List<Object> arguments;
 
     @XmlElement(name = "payload")
