@@ -24,7 +24,6 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.camel.test.spring.CamelSpringTestSupport;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -38,6 +37,7 @@ public class CxfSoapTest extends CamelSpringTestSupport {
 
     @Test
     public void test1() throws Exception {
+        java.lang.System.setProperty("javax.xml.soap.MessageFactory","com.sun.xml.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl");
         SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
         SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
         QName payloadName = new QName("http://soap.jax.drools.org", "execute", "ns1");
@@ -59,7 +59,6 @@ public class CxfSoapTest extends CamelSpringTestSupport {
 
         Object object = this.context.createProducerTemplate().requestBody("direct://http", soapMessage);
         OutputStream out = new ByteArrayOutputStream();
-        out = new ByteArrayOutputStream();
         soapMessage = (SOAPMessage)object;
         soapMessage.writeTo(out);
         String response = out.toString();
