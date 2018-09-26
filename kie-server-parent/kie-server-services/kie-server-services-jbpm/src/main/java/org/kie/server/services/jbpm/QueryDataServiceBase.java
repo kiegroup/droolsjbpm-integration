@@ -32,9 +32,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jbpm.kie.services.impl.query.QueryServiceImpl;
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.jbpm.services.api.model.ProcessInstanceCustomDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
@@ -78,6 +80,22 @@ public class QueryDataServiceBase {
         this.queryService = queryService;
         this.context = context;
         this.marshallerHelper = new MarshallerHelper(context);
+        
+        Function<String, String> kieServerDataSourceResolver = input -> {
+            String dataSource = input;
+            Matcher matcher = PARAMETER_MATCHER.matcher(dataSource);
+            while (matcher.find()) {
+                String paramName = matcher.group(1);
+                KieServerConfig configuration = context.getStateRepository().load(KieServerEnvironment.getServerId()).getConfiguration();
+                dataSource = configuration.getConfigItemValue(paramName, "java:jboss/datasources/ExampleDS");
+                logger.info("Data source expression {} resolved to {}", input, dataSource);
+            }
+            
+            return dataSource;
+        };
+        if (queryService instanceof QueryServiceImpl) {
+            ((QueryServiceImpl) queryService).setDataSourceResolver(kieServerDataSourceResolver);
+        }
     }
 
     public QueryDefinition registerQuery(String queryName, String payload, String marshallingType) throws QueryAlreadyRegisteredException {
@@ -200,6 +218,7 @@ public class QueryDataServiceBase {
         return queryFilteredWithBuilder(null, queryName, mapper, builder, page, pageSize, payload, marshallingType);
     }
 
+    @SuppressWarnings("unchecked")
     public Object queryFilteredWithBuilder(String containerId, String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {
         Map<String, String> columnMapping = null;
         QueryContext queryContext = buildQueryContext(page, pageSize);
@@ -249,6 +268,7 @@ public class QueryDataServiceBase {
      * helper methods
      */
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected Object transform(Object result, QueryResultMapper resultMapper) {
         Object actualResult = null;
         if (result instanceof Collection) {
@@ -304,15 +324,7 @@ public class QueryDataServiceBase {
     }
 
     protected static SqlQueryDefinition build(KieServerRegistry context, QueryDefinition queryDefinition) {
-
-        String dataSource = queryDefinition.getSource();
-        Matcher matcher = PARAMETER_MATCHER.matcher(dataSource);
-        while (matcher.find()) {
-            String paramName = matcher.group(1);
-            KieServerConfig configuration = context.getStateRepository().load(KieServerEnvironment.getServerId()).getConfiguration();
-            dataSource = configuration.getConfigItemValue(paramName, "java:jboss/datasources/ExampleDS");
-        }
-        SqlQueryDefinition actualDefinition = new SqlQueryDefinition(queryDefinition.getName(), dataSource);
+        SqlQueryDefinition actualDefinition = new SqlQueryDefinition(queryDefinition.getName(), queryDefinition.getSource());
         actualDefinition.setExpression(queryDefinition.getExpression());
         actualDefinition.setTarget(org.jbpm.services.api.query.model.QueryDefinition.Target.valueOf(queryDefinition.getTarget()));
 
