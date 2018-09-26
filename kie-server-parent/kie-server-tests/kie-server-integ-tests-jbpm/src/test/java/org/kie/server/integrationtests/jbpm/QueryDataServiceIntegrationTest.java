@@ -456,9 +456,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     }
 
     @Test
-    public void testCRUDOnQueryDefinitionWithDSAsProperty() throws Exception {
-        String expectedResolvedDS = System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds");
-
+    public void testCRUDOnQueryDefinitionWithDSAsProperty() throws Exception {       
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance("john"));
@@ -479,7 +477,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             QueryDefinition registeredQuery = queries.stream().filter(q -> q.getName().equals("allProcessInstances")).findFirst().orElse(null);
             assertNotNull(registeredQuery);
             assertEquals(query.getName(), registeredQuery.getName());
-            assertEquals(expectedResolvedDS, registeredQuery.getSource());
+            assertEquals(query.getSource(), registeredQuery.getSource());
             assertEquals(query.getExpression(), registeredQuery.getExpression());
             assertEquals(query.getTarget(), registeredQuery.getTarget());
 
@@ -487,9 +485,13 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             assertNotNull(registeredQuery);
             assertEquals(query.getName(), registeredQuery.getName());
-            assertEquals(expectedResolvedDS, registeredQuery.getSource());
+            assertEquals(query.getSource(), registeredQuery.getSource());
             assertEquals(query.getExpression(), registeredQuery.getExpression());
             assertEquals(query.getTarget(), registeredQuery.getTarget());
+            
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
 
         } finally {
             abortProcessInstances(processInstanceIds);
