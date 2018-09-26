@@ -52,8 +52,6 @@ public class QueryInKjarIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private static final String KJAR_ONE_UPDATED_FIRST_REGISTERED_QUERY = "first-query";
     private static final String KJAR_ONE_UPDATED_SECOND_REGISTERED_QUERY = KJAR_TWO_REGISTERED_QUERY;
 
-    private static final String EXPECTED_RESOLVED_DS = System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds");
-
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.createAndDeployKJar(releaseIdKjarOne, getQueryDefinitionKjarContentFromFile("query-definitions-kjar-one.json"));
@@ -174,7 +172,7 @@ public class QueryInKjarIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private void assertKjarOneQuery(QueryDefinition registeredQuery) {
         Assertions.assertThat(registeredQuery).isNotNull();
         Assertions.assertThat(registeredQuery.getName()).isEqualTo(KJAR_ONE_REGISTERED_QUERY);
-        Assertions.assertThat(registeredQuery.getSource()).isEqualTo(EXPECTED_RESOLVED_DS);
+        Assertions.assertThat(registeredQuery.getSource()).isEqualTo("${org.kie.server.persistence.ds}");
         Assertions.assertThat(registeredQuery.getExpression()).isEqualTo("select * from ProcessInstanceLog");
         Assertions.assertThat(registeredQuery.getTarget()).isEqualTo("PROCESS");
     }
@@ -182,7 +180,7 @@ public class QueryInKjarIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private void assertKjarOneUpdatedQuery(QueryDefinition registeredQuery) {
         Assertions.assertThat(registeredQuery).isNotNull();
         Assertions.assertThat(registeredQuery.getName()).isEqualTo(KJAR_ONE_UPDATED_FIRST_REGISTERED_QUERY);
-        Assertions.assertThat(registeredQuery.getSource()).isEqualTo(EXPECTED_RESOLVED_DS);
+        Assertions.assertThat(registeredQuery.getSource()).isEqualTo("${org.kie.server.persistence.ds}");
         Assertions.assertThat(registeredQuery.getExpression()).isEqualTo("select * from NodeInstanceLog");
         Assertions.assertThat(registeredQuery.getTarget()).isEqualTo("CUSTOM");
     }
@@ -190,7 +188,7 @@ public class QueryInKjarIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private void assertKjarTwoQuery(QueryDefinition registeredQuery) {
         Assertions.assertThat(registeredQuery).isNotNull();
         Assertions.assertThat(registeredQuery.getName()).isEqualTo(KJAR_TWO_REGISTERED_QUERY);
-        Assertions.assertThat(registeredQuery.getSource()).isEqualTo(EXPECTED_RESOLVED_DS);
+        Assertions.assertThat(registeredQuery.getSource()).isEqualTo("${org.kie.server.persistence.ds}");
         Assertions.assertThat(registeredQuery.getExpression()).isEqualTo("select * from VariableInstanceLog");
         Assertions.assertThat(registeredQuery.getTarget()).isEqualTo("CUSTOM");
     }
@@ -198,7 +196,7 @@ public class QueryInKjarIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private void assertKjarWithDuplicateQueriesResultQuery(QueryDefinition registeredQuery) {
         Assertions.assertThat(registeredQuery).isNotNull();
         Assertions.assertThat(registeredQuery.getName()).isEqualTo(KJAR_DUPLICATE_QUERIES_REGISTERED_QUERY);
-        Assertions.assertThat(registeredQuery.getSource()).isEqualTo(EXPECTED_RESOLVED_DS);
+        Assertions.assertThat(registeredQuery.getSource()).isEqualTo("${org.kie.server.persistence.ds}");
         Assertions.assertThat(registeredQuery.getExpression()).isEqualTo("select * from AuditTaskImpl where status = 'InProgress'");
         Assertions.assertThat(registeredQuery.getTarget()).isEqualTo("CUSTOM");
     }
