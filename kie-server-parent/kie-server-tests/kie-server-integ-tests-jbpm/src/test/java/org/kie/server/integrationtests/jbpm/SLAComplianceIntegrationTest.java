@@ -73,7 +73,7 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         assertNodeInstance(taskNode, "Hello", SLA_NA);
 
         // Let's wait for SLA violation
-        KieServerSynchronization.waitForProcessInstanceSLAViolated(queryClient, pid, 6_000L);
+        KieServerSynchronization.waitForProcessInstanceSLAViolated(queryClient, pid, 8_000L);
         assertProcessInstance(pid, STATE_ACTIVE, SLA_VIOLATED);
 
         taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, null);
@@ -140,7 +140,7 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         assertNodeInstance(taskNode, "Hello", SLA_PENDING);
 
         // Let's wait for SLA violation
-        KieServerSynchronization.waitForNodeInstanceSLAViolated(queryClient, pid, taskNode.getId(), 6_000L);
+        KieServerSynchronization.waitForNodeInstanceSLAViolated(queryClient, pid, taskNode.getId(), 8_000L);
 
         assertProcessInstance(pid, STATE_ACTIVE, SLA_NA);
 

@@ -98,7 +98,7 @@ public class CaseSLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrati
         Long caseProcessInstanceId = johnTask.getProcessInstanceId();
 
         // Wait for SLA to expire
-        KieServerSynchronization.waitForProcessInstanceSLAViolated(queryClient, caseProcessInstanceId, 6_000L);
+        KieServerSynchronization.waitForProcessInstanceSLAViolated(queryClient, caseProcessInstanceId, 8_000L);
 
         caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
         assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
