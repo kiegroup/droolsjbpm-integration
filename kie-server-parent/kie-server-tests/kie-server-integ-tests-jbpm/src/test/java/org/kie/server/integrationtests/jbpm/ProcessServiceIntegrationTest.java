@@ -794,13 +794,13 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals(3, instances.size());
 
             nodeInstance = instances.get(0);
-            assertNodeInstance(expectedStart, nodeInstance);
-            assertNull(nodeInstance.getWorkItemId());
+            assertNodeInstance(expectedFirstTask, nodeInstance);
+            assertNotNull(nodeInstance.getWorkItemId());
             assertNotNull(nodeInstance.getDate());
 
             nodeInstance = instances.get(1);
-            assertNodeInstance(expectedFirstTask, nodeInstance);
-            assertNotNull(nodeInstance.getWorkItemId());
+            assertNodeInstance(expectedStart, nodeInstance);
+            assertNull(nodeInstance.getWorkItemId());
             assertNotNull(nodeInstance.getDate());
 
             nodeInstance = instances.get(2);
