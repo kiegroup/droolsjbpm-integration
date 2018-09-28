@@ -17,6 +17,8 @@
 package org.kie.server.controller.plugin;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.client.ResponseProcessingException;
+import javax.ws.rs.core.Response;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -55,7 +57,15 @@ public class DisposeContainerMojo extends KieControllerMojo {
         try {
             containerSpec = kieControllerGateway.getContainer(templateId, container);
         } catch (NotFoundException containerNotFoundException) {
-            throw containerNotFoundException;
+            getLog().info("Container " + container + " not found on server template " + templateId + ". Skip that task");
+            return;
+        } catch (ResponseProcessingException exception) {
+            if (exception.getResponse().getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                getLog().info("Container " + container + " not found on server template " + templateId + ". Skip that task");
+                return;
+            } else {
+                throw new RuntimeException(exception.getMessage(), exception);
+            }
         }
 
         if (KieContainerStatus.STARTED.equals(containerSpec.getStatus())) {
