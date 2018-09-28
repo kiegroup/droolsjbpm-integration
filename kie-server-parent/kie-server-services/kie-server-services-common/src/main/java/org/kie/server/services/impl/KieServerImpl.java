@@ -306,6 +306,84 @@ public class KieServerImpl implements KieServer {
             this.containerMessages.put(containerId, messages);
         }
     }
+    
+    public ServiceResponse<KieContainerResource> activateContainer(String containerId) {
+     
+        List<Message> messages = new CopyOnWriteArrayList<Message>();
+        try {
+            KieContainerInstanceImpl kci = context.getContainer(containerId);
+            if (kci != null && kci.getStatus().equals(KieContainerStatus.DEACTIVATED)) { 
+                
+                synchronized (kci) {
+                    eventSupport.fireBeforeContainerActivated(this, kci);
+                    
+                    Map<String, Object> parameters = getContainerParameters(kci.getKieContainer().getContainerReleaseId(), messages);
+                    // process server extensions
+                    List<KieServerExtension> extensions = context.getServerExtensions();
+                    for (KieServerExtension extension : extensions) {
+                        extension.activateContainer(containerId, kci, parameters);
+                        logger.debug("Container {} (for release id {}) {} activation: DONE", containerId, kci.getKieContainer().getContainerReleaseId(), extension);
+                    }
+                    
+                    kci.setStatus(KieContainerStatus.STARTED);
+                    
+                    eventSupport.fireAfterContainerActivated(this, kci);
+                    
+                    messages.add(new Message(Severity.INFO, "Container " + containerId + " activated successfully."));
+                    return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " activated successfully.", kci.getResource());
+                }
+            } else {
+                messages.add(new Message(Severity.ERROR, "Container " + containerId + " not found or not in deactivated status."));
+                return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " not found or not in deactivated status.");
+            }
+        } catch (Exception e) {
+            messages.add(new Message(Severity.ERROR, "Error activating container '" + containerId + "' due to " + e.getMessage()));
+            logger.error("Error activating Container '" + containerId + "'", e);
+            return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Error activating container " + containerId + ": " +
+                    e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            this.containerMessages.put(containerId, messages);
+        }
+    }
+    
+    public ServiceResponse<KieContainerResource> deactivateContainer(String containerId) {
+        
+        List<Message> messages = new CopyOnWriteArrayList<Message>();
+        try {
+            KieContainerInstanceImpl kci = context.getContainer(containerId);
+            if (kci != null && kci.getStatus().equals(KieContainerStatus.STARTED)) { 
+                
+                synchronized (kci) {
+                    eventSupport.fireBeforeContainerDeactivated(this, kci);
+                    
+                    Map<String, Object> parameters = getContainerParameters(kci.getKieContainer().getContainerReleaseId(), messages);
+                    // process server extensions
+                    List<KieServerExtension> extensions = context.getServerExtensions();
+                    for (KieServerExtension extension : extensions) {
+                        extension.deactivateContainer(containerId, kci, parameters);
+                        logger.debug("Container {} (for release id {}) {} deactivation: DONE", containerId, kci.getKieContainer().getContainerReleaseId(), extension);
+                    }
+                    
+                    kci.setStatus(KieContainerStatus.DEACTIVATED);
+                    
+                    eventSupport.fireAfterContainerDeactivated(this, kci);
+                    
+                    messages.add(new Message(Severity.INFO, "Container " + containerId + " deactivated successfully."));
+                    return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " deactivated successfully.", kci.getResource());
+                }
+            } else {
+                messages.add(new Message(Severity.ERROR, "Container " + containerId + " not found or not in started status."));
+                return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " not found or not in started status.");
+            }
+        } catch (Exception e) {
+            messages.add(new Message(Severity.ERROR, "Error deactivating container '" + containerId + "' due to " + e.getMessage()));
+            logger.error("Error deactivating Container '" + containerId + "'", e);
+            return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Error deactivating container " + containerId + ": " +
+                    e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            this.containerMessages.put(containerId, messages);
+        }
+    }
 
     public ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter) {
         try {

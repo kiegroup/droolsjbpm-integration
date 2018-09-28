@@ -143,7 +143,25 @@
            "methodName": "findProcessInstancesByProcessIdAndInitiator",
            "elementKind": "method",
            "justification":  "Added additional methods for quering process instances by both process and initiator"
-         }
+         },
+         {
+		   "code": "java.method.addedToInterface",
+		   "new": "method org.kie.server.api.model.ServiceResponse<org.kie.server.api.model.KieContainerResource> org.kie.server.client.KieServicesClient::activateContainer(java.lang.String)",
+		   "package": "org.kie.server.client",
+		   "classSimpleName": "KieServicesClient",
+		   "methodName": "activateContainer",
+		   "elementKind": "method",
+		   "justification": "Enable activate and deactivate for KIE Containers"
+		 },
+		 {
+		   "code": "java.method.addedToInterface",
+		   "new": "method org.kie.server.api.model.ServiceResponse<org.kie.server.api.model.KieContainerResource> org.kie.server.client.KieServicesClient::deactivateContainer(java.lang.String)",
+		   "package": "org.kie.server.client",
+		   "classSimpleName": "KieServicesClient",
+		   "methodName": "deactivateContainer",
+		   "elementKind": "method",
+		   "justification": "Enable activate and deactivate for KIE Containers"
+		 }
       ]
     }
   }

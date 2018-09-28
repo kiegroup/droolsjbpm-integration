@@ -27,8 +27,10 @@ import javax.websocket.Session;
 import org.kie.api.command.Command;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.commands.ActivateContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DeactivateContainerCommand;
 import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
@@ -559,6 +561,28 @@ public class WebSocketKieServerClient implements KieServicesClient {
     @Override
     public void setResponseHandler(ResponseHandler responseHandler) {
         // no-op
+    }
+
+    @Override
+    public ServiceResponse<KieContainerResource> activateContainer(String id) {
+        CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new ActivateContainerCommand(id)));
+        ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
+            return list.getResponses().get(0);
+        })).getResponses().get(0);
+        
+        return response;
+    }
+
+    @Override
+    public ServiceResponse<KieContainerResource> deactivateContainer(String id) {
+        CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DeactivateContainerCommand(id)));
+        ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
+            ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
+            return list.getResponses().get(0);
+        })).getResponses().get(0);
+        
+        return response;
     }
 
 }

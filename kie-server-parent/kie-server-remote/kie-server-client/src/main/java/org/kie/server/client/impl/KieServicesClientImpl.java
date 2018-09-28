@@ -18,9 +18,11 @@ package org.kie.server.client.impl;
 import org.kie.api.command.Command;
 import org.kie.server.api.commands.GetReleaseIdCommand;
 import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.commands.ActivateContainerCommand;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DeactivateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
@@ -186,6 +188,28 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return makeHttpPutRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/" + id, resource, KieContainerResource.class );
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CreateContainerCommand(resource)));
+            ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
+        }
+    }
+    
+    @Override
+    public ServiceResponse<KieContainerResource> activateContainer(String id) {
+        if( config.isRest() ) {
+            return makeHttpPutRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/" + id + "/status/activated", null, KieContainerResource.class );
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new ActivateContainerCommand(id)));
+            ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
+        }
+    }
+    
+    @Override
+    public ServiceResponse<KieContainerResource> deactivateContainer(String id) {
+        if( config.isRest() ) {
+            return makeHttpPutRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/" + id + "/status/deactivated", null, KieContainerResource.class );
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DeactivateContainerCommand(id)));
             ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
             return getResponseOrNullIfNoResponse(response);
         }

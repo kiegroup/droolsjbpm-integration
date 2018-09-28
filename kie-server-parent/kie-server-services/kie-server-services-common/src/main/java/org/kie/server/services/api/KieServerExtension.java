@@ -38,6 +38,12 @@ public interface KieServerExtension {
     void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
 
     boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
+    
+    default void activateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {        
+    }
+    
+    default void deactivateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {        
+    }
 
     void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
 

@@ -344,6 +344,50 @@ public class RestSpecManagementServiceImpl {
             return createCorrectVariant("Unknown error " + e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @POST
+    @Path("servers/{id}/containers/{containerId}/status/activated")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response activateContainer(@Context HttpHeaders headers, @PathParam("id") String serverTemplateId, @PathParam("containerId") String containerId) {
+        logger.debug("Requesting stop container with id {} server instance: {}", containerId, serverTemplateId);
+        try {
+            ContainerSpecKey containerSpecKey = new ContainerSpecKey();
+            containerSpecKey.setId(containerId);
+            containerSpecKey.setServerTemplateKey(new ServerTemplateKey(serverTemplateId, ""));
+            specManagementService.activateContainer(containerSpecKey);
+
+            logger.debug("Returning response for activate container with id {} server instance: {}", containerId, serverTemplateId);
+            return createCorrectVariant("", headers, Response.Status.OK);
+        } catch (KieServerControllerIllegalArgumentException e) {
+            return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
+        } catch (Exception e) {
+            logger.error("Stop container failed due to {}", e.getMessage(), e);
+            return createCorrectVariant("Unknown error " + e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @POST
+    @Path("servers/{id}/containers/{containerId}/status/deactivated")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response deactivateContainer(@Context HttpHeaders headers, @PathParam("id") String serverTemplateId, @PathParam("containerId") String containerId) {
+        logger.debug("Requesting start container with id {} server instance: {}", containerId, serverTemplateId);
+        try {
+            ContainerSpecKey containerSpecKey = new ContainerSpecKey();
+            containerSpecKey.setId(containerId);
+            containerSpecKey.setServerTemplateKey(new ServerTemplateKey(serverTemplateId, ""));
+            specManagementService.deactivateContainer(containerSpecKey);
+
+            logger.debug("Returning response for deactivate container with id {} server instance: {}", containerId, serverTemplateId);
+            return createCorrectVariant("", headers, Response.Status.OK);
+        } catch (KieServerControllerIllegalArgumentException e) {
+            return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
+        } catch (Exception e) {
+            logger.error("Start container failed due to {}", e.getMessage(), e);
+            return createCorrectVariant("Unknown error " + e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     public void setSpecManagementService(final SpecManagementServiceImpl specManagementService) {
         this.specManagementService = specManagementService;

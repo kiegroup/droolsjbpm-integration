@@ -32,4 +32,12 @@ public interface KieServerEventListener {
     void beforeContainerStopped(KieServer kieServer, KieContainerInstance containerInstance);
 
     void afterContainerStopped(KieServer kieServer, KieContainerInstance containerInstance);
+    
+    void beforeContainerActivated(KieServer kieServer, KieContainerInstance containerInstance);
+
+    void afterContainerActivated(KieServer kieServer, KieContainerInstance containerInstance);
+    
+    void beforeContainerDeactivated(KieServer kieServer, KieContainerInstance containerInstance);
+
+    void afterContainerDeactivated(KieServer kieServer, KieContainerInstance containerInstance);
 }

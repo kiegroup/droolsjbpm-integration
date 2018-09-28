@@ -197,6 +197,51 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
         ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
         KieServerAssert.assertSuccess(disposeReply);
     }
+    
+    @Test
+    public void testActivateAndDeactivateContainer() throws Exception {
+        ServiceResponse<KieContainerResource> reply = client.createContainer("container-info", new KieContainerResource("container-info", releaseId1));
+        KieServerAssert.assertSuccess(reply);
+        
+        reply = client.getContainerInfo("container-info");
+        KieServerAssert.assertSuccess(reply);
+
+        KieContainerResource info = reply.getResult();
+        Assert.assertEquals(KieContainerStatus.STARTED, info.getStatus());
+        
+        reply = client.deactivateContainer("container-info");
+        KieServerAssert.assertSuccess(reply);
+        
+        info = reply.getResult();
+        Assert.assertEquals(KieContainerStatus.DEACTIVATED, info.getStatus());
+        
+        reply = client.activateContainer("container-info");
+        KieServerAssert.assertSuccess(reply);
+        
+        info = reply.getResult();
+        Assert.assertEquals(KieContainerStatus.STARTED, info.getStatus());
+    }
+    
+    @Test
+    public void testActivateStartedContainer() throws Exception {
+        ServiceResponse<KieContainerResource> reply = client.createContainer("container-info", new KieContainerResource("container-info", releaseId1));
+        KieServerAssert.assertSuccess(reply);
+        
+        reply = client.getContainerInfo("container-info");
+        KieServerAssert.assertSuccess(reply);
+
+        KieContainerResource info = reply.getResult();
+        Assert.assertEquals(KieContainerStatus.STARTED, info.getStatus());
+       
+        reply = client.activateContainer("container-info");
+        KieServerAssert.assertFailure(reply);
+        Assert.assertEquals("Container container-info not found or not in deactivated status.", reply.getMsg());
+        
+        reply = client.getContainerInfo("container-info");
+        KieServerAssert.assertSuccess(reply);
+        info = reply.getResult();
+        Assert.assertEquals(KieContainerStatus.STARTED, info.getStatus());
+    }
 
     private void assertContainsContainer(List<KieContainerResource> containers, String expectedContainerId) {
         for (KieContainerResource container : containers) {

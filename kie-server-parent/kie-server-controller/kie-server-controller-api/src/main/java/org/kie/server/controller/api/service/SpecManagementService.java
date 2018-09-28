@@ -54,4 +54,8 @@ public interface SpecManagementService {
 
     void deleteServerInstance(ServerInstanceKey serverInstanceKey);
 
+    void activateContainer(ContainerSpecKey containerSpecKey);
+    
+    void deactivateContainer(ContainerSpecKey containerSpecKey);
+
 }
