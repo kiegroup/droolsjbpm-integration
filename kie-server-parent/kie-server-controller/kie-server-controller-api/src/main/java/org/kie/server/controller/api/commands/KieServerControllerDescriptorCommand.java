@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ReleaseId;
@@ -56,6 +57,7 @@ public class KieServerControllerDescriptorCommand implements KieServerCommand {
             @XmlElement(name = "arguments", type = String.class),
             @XmlElement(name = "long", type = Long.class)
     })
+    @JsonProperty
     private List<Object> arguments;
 
     @XmlElement(name = "payload")
