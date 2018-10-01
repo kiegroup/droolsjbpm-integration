@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -332,6 +332,8 @@
                 <systemPropertyVariables>
                   <kie.server.server.deployment.settings.xml>${kie.server.server.deployment.settings.xml}</kie.server.server.deployment.settings.xml>
                   <jms.skip>${jms.skip}</jms.skip>
+                  <kie.server.testing.server.local.repo.dir>${kie.server.testing.server.local.repo.dir}</kie.server.testing.server.local.repo.dir>
+                  <kie.server.testing.remote.repo.dir>${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.dir>
                 </systemPropertyVariables>
               </configuration>
             </execution>

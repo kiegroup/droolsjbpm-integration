@@ -30,9 +30,12 @@ import org.kie.api.KieServices;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
+import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.jms.AsyncResponseHandler;
 import org.kie.server.client.jms.BlockingResponseCallback;
@@ -42,6 +45,7 @@ import org.kie.server.client.jms.ResponseCallback;
 import org.kie.server.client.jms.ResponseHandler;
 import org.kie.server.integrationtests.category.JMSOnly;
 import org.kie.server.integrationtests.optaplanner.OptaplannerKieServerBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -64,6 +68,8 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
     private static final String CLASS_ADD_COMPUTER_PROBLEM_FACT_CHANGE = "org.kie.server.testing.AddComputerProblemFactChange";
     private static final String CLASS_DELETE_COMPUTER_PROBLEM_FACT_CHANGE = "org.kie.server.testing.DeleteComputerProblemFactChange";
 
+    private static final long EXTENDED_TIMEOUT = 300_000L;
+
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
@@ -82,7 +88,10 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
 
         kieContainer = KieServices.Factory.get().newKieContainer(RELEASE_ID);
 
-        createContainer(CONTAINER_1_ID, RELEASE_ID);
+        // Having timeout issues due to kjar dependencies -> raised timeout.
+        KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
+        ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, RELEASE_ID));
+        KieServerAssert.assertSuccess(reply);
     }
 
     @Override
