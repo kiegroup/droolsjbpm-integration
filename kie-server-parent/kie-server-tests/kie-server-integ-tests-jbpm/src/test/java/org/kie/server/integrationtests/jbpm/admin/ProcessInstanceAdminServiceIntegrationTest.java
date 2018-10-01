@@ -146,6 +146,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
     }
 
     @Test(timeout = 60 * 1000)
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testUpdateTimer() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("timer", "1h");
@@ -177,6 +178,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
     }
 
     @Test(timeout = 60 * 1000)
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testUpdateTimerRelative() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("timer", "1h");

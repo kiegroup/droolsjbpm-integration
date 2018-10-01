@@ -25,6 +25,7 @@ import java.util.Map;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.exception.KieServicesException;
@@ -42,19 +43,22 @@ import org.kie.server.api.model.instance.TaskWithProcessDescription;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 
+// Skip for PR builder as creating of container for query-definition-project on Kie server side takes extreme amount of time (10 minutes+)
+@Category({UnstableOnJenkinsPrBuilder.class})
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "query-definition-project", "1.0.0.Final");
 
     private static final String CONTAINER_ID = "query-definition-project";
 
-    private static final long EXTENDED_TIMEOUT = 300000;
+    private static final long EXTENDED_TIMEOUT = 600_000L;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
