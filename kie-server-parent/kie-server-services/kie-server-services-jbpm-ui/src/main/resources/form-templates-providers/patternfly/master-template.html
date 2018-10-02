@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<!-- Patternfly -->
+<link href="${serverPath}/patternfly/css/patternfly.min.css" rel="stylesheet">
+<link href="${serverPath}/patternfly/css/patternfly-additions.min.css" rel="stylesheet">
+</head>
+<body>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="${serverPath}/patternfly/js/jquery.min.js"></script>
+	<script src="${serverPath}/patternfly/js/patternfly.min.js"></script>
+	<script src="${serverPath}/js/kieserver-ui.js"></script>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">${header}</h3>
+		</div>
+		<div class="panel-body">
+			<div id="successAlert" class="alert alert-success hidden" role="alert"></div>
+			<div id="failureAlert" class="alert alert-danger hidden" role="alert"></div>
+			${body}
+		</div>
+	</div>
+
+	<script>
+		${scriptData}
+	</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<div class="container-fluid">
+	<#list rows as row>
+	<div class="row">
+		<#list row.columns as column>
+		<div class="col-md-${column.span}">${column.content}</div>
+		</#list>
+	</div>
+	</#list>
+	<#if renderButtons??>
+	<div class="row">
+		<div class="col-md-12">
+			<hr/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<button type="button" class="btn btn-success" onclick="startProcess(this);">Submit</button>
+		</div>
+	</div>
+	</#if>
+</div>

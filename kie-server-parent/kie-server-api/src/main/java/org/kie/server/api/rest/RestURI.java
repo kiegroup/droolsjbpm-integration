@@ -56,18 +56,20 @@ public class RestURI {
     public static final String REASSIGNMENT_ID = "reassignmentId";
     public static final String NOTIFICATION_ID = "notificationId";
     public static final String ERROR_ID = "errorId";
+    public static final String RENDERER_ID = "provider";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";
     public static final String JOB_URI = "jobs";
     public static final String TASK_URI = "containers/{" + CONTAINER_ID + "}/tasks";
     public static final String QUERY_URI = "queries";
-    public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";
+    public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";    
     public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
     public static final String QUERY_DEF_URI = "queries/definitions";
     public static final String DOCUMENT_URI = "documents";
     public static final String CASE_URI = "containers/{" + CONTAINER_ID + "}/cases";
     public static final String CASE_QUERY_URI = "queries/cases";
+    public static final String STATIC_FILES_URI = "files";
 
     // admin URIs
     public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
@@ -197,6 +199,9 @@ public class RestURI {
     // form prefixed by FORM_URI
     public static final String PROCESS_FORM_GET_URI = "processes/{" + PROCESS_ID + "}";
     public static final String TASK_FORM_GET_URI = "tasks/{" + TASK_INSTANCE_ID + "}";
+    public static final String PROCESS_FORM_CONTENT_GET_URI = "processes/{" + PROCESS_ID + "}/content";
+    public static final String TASK_FORM_CONTENT_GET_URI = "tasks/{" + TASK_INSTANCE_ID + "}/content";
+    public static final String CASE_FORM_CONTENT_GET_URI = "cases/{" + CASE_DEF_ID + "}/content";
 
     // image prefixed by IMAGE_URI
     public static final String PROCESS_IMG_GET_URI = "processes/{" + PROCESS_ID + "}";
@@ -312,6 +317,10 @@ public class RestURI {
     public static final String CASE_ALL_PROCESSES_INSTANCES_GET_URI = "processes";
     public static final String CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI = "{" + CONTAINER_ID + "}/processes";
     public static final String ADMIN_CASE_ALL_INSTANCES_GET_URI = "cases/instances";
+    
+    // static files 
+    public static final String STATIC_BY_TYPE_GET_URI = "{type}/{file}";
+    public static final String STATIC_RENDERER_BY_TYPE_GET_URI = "{provider}/{type}/{file}";
 
     public static String build(String baseUrl,
                                String template,

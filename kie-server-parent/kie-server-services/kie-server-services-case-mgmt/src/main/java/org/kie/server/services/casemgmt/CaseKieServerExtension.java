@@ -168,6 +168,8 @@ public class CaseKieServerExtension implements KieServerExtension {
         this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, registry);
         this.caseAdminServiceBase = new CaseAdminServiceBase(caseInstanceMigrationService, registry);
         
+        this.services.add(caseRuntimeDataService);
+        
     }
 
     protected CaseIdGenerator getCaseIdGenerator() {
@@ -272,7 +274,7 @@ public class CaseKieServerExtension implements KieServerExtension {
 
     @Override
     public Integer getStartOrder() {
-        return 10;
+        return 8;
     }
 
     @Override
