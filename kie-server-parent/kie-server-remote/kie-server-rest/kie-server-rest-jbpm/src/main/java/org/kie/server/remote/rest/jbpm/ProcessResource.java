@@ -45,6 +45,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CREATE_RESPONSE_ERROR;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
@@ -73,6 +74,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.services.api.DeploymentNotActiveException;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessDefinitionNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
@@ -144,6 +146,9 @@ public class ProcessResource  {
             logger.debug("Returning CREATED response with content '{}'", response);
             Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+        } catch (DeploymentNotActiveException e) {
+            return badRequest(
+                    e.getMessage(), v);
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
@@ -179,6 +184,9 @@ public class ProcessResource  {
             logger.debug("Returning CREATED response with content '{}'", response);
             Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+        } catch (DeploymentNotActiveException e) {
+            return badRequest(
+                    e.getMessage(), v);
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);

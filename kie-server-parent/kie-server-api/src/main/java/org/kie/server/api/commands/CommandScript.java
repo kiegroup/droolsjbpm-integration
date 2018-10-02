@@ -56,6 +56,8 @@ public class CommandScript implements Serializable {
             @XmlElement(name = "get-container-info", type = GetContainerInfoCommand.class),
             @XmlElement(name = "list-containers", type = ListContainersCommand.class),
             @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class),
+            @XmlElement(name = "activate-container", type = ActivateContainerCommand.class),
+            @XmlElement(name = "deactivate-container", type = DeactivateContainerCommand.class),
             @XmlElement(name = "get-scanner-info", type = GetScannerInfoCommand.class),
             @XmlElement(name = "update-scanner", type = UpdateScannerCommand.class),
             @XmlElement(name = "get-release-id", type = GetReleaseIdCommand.class),

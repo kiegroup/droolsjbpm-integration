@@ -149,6 +149,22 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         
     }
     
+    @Override
+    public void beforeContainerActivated(KieServer kieServer, KieContainerInstance containerInstance) {
+    }
+
+    @Override
+    public void afterContainerActivated(KieServer kieServer, KieContainerInstance containerInstance) {
+    }
+
+    @Override
+    public void beforeContainerDeactivated(KieServer kieServer, KieContainerInstance containerInstance) {
+    }
+
+    @Override
+    public void afterContainerDeactivated(KieServer kieServer, KieContainerInstance containerInstance) {  
+    }
+
     protected boolean send(String url, String containerId, String payload, boolean add, boolean retry) {
 
         try {

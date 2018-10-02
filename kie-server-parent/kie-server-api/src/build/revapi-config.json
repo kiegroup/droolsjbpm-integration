@@ -203,7 +203,19 @@
           "methodName": "setLastModificationUser",
           "elementKind": "method",
           "justification": "JBPM-6890: Adding the customTaskID as a unique identifier for an active"
-        }
+        },
+        {
+		  "code": "java.annotation.attributeValueChanged",
+		  "old": "field org.kie.server.api.commands.CommandScript.commands",
+		  "new": "field org.kie.server.api.commands.CommandScript.commands",
+		  "annotationType": "javax.xml.bind.annotation.XmlElements",
+		  "attribute": "value",
+		  "package": "org.kie.server.api.commands",
+		  "classSimpleName": "CommandScript",
+		  "fieldName": "commands",
+		  "elementKind": "field",
+		  "justification": "Enable activate and deactivate for KIE Containers"
+		}
       ]
     }
   }
