@@ -113,4 +113,40 @@ public class KieServerEventSupport {
             } while (iter.hasNext());
         }
     }
+    
+    public void fireBeforeContainerActivated(KieServer kieServer, KieContainerInstance containerInstance) {
+        final Iterator<KieServerEventListener> iter = eventListeners.iterator();
+        if (iter.hasNext()) {
+            do{
+                iter.next().beforeContainerActivated(kieServer, containerInstance);
+            } while (iter.hasNext());
+        }
+    }
+
+    public void fireAfterContainerActivated(KieServer kieServer, KieContainerInstance containerInstance) {
+        final Iterator<KieServerEventListener> iter = eventListeners.iterator();
+        if (iter.hasNext()) {
+            do{
+                iter.next().afterContainerActivated(kieServer, containerInstance);
+            } while (iter.hasNext());
+        }
+    }
+    
+    public void fireBeforeContainerDeactivated(KieServer kieServer, KieContainerInstance containerInstance) {
+        final Iterator<KieServerEventListener> iter = eventListeners.iterator();
+        if (iter.hasNext()) {
+            do{
+                iter.next().beforeContainerDeactivated(kieServer, containerInstance);
+            } while (iter.hasNext());
+        }
+    }
+
+    public void fireAfterContainerDeactivated(KieServer kieServer, KieContainerInstance containerInstance) {
+        final Iterator<KieServerEventListener> iter = eventListeners.iterator();
+        if (iter.hasNext()) {
+            do{
+                iter.next().afterContainerDeactivated(kieServer, containerInstance);
+            } while (iter.hasNext());
+        }
+    }
 }

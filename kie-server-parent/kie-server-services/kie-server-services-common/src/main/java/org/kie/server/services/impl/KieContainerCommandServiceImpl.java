@@ -26,9 +26,11 @@ import org.kie.api.command.Command;
 import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
+import org.kie.server.api.commands.ActivateContainerCommand;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DeactivateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetReleaseIdCommand;
@@ -185,6 +187,24 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     responses.add(this.kieServer.updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId()));
                 } else if (command instanceof GetServerStateCommand) {
                     responses.add(this.kieServer.getServerState());
+                } else if (command instanceof ActivateContainerCommand) {
+                    ServiceResponse<?> forbidden = this.kieServer.checkAccessability();
+                    if (forbidden != null) {
+                        logger.warn("Kie Server management api is disabled, skiping command execution {}", command);
+                        responses.add(forbidden);
+                        continue;
+                    }
+                    
+                    responses.add(this.kieServer.activateContainer(((ActivateContainerCommand) command).getContainerId()));
+                } else if (command instanceof DeactivateContainerCommand) {
+                    ServiceResponse<?> forbidden = this.kieServer.checkAccessability();
+                    if (forbidden != null) {
+                        logger.warn("Kie Server management api is disabled, skiping command execution {}", command);
+                        responses.add(forbidden);
+                        continue;
+                    }
+                    
+                    responses.add(this.kieServer.deactivateContainer(((DeactivateContainerCommand) command).getContainerId()));
                 }
             }
         }

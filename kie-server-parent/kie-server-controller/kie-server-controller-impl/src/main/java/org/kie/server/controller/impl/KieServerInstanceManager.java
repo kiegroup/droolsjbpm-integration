@@ -415,6 +415,57 @@ public class KieServerInstanceManager {
         return containers;
     }
 
+    public synchronized List<Container> activateContainer(final ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+
+        final RemoteKieServerOperation<Void> startContainerOperation = makeActivateContainerOperation(containerSpec);
+
+        return callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+    }
+
+    RemoteKieServerOperation<Void> makeActivateContainerOperation(final ContainerSpec containerSpec) {
+        return new RemoteKieServerOperation<Void>() {
+
+            @Override
+            public Void doOperation(final KieServicesClient client, final Container container) {
+                
+                final ServiceResponse<KieContainerResource> response = client.activateContainer(containerSpec.getId());
+
+                if (response.getType() != ServiceResponse.ResponseType.SUCCESS) {
+                    log("Container {} failed to activate on server instance {} due to {}", container, response, containerSpec);
+                }
+
+                collectContainerInfo(containerSpec, client, container);
+
+                return null;
+            }
+        };
+    }
+    
+    public synchronized List<Container> deactivateContainer(final ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+
+        final RemoteKieServerOperation<Void> startContainerOperation = makeDeactivateContainerOperation(containerSpec);
+
+        return callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+    }
+
+    RemoteKieServerOperation<Void> makeDeactivateContainerOperation(final ContainerSpec containerSpec) {
+        return new RemoteKieServerOperation<Void>() {
+
+            @Override
+            public Void doOperation(final KieServicesClient client, final Container container) {
+                
+                final ServiceResponse<KieContainerResource> response = client.deactivateContainer(containerSpec.getId());
+
+                if (response.getType() != ServiceResponse.ResponseType.SUCCESS) {
+                    log("Container {} failed to deactivate on server instance {} due to {}", container, response, containerSpec);
+                }
+
+                collectContainerInfo(containerSpec, client, container);
+
+                return null;
+            }
+        };
+    }    
 
     /*
      * helper methods

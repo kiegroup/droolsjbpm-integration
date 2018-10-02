@@ -65,7 +65,25 @@
           "methodName": "getContainers",
           "elementKind": "method",
           "justification": "New method for getting list of containers by server template"
-        }
+        },
+        {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.controller.api.service.SpecManagementService::activateContainer(org.kie.server.controller.api.model.spec.ContainerSpecKey)",
+		  "package": "org.kie.server.controller.api.service",
+		  "classSimpleName": "SpecManagementService",
+		  "methodName": "activateContainer",
+		  "elementKind": "method",
+		  "justification": "Enable activate and deactivate for KIE Containers"
+		},
+		{
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.controller.api.service.SpecManagementService::deactivateContainer(org.kie.server.controller.api.model.spec.ContainerSpecKey)",
+		  "package": "org.kie.server.controller.api.service",
+		  "classSimpleName": "SpecManagementService",
+		  "methodName": "deactivateContainer",
+		  "elementKind": "method",
+		  "justification": "Enable activate and deactivate for KIE Containers"
+		 }
       ]
     }
   }

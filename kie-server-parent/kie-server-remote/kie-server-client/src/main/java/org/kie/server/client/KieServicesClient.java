@@ -39,6 +39,10 @@ public interface KieServicesClient {
     ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter);
 
     ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource);
+    
+    ServiceResponse<KieContainerResource> activateContainer(String id);
+    
+    ServiceResponse<KieContainerResource> deactivateContainer(String id);
 
     ServiceResponse<KieContainerResource> getContainerInfo(String id);
 

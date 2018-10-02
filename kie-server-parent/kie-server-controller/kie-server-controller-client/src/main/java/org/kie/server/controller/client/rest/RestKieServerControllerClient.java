@@ -65,6 +65,8 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
     private static final String STARTED_STATUS_URI_PART = "/status/started";
     private static final String STOPPED_STATUS_URI_PART = "/status/stopped";
+    private static final String ACTIVATED_STATUS_URI_PART = "/status/activated";
+    private static final String DEACTIVATED_STATUS_URI_PART = "/status/deactivated";
     private static final String CONFIG_URI_PART = "/config/";
 
     private String controllerBaseUrl;
@@ -145,6 +147,16 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
     @Override
     public void stopContainer(ContainerSpecKey containerSpecKey) {
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + containerSpecKey.getServerTemplateKey().getId() + CONTAINERS_URI_PART + containerSpecKey.getId() + STOPPED_STATUS_URI_PART, "", null);
+    }
+    
+    @Override
+    public void activateContainer(ContainerSpecKey containerSpecKey) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + containerSpecKey.getServerTemplateKey().getId() + CONTAINERS_URI_PART + containerSpecKey.getId() + ACTIVATED_STATUS_URI_PART, "", null);
+    }
+
+    @Override
+    public void deactivateContainer(ContainerSpecKey containerSpecKey) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + containerSpecKey.getServerTemplateKey().getId() + CONTAINERS_URI_PART + containerSpecKey.getId() + DEACTIVATED_STATUS_URI_PART, "", null);
     }
 
     @Override

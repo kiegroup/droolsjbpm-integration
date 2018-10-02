@@ -143,6 +143,54 @@ public class KieServerRestImpl {
         }
         return createCorrectVariant( response, headers, Status.BAD_REQUEST );
     }
+    
+    @ApiOperation(value="Activates (previously deactivated) KIE container on this server",
+            response=ServiceResponse.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 400, message = "container could not be activated") })
+    @PUT
+    @Path("containers/{id}/status/activated")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response activateContainer( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id of deployed KIE Container", required = true) @PathParam("id") String id) {        
+        
+        ServiceResponse<?> forbidden = this.server.checkAccessability();
+        if (forbidden != null) {                       
+            return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
+        }
+
+        ServiceResponse<KieContainerResource> response = server.activateContainer( id );
+
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
+            return createCorrectVariant( response, headers, Status.CREATED, conversationIdHeader );
+        }
+        return createCorrectVariant( response, headers, Status.BAD_REQUEST );
+    }
+    
+    @ApiOperation(value="Deactivates (previously started) KIE container on this server",
+            response=ServiceResponse.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 400, message = "container could not be deactivated") })
+    @PUT
+    @Path("containers/{id}/status/deactivated")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response deactivateContainer( @Context HttpHeaders headers, 
+            @ApiParam(value = "Container id of deployed KIE Container", required = true) @PathParam("id") String id) {        
+        
+        ServiceResponse<?> forbidden = this.server.checkAccessability();
+        if (forbidden != null) {                       
+            return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
+        }
+
+        ServiceResponse<KieContainerResource> response = server.deactivateContainer( id );
+
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
+            return createCorrectVariant( response, headers, Status.CREATED, conversationIdHeader );
+        }
+        return createCorrectVariant( response, headers, Status.BAD_REQUEST );
+    }
 
     @ApiOperation(value="Retrieves container with given id",
             response=ServiceResponse.class, code=200)

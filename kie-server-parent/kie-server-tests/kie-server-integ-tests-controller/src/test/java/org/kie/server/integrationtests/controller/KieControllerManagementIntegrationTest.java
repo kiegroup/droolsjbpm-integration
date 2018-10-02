@@ -948,6 +948,60 @@ public abstract class KieControllerManagementIntegrationTest<T extends KieServer
         assertNotNull(serverState);
         assertFalse("Did not expect to find containers", serverState.getContainers() != null && serverState.getContainers().size() > 0);
     }
+    
+    @Test
+    public void testActivateAndDeactivateContainer() throws Exception {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, RELEASE_ID, KieContainerStatus.STOPPED, new HashMap());
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        ContainerSpec containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+
+        // Check that container is not deployed in kie server (as container is in STOPPED state).
+        ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
+        KieServerAssert.assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
+
+        controllerClient.startContainer(containerToDeploy);
+
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
+
+        // Check that container is deployed in kie server.
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
+        assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+        assertEquals(RELEASE_ID, containerInfo.getResult().getReleaseId());
+
+        controllerClient.deactivateContainer(containerToDeploy);
+
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.DEACTIVATED);
+
+        // Check that container is deactivated in kie server (as container is in DEACTIVATED state).
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertEquals(KieContainerStatus.DEACTIVATED, containerInfo.getResult().getStatus());
+        
+        controllerClient.activateContainer(containerToDeploy);
+
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
+
+        // Check that container is activated in kie server (as container is in STARTED state).
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+    }
 
     protected void checkContainerConfigAgainstServer(ContainerConfig...configs) {
         ServiceResponse<KieContainerResource> containerResource = client.getContainerInfo(CONTAINER_ID);

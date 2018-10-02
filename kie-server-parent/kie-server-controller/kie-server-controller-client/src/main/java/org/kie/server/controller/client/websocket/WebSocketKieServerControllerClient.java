@@ -270,6 +270,20 @@ public class WebSocketKieServerControllerClient implements KieServerControllerCl
                     "stopContainer",
                     containerSpecKey);
     }
+    
+    @Override
+    public void activateContainer(final ContainerSpecKey containerSpecKey) {
+        sendCommand(SpecManagementService.class.getName(),
+                    "activateContainer",
+                    containerSpecKey);
+    }
+
+    @Override
+    public void deactivateContainer(final ContainerSpecKey containerSpecKey) {
+        sendCommand(SpecManagementService.class.getName(),
+                    "deactivateContainer",
+                    containerSpecKey);
+    }
 
     @Override
     public void scanNow(final ContainerSpecKey containerSpecKey) {

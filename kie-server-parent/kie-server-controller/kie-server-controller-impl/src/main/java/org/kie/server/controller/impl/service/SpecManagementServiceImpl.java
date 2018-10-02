@@ -421,6 +421,56 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         notificationService.notify(serverTemplate, containerSpec, containers);
     }
+    
+    @Override
+    public synchronized void activateContainer(ContainerSpecKey containerSpecKey) {
+        ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
+        if (serverTemplate == null) {
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+        }
+
+        final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId()
+                                                                   + " within server template with id " + serverTemplate.getId());
+        }
+        if (!containerSpec.getStatus().equals(KieContainerStatus.DEACTIVATED)) {
+            throw new KieServerControllerIllegalArgumentException("Container " + containerSpecKey.getId()
+                                                                   + " cannot be activated because it's not in deactivated state, actual state " + containerSpec.getStatus());
+        }
+        containerSpec.setStatus(KieContainerStatus.STARTED);
+
+        templateStorage.update(serverTemplate);
+
+        List<Container> containers = kieServerInstanceManager.activateContainer(serverTemplate, containerSpec);
+
+        notificationService.notify(serverTemplate, containerSpec, containers);
+    }
+
+    @Override
+    public synchronized void deactivateContainer(ContainerSpecKey containerSpecKey) {
+
+        ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
+        if (serverTemplate == null) {
+            throw new KieServerControllerIllegalArgumentException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
+        }
+
+        ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerIllegalArgumentException("No container spec found for id " + containerSpecKey.getId() + " within server template with id " + serverTemplate.getId());
+        }
+        if (!containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
+            throw new KieServerControllerIllegalArgumentException("Container " + containerSpecKey.getId()
+                                                                   + " cannot be deactivated because it's not in started state, actual state " + containerSpec.getStatus());
+        }
+        containerSpec.setStatus(KieContainerStatus.DEACTIVATED);
+
+        templateStorage.update(serverTemplate);
+
+        List<Container> containers = kieServerInstanceManager.deactivateContainer(serverTemplate, containerSpec);
+
+        notificationService.notify(serverTemplate, containerSpec, containers);
+    }
 
     @Override
     public void deleteServerInstance(final ServerInstanceKey serverInstanceKey) {

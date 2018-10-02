@@ -476,6 +476,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
     }
 
     @Override
+    public void activateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        deploymentService.activate(id);
+    }
+
+    @Override
+    public void deactivateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        deploymentService.deactivate(id);
+    }
+
+    @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         if (!deploymentService.isDeployed(id)) {
             logger.info("No container with id {} found", id);
