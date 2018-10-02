@@ -58,7 +58,7 @@ public class CustomProcessInstanceQueryMapper implements QueryResultMapper<List<
     }
     
     protected ProcessInstanceDesc buildInstance(DataSet dataSetResult, int index) {
-        ProcessInstanceDesc pi = new org.jbpm.kie.services.impl.model.ProcessInstanceDesc(
+        ProcessInstanceDesc pi = new org.jbpm.data.ProcessInstanceDesc(
                 getColumnLongValue(dataSetResult, COLUMN_PROCESSINSTANCEID, index),
                 getColumnStringValue(dataSetResult, COLUMN_PROCESSID, index),
                 getColumnStringValue(dataSetResult, COLUMN_PROCESSNAME, index),
