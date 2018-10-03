@@ -15,7 +15,6 @@
 
   <properties>
     <jbpm.services.api.path>${settings.localRepository}/org/jbpm/jbpm-services-api/${version.org.kie}/jbpm-services-api-${version.org.kie}.jar</jbpm.services.api.path>
-    <jbpm.kie.services.path>${settings.localRepository}/org/jbpm/jbpm-kie-services/${version.org.kie}/jbpm-kie-services-${version.org.kie}.jar</jbpm.kie.services.path>
     <kie.soup.dataset.api.path>${settings.localRepository}/org/kie/soup/kie-soup-dataset-api/${version.org.kie}/kie-soup-dataset-api-${version.org.kie}.jar</kie.soup.dataset.api.path>
   </properties>
 
@@ -26,13 +25,6 @@
       <version>${version.org.kie}</version>
       <scope>system</scope>
       <systemPath>${jbpm.services.api.path}</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-kie-services</artifactId>
-      <version>${version.org.kie}</version>
-      <scope>system</scope>
-      <systemPath>${jbpm.kie.services.path}</systemPath>
     </dependency>
     <dependency>
       <groupId>org.kie.soup</groupId>
