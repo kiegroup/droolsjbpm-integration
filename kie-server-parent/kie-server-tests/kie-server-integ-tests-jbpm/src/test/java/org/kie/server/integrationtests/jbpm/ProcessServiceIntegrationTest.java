@@ -462,7 +462,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(expected = KieServicesException.class)
     public void testGetNonExistingProcessInstance() {
-        processClient.getProcessInstance(CONTAINER_ID, 9999l);
+        processClient.getProcessInstance(CONTAINER_ID, -9999l);
     }
 
     @Test
