@@ -69,14 +69,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
 
     @After
     public void cleanAllRepos() throws IOException {
-        File kieServerRemoteRepoDir = new File(TestConfig.getKieServerRemoteRepoDir());
-        File kieServerLocalRepoDir = new File(TestConfig.getKieServerLocalRepoDir());
-
-        FileUtils.deleteDirectory(kieServerRemoteRepoDir);
-        FileUtils.deleteDirectory(kieServerLocalRepoDir);
-
-        kieServerRemoteRepoDir.mkdir();
-        kieServerLocalRepoDir.mkdir();
+        KieServerDeployer.cleanAllRepositories();
     }
 
     @Test //RHPAM-479
