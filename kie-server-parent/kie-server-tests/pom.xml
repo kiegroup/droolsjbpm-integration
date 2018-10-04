@@ -510,6 +510,40 @@
       </build>
     </profile>
     <profile>
+      <id>cargo-debug-container</id>
+      <activation>
+        <property>
+          <name>debug</name>
+        </property>
+      </activation>
+      <properties>
+        <!-- Default debug port is 8787. -->
+        <debug.port>8787</debug.port>
+        <container.suspend>y</container.suspend>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <configuration>
+                  <properties>
+                    <cargo.start.jvmargs>
+                      -Xdebug
+                      -Xrunjdwp:transport=dt_socket,server=y,suspend=${container.suspend},address=${debug.port}
+                      -Xnoagent
+                    </cargo.start.jvmargs>
+                  </properties>
+                </configuration>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>tomcat9</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>

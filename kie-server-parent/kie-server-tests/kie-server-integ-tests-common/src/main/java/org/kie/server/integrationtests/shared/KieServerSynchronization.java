@@ -343,7 +343,7 @@ public class KieServerSynchronization {
      * @param condition Condition result supplier. If returns true then condition is met.
      * @throws Exception
      */
-    private static void waitForCondition(BooleanSupplier condition) throws Exception {
+    public static void waitForCondition(BooleanSupplier condition) throws Exception {
         waitForCondition(condition, SERVICE_TIMEOUT);
     }
 
@@ -351,7 +351,7 @@ public class KieServerSynchronization {
      * @param condition Condition result supplier. If returns true then condition is met.
      * @throws Exception
      */
-    private static void waitForCondition(BooleanSupplier condition, long timeOut) throws Exception {
+    public static void waitForCondition(BooleanSupplier condition, long timeOut) throws Exception {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + timeOut;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
 
