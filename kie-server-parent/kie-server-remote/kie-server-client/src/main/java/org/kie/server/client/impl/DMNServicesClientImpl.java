@@ -15,14 +15,9 @@
 
 package org.kie.server.client.impl;
 
-import static org.kie.server.api.rest.RestURI.DMN_URI;
-import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
-import static org.kie.server.api.rest.RestURI.build;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,6 +44,10 @@ import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
+
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.DMN_URI;
+import static org.kie.server.api.rest.RestURI.build;
 
 public class DMNServicesClientImpl extends AbstractKieServicesClientImpl implements DMNServicesClient {
 
@@ -108,6 +107,14 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             Objects.requireNonNull(decisionId, "Parameter decisionId cannot be null; method evaluateAllDecisions() can be used to avoid the need of supplying decisionId");
             DMNContextKS payload = new DMNContextKS(namespace, modelName, dmnContext.getAll()); 
             payload.setDecisionIds(Collections.singletonList(decisionId));
+            return evaluateDecisions(containerId, payload);
+        }
+
+        @Override
+        public ServiceResponse<DMNResult> evaluateDecisionService(String containerId, String namespace, String modelName, String decisionServiceName, DMNContext dmnContext) {
+            Objects.requireNonNull(decisionServiceName, "Parameter decisionServiceName cannot be null; method evaluateAllDecisions() can be used to evaluate all decisions in a model, this method is to invoke a specific decision service only.");
+            DMNContextKS payload = new DMNContextKS(namespace, modelName, dmnContext.getAll());
+            payload.setDecisionServiceName(decisionServiceName);
             return evaluateDecisions(containerId, payload);
         }
 

@@ -27,10 +27,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-context")
@@ -59,6 +58,10 @@ public class DMNContextKS {
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, Object> dmnContext = new HashMap<>();
+
+    @XmlElement(name = "decision-service-name")
+    @XStreamAlias("decision-service-name")
+    private String decisionServiceName;
     
     public DMNContextKS() {
         // no-arg constructor for marshalling
@@ -119,9 +122,19 @@ public class DMNContextKS {
         return new StringBuilder("DMNContextKS [")
                .append("namespace=").append(namespace)
                .append(", modelName=").append(modelName)
+               .append(", decisionServiceName=").append(decisionServiceName)
                .append(", decisionNames=").append(decisionNames)
                .append(", decisionIds=").append(decisionIds)
                .append(", dmnContext=").append(dmnContext)
                .append("]").toString();
     }
+
+    public String getDecisionServiceName() {
+        return decisionServiceName;
+    }
+
+    public void setDecisionServiceName(String decisionServiceName) {
+        this.decisionServiceName = decisionServiceName;
+    }
+
 }
