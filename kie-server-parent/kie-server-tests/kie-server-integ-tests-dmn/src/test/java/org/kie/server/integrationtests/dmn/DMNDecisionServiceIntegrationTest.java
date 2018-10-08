@@ -43,9 +43,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
-public class DMNDecisionServiceTest extends DMNKieServerBaseIntegrationTest {
+public class DMNDecisionServiceIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
-    public static final Logger LOG = LoggerFactory.getLogger(DMNDecisionServiceTest.class);
+    public static final Logger LOG = LoggerFactory.getLogger(DMNDecisionServiceIntegrationTest.class);
 
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "decision-services", "1.0.0.Final");
 
