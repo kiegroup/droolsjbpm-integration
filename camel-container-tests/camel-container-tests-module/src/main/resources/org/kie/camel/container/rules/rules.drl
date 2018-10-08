@@ -1,0 +1,10 @@
+package org.kie.camel.container.rules;
+
+import org.kie.camel.container.api.model.Person;
+
+rule "CanDrink"
+when
+    p : Person( age >= 21 )
+then
+	p.setCanDrink(true);
+end

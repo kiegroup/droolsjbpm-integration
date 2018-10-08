@@ -76,6 +76,7 @@
     <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
     <module>kie-spring-boot</module>
+    <module>camel-container-tests</module>
   </modules>
 
   <dependencyManagement>
