@@ -54,14 +54,14 @@ public class DMNContextKS {
     @JsonFormat(with = { JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED })
     private List<String> decisionIds = new ArrayList<>();
 
+    @XmlElement(name = "decision-service-name")
+    @XStreamAlias("decision-service-name")
+    private String decisionServiceName;
+
     @XmlElement(name="dmn-context")
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, Object> dmnContext = new HashMap<>();
-
-    @XmlElement(name = "decision-service-name")
-    @XStreamAlias("decision-service-name")
-    private String decisionServiceName;
     
     public DMNContextKS() {
         // no-arg constructor for marshalling
