@@ -1098,6 +1098,8 @@
                         <outputDirectory>${project.build.directory}</outputDirectory>
                       </artifactItem>
                     </artifactItems>
+                    <!-- Always produce the -SNAPSHOT suffix instead of a timestamp -->
+                    <useBaseVersion>true</useBaseVersion>
                   </configuration>
                 </execution>
               </executions>
