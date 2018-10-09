@@ -51,7 +51,8 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
         return new JpaPersistenceContext(
                 getApplicationScopedEntityManager(), 
                 isJTA, 
-                pessimisticLocking, 
+                pessimisticLocking,
+                (String) this.env.get(EnvironmentName.USE_PESSIMISTIC_LOCKING_MODE), 
                 (TransactionManager) this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
@@ -59,7 +60,8 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
         return new JpaPersistenceContext(
                 (EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), 
                 isJTA, 
-                pessimisticLocking, 
+                pessimisticLocking,
+                (String) this.env.get(EnvironmentName.USE_PESSIMISTIC_LOCKING_MODE), 
                 (TransactionManager) this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
@@ -77,6 +79,7 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
                 (EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), 
                 isJTA,
                 pessimisticLocking,
+                (String) this.env.get(EnvironmentName.USE_PESSIMISTIC_LOCKING_MODE),
                 (TransactionManager) this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
