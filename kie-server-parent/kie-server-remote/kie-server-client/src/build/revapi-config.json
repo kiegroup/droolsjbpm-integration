@@ -161,7 +161,16 @@
 		   "methodName": "deactivateContainer",
 		   "elementKind": "method",
 		   "justification": "Enable activate and deactivate for KIE Containers"
-		 }
+		 },
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method org.kie.server.api.model.ServiceResponse<org.kie.dmn.api.core.DMNResult> org.kie.server.client.DMNServicesClient::evaluateDecisionService(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.kie.dmn.api.core.DMNContext)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "DMNServicesClient",
+           "methodName": "evaluateDecisionService",
+           "elementKind": "method",
+           "justification": "DROOLS-3079 kie-server DMN evaluate Decision Service only"
+         }
       ]
     }
   }

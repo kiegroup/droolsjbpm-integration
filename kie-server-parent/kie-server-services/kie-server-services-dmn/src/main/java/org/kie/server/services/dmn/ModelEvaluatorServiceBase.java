@@ -30,6 +30,7 @@ import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
+import org.kie.dmn.api.core.ast.DecisionServiceNode;
 import org.kie.dmn.api.core.ast.InputDataNode;
 import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.core.ast.InputDataNodeImpl;
@@ -39,6 +40,7 @@ import org.kie.dmn.model.api.ItemDefinition;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
+import org.kie.server.api.model.dmn.DMNDecisionServiceInfo;
 import org.kie.server.api.model.dmn.DMNInputDataInfo;
 import org.kie.server.api.model.dmn.DMNItemDefinitionInfo;
 import org.kie.server.api.model.dmn.DMNModelInfo;
@@ -94,11 +96,19 @@ public class ModelEvaluatorServiceBase {
         res.setName(model.getName());
         res.setId(model.getDefinitions().getId());
         res.setDecisions(model.getDecisions().stream().map(ModelEvaluatorServiceBase::decisionToInfo).collect(Collectors.toSet()));
+        res.setDecisionServices(model.getDecisionServices().stream().map(ModelEvaluatorServiceBase::decisionServiceToInfo).collect(Collectors.toSet()));
         res.setInputs(model.getInputs().stream().map(ModelEvaluatorServiceBase::inputDataToInfo).collect(Collectors.toSet()));
         res.setItemDefinitions(model.getItemDefinitions().stream().map(id -> itemDefinitionToInfo(((ItemDefNodeImpl) id).getItemDef())).collect(Collectors.toSet()));
         return res;
     }
     
+    public static DMNDecisionServiceInfo decisionServiceToInfo(DecisionServiceNode dsNode) {
+        DMNDecisionServiceInfo res = new DMNDecisionServiceInfo();
+        res.setName(dsNode.getName());
+        res.setId(dsNode.getId());
+        return res;
+    }
+
     public static DMNDecisionInfo decisionToInfo(DecisionNode decisionNode) {
         DMNDecisionInfo res = new DMNDecisionInfo();
         res.setName(decisionNode.getName());
@@ -177,11 +187,15 @@ public class ModelEvaluatorServiceBase {
 
             final List<String> names = Optional.ofNullable(evalCtx.getDecisionNames()).orElse(Collections.emptyList());
             final List<String> ids = Optional.ofNullable(evalCtx.getDecisionIds()).orElse(Collections.emptyList());
+            final String decisionServiceName = evalCtx.getDecisionServiceName();
 
-            if ( names.isEmpty() && ids.isEmpty() ) {
+            if (decisionServiceName == null && names.isEmpty() && ids.isEmpty()) {
                 // then implies evaluate All decisions
                 LOG.debug("Invoking evaluateAll...");
                 result = dmnRuntime.evaluateAll(model, dmnContext);
+            } else if (decisionServiceName != null && names.isEmpty() && ids.isEmpty()) {
+                LOG.debug("Invoking evaluateDecisionService using decisionServiceName: {}", decisionServiceName);
+                result = dmnRuntime.evaluateDecisionService(model, dmnContext, decisionServiceName);
             } else if ( !names.isEmpty()  && ids.isEmpty() ) {
                 LOG.debug("Invoking evaluateDecisionByName using {}", names);
                 result = dmnRuntime.evaluateByName( model, dmnContext, names.toArray(new String[]{}) );
