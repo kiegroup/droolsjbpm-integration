@@ -37,6 +37,7 @@ import org.drools.core.impl.InternalKieContainer;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
+import org.kie.api.builder.KieScanner.Status;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
@@ -475,6 +476,9 @@ public class KieServerImpl implements KieServer {
 
                             return new ServiceResponse<Void>(ResponseType.FAILURE, "Container " + containerId +
                                     " failed to dispose, exception was raised: " + e.getClass().getName() + ": " + e.getMessage());
+                        }
+                        if (kci.getScanner() != null && kci.getScanner().getStatus() != Status.SHUTDOWN) {
+                            kci.stopScanner();
                         }
                         InternalKieContainer kieContainer = kci.getKieContainer();
                         kci.setKieContainer(null); // helps reduce concurrent access issues
