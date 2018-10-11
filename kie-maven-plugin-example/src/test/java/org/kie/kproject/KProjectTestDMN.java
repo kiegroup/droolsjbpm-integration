@@ -17,6 +17,7 @@ package org.kie.kproject;
 
 import java.math.BigDecimal;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -32,9 +33,21 @@ import org.kie.firealarm.Fire;
 import org.kie.firealarm.Room;
 import org.kie.firealarm.Sprinkler;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class KProjectTestDMN extends BaseInterpretedVsCompiledTest {
+
+    public KProjectTestDMN(boolean useExecModelCompiler) {
+        super(useExecModelCompiler);
+    }
 
     @Test
     public void testSolutionCase1() {
@@ -44,7 +57,7 @@ public class KProjectTestDMN extends BaseInterpretedVsCompiledTest {
     private void executeTest( int age, int yearsService, int expectedVacationDays ) {
         DMNRuntime runtime = DMNRuntimeUtil.createRuntime("0020-vacation-days.dmn", this.getClass() );
         DMNModel dmnModel = runtime.getModel("https://www.drools.org/kie-dmn", "0020-vacation-days" );
-        assertThat( dmnModel, notNullValue() );
+        assertThat(dmnModel, notNullValue() );
 
         DMNContext context = DMNFactory.newContext();
 
