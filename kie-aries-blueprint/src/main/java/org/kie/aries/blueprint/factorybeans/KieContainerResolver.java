@@ -26,6 +26,7 @@ import org.kie.api.builder.model.KieBaseModel;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieContainerSessionsPool;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
@@ -108,6 +109,11 @@ public class KieContainerResolver extends AbstractKieObjectsResolver implements 
     @Override
     public KieBase newKieBase( String kBaseName, KieBaseConfiguration conf ) {
         return getKieContainer().newKieBase( kBaseName, conf );
+    }
+
+    @Override
+    public KieContainerSessionsPool newKieSessionsPool( int initialSize ) {
+        return getKieContainer().newKieSessionsPool( initialSize );
     }
 
     @Override

@@ -16,6 +16,9 @@
 
 package org.kie.aries.blueprint.factorybeans;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.kie.api.KieBase;
 import org.kie.api.definition.KiePackage;
 import org.kie.api.definition.process.Process;
@@ -26,11 +29,9 @@ import org.kie.api.event.kiebase.KieBaseEventListener;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.KieSessionsPool;
 import org.kie.api.runtime.StatelessKieSession;
 import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
-
-import java.util.Collection;
-import java.util.Set;
 
 public class KieImportBaseResolver extends AbstractKieObjectsResolver implements KieBase {
 
@@ -119,6 +120,11 @@ public class KieImportBaseResolver extends AbstractKieObjectsResolver implements
     @Override
     public KieSession newKieSession() {
         return kieBase.newKieSession();
+    }
+
+    @Override
+    public KieSessionsPool newKieSessionsPool( int initialSize ) {
+        return kieBase.newKieSessionsPool( initialSize );
     }
 
     @Override
