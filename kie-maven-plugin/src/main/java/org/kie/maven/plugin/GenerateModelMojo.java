@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -32,16 +33,23 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.drools.compiler.compiler.io.Folder;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
+import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
+import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
+import org.drools.modelcompiler.builder.CanonicalModelKieProject;
+import org.drools.modelcompiler.builder.ModelBuilderImpl;
+import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 
@@ -72,7 +80,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
     @Parameter(property = "generateModel", defaultValue = "no")
     private String generateModel;
-
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -136,8 +143,8 @@ public class GenerateModelMojo extends AbstractKieMojo {
             getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
 
             MemoryFileSystem mfs = kieModule instanceof CanonicalKieModule ?
-                    ((MemoryKieModule) ((CanonicalKieModule)kieModule).getInternalKieModule()).getMemoryFileSystem() :
-                    ((MemoryKieModule)kieModule).getMemoryFileSystem();
+                    ((MemoryKieModule) ((CanonicalKieModule) kieModule).getInternalKieModule()).getMemoryFileSystem() :
+                    ((MemoryKieModule) kieModule).getMemoryFileSystem();
 
             final String droolsModelCompilerPath = "/generated-sources/drools-model-compiler/main/java";
             final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
@@ -167,7 +174,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
             final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
 
             try {
-                if(!Files.exists(packagesDestinationPath)) {
+                if (!Files.exists(packagesDestinationPath)) {
                     Files.createDirectories(packagesDestinationPath);
                 }
                 Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
@@ -176,7 +183,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 throw new MojoExecutionException("Unable to write file", e);
             }
 
-            if(ExecModelMode.shouldDeleteFile(generateModel)) {
+            if (ExecModelMode.shouldDeleteFile(generateModel)) {
                 deleteDrlFiles();
             }
         } finally {
@@ -224,5 +231,32 @@ public class GenerateModelMojo extends AbstractKieMojo {
             }
         }
         return null;
+    }
+
+    public static class ExecutableModelMavenProject implements KieBuilder.ProjectType {
+
+        public static final BiFunction<InternalKieModule, ClassLoader, KieModuleKieProject> SUPPLIER = ExecutableModelMavenPluginKieProject::new;
+
+        public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
+
+            public ExecutableModelMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
+                super(true, kieModule, classLoader);
+            }
+
+            @Override
+            public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
+                MemoryFileSystem srcMfs = new MemoryFileSystem();
+                List<String> modelFiles = new ArrayList<>();
+                ModelWriter modelWriter = new ModelWriter();
+                for (ModelBuilderImpl modelBuilder : modelBuilders) {
+                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageModels());
+                    modelFiles.addAll(result.getModelFiles());
+                    final Folder sourceFolder = srcMfs.getFolder("src/main/java");
+                    final Folder targetFolder = trgMfs.getFolder(".");
+                    srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
+                }
+                modelWriter.writeModelFile(modelFiles, trgMfs);
+            }
+        }
     }
 }
