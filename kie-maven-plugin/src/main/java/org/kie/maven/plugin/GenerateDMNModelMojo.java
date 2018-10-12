@@ -52,6 +52,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
+import org.kie.dmn.core.compiler.*;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 
@@ -84,162 +85,89 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (ExecModelMode.shouldGenerateModel(generateModel)) {
-            System.out.println("HELLO WORLD!");
+            generateDMNModel();
         }
     }
 
-    private void generateModel() throws MojoExecutionException {
+    private void generateDMNModel() throws MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
-        List<InternalKieModule> kmoduleDeps = new ArrayList<>();
 
         KieServices ks = KieServices.Factory.get();
 
         try {
-            Set<URL> urls = new HashSet<>();
-            for (String element : project.getCompileClasspathElements()) {
-                urls.add(new File(element).toURI().toURL());
-            }
-
-            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile",
-                                                                                      "runtime")));
-            for (Artifact artifact : project.getArtifacts()) {
-                File file = artifact.getFile();
-                if (file != null) {
-                    urls.add(file.toURI().toURL());
-                    KieModuleModel depModel = getDependencyKieModel(file);
-                    if (depModel != null) {
-                        ReleaseId releaseId = new ReleaseIdImpl(artifact.getGroupId(),
-                                                                artifact.getArtifactId(),
-                                                                artifact.getVersion());
-                        kmoduleDeps.add(new ZipKieModule(releaseId,
-                                                         depModel,
-                                                         file));
-                    }
-                }
-            }
-            urls.add(outputDirectory.toURI().toURL());
-
-            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
-                                                                        getClass().getClassLoader());
-
-            Thread.currentThread().setContextClassLoader(projectClassLoader);
-        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
             setSystemProperties(properties);
 
+            System.setProperty(ExecModelCompilerOption.PROPERTY_NAME, Boolean.TRUE.toString());
+
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(ExecutableModelMavenProject.class);
+            kieBuilder.buildAll(ExecutableModelDMNMavenProject.class);
 
-            InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
-            List<String> generatedFiles = kieModule.getFileNames()
-                    .stream()
-                    .filter(f -> f.endsWith("java"))
-                    .collect(Collectors.toList());
-
-            getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
-
-            MemoryFileSystem mfs = kieModule instanceof CanonicalKieModule ?
-                    ((MemoryKieModule) ((CanonicalKieModule) kieModule).getInternalKieModule()).getMemoryFileSystem() :
-                    ((MemoryKieModule) kieModule).getMemoryFileSystem();
-
-            final String droolsModelCompilerPath = "/generated-sources/drools-model-compiler/main/java";
-            final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
-            project.addCompileSourceRoot(newCompileSourceRoot);
-
-            for (String generatedFile : generatedFiles) {
-                final MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
-                final Path newFile = Paths.get(targetDirectory.getPath(),
-                                               droolsModelCompilerPath,
-                                               f.getPath().toPortableString());
-
-                try {
-                    Files.deleteIfExists(newFile);
-                    Files.createDirectories(newFile);
-                    Files.copy(f.getContents(), newFile, StandardCopyOption.REPLACE_EXISTING);
-
-                    getLog().info("Generating " + newFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new MojoExecutionException("Unable to write file", e);
-                }
-            }
-
-            // copy the META-INF packages file
-            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(CanonicalKieModule.MODEL_FILE);
-            final String packagesMemoryFilePath = packagesMemoryFile.getFolder().getPath().toPortableString();
-            final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
-
-            try {
-                if (!Files.exists(packagesDestinationPath)) {
-                    Files.createDirectories(packagesDestinationPath);
-                }
-                Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new MojoExecutionException("Unable to write file", e);
-            }
-
-            if (ExecModelMode.shouldDeleteFile(generateModel)) {
-                deleteDrlFiles();
-            }
+//            InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
+//            List<String> generatedFiles = kieModule.getFileNames()
+//                    .stream()
+//                    .filter(f -> f.endsWith("java"))
+//                    .collect(Collectors.toList());
+//
+//            getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
+//
+//            MemoryFileSystem mfs = kieModule instanceof CanonicalKieModule ?
+//                    ((MemoryKieModule) ((CanonicalKieModule) kieModule).getInternalKieModule()).getMemoryFileSystem() :
+//                    ((MemoryKieModule) kieModule).getMemoryFileSystem();
+//
+//            final String droolsModelCompilerPath = "/generated-sources/drools-model-compiler/main/java";
+//            final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
+//            project.addCompileSourceRoot(newCompileSourceRoot);
+//
+//            for (String generatedFile : generatedFiles) {
+//                final MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
+//                final Path newFile = Paths.get(targetDirectory.getPath(),
+//                                               droolsModelCompilerPath,
+//                                               f.getPath().toPortableString());
+//
+//                try {
+//                    Files.deleteIfExists(newFile);
+//                    Files.createDirectories(newFile);
+//                    Files.copy(f.getContents(), newFile, StandardCopyOption.REPLACE_EXISTING);
+//
+//                    getLog().info("Generating " + newFile);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    throw new MojoExecutionException("Unable to write file", e);
+//                }
+//            }
+//
+//            // copy the META-INF packages file
+//            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(CanonicalKieModule.MODEL_FILE);
+//            final String packagesMemoryFilePath = packagesMemoryFile.getFolder().getPath().toPortableString();
+//            final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
+//
+//            try {
+//                if (!Files.exists(packagesDestinationPath)) {
+//                    Files.createDirectories(packagesDestinationPath);
+//                }
+//                Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                throw new MojoExecutionException("Unable to write file", e);
+//            }
+//
+//            if (ExecModelMode.shouldDeleteFile(generateModel)) {
+//                deleteDrlFiles();
+//            }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        getLog().info("DSL successfully generated");
+        getLog().info("DMN Model successfully generated");
     }
 
-    private void deleteDrlFiles() throws MojoExecutionException {
-        // Remove drl files
-        try {
-            final Stream<Path> drlFiles = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p));
-            drlFiles.forEach(p -> {
-                try {
-                    Files.delete(p);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Unable to delete file " + p);
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new MojoExecutionException("Unable to find .drl files");
-        }
-    }
+    public static class ExecutableModelDMNMavenProject implements KieBuilder.ProjectType {
 
-    private KieModuleModel getDependencyKieModel(File jar) {
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(jar);
-            ZipEntry zipEntry = zipFile.getEntry(KieModuleModelImpl.KMODULE_JAR_PATH);
-            if (zipEntry != null) {
-                KieModuleModel kieModuleModel = KieModuleModelImpl.fromXML(zipFile.getInputStream(zipEntry));
-                setDefaultsforEmptyKieModule(kieModuleModel);
-                return kieModuleModel;
-            }
-        } catch (Exception e) {
-        } finally {
-            if (zipFile != null) {
-                try {
-                    zipFile.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-        return null;
-    }
+        public static final BiFunction<InternalKieModule, ClassLoader, KieModuleKieProject> SUPPLIER = ExecutableModelDMNMavenPluginKieProject::new;
 
-    public static class ExecutableModelMavenProject implements KieBuilder.ProjectType {
+        public static class ExecutableModelDMNMavenPluginKieProject extends CanonicalModelKieProject {
 
-        public static final BiFunction<InternalKieModule, ClassLoader, KieModuleKieProject> SUPPLIER = ExecutableModelMavenPluginKieProject::new;
-
-        public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
-
-            public ExecutableModelMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
+            public ExecutableModelDMNMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
                 super(true, kieModule, classLoader);
             }
 
@@ -248,14 +176,17 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
-                for (ModelBuilderImpl modelBuilder : modelBuilders) {
-                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageModels());
-                    modelFiles.addAll(result.getModelFiles());
-                    final Folder sourceFolder = srcMfs.getFolder("src/main/java");
-                    final Folder targetFolder = trgMfs.getFolder(".");
-                    srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
-                }
-                modelWriter.writeModelFile(modelFiles, trgMfs);
+
+                System.out.println("++++ modelBuilders = " + modelBuilders);
+
+//                for (ModelBuilderImpl modelBuilder : modelBuilders) {
+//                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageModels());
+//                    modelFiles.addAll(result.getModelFiles());
+//                    final Folder sourceFolder = srcMfs.getFolder("src/main/java");
+//                    final Folder targetFolder = trgMfs.getFolder(".");
+//                    srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
+//                }
+//                modelWriter.writeModelFile(modelFiles, trgMfs);
             }
         }
     }

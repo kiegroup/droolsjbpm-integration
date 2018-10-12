@@ -39,7 +39,7 @@ public class KProjectTestDMN {
     }
 
     private void executeTest(int age, int yearsService, int expectedVacationDays) {
-        DMNRuntime runtime = DMNRuntimeUtil.createRuntime("0020-vacation-days.dmn", this.getClass());
+        DMNRuntime runtime = DMNRuntimeUtil.createRuntime("org/kie/example/0020-vacation-days.dmn", this.getClass());
         DMNModel dmnModel = runtime.getModel("https://www.drools.org/kie-dmn", "0020-vacation-days");
         assertThat(dmnModel, notNullValue());
 
