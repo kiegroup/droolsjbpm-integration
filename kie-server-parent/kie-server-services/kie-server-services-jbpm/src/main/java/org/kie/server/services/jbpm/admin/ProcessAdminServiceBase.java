@@ -35,7 +35,6 @@ import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
 import org.kie.server.api.model.admin.ProcessNodeList;
 import org.kie.server.api.model.admin.TimerInstanceList;
-import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -43,7 +42,9 @@ import org.kie.server.services.jbpm.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.jbpm.ConvertUtils.*;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
 
 public class ProcessAdminServiceBase {
 
@@ -166,7 +167,7 @@ public class ProcessAdminServiceBase {
 
     public ExecutionErrorInstanceList getExecutionErrors(String containerId, boolean includeAcknowledged, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         logger.debug("About to get execution errors");
-        List<ExecutionError> errors = processInstanceAdminService.getErrors(includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+        List<ExecutionError> errors = processInstanceAdminService.getErrorsByDeploymentId(containerId, includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
 
         logger.debug("Found errors {}", errors);
         ExecutionErrorInstanceList errorInstanceList = convertToErrorInstanceList(errors);
