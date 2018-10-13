@@ -119,6 +119,7 @@ public class CaseManagementServiceBase {
                 caseFile.getUserAssignments()
                         .entrySet()
                         .stream()
+                        .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
                         .forEach(entry -> roleAssignments.put(entry.getKey(), taskModelFactory.newUser(entry.getValue())));
             }
 
@@ -126,6 +127,7 @@ public class CaseManagementServiceBase {
                 caseFile.getGroupAssignments()
                         .entrySet()
                         .stream()
+                        .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
                         .forEach( entry -> roleAssignments.put(entry.getKey(), taskModelFactory.newGroup(entry.getValue())));
             }
             Map<String, List<String>> accessRestrictions = null;

@@ -40,13 +40,14 @@ public class JBPMUIKieContainerCommandServiceImpl implements KieContainerCommand
 
     private FormServiceBase formServiceBase;
     private ImageServiceBase imageServiceBase;
+    private FormRendererBase formRendererBase;
 
-
-    public JBPMUIKieContainerCommandServiceImpl(KieServerRegistry context, FormServiceBase formServiceBase, ImageServiceBase imageServiceBase) {
+    public JBPMUIKieContainerCommandServiceImpl(KieServerRegistry context, FormServiceBase formServiceBase, ImageServiceBase imageServiceBase, FormRendererBase formRendererBase) {
 
         this.context = context;
         this.formServiceBase = formServiceBase;
         this.imageServiceBase = imageServiceBase;
+        this.formRendererBase = formRendererBase;
     }
 
     @Override
@@ -73,7 +74,9 @@ public class JBPMUIKieContainerCommandServiceImpl implements KieContainerCommand
                     handler = formServiceBase;
                 } else if ("ImageService".equals(descriptorCommand.getService())) {
                     handler = imageServiceBase;
-                } else {
+                } else if ("FormRendererService".equals(descriptorCommand.getService())) {
+                    handler = formRendererBase;
+                }  else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }
 

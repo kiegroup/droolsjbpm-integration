@@ -209,4 +209,112 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             return response.getResult();
         }
     }
+
+    @Override
+    public String renderProcessForm(String containerId, String processId) {
+        return renderProcessForm(containerId, processId, PATTERNFLY_FORM_RENDERER);
+    }
+
+    @Override
+    public String renderProcessForm(String containerId, String processId, String renderer) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(RestURI.CONTAINER_ID, containerId);
+            valuesMap.put(RestURI.PROCESS_ID, processId);
+            
+            StringBuffer params = new StringBuffer();
+            if (renderer != null) {
+                params.append("?renderer=").append(renderer);
+            }
+            
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put("Accept", MediaType.TEXT_HTML);
+            
+            return makeHttpGetRequestAndCreateRawResponse(
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_CONTENT_GET_URI + params.toString(), valuesMap), headers);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "FormRendererService", "getProcessRenderedForm", new Object[]{renderer, containerId, processId} )) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            return response.getResult();
+        }
+    }
+
+    @Override
+    public String renderCaseForm(String containerId, String caseDefinitionId) {
+        return renderCaseForm(containerId, caseDefinitionId, PATTERNFLY_FORM_RENDERER);
+    }
+
+    @Override
+    public String renderCaseForm(String containerId, String caseDefinitionId, String renderer) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(RestURI.CONTAINER_ID, containerId);
+            valuesMap.put(RestURI.CASE_DEF_ID, caseDefinitionId);
+            
+            StringBuffer params = new StringBuffer();
+            if (renderer != null) {
+                params.append("?renderer=").append(renderer);
+            }
+            
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put("Accept", MediaType.TEXT_HTML);
+            
+            return makeHttpGetRequestAndCreateRawResponse(
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + CASE_FORM_CONTENT_GET_URI + params.toString(), valuesMap), headers);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "FormRendererService", "getCaseRenderedForm", new Object[]{renderer, containerId, caseDefinitionId} )) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            return response.getResult();
+        }
+    }
+
+    @Override
+    public String renderTaskForm(String containerId, Long taskId) {
+        return renderTaskForm(containerId, taskId, PATTERNFLY_FORM_RENDERER);
+    }
+
+    @Override
+    public String renderTaskForm(String containerId, Long taskId, String renderer) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(RestURI.CONTAINER_ID, containerId);
+            valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
+            
+            StringBuffer params = new StringBuffer();
+            if (renderer != null) {
+                params.append("?renderer=").append(renderer);
+            }
+            
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put("Accept", MediaType.TEXT_HTML);
+            
+            return makeHttpGetRequestAndCreateRawResponse(
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_CONTENT_GET_URI + params.toString(), valuesMap), headers);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "FormRendererService", "getTaskRenderedForm", new Object[]{renderer, containerId, taskId} )) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            return response.getResult();
+        }
+    }
 }

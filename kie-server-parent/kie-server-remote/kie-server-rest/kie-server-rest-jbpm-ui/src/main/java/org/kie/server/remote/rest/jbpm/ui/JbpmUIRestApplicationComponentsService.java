@@ -23,6 +23,7 @@ import java.util.List;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.jbpm.ui.FormRendererBase;
 import org.kie.server.services.jbpm.ui.FormServiceBase;
 import org.kie.server.services.jbpm.ui.ImageServiceBase;
 import org.kie.server.services.jbpm.ui.JBPMUIKieServerExtension;
@@ -40,6 +41,7 @@ public class JbpmUIRestApplicationComponentsService implements KieServerApplicat
 
         FormServiceBase formServiceBase = null;
         ImageServiceBase imageServiceBase = null;
+        FormRendererBase formRendererBase = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
@@ -53,6 +55,9 @@ public class JbpmUIRestApplicationComponentsService implements KieServerApplicat
             } else if (ImageServiceBase.class.isAssignableFrom(object.getClass())) {
                 imageServiceBase = (ImageServiceBase) object;
                 continue;
+            } else if (FormRendererBase.class.isAssignableFrom(object.getClass())) {
+                formRendererBase = (FormRendererBase) object;
+                continue;
             } else if (KieServerRegistry.class.isAssignableFrom(object.getClass())) {
                 context = (KieServerRegistry) object;
                 continue;
@@ -61,8 +66,9 @@ public class JbpmUIRestApplicationComponentsService implements KieServerApplicat
 
         List<Object> components = new ArrayList<Object>(2);
 
-        components.add(new FormResource(formServiceBase, context));
+        components.add(new FormResource(formServiceBase, formRendererBase, context));
         components.add(new ImageResource(imageServiceBase, context));
+        components.add(new StaticFilesResource(formRendererBase));
 
         return components;
     }

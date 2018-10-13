@@ -23,6 +23,9 @@ public interface UIServicesClient {
     public static final String FORM_TYPE = "FRM";
     public static final String FREE_MARKER_TYPE = "FTL";
     public static final String ANY_FORM = "ANY";
+    
+    public static final String BOOTSTRAP_FORM_RENDERER = "bootstrap";
+    public static final String PATTERNFLY_FORM_RENDERER = "patternfly";
 
     /**
      * Returns process form for given process id that resides in given container. It returns default form type
@@ -135,6 +138,57 @@ public interface UIServicesClient {
      * @return svg (xml) representing process image annotated with active (in red) and completed (in grey) nodes
      */
     String getProcessInstanceImage(String containerId, Long processInstanceId);
+    
+    /**
+     * Returns process form for given process id that resides in given container - completely rendered so the output is HTML
+     * @param containerId container identifier where process resides
+     * @param processId  unique process id
+     * @return HTML representation of the process form
+     */
+    String renderProcessForm(String containerId, String processId);
+    
+    /**
+     * Returns process form for given process id that resides in given container - completely rendered so the output is HTML
+     * @param containerId container identifier where process resides
+     * @param processId  unique process id
+     * @param renderer name of the renderer to be used to produce the HTML
+     * @return HTML representation of the process form
+     */
+    String renderProcessForm(String containerId, String processId, String renderer);
+    
+    /**
+     * Returns case form for given case definition that resides in given container - completely rendered so the output is HTML
+     * @param containerId container identifier where process resides
+     * @param caseDefinitionId  unique case definition id
+     * @return HTML representation of the process form
+     */
+    String renderCaseForm(String containerId, String caseDefinitionId);
+    
+    /**
+     * Returns case form for given case definition id that resides in given container - completely rendered so the output is HTML
+     * @param containerId container identifier where process resides
+     * @param caseDefinitionId  unique case definition id
+     * @param renderer name of the renderer to be used to produce the HTML
+     * @return HTML representation of the process form
+     */
+    String renderCaseForm(String containerId, String caseDefinitionId, String renderer);
+    
+    /**
+     * Returns task form for given task id that belongs to given container - completely rendered so the output is HTML
+     * @param containerId container identifier where task resides
+     * @param taskId unique task id
+     * @return HTML representation of the task form
+     */
+    String renderTaskForm(String containerId, Long taskId);
+    
+    /**
+     * Returns task form for given task id that belongs to given container - completely rendered so the output is HTML
+     * @param containerId container identifier where task resides
+     * @param taskId unique task id
+     * @param renderer name of the renderer to be used to produce the HTML
+     * @return HTML representation of the task form
+     */
+    String renderTaskForm(String containerId, Long taskId, String renderer);
 
     /**
      * Override default response handler to change interaction pattern. Applies only to JMS

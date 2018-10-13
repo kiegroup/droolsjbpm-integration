@@ -170,7 +170,61 @@
            "methodName": "evaluateDecisionService",
            "elementKind": "method",
            "justification": "DROOLS-3079 kie-server DMN evaluate Decision Service only"
-         }
+         },
+		 {
+ 		   "code": "java.method.addedToInterface",
+ 		   "new": "method java.lang.String org.kie.server.client.UIServicesClient::renderCaseForm(java.lang.String, java.lang.String)",
+ 		   "package": "org.kie.server.client",
+ 		   "classSimpleName": "UIServicesClient",
+ 		   "methodName": "renderCaseForm",
+ 		   "elementKind": "method",
+ 		   "justification": "Support for rendering forms by KIE Server"
+ 		 },
+ 		 {
+ 		   "code": "java.method.addedToInterface",
+ 		   "new": "method java.lang.String org.kie.server.client.UIServicesClient::renderCaseForm(java.lang.String, java.lang.String, java.lang.String)",
+ 		   "package": "org.kie.server.client",
+ 		   "classSimpleName": "UIServicesClient",
+ 		   "methodName": "renderCaseForm",
+ 		   "elementKind": "method",
+ 		   "justification": "Support for rendering forms by KIE Server"
+ 		 },
+ 		 {
+ 		   "code": "java.method.addedToInterface",
+ 		   "new": "method java.lang.String org.kie.server.client.UIServicesClient::renderProcessForm(java.lang.String, java.lang.String)",
+ 		   "package": "org.kie.server.client",
+ 		   "classSimpleName": "UIServicesClient",
+ 		   "methodName": "renderProcessForm",
+ 		   "elementKind": "method",
+ 		   "justification": "Support for rendering forms by KIE Server"
+ 		 },
+ 		 {
+ 		   "code": "java.method.addedToInterface",
+ 		   "new": "method java.lang.String org.kie.server.client.UIServicesClient::renderProcessForm(java.lang.String, java.lang.String, java.lang.String)",
+ 		   "package": "org.kie.server.client",
+ 		   "classSimpleName": "UIServicesClient",
+ 		   "methodName": "renderProcessForm",
+ 		   "elementKind": "method",
+ 		   "justification": "Support for rendering forms by KIE Server"
+ 		 },
+ 		 {
+ 		   "code": "java.method.addedToInterface",
+ 		   "new": "method java.lang.String org.kie.server.client.UIServicesClient::renderTaskForm(java.lang.String, java.lang.Long)",
+ 		   "package": "org.kie.server.client",
+ 		   "classSimpleName": "UIServicesClient",
+ 		   "methodName": "renderTaskForm",
+ 		   "elementKind": "method",
+ 		   "justification": "Support for rendering forms by KIE Server"
+ 		 },
+ 		 {
+ 		   "code": "java.method.addedToInterface",
+ 		   "new": "method java.lang.String org.kie.server.client.UIServicesClient::renderTaskForm(java.lang.String, java.lang.Long, java.lang.String)",
+ 		   "package": "org.kie.server.client",
+ 		   "classSimpleName": "UIServicesClient",
+ 		   "methodName": "renderTaskForm",
+ 		   "elementKind": "method",
+ 		   "justification": "Support for rendering forms by KIE Server"
+ 		 }
       ]
     }
   }
