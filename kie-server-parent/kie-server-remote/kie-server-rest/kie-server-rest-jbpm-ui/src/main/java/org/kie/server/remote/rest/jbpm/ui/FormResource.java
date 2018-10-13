@@ -31,6 +31,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jbpm.services.api.DeploymentNotFoundException;
@@ -43,6 +44,7 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.ui.FormRendererBase;
 import org.kie.server.services.jbpm.ui.FormServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,14 +67,16 @@ public class FormResource {
     public static final String TASK_INSTANCE_NOT_FOUND = "Could not find task instance with id \"{0}\"";
 
     private FormServiceBase formServiceBase;
+    private FormRendererBase formRendererBase;
     private KieServerRegistry context;
 
     public FormResource() {
 
     }
 
-    public FormResource(FormServiceBase formServiceBase, KieServerRegistry context) {
+    public FormResource(FormServiceBase formServiceBase, FormRendererBase formRendererBase, KieServerRegistry context) {
         this.formServiceBase = formServiceBase;
+        this.formRendererBase = formRendererBase;
         this.context = context;
     }
 
@@ -153,6 +157,110 @@ public class FormResource {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
         }
+    }
+    
+    @ApiOperation(value="Retrieves form for process definition within a container that is completely rendered and ready for use",
+            response=String.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process, form or Container Id not found") })
+    @GET
+    @Path(PROCESS_FORM_CONTENT_GET_URI)
+    @Produces({MediaType.TEXT_HTML})
+    public Response getProcessRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
+            @ApiParam(value = "container id that process definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true) @PathParam(PROCESS_ID) String processId, 
+            @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
+        Variant variant = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+                
+        try {
+            String renderedForm = formRendererBase.getProcessRenderedForm(renderer, containerId, processId);
+            if (renderedForm == null) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+         
+            return Response.ok().entity(renderedForm).build();
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), variant, conversationIdHeader);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound( MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), variant, conversationIdHeader);
+        } catch (IllegalArgumentException e) {
+            return notFound(e.getMessage(), variant, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+        }
+        
+    }
+    
+    @ApiOperation(value="Retrieves form for task instance within a container that is completely rendered and ready for use",
+            response=String.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task, form or Container Id not found") })
+    @GET
+    @Path(TASK_FORM_CONTENT_GET_URI)
+    @Produces({MediaType.TEXT_HTML})
+    public Response getTaskRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId, 
+            @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
+        Variant variant = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+                
+        try {
+            String renderedForm = formRendererBase.getTaskRenderedForm(renderer, containerId, taskId);
+            if (renderedForm == null) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+         
+            return Response.ok().entity(renderedForm).build();
+        } catch (PermissionDeniedException e) {
+            return permissionDenied(MessageFormat.format(TASK_PERMISSION_ERROR, taskId), variant, conversationIdHeader);
+        } catch (TaskNotFoundException e) {
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), variant, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), variant, conversationIdHeader);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return notFound(e.getMessage(), variant, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+        }
+        
+    }
+    
+    @ApiOperation(value="Retrieves form for case definition within a container that is completely rendered and ready for use",
+            response=String.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Case, form or Container Id not found") })
+    @GET
+    @Path(CASE_FORM_CONTENT_GET_URI)
+    @Produces({MediaType.TEXT_HTML})
+    public Response getCaseRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
+            @ApiParam(value = "container id that case definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of case definition that form should be fetched for", required = true) @PathParam("caseDefId") String caseDefId, 
+            @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
+        Variant variant = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+                
+        try {
+            String renderedForm = formRendererBase.getCaseRenderedForm(renderer, containerId, caseDefId);
+            if (renderedForm == null) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+         
+            return Response.ok().entity(renderedForm).build();
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), variant, conversationIdHeader);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound( MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, caseDefId, containerId), variant, conversationIdHeader);
+        } catch (IllegalArgumentException e) {
+            return notFound(e.getMessage(), variant, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+        }
+        
     }
 
     protected String marshallFormContent( String formContent, String formType, Variant variant ) throws Exception {

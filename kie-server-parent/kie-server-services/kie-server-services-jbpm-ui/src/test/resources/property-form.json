@@ -1,0 +1,255 @@
+{
+	"id": "2aeaf281-71e1-45a5-9ab3-0abd855d924e",
+	"name": "Property",
+	"model": {
+		"source": "INTERNAL",
+		"className": "com.myspace.mortgage_app.Property",
+		"name": "property",
+		"properties": [
+			{
+				"name": "age",
+				"typeInfo": {
+					"type": "BASE",
+					"className": "java.lang.Integer",
+					"multiple": false
+				},
+				"metaData": {
+					"entries": [
+						{
+							"name": "field-label",
+							"value": "Age of property"
+						},
+						{
+							"name": "field-placeHolder",
+							"value": "Age of property"
+						}
+					]
+				}
+			},
+			{
+				"name": "address",
+				"typeInfo": {
+					"type": "BASE",
+					"className": "java.lang.String",
+					"multiple": false
+				},
+				"metaData": {
+					"entries": [
+						{
+							"name": "field-label",
+							"value": "Address of property"
+						},
+						{
+							"name": "field-placeHolder",
+							"value": "Address of property"
+						}
+					]
+				}
+			},
+			{
+				"name": "locale",
+				"typeInfo": {
+					"type": "BASE",
+					"className": "java.lang.String",
+					"multiple": false
+				},
+				"metaData": {
+					"entries": [
+						{
+							"name": "field-label",
+							"value": "Locale"
+						},
+						{
+							"name": "field-placeHolder",
+							"value": "Locale"
+						}
+					]
+				}
+			},
+			{
+				"name": "saleprice",
+				"typeInfo": {
+					"type": "BASE",
+					"className": "java.lang.Integer",
+					"multiple": false
+				},
+				"metaData": {
+					"entries": [
+						{
+							"name": "field-label",
+							"value": "Sale Price"
+						},
+						{
+							"name": "field-placeHolder",
+							"value": "Sale Price"
+						}
+					]
+				}
+			}
+		],
+		"formModelType": "org.kie.workbench.common.forms.data.modeller.model.DataObjectFormModel"
+	},
+	"fields": [
+		{
+			"placeHolder": "Age of property",
+			"maxLength": 100,
+			"id": "field_815717729253767E11",
+			"name": "age",
+			"label": "Age of property",
+			"required": false,
+			"readOnly": false,
+			"validateOnChange": true,
+			"binding": "age",
+			"standaloneClassName": "java.lang.Integer",
+			"code": "IntegerBox",
+			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.integerBox.definition.IntegerBoxFieldDefinition"
+		},
+		{
+			"maxLength": 100,
+			"placeHolder": "Address of property",
+			"id": "field_236289653097941E11",
+			"name": "address",
+			"label": "Address of property",
+			"required": false,
+			"readOnly": false,
+			"validateOnChange": true,
+			"binding": "address",
+			"standaloneClassName": "java.lang.String",
+			"code": "TextBox",
+			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.textBox.definition.TextBoxFieldDefinition"
+		},
+		{
+			"maxLength": 100,
+			"placeHolder": "Locale",
+			"id": "field_9471909295199063E11",
+			"name": "locale",
+			"label": "Locale",
+			"required": false,
+			"readOnly": false,
+			"validateOnChange": true,
+			"binding": "locale",
+			"standaloneClassName": "java.lang.String",
+			"code": "TextBox",
+			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.textBox.definition.TextBoxFieldDefinition"
+		},
+		{
+			"placeHolder": "Sale Price",
+			"maxLength": 100,
+			"id": "field_4113393327260706E12",
+			"name": "saleprice",
+			"label": "Sale Price",
+			"required": false,
+			"readOnly": false,
+			"validateOnChange": true,
+			"binding": "saleprice",
+			"standaloneClassName": "java.lang.Integer",
+			"code": "IntegerBox",
+			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.integerBox.definition.IntegerBoxFieldDefinition"
+		}
+	],
+	"layoutTemplate": {
+		"version": 2,
+		"style": "FLUID",
+		"layoutProperties": {
+			
+		},
+		"rows": [
+			{
+				"properties": {
+					
+				},
+				"layoutColumns": [
+					{
+						"span": "12",
+						"height": "12",
+						"properties": {
+							
+						},
+						"rows": [],
+						"layoutComponents": [
+							{
+								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+								"properties": {
+									"field_id": "field_815717729253767E11",
+									"form_id": "2aeaf281-71e1-45a5-9ab3-0abd855d924e"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"properties": {
+					
+				},
+				"layoutColumns": [
+					{
+						"span": "12",
+						"height": "12",
+						"properties": {
+							
+						},
+						"rows": [],
+						"layoutComponents": [
+							{
+								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+								"properties": {
+									"field_id": "field_236289653097941E11",
+									"form_id": "2aeaf281-71e1-45a5-9ab3-0abd855d924e"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"properties": {
+					
+				},
+				"layoutColumns": [
+					{
+						"span": "12",
+						"height": "12",
+						"properties": {
+							
+						},
+						"rows": [],
+						"layoutComponents": [
+							{
+								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+								"properties": {
+									"field_id": "field_9471909295199063E11",
+									"form_id": "2aeaf281-71e1-45a5-9ab3-0abd855d924e"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"properties": {
+					
+				},
+				"layoutColumns": [
+					{
+						"span": "12",
+						"height": "12",
+						"properties": {
+							
+						},
+						"rows": [],
+						"layoutComponents": [
+							{
+								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+								"properties": {
+									"field_id": "field_4113393327260706E12",
+									"form_id": "2aeaf281-71e1-45a5-9ab3-0abd855d924e"
+								}
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

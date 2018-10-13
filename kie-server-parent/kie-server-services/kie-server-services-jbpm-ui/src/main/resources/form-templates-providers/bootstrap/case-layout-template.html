@@ -1,0 +1,45 @@
+<div class="container-fluid">
+	<#if renderButtons?? && roles??>
+	<div class="row">
+		<div class="col-md-12">
+			<h4>Role assignment</h4>
+			<hr/>
+		</div>
+	</div>
+	<#list roles as role>
+	<div class="row">		
+		<div class="col-md-2">${role.name}</div>
+		<div class="col-md-4">
+			<input name="user_${role.name}" type="text" class="form-control" id="user_${role.name}" placeholder="Enter role assignment for ${role.name} (user assignment)" >
+		</div>
+		<div class="col-md-4">
+			<input name="group_${role.name}" type="text" class="form-control" id="group_${role.name}" placeholder="Enter role assignment for ${role.name} group assignment)" >
+		</div>		
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<hr/>
+		</div>
+	</div>
+	</#list>
+	</#if>
+	<#list rows as row>
+	<div class="row">
+		<#list row.columns as column>
+		<div class="col-md-${column.span}">${column.content}</div>
+		</#list>
+	</div>
+	</#list>
+	<#if renderButtons??>
+	<div class="row">
+		<div class="col-md-12">
+			<hr/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<button type="button" class="btn btn-success" onclick="startCase(this);">Submit</button>
+		</div>
+	</div>
+	</#if>
+</div>
