@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,16 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceConfiguration;
+import org.kie.api.io.ResourceType;
+import org.kie.api.io.ResourceWithConfiguration;
+import org.kie.dmn.core.assembler.DMNAssemblerService;
 import org.kie.dmn.core.compiler.*;
+import org.kie.internal.builder.CompositeKnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceWithConfigurationImpl;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 
@@ -84,9 +94,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (ExecModelMode.shouldGenerateModel(generateModel)) {
-            generateDMNModel();
-        }
+        generateDMNModel();
     }
 
     private void generateDMNModel() throws MojoExecutionException {
@@ -100,7 +108,34 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             System.setProperty(ExecModelCompilerOption.PROPERTY_NAME, Boolean.TRUE.toString());
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(ExecutableModelDMNMavenProject.class);
+
+            InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
+            List<String> dmnFiles = kieModule.getFileNames()
+                    .stream()
+                    .filter(f -> f.endsWith("dmn"))
+                    .collect(Collectors.toList());
+
+            System.out.println("dmnFiles = " + dmnFiles);
+
+            String file0 = dmnFiles.get(0);
+
+            Resource resource = kieModule.getResource(file0);
+
+            ResourceConfiguration resourceConfiguration = kieModule.getResourceConfiguration(file0);
+
+            ResourceWithConfiguration resourceWithConfiguration =
+                    new ResourceWithConfigurationImpl(resource, resourceConfiguration, a -> {
+                    }, b -> {
+                    });
+
+            KnowledgeBuilder knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+            DMNAssemblerService assemblerService = new DMNAssemblerService();
+
+            assemblerService.addResources(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
+
+
+
 
 //            InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
 //            List<String> generatedFiles = kieModule.getFileNames()
@@ -154,6 +189,8 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 //            if (ExecModelMode.shouldDeleteFile(generateModel)) {
 //                deleteDrlFiles();
 //            }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
