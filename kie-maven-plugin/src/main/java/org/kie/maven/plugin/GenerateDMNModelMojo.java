@@ -137,7 +137,6 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                     }, b -> {
                     });
 
-            KnowledgeBuilder knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
             DMNCompilerConfigurationImpl dmnCompilerConfiguration = (DMNCompilerConfigurationImpl) DMNFactory.newCompilerConfiguration();
 
@@ -145,13 +144,13 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             dmnCompilerConfiguration.addListener(new AfterGeneratingSourcesListener() {
                 @Override
                 public void accept(List<String> generatedSource) {
-                    System.out.println("================= HELLO WORLD");
                     System.out.println("generatedSource = " + generatedSource);
                 }
             });
 
             DMNAssemblerService assemblerService = new DMNAssemblerService(dmnCompilerConfiguration);
 
+            KnowledgeBuilder knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
             assemblerService.addResources(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
 
         } catch (Exception e) {
