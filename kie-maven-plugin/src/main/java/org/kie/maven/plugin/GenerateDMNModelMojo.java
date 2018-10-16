@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.drools.compiler.builder.impl.KnowledgeBuilderImpl;
 import org.drools.compiler.compiler.io.Folder;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
@@ -57,14 +59,23 @@ import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceConfiguration;
 import org.kie.api.io.ResourceType;
 import org.kie.api.io.ResourceWithConfiguration;
+import org.kie.dmn.api.core.AfterGeneratingSourcesListener;
+import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.core.assembler.DMNAssemblerService;
 import org.kie.dmn.core.compiler.*;
+import org.kie.dmn.core.compiler.profiles.ExtendedDMNProfile;
+import org.kie.dmn.core.impl.DMNKnowledgeBuilderError;
 import org.kie.internal.builder.CompositeKnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.builder.ResultSeverity;
 import org.kie.internal.io.ResourceWithConfigurationImpl;
+import org.kie.internal.utils.ChainedProperties;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
+import static org.kie.dmn.core.assembler.DMNAssemblerService.DMN_PROFILES_CACHE_KEY;
+import static org.kie.dmn.core.assembler.DMNAssemblerService.DMN_PROFILE_PREFIX;
+import static org.kie.dmn.core.assembler.DMNAssemblerService.isStrictMode;
 
 @Mojo(name = "generateDMNModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -130,7 +141,17 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
             KnowledgeBuilder knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-            DMNAssemblerService assemblerService = new DMNAssemblerService();
+            DMNCompilerConfigurationImpl dmnCompilerConfiguration = (DMNCompilerConfigurationImpl) DMNFactory.newCompilerConfiguration();
+
+            dmnCompilerConfiguration.addListener(new AfterGeneratingSourcesListener() {
+                @Override
+                public void accept(List<String> generatedSource) {
+                    System.out.println("================= HELLO WORLD");
+                    System.out.println("generatedSource = " + generatedSource);
+                }
+            });
+
+            DMNAssemblerService assemblerService = new DMNAssemblerService(dmnCompilerConfiguration);
 
             assemblerService.addResources(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
 
