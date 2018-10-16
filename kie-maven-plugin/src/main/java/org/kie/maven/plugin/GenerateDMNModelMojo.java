@@ -118,7 +118,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
 
-            InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
+            InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModuleIgnoringErrors();
             List<String> dmnFiles = kieModule.getFileNames()
                     .stream()
                     .filter(f -> f.endsWith("dmn"))
