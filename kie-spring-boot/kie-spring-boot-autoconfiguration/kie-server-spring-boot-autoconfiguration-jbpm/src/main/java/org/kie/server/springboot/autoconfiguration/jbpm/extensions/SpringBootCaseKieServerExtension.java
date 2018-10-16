@@ -29,7 +29,6 @@ import org.kie.server.services.impl.KieServerImpl;
 public class SpringBootCaseKieServerExtension extends CaseKieServerExtension {
 
     private CaseService caseService;
-    private CaseRuntimeDataService caseRuntimeDataService;
     private CaseInstanceMigrationService caseInstanceMigrationService;
     
     public SpringBootCaseKieServerExtension(CaseService caseService,
