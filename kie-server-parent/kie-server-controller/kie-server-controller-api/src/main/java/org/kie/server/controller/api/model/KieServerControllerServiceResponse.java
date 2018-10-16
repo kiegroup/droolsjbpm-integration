@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.controller.api.model.runtime.ContainerList;
@@ -56,6 +57,7 @@ public class KieServerControllerServiceResponse<T> implements KieServiceResponse
             @XmlElement(name = "server-instance-key", type = ServerInstanceKey.class),
             @XmlElement(name = "container-details-list", type = ContainerList.class)
     })
+    @JsonProperty
     private T result;
 
     public KieServerControllerServiceResponse() {
