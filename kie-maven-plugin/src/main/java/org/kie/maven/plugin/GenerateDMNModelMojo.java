@@ -162,5 +162,5 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
         getLog().info("DMN Model successfully generated");
     }
-}|
+}
 
