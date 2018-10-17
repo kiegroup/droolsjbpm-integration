@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -91,12 +92,23 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                     final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
                     project.addCompileSourceRoot(newCompileSourceRoot);
 
+                    final List<String> compiledClassNames = new ArrayList<>();
+
                     for (GeneratedSource generatedFile : generatedSource) {
                         Path fileName = Paths.get(generatedFile.getFileName());
                         Path originalFilePath = Paths.get("src/main/java");
+                        final Path fileNameRelative;
                         if(fileName.startsWith(originalFilePath)) {
-                            fileName = originalFilePath.relativize(fileName);
+                            fileNameRelative = originalFilePath.relativize(fileName);
+                        } else {
+                            fileNameRelative = fileName;
                         }
+
+                        final String compiledClassName = fileNameRelative.toString()
+                                .replace("/", ".")
+                                .replace(".java", "");
+                        compiledClassNames.add(compiledClassName);
+
                         final Path newFile = Paths.get(targetDirectory.getPath(),
                                                        droolsModelCompilerPath,
                                                        fileName.toString());
@@ -113,21 +125,20 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                         }
                     }
 
-//                    // copy the META-INF packages file
-//                    final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(CanonicalKieModule.MODEL_FILE);
-//                    final String packagesMemoryFilePath = packagesMemoryFile.getFolder().getPath().toPortableString();
-//                    final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
-//
-//                    try {
-//                        if (!Files.exists(packagesDestinationPath)) {
-//                            Files.createDirectories(packagesDestinationPath);
-//                        }
-//                        Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                        throw new MojoExecutionException("Unable to write file", e);
-//                    }
-//
+
+                    // copy the META-INF packages file
+                    final String packagesMemoryFilePath = "META-INF/kie/dmn";
+                    final Path dmnCompiledClassFile = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath);
+
+                    try {
+                        if (!Files.exists(dmnCompiledClassFile)) {
+                            Files.createDirectories(dmnCompiledClassFile.getParent());
+                        }
+                        Files.write(dmnCompiledClassFile, compiledClassNames);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException("Unable to write file", e);
+                    }
 
                 }
             });
