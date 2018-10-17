@@ -143,7 +143,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             dmnCompilerConfiguration.setProperty(ExecModelCompilerOption.PROPERTY_NAME, Boolean.TRUE.toString());
             dmnCompilerConfiguration.addListener(new AfterGeneratingSourcesListener() {
                 @Override
-                public void accept(List<String> generatedSource) {
+                public void accept(List<AfterGeneratingSourcesListener.GeneratedSource> generatedSource) {
                     System.out.println("generatedSource = " + generatedSource);
                 }
             });
