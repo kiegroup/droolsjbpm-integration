@@ -30,7 +30,6 @@ public class SSLContextBuilder {
     private static final Logger logger = Logger.getLogger(SSLContextBuilder.class);
 
     private static final String KEYSTORE_TYPE = "JKS";
-    private static final String KEYSTORE_ALGORITHM = "SunX509";
 
     private String keystorePath;
     private String keystorePassword;
@@ -81,7 +80,7 @@ public class SSLContextBuilder {
                 throw new IllegalArgumentException(messageBuilder.toString());
             }
 
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KEYSTORE_ALGORITHM);
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keyStore,
                                    password);
 
