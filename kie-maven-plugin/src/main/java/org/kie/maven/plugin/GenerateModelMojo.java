@@ -158,7 +158,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
                 try {
                     Files.deleteIfExists(newFile);
-                    Files.createDirectories(newFile);
+                    Files.createDirectories(newFile.getParent());
                     Files.copy(f.getContents(), newFile, StandardCopyOption.REPLACE_EXISTING);
 
                     getLog().info("Generating " + newFile);
