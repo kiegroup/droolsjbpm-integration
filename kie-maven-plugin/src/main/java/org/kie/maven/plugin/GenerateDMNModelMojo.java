@@ -1,8 +1,13 @@
 package org.kie.maven.plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +20,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.kie.api.KieServices;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceConfiguration;
@@ -79,6 +86,44 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                 @Override
                 public void accept(List<AfterGeneratingSourcesListener.GeneratedSource> generatedSource) {
                     getLog().info("generatedSource = " + generatedSource);
+
+                    final String droolsModelCompilerPath = "/generated-sources/dmn/main/java";
+                    final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
+                    project.addCompileSourceRoot(newCompileSourceRoot);
+
+                    for (GeneratedSource generatedFile : generatedSource) {
+                        final Path newFile = Paths.get(targetDirectory.getPath(),
+                                                       droolsModelCompilerPath,
+                                                       generatedFile.getFileName());
+
+                        try {
+                            Files.deleteIfExists(newFile);
+                            Files.createDirectories(newFile.getParent());
+                            Path newFilePath = Files.createFile(newFile);
+                            Files.write(newFilePath, generatedFile.getSourceContent().getBytes());
+                            getLog().info("Generating " + newFilePath);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            throw new RuntimeException("Unable to write file", e);
+                        }
+                    }
+
+//                    // copy the META-INF packages file
+//                    final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(CanonicalKieModule.MODEL_FILE);
+//                    final String packagesMemoryFilePath = packagesMemoryFile.getFolder().getPath().toPortableString();
+//                    final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
+//
+//                    try {
+//                        if (!Files.exists(packagesDestinationPath)) {
+//                            Files.createDirectories(packagesDestinationPath);
+//                        }
+//                        Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        throw new MojoExecutionException("Unable to write file", e);
+//                    }
+//
+
                 }
             });
 
