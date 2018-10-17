@@ -92,9 +92,14 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                     project.addCompileSourceRoot(newCompileSourceRoot);
 
                     for (GeneratedSource generatedFile : generatedSource) {
+                        Path fileName = Paths.get(generatedFile.getFileName());
+                        Path originalFilePath = Paths.get("src/main/java");
+                        if(fileName.startsWith(originalFilePath)) {
+                            fileName = originalFilePath.relativize(fileName);
+                        }
                         final Path newFile = Paths.get(targetDirectory.getPath(),
                                                        droolsModelCompilerPath,
-                                                       generatedFile.getFileName());
+                                                       fileName.toString());
 
                         try {
                             Files.deleteIfExists(newFile);
