@@ -73,6 +73,10 @@ public class FormInstance {
     public FormField getField(String fieldId) {
         return fields.stream().filter(f -> f.getId().equals(fieldId)).findFirst().get();
     }
+    
+    public FormField getFieldByBinding(String binding) {
+        return fields.stream().filter(f -> f.getBinding().equals(binding)).findFirst().get();
+    }
 
     public FormModel getModel() {
         return model;
