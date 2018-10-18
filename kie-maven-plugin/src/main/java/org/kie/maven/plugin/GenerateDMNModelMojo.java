@@ -85,7 +85,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             dmnCompilerConfiguration.setProperty(ExecModelCompilerOption.PROPERTY_NAME, Boolean.TRUE.toString());
             dmnCompilerConfiguration.addListener(new AfterGeneratingSourcesListener() {
                 @Override
-                public void accept(List<AfterGeneratingSourcesListener.GeneratedSource> generatedSource) {
+                public boolean accept(List<AfterGeneratingSourcesListener.GeneratedSource> generatedSource) {
                     getLog().info("generatedSource = " + generatedSource);
 
                     final String droolsModelCompilerPath = "/generated-sources/dmn/main/java";
@@ -111,7 +111,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
                         final Path newFile = Paths.get(targetDirectory.getPath(),
                                                        droolsModelCompilerPath,
-                                                       fileName.toString());
+                                                       fileNameRelative.toString());
 
                         try {
                             Files.deleteIfExists(newFile);
@@ -139,6 +139,9 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                         e.printStackTrace();
                         throw new RuntimeException("Unable to write file", e);
                     }
+
+                    // Avoid compile the sources
+                    return false;
 
                 }
             });
