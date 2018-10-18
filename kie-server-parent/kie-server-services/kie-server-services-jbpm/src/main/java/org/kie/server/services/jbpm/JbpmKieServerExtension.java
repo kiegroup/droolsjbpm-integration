@@ -32,6 +32,9 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.naming.InitialContext;
 import javax.persistence.EntityManagerFactory;
@@ -96,6 +99,7 @@ import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -127,7 +131,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
-
+    protected static final Pattern PARAMETER_MATCHER = Pattern.compile("\\$\\{([\\S&&[^\\}]]+)\\}", Pattern.DOTALL);
+   
     protected boolean isExecutorAvailable = false;
 
     protected String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
@@ -265,6 +270,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
         queryService = new QueryServiceImpl();
         ((QueryServiceImpl)queryService).setIdentityProvider(registry.getIdentityProvider());
         ((QueryServiceImpl)queryService).setCommandService(new TransactionalCommandService(emf));
+        Function<String, String> kieServerDataSourceResolver = input -> {
+            String dataSource = input;
+            Matcher matcher = PARAMETER_MATCHER.matcher(dataSource);
+            while (matcher.find()) {
+                String paramName = matcher.group(1);
+                KieServerConfig configuration = context.getStateRepository().load(KieServerEnvironment.getServerId()).getConfiguration();
+                dataSource = configuration.getConfigItemValue(paramName, "java:jboss/datasources/ExampleDS");
+                logger.info("Data source expression {} resolved to {}", input, dataSource);
+            }
+            
+            return dataSource;
+        };        
+        ((QueryServiceImpl) queryService).setDataSourceResolver(kieServerDataSourceResolver);        
         ((QueryServiceImpl)queryService).init();
 
         // set runtime data service as listener on deployment service
