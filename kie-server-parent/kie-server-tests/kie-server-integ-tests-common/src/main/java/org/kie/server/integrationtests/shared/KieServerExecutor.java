@@ -107,5 +107,6 @@ public class KieServerExecutor {
         ((KieServicesImpl) KieServices.Factory.get()).nullAllContainerIds();
         server.stop();
         server = null;
+        TestConfig.cleanKieServerAllocatedPort();
     }
 }
