@@ -17,26 +17,22 @@ package org.kie.server.services.jbpm;
 
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.convertQueryDefinition;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceWithVarsList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinitionList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceListPO;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceListPO;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.jbpm.kie.services.impl.query.QueryServiceImpl;
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.jbpm.services.api.model.ProcessInstanceCustomDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
@@ -56,8 +52,6 @@ import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.error.ExecutionError;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.KieServerEnvironment;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
@@ -70,8 +64,6 @@ public class QueryDataServiceBase {
 
     public static final Logger logger = LoggerFactory.getLogger(QueryDataServiceBase.class);
 
-    protected static final Pattern PARAMETER_MATCHER = Pattern.compile("\\$\\{([\\S&&[^\\}]]+)\\}", Pattern.DOTALL);
-
     private QueryService queryService;
     private MarshallerHelper marshallerHelper;
     private KieServerRegistry context;
@@ -79,23 +71,7 @@ public class QueryDataServiceBase {
     public QueryDataServiceBase(QueryService queryService, KieServerRegistry context) {
         this.queryService = queryService;
         this.context = context;
-        this.marshallerHelper = new MarshallerHelper(context);
-        
-        Function<String, String> kieServerDataSourceResolver = input -> {
-            String dataSource = input;
-            Matcher matcher = PARAMETER_MATCHER.matcher(dataSource);
-            while (matcher.find()) {
-                String paramName = matcher.group(1);
-                KieServerConfig configuration = context.getStateRepository().load(KieServerEnvironment.getServerId()).getConfiguration();
-                dataSource = configuration.getConfigItemValue(paramName, "java:jboss/datasources/ExampleDS");
-                logger.info("Data source expression {} resolved to {}", input, dataSource);
-            }
-            
-            return dataSource;
-        };
-        if (queryService instanceof QueryServiceImpl) {
-            ((QueryServiceImpl) queryService).setDataSourceResolver(kieServerDataSourceResolver);
-        }
+        this.marshallerHelper = new MarshallerHelper(context);       
     }
 
     public QueryDefinition registerQuery(String queryName, String payload, String marshallingType) throws QueryAlreadyRegisteredException {
