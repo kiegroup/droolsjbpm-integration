@@ -195,6 +195,13 @@ public class TestConfig {
     }
 
     /**
+     * Cleanup Kie server allocated port so next time the embedded Kie server is created the new port is allocated.
+     */
+    public static void cleanKieServerAllocatedPort() {
+        ALLOCATED_PORT = null;
+    }
+
+    /**
      * Get allocated port of embedded REST server.
      *
      * @return HTTP port number.
@@ -213,6 +220,13 @@ public class TestConfig {
         }
 
         return CONTROLLER_ALLOCATED_PORT;
+    }
+
+    /**
+     * Cleanup Controller allocated port so next time the embedded Controller is created the new port is allocated.
+     */
+    public static void cleanControllerAllocatedPort() {
+        CONTROLLER_ALLOCATED_PORT = null;
     }
 
     /**

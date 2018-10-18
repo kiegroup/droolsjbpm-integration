@@ -42,5 +42,6 @@ public class KieControllerExecutor {
         }
         controller.stop();
         controller = null;
+        TestConfig.cleanControllerAllocatedPort();
     }
 }
