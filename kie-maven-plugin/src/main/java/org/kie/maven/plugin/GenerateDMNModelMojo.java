@@ -82,6 +82,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
             DMNCompilerConfigurationImpl dmnCompilerConfiguration = (DMNCompilerConfigurationImpl) DMNFactory.newCompilerConfiguration();
 
+            final List<String> compiledClassNames = new ArrayList<>();
             dmnCompilerConfiguration.setProperty(ExecModelCompilerOption.PROPERTY_NAME, Boolean.TRUE.toString());
             dmnCompilerConfiguration.addListener(new AfterGeneratingSourcesListener() {
                 @Override
@@ -91,8 +92,6 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                     final String droolsModelCompilerPath = "/generated-sources/dmn/main/java";
                     final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
                     project.addCompileSourceRoot(newCompileSourceRoot);
-
-                    final List<String> compiledClassNames = new ArrayList<>();
 
                     for (GeneratedSource generatedFile : generatedSource) {
                         Path fileName = Paths.get(generatedFile.getFileName());
@@ -125,21 +124,6 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                         }
                     }
 
-
-                    // copy the META-INF packages file
-                    final String packagesMemoryFilePath = "META-INF/kie/dmn";
-                    final Path dmnCompiledClassFile = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath);
-
-                    try {
-                        if (!Files.exists(dmnCompiledClassFile)) {
-                            Files.createDirectories(dmnCompiledClassFile.getParent());
-                        }
-                        Files.write(dmnCompiledClassFile, compiledClassNames);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("Unable to write file", e);
-                    }
-
                     // Avoid compile the sources
                     return false;
 
@@ -168,6 +152,21 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                         });
 
                 assemblerService.addResources(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
+
+
+                // copy the META-INF packages file
+                final String packagesMemoryFilePath = "META-INF/kie/dmn";
+                final Path dmnCompiledClassFile = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath);
+
+                try {
+                    if (!Files.exists(dmnCompiledClassFile)) {
+                        Files.createDirectories(dmnCompiledClassFile.getParent());
+                    }
+                    Files.write(dmnCompiledClassFile, compiledClassNames);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("Unable to write file", e);
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
