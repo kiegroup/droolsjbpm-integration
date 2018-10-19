@@ -17,6 +17,8 @@ package org.kie.kproject;
 
 import java.math.BigDecimal;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
@@ -27,6 +29,7 @@ import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.core.compiler.ExecModelCompilerOption;
 import org.kie.firealarm.Fire;
 import org.kie.firealarm.Room;
 import org.kie.firealarm.Sprinkler;
@@ -75,5 +78,15 @@ public class KProjectTest {
         DMNContext result = dmnResult.getContext();
 
         assertThat(result.get("Total Vacation Days"), is(BigDecimal.valueOf(27)));
+    }
+
+    @Before
+    public void before() {
+        System.setProperty(ExecModelCompilerOption.PROPERTY_NAME, Boolean.toString(true));
+    }
+
+    @After
+    public void after() {
+        System.clearProperty(ExecModelCompilerOption.PROPERTY_NAME);
     }
 }

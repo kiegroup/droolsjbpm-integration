@@ -34,6 +34,7 @@ import org.kie.dmn.api.core.AfterGeneratingSourcesListener;
 import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.core.assembler.DMNAssemblerService;
 import org.kie.dmn.core.compiler.DMNCompilerConfigurationImpl;
+import org.kie.dmn.core.compiler.ExecModelCompilerDeferredOption;
 import org.kie.dmn.core.compiler.ExecModelCompilerOption;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
@@ -84,9 +85,10 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
             final List<String> compiledClassNames = new ArrayList<>();
             dmnCompilerConfiguration.setProperty(ExecModelCompilerOption.PROPERTY_NAME, Boolean.TRUE.toString());
+            dmnCompilerConfiguration.setProperty(ExecModelCompilerDeferredOption.PROPERTY_NAME, Boolean.TRUE.toString());
             dmnCompilerConfiguration.addListener(new AfterGeneratingSourcesListener() {
                 @Override
-                public boolean accept(List<AfterGeneratingSourcesListener.GeneratedSource> generatedSource) {
+                public void accept(List<AfterGeneratingSourcesListener.GeneratedSource> generatedSource) {
                     getLog().info("generatedSource = " + generatedSource);
 
                     final String droolsModelCompilerPath = "/generated-sources/dmn/main/java";
@@ -123,10 +125,6 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                             throw new RuntimeException("Unable to write file", e);
                         }
                     }
-
-                    // Avoid compile the sources
-                    return false;
-
                 }
             });
 
