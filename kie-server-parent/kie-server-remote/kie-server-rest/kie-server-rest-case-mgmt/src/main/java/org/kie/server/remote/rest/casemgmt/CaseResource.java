@@ -40,8 +40,8 @@ import static org.kie.server.api.rest.RestURI.CASE_ID;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCES_BY_DEF_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCES_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_DELETE_URI;
-import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_POST_URI;
 import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.CASE_INSTANCE_POST_URI;
 import static org.kie.server.api.rest.RestURI.CASE_MILESTONES_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_NODE_INSTANCES_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_NODE_NAME;
@@ -59,6 +59,14 @@ import static org.kie.server.api.rest.RestURI.REOPEN_CASE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.START_CASE_POST_URI;
 import static org.kie.server.remote.rest.casemgmt.Messages.CASE_COMMENT_NOT_FOUND;
 import static org.kie.server.remote.rest.casemgmt.Messages.CASE_DEFINITION_NOT_FOUND;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_FILE_JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_FILE_XML;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.VAR_JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.VAR_MAP_JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.VAR_MAP_XML;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.VAR_XML;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
@@ -69,6 +77,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -110,6 +119,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Case instances :: Case Management")
 @Path("server/" + CASE_URI)
@@ -136,11 +147,14 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case definition or Container Id not found") })
     @POST
     @Path(START_CASE_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startCase(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id where the case definition resides", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "case definition id that new instance should be created from", required = true) @PathParam(CASE_DEF_ID) String caseDefId, 
-            @ApiParam(value = "optional CaseFile with variables and/or case role assignments", required = false) String payload) {
+            @ApiParam(value = "optional CaseFile with variables and/or case role assignments", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=CASE_FILE_JSON),
+                    @ExampleProperty(mediaType=XML, value=CASE_FILE_XML)})) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -234,12 +248,15 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @PUT
     @Path(REOPEN_CASE_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response reopenCase(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id where the case definition resides", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "case definition id that new instance should be created from", required = true) @PathParam(CASE_DEF_ID) String caseDefId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId, 
-            @ApiParam(value = "optional CaseFile with variables and/or case role assignments", required = false) String payload) {
+            @ApiParam(value = "optional CaseFile with variables and/or case role assignments", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=CASE_FILE_JSON),
+                    @ExampleProperty(mediaType=XML, value=CASE_FILE_XML)})) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -304,12 +321,15 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @POST
     @Path(CASE_FILE_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response putCaseInstanceData(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
-            @ApiParam(value = "map of data to be placed in case file as Map", required = true) String payload) {
+            @ApiParam(value = "map of data to be placed in case file as Map", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -330,13 +350,16 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @POST
     @Path(CASE_FILE_BY_NAME_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response putCaseInstanceDataByName(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId, 
             @ApiParam(value = "name of the data item to be added to case file", required = true) @PathParam(CASE_FILE_ITEM) String caseDataName,
             @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
-            @ApiParam(value = "data to be placed in case file, any type can be provided", required = true) String payload) {
+            @ApiParam(value = "data to be placed in case file, any type can be provided", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_XML)})) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -384,11 +407,14 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_TASK_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addDynamicTaskToCase(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true) String payload) {
+            @ApiParam(value = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -407,12 +433,15 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_TASK_IN_STAGE_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addDynamicTaskToCase(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId, 
             @ApiParam(value = "identifier of the stage within case instance where dynamic task should be added", required = true) @PathParam(CASE_STAGE_ID) String stageId,
-            @ApiParam(value = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true) String payload) {
+            @ApiParam(value = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -431,12 +460,15 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_PROCESS_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addDynamicProcessToCase(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "process id of the subprocess to be added", required = true) @PathParam(PROCESS_ID) String processId,
-            @ApiParam(value = "data for dynamic subprocess", required = true) String payload) {
+            @ApiParam(value = "data for dynamic subprocess", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -456,13 +488,16 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addDynamicProcessToCase(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "identifier of the stage within case instance where dynamic subprocess should be added", required = true) @PathParam(CASE_STAGE_ID) String stageId, 
             @ApiParam(value = "process id of the subprocess to be added", required = true) @PathParam(PROCESS_ID) String processId,
-            @ApiParam(value = "data for dynamic subprocess", required = true) String payload) {
+            @ApiParam(value = "data for dynamic subprocess", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -482,13 +517,16 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @PUT
     @Path(CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response triggerAdHocNodeInStage(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "identifier of the stage within case instance where adhoc fragment should be triggered", required = true) @PathParam(CASE_STAGE_ID) String stageId, 
             @ApiParam(value = "name of the adhoc fragment to be triggered", required = true) @PathParam(CASE_NODE_NAME) String adHocName,
-            @ApiParam(value = "optional data to be given when triggering adhoc fragment", required = false) String payload) {
+            @ApiParam(value = "optional data to be given when triggering adhoc fragment", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -507,12 +545,15 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @PUT
     @Path(CASE_DYNAMIC_TASK_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response triggerAdHocNode(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "name of the adhoc fragment to be triggered", required = true) @PathParam(CASE_NODE_NAME) String adHocName,
-            @ApiParam(value = "optional data to be given when triggering adhoc fragment", required = false) String payload) {
+            @ApiParam(value = "optional data to be given when triggering adhoc fragment", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -769,6 +810,7 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @POST
     @Path(CASE_COMMENTS_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addComment(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
@@ -794,6 +836,7 @@ public class CaseResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance not found") })
     @PUT
     @Path(CASE_COMMENTS_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateComment(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 

@@ -30,8 +30,6 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;
@@ -43,12 +41,9 @@ import io.swagger.models.Info;
 public class SwaggerKieServerExtension implements KieServerExtension {
 
     public static final String EXTENSION_NAME = "Swagger";
-    
-    private static final Logger logger = LoggerFactory.getLogger(SwaggerKieServerExtension.class);
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SWAGGER_SERVER_EXT_DISABLED, "false"));
     
-    private KieServerImpl kieServer;
     private KieServerRegistry context;
     
     private List<Object> services = new ArrayList<Object>();
@@ -65,8 +60,7 @@ public class SwaggerKieServerExtension implements KieServerExtension {
     }
 
     @Override
-    public void init(KieServerImpl kieServer, KieServerRegistry registry) {
-    	this.kieServer = kieServer;
+    public void init(KieServerImpl kieServer, KieServerRegistry registry) {    	
     	this.context = registry;
     	
     	JaxrsScanner jaxrsScanner = new DefaultJaxrsScanner();
@@ -96,7 +90,8 @@ public class SwaggerKieServerExtension implements KieServerExtension {
     	Info info = new Info();
     	// version in general refers to major version of the project (kie server) though it uses minor as well to allow emergency type of changesinfo.setTitle("KIE-Server API");
     	// must be updated with every major release
-    	info.setVersion("7.0"); 
+    	info.setVersion("7.0");
+    	info.setTitle("KIE Server");
     	return info;
     }
 
