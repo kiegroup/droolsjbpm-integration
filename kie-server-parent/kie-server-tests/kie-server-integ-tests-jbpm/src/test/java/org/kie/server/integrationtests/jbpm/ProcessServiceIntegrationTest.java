@@ -31,7 +31,9 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
@@ -462,7 +464,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(expected = KieServicesException.class)
     public void testGetNonExistingProcessInstance() {
-        processClient.getProcessInstance(CONTAINER_ID, 9999l);
+        processClient.getProcessInstance(CONTAINER_ID, -9999l);
     }
 
     @Test
@@ -1000,6 +1002,54 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         } finally {
             processClient.abortProcessInstances(CONTAINER_ID, processInstanceIds);
         }
+    }
+    
+    @Test
+    public void testStartProcessOnDeactivatedContainer() throws Exception {
+        
+        Object person = createPersonInstance(USER_JOHN);
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("test", USER_MARY);
+        parameters.put("number", new Integer(12345));
+
+        List<Object> list = new ArrayList<Object>();
+        list.add("item");
+
+        parameters.put("list", list);
+        parameters.put("person", person);
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+
+            assertNotNull(processInstanceId);
+            assertTrue(processInstanceId.longValue() > 0);
+
+            ServiceResponse<KieContainerResource> reply = client.deactivateContainer(CONTAINER_ID);            
+            KieServerAssert.assertSuccess(reply);
+            
+            assertClientException(
+                    () -> processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters),
+                    400,
+                    "Deployment " + CONTAINER_ID + " is not active");
+                     
+            // abort is allowed on deactivated container
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            
+            reply = client.activateContainer(CONTAINER_ID);            
+            KieServerAssert.assertSuccess(reply);
+            
+            // since we activate it again new instance can be started
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+
+
+
     }
 
     protected List<Long> createProcessInstances(Map<String, Object> parameters) {

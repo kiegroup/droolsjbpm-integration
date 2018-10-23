@@ -142,6 +142,42 @@
           "methodName": "getCaseInstanceProcessInstance",
           "elementKind": "method",
           "justification": "Minor change in Swagger docs"
+        },
+        {
+          "code": "java.annotation.added",
+          "package": "org.kie.server.remote.rest.casemgmt",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeAdded",          
+          "package": "org.kie.server.remote.rest.casemgmt",
+          "elementKind": "parameter",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",          
+          "package": "org.kie.server.remote.rest.casemgmt",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.added",
+          "package": "org.kie.server.remote.rest.casemgmt.admin",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeAdded",          
+          "package": "org.kie.server.remote.rest.casemgmt.admin",
+          "elementKind": "parameter",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",          
+          "package": "org.kie.server.remote.rest.casemgmt.admin",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
         }
       ]
     }

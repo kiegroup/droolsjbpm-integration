@@ -88,4 +88,17 @@ public interface DMNServicesClient {
      */
     ServiceResponse<DMNResult> evaluateAll(String containerId, DMNContext dmnContext);
 
+    /**
+     * Evaluate the Decision Service identified by the given name, given the context
+     *
+     * @param containerId the container id deploying the DMN model
+     * @param namespace namespace to identify the model to evaluate
+     * @param modelName model name to identify the model to evaluate
+     * @param decisionServiceName the Decision Service name
+     * @param context the context with all the required inputs (inputData and inputDecision) required by the Decision Service
+     *
+     * @return the result of the evaluation
+     */
+    ServiceResponse<DMNResult> evaluateDecisionService(String containerId, String namespace, String modelName, String decisionServiceName, DMNContext context);
+
 }

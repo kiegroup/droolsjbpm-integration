@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DefinitionService;
@@ -62,6 +63,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
 
     private FormServiceBase formServiceBase;
     private ImageServiceBase imageServiceBase;
+    private FormRendererBase formRendererBase;
 
     private DeploymentService deploymentService;
 
@@ -95,6 +97,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         DefinitionService definitionService = null;
         UserTaskService userTaskService = null;
         FormManagerService formManagerService = null;
+        CaseRuntimeDataService caseRuntimeDataService = null;
 
         for( Object object : jbpmServices ) {
             // in case given service is null (meaning was not configured) continue with next one
@@ -118,14 +121,33 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
                 continue;
             }
         }
+        KieServerExtension caseExtension = registry.getServerExtension("Case-Mgmt");
+        if (caseExtension != null) {                        
+        
+            List<Object> caseMgmtServices = caseExtension.getServices();
+            for( Object object : caseMgmtServices ) {
+                // in case given service is null (meaning was not configured) continue with next one
+                if (object == null) {
+                    continue;
+                }
+                if( CaseRuntimeDataService.class.isAssignableFrom(object.getClass()) ) {
+                    caseRuntimeDataService = (CaseRuntimeDataService) object;
+                    continue;
+                }
+            }
+        } else {
+            logger.warn("Case-Mgmt extension not found, jBPM UI capabilities will be limited");
+        }
 
         formServiceBase = new FormServiceBase(definitionService, runtimeDataService, userTaskService, formManagerService, registry);
         imageServiceBase = new ImageServiceBase(runtimeDataService, imageReferences, registry);
+        formRendererBase = new FormRendererBase(definitionService, userTaskService, formManagerService, caseRuntimeDataService, registry);
 
         services.add(formServiceBase);
         services.add(imageServiceBase);
+        services.add(formRendererBase);
 
-        this.kieContainerCommandService = new JBPMUIKieContainerCommandServiceImpl(null, formServiceBase, imageServiceBase);
+        this.kieContainerCommandService = new JBPMUIKieContainerCommandServiceImpl(null, formServiceBase, imageServiceBase, formRendererBase);
 
         initialized = true;
     }
@@ -153,6 +175,8 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
 
                 KieContainer kieContainer = kieContainerInstance.getKieContainer();
                 imageReferences.putIfAbsent(id, new ImageReference(kieContainer, kieBaseName));
+                
+                formRendererBase.indexDeploymentForms(id);
             }
         } catch (Exception e) {
             messages.add(new Message(Severity.WARN, "Unable to create image reference for container " + id +" by extension " + this + " due to " + e.getMessage()));
@@ -180,6 +204,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         }
 
         imageReferences.remove(id);
+        formRendererBase.dropDeploymentForms(id);
     }
 
     @Override
@@ -194,6 +219,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         Object [] services = {
                 formServiceBase,
                 imageServiceBase,
+                formRendererBase,
                 registry
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {

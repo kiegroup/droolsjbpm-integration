@@ -1,0 +1,26 @@
+<div class="container-fluid">
+	<#list rows as row>
+	<div class="row">
+		<#list row.columns as column>
+		<div class="col-md-${column.span}">${column.content}</div>
+		</#list>
+	</div>
+	</#list>
+	<#if renderButtons??>
+	<div class="row">
+		<div class="col-md-12">
+			<hr/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<button id="claimButton" type="button" class="btn btn-default" onclick="claimTask();">Claim</button>
+			<button id="releaseButton" type="button" class="btn btn-default" onclick="releaseTask();">Release</button>
+			<button id="startButton" type="button" class="btn btn-default" onclick="startTask();">Start</button>
+			<button id="stopButton" type="button" class="btn btn-default" onclick="stopTask();">Stop</button>
+			<button id="saveButton" type="button" class="btn btn-default" onclick="saveTask();">Save</button>
+			<button id="completeButton" type="button" class="btn btn-primary" onclick="completeTask();">Complete</button>
+		</div>
+	</div>
+	</#if>
+</div>

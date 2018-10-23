@@ -47,6 +47,7 @@ public class DMNContextKSMarshallingTest {
   private static final String MODEL_NAME = "bar";
   private static final String DECISION_ID = "baz";
   private static final String DECISION_NAME = "qux";
+  private static final String DECISION_SERVICE_NAME = "ds";
   private static final String DMN_CONTEXT_KEY = "quux";
   private static final String DMN_CONTEXT_VALUE = "corge";
 
@@ -54,6 +55,7 @@ public class DMNContextKSMarshallingTest {
   private static final String MODEL_NAME_XPATH = "/dmn-evaluation-context/model-name";
   private static final String DECISION_ID_XPATH = "/dmn-evaluation-context/decision-id";
   private static final String DECISION_NAME_XPATH = "/dmn-evaluation-context/decision-name";
+  private static final String DECISION_SERVICE_NAME_XPATH = "/dmn-evaluation-context/decision-service-name";
   private static final String DMN_CONTEXT_ENTRY_XPATH_XSTREAM = "/dmn-evaluation-context/dmn-context/entry/string";
   private static final String DMN_CONTEXT_KEY_XPATH_JAXB = "/dmn-evaluation-context/dmn-context/element/@key";
   private static final String DMN_CONTEXT_VALUE_XPATH_JAXB = "/dmn-evaluation-context/dmn-context/element/value";
@@ -74,12 +76,14 @@ public class DMNContextKSMarshallingTest {
     BEAN.setModelName( MODEL_NAME );
     BEAN.setDecisionIds( Collections.singletonList( DECISION_ID ) );
     BEAN.setDecisionNames( Collections.singletonList( DECISION_NAME ) );
+    BEAN.setDecisionServiceName( DECISION_SERVICE_NAME );
     BEAN.setDmnContext( Collections.singletonMap( DMN_CONTEXT_KEY, DMN_CONTEXT_VALUE ) );
     XSTREAM = "<dmn-evaluation-context>\n" +
               "  <model-namespace>foo</model-namespace>\n" +
               "  <model-name>bar</model-name>\n" +
               "  <decision-name>qux</decision-name>\n" +
               "  <decision-id>baz</decision-id>\n" +
+              "  <decision-service-name>ds</decision-service-name>\n" +
               "  <dmn-context class=\"singleton-map\">\n" +
               "    <entry>\n" +
               "      <string>quux</string>\n" +
@@ -93,6 +97,7 @@ public class DMNContextKSMarshallingTest {
            "    <model-name>bar</model-name>\n" +
            "    <decision-name>qux</decision-name>\n" +
            "    <decision-id>baz</decision-id>\n" +
+           "    <decision-service-name>ds</decision-service-name>\n" +
            "    <dmn-context xsi:type=\"jaxbListWrapper\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
            "        <type>MAP</type>\n" +
            "        <element xsi:type=\"jaxbStringObjectPair\" key=\"quux\">\n" +
@@ -105,6 +110,7 @@ public class DMNContextKSMarshallingTest {
            "  \"model-name\" : \"bar\",%n" +
            "  \"decision-name\" : \"qux\",%n" +
            "  \"decision-id\" : \"baz\",%n" +
+           "  \"decision-service-name\" : \"ds\",%n" +
            "  \"dmn-context\" : {\"quux\" : \"corge\"}%n" +
            "}");
     xStreamMarshaller = MarshallerFactory.getMarshaller( classes, MarshallingFormat.XSTREAM, DMNContextKS.class.getClassLoader() );
@@ -120,6 +126,7 @@ public class DMNContextKSMarshallingTest {
     checkXPath( result, MODEL_NAME_XPATH, MODEL_NAME );
     checkXPath( result, DECISION_ID_XPATH, DECISION_ID );
     checkXPath( result, DECISION_NAME_XPATH, DECISION_NAME );
+    checkXPath( result, DECISION_SERVICE_NAME_XPATH, DECISION_SERVICE_NAME );
     checkXPath( result, DMN_CONTEXT_ENTRY_XPATH_XSTREAM, DMN_CONTEXT_KEY, DMN_CONTEXT_VALUE );
   }
 
@@ -152,6 +159,7 @@ public class DMNContextKSMarshallingTest {
     assertNotNull( bean.getDecisionNames() );
     assertEquals( bean.getDecisionNames().size(), 1 );
     assertEquals( bean.getDecisionNames().get( 0 ), DECISION_NAME );
+    assertEquals( bean.getDecisionServiceName(), DECISION_SERVICE_NAME );
     assertNotNull( bean.getDmnContext() );
     assertEquals( bean.getDmnContext().size(), 1 );
     assertEquals( bean.getDmnContext().get(DMN_CONTEXT_KEY), DMN_CONTEXT_VALUE );
@@ -165,6 +173,7 @@ public class DMNContextKSMarshallingTest {
     checkXPath( result, MODEL_NAME_XPATH, MODEL_NAME );
     checkXPath( result, DECISION_ID_XPATH, DECISION_ID );
     checkXPath( result, DECISION_NAME_XPATH, DECISION_NAME );
+    checkXPath( result, DECISION_SERVICE_NAME_XPATH, DECISION_SERVICE_NAME );
     checkXPath( result, DMN_CONTEXT_KEY_XPATH_JAXB, DMN_CONTEXT_KEY );
     checkXPath( result, DMN_CONTEXT_VALUE_XPATH_JAXB, DMN_CONTEXT_VALUE );
   }

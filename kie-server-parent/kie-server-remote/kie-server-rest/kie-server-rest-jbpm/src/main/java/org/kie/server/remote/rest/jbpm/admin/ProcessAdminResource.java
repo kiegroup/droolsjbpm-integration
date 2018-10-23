@@ -15,9 +15,47 @@
 
 package org.kie.server.remote.rest.jbpm.admin;
 
+import static org.kie.server.api.rest.RestURI.ACK_ERRORS_PUT_URI;
+import static org.kie.server.api.rest.RestURI.ACK_ERROR_PUT_URI;
+import static org.kie.server.api.rest.RestURI.ADMIN_PROCESS_URI;
+import static org.kie.server.api.rest.RestURI.CANCEL_NODE_INST_PROCESS_INST_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.ERRORS_BY_PROCESS_INST_GET_URI;
+import static org.kie.server.api.rest.RestURI.ERRORS_GET_URI;
+import static org.kie.server.api.rest.RestURI.ERROR_GET_URI;
+import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_INSTANCES_PUT_URI;
+import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_INST_PUT_URI;
+import static org.kie.server.api.rest.RestURI.NODES_PROCESS_INST_GET_URI;
+import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_PROCESS_INST_GET_URI;
+import static org.kie.server.api.rest.RestURI.RETRIGGER_NODE_INST_PROCESS_INST_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TIMERS_PROCESS_INST_GET_URI;
+import static org.kie.server.api.rest.RestURI.TRIGGER_NODE_PROCESS_INST_POST_URI;
+import static org.kie.server.api.rest.RestURI.UPDATE_TIMER_PROCESS_INST_PUT_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.SIMPLE_VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.SIMPLE_VAR_MAP_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TIMER_VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TIMER_VAR_MAP_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.NODE_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.NODE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.TIMER_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
+
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -55,10 +93,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Process instances administration :: BPM")
 @Path("server/" + ADMIN_PROCESS_URI)
@@ -85,13 +121,16 @@ public class ProcessAdminResource {
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @PUT
     @Path(MIGRATE_PROCESS_INST_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response migrateProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
             @ApiParam(value = "identifier of process instance to be migrated", required = true) @PathParam("pInstanceId") Long processInstanceId,
             @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
             @ApiParam(value = "process definition that process instance should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
-            @ApiParam(value = "node mapping - unique ids of old definition to new definition given as Map", required = false) String payload) {
+            @ApiParam(value = "node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=SIMPLE_VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=SIMPLE_VAR_MAP_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -119,13 +158,16 @@ public class ProcessAdminResource {
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @PUT
     @Path(MIGRATE_PROCESS_INSTANCES_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response migrateProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instances belongs to", required = true) @PathParam("id") String containerId, 
             @ApiParam(value = "list of identifiers of process instance to be migrated", required = true) @QueryParam("pInstanceId") List<Long> processInstanceIds,
             @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
             @ApiParam(value = "process definition that process instances should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
-            @ApiParam(value = "node mapping - unique ids of old definition to new definition given as Map", required = false) String payload) {
+            @ApiParam(value = "node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=SIMPLE_VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=SIMPLE_VAR_MAP_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -218,13 +260,16 @@ public class ProcessAdminResource {
             @ApiResponse(code = 404, message = "Process instance, node instance or Container Id not found") })
     @PUT
     @Path(UPDATE_TIMER_PROCESS_INST_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateTimer(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
             @ApiParam(value = "identifier of process instance that timer belongs to", required = true) @PathParam("pInstanceId") Long processInstanceId,
             @ApiParam(value = "identifier of timer instance to be updated", required = true) @PathParam("timerId") Long timerId, 
             @ApiParam(value = "optional flag that indicates if the time expression is relative to the current date or not, defaults to true", required = false) @QueryParam("relative") @DefaultValue("true") boolean relative, 
-            @ApiParam(value = "Map of timer expressions - deplay, perios and repeat are allowed values in the map", required = true) String payload) {
+            @ApiParam(value = "Map of timer expressions - deplay, perios and repeat are allowed values in the map", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=TIMER_VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=TIMER_VAR_MAP_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);

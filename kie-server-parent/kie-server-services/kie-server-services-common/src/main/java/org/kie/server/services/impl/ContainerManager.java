@@ -40,7 +40,7 @@ public class ContainerManager {
             return;
         }
         for (KieContainerResource containerResource : containers) {
-            if (KieContainerStatus.STARTED.equals(containerResource.getStatus())) {
+            if (KieContainerStatus.STARTED.equals(containerResource.getStatus()) || KieContainerStatus.DEACTIVATED.equals(containerResource.getStatus())) {
                 kieServer.createContainer(containerResource.getContainerId(), containerResource);
             }
         }

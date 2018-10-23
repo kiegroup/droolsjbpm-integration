@@ -1,0 +1,73 @@
+
+<#if column.type == "textarea">
+  <div class="form-group">
+	<label for="${column.id}">${column.label}</label>
+	<#if column.required>
+	<strong style="color: red">*</strong>
+	</#if> 
+	<textarea name="${column.name}" class="form-control" id="${column.id}" rows="5" placeholder="${column.placeHolder}" ${(column.readOnly)?string('readonly', '')} ${(column.required)?string('required', '')}>${column.value}</textarea>
+</div>
+<#elseif column.type == "checkbox">
+<div class="form-group">
+	<label for="${column.id}">${column.label}</label> 
+	<#if column.required>
+	<strong style="color: red">*</strong>
+	</#if>
+	<input name="${column.name}" type="${column.type}" class="form-control" id="${column.id}" ${(column.value == "true")?string('checked', '')} ${(column.readOnly)?string('readonly', '')} ${(column.required)?string('required', '')} >
+</div>
+<#elseif column.type == "select">
+<div class="form-group">
+	<label for="${column.id}">${column.label}</label> 
+	<#if column.required>
+	<strong style="color: red">*</strong>
+	</#if>
+	<select id="${column.id}" name="${column.name}" class="form-control" ${(column.required)?string('required', '')}>
+	<#list column.options as option>
+	  <option value="${option.value}" ${(column.value == option.value)?string('selected', '')}>${option.text}</option>	  
+	  </#list>
+	</select>
+</div>
+<#elseif column.type == "radio">
+<div class="form-group">
+	<label>${column.label}</label>
+	<#if column.required>
+	<strong style="color: red">*</strong>
+	</#if>
+	<#list column.options as option>
+	<div class="radio">
+	  <label>
+	    <input type="radio" name="${column.name}" id="${column.name}_${option.value}" value="${option.value}" ${(column.value == option.value)?string('checked', '')} ${(column.required)?string('required', '')}>
+	    ${option.text}
+	  </label>
+	</div>
+	</#list>
+</div>
+<#elseif column.type == "file">
+<div class="form-group">
+	<#if column.value != "">
+	<#assign x=column.value?split("####")>
+	Download file <a href="${serverPath}/documents/${x[3]}/content">${x[0]}</a><br/>
+	</#if>
+	<label for="${column.id}">${column.label}</label> 
+	<#if column.required>
+	<strong style="color: red">*</strong>
+	</#if>
+	<input name="${column.name}" type="file" class="form-control" id="${column.id}" onchange="encodeImageFileAsURL(this);" ${(column.required)?string('required', '')} >
+</div>
+<#elseif column.type == "date">
+<div class="form-group">
+	<label for="${column.id}">${column.label}</label> 
+	<#if column.required>
+	<strong style="color: red">*</strong>
+	</#if>
+    <input id="${column.id}" name="${column.name}" type="date" class="form-control" value="${column.value}" ${(column.required)?string('required', '')} pattern="${column.pattern}"/>    
+</div>
+<#else>
+<div class="form-group">
+	<label for="${column.id}">${column.label}</label> 
+	<#if column.required>
+	<strong style="color: red">*</strong>
+	</#if>
+	<input name="${column.name}" type="${column.type}" class="form-control" id="${column.id}" placeholder="${column.placeHolder}" value="${column.value}" pattern="${column.pattern}" ${(column.readOnly)?string('readonly', '')} ${(column.required)?string('required', '')}>
+</div>
+</#if>

@@ -16,6 +16,8 @@
 package org.kie.server.integrationtests.shared;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.MavenRepository;
@@ -163,6 +166,17 @@ public class KieServerDeployer {
 
         System.setProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS, originalMavenSettings);
         MavenSettings.reinitSettings();
+    }
+
+    public static void cleanAllRepositories() throws IOException {
+        File kieServerRemoteRepoDir = new File(TestConfig.getKieServerRemoteRepoDir());
+        File kieServerLocalRepoDir = new File(TestConfig.getKieServerLocalRepoDir());
+
+        FileUtils.deleteDirectory(kieServerRemoteRepoDir);
+        FileUtils.deleteDirectory(kieServerLocalRepoDir);
+
+        kieServerRemoteRepoDir.mkdir();
+        kieServerLocalRepoDir.mkdir();
     }
 
     public static MavenRepository getRepository() {

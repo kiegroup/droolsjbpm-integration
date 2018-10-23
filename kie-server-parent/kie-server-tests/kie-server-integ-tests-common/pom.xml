@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-common</artifactId>
@@ -177,6 +177,10 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
 
     <!-- Cargo dependencies -->
     <dependency>
@@ -239,6 +243,7 @@
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
+              <org.kie.swagger.server.ext.disabled>true</org.kie.swagger.server.ext.disabled>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -279,6 +284,7 @@
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
+              <org.kie.swagger.server.ext.disabled>true</org.kie.swagger.server.ext.disabled>
               <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
             </systemProperties>
           </container>

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
@@ -68,6 +69,7 @@ public class CaseKieServerExtension implements KieServerExtension {
     protected CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataService;
     protected CaseAdminServiceBase caseAdminServiceBase;
 
+    protected CaseRuntimeDataService caseRuntimeDataService;
     protected KieContainerCommandService kieContainerCommandService;
 
     @Override
@@ -95,6 +97,7 @@ public class CaseKieServerExtension implements KieServerExtension {
 
         this.services.add(this.caseManagementServiceBase);
         this.services.add(this.caseManagementRuntimeDataService);
+        this.services.add(this.caseRuntimeDataService);
 
         this.kieContainerCommandService = new CaseKieContainerCommandServiceImpl(registry, caseManagementServiceBase, caseManagementRuntimeDataService, caseAdminServiceBase);
 
@@ -133,7 +136,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         CaseIdGenerator caseIdGenerator = getCaseIdGenerator();
 
         // build case runtime data service
-        CaseRuntimeDataServiceImpl caseRuntimeDataService = new CaseRuntimeDataServiceImpl();
+        caseRuntimeDataService = new CaseRuntimeDataServiceImpl();
         ((CaseRuntimeDataServiceImpl) caseRuntimeDataService).setCaseIdGenerator(caseIdGenerator);
         ((CaseRuntimeDataServiceImpl) caseRuntimeDataService).setRuntimeDataService(runtimeDataService);
         ((CaseRuntimeDataServiceImpl) caseRuntimeDataService).setCommandService(new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName)));
@@ -167,7 +170,6 @@ public class CaseKieServerExtension implements KieServerExtension {
         this.caseManagementServiceBase = new CaseManagementServiceBase(caseService, caseRuntimeDataService, registry);
         this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, registry);
         this.caseAdminServiceBase = new CaseAdminServiceBase(caseInstanceMigrationService, registry);
-        
     }
 
     protected CaseIdGenerator getCaseIdGenerator() {
@@ -272,7 +274,7 @@ public class CaseKieServerExtension implements KieServerExtension {
 
     @Override
     public Integer getStartOrder() {
-        return 10;
+        return 8;
     }
 
     @Override
