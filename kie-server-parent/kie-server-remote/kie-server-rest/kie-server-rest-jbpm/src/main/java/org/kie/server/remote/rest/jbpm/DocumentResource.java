@@ -27,6 +27,10 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.io.IOException;
@@ -65,6 +69,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 import io.swagger.annotations.ResponseHeader;
 
 @Api(value="Documents :: BPM")
@@ -179,7 +185,9 @@ public class DocumentResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createDocument(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance") String payload) {
+            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=DOCUMENT_JSON),
+                    @ExampleProperty(mediaType=XML, value=DOCUMENT_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -205,7 +213,9 @@ public class DocumentResource {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateDocument(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "document id of a document that should be updated", required = true) @PathParam("documentId") String documentId, 
-            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance") String payload) {
+            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=DOCUMENT_JSON),
+                    @ExampleProperty(mediaType=XML, value=DOCUMENT_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client

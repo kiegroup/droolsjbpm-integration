@@ -18,10 +18,15 @@ package org.kie.server.remote.rest.casemgmt;
 import static org.kie.server.api.rest.RestURI.ADMIN_CASE_ALL_INSTANCES_GET_URI;
 import static org.kie.server.api.rest.RestURI.ADMIN_CASE_URI;
 import static org.kie.server.api.rest.RestURI.MIGRATE_CASE_INST_PUT_URI;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_XML;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -48,6 +53,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Administration of cases :: Case Management")
 @Path("server/" + ADMIN_CASE_URI)
@@ -113,13 +120,16 @@ public class CaseAdminResource extends AbstractCaseResource {
             @ApiResponse(code = 404, message = "Case instance or Container Id not found") })
     @PUT
     @Path(MIGRATE_CASE_INST_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response migrateCaseInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam("id") String containerId, 
             @ApiParam(value = "identifier of case instance to be migrated", required = true) @PathParam("caseId") String caseId,
             @ApiParam(value = "container id that new case definition should be migrated to to", required = true) @QueryParam("targetContainerId") String targetContainerId,             
             @ApiParam(value = "process and node mapping - unique ids of old definition to new definition given as Map of Maps - ProcessMapping should provide map of process definitions (mandatory), NodeMapping should provide map of node mappings (optional)",
-            required = false) String payload) {
+            required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=CASE_MIGRATION_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=CASE_MIGRATION_MAP_XML)})) String payload) {
         
         return invokeCaseOperation(headers,
                                    "",

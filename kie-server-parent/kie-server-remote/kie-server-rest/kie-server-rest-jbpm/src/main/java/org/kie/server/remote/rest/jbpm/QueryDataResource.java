@@ -27,12 +27,17 @@ import static org.kie.server.remote.rest.common.util.RestUtils.alreadyExists;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_DEF_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_DEF_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_FILTER_SPEC_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_FILTER_SPEC_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.BAD_REQUEST;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_ALREADY_EXISTS;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_NOT_FOUND;
@@ -40,6 +45,7 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERRO
 
 import java.text.MessageFormat;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -55,6 +61,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.dashbuilder.dataset.exception.DataSetLookupException;
 import org.jbpm.services.api.query.QueryAlreadyRegisteredException;
 import org.jbpm.services.api.query.QueryNotFoundException;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -65,14 +73,14 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.QueryDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.dashbuilder.dataset.exception.DataSetLookupException;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Custom queries :: BPM")
 @Path("server/" + QUERY_DEF_URI)
@@ -123,10 +131,13 @@ public class QueryDataResource {
             @ApiResponse(code = 409, message = "Query with given name already exists")})
     @POST
     @Path(CREATE_QUERY_DEF_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "identifier of the query definition to be registered", required = true) @PathParam("queryName") String queryName,
-            @ApiParam(value = "query definition represented as QueryDefinition", required = true) String payload ) {
+            @ApiParam(value = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
+                    @ExampleProperty(mediaType=XML, value=QUERY_DEF_XML)})) String payload ) {
         Variant v = getVariant( headers );
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -166,10 +177,13 @@ public class QueryDataResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @PUT
     @Path(REPLACE_QUERY_DEF_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response replaceQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "identifier of the query definition to be replaced", required = true) @PathParam("queryName") String queryName,
-            @ApiParam(value = "query definition represented as QueryDefinition", required = true) String payload ) {
+            @ApiParam(value = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
+                    @ExampleProperty(mediaType=XML, value=QUERY_DEF_XML)})) String payload ) {
         Variant v = getVariant( headers );
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -312,6 +326,7 @@ public class QueryDataResource {
             @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions")})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response runQueryFiltered( @Context HttpHeaders headers,
             @ApiParam(value = "identifier of the query definition to be used for query", required = true) @PathParam("queryName") String queryName,
@@ -319,7 +334,9 @@ public class QueryDataResource {
             @ApiParam(value = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional query filter specification represented as QueryFilterSpec", required = false) String payload ) {
+            @ApiParam(value = "optional query filter specification represented as QueryFilterSpec", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=QUERY_FILTER_SPEC_JSON),
+                    @ExampleProperty(mediaType=XML, value=QUERY_FILTER_SPEC_XML)})) String payload ) {
         
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -389,6 +406,7 @@ public class QueryDataResource {
             @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions")})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response runQueryFilteredByDeploymentId( @Context HttpHeaders headers,
                                                     @ApiParam(value = "container id to filter queries", required = true) @PathParam("id") String containerId,
@@ -397,7 +415,9 @@ public class QueryDataResource {
                                                     @ApiParam(value = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
                                                     @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
                                                     @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-                                                    @ApiParam(value = "optional query filter specification represented as QueryFilterSpec", required = false) String payload ) {
+                                                    @ApiParam(value = "optional query filter specification represented as QueryFilterSpec", required = false, examples=@Example(value= {
+                                                            @ExampleProperty(mediaType=JSON, value=QUERY_FILTER_SPEC_JSON),
+                                                            @ExampleProperty(mediaType=XML, value=QUERY_FILTER_SPEC_XML)})) String payload ) {
 
         String type = getContentType( headers );
         Header conversationIdHeader = buildConversationIdHeader( containerId,

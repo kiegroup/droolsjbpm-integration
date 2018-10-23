@@ -33,6 +33,12 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JOB_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JOB_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.text.MessageFormat;
@@ -66,6 +72,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Asynchronous jobs :: BPM")
 @Path("server/" + JOB_URI)
@@ -96,7 +104,9 @@ public class ExecutorResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response scheduleRequest(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "optional container id that the job should be associated with", required = false) @QueryParam("containerId") String containerId, 
-            @ApiParam(value = "asynchronous job definition represented as JobRequestInstance", required = true) String payload) {
+            @ApiParam(value = "asynchronous job definition represented as JobRequestInstance", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=JOB_JSON),
+                    @ExampleProperty(mediaType=XML, value=JOB_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -168,11 +178,14 @@ public class ExecutorResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @POST
     @Path(UPDATE_JOB_DATA_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateRequestData(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "identifier of the asynchronous job to be updated", required = true) @PathParam("jobId") long requestId,
             @ApiParam(value = "optional container id that the job should be associated with", required = false) @QueryParam("containerId") String containerId, 
-            @ApiParam(value = "data to be updated on the asynchronous job represented as Map", required = true) String payload) {
+            @ApiParam(value = "data to be updated on the asynchronous job represented as Map", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client

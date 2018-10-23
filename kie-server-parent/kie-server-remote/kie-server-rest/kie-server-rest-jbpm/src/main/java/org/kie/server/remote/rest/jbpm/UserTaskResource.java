@@ -54,12 +54,30 @@ import static org.kie.server.api.rest.RestURI.TASK_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.BOOLEAN_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.BOOLEAN_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DATE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DATE_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.INTEGER_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.INTEGER_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.STRING_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.STRING_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TASK_ATTACHMENT_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TASK_ATTACHMENT_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TASK_COMMENT_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TASK_COMMENT_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TASK_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TASK_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
@@ -67,6 +85,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -102,6 +121,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="User task operations and queries :: BPM")
 @Path("server/" + TASK_URI)
@@ -187,13 +208,16 @@ public class UserTaskResource {
                             @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_COMPLETE_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response complete(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance that should be completed", required = true) @PathParam("tInstanceId") Long taskId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
             @ApiParam(value = "optional flag that allows to directlu claim and start task (if needed) before completion", required = false) @QueryParam("auto-progress") boolean autoProgress, 
-            @ApiParam(value = "optional map of output variables", required = false) String payload) {
+            @ApiParam(value = "optional map of output variables", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -278,12 +302,15 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_FAIL_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response fail(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance that should be failed", required = true) @PathParam("tInstanceId") Long taskId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
-            @ApiParam(value = "optional map of output variables", required = false) String payload) {
+            @ApiParam(value = "optional map of output variables", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -520,11 +547,14 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_PRIORITY_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setPriority(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance where priority should be updated", required = true) @PathParam("tInstanceId") Long taskId, 
-            @ApiParam(value = "priority as Integer", required = true) String priorityPayload) {
+            @ApiParam(value = "priority as Integer", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=INTEGER_JSON),
+                    @ExampleProperty(mediaType=XML, value=INTEGER_XML)})) String priorityPayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -547,11 +577,14 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_EXPIRATION_DATE_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setExpirationDate(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance where expiration date should be updated", required = true) @PathParam("tInstanceId") Long taskId, 
-            @ApiParam(value = "expiration date as Date", required = true) String datePayload) {
+            @ApiParam(value = "expiration date as Date", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=DATE_JSON),
+                    @ExampleProperty(mediaType=XML, value=DATE_XML)})) String datePayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -574,11 +607,14 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_SKIPABLE_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setSkipable(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance where skipable flag should be updated", required = true) @PathParam("tInstanceId") Long taskId, 
-            @ApiParam(value = "skipable flag as Boolean", required = true) String skipablePayload) {
+            @ApiParam(value = "skipable flag as Boolean", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=BOOLEAN_JSON),
+                    @ExampleProperty(mediaType=XML, value=BOOLEAN_XML)})) String skipablePayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -601,11 +637,14 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_NAME_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setName(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance where name should be updated", required = true) @PathParam("tInstanceId") Long taskId, 
-            @ApiParam(value = "name as String", required = true) String namePayload) {
+            @ApiParam(value = "name as String", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=STRING_JSON),
+                    @ExampleProperty(mediaType=XML, value=STRING_XML)})) String namePayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -626,11 +665,14 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_DESCRIPTION_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setDescription(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance where description should be updated", required = true) @PathParam("tInstanceId") Long taskId, 
-            @ApiParam(value = "description as String", required = true) String descriptionPayload) {
+            @ApiParam(value = "description as String", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=STRING_JSON),
+                    @ExampleProperty(mediaType=XML, value=STRING_XML)})) String descriptionPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -652,11 +694,14 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_OUTPUT_DATA_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveContent(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance that data should be saved into", required = true) @PathParam("tInstanceId") Long taskId, 
-            @ApiParam(value = "output data to be saved as Map ", required = true) String payload) {
+            @ApiParam(value = "output data to be saved as Map ", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -757,11 +802,14 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @POST
     @Path(TASK_INSTANCE_COMMENT_ADD_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addComment(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance that comment should be added to", required = true) @PathParam("tInstanceId") Long taskId, 
-            @ApiParam(value = "comment data as TaskComment", required = true) String payload) {
+            @ApiParam(value = "comment data as TaskComment", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=TASK_COMMENT_JSON),
+                    @ExampleProperty(mediaType=XML, value=TASK_COMMENT_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -863,13 +911,16 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @POST
     @Path(TASK_INSTANCE_ATTACHMENT_ADD_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addAttachment(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance that attachment should be added to", required = true) @PathParam("tInstanceId") Long taskId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
             @ApiParam(value = "name of the attachment to be added", required = true) @QueryParam("name") String name, 
-            @ApiParam(value = "attachment content, any type can be provided", required = true) String attachmentPayload) {
+            @ApiParam(value = "attachment content, any type can be provided", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=TASK_ATTACHMENT_JSON),
+                    @ExampleProperty(mediaType=XML, value=TASK_ATTACHMENT_XML)})) String attachmentPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -1057,12 +1108,15 @@ public class UserTaskResource {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response update(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the task instance that should be updated", required = true) @PathParam("tInstanceId") Long taskId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,             
-            @ApiParam(value = "task instance with updates as TaskInstance type", required = true) String payload) {
+            @ApiParam(value = "task instance with updates as TaskInstance type", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=TASK_JSON),
+                    @ExampleProperty(mediaType=XML, value=TASK_XML)})) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);

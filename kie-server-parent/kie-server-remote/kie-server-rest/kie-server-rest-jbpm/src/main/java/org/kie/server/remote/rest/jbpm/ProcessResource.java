@@ -37,6 +37,7 @@ import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INSTANCES_PORT_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INST_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
@@ -45,7 +46,14 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.LONG_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.LONG_RESPONSE_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CREATE_RESPONSE_ERROR;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
@@ -98,6 +106,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Process instances :: BPM")
 @Path("server/" + PROCESS_URI)
@@ -127,7 +137,11 @@ public class ProcessResource  {
 
     @ApiOperation(value="Starts new process instance of given process definition within given container with optional variables",
             response=Long.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+    @ApiResponses(value = { 
+            @ApiResponse(code = 201, response=Long.class, message = "Process instance started", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
+                    @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
+            @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process ID or Container Id not found") })
     @POST
     @Path(START_PROCESS_POST_URI)
@@ -136,7 +150,9 @@ public class ProcessResource  {
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id where the process definition resides", required = true) @PathParam("id") String containerId, 
             @ApiParam(value = "process id that new instance should be created from", required = true) @PathParam("pId") String processId, 
-            @ApiParam(value = "optional map of process variables", required = false) @DefaultValue("") String payload) {
+            @ApiParam(value = "optional map of process variables", required = false, examples=@Example(value= {
+                                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
 
@@ -174,7 +190,9 @@ public class ProcessResource  {
             @ApiParam(value = "container id where the process definition resides", required = true) @PathParam("id") String containerId, 
             @ApiParam(value = "process id that new instance should be created from", required = true) @PathParam("pId") String processId,
             @ApiParam(value = "correlation key to be assigned to process instance", required = true) @PathParam("correlationKey") String correlationKey, 
-            @ApiParam(value = "optional map of process variables", required = false) @DefaultValue("") String payload) {
+            @ApiParam(value = "optional map of process variables", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)}))  @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
 
@@ -269,7 +287,9 @@ public class ProcessResource  {
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the process instance to be signaled", required = true) @PathParam("pInstanceId") Long processInstanceId, 
             @ApiParam(value = "signal name to be send to process instance", required = true) @PathParam("sName") String signalName, 
-            @ApiParam(value = "optional event data - any type can be provided", required = false) String eventPayload) {
+            @ApiParam(value = "optional event data - any type can be provided", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_XML)}))  String eventPayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -302,7 +322,9 @@ public class ProcessResource  {
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "list of identifiers of the process instances to be signaled", required = true) @QueryParam("instanceId") List<Long> processInstanceIds, 
             @ApiParam(value = "signal name to be send to process instance", required = true) @PathParam("sName") String signalName, 
-            @ApiParam(value = "optional event data - any type can be provided", required = false) String eventPayload) {
+            @ApiParam(value = "optional event data - any type can be provided", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_XML)})) String eventPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -370,7 +392,9 @@ public class ProcessResource  {
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the process instance to be updated", required = true) @PathParam("pInstanceId") Long processInstanceId, 
             @ApiParam(value = "name of the variable to be set/updated", required = true) @PathParam("varName") String varName, 
-            @ApiParam(value = "variable data - any type can be provided", required = true) String variablePayload) {
+            @ApiParam(value = "variable data - any type can be provided", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_XML)})) String variablePayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -401,7 +425,9 @@ public class ProcessResource  {
     public Response setProcessVariables(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the process instance to be updated", required = true) @PathParam("pInstanceId") Long processInstanceId, 
-            @ApiParam(value = "variable data give as map", required = true) String variablePayload) {
+            @ApiParam(value = "variable data give as map", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)}))  String variablePayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -529,7 +555,9 @@ public class ProcessResource  {
             @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
             @ApiParam(value = "identifier of the process instance that work item belongs to", required = true) @PathParam("pInstanceId") Long processInstanceId, 
             @ApiParam(value = "identifier of the work item to complete", required = true) @PathParam("workItemId") Long workItemId, 
-            @ApiParam(value = "optional outcome data give as map", required = false) String resultPayload) {
+            @ApiParam(value = "optional outcome data give as map", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String resultPayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);

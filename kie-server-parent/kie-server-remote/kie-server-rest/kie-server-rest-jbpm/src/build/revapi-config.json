@@ -300,6 +300,42 @@
           "methodName": "release",
           "elementKind": "method",
           "justification": "JBPM-7542: Create better response for user without permissions to do"
+        },
+        {
+          "code": "java.annotation.added",
+          "package": "org.kie.server.remote.rest.jbpm",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeAdded",          
+          "package": "org.kie.server.remote.rest.jbpm",
+          "elementKind": "parameter",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",          
+          "package": "org.kie.server.remote.rest.jbpm",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.added",
+          "package": "org.kie.server.remote.rest.jbpm.admin",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeAdded",          
+          "package": "org.kie.server.remote.rest.jbpm.admin",
+          "elementKind": "parameter",
+          "justification": "Improved KIE Server Swagger docs"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",          
+          "package": "org.kie.server.remote.rest.jbpm.admin",
+          "elementKind": "method",
+          "justification": "Improved KIE Server Swagger docs"
         }
       ]
     }
