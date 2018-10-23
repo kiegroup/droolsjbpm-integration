@@ -22,6 +22,7 @@
 
   <properties>
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
+    <version.tomcat9>9.0.12</version.tomcat9>
   </properties>
 
   <repositories>
@@ -49,6 +50,7 @@
   </scm>
 
   <modules>
+    <module>kie-swagger-ui</module>
     <module>kie-identity-session-provider</module>
     <module>kie-maven-plugin</module>
     <module>kie-takari-plugin</module>
