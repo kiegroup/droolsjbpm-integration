@@ -53,9 +53,14 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project}")
     private MavenProject project;
 
+    @Parameter(property = "generateDMNModel", defaultValue = "no")
+    private String generateDMNModel;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        generateDMNModel();
+        if (DMNModelMode.shouldGenerateDMNModel(generateDMNModel)) {
+            generateDMNModel();
+        }
     }
 
     private void generateDMNModel() throws MojoExecutionException {
