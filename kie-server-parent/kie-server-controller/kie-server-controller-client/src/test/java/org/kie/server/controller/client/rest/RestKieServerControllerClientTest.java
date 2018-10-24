@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
@@ -107,5 +108,36 @@ public class RestKieServerControllerClientTest {
         assertTrue(ruleConfigResult instanceof RuleConfig);
         assertEquals(ruleConfig,
                      ruleConfigResult);
+    }
+
+    @Test
+    public void testContainerSpecSerializationUsingRuntimeStrategyEnum() {
+        final ContainerSpec spec = new ContainerSpec();
+        spec.setId("id");
+        spec.setContainerName("name");
+        spec.setStatus(KieContainerStatus.STARTED);
+
+        ProcessConfig processConfig = new ProcessConfig("runtimeStrategy", "kBase", "kSession", "mergeMode");
+        processConfig.setRuntimeStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
+
+        spec.addConfig(Capability.PROCESS, processConfig);
+        final String specContent = client.serialize(spec);
+        LOGGER.info("{} content\n{}", marshallingFormat.getType(), specContent);
+        final ContainerSpec specResult = client.deserialize(specContent, ContainerSpec.class);
+
+        assertNotNull(specResult);
+        assertEquals(spec, specResult);
+        assertEquals(spec.getId(), specResult.getId());
+        assertEquals(spec.getStatus(), specResult.getStatus());
+        assertEquals(spec.getContainerName(), specResult.getContainerName());
+        assertEquals(spec.getConfigs(), specResult.getConfigs());
+        assertNotNull(specResult.getConfigs());
+        final ContainerConfig processConfigResult = specResult.getConfigs().get(Capability.PROCESS);
+        assertNotNull(processConfigResult);
+        assertTrue(processConfigResult instanceof ProcessConfig);
+        assertEquals(processConfig, processConfigResult);
+
+        assertEquals(processConfig.getRuntimeStrategy(), "PER_PROCESS_INSTANCE");
+        assertEquals(processConfig.getRuntimeStrategyEnum(), RuntimeStrategy.PER_PROCESS_INSTANCE);
     }
 }
