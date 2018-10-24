@@ -6,9 +6,4 @@
             factory="org.jboss.narayana.tomcat.jta.TransactionManagerFactory"/>
   <Resource name="TransactionSynchronizationRegistry" type="javax.transaction.TransactionSynchronizationRegistry"
             factory="org.jboss.narayana.tomcat.jta.TransactionSynchronizationRegistryFactory"/>
-
-
-  <Resource name="jdbc/jbpm" auth="Container" type="javax.sql.DataSource"
-            driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
-            url="jdbc:arjuna:java:comp/env/sharedDataSource" />
 </Context>
