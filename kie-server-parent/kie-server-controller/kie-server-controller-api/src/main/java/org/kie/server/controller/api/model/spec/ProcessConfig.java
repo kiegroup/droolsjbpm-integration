@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.internal.runtime.conf.RuntimeStrategy;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-config")
 public class ProcessConfig extends ContainerConfig {
@@ -47,6 +49,10 @@ public class ProcessConfig extends ContainerConfig {
         return runtimeStrategy;
     }
 
+    public RuntimeStrategy getRuntimeStrategyEnum() {
+        return RuntimeStrategy.valueOf(runtimeStrategy);
+    }
+
     public String getKBase() {
         return kBase;
     }
@@ -60,7 +66,13 @@ public class ProcessConfig extends ContainerConfig {
     }
 
     public void setRuntimeStrategy(String runtimeStrategy) {
+        // Check that the runtimeStrategy string is correct
+        RuntimeStrategy.valueOf(runtimeStrategy);
         this.runtimeStrategy = runtimeStrategy;
+    }
+
+    public void setRuntimeStrategy(RuntimeStrategy runtimeStrategy) {
+        this.runtimeStrategy = runtimeStrategy.name();
     }
 
     public void setKBase(String kBase) {
