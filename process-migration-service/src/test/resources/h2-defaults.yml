@@ -1,0 +1,25 @@
+swarm:
+  deployment:
+    process-migration.war:
+      jaxrs:
+        application-path: /
+  logging:
+    org.kie.server:
+      level: DEBUG
+    org.kie.processmigration:
+      level: DEBUG
+  datasources:
+    data-sources:
+      ExampleDS:
+        driver-name: h2
+        connection-url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        user-name: sa
+        password: sa
+kieserver:
+  host: localhost
+  port: 8080
+  protocol: http
+  contextRoot: /kie-server
+  path: /services/rest/server
+credentials:
+  password: gUkXp2s5v8x/A?D(

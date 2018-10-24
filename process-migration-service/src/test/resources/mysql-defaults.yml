@@ -1,0 +1,24 @@
+swarm:
+  deployment:
+    process-migration.war:
+      jaxrs:
+        application-path: /
+  logging:
+    org.kie.processmigration:
+      level: INFO
+  datasources:
+    data-sources:
+      ExampleDS:
+        driver-name: mysql
+        #add the ?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC to avoid timezone related exception        
+        connection-url: jdbc:mysql://localhost:3306/rhpam?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+        user-name: mysqluser
+        password: password    
+kieserver:
+  host: localhost
+  port: 8080
+  protocol: http
+  contextRoot: /kie-server
+  path: /services/rest/server
+credentials:
+  password: gUkXp2s5v8x/A?D(
