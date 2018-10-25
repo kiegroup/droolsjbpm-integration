@@ -76,7 +76,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             DMNCompilerConfigurationImpl dmnCompilerConfiguration = (DMNCompilerConfigurationImpl) DMNFactory.newCompilerConfiguration();
 
             final List<String> compiledClassNames = new ArrayList<>();
-            dmnCompilerConfiguration.setProperty(ExecModelCompilerDeferredOption.PROPERTY_NAME, Boolean.TRUE.toString());
+            dmnCompilerConfiguration.setDeferredCompilation(true);
             dmnCompilerConfiguration.addListener(generatedSource -> {
                 final String droolsModelCompilerPath = "/generated-sources/dmn/main/java";
                 addNewCompileRoot(droolsModelCompilerPath);
