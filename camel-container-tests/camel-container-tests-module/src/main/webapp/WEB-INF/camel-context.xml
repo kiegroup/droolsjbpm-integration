@@ -1,0 +1,55 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
+
+  <cxf:rsServer id="cxfConsumer"
+                address="http://localhost:8080/rest"
+                serviceClass="org.kie.camel.container.api.service.KieCamelTestService" />
+
+  <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+  <kie:kmodule id="test-kmodule">
+    <kie:kbase name="rules-kbase" packages="org.kie.camel.container.rules,org.kie.camel.container.api.model" >
+      <kie:ksession name="rules-session" type="stateless"/>
+    </kie:kbase>
+    <kie:kbase name="process-kbase" packages="org.kie.camel.container.processes,org.kie.camel.container.api.model" >
+      <kie:ksession name="process-session" type="stateful"/>
+    </kie:kbase>
+  </kie:kmodule>
+
+  <camelContext id="camel-context" xmlns="http://camel.apache.org/schema/spring">
+    <!-- Routes requests from CXF endpoint -->
+    <route id="cxfConsumerToProcessorRoute">
+      <from id="cxfrsConsumer" uri="cxfrs:bean:cxfConsumer" />
+      <choice>
+        <when>
+          <simple>${header.operationName} == 'verifyAge'</simple>
+          <to uri="direct:ageVerification" />
+        </when>
+        <when>
+          <simple>${header.operationName} == 'startProcessCommand'</simple>
+          <to uri="direct:runProcessCommand"/>
+        </when>
+      </choice>
+    </route>
+
+    <!-- Route for age verfication service -->
+    <route id="ageVerificationRoute">
+      <from uri="direct:ageVerification" />
+      <transform><simple>${body[0]}</simple></transform>
+      <to uri="kie-local:rules-session?action=insertBody"/>
+    </route>
+
+    <!-- Route for running processes using commands -->
+    <route id="runProcessCommand">
+      <from uri="direct:runProcessCommand" />
+      <transform><simple>${body[0]}</simple></transform>
+      <to uri="kie-local:process-session?action=execute"/>
+    </route>
+  </camelContext>
+</beans>
