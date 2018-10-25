@@ -29,7 +29,6 @@ import org.kie.dmn.api.core.AfterGeneratingSourcesListener;
 import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.core.assembler.DMNAssemblerService;
 import org.kie.dmn.core.compiler.DMNCompilerConfigurationImpl;
-import org.kie.dmn.core.compiler.ExecModelCompilerDeferredOption;
 import org.kie.dmn.core.compiler.execmodelbased.DMNRuleClassFile;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
