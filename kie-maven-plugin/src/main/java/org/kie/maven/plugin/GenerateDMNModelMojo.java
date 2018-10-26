@@ -26,6 +26,7 @@ import org.kie.api.io.ResourceConfiguration;
 import org.kie.api.io.ResourceType;
 import org.kie.api.io.ResourceWithConfiguration;
 import org.kie.dmn.api.core.AfterGeneratingSourcesListener;
+import org.kie.dmn.api.core.GeneratedSource;
 import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.core.assembler.DMNAssemblerService;
 import org.kie.dmn.core.compiler.DMNCompilerConfigurationImpl;
@@ -80,7 +81,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                 final String droolsModelCompilerPath = "/generated-sources/dmn/main/java";
                 addNewCompileRoot(droolsModelCompilerPath);
 
-                for (AfterGeneratingSourcesListener.GeneratedSource generatedFile : generatedSource) {
+                for (GeneratedSource generatedFile : generatedSource) {
                     final Path fileNameRelative = transformPathToMavenPath(generatedFile);
 
                     compiledClassNames.add(getCompiledClassName(fileNameRelative));
@@ -161,7 +162,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                                 .replace(".java", "");
     }
 
-    private Path transformPathToMavenPath(AfterGeneratingSourcesListener.GeneratedSource generatedFile) {
+    private Path transformPathToMavenPath(GeneratedSource generatedFile) {
         Path fileName = Paths.get(generatedFile.getFileName());
         Path originalFilePath = Paths.get("src/main/java");
         final Path fileNameRelative;
