@@ -34,12 +34,20 @@ public class FormField {
     private String placeHolder;
     private long maxLength;
     private boolean required;
-    @JsonProperty("readonly")
+    @JsonProperty("readOnly")
     private boolean readOnly;
 
     private List<ItemOption> options;
 
+    // subform related
     private String nestedForm;
+
+    // multi subform related
+    @JsonProperty("columnMetas")
+    private List<TableInfo> tableInfo;
+
+    private String creationForm;
+    private String editionForm;
 
     public String getId() {
         return id;
@@ -135,6 +143,30 @@ public class FormField {
 
     public void setOptions(List<ItemOption> options) {
         this.options = options;
+    }
+
+    public List<TableInfo> getTableInfo() {
+        return tableInfo;
+    }
+
+    public void setTableInfo(List<TableInfo> tableInfo) {
+        this.tableInfo = tableInfo;
+    }
+
+    public String getCreationForm() {
+        return creationForm;
+    }
+
+    public void setCreationForm(String creationForm) {
+        this.creationForm = creationForm;
+    }
+
+    public String getEditionForm() {
+        return editionForm;
+    }
+
+    public void setEditionForm(String editionForm) {
+        this.editionForm = editionForm;
     }
 
 }

@@ -22,7 +22,9 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.kie.server.services.jbpm.ui.form.render.model.FormInstance;
+import org.kie.server.services.jbpm.ui.form.render.model.LayoutRow;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,7 +43,8 @@ public class FormReader {
             return null;
         }
         try {
-            return this.mapper.readValue(formStructure, FormInstance.class);
+            FormInstance formInstance = this.mapper.readValue(formStructure, FormInstance.class);
+            return flatColumnData(formInstance);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -50,7 +53,8 @@ public class FormReader {
     public FormInstance readFromStream(InputStream formStructure) {
         
         try {
-            return this.mapper.readValue(formStructure, FormInstance.class);
+            FormInstance formInstance =  this.mapper.readValue(formStructure, FormInstance.class);
+            return flatColumnData(formInstance);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,5 +65,28 @@ public class FormReader {
             return Collections.emptyMap();
         }
         return mapper.convertValue(data, Map.class);
+    }
+    
+    public String toJson(Object data) {
+        if (data == null) {
+            return "{}";
+        }
+        try {
+            return mapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    protected FormInstance flatColumnData(FormInstance formInstance) {
+        
+        if (formInstance.getLayout() != null) {
+            for (LayoutRow row : formInstance.getLayout().getRows()) {
+                
+                row.getColumns().forEach(c -> c.flatItems());
+            }
+        }
+        
+        return formInstance;
     }
 }

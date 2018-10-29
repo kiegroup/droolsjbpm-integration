@@ -1,73 +1,73 @@
 
-<#if column.type == "textarea">
+<#if item.type == "textarea">
   <div class="form-group">
-	<label for="${column.id}">${column.label}</label>
-	<#if column.required>
+	<label for="${item.id}">${item.label}</label>
+	<#if item.required>
 	<strong style="color: red">*</strong>
 	</#if> 
-	<textarea name="${column.name}" class="form-control" id="${column.id}" rows="5" placeholder="${column.placeHolder}" ${(column.readOnly)?string('readonly', '')} ${(column.required)?string('required', '')}>${column.value}</textarea>
+	<textarea name="${item.name}" class="form-control" id="${item.id}" rows="5" placeholder="${item.placeHolder}" ${(item.readOnly)?string('readonly', '')} ${(item.required)?string('required', '')}>${item.value}</textarea>
 </div>
-<#elseif column.type == "checkbox">
+<#elseif item.type == "checkbox">
 <div class="form-group">
-	<label for="${column.id}">${column.label}</label> 
-	<#if column.required>
+	<label for="${item.id}">${item.label}</label> 
+	<#if item.required>
 	<strong style="color: red">*</strong>
 	</#if>
-	<input name="${column.name}" type="${column.type}" class="form-control" id="${column.id}" ${(column.value == "true")?string('checked', '')} ${(column.readOnly)?string('readonly', '')} ${(column.required)?string('required', '')} >
+	<input name="${item.name}" type="${item.type}" class="form-control" id="${item.id}" ${(item.value == "true")?string('checked', '')} ${(item.readOnly)?string('readonly', '')} ${(item.required)?string('required', '')} >
 </div>
-<#elseif column.type == "select">
+<#elseif item.type == "select">
 <div class="form-group">
-	<label for="${column.id}">${column.label}</label> 
-	<#if column.required>
+	<label for="${item.id}">${item.label}</label> 
+	<#if item.required>
 	<strong style="color: red">*</strong>
 	</#if>
-	<select id="${column.id}" name="${column.name}" class="form-control" ${(column.required)?string('required', '')}>
-	<#list column.options as option>
-	  <option value="${option.value}" ${(column.value == option.value)?string('selected', '')}>${option.text}</option>	  
+	<select id="${item.id}" name="${item.name}" class="form-control" ${(item.required)?string('required', '')}>
+	<#list item.options as option>
+	  <option value="${option.value}" ${(item.value == option.value)?string('selected', '')}>${option.text}</option>	  
 	  </#list>
 	</select>
 </div>
-<#elseif column.type == "radio">
+<#elseif item.type == "radio">
 <div class="form-group">
-	<label>${column.label}</label>
-	<#if column.required>
+	<label>${item.label}</label>
+	<#if item.required>
 	<strong style="color: red">*</strong>
 	</#if>
-	<#list column.options as option>
+	<#list item.options as option>
 	<div class="radio">
 	  <label>
-	    <input type="radio" name="${column.name}" id="${column.name}_${option.value}" value="${option.value}" ${(column.value == option.value)?string('checked', '')} ${(column.required)?string('required', '')}>
+	    <input type="radio" name="${item.name}" id="${item.name}_${option.value}" value="${option.value}" ${(item.value == option.value)?string('checked', '')} ${(item.required)?string('required', '')}>
 	    ${option.text}
 	  </label>
 	</div>
 	</#list>
 </div>
-<#elseif column.type == "file">
+<#elseif item.type == "file">
 <div class="form-group">
-	<#if column.value != "">
-	<#assign x=column.value?split("####")>
+	<#if item.value != "">
+	<#assign x=item.value?split("####")>
 	Download file <a href="${serverPath}/documents/${x[3]}/content">${x[0]}</a><br/>
 	</#if>
-	<label for="${column.id}">${column.label}</label> 
-	<#if column.required>
+	<label for="${item.id}">${item.label}</label> 
+	<#if item.required>
 	<strong style="color: red">*</strong>
 	</#if>
-	<input name="${column.name}" type="file" class="form-control" id="${column.id}" onchange="encodeImageFileAsURL(this);" ${(column.required)?string('required', '')} >
+	<input name="${item.name}" type="file" class="form-control" id="${item.id}" onchange="encodeImageFileAsURL(this);" ${(item.required)?string('required', '')} >
 </div>
-<#elseif column.type == "date">
+<#elseif item.type == "date">
 <div class="form-group">
-	<label for="${column.id}">${column.label}</label> 
-	<#if column.required>
+	<label for="${item.id}">${item.label}</label> 
+	<#if item.required>
 	<strong style="color: red">*</strong>
 	</#if>
-    <input id="${column.id}" name="${column.name}" type="date" class="form-control" value="${column.value}" ${(column.required)?string('required', '')} pattern="${column.pattern}"/>    
+    <input id="${item.id}" name="${item.name}" type="date" class="form-control" value="${item.value}" ${(item.required)?string('required', '')} pattern="${item.pattern}"/>    
 </div>
 <#else>
 <div class="form-group">
-	<label for="${column.id}">${column.label}</label> 
-	<#if column.required>
+	<label for="${item.id}">${item.label}</label> 
+	<#if item.required>
 	<strong style="color: red">*</strong>
 	</#if>
-	<input name="${column.name}" type="${column.type}" class="form-control" id="${column.id}" placeholder="${column.placeHolder}" value="${column.value}" pattern="${column.pattern}" ${(column.readOnly)?string('readonly', '')} ${(column.required)?string('required', '')}>
+	<input name="${item.name}" type="${item.type}" class="form-control" id="${item.id}" placeholder="${item.placeHolder}" value="${item.value}" pattern="${item.pattern}" ${(item.readOnly)?string('readonly', '')} ${(item.required)?string('required', '')}>
 </div>
 </#if>
