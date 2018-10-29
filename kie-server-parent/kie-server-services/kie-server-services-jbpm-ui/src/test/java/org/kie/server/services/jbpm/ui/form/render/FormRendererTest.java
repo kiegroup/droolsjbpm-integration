@@ -39,6 +39,7 @@ import org.junit.runners.Parameterized;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskData;
+import org.kie.server.services.jbpm.ui.form.render.data.Item;
 import org.kie.server.services.jbpm.ui.form.render.model.FormInstance;
 import org.mockito.Mockito;
 
@@ -248,6 +249,52 @@ public class FormRendererTest {
         String renderedForm = renderer.renderTask("", task, form, inputs, outputs);
         assertThat(renderedForm).isNotNull();
         writeToFile("testRenderOfBasicTaskFormWithSelectRadioGroupAndData.html", renderedForm);
+    }
+    
+    @Test
+    public void testRenderOfMultiSubFormNoData() {
+                        
+        FormReader reader = new FormReader();
+        
+        FormInstance itemForm = reader.readFromStream(this.getClass().getResourceAsStream("/item-taskform.json"));
+        assertThat(itemForm).isNotNull();
+        FormInstance form = reader.readFromStream(this.getClass().getResourceAsStream("/order-taskform.json"));
+        assertThat(form).isNotNull();
+        form.addNestedForm(itemForm);
+        
+        ProcessDefinition processDefinition = newProcessDefinition("");
+        
+        String renderedForm = renderer.renderProcess("", processDefinition, form);
+        assertThat(renderedForm).isNotNull();
+        writeToFile("testRenderOfMultiSubFormNoData.html", renderedForm);
+    }
+    
+    @Test
+    public void testRenderOfMultiSubFormWithData() {
+                        
+        FormReader reader = new FormReader();
+        FormInstance itemForm = reader.readFromStream(this.getClass().getResourceAsStream("/item-taskform.json"));
+        assertThat(itemForm).isNotNull();
+        FormInstance form = reader.readFromStream(this.getClass().getResourceAsStream("/order-taskform.json"));
+        assertThat(form).isNotNull();
+        form.addNestedForm(itemForm);
+        
+        List<Item> items = new ArrayList<>();
+        items.add(new Item("test", 10, 125.50));
+        items.add(new Item("another", 4, 25.80));
+        
+        Map<String, Object> inputs = new HashMap<>();
+        inputs.put("items", items);
+        inputs.put("orderNumber", "XXX-ZZZ-YYY");
+        inputs.put("customer", "John");
+        inputs.put("address", "Main Street");
+        Map<String, Object> outputs = new HashMap<>();
+        
+        Task task = newTask(0L, "Ready");
+        
+        String renderedForm = renderer.renderTask("", task, form, inputs, outputs);
+        assertThat(renderedForm).isNotNull();
+        writeToFile("testRenderOfMultiSubFormWithData.html", renderedForm);
     }
     
     protected void writeToFile(String fileName, String content) {
