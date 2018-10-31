@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.kie.server</groupId>
@@ -12,9 +12,15 @@
 
   <properties>
     <java.module.name>org.kie.server.controller.standalone.wars</java.module.name>
+    <org.kie.swagger.url>../rest/swagger.json</org.kie.swagger.url>
+    <org.kie.swagger.title>Controller Documentation</org.kie.swagger.title>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-standalone-impl</artifactId>
@@ -34,6 +40,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-websocket-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-swagger-ui</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -66,15 +76,87 @@
       <artifactId>cdi-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_3.1_spec</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-jaxrs</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.ws.rs</groupId>
+          <artifactId>jsr311-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
+
   </dependencies>
   <build>
     <finalName>kie-server-controller-standalone-${project.version}</finalName>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.cargo</groupId>
+          <artifactId>cargo-maven2-plugin</artifactId>
+          <configuration>
+            <container>
+              <containerId>tomcat9x</containerId>
+              <type>installed</type>
+              <artifactInstaller>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat</artifactId>
+                <version>${version.tomcat9}</version>
+              </artifactInstaller>
+              <systemProperties>
+                <tomcat.home>${project.build.directory}/cargo/configurations/tomcat9x</tomcat.home>
+                <conf.directory>${project.build.testOutputDirectory}</conf.directory>
+                <tmp.directory>${project.build.directory}</tmp.directory>
+                <!--<org.kie.server.controller.swagger.disabled>true</org.kie.server.controller.swagger.disabled>-->
+              </systemProperties>
+            </container>
+            <deployables>
+              <deployable>
+                <groupId>org.kie.server</groupId>
+                <artifactId>kie-server-controller-standalone</artifactId>
+                <classifier>webc</classifier>
+                <type>war</type>
+                <location>${project.build.directory}/${project.build.finalName}-webc.war</location>
+                <properties>
+                  <context>/controller</context>
+                </properties>
+                <pingURL>http://localhost:8080/controller/rest/controller</pingURL>
+                <pingTimeout>60000</pingTimeout>
+              </deployable>
+            </deployables>
+            <configuration>
+              <users>
+                <user>
+                  <name>kieserver</name>
+                  <password>kieserver</password>
+                  <roles>
+                    <role>kie-server</role>
+                  </roles>
+                </user>
+              </users>
+            </configuration>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -108,10 +190,9 @@
               <goal>compile</goal>
             </goals>
           </execution>
-
         </executions>
       </plugin>
     </plugins>
   </build>
-  
+
 </project>

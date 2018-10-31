@@ -21,14 +21,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import io.swagger.jaxrs.listing.SwaggerSerializers;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.controller.api.KieServerController;
+import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
 import org.kie.server.controller.service.StandaloneRuntimeManagementServiceImpl;
 import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
 
-
 @ApplicationPath("/")
 public class StandaloneControllerApplication extends Application {
-    
+
+    private static final Boolean SWAGGER_DISABLED = Boolean.parseBoolean(System.getProperty(KieServerControllerConstants.KIE_CONTROLLER_SWAGGER_DISABLED, "false"));
+
     private final Set<Object> instances;
     
     public StandaloneControllerApplication() {
@@ -38,6 +43,10 @@ public class StandaloneControllerApplication extends Application {
                 add(new StandaloneKieServerControllerImpl());
                 add(new StandaloneSpecManagementServiceImpl());
                 add(new StandaloneRuntimeManagementServiceImpl());
+                if(SWAGGER_DISABLED == false) {
+                    add(new SwaggerSerializers());
+                    add(new KieSwaggerApiListingResource());
+                }
             }
         };
     }
