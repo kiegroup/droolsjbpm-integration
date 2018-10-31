@@ -19,15 +19,18 @@ package org.kie.processmigration.service;
 import java.util.List;
 
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.exceptions.PlanNotFoundException;
 
 public interface PlanService {
 
-    Plan get(Long id);
-
     List<Plan> findAll();
 
-    Plan delete(Long id);
+    Plan get(Long id) throws PlanNotFoundException;
 
-    Plan save(Plan plan);
+    Plan create(Plan plan);
+
+    Plan update(Long id, Plan plan) throws PlanNotFoundException;
+
+    Plan delete(Long id) throws PlanNotFoundException;
 
 }

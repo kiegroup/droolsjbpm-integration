@@ -26,6 +26,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.exceptions.PlanNotFoundException;
 import org.kie.processmigration.service.PlanService;
 
 @ApplicationScoped
@@ -35,34 +36,40 @@ public class PlanServiceImpl implements PlanService {
     private EntityManager em;
 
     @Override
-    public Plan get(Long id) {
-        TypedQuery<Plan> query = em.createNamedQuery("Plan.findById", Plan.class);
-        query.setParameter("id", id);
-        try {
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    @Override
     public List<Plan> findAll() {
         return em.createNamedQuery("Plan.findAll", Plan.class).getResultList();
     }
 
     @Override
+    public Plan get(Long id) throws PlanNotFoundException {
+        TypedQuery<Plan> query = em.createNamedQuery("Plan.findById", Plan.class);
+        query.setParameter("id", id);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new PlanNotFoundException(id);
+        }
+    }
+
+    @Override
     @Transactional
-    public Plan delete(Long id) {
-        Plan plan = em.find(Plan.class, id);
+    public Plan delete(Long id) throws PlanNotFoundException {
+        Plan plan = get(id);
         em.remove(plan);
         return plan;
     }
 
     @Override
     @Transactional
-    public Plan save(Plan plan) {
+    public Plan create(Plan plan) {
         em.persist(plan);
         return plan;
     }
 
+
+    @Override
+    public Plan update(Long id, Plan plan) throws PlanNotFoundException {
+        get(id);
+        return create(plan);
+    }
 }

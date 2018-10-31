@@ -54,7 +54,7 @@ public class PlanServiceImplTest extends PersistenceTest {
 
         // When
         getEntityManager().getTransaction().begin();
-        planService.save(plan);
+        planService.create(plan);
         getEntityManager().getTransaction().commit();
 
         // Then

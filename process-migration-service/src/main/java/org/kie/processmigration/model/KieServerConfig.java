@@ -16,29 +16,25 @@
 
 package org.kie.processmigration.model;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import org.kie.server.client.CredentialsProvider;
 
-import org.wildfly.swarm.spi.runtime.annotations.ConfigurationValue;
-
-@ApplicationScoped
 public class KieServerConfig {
 
-    @Inject
-    @ConfigurationValue("kieserver.host")
+    private String id;
     private String host;
-    @Inject
-    @ConfigurationValue("kieserver.port")
     private Integer port;
-    @Inject
-    @ConfigurationValue("kieserver.contextRoot")
     private String contextRoot;
-    @Inject
-    @ConfigurationValue("kieserver.path")
     private String path;
-    @Inject
-    @ConfigurationValue("kieserver.protocol")
     private String protocol;
+    private CredentialsProvider credentialsProvider;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getHost() {
         return host;
@@ -72,6 +68,22 @@ public class KieServerConfig {
         this.protocol = protocol;
     }
 
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public CredentialsProvider getCredentialsProvider() {
+        return credentialsProvider;
+    }
+
+    public void setCredentialsProvider(CredentialsProvider credentialsProvider) {
+        this.credentialsProvider = credentialsProvider;
+    }
+
     public String getUrl() {
         return new StringBuilder(protocol)
                                           .append("://")
@@ -86,7 +98,7 @@ public class KieServerConfig {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("KieServerConfig [host=").append(host).append(", port=").append(port).append(", contextRoot=")
+        builder.append("KieServerConfig [id=").append(id).append(", host=").append(host).append(", port=").append(port).append(", contextRoot=")
                .append(contextRoot).append(", path=").append(path).append(", protocol=").append(protocol).append("]");
         return builder.toString();
     }

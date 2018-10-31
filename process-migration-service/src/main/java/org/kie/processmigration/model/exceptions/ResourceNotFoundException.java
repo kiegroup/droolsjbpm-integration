@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.service;
+package org.kie.processmigration.model.exceptions;
 
-import java.util.Map;
+public class ResourceNotFoundException extends Exception {
 
-import org.kie.processmigration.model.KieServerConfig;
-import org.kie.server.client.CredentialsProvider;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.admin.ProcessAdminServicesClient;
+    private static final long serialVersionUID = 2319415509210342979L;
 
-public interface KieService {
+    private final String resource;
+    private final Long id;
 
-    ProcessAdminServicesClient createProcessAdminServicesClient(String kieServerId, CredentialsProvider credentialsProvider);
+    public ResourceNotFoundException(String resource, Long id) {
+        this.resource = resource;
+        this.id = id;
+    }
 
-    KieServicesClient createKieServicesClient(String kieServerId, CredentialsProvider credentialsProvider);
+    public String getMessage() {
+        return String.format("%s not found with id %s", resource, id);
+    }
 
-    Map<String, KieServerConfig> getConfigs();
 }

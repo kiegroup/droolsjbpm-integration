@@ -23,15 +23,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.kie.processmigration.model.exceptions.PlanNotFoundException;
+import org.kie.processmigration.model.exceptions.ResourceNotFoundException;
 
 @Provider
-public class NotFoundExceptionMapper implements ExceptionMapper<PlanNotFoundException> {
+public class ResourceNotFoundExceptionMapper implements ExceptionMapper<ResourceNotFoundException> {
 
     @Override
-    public Response toResponse(PlanNotFoundException exception) {
+    public Response toResponse(ResourceNotFoundException exception) {
         JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
-        return Response.status(Response.Status.BAD_REQUEST).entity(json).type(MediaType.APPLICATION_JSON).build();
+        return Response.status(Response.Status.NOT_FOUND).entity(json).type(MediaType.APPLICATION_JSON).build();
     }
 
 }

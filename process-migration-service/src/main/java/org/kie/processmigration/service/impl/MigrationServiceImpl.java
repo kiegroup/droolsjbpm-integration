@@ -34,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kie.processmigration.model.Credentials;
 import org.kie.processmigration.model.Execution.ExecutionStatus;
 import org.kie.processmigration.model.Execution.ExecutionType;
@@ -41,6 +42,8 @@ import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
 import org.kie.processmigration.model.MigrationReport;
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.exceptions.InvalidMigrationException;
+import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
 import org.kie.processmigration.model.exceptions.PlanNotFoundException;
 import org.kie.processmigration.model.exceptions.ReScheduleException;
 import org.kie.processmigration.service.CredentialsProviderFactory;
@@ -74,7 +77,7 @@ public class MigrationServiceImpl implements MigrationService {
     private CredentialsService credentialsService;
 
     @Override
-    public Migration get(Long id) {
+    public Migration get(Long id) throws MigrationNotFoundException {
         TypedQuery<Migration> query = em.createNamedQuery("Migration.findById", Migration.class);
         query.setParameter("id", id);
         try {
@@ -85,9 +88,10 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     @Override
-    public List<MigrationReport> getResults(Long id) {
+    public List<MigrationReport> getResults(Long id) throws MigrationNotFoundException {
+        Migration m = get(id);
         TypedQuery<MigrationReport> query = em.createNamedQuery("MigrationReport.findByMigrationId", MigrationReport.class);
-        query.setParameter("id", id);
+        query.setParameter("id", m.getId());
         return query.getResultList();
     }
 
@@ -98,16 +102,12 @@ public class MigrationServiceImpl implements MigrationService {
 
     @Override
     @Transactional
-    public Migration submit(MigrationDefinition definition, Credentials credentials) {
-        Plan plan = planService.get(definition.getPlanId());
-        if (plan == null) {
-            throw new PlanNotFoundException(definition.getPlanId());
-        }
+    public Migration submit(MigrationDefinition definition, Credentials credentials) throws InvalidMigrationException {
         Migration migration = new Migration(definition);
         em.persist(migration);
         if (ExecutionType.SYNC.equals(definition.getExecution().getType())) {
             credentialsService.save(credentials.setMigrationId(migration.getId()));
-            migrate(migration, plan, credentials);
+            migrate(migration, credentials);
         } else {
             schedulerService.scheduleMigration(migration, credentials);
         }
@@ -116,19 +116,17 @@ public class MigrationServiceImpl implements MigrationService {
 
     @Override
     @Transactional
-    public Migration delete(Long id) {
+    public Migration delete(Long id) throws MigrationNotFoundException {
         Migration migration = get(id);
-        if (migration == null) {
-            return null;
-        }
         em.remove(migration);
         return migration;
     }
 
     @Override
     @Transactional
-    public Migration update(Long id, MigrationDefinition definition, Credentials credentials) throws ReScheduleException {
+    public Migration update(Long id, MigrationDefinition definition, Credentials credentials) throws MigrationNotFoundException, ReScheduleException, InvalidMigrationException {
         Migration migration = get(id);
+        validateDefinition(definition);
         if (migration == null) {
             return null;
         }
@@ -146,17 +144,14 @@ public class MigrationServiceImpl implements MigrationService {
 
     @Override
     @Transactional
-    public Migration migrate(Migration migration) {
-        Plan plan = planService.get(migration.getDefinition().getPlanId());
-        if (plan == null) {
-            throw new PlanNotFoundException(migration.getDefinition().getPlanId());
-        }
+    public Migration migrate(Migration migration) throws InvalidMigrationException {
         Credentials credentials = credentialsService.get(migration.getId());
-        return migrate(migration, plan, credentials);
+        return migrate(migration, credentials);
     }
 
-    private Migration migrate(Migration migration, Plan plan, Credentials credentials) {
+    private Migration migrate(Migration migration, Credentials credentials) throws InvalidMigrationException {
         try {
+            Plan plan = planService.get(migration.getDefinition().getPlanId());
             migration = em.find(Migration.class, migration.getId());
             em.persist(migration.start());
             if (credentials == null) {
@@ -167,7 +162,8 @@ public class MigrationServiceImpl implements MigrationService {
             List<Long> instancesIdList = migration.getDefinition().getProcessInstanceIds();
             for (Long instanceId : instancesIdList) {
                 MigrationReportInstance reportInstance = kieService
-                                                                   .createProcessAdminServicesClient(CredentialsProviderFactory.getProvider(credentials))
+                                                                   .createProcessAdminServicesClient(migration.getDefinition().getKieserverId(),
+                                                                                                     CredentialsProviderFactory.getProvider(credentials))
                                                                    .migrateProcessInstance(
                                                                                            plan.getSourceContainerId(),
                                                                                            instanceId,
@@ -180,6 +176,9 @@ public class MigrationServiceImpl implements MigrationService {
                 em.persist(new MigrationReport(migration.getId(), reportInstance));
             }
             migration.complete(hasErrors.get());
+        } catch (PlanNotFoundException e) {
+            migration.fail(e);
+            throw new InvalidMigrationException("The provided plan id does not exist: " + migration.getDefinition().getPlanId());
         } catch (Exception e) {
             logger.error("Migration failed", e);
             migration.fail(e);
@@ -210,6 +209,18 @@ public class MigrationServiceImpl implements MigrationService {
             }
         } catch (Exception e) {
             logger.error("Migration [{}] - Callback to {} failed.", migration.getId(), callbackURI, e);
+        }
+    }
+
+    private void validateDefinition(MigrationDefinition definition) throws InvalidMigrationException {
+        if (definition.getPlanId() == null) {
+            throw new InvalidMigrationException("The Plan ID is mandatory");
+        }
+        if (StringUtils.isBlank(definition.getKieserverId())) {
+            throw new InvalidMigrationException("The KIE Server ID is mandatory");
+        }
+        if (definition.getProcessInstanceIds().isEmpty()) {
+            throw new InvalidMigrationException("The process instances IDs to migrate are mandatory");
         }
     }
 

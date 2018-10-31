@@ -15,11 +15,13 @@ swarm:
         connection-url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
         user-name: sa
         password: sa
-kieserver:
-  host: localhost
-  port: 8080
-  protocol: http
-  contextRoot: /kie-server
-  path: /services/rest/server
+kieservers:
+  - host: rhpam-authoring-kieserver-myproject.172.17.0.1.nip.io
+    port: 80
+    protocol: https
+    contextRoot: /
+    path: services/rest/server  
+    username: adminUser
+    password: fEy11kFx  
 credentials:
   password: gUkXp2s5v8x/A?D(

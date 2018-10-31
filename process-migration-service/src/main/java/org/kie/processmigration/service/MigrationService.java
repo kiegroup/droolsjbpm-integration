@@ -22,22 +22,24 @@ import org.kie.processmigration.model.Credentials;
 import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
 import org.kie.processmigration.model.MigrationReport;
+import org.kie.processmigration.model.exceptions.InvalidMigrationException;
+import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
 import org.kie.processmigration.model.exceptions.ReScheduleException;
 
 public interface MigrationService {
 
-    Migration get(Long id);
+    Migration get(Long id) throws MigrationNotFoundException;
 
-    List<MigrationReport> getResults(Long id);
+    List<MigrationReport> getResults(Long id) throws MigrationNotFoundException;
 
     List<Migration> findAll();
 
-    Migration submit(MigrationDefinition definition, Credentials credentials);
+    Migration submit(MigrationDefinition definition, Credentials credentials) throws InvalidMigrationException;
 
-    Migration update(Long id, MigrationDefinition migration, Credentials credentials) throws ReScheduleException;
+    Migration update(Long id, MigrationDefinition migration, Credentials credentials) throws ReScheduleException, MigrationNotFoundException, InvalidMigrationException;
 
-    Migration delete(Long id);
+    Migration delete(Long id) throws MigrationNotFoundException;
     
-    Migration migrate(Migration migration);
+    Migration migrate(Migration migration) throws InvalidMigrationException;
 
 }

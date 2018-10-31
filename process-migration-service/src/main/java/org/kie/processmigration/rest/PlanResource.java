@@ -28,9 +28,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.exceptions.PlanNotFoundException;
 import org.kie.processmigration.service.PlanService;
 
 import io.swagger.annotations.Api;
@@ -55,20 +55,15 @@ public class PlanResource {
     @GET
     @Path("/{id}")
     @ApiOperation(value = "Finds a migration plan by the given plan Id")
-    public Response get(@ApiParam(value = "Plan Id") @PathParam("id") Long id) {
-        Plan plan = planService.get(id);
-        if (plan == null) {
-            return getPlanNotFound(id);
-        } else {
-            return Response.ok(plan).build();
-        }
+    public Response get(@ApiParam(value = "Plan Id") @PathParam("id") Long id) throws PlanNotFoundException {
+        return Response.ok(planService.get(id)).build();
     }
 
     @POST
     @ApiOperation(value = "Create a migration plan")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(value = "Plan") Plan plan) {
-        return Response.ok(planService.save(plan)).build();
+        return Response.ok(planService.create(plan)).build();
     }
 
     @PUT
@@ -76,28 +71,16 @@ public class PlanResource {
     @ApiOperation(value = "Save a migration plan")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response save(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id,
-                         @ApiParam(value = "Plan") Plan plan) {
-        if (planService.get(id) == null) {
-            return getPlanNotFound(id);
-        }
-        return Response.ok(planService.save(plan)).build();
+                         @ApiParam(value = "Plan") Plan plan) throws PlanNotFoundException {
+        return Response.ok(planService.update(id, plan)).build();
     }
 
     @DELETE
     @Path("/{id}")
     @ApiOperation(value = "Delete an existing migration plan")
-    public Response delete(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id) {
-        Plan plan = planService.delete(id);
-        if (plan == null) {
-            return getPlanNotFound(id);
-        } else {
-            return Response.ok().build();
-        }
-    }
-
-    private Response getPlanNotFound(Long id) {
-        return Response.status(Status.NOT_FOUND)
-                       .entity(String.format("{\"message\": \"Migration plan with id %s does not exist\"}", id)).build();
+    public Response delete(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id) throws PlanNotFoundException {
+        planService.delete(id);
+        return Response.ok().build();
     }
 
 }

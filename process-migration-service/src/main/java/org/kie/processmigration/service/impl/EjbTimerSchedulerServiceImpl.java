@@ -29,13 +29,19 @@ import javax.inject.Inject;
 
 import org.kie.processmigration.model.Credentials;
 import org.kie.processmigration.model.Migration;
+import org.kie.processmigration.model.exceptions.InvalidMigrationException;
+import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
 import org.kie.processmigration.service.CredentialsService;
 import org.kie.processmigration.service.MigrationService;
 import org.kie.processmigration.service.SchedulerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 @Startup
 public class EjbTimerSchedulerServiceImpl implements SchedulerService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EjbTimerSchedulerServiceImpl.class);
 
     @Resource
     private TimerService timerService;
@@ -49,8 +55,12 @@ public class EjbTimerSchedulerServiceImpl implements SchedulerService {
     @Timeout
     public void doMigration(Timer timer) {
         Long migrationId = (Long) timer.getInfo();
-        Migration migration = migrationService.get(migrationId);
-        migrationService.migrate(migration);
+        try {
+            Migration migration = migrationService.get(migrationId);
+            migrationService.migrate(migration);
+        } catch (InvalidMigrationException | MigrationNotFoundException e) {
+            logger.error("Unable to perform asynchronous migration", e);
+        }
     }
 
     @Override

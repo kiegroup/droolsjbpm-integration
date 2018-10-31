@@ -16,8 +16,6 @@
 
 package org.kie.processmigration.rest;
 
-import java.util.List;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -38,7 +36,8 @@ import org.kie.processmigration.model.Credentials;
 import org.kie.processmigration.model.Execution.ExecutionType;
 import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
-import org.kie.processmigration.model.MigrationReport;
+import org.kie.processmigration.model.exceptions.InvalidMigrationException;
+import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
 import org.kie.processmigration.model.exceptions.ReScheduleException;
 import org.kie.processmigration.service.CredentialsProviderFactory;
 import org.kie.processmigration.service.MigrationService;
@@ -59,27 +58,19 @@ public class MigrationResource {
 
     @GET
     @Path("/{id}")
-    public Response get(@PathParam("id") Long id) {
-        Migration migration = migrationService.get(id);
-        if (migration == null) {
-            return getMigrationNotFound(id);
-        }
-        return Response.ok(migration).build();
+    public Response get(@PathParam("id") Long id) throws MigrationNotFoundException {
+        return Response.ok(migrationService.get(id)).build();
     }
 
     @GET
     @Path("/{id}/results")
-    public Response getResults(@PathParam("id") Long id) {
-        List<MigrationReport> results = migrationService.getResults(id);
-        if (results == null) {
-            return getMigrationNotFound(id);
-        }
-        return Response.ok(results).build();
+    public Response getResults(@PathParam("id") Long id) throws MigrationNotFoundException {
+        return Response.ok(migrationService.getResults(id)).build();
     }
 
     @POST
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response submit(@Context HttpHeaders headers, MigrationDefinition migration) {
+    public Response submit(@Context HttpHeaders headers, MigrationDefinition migration) throws InvalidMigrationException {
         Credentials credentials = CredentialsProviderFactory.getCredentials(headers.getHeaderString(HttpHeaders.AUTHORIZATION));
         if (credentials == null) {
             return Response.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "Basic").build();
@@ -95,39 +86,20 @@ public class MigrationResource {
     @PUT
     @Path("/{id}")
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition migrationDefinition) {
+    public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition migrationDefinition) throws MigrationNotFoundException, InvalidMigrationException, ReScheduleException {
         Credentials credentials = CredentialsProviderFactory.getCredentials(headers.getHeaderString(HttpHeaders.AUTHORIZATION));
         if (credentials == null) {
             return Response.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "Basic").build();
         }
-        try {
-            Migration migration = migrationService.update(id, migrationDefinition, credentials);
-            if (migration == null) {
-                return getMigrationNotFound(id);
-            } else {
-                return Response.ok(migration).build();
-            }
-        } catch (ReScheduleException e) {
-            return Response.status(Status.BAD_REQUEST)
-                           .entity(String.format("{\"message\": \"%s\"}", e.getMessage())).build();
-        }
-
+        Migration migration = migrationService.update(id, migrationDefinition, credentials);
+        return Response.ok(migration).build();
     }
 
     @DELETE
     @Path("/{id}")
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response delete(@PathParam("id") Long id) {
-        Migration migration = migrationService.delete(id);
-        if (migration == null) {
-            return getMigrationNotFound(id);
-        }
-        return Response.ok(migration).build();
-    }
-
-    private Response getMigrationNotFound(Long id) {
-        return Response.status(Status.NOT_FOUND)
-                       .entity(String.format("{\"message\": \"Migration with id %s does not exist\"}", id)).build();
+    public Response delete(@PathParam("id") Long id) throws MigrationNotFoundException {
+        return Response.ok(migrationService.delete(id)).build();
     }
 
 }

@@ -44,6 +44,9 @@ public class MigrationDefinition {
     )
     private List<Long> processInstanceIds;
 
+    @JsonProperty("kieserver_id")
+    private String kieserverId;
+
     @Embedded
     private Execution execution;
 
@@ -65,6 +68,14 @@ public class MigrationDefinition {
         } else {
             this.processInstanceIds = null;
         }
+    }
+
+    public String getKieserverId() {
+        return kieserverId;
+    }
+
+    public void setKieserverId(String kieserverId) {
+        this.kieserverId = kieserverId;
     }
 
     public Execution getExecution() {
