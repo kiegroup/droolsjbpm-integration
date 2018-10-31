@@ -16,6 +16,9 @@
 
 package org.jbpm.springboot.autoconfigure;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -23,9 +26,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "jbpm")
 public class JBPMProperties implements InitializingBean {
+    
+    private static final String PROPERTY_PREFIX = "org.jbpm.";
 
     private Executor executor = new Executor();
     private Quartz quartz = new Quartz();
+    
+    private Map<String, String> addons = new HashMap<>(); 
 
     public Executor getExecutor() {
         return executor;
@@ -42,10 +49,22 @@ public class JBPMProperties implements InitializingBean {
     public void setQuartz(Quartz quartz) {
         this.quartz = quartz;
     }
+    
+    public Map<String, String> getAddons() {
+        return addons;
+    }
+    
+    public void setAddons(Map<String, String> addons) {
+        this.addons = addons;
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        if (!this.addons.isEmpty()) {
+            for (Entry<String, String> entry : this.addons.entrySet()) {
+                System.setProperty(PROPERTY_PREFIX + entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     public static class Executor {
