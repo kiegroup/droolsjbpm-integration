@@ -50,6 +50,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>camel-container-tests-module</artifactId>
       <type>war</type>
