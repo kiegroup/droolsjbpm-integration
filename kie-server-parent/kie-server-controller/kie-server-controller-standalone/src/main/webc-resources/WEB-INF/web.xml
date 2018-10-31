@@ -28,8 +28,16 @@
 
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>All web resources</web-resource-name>
-      <url-pattern>/*</url-pattern>
+      <web-resource-name>Swagger web resources</web-resource-name>
+      <url-pattern>/rest/swagger.json</url-pattern>
+      <http-method>GET</http-method>
+    </web-resource-collection>
+    <!-- No authentication. Swagger resources should be accessible without authentication. -->
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>REST web resources</web-resource-name>
+      <url-pattern>/rest/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>kie-server</role-name>

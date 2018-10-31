@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -15,6 +15,8 @@
 
   <properties>
     <java.module.name>org.kie.server.distribution.wars</java.module.name>
+    <org.kie.swagger.url>../services/rest/server/swagger.json</org.kie.swagger.url>
+    <org.kie.swagger.title>Execution Server Documentation</org.kie.swagger.title>
   </properties>
 
   <dependencies>
@@ -165,7 +167,7 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-dmn</artifactId>
-        <!-- TODO Exclusions? -->
+      <!-- TODO Exclusions? -->
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -174,6 +176,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-swagger</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-swagger-ui</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -188,12 +194,12 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-websocket-client</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-websocket-common</artifactId>
