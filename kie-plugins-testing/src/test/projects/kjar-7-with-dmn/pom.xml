@@ -30,14 +30,6 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-dmn-core</artifactId>
-      <version>7.14.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>

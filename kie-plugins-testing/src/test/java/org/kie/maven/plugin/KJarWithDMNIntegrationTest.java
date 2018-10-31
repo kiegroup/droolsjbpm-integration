@@ -61,7 +61,7 @@ public class KJarWithDMNIntegrationTest extends KieMavenPluginBaseIntegrationTes
 
     private void testComplexDMNModel(final boolean useExecutableModel) throws Exception {
         if (useExecutableModel) {
-            buildKJarProject(KJAR_NAME, "clean", "install", "-DgenerateModel=YES", "-DgenerateDMNModel=YES");
+            buildKJarProject(KJAR_NAME, "clean", "install", "-DgenerateDMNModel=YES");
         } else {
             buildKJarProject(KJAR_NAME, "clean", "install");
         }
