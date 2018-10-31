@@ -17,10 +17,10 @@ package org.kie.maven.plugin;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import io.takari.maven.testing.TestResources;
+import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
@@ -36,17 +36,13 @@ abstract public class KieMavenPluginBaseIntegrationTest {
 
     public final MavenRuntime mavenRuntime;
 
-    public KieMavenPluginBaseIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
+    public KieMavenPluginBaseIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) {
         this.mavenRuntime = builder
                 .forkedBuilder()
                 // To enable logging using slf4j-simple on the internal classes of the plug-in:
                 //.withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
                 .withEnvironment(System.getenv())
                 .build();
-    }
-
-    protected File getBasedir(String projectName) throws Exception {
-        return resources.getBasedir(projectName);
     }
 
     protected void prepareTakariPom(String projectName) throws Exception {
@@ -59,5 +55,18 @@ abstract public class KieMavenPluginBaseIntegrationTest {
         File basedir = getBasedir(projectName);
         File pomKie = new File(basedir, "pom-kie.xml");
         Files.move(pomKie.toPath(), new File(basedir, "pom.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    protected MavenExecutionResult buildKJarProject(String kjarName, String... mavenGoals) throws Exception {
+        File basedir = resources.getBasedir(kjarName);
+        MavenExecutionResult result = mavenRuntime
+                .forProject(basedir)
+                .execute(mavenGoals);
+        result.assertErrorFreeLog();
+        return result;
+    }
+
+    private File getBasedir(String projectName) throws Exception {
+        return resources.getBasedir(projectName);
     }
 }
