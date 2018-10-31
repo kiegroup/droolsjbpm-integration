@@ -16,11 +16,17 @@
 
 package org.kie.server.springboot.autoconfiguration;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "kieserver")
 public class KieServerProperties implements InitializingBean {
+    
+    private static final String PROPERTY_PREFIX = "org.kie.server.";
 
     private String location = "";
     private String controllers = "";
@@ -28,6 +34,8 @@ public class KieServerProperties implements InitializingBean {
     private String serverName = "KieServer-SpringBoot";
 
     private Swagger swagger = new Swagger();
+    
+    private Map<String, String> addons = new HashMap<>(); 
 
     public String getServerId() {
         return serverId;
@@ -69,9 +77,21 @@ public class KieServerProperties implements InitializingBean {
         this.swagger = swagger;
     }
 
+    public Map<String, String> getAddons() {
+        return addons;
+    }
+    
+    public void setAddons(Map<String, String> addons) {
+        this.addons = addons;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        if (!this.addons.isEmpty()) {
+            for (Entry<String, String> entry : this.addons.entrySet()) {
+                System.setProperty(PROPERTY_PREFIX + entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     public static class Swagger {

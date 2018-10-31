@@ -78,7 +78,11 @@ public class KieServerEnvironment {
 
     public static void setServerId(String serverIdIn) {
         serverId = serverIdIn;
+        if (serverIdIn != null) {
+            System.setProperty(KieServerConstants.KIE_SERVER_ID, serverIdIn);
+        }
     }
+    
     public static String getServerName() {
         return name;
     }
