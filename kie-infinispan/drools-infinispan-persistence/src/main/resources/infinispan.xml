@@ -3,11 +3,14 @@
     xsi:schemaLocation="urn:infinispan:config:5.1 http://www.infinispan.org/schemas/infinispan-config-8.1.xsd"
     xmlns="urn:infinispan:config:8.1">
 
-  <cache-container name="kie" default-cache="default" statistics="true" shutdown-hook="DONT_REGISTER">
+  <cache-container name="kie" default-cache="jbpm-configured-cache" statistics="true" shutdown-hook="DONT_REGISTER">
     <jmx duplicate-domains="true"  />
     <local-cache name="jbpm-configured-cache">
-      <eviction strategy="NONE" />
       <!-- NON_XA is: useSynchronization=true, recovery=false, -->
+      <eviction strategy="NONE" />
+      <locking
+          isolation="READ_COMMITTED"
+          write-skew="false"/>
       <transaction mode="NON_XA" locking="OPTIMISTIC" auto-commit="false"
         transaction-manager-lookup="org.infinispan.transaction.lookup.BitronixTransactionManagerLookup" />
       <indexing index="LOCAL">
