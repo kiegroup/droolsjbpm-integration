@@ -39,6 +39,8 @@ import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -55,6 +57,7 @@ import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 
 @RunWith(Parameterized.class)
@@ -102,9 +105,15 @@ public class RenderFormServiceIntegrationTest extends KieServerBaseIntegrationTe
     private static final String HIRING_PROCESS_ID = "hiring";
     private static final String HIRING_2_PROCESS_ID = "hiring2";
     private static final String USERTASK_PROCESS_ID = "definition-project.usertask";
+    private static final String PLACE_ORDER_PROCESS_ID = "form-rendering.place_order";
     
     private static final String CASE_CONTAINER_ID = "insurance";
     private static final String CLAIM_CASE_DEF_ID = "insurance-claims.CarInsuranceClaimCase";
+    
+    private static final String ORDER_CLASS_NAME = "com.myspace.form_rendering.Order";
+    private static final String ITEM_CLASS_NAME = "com.myspace.form_rendering.Item";
+    
+    protected static KieContainer kieContainer;
 
     protected ProcessServicesClient processClient;
     protected UserTaskServicesClient taskClient;
@@ -119,8 +128,16 @@ public class RenderFormServiceIntegrationTest extends KieServerBaseIntegrationTe
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/case-insurance").getFile());
 
+        kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+        
         createContainer(CONTAINER_ID, releaseId);
         createContainer(CASE_CONTAINER_ID, caseReleaseId);
+    }
+    
+    @Override
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        extraClasses.put(ORDER_CLASS_NAME, Class.forName(ORDER_CLASS_NAME, true, kieContainer.getClassLoader()));
+        extraClasses.put(ITEM_CLASS_NAME, Class.forName(ITEM_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
 
     @Before
@@ -430,12 +447,311 @@ public class RenderFormServiceIntegrationTest extends KieServerBaseIntegrationTe
         assertThat(result).contains("<button type=\"button\" class=\"btn btn-success\" onclick=\"startCase(this);\">Submit</button>");
     }
     
+    @Test
+    public void testRenderProcessFormViaUIClientTestMultiSubForm() throws Exception {
+        String result = uiServicesClient.renderProcessForm(CONTAINER_ID, PLACE_ORDER_PROCESS_ID);
+        logger.debug("Form content is '{}'", result);
+        assertThat(result).isNotNull().isNotEmpty();
+        
+        // it has the patternfly (default renderer) css
+        assertThat(result).contains("/files/patternfly/css/patternfly.min.css\" rel=\"stylesheet\">");
+        assertThat(result).contains("/files/patternfly/css/patternfly-additions.min.css\" rel=\"stylesheet\">");
+        
+        // it has required js files
+        assertThat(result).contains("/files/patternfly/js/jquery.min.js\"></script>");
+        assertThat(result).contains("/files/patternfly/js/patternfly.min.js\"></script>");
+        assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                
+        // it has the form header
+        assertThat(result).contains("<h3 class=\"panel-title\">form-rendering.place_order-taskform.frm</h3>");
+        
+        // it has three input fields
+        assertThat(result).contains("<input name=\"orderNumber\" type=\"text\" class=\"form-control\" id=\"field_733428728888174E11\" placeholder=\"OrderNumber\" value=\"\" pattern=\"\"  required>");
+        assertThat(result).contains("<input name=\"customer\" type=\"text\" class=\"form-control\" id=\"field_094300706550535E11\" placeholder=\"Customer\" value=\"\" pattern=\"\"  required>");
+        assertThat(result).contains("<input name=\"address\" type=\"text\" class=\"form-control\" id=\"field_428085212636635E12\" placeholder=\"Address\" value=\"\" pattern=\"\"  required>");
+        
+        // it has a hidden form for multisubform items
+        assertThat(result).contains("<div class=\"row hidden\" id=\"form_field_180962688550559E11\">");
+        // with three input fields
+        assertThat(result).contains("<input name=\"name\" type=\"text\" class=\"form-control\" id=\"field_822453895302379E11\" placeholder=\"Name\" value=\"\" pattern=\"\"  required>");
+        assertThat(result).contains("<input name=\"quantity\" type=\"text\" class=\"form-control\" id=\"field_99531536931457E11\" placeholder=\"Quantity\" value=\"\" pattern=\"^\\d+$\"  required>");
+        assertThat(result).contains("<input name=\"price\" type=\"text\" class=\"form-control\" id=\"field_774182907094941E11\" placeholder=\"Price\" value=\"\" pattern=\"^\\d+(\\.\\d+)?$\"  required>");
+        
+        // it has a table
+        assertThat(result).contains("<table class=\"table table-bordered\" id=\"table_field_180962688550559E11\" data-type=\"com.myspace.form_rendering.Item\">");
+        
+        // it has three columns and action column
+        assertThat(result).contains("<th>Name</th>");
+        assertThat(result).contains("<th>Quantity</th>");
+        assertThat(result).contains("<th>Price</th>");
+        assertThat(result).contains("<th width=\"10%\" class=\"text-center\" colspan=\"2\"><button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-primary\" onclick=\"openForm('field_180962688550559E11');\">Add</button></th>");
+        
+        // it has hidden row to be cloned
+        assertThat(result).contains("<tr id=\"hiddenRow\" class=\"hidden\">");
+        // with three column placeholders and two action columns 
+        assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">placeholder</td>");
+        assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">placeholder</td>");
+        assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">placeholder</td>");
+        assertThat(result).contains("<button data-row=\"\" data-table=\"field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem($(this).data('table'), $(this).data('row'));\">Edit</button>");
+        assertThat(result).contains("<button data-row=\"\" data-table=\"table_field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem($(this).data('table'), $(this).data('row'));\">Delete</button>");
+        
+        // it has start process button
+        assertThat(result).contains("<button type=\"button\" class=\"btn btn-primary\" onclick=\"startProcess(this);\">Submit</button>");
+    }
+    
+    @Test
+    public void testRenderProcessFormViaUIClientTestMultiSubFormBootStrap() throws Exception {
+        String result = uiServicesClient.renderProcessForm(CONTAINER_ID, PLACE_ORDER_PROCESS_ID, UIServicesClient.BOOTSTRAP_FORM_RENDERER);
+        logger.debug("Form content is '{}'", result);
+        assertThat(result).isNotNull().isNotEmpty();
+        
+        // it has the bootstrap css
+        assertThat(result).contains("/files/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\">");
+        
+        // it has required js files
+        assertThat(result).contains("/files/bootstrap/js/jquery.min.js\"></script>");
+        assertThat(result).contains("/files/bootstrap/js/bootstrap.min.js\"></script>");
+        assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                
+        // it has the form header
+        assertThat(result).contains("<h3 class=\"panel-title\">form-rendering.place_order-taskform.frm</h3>");
+        
+        // it has three input fields
+        assertThat(result).contains("<input name=\"orderNumber\" type=\"text\" class=\"form-control\" id=\"field_733428728888174E11\" placeholder=\"OrderNumber\" value=\"\" pattern=\"\"  required>");
+        assertThat(result).contains("<input name=\"customer\" type=\"text\" class=\"form-control\" id=\"field_094300706550535E11\" placeholder=\"Customer\" value=\"\" pattern=\"\"  required>");
+        assertThat(result).contains("<input name=\"address\" type=\"text\" class=\"form-control\" id=\"field_428085212636635E12\" placeholder=\"Address\" value=\"\" pattern=\"\"  required>");
+        
+        // it has a hidden form for multisubform items
+        assertThat(result).contains("<div class=\"row hidden\" id=\"form_field_180962688550559E11\">");
+        // with three input fields
+        assertThat(result).contains("<input name=\"name\" type=\"text\" class=\"form-control\" id=\"field_822453895302379E11\" placeholder=\"Name\" value=\"\" pattern=\"\"  required>");
+        assertThat(result).contains("<input name=\"quantity\" type=\"text\" class=\"form-control\" id=\"field_99531536931457E11\" placeholder=\"Quantity\" value=\"\" pattern=\"^\\d+$\"  required>");
+        assertThat(result).contains("<input name=\"price\" type=\"text\" class=\"form-control\" id=\"field_774182907094941E11\" placeholder=\"Price\" value=\"\" pattern=\"^\\d+(\\.\\d+)?$\"  required>");
+        
+        // it has a table
+        assertThat(result).contains("<table class=\"table table-bordered\" id=\"table_field_180962688550559E11\" data-type=\"com.myspace.form_rendering.Item\">");
+        
+        // it has three columns and action column
+        assertThat(result).contains("<th>Name</th>");
+        assertThat(result).contains("<th>Quantity</th>");
+        assertThat(result).contains("<th>Price</th>");
+        assertThat(result).contains("<th width=\"10%\" class=\"text-center\" colspan=\"2\"><button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-primary\" onclick=\"openForm('field_180962688550559E11');\">Add</button></th>");
+        
+        // it has hidden row to be cloned
+        assertThat(result).contains("<tr id=\"hiddenRow\" class=\"hidden\">");
+        // with three column placeholders and two action columns 
+        assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">placeholder</td>");
+        assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">placeholder</td>");
+        assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">placeholder</td>");
+        assertThat(result).contains("<button data-row=\"\" data-table=\"field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem($(this).data('table'), $(this).data('row'));\">Edit</button>");
+        assertThat(result).contains("<button data-row=\"\" data-table=\"table_field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem($(this).data('table'), $(this).data('row'));\">Delete</button>");
+        
+        // it has start process button
+        assertThat(result).contains("<button type=\"button\" class=\"btn btn-success\" onclick=\"startProcess(this);\">Submit</button>");
+    }
+    
+    @Test
+    public void testRenderTaskFormViaUIClientTestMultiSubForm() throws Exception {
+        
+        ClassLoader loader = kieContainer.getClassLoader();
+        
+        Object firstItem = KieServerReflections.createInstance(ITEM_CLASS_NAME, loader, "first", 100, 25.5);
+        Object secondItem = KieServerReflections.createInstance(ITEM_CLASS_NAME, loader, "second", 200, 8.5);
+        
+        List<Object> items = new ArrayList<>();
+        items.add(firstItem);
+        items.add(secondItem);
+        
+        Object order = KieServerReflections.createInstance(ORDER_CLASS_NAME, loader, "XXX", "JOHN", "MainStreet", items);
+        
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("order", order);
+        
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, PLACE_ORDER_PROCESS_ID, parameters);
+        try {
+            
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertThat(tasks).isNotNull().hasSize(1);
+
+            Long taskId = tasks.get(0).getId();            
+
+            String result = uiServicesClient.renderTaskForm(CONTAINER_ID, taskId);
+            logger.debug("Form content is '{}'", result);
+            assertThat(result).isNotNull().isNotEmpty();
+            
+            // it has the patternfly (default renderer) css
+            assertThat(result).contains("/files/patternfly/css/patternfly.min.css\" rel=\"stylesheet\">");
+            assertThat(result).contains("/files/patternfly/css/patternfly-additions.min.css\" rel=\"stylesheet\">");
+            
+            // it has required js files
+            assertThat(result).contains("/files/patternfly/js/jquery.min.js\"></script>");
+            assertThat(result).contains("/files/patternfly/js/patternfly.min.js\"></script>");
+            assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                    
+            // it has the form header
+            assertThat(result).contains("<h3 class=\"panel-title\">AddItems-taskform.frm</h3>");
+            
+            // it has three input fields with data from starting process
+            assertThat(result).contains("<input name=\"orderNumber\" type=\"text\" class=\"form-control\" id=\"field_733428728888174E11\" placeholder=\"OrderNumber\" value=\"XXX\" pattern=\"\"  required>");
+            assertThat(result).contains("<input name=\"customer\" type=\"text\" class=\"form-control\" id=\"field_094300706550535E11\" placeholder=\"Customer\" value=\"JOHN\" pattern=\"\"  required>");
+            assertThat(result).contains("<input name=\"address\" type=\"text\" class=\"form-control\" id=\"field_428085212636635E12\" placeholder=\"Address\" value=\"MainStreet\" pattern=\"\"  required>");
+            
+            // it has a hidden form for multisubform items
+            assertThat(result).contains("<div class=\"row hidden\" id=\"form_field_180962688550559E11\">");
+            // with three input fields
+            assertThat(result).contains("<input name=\"name\" type=\"text\" class=\"form-control\" id=\"field_822453895302379E11\" placeholder=\"Name\" value=\"\" pattern=\"\"  required>");
+            assertThat(result).contains("<input name=\"quantity\" type=\"text\" class=\"form-control\" id=\"field_99531536931457E11\" placeholder=\"Quantity\" value=\"\" pattern=\"^\\d+$\"  required>");
+            assertThat(result).contains("<input name=\"price\" type=\"text\" class=\"form-control\" id=\"field_774182907094941E11\" placeholder=\"Price\" value=\"\" pattern=\"^\\d+(\\.\\d+)?$\"  required>");
+            
+            // it has a table
+            assertThat(result).contains("<table class=\"table table-bordered\" id=\"table_field_180962688550559E11\" data-type=\"com.myspace.form_rendering.Item\">");
+            
+            // it has three columns and action column
+            assertThat(result).contains("<th>Name</th>");
+            assertThat(result).contains("<th>Quantity</th>");
+            assertThat(result).contains("<th>Price</th>");
+            assertThat(result).contains("<th width=\"10%\" class=\"text-center\" colspan=\"2\"><button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-primary\" onclick=\"openForm('field_180962688550559E11');\">Add</button></th>");
+            
+            // it has hidden row to be cloned
+            assertThat(result).contains("<tr id=\"hiddenRow\" class=\"hidden\">");
+            // with three column placeholders and two action columns 
+            assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">placeholder</td>");
+            assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">placeholder</td>");
+            assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">placeholder</td>");
+            assertThat(result).contains("<button data-row=\"\" data-table=\"field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem($(this).data('table'), $(this).data('row'));\">Edit</button>");
+            assertThat(result).contains("<button data-row=\"\" data-table=\"table_field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem($(this).data('table'), $(this).data('row'));\">Delete</button>");
+            
+            // table has two rwos with data from the items given at start
+            assertThat(result).contains("<tr id=\"table_field_180962688550559E11_0\">");
+            assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">first</td>");
+            assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">100</td>");
+            assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">25.5</td>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem('field_180962688550559E11', 'table_field_180962688550559E11_0');\">Edit</button>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem('table_field_180962688550559E11', 'table_field_180962688550559E11_0');\">Delete</button>");
+            
+            assertThat(result).contains("<tr id=\"table_field_180962688550559E11_1\">");
+            assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">second</td>");
+            assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">200</td>");
+            assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">8.5</td>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem('field_180962688550559E11', 'table_field_180962688550559E11_1');\">Edit</button>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem('table_field_180962688550559E11', 'table_field_180962688550559E11_1');\">Delete</button>");
+            
+            // it has life cycle buttons process button
+            assertThat(result).contains("<button id=\"claimButton\" type=\"button\" class=\"btn btn-default\" onclick=\"claimTask();\">Claim</button>");
+            assertThat(result).contains("<button id=\"releaseButton\" type=\"button\" class=\"btn btn-default\" onclick=\"releaseTask();\">Release</button>");
+            assertThat(result).contains("<button id=\"startButton\" type=\"button\" class=\"btn btn-default\" onclick=\"startTask();\">Start</button>");
+            assertThat(result).contains("<button id=\"stopButton\" type=\"button\" class=\"btn btn-default\" onclick=\"stopTask();\">Stop</button>");
+            assertThat(result).contains("<button id=\"saveButton\" type=\"button\" class=\"btn btn-default\" onclick=\"saveTask();\">Save</button>");
+            assertThat(result).contains("<button id=\"completeButton\" type=\"button\" class=\"btn btn-primary\" onclick=\"completeTask();\">Complete</button>");
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    @Test
+    public void testRenderTaskFormViaUIClientTestMultiSubFormBootstrap() throws Exception {
+        
+        ClassLoader loader = kieContainer.getClassLoader();
+        
+        Object firstItem = KieServerReflections.createInstance(ITEM_CLASS_NAME, loader, "first", 100, 25.5);
+        Object secondItem = KieServerReflections.createInstance(ITEM_CLASS_NAME, loader, "second", 200, 8.5);
+        
+        List<Object> items = new ArrayList<>();
+        items.add(firstItem);
+        items.add(secondItem);
+        
+        Object order = KieServerReflections.createInstance(ORDER_CLASS_NAME, loader, "XXX", "JOHN", "MainStreet", items);
+        
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("order", order);
+        
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, PLACE_ORDER_PROCESS_ID, parameters);
+        try {
+            
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertThat(tasks).isNotNull().hasSize(1);
+
+            Long taskId = tasks.get(0).getId();            
+
+            String result = uiServicesClient.renderTaskForm(CONTAINER_ID, taskId, UIServicesClient.BOOTSTRAP_FORM_RENDERER);
+            logger.debug("Form content is '{}'", result);
+            assertThat(result).isNotNull().isNotEmpty();
+            
+            // it has the bootstrap css
+            assertThat(result).contains("/files/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\">");
+            
+            // it has required js files
+            assertThat(result).contains("/files/bootstrap/js/jquery.min.js\"></script>");
+            assertThat(result).contains("/files/bootstrap/js/bootstrap.min.js\"></script>");
+            assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                    
+            // it has the form header
+            assertThat(result).contains("<h3 class=\"panel-title\">AddItems-taskform.frm</h3>");
+            
+            // it has three input fields with data from starting process
+            assertThat(result).contains("<input name=\"orderNumber\" type=\"text\" class=\"form-control\" id=\"field_733428728888174E11\" placeholder=\"OrderNumber\" value=\"XXX\" pattern=\"\"  required>");
+            assertThat(result).contains("<input name=\"customer\" type=\"text\" class=\"form-control\" id=\"field_094300706550535E11\" placeholder=\"Customer\" value=\"JOHN\" pattern=\"\"  required>");
+            assertThat(result).contains("<input name=\"address\" type=\"text\" class=\"form-control\" id=\"field_428085212636635E12\" placeholder=\"Address\" value=\"MainStreet\" pattern=\"\"  required>");
+            
+            // it has a hidden form for multisubform items
+            assertThat(result).contains("<div class=\"row hidden\" id=\"form_field_180962688550559E11\">");
+            // with three input fields
+            assertThat(result).contains("<input name=\"name\" type=\"text\" class=\"form-control\" id=\"field_822453895302379E11\" placeholder=\"Name\" value=\"\" pattern=\"\"  required>");
+            assertThat(result).contains("<input name=\"quantity\" type=\"text\" class=\"form-control\" id=\"field_99531536931457E11\" placeholder=\"Quantity\" value=\"\" pattern=\"^\\d+$\"  required>");
+            assertThat(result).contains("<input name=\"price\" type=\"text\" class=\"form-control\" id=\"field_774182907094941E11\" placeholder=\"Price\" value=\"\" pattern=\"^\\d+(\\.\\d+)?$\"  required>");
+            
+            // it has a table
+            assertThat(result).contains("<table class=\"table table-bordered\" id=\"table_field_180962688550559E11\" data-type=\"com.myspace.form_rendering.Item\">");
+            
+            // it has three columns and action column
+            assertThat(result).contains("<th>Name</th>");
+            assertThat(result).contains("<th>Quantity</th>");
+            assertThat(result).contains("<th>Price</th>");
+            assertThat(result).contains("<th width=\"10%\" class=\"text-center\" colspan=\"2\"><button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-primary\" onclick=\"openForm('field_180962688550559E11');\">Add</button></th>");
+            
+            // it has hidden row to be cloned
+            assertThat(result).contains("<tr id=\"hiddenRow\" class=\"hidden\">");
+            // with three column placeholders and two action columns 
+            assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">placeholder</td>");
+            assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">placeholder</td>");
+            assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">placeholder</td>");
+            assertThat(result).contains("<button data-row=\"\" data-table=\"field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem($(this).data('table'), $(this).data('row'));\">Edit</button>");
+            assertThat(result).contains("<button data-row=\"\" data-table=\"table_field_180962688550559E11\" style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem($(this).data('table'), $(this).data('row'));\">Delete</button>");
+            
+            // table has two rwos with data from the items given at start
+            assertThat(result).contains("<tr id=\"table_field_180962688550559E11_0\">");
+            assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">first</td>");
+            assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">100</td>");
+            assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">25.5</td>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem('field_180962688550559E11', 'table_field_180962688550559E11_0');\">Edit</button>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem('table_field_180962688550559E11', 'table_field_180962688550559E11_0');\">Delete</button>");
+            
+            assertThat(result).contains("<tr id=\"table_field_180962688550559E11_1\">");
+            assertThat(result).contains("<td data-name=\"name\" data-type=\"String(\">second</td>");
+            assertThat(result).contains("<td data-name=\"quantity\" data-type=\"Number(\">200</td>");
+            assertThat(result).contains("<td data-name=\"price\" data-type=\"Number(\">8.5</td>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-default\" onclick=\"editItem('field_180962688550559E11', 'table_field_180962688550559E11_1');\">Edit</button>");
+            assertThat(result).contains("<button style=\"width: 80px !important;\" type=\"button\" class=\"btn btn-danger\" onclick=\"deleteItem('table_field_180962688550559E11', 'table_field_180962688550559E11_1');\">Delete</button>");
+            
+            // it has life cycle buttons process button
+            assertThat(result).contains("<button id=\"claimButton\" type=\"button\" class=\"btn btn-default\" onclick=\"claimTask();\">Claim</button>");
+            assertThat(result).contains("<button id=\"releaseButton\" type=\"button\" class=\"btn btn-default\" onclick=\"releaseTask();\">Release</button>");
+            assertThat(result).contains("<button id=\"startButton\" type=\"button\" class=\"btn btn-default\" onclick=\"startTask();\">Start</button>");
+            assertThat(result).contains("<button id=\"stopButton\" type=\"button\" class=\"btn btn-default\" onclick=\"stopTask();\">Stop</button>");
+            assertThat(result).contains("<button id=\"saveButton\" type=\"button\" class=\"btn btn-default\" onclick=\"saveTask();\">Save</button>");
+            assertThat(result).contains("<button id=\"completeButton\" type=\"button\" class=\"btn btn-success\" onclick=\"completeTask();\">Complete</button>");
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
     /*
      * Helper methods
      */
 
     @Override
     protected KieServicesClient createDefaultClient() throws Exception {
+        addExtraCustomClasses(extraClasses);
         KieServicesConfiguration restConfiguration = configuration;
         if (TestConfig.isLocalServer()) {
             restConfiguration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);

@@ -266,7 +266,8 @@ function saveTask() {
 }
 
 function completeTask() {
-	if (validate()) {
+	console.log('Task completed with data ' + JSON.stringify(getData()));
+	if (validate('')) {
 		$.ajax({
 		    method: 'PUT',
 		    dataType: 'text',
@@ -293,10 +294,10 @@ function completeTask() {
 	}
 }
 
-function validate() {
+function validate(start) {
 	clearNotifications();
 	var messages = '';
-	$('input, select, textarea').each(
+	$(start + 'input, select, textarea').not(':button,:hidden').each(
 		    function(index){  
 		        var input = $(this);
 		        if (input.attr('required') != null && !input.val()) {
@@ -385,3 +386,124 @@ function getDateFormated(id) {
 		};
 	return wrappedDate;
 }
+
+// multi sub forms support
+var currentRow = null;
+var tableData = new Map();
+
+function openForm(fieldId) {	
+	var creationForm = $('#form_' + fieldId);	
+	creationForm.removeClass('hidden');
+	
+	var creationFormActions = $('#form_actions_' + fieldId);	
+	creationFormActions.removeClass('hidden');
+	
+	var table = $('#content_' + fieldId);	
+	table.addClass('hidden');
+}
+
+function editItem(fieldId, rowId) {
+	var row = tableData.get('table_' + fieldId).get(rowId);
+	currentRow = rowId;
+	var $inputs = $('#creationform :input');
+
+    $inputs.each(function() {        
+    	$(this).val(row[$(this).attr('name')]);
+    });
+    openForm(fieldId);
+}
+
+function deleteItem(tableId, rowId) {
+	
+	tableData.get(tableId).delete(rowId);
+	$('#' + rowId).remove();
+}
+
+function getTableData(tableId) {
+	var items = [];
+	var rows = tableData.get(tableId);
+	var type = $('#' + tableId).attr('data-type');
+	rows.forEach(function (val) {
+        // wrap collected item with type information
+        var wrapped = {};
+        wrapped[type] = val;
+        items.push(wrapped);
+    });
+	
+	return items;
+}
+
+function saveItem(fieldId) {	
+	if (validate('#creationform ')) {
+		var target = 'formData_' + fieldId;	
+		var collectedData = window[target]();
+		
+		var rows = tableData.get('table_' + fieldId);
+		if (rows == null) {
+			rows = new Map();
+			tableData.set('table_' + fieldId, rows)
+		}
+		var index = rows.size;
+			
+		var selectedRow = null;	
+		var rowId = currentRow;
+		if (rowId == null) {
+			rowId = 'table_' + fieldId + '_' + index;
+			
+			selectedRow = $('#hiddenRow').clone();
+			selectedRow.attr('id', rowId);
+			
+			selectedRow.removeClass('hidden');
+			
+			selectedRow.find('td').each(function () {
+		    	
+		    	var column = $(this);
+		    	var property = column.attr('data-name');
+		    	
+		    	if (property != null) {
+		    		column.html(collectedData[property]);	    		
+		    	} else {
+		    		column.find('button').each(function () {
+		    			$(this).attr('data-row', rowId);
+		    		});
+		    	}
+		    });
+			$('#table_' + fieldId + ' tbody').append(selectedRow);
+			
+		} else {
+			selectedRow = $('#' + rowId);	
+			if (selectedRow != null) { 		
+			    //update row        
+				selectedRow.find('td').each(function () {
+			    	
+			    	var column = $(this);
+			    	var property = column.attr('data-name');
+			    	
+			    	if (property != null) {
+			    		column.html(collectedData[property]);
+			    		console.log('setting ' + collectedData[property] + ' for ' + property);
+			    	}
+			    });
+			       
+			}
+		}	
+		rows.set(rowId, collectedData);
+				
+		closeCreationForm(fieldId);
+	}
+}
+
+function closeCreationForm(fieldId) {
+	var creationForm = $('#form_' + fieldId);	
+	creationForm.addClass('hidden');
+	
+	var creationFormActions = $('#form_actions_' + fieldId);	
+	creationFormActions.addClass('hidden');
+	
+	var table = $('#content_' + fieldId);	
+	table.removeClass('hidden');
+	
+	document.getElementById('creationform').reset();
+	currentRow = null;
+}
+

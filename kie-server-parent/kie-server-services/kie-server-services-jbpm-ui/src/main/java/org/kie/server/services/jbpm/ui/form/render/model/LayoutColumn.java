@@ -16,6 +16,7 @@
 
 package org.kie.server.services.jbpm.ui.form.render.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,6 +26,8 @@ public class LayoutColumn {
     private String span;
     @JsonProperty("layoutComponents")
     private List<LayoutItem> items;
+    
+    private List<LayoutRow> rows;
 
     private String content;
 
@@ -44,6 +47,14 @@ public class LayoutColumn {
         this.items = items;
     }
 
+    public List<LayoutRow> getRows() {
+        return rows;
+    }
+
+    public void setRows(List<LayoutRow> rows) {
+        this.rows = rows;
+    }
+
     public String getContent() {
         return content;
     }
@@ -51,5 +62,25 @@ public class LayoutColumn {
     public void setContent(String content) {
         this.content = content;
     }
+    
+    public void flatItems() {
+        if (rows != null && !rows.isEmpty()) {
+            for (LayoutRow row : rows) {
+            this.items.addAll(collectItems(row));
+            }
+        }
+    }
 
+    protected List<LayoutItem> collectItems(LayoutRow row) {
+        List<LayoutItem> collected = new ArrayList<>();
+        for (LayoutColumn column : row.getColumns()) {
+            collected.addAll(column.getItems());
+            
+            for (LayoutRow nestedRow : column.getRows()) {
+                collected.addAll(collectItems(nestedRow));
+            }
+        }
+        
+        return collected;
+    }
 }

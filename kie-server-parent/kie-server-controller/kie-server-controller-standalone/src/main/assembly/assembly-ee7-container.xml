@@ -57,6 +57,19 @@
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
     </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.kie:kie-swagger-ui</include>
+      </includes>
+      <unpack>true</unpack>
+      <outputDirectory>docs</outputDirectory>
+      <unpackOptions>
+        <filtered>true</filtered>
+        <excludes>
+          <exclude>META-INF/**</exclude>
+        </excludes>
+      </unpackOptions>
+    </dependencySet>
   </dependencySets>
 
 </assembly>

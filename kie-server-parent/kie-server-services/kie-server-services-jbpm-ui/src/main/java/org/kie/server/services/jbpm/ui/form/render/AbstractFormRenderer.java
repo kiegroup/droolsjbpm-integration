@@ -22,8 +22,10 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +40,7 @@ import org.kie.server.services.jbpm.ui.form.render.model.FormLayout;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutColumn;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutItem;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutRow;
+import org.kie.server.services.jbpm.ui.form.render.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     public static final String CASE_LAYOUT_TEMPLATE = "case-layout";
     public static final String PROCESS_LAYOUT_TEMPLATE = "process-layout";
     public static final String TASK_LAYOUT_TEMPLATE = "task-layout";
+    public static final String TABLE_LAYOUT_TEMPLATE = "table";
     
     private Map<String, String> inputTypes;
     private StringTemplateLoader stringLoader = new StringTemplateLoader();
@@ -111,7 +115,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
 
         if (form != null) { 
             FormLayout layout = form.getLayout();
-            processFormLayout(form, form, Collections.emptyMap(), Collections.emptyMap(), CASE_LAYOUT_TEMPLATE, jsonTemplate);
+            processFormLayout(form, form, Collections.emptyMap(), Collections.emptyMap(), CASE_LAYOUT_TEMPLATE, jsonTemplate, true, scriptDataList);
             
             // finish json template
             jsonTemplate
@@ -168,7 +172,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         jsonTemplate
             .append("{");
 
-        processFormLayout(form, form, Collections.emptyMap(), Collections.emptyMap(), PROCESS_LAYOUT_TEMPLATE, jsonTemplate);
+        processFormLayout(form, form, Collections.emptyMap(), Collections.emptyMap(), PROCESS_LAYOUT_TEMPLATE, jsonTemplate, true, scriptDataList);
         
         // finish json template
         jsonTemplate
@@ -214,7 +218,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         // start json template
         jsonTemplate
             .append("{");
-        processFormLayout(form, form, inputs, outputs, TASK_LAYOUT_TEMPLATE, jsonTemplate);
+        processFormLayout(form, form, inputs, outputs, TASK_LAYOUT_TEMPLATE, jsonTemplate, true, scriptDataList);
 
         // finish json template
         jsonTemplate
@@ -250,11 +254,28 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         return finalOutput;
     }
     
-    
-    protected void processFormLayout(FormInstance topLevelForm, FormInstance form, Map<String, Object> inputs, Map<String, Object> outputs, String layoutTemplate, StringBuilder jsonTemplate) {
+    /**
+     * Renders the entire form (including any subforms if found as nested forms)
+     * @param topLevelForm - the top level form to be rendered, if needed it should include all nested forms inside or lookup mechanism
+     * @param form - form being currently processed - could be top level (on first iteration) or nested (on subsequent iterations)
+     * @param inputs - data inputs or empty list
+     * @param outputs - data outputs or empty list
+     * @param layoutTemplate - layout template to be applied when processing form content
+     * @param jsonTemplate - JSON template on how to retrieve data from rendered form - it's constantly updated by each form being processed
+     * @param wrapJson - indicates if complex type information should be wrapped with type - usually it's set to true only multi subforms change it to false
+     * @param scriptDataList - list of JS functions and code to be placed into the rendered html - at the end of the page
+     */
+    protected void processFormLayout(FormInstance topLevelForm, 
+            FormInstance form, 
+            Map<String, Object> inputs, 
+            Map<String, Object> outputs, 
+            String layoutTemplate, 
+            StringBuilder jsonTemplate, 
+            boolean wrapJson,
+            List<String> scriptDataList) {
         FormLayout layout = form.getLayout();
         
-        if (form.getModel().getClassName() != null) {
+        if (form.getModel().getClassName() != null && wrapJson) {
             jsonTemplate                
                 .append("'")
                 .append(form.getModel().getName())
@@ -280,36 +301,16 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                         FormField field = form.getField(item.getFieldId());
                         
                         if (field.getNestedForm() != null && !field.getNestedForm().isEmpty()) {
-                            FormInstance nestedForm = topLevelForm.getNestedForm(field.getNestedForm());
-                            Map<String, Object> nestedInputs = new HashMap<>(inputs); 
-                            Map<String, Object> nestedOutputs = new HashMap<>(outputs);
-                            // extract properties of the binding
-                            Object binding = outputs.get(field.getBinding());
-                            if (binding == null) {
-                                binding = inputs.get(field.getBinding());
-                                Map<String, Object> nestedDataExtracted = reader.extractValues(binding);
-                                nestedInputs.putAll(nestedDataExtracted);
-                            } else {
-                                Map<String, Object> nestedDataExtracted = reader.extractValues(binding);
-                                nestedOutputs.putAll(nestedDataExtracted);
-                            }
-                                                        
-                            processFormLayout(topLevelForm, nestedForm, nestedInputs, nestedOutputs, layoutTemplate, jsonTemplate);
-                            
-                            Map<String, Object> parameters = new HashMap<>();
-                            parameters.put("header", nestedForm.getName());
-                            String output = renderTemplate(HEADER_LAYOUT_TEMPLATE, parameters);
-                            content.append(output);                         
-                            FormLayout nestedLayout = nestedForm.getLayout();
-                            
-                            parameters = new HashMap<>();
-                            parameters.put("rows", nestedLayout.getRows());
-                            output = renderTemplate(layoutTemplate, parameters);
-                            // append rendered content to the column content
-                            content.append(output);
+                            // handle subform
+                            handleSubForm(topLevelForm, field, inputs, outputs, layoutTemplate, jsonTemplate, wrapJson, scriptDataList, content);
+                            continue;
+                        } else if (field.getCreationForm() != null) {
+                            // handle multi subforms
+                            handleMultiSubForm(topLevelForm, field, inputs, outputs, layoutTemplate, jsonTemplate, scriptDataList, content);
                             continue;
                         }
                         
+                        // handle regular fields in the form 
                         String fieldType = inputTypes.get(field.getCode());
                         if (fieldType != null) {
                                                     
@@ -336,14 +337,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             
                             // generate column content                    
                             Map<String, Object> parameters = new HashMap<>();
-                            parameters.put("column", item);
+                            parameters.put("item", item);
                             parameters.put("serverPath", serverPath); // used to generate link for documents
                             String output = renderTemplate(FORM_GROUP_LAYOUT_TEMPLATE, parameters);
                             // append rendered content to the column content
                             content.append(output);
                             
                             // add the field to json template
-                            appendFieldJSON(jsonTemplate, fieldType, field.getName(), field.getId(), jsType);
+                            appendFieldJSON(jsonTemplate, fieldType, field.getBinding(), field.getId(), jsType);
                         } else {
                             logger.warn("Field type {} is not supported, skipping it...", field.getCode());
                         }
@@ -354,15 +355,132 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             }
         }
 
-        if (form.getModel().getClassName() != null) {
+        if (form.getModel().getClassName() != null && wrapJson) {
             jsonTemplate
                 .deleteCharAt(jsonTemplate.length() - 1)
                 .append("}")
                 .append("}")
                 .append(",");
+        }        
+    }
+    
+    protected void handleSubForm(FormInstance topLevelForm, 
+            FormField field, 
+            Map<String, Object> inputs, 
+            Map<String, Object> outputs, 
+            String layoutTemplate, 
+            StringBuilder jsonTemplate, 
+            boolean wrapJson,
+            List<String> scriptDataList,
+            StringBuilder content) {
+        
+        FormInstance nestedForm = topLevelForm.getNestedForm(field.getNestedForm());
+        if (nestedForm == null) {
+            throw new RuntimeException("Unable to find nested form with form id " + field.getNestedForm());
+        }
+        Map<String, Object> nestedInputs = new HashMap<>(inputs); 
+        Map<String, Object> nestedOutputs = new HashMap<>(outputs);
+        // extract properties of the binding
+        Object binding = outputs.get(field.getBinding());
+        if (binding == null) {
+            binding = inputs.get(field.getBinding());
+            Map<String, Object> nestedDataExtracted = reader.extractValues(binding);
+            nestedInputs.putAll(nestedDataExtracted);
+        } else {
+            Map<String, Object> nestedDataExtracted = reader.extractValues(binding);
+            nestedOutputs.putAll(nestedDataExtracted);
+        }
+                                    
+        processFormLayout(topLevelForm, nestedForm, nestedInputs, nestedOutputs, layoutTemplate, jsonTemplate, wrapJson, scriptDataList);
+        
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("header", nestedForm.getName());
+        String output = renderTemplate(HEADER_LAYOUT_TEMPLATE, parameters);
+        content.append(output);                         
+        FormLayout nestedLayout = nestedForm.getLayout();
+        
+        parameters = new HashMap<>();
+        parameters.put("rows", nestedLayout.getRows());
+        output = renderTemplate(layoutTemplate, parameters);
+        // append rendered content to the column content
+        content.append(output);
+    }
+    
+    protected void handleMultiSubForm(FormInstance topLevelForm, 
+            FormField field, 
+            Map<String, Object> inputs, 
+            Map<String, Object> outputs, 
+            String layoutTemplate, 
+            StringBuilder jsonTemplate, 
+            List<String> scriptDataList,
+            StringBuilder content) {
+        
+        FormInstance nestedForm = topLevelForm.getNestedForm(field.getCreationForm());                  
+        if (nestedForm == null) {
+            throw new RuntimeException("Unable to find creation form with form id " + field.getCreationForm());
+        }
+        // extract and set type of the nested fields
+        for (TableInfo tableInfo : field.getTableInfo()) {
+        
+            FormField nestedField = nestedForm.getFieldByBinding(tableInfo.getProperty());
+            String jsType = getFieldType(nestedField.getType());
+            tableInfo.setType(jsType);
+        }
+                                    
+        Object bindingData = outputs.get(field.getBinding());
+        if (bindingData == null) {
+            bindingData = inputs.get(field.getBinding());                                
         }
         
+        // build initial JSON content for the data
+        if (bindingData != null && bindingData instanceof Collection<?>) {
+            Map<String, Object> mappedData = new LinkedHashMap<>();
+            
+            int index = 0;
+            for (Object data : ((Collection<?>)bindingData)) {
+                mappedData.put("table_" + field.getId() + "_" + index, data);
+                index++;
+            }
+            
+            String jsonData = reader.toJson(mappedData);                                
+            String loadDataScript = "tableData.set('table_" + field.getId() +"', new Map(Object.entries(JSON.parse('" + jsonData + "'))));";
+            scriptDataList.add(loadDataScript);
+        }
         
+        StringBuilder creationJsonTemplate = new  StringBuilder("{");
+        processFormLayout(topLevelForm, nestedForm, inputs, outputs, layoutTemplate, creationJsonTemplate, false, scriptDataList);
+        creationJsonTemplate
+            .deleteCharAt(creationJsonTemplate.length() - 1)
+            .append("}");    
+        
+        scriptDataList.add(buildFunctionWithBody("formData_" + field.getId(), " return " + creationJsonTemplate.toString() + ";"));
+        
+        FormLayout nestedLayout = nestedForm.getLayout();
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("rows", nestedLayout.getRows());
+        String output = renderTemplate(layoutTemplate, parameters);
+        
+        
+        parameters = new HashMap<>();
+        parameters.put("tableColumns", field.getTableInfo());
+        parameters.put("tableData", bindingData);
+        parameters.put("fieldId", field.getId());
+        parameters.put("label", field.getLabel());
+        parameters.put("type", field.getType());                            
+        parameters.put("creationForm", output);
+        output = renderTemplate(TABLE_LAYOUT_TEMPLATE, parameters);                                                    
+        
+        // append rendered content to the column content
+        content.append(output);
+        
+        // add json template for the table
+        jsonTemplate
+            .append("'")
+            .append(field.getBinding())
+            .append("' : getTableData('table_")
+            .append(field.getId())                            
+            .append("')")
+            .append(",");
     }
 
     protected abstract void loadTemplates();

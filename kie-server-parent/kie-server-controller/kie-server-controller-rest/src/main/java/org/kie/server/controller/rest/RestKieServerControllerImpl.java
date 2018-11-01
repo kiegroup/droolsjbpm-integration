@@ -18,18 +18,13 @@ package org.kie.server.controller.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.*;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.storage.KieServerControllerStorage;
@@ -39,7 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.controller.rest.ControllerUtils.*;
+import static org.kie.server.controller.rest.docs.ParameterSamples.*;
 
+@Api(value = "Controller :: Server Controller")
 @Path("/controller")
 public class RestKieServerControllerImpl extends KieServerControllerImpl {
 
@@ -47,12 +44,19 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
 
     private KieServerControllerStorage storage = InMemoryKieServerControllerStorage.getInstance();
 
+    @ApiOperation(value = "Connect a new Kie Server instance to Controller", response = KieServerSetup.class)
+    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error")})
     @PUT
     @Path("server/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response connectKieServer( @Context HttpHeaders headers, @PathParam("id") String id, String serverInfoPayload ) {
-
+    public Response connectKieServer(@Context HttpHeaders headers,
+                                     @ApiParam(name = "Kie Server instance identifier", required = true) @PathParam("id") String id,
+                                     @ApiParam(name = "Kie Server instance information", required = true, examples =
+                                     @Example(value = {
+                                             @ExampleProperty(mediaType = JSON, value = KIE_SERVER_INFO_JSON),
+                                             @ExampleProperty(mediaType = XML, value = KIE_SERVER_INFO_XML)
+                                     })) String serverInfoPayload) {
         String contentType = getContentType(headers);
         logger.debug("Received connect request from server with id {}", id);
         KieServerInfo serverInfo = unmarshal(serverInfoPayload, contentType, KieServerInfo.class);
@@ -64,22 +68,23 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
 
         logger.debug("Returning response for connect of server '{}': {}", id, response);
         return createCorrectVariant(response, headers, Response.Status.CREATED);
-
     }
 
+    @ApiOperation(value = "Remove a Kie Server instance from Controller")
+    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error")})
     @DELETE
     @Path("server/{id}")
-    public Response disposeContainer( @Context HttpHeaders headers, @PathParam("id") String id, @QueryParam("location") String serverLocation) {
-
-        KieServerInfo serverInfo = null;
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response disconnectKieServer(@Context HttpHeaders headers,
+                                        @ApiParam(name = "Kie Server instance identifier", required = true) @PathParam("id") String id,
+                                        @ApiParam(name = "Kie Server instance URL", required = true) @QueryParam("location") String serverLocation) {
         try {
-            serverInfo = new KieServerInfo(id, "", "", Collections.<String>emptyList(), URLDecoder.decode(serverLocation, "UTF-8"));
+            KieServerInfo serverInfo = new KieServerInfo(id, "", "", Collections.<String>emptyList(), URLDecoder.decode(serverLocation, "UTF-8"));
             disconnect(serverInfo);
             logger.info("Server with id '{}' disconnected", id);
         } catch (UnsupportedEncodingException e) {
             logger.debug("Cannot URL decode kie server location due to unsupported encoding exception", e);
         }
-
         return null;
     }
 
