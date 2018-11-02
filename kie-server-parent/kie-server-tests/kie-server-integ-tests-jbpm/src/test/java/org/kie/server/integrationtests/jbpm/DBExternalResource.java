@@ -15,16 +15,19 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import org.jbpm.test.util.PoolingDataSource;
+import java.util.Properties;
+
 import org.junit.rules.ExternalResource;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
+import org.kie.test.util.db.DataSourceFactory;
+import org.kie.test.util.db.PoolingDataSourceWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DBExternalResource extends ExternalResource {
     private static final Logger logger = LoggerFactory.getLogger(DBExternalResource.class);
-    PoolingDataSource pds;
+    PoolingDataSourceWrapper pds;
     
     @Override
     protected void after() {
@@ -43,13 +46,14 @@ public class DBExternalResource extends ExternalResource {
 
         KieServerBaseIntegrationTest.cleanupSingletonSessionId();
         if (TestConfig.isLocalServer()) {
-            pds = new PoolingDataSource();
-            pds.setUniqueName("jdbc/jbpm-ds");
-            pds.setClassName("org.h2.jdbcx.JdbcDataSource");
-            pds.getDriverProperties().put("user", "sa");
-            pds.getDriverProperties().put("password", "");
-            pds.getDriverProperties().put("URL", "jdbc:h2:mem:jbpm-db;MVCC=true");
-            pds.init();
+            Properties driverProperties = new Properties();
+            driverProperties.setProperty("user", "sa");
+            driverProperties.setProperty("password", "");
+            driverProperties.setProperty("url", "jdbc:h2:mem:jbpm-db;MVCC=true");
+            driverProperties.setProperty("className", "org.h2.jdbcx.JdbcDataSource");
+            driverProperties.setProperty("driverClassName", "org.h2.Driver");
+
+            pds = DataSourceFactory.setupPoolingDataSource("jdbc/jbpm-ds", driverProperties);
         }
     };
 };

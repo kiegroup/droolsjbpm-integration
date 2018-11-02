@@ -16,8 +16,11 @@
 package org.kie.spring.jbpm;
 
 import org.kie.spring.jbpm.tools.IntegrationSpringBase;
+import org.kie.test.util.db.DataSourceFactory;
+import org.kie.test.util.db.PoolingDataSourceWrapper;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Properties;
 
 import javax.naming.Context;
 
@@ -27,11 +30,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import org.jbpm.test.util.PoolingDataSource;
-
 public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
 
-    protected static PoolingDataSource pds;
+    protected static PoolingDataSourceWrapper pds;
     protected ClassPathXmlApplicationContext context;
 
     @BeforeClass
@@ -64,15 +65,14 @@ public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
         System.clearProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY);
     }
 
-    protected static PoolingDataSource setupPoolingDataSource() {
-        PoolingDataSource pds = new PoolingDataSource();
-        pds.setUniqueName("jdbc/jbpm-ds");
-        pds.setClassName("org.h2.jdbcx.JdbcDataSource");
-        pds.getDriverProperties().put("user", "sa");
-        pds.getDriverProperties().put("password", "");
-        pds.getDriverProperties().put("URL", "jdbc:h2:mem:jbpm-db;MVCC=true");
-        pds.init();
-        return pds;
+    protected static PoolingDataSourceWrapper setupPoolingDataSource() {
+        Properties driverProperties = new Properties();
+        driverProperties.put("user", "sa");
+        driverProperties.put("password", "");
+        driverProperties.put("url", "jdbc:h2:mem:mydb;MVCC=true");
+        driverProperties.put("driverClassName", "org.h2.Driver");
+        driverProperties.put("className", "org.h2.jdbcx.JdbcDataSource");
+        return DataSourceFactory.setupPoolingDataSource("jdbc/jbpm-ds", driverProperties);
     }
 
     protected static void cleanupSingletonSessionId() {

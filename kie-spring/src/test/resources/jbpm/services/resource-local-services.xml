@@ -11,17 +11,20 @@
   <context:annotation-config />
   <tx:annotation-driven />
 
-  <bean id="dataSource" class="org.jbpm.test.util.PoolingDataSource" init-method="init" destroy-method="close">
+  <bean id="dataSourceFactory" class="org.kie.spring.jbpm.tools.SpringDataSourceFactory">
+    <property name="xaClassName" value="org.h2.jdbcx.JdbcDataSource" />
+    <property name="driverClassName" value="org.h2.Driver" />
     <property name="uniqueName" value="jdbc/jbpm-ds" />
-    <property name="className" value="org.h2.jdbcx.JdbcDataSource" />
     <property name="driverProperties">
       <props>
         <prop key="user">sa</prop>
         <prop key="password">sa</prop>
-        <prop key="URL">jdbc:h2:mem:jbpm-services-db;MVCC=true</prop>
+        <prop key="url">jdbc:h2:mem:jbpm-services-db;MVCC=true</prop>
       </props>
     </property>
   </bean>
+
+  <bean id="dataSource" factory-bean="dataSourceFactory" factory-method="setupPoolingDataSource" destroy-method="close"/>
 
   <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
     <property name="entityManagerFactory" ref="entityManagerFactory" />
