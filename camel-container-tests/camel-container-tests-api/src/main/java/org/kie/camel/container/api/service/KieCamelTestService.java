@@ -16,6 +16,8 @@
 
 package org.kie.camel.container.api.service;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -38,8 +40,8 @@ public interface KieCamelTestService {
     Person verifyAge(Person person);
 
     @POST
-    @Path("/start-process")
-    @Consumes({MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML})
-    ExecutionResultImpl startProcessCommand(StartProcessCommand command);
+    @Path("/run-command")
+    @Consumes({MediaType.TEXT_PLAIN})
+    @Produces({MediaType.TEXT_PLAIN})
+    String runCommand(String command);
 }

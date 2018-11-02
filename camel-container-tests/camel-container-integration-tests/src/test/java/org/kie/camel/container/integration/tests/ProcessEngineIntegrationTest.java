@@ -16,26 +16,66 @@
 
 package org.kie.camel.container.integration.tests;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
+import org.drools.core.command.runtime.process.GetProcessIdsCommand;
+import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
+import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
-import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.drools.core.marshalling.impl.ProtobufMessages;
 import org.junit.Test;
-import org.kie.api.KieServices;
-import org.kie.api.command.KieCommands;
+import org.kie.api.runtime.ExecutionResults;
 
 public class ProcessEngineIntegrationTest extends AbstractKieCamelIntegrationTest {
 
-    private static final String TEST_PROCESS_ID = "process1";
-    private static final String PROCESS_INSTANCE_ID_PROPERTY = "process-id";
+    private static final String SIMPLE_PROCESS_ID = "process1";
+    private static final String PROCESS_WITH_SIGNAL = "processWithSignal";
+    private static final String SIGNAL_NAME = "signal1";
+
+    @Test
+    public void testGetProcessIds() {
+        final GetProcessIdsCommand getProcessIdsCommand = new GetProcessIdsCommand();
+        getProcessIdsCommand.setOutIdentifier(DEFAULT_OUT_ID);
+
+        final ExecutionResults executionResults = runCommand(getProcessIdsCommand);
+        Assertions.assertThat(executionResults).isNotNull();
+        Assertions.assertThat((List) executionResults.getValue(DEFAULT_OUT_ID)).contains(SIMPLE_PROCESS_ID,
+                                                                                         PROCESS_WITH_SIGNAL);
+    }
 
     @Test
     public void testStartProcess() {
-        final KieCommands kieCommands = KieServices.Factory.get().getCommands();
-
-        final StartProcessCommand command = (StartProcessCommand) kieCommands.newStartProcess(TEST_PROCESS_ID);
-        command.setOutIdentifier(PROCESS_INSTANCE_ID_PROPERTY);
-        final ExecutionResultImpl response = kieCamelTestService.startProcessCommand(command);
+        final StartProcessCommand command = (StartProcessCommand) kieCommands.newStartProcess(SIMPLE_PROCESS_ID);
+        command.setOutIdentifier(DEFAULT_OUT_ID);
+        final ExecutionResults response = runCommand(command);
         Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getResults().get(PROCESS_INSTANCE_ID_PROPERTY)).isNotNull();
+        final Long processId = (Long) response.getValue(DEFAULT_OUT_ID);
+        Assertions.assertThat(processId).isNotNull();
+        Assertions.assertThat(processId).isPositive();
+    }
+
+    @Test
+    public void testSignalToProcess() {
+        /* Start process */
+        final StartProcessCommand startProcessCommand = (StartProcessCommand) kieCommands.newStartProcess(PROCESS_WITH_SIGNAL);
+        startProcessCommand.setOutIdentifier(DEFAULT_OUT_ID);
+        final ExecutionResults responseStartProcess = runCommand(startProcessCommand);
+        Assertions.assertThat(responseStartProcess).isNotNull();
+        final Long processId = (Long) responseStartProcess.getValue(DEFAULT_OUT_ID);
+        Assertions.assertThat(processId).isNotNull();
+        Assertions.assertThat(processId).isPositive();
+
+        /* Check that process is running */
+        Assertions.assertThat(listProcesses()).contains(processId);
+
+        /* Send signal to allow process to terimanate */
+        final SignalEventCommand signalEventCommand = new SignalEventCommand(SIGNAL_NAME, new Object());
+        runCommand(signalEventCommand);
+
+        /* Check that process was finished */
+        Assertions.assertThat(listProcesses()).doesNotContain(processId);
     }
 }

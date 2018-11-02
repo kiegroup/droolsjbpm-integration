@@ -12,13 +12,17 @@
                 address="http://localhost:8080/rest"
                 serviceClass="org.kie.camel.container.api.service.KieCamelTestService" />
 
+  <bean id="batchExecutionHelperProvider" class="org.drools.core.runtime.help.impl.BatchExecutionHelperProviderImpl" />
+  <bean id="xstreamBean" factory-bean="batchExecutionHelperProvider" factory-method="newJSonMarshaller" />
+  <bean id="listProcessInstancesProcessor" class="org.kie.camel.container.module.ListProcessInstancesProcessor"/>
+
   <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
   <kie:kmodule id="test-kmodule">
     <kie:kbase name="rules-kbase" packages="org.kie.camel.container.rules,org.kie.camel.container.api.model" >
-      <kie:ksession name="rules-session" type="stateless"/>
+      <kie:ksession name="stateless-session" type="stateless"/>
     </kie:kbase>
-    <kie:kbase name="process-kbase" packages="org.kie.camel.container.processes,org.kie.camel.container.api.model" >
-      <kie:ksession name="process-session" type="stateful"/>
+    <kie:kbase name="process-kbase" packages="org.kie.camel.container.processes,org.kie.camel.container.api.model,org.kie.camel.container.rules" >
+      <kie:ksession name="stateful-session" type="stateful"/>
     </kie:kbase>
   </kie:kmodule>
 
@@ -32,8 +36,8 @@
           <to uri="direct:ageVerification" />
         </when>
         <when>
-          <simple>${header.operationName} == 'startProcessCommand'</simple>
-          <to uri="direct:runProcessCommand"/>
+          <simple>${header.operationName} == 'runCommand'</simple>
+          <to uri="direct:runCommand"/>
         </when>
       </choice>
     </route>
@@ -42,14 +46,35 @@
     <route id="ageVerificationRoute">
       <from uri="direct:ageVerification" />
       <transform><simple>${body[0]}</simple></transform>
-      <to uri="kie-local:rules-session?action=insertBody"/>
+      <to uri="kie-local:stateless-session?action=insertBody"/>
     </route>
 
-    <!-- Route for running processes using commands -->
-    <route id="runProcessCommand">
-      <from uri="direct:runProcessCommand" />
-      <transform><simple>${body[0]}</simple></transform>
-      <to uri="kie-local:process-session?action=execute"/>
+    <route id="runCommand">
+      <from uri="direct:runCommand" />
+      <convertBodyTo type="java.lang.String"/>
+      <to uri="bean:xstreamBean?method=fromXML(String)"/>
+      <choice>
+        <when>
+          <simple>${body} is 'org.drools.core.command.runtime.process.GetProcessInstancesCommand'</simple>
+          <to uri="direct:runListProcessesCommand"/>
+        </when>
+        <otherwise>
+          <to uri="direct:runOtherCommand"/>
+        </otherwise>
+      </choice>
+    </route>
+
+    <route id="runListProcessesCommand">
+      <from uri="direct:runListProcessesCommand" />
+      <to uri="kie-local:stateful-session?action=execute"/>
+      <to uri="bean:listProcessInstancesProcessor"/>
+      <to uri="bean:xstreamBean?method=toXML(Object)"/>
+    </route>
+
+    <route id="runOtherCommand">
+      <from uri="direct:runOtherCommand" />
+      <to uri="kie-local:stateful-session?action=execute"/>
+      <to uri="bean:xstreamBean?method=toXML(Object)"/>
     </route>
   </camelContext>
 </beans>
