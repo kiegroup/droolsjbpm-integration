@@ -62,7 +62,7 @@
     <!-- By default we use bundled H2 database jar -->
     <springboot.jdbc.driver.jar/>
 
-    <version.wildfly11>11.0.0.Final</version.wildfly11>
+    <version.wildfly14>14.0.1.Final</version.wildfly14>
     <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
     <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
@@ -720,12 +720,13 @@
       </dependencies>
     </profile>    
     <profile>
+      <!-- temporary hack to let it test on jenkins id>wildfly14</id-->
       <id>wildfly11</id>
       <properties>        
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
-        <cargo.container.id>wildfly11x</cargo.container.id>
+        <cargo.container.id>wildfly14x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -739,7 +740,7 @@
                   <artifactInstaller>
                     <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-dist</artifactId>
-                    <version>${version.wildfly11}</version>
+                    <version>${version.wildfly14}</version>
                   </artifactInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
@@ -800,7 +801,7 @@
           <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-parent</artifactId>
-            <version>${version.wildfly11}</version>
+            <version>${version.wildfly14}</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
@@ -825,8 +826,8 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-        <!-- eap7 is basically wildfly11; until there is a EAP 7 specific containerId, 'wildfly11x' should work just fine -->
-        <cargo.container.id>wildfly11x</cargo.container.id>
+        <!-- eap7 is basically wildfly14; until there is a EAP 7 specific containerId, 'wildfly14x' should work just fine -->
+        <cargo.container.id>wildfly14x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -883,7 +884,7 @@
           <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-parent</artifactId>
-            <version>${version.wildfly11}</version>
+            <version>${version.wildfly14}</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>

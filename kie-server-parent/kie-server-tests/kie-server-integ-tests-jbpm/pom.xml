@@ -410,6 +410,7 @@
       </build>
     </profile>
     <profile>
+      <!-- temporary hack to let it test on jenkins <id>wildfly14</id>-->
       <id>wildfly11</id>
       <build>
         <pluginManagement>
