@@ -32,18 +32,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-canonical-model</artifactId>
-      <version>${drools.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-model-compiler</artifactId>
-      <version>${drools.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-core</artifactId>
       <version>${drools.version}</version>

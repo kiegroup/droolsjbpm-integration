@@ -61,8 +61,6 @@ public class KJarWithDMNIntegrationTest extends KieMavenPluginBaseIntegrationTes
     }
 
     private void testComplexDMNModel(final boolean useExecutableModel) throws Exception {
-        final String projectVersion = TestUtil.getProjectVersion();
-        assertThat(projectVersion).isNotNull().isNotEmpty();
         if (useExecutableModel) {
             buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions(true));
         } else {
