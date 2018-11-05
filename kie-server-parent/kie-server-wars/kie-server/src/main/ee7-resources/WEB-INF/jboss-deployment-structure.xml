@@ -26,6 +26,13 @@
            the WAR depends on private modules. -->
       <!-- Keep the alphabetical order! -->
       <module name="org.apache.xerces"/>
+      <!-- required jdk dependencies for batik/svg transformation -->
+      <system export="true">
+        <paths>
+          <path name="org/w3c/dom/css"/>
+          <path name="org/w3c/dom/xpath"/>
+        </paths>
+      </system>
     </dependencies>
   </deployment>
 </jboss-deployment-structure>

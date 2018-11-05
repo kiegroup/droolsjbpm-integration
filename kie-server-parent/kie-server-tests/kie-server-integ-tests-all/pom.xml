@@ -180,6 +180,11 @@
       <artifactId>jbpm-test-util</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
     
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -362,6 +367,7 @@
       <id>wildfly10</id>
     </profile>
     <profile>
+      <!-- temporary hack to let it test on jenkins <id>wildfly14</id>-->
       <id>wildfly11</id>
     </profile>
     <profile>
