@@ -132,7 +132,7 @@
             <artifactId>cargo-maven2-plugin</artifactId>
             <configuration>
               <container>
-                <containerId>wildfly11x</containerId>
+                <containerId>wildfly14x</containerId>
                 <home>${project.build.directory}/application-server/wildfly-${version.org.wildfly}</home>
                 <type>installed</type>
               </container>
@@ -204,7 +204,7 @@
             <artifactId>cargo-maven2-plugin</artifactId>
             <configuration>
               <container>
-                <containerId>wildfly11x</containerId>
+                <containerId>wildfly14x</containerId>
                 <home>${project.build.directory}/application-server</home>
                 <type>installed</type>
               </container>

@@ -720,8 +720,7 @@
       </dependencies>
     </profile>    
     <profile>
-      <!-- temporary hack to let it test on jenkins id>wildfly14</id-->
-      <id>wildfly11</id>
+      <id>wildfly</id>
       <properties>        
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
