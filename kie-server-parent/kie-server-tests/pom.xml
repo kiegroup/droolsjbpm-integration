@@ -573,7 +573,7 @@
                     <org.kie.server.persistence.tm>JBossTS</org.kie.server.persistence.tm>
                     <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
-                    <hibernate.connection.release_mode>after_transaction</hibernate.connection.release_mode>
+                    <hibernate.connection.handling_mode>DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION</hibernate.connection.handling_mode>
                   </systemProperties>
                   <dependencies>
                     <dependency>
