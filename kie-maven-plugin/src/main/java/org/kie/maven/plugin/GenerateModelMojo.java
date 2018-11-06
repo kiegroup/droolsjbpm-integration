@@ -180,7 +180,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
             try {
                 if (!Files.exists(packagesDestinationPath)) {
-                    Files.createDirectories(packagesDestinationPath);
+                    Files.createDirectories(packagesDestinationPath.getParent());
                 }
                 Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
