@@ -27,6 +27,8 @@ public class DMNTest {
 
         DMNRuntime dmnRuntime = kieContainer.newKieSession().getKieRuntime(DMNRuntime.class);
 
+        System.out.println("dmnRuntime.getModels() = " + dmnRuntime.getModels());
+
         DMNModel dmnModel = dmnRuntime.getModel("http://www.trisotech.com/dmn/definitions/_73732c1d-f5ff-4219-a705-f551a5161f88", "Bank monthly fees");
 
         DMNContext dmnContext = dmnRuntime.newContext();
