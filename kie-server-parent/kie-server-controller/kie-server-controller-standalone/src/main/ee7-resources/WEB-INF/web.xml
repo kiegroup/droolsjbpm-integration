@@ -24,8 +24,9 @@
   </security-constraint>
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>REST web resources</web-resource-name>
+      <web-resource-name>web resources</web-resource-name>
       <url-pattern>/rest/*</url-pattern>
+      <url-pattern>/websocket/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>kie-server</role-name>
