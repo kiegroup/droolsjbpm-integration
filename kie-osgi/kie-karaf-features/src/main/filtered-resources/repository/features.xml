@@ -123,12 +123,14 @@
     <feature>transaction</feature>
     <feature>jpa</feature>
     <feature version="${project.version}">servlet-api-kie</feature>
+    <bundle dependency="true">mvn:javax.persistence/javax.persistence-api/2.2</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.version.org.apache.servicemix.bundles.antlr}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${karaf.version.org.apache.servicemix.bundles.ant}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/${karaf.version.org.apache.servicemix.bundles.dom4j}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.serp/${karaf.version.org.apache.servicemix.bundles.serp}</bundle>
     <bundle dependency="true">mvn:com.fasterxml/classmate/${karaf.version.com.fasterxml.classmate}</bundle>
     <bundle dependency="true">mvn:org.javassist/javassist/${version.org.javassist}</bundle>
+    <bundle dependency="true">mvn:net.bytebuddy/byte-buddy/${version.net.byte-buddy}</bundle>
     <bundle dependency="true">mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/${version.org.jboss.spec.javax.security.jacc.jboss-jacc-api_1.5_spec}</bundle>
     <bundle dependency="true">wrap:mvn:org.jboss/jandex/${karaf.version.org.jboss.jandex}</bundle>
     <bundle dependency="true">mvn:javax.validation/validation-api/${karaf.version.javax.validation}</bundle>

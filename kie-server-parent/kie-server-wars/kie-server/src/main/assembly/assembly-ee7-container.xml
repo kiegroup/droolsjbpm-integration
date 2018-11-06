@@ -88,7 +88,7 @@
         <exclude>javax.validation:validation-api</exclude>
         <exclude>stax:stax-api</exclude>
         <exclude>javax.activation:activation</exclude>
-        <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</exclude>
+        <exclude>javax.persistence:javax.persistence-api</exclude>
         <exclude>xml-apis:xml-apis:jar</exclude>
         <exclude>javax.mail:mail</exclude>
         <exclude>org.apache.cxf:cxf-rt-ws-policy</exclude>
