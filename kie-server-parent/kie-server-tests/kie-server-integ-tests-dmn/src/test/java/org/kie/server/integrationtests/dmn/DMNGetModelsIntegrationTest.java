@@ -49,7 +49,7 @@ public class DMNGetModelsIntegrationTest
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/get-models").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/get-models");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
         createContainer(CONTAINER_1_ID, kjar1);

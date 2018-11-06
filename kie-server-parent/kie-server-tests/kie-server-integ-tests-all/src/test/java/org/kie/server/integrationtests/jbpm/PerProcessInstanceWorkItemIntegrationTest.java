@@ -39,7 +39,7 @@ public class PerProcessInstanceWorkItemIntegrationTest extends JbpmKieServerBase
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/per-process-instance-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/per-process-instance-project");
 
         createContainer(CONTAINER_ID, releaseId);
     }

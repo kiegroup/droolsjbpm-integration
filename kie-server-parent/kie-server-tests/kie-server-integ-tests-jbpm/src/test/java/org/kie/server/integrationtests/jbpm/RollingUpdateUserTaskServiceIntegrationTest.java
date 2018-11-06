@@ -45,8 +45,8 @@ public class RollingUpdateUserTaskServiceIntegrationTest extends JbpmKieServerBa
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project-101");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
