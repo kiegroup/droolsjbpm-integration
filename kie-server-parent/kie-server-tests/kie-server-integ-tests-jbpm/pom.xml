@@ -370,48 +370,7 @@
       <id>tomcat9</id>
     </profile>
     <profile>
-      <id>wildfly10</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <!-- default, may be overridden in container specific 
-                      profiles -->
-                    <classifier>${kie.server.classifier}</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>60000</pingTimeout>
-                  </deployable>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server-test-web-service</artifactId>                    
-                    <type>war</type>
-                    <properties>
-                      <context>kie-server-test-web-service</context>
-                    </properties>
-                    <pingURL>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</pingURL>
-                    <pingTimeout>60000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <!-- temporary hack to let it test on jenkins <id>wildfly14</id>-->
-      <id>wildfly11</id>
+      <id>wildfly</id>
       <build>
         <pluginManagement>
           <plugins>
