@@ -1356,5 +1356,18 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <!-- Full downstream build disables active profiles because of ghprbGhRepository property, which means Cargo would stay enabled.
+           This profile disables Cargo when full downstream build is run (its invocation contains -DskipTests property). -->
+      <id>skipCargoInFDB</id>
+      <activation>
+        <property>
+          <name>skipTests</name>
+        </property>
+      </activation>
+      <properties>
+        <cargo.maven.skip>true</cargo.maven.skip>
+      </properties>
+    </profile>
   </profiles>
 </project>
