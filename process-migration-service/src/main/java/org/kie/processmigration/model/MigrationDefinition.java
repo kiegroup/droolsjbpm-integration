@@ -47,6 +47,8 @@ public class MigrationDefinition {
     @JsonProperty("kieserver_id")
     private String kieserverId;
 
+    private String requester;
+
     @Embedded
     private Execution execution;
 
@@ -76,6 +78,14 @@ public class MigrationDefinition {
 
     public void setKieserverId(String kieserverId) {
         this.kieserverId = kieserverId;
+    }
+
+    public String getRequester() {
+        return requester;
+    }
+
+    public void setRequester(String requester) {
+        this.requester = requester;
     }
 
     public Execution getExecution() {

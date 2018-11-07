@@ -30,6 +30,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.kie.processmigration.model.Execution.ExecutionType;
 import org.kie.processmigration.model.Migration;
@@ -43,6 +44,11 @@ import org.kie.processmigration.service.MigrationService;
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
 public class MigrationResource {
+
+    private static final String ANONYMOUS = "ANONYMOUS";
+
+    @Context
+    private SecurityContext securityContext;
 
     @Inject
     private MigrationService migrationService;
@@ -67,9 +73,10 @@ public class MigrationResource {
 
     @POST
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response submit(@Context HttpHeaders headers, MigrationDefinition migration) throws InvalidMigrationException {
-        Migration result = migrationService.submit(migration);
-        if (ExecutionType.ASYNC.equals(migration.getExecution().getType())) {
+    public Response submit(@Context HttpHeaders headers, MigrationDefinition definition) throws InvalidMigrationException {
+        setRequester(definition);
+        Migration result = migrationService.submit(definition);
+        if (ExecutionType.ASYNC.equals(definition.getExecution().getType())) {
             return Response.accepted(result).build();
         } else {
             return Response.ok(result).build();
@@ -79,8 +86,9 @@ public class MigrationResource {
     @PUT
     @Path("/{id}")
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition migrationDefinition) throws MigrationNotFoundException, InvalidMigrationException, ReScheduleException {
-        Migration migration = migrationService.update(id, migrationDefinition);
+    public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition definition) throws MigrationNotFoundException, InvalidMigrationException, ReScheduleException {
+        setRequester(definition);
+        Migration migration = migrationService.update(id, definition);
         return Response.ok(migration).build();
     }
 
@@ -91,4 +99,11 @@ public class MigrationResource {
         return Response.ok(migrationService.delete(id)).build();
     }
 
+    private void setRequester(MigrationDefinition migration) {
+        String requester = ANONYMOUS;
+        if (securityContext.getUserPrincipal() != null) {
+            requester = securityContext.getUserPrincipal().getName();
+        }
+        migration.setRequester(requester);
+    }
 }
