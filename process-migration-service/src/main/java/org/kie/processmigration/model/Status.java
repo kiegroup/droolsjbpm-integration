@@ -14,16 +14,30 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.service;
+package org.kie.processmigration.model;
 
-import org.kie.processmigration.model.Credentials;
+import java.util.Collection;
 
-public interface CredentialsService {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    Credentials get(Long id);
+public class Status {
 
-    Credentials save(Credentials credentials);
+    private final Health health;
 
-    Credentials delete(Long id);
+    @JsonProperty("kie_servers")
+    private final Collection<KieServerConfig> kieServers;
+
+    public Status(Collection<KieServerConfig> kieServers) {
+        this.health = Health.UP;
+        this.kieServers = kieServers;
+    }
+
+    public Collection<KieServerConfig> getKieServers() {
+        return kieServers;
+    }
+
+    public Health getHealth() {
+        return health;
+    }
 
 }

@@ -43,6 +43,8 @@ public class Execution {
         CREATED
     }
 
+    public static final Execution SYNC = new Execution().setType(ExecutionType.SYNC);
+
     @Column(name = "execution_type")
     private ExecutionType type;
 
@@ -60,24 +62,27 @@ public class Execution {
         return scheduledStartTime;
     }
 
-    public void setScheduledStartTime(Instant scheduledStartTime) {
+    public Execution setScheduledStartTime(Instant scheduledStartTime) {
         this.scheduledStartTime = scheduledStartTime;
+        return this;
     }
 
     public ExecutionType getType() {
         return type;
     }
 
-    public void setType(ExecutionType type) {
+    public Execution setType(ExecutionType type) {
         this.type = type;
+        return this;
     }
 
     public URI getCallbackUrl() {
         return callbackUrl;
     }
 
-    public void setCallbackUrl(URI callbackUrl) {
+    public Execution setCallbackUrl(URI callbackUrl) {
         this.callbackUrl = callbackUrl;
+        return this;
     }
 
 }

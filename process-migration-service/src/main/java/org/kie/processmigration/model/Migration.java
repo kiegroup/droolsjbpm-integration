@@ -31,6 +31,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.kie.processmigration.model.Execution.ExecutionStatus;
@@ -43,16 +44,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "migrations")
+@SequenceGenerator(name = "migrationIdSeq", sequenceName = "MIGRATION_ID_SEQ")
 @NamedQueries({
-               @NamedQuery(name = "Migration.findAll", query = "SELECT p FROM Migration p"),
-               @NamedQuery(name = "Migration.findById", query = "SELECT p FROM Migration p WHERE p.id = :id")
+               @NamedQuery(name = "Migration.findAll", query = "SELECT m FROM Migration m"),
+               @NamedQuery(name = "Migration.findById", query = "SELECT m FROM Migration m WHERE m.id = :id"),
+               @NamedQuery(name = "Migration.findByStatus", query = "SELECT m FROM Migration m WHERE m.status IN :statuses")
 })
 public class Migration implements Serializable {
 
     private static final long serialVersionUID = 7212317252498596171L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "migrationIdSeq")
     private Long id;
 
     @Embedded

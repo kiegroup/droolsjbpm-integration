@@ -4,10 +4,11 @@ swarm:
       jaxrs:
         application-path: /
   logging:
-    org.kie.server:
-      level: DEBUG
-    org.kie.processmigration:
-      level: DEBUG
+    loggers:
+      org.kie.server:
+        level: DEBUG
+      org.kie.processmigration:
+        level: DEBUG
   datasources:
     data-sources:
       ExampleDS:
@@ -16,12 +17,10 @@ swarm:
         user-name: sa
         password: sa
 kieservers:
-  - host: rhpam-authoring-kieserver-myproject.172.17.0.1.nip.io
-    port: 80
-    protocol: https
+  - host: kieserver1
+    port: 8080
+    protocol: http
     contextRoot: /
     path: services/rest/server  
     username: adminUser
-    password: fEy11kFx  
-credentials:
-  password: gUkXp2s5v8x/A?D(
+    password: RedHat  

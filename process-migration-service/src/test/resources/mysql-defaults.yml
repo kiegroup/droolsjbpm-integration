@@ -1,24 +1,52 @@
-swarm:
+thorntail:
   deployment:
     process-migration.war:
       jaxrs:
         application-path: /
+      web:
+        login-config:
+          auth-method: BASIC
+          security-domain: pim
+        security-constraints:
+          - url-pattern: /*
+            roles: [ admin ]
+          - url-pattern: /health/*
+  security:
+    security-domains:
+      pim:
+        classic-authentication:
+          login-modules:
+            UsersRoles:
+              code: UsersRoles
+              flag: required
+              module-options:
+                usersProperties: application-users.properties
+                rolesProperties: application-roles.properties
   logging:
-    org.kie.processmigration:
-      level: INFO
+    loggers:
+      org.kie.server:
+        level: DEBUG
+      org.kie.processmigration:
+        level: DEBUG
   datasources:
     data-sources:
-      ExampleDS:
+      pimDS:
         driver-name: mysql
-        #add the ?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC to avoid timezone related exception        
-        connection-url: jdbc:mysql://localhost:3306/rhpam?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-        user-name: mysqluser
-        password: password    
-kieserver:
-  host: localhost
-  port: 8080
-  protocol: http
-  contextRoot: /kie-server
-  path: /services/rest/server
-credentials:
-  password: gUkXp2s5v8x/A?D(
+        connection-url: jdbc:mysql://mysql:3306/sampledb?useUnicode=true&useSSL=false&serverTimezone=UTC
+        user-name: pim
+        password: pim    
+  ejb3:
+    timer-service:
+      default-data-store: timers-store
+      database-data-stores:
+        timers-store:
+          datasource-jndi-name: java:jboss/datasources/pimDS
+          partition: timer
+kieservers:
+  - host: kieserver.example.com
+    port: 8080
+    protocol: http
+    contextRoot: /
+    path: services/rest/server  
+    username: adminUser
+    password: RedHat  

@@ -16,14 +16,17 @@
 
 package org.kie.processmigration.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.kie.processmigration.model.KieServerConfig;
+import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.service.KieService;
 import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesClient;
@@ -50,14 +53,14 @@ public class KieServiceImpl implements KieService {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServiceImpl.class);
 
-    private Map<String, KieServerConfig> configs;
+    private Map<String, KieServerConfig> configs = new HashMap<>();
+    private Map<String, Map<Class<?>, Object>> kieServices = new HashMap<>();
 
     @Inject
     private ConfigView configView;
 
     @SuppressWarnings("unchecked")
-    @PostConstruct
-    private void loadConfigs() {
+    public void loadConfigs(@Observes @Initialized(ApplicationScoped.class) Object event) {
         List<Map<String, String>> value = configView.resolve("kieservers").as(List.class).getValue();
         value.stream().forEach(this::loadConfig);
     }
@@ -66,24 +69,11 @@ public class KieServiceImpl implements KieService {
         return configs;
     }
 
-    public ProcessAdminServicesClient createProcessAdminServicesClient(String kieServerId, CredentialsProvider credentialsProvider) {
-        Map<Class<?>, Object> services = createServices(configs.get(kieServerId), credentialsProvider);
-        ProcessAdminServicesClientImpl processAdminServicesClient = (ProcessAdminServicesClientImpl) services.get(ProcessAdminServicesClient.class);
-        processAdminServicesClient.setOwner((KieServicesClientImpl) createKieServicesClient(kieServerId, credentialsProvider));
-        return processAdminServicesClient;
-    }
-
-    public KieServicesClient createKieServicesClient(String kieServerId, CredentialsProvider credentialsProvider) {
-        return KieServicesFactory.newKieServicesRestClient(configs.get(kieServerId).getUrl(), credentialsProvider);
-    }
-
-    private String getServerId(KieServerConfig config) {
-        KieServicesClient restClient = KieServicesFactory.newKieServicesRestClient(config.getUrl(), config.getCredentialsProvider());
-        return restClient.getServerInfo().getResult().getServerId();
-    }
-
-    private Map<Class<?>, Object> createServices(KieServerConfig config, CredentialsProvider credentialsProvider) {
-        return new JBPMServicesClientBuilder().build(KieServicesFactory.newRestConfiguration(config.getUrl(), credentialsProvider), this.getClass().getClassLoader());
+    public ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws InvalidKieServerException {
+        if (!kieServices.containsKey(kieServerId)) {
+            throw new InvalidKieServerException(kieServerId);
+        }
+        return (ProcessAdminServicesClient) kieServices.get(kieServerId).get(ProcessAdminServicesClient.class);
     }
 
     private void loadConfig(Map<String, String> config) {
@@ -97,7 +87,25 @@ public class KieServiceImpl implements KieService {
         kieConfig.setCredentialsProvider(credentialsProvider);
         kieConfig.setId(getServerId(kieConfig));
         configs.put(kieConfig.getId(), kieConfig);
-        logger.error("Loaded kie server configuration: {}", kieConfig.getId());
+        kieServices.put(kieConfig.getId(), createServices(kieConfig));
+        logger.info("Loaded kie server configuration: {}", kieConfig.getId());
+    }
+
+    private Map<Class<?>, Object> createServices(KieServerConfig config) {
+        Map<Class<?>, Object> services = new JBPMServicesClientBuilder().build(KieServicesFactory.newRestConfiguration(config.getUrl(), config.getCredentialsProvider()), this.getClass().getClassLoader());
+        ProcessAdminServicesClientImpl processAdminServicesClient = (ProcessAdminServicesClientImpl) services.get(ProcessAdminServicesClient.class);
+        processAdminServicesClient.setOwner((KieServicesClientImpl) createKieServicesClient(config.getId()));
+        return services;
+    }
+
+    private KieServicesClient createKieServicesClient(String kieServerId) {
+        KieServerConfig config = configs.get(kieServerId);
+        return KieServicesFactory.newKieServicesRestClient(config.getUrl(), config.getCredentialsProvider());
+    }
+
+    private String getServerId(KieServerConfig config) {
+        KieServicesClient restClient = KieServicesFactory.newKieServicesRestClient(config.getUrl(), config.getCredentialsProvider());
+        return restClient.getServerInfo().getResult().getServerId();
     }
 
 }

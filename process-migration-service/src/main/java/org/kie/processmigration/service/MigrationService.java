@@ -18,7 +18,6 @@ package org.kie.processmigration.service;
 
 import java.util.List;
 
-import org.kie.processmigration.model.Credentials;
 import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
 import org.kie.processmigration.model.MigrationReport;
@@ -34,9 +33,9 @@ public interface MigrationService {
 
     List<Migration> findAll();
 
-    Migration submit(MigrationDefinition definition, Credentials credentials) throws InvalidMigrationException;
+    Migration submit(MigrationDefinition definition) throws InvalidMigrationException;
 
-    Migration update(Long id, MigrationDefinition migration, Credentials credentials) throws ReScheduleException, MigrationNotFoundException, InvalidMigrationException;
+    Migration update(Long id, MigrationDefinition migration) throws ReScheduleException, MigrationNotFoundException, InvalidMigrationException;
 
     Migration delete(Long id) throws MigrationNotFoundException;
     

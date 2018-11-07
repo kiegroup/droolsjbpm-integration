@@ -39,7 +39,7 @@ $ mvn clean package
 
 # Run application
 
-It is a [Thorntail 2.x](http://docs.wildfly-swarm.io/2.2.0.Final/) application
+It is a [Thorntail 2.x](http://docs.wildfly-swarm.io/2.2.1.Final/) application
 
 ```
 $ java -jar target/process-migration-thorntail.jar

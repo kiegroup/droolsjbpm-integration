@@ -15,11 +15,11 @@
     <packaging>war</packaging>
 
     <properties>
-        <version.thorntail>2.2.0.Final</version.thorntail>
+        <version.thorntail>2.2.1.Final</version.thorntail>
         <version.fabric8-maven>3.5.42</version.fabric8-maven>
         <version.weld-junit>1.3.1.Final</version.weld-junit>
         <version.microprofile-health>1.0</version.microprofile-health>
-        <version.org.jboss.weld.weld>2.4.6.Final</version.org.jboss.weld.weld>
+        <version.org.jboss.weld.weld>2.4.3.Final</version.org.jboss.weld.weld>
         <version.org.jboss.weld.weld-api>2.4.SP2</version.org.jboss.weld.weld-api>
     </properties>
 
@@ -95,14 +95,6 @@
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>microprofile-config</artifactId>
-            <exclusions>
-                <!-- https://groups.google.com/forum/#!topic/thorntail/LVzz6UdU3ZE 
-                    java.lang.ClassCastException: java.lang.Boolean cannot be cast to java.lang.String -->
-                <exclusion>
-                    <groupId>org.wildfly.swarm</groupId>
-                    <artifactId>config-api-runtime</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>

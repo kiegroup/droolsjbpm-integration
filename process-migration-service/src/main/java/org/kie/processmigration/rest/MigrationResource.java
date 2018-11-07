@@ -30,16 +30,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import org.kie.processmigration.model.Credentials;
 import org.kie.processmigration.model.Execution.ExecutionType;
 import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
 import org.kie.processmigration.model.exceptions.InvalidMigrationException;
 import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
 import org.kie.processmigration.model.exceptions.ReScheduleException;
-import org.kie.processmigration.service.CredentialsProviderFactory;
 import org.kie.processmigration.service.MigrationService;
 
 @Path("/migrations")
@@ -71,11 +68,7 @@ public class MigrationResource {
     @POST
     @Consumes({MediaType.APPLICATION_JSON})
     public Response submit(@Context HttpHeaders headers, MigrationDefinition migration) throws InvalidMigrationException {
-        Credentials credentials = CredentialsProviderFactory.getCredentials(headers.getHeaderString(HttpHeaders.AUTHORIZATION));
-        if (credentials == null) {
-            return Response.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "Basic").build();
-        }
-        Migration result = migrationService.submit(migration, credentials);
+        Migration result = migrationService.submit(migration);
         if (ExecutionType.ASYNC.equals(migration.getExecution().getType())) {
             return Response.accepted(result).build();
         } else {
@@ -87,11 +80,7 @@ public class MigrationResource {
     @Path("/{id}")
     @Consumes({MediaType.APPLICATION_JSON})
     public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition migrationDefinition) throws MigrationNotFoundException, InvalidMigrationException, ReScheduleException {
-        Credentials credentials = CredentialsProviderFactory.getCredentials(headers.getHeaderString(HttpHeaders.AUTHORIZATION));
-        if (credentials == null) {
-            return Response.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, "Basic").build();
-        }
-        Migration migration = migrationService.update(id, migrationDefinition, credentials);
+        Migration migration = migrationService.update(id, migrationDefinition);
         return Response.ok(migration).build();
     }
 

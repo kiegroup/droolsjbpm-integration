@@ -33,6 +33,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.kie.server.api.model.admin.MigrationReportInstance;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "migration_reports", indexes = {@Index(columnList = "migration_id")})
+@SequenceGenerator(name = "migRepIdSeq", sequenceName = "MIG_REP_ID_SEQ")
 @NamedQueries({
                @NamedQuery(name = "MigrationReport.findByMigrationId", query = "SELECT p FROM MigrationReport p WHERE p.migrationId = :id")
 })
@@ -49,7 +51,7 @@ public class MigrationReport implements Serializable {
     private static final long serialVersionUID = 5817223334991683064L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "migRepIdSeq")
     private Long id;
 
     @JsonProperty("migration_id")

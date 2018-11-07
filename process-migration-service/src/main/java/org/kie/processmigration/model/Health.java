@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.service;
+package org.kie.processmigration.model;
 
-import java.util.Map;
+public class Health {
 
-import org.kie.processmigration.model.KieServerConfig;
-import org.kie.processmigration.model.exceptions.InvalidKieServerException;
-import org.kie.server.client.admin.ProcessAdminServicesClient;
+    public enum HealthStatus {
+        UP,
+        DOWN
+    }
 
-public interface KieService {
+    public static final Health UP = new Health(HealthStatus.UP);
+    public static final Health DOWN = new Health(HealthStatus.DOWN);
 
-    ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws InvalidKieServerException;
+    private final HealthStatus status;
 
-    Map<String, KieServerConfig> getConfigs();
+    public Health(HealthStatus status) {
+        this.status = status;
+    }
+
+    public HealthStatus getStatus() {
+        return status;
+    }
 
 }

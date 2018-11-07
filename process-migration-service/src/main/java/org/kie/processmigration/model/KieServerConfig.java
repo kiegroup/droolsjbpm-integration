@@ -18,14 +18,19 @@ package org.kie.processmigration.model;
 
 import org.kie.server.client.CredentialsProvider;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class KieServerConfig {
 
     private String id;
     private String host;
     private Integer port;
+    @JsonProperty("context_root")
     private String contextRoot;
     private String path;
     private String protocol;
+    @JsonIgnore
     private CredentialsProvider credentialsProvider;
 
     public String getId() {

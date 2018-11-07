@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.service;
+package org.kie.processmigration.model.exceptions;
 
-import java.util.Map;
+public class InvalidKieServerException extends InvalidMigrationException {
 
-import org.kie.processmigration.model.KieServerConfig;
-import org.kie.processmigration.model.exceptions.InvalidKieServerException;
-import org.kie.server.client.admin.ProcessAdminServicesClient;
+    private static final long serialVersionUID = -7640655290779519838L;
 
-public interface KieService {
+    public InvalidKieServerException(String kieServerId) {
+        super(kieServerId);
+    }
 
-    ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws InvalidKieServerException;
-
-    Map<String, KieServerConfig> getConfigs();
+    @Override
+    public String getMessage() {
+        return String.format("Invalid KIE Server provided: %s", super.getMessage());
+    }
 
 }

@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.rest;
+package org.kie.processmigration.service;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import org.kie.processmigration.model.Health;
+import org.kie.processmigration.model.Status;
 
-import org.eclipse.microprofile.health.Health;
-import org.kie.processmigration.model.HealthStatus;
+public interface StatusService {
 
-@Path("/health")
-@Produces(MediaType.APPLICATION_JSON)
-public class HealthCheckResource {
+    Status getStatus();
 
-    @GET
-    @Path("/readiness")
-    @Health
-    public Response checkReadiness() {
-        return Response.ok(new HealthStatus().up()).build();
-    }
+    Health getHealth();
 
 }

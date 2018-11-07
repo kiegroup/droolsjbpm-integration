@@ -27,11 +27,9 @@ import javax.ejb.Timer;
 import javax.ejb.TimerService;
 import javax.inject.Inject;
 
-import org.kie.processmigration.model.Credentials;
 import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.exceptions.InvalidMigrationException;
 import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
-import org.kie.processmigration.service.CredentialsService;
 import org.kie.processmigration.service.MigrationService;
 import org.kie.processmigration.service.SchedulerService;
 import org.slf4j.Logger;
@@ -49,9 +47,6 @@ public class EjbTimerSchedulerServiceImpl implements SchedulerService {
     @Inject
     private MigrationService migrationService;
 
-    @Inject
-    private CredentialsService credentialsService;
-
     @Timeout
     public void doMigration(Timer timer) {
         Long migrationId = (Long) timer.getInfo();
@@ -64,9 +59,8 @@ public class EjbTimerSchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void scheduleMigration(Migration migration, Credentials credentials) {
+    public void scheduleMigration(Migration migration) {
         Long migrationId = migration.getId();
-        credentialsService.save(credentials.setMigrationId(migrationId));
         if (migration.getDefinition().getExecution().getScheduledStartTime() == null) {
             timerService.createTimer(new Date(), migrationId);
         } else {
@@ -79,13 +73,13 @@ public class EjbTimerSchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void reScheduleMigration(Migration migration, Credentials credentials) {
+    public void reScheduleMigration(Migration migration) {
         Optional<Timer> timer = timerService.getTimers()
                                             .stream()
                                             .filter(t -> t.getInfo().equals(migration.getId())).findFirst();
         if (timer.isPresent()) {
             timer.get().cancel();
-            scheduleMigration(migration, credentials);
+            scheduleMigration(migration);
         }
     }
 

@@ -31,12 +31,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "plans")
+@SequenceGenerator(name = "planIdSeq", sequenceName = "PLAN_ID_SEQ")
 @NamedQueries({
                @NamedQuery(name = "Plan.findAll", query = "SELECT p FROM Plan p"),
                @NamedQuery(name = "Plan.findById", query = "SELECT p FROM Plan p WHERE p.id = :id")
@@ -46,7 +48,7 @@ public class Plan implements Serializable {
     private static final long serialVersionUID = 1244535648642365858L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "planIdSeq")
     private long id;
 
     private String name;
