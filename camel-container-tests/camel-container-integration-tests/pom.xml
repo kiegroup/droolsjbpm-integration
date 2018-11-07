@@ -90,11 +90,6 @@
   <profiles>
     <profile>
       <id>wildfly</id>
-      <activation>
-        <property>
-          <name>!eap.url</name>
-        </property>
-      </activation>
       <build>
         <plugins>
           <plugin>
@@ -171,11 +166,6 @@
     </profile>
     <profile>
       <id>eap</id>
-      <activation>
-        <property>
-          <name>eap.url</name>
-        </property>
-      </activation>
       <build>
         <plugins>
           <plugin>
@@ -239,6 +229,25 @@
             </executions>
           </plugin>
         </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- Integration tests are skipped by default. They are activated when specific container profile is used. -->
+      <id>skipITs-by-default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <skipITs>true</skipITs>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
       </build>
     </profile>
   </profiles>
