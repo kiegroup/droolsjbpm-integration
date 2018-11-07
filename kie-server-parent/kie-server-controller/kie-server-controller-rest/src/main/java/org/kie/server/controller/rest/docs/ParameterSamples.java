@@ -28,7 +28,7 @@ public class ParameterSamples {
      */
     public static final String KIE_SERVER_INFO_JSON = "{\n" +
             "  \"id\" : \"sample-server\",\n" +
-            "  \"version\" : \"7.14.0-SNAPSHOT\",\n" +
+            "  \"version\" : \"7.15.0-SNAPSHOT\",\n" +
             "  \"name\" : \"sample-server\",\n" +
             "  \"location\" : \"http://localhost:8080/kie-server/services/rest/server\",\n" +
             "  \"capabilities\" : [\n" +
@@ -85,7 +85,7 @@ public class ParameterSamples {
     public static final String KIE_SERVER_INFO_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
             "<kie-server-info>\n" +
             "  <id>sample-server</id>\n" +
-            "  <version>7.14.0-SNAPSHOT</version>\n" +
+            "  <version>7.15.0-SNAPSHOT</version>\n" +
             "  <name>sample-server</name>\n" +
             "  <location>http://localhost:8080/kie-server/services/rest/server</location>\n" +
             "  <capabilities>KieServer</capabilities>\n" +
