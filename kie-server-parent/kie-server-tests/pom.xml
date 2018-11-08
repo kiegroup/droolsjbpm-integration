@@ -62,7 +62,6 @@
     <!-- By default we use bundled H2 database jar -->
     <springboot.jdbc.driver.jar/>
 
-    <version.wildfly14>14.0.1.Final</version.wildfly14>
     <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
     <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
@@ -739,7 +738,7 @@
                   <artifactInstaller>
                     <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-dist</artifactId>
-                    <version>${version.wildfly14}</version>
+                    <version>${version.org.wildfly}</version>
                   </artifactInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
@@ -800,7 +799,7 @@
           <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-parent</artifactId>
-            <version>${version.wildfly14}</version>
+            <version>${version.org.wildfly}</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
@@ -883,7 +882,7 @@
           <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-parent</artifactId>
-            <version>${version.wildfly14}</version>
+            <version>${version.org.wildfly}</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
