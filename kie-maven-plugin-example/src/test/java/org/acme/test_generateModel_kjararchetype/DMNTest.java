@@ -16,7 +16,8 @@ import static org.acme.test_generateModel_kjararchetype.Utils.entry;
 import static org.acme.test_generateModel_kjararchetype.Utils.mapOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.number.BigDecimalCloseTo.closeTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
+
 public class DMNTest {
 
     @Test
@@ -25,7 +26,7 @@ public class DMNTest {
 
         KieContainer kieContainer = kieServices.getKieClasspathContainer();
 
-        DMNRuntime dmnRuntime = kieContainer.newKieSession().getKieRuntime(DMNRuntime.class);
+        DMNRuntime dmnRuntime = kieContainer.newKieSession("dmnTest.session").getKieRuntime(DMNRuntime.class);
 
         System.out.println("dmnRuntime.getModels() = " + dmnRuntime.getModels());
 
