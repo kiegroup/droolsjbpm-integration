@@ -11,7 +11,7 @@ Tests are run very easily using the command
 ```mvn clean install -P<container-profile> <container-specific-params>```
 
 where `<container-profile>` is simply a particular container. Another container-specific parameters may also be configured (see the table below).
-WildFly10, EAP 7 and Tomcat 8 do not have to be pre-installed, they will be downloaded automatically (in case of EAP 7, download URL has to be provided).
+WildFly14, EAP 7 and Tomcat 8 do not have to be pre-installed, they will be downloaded automatically (in case of EAP 7, download URL has to be provided).
 Oracle WebLogic 12 and IBM WebSphere 9 have to be pre-installed and the installation path has to be provided using a Maven property `weblogic.home` or `websphere.home` respectively.
 Tests are executed using Failsafe plugin. To run specific test class use `-Dit.test=<Test class name>`
 Most of the tests can be executed locally as JUnit tests, in this case embedded server is used and only REST endpoints are tested.
@@ -20,7 +20,7 @@ The following table lists all currently supported combinations of parameters:
 
 | Container to run    | \<container-profile\> | \<container-specific params\>             |
 | -----------------   | --------------------- | ----------------------------------------- |
-|     WildFly10       | wildfly10             | *none*                                    |
+|     WildFly14       | wildfly               | *none*                                    |
 |     EAP 7           | eap7                  | eap7.download.url                         |
 |     Tomcat 9        | tomcat9               | *none*                                    |
 | Oracle WebLogic 12  | oracle-wls-12         | weblogic.home                             |

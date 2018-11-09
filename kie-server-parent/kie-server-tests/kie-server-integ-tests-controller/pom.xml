@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.15.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-controller</artifactId>
@@ -280,18 +280,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>wildfly10</id>
-      <dependencies>
-        <dependency>
-          <groupId>io.undertow</groupId>
-          <artifactId>undertow-websockets-jsr</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <!-- temporary hack to let it test on jenkins <id>wildfly14</id>-->
-      <id>wildfly11</id>
+      <id>wildfly</id>
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>

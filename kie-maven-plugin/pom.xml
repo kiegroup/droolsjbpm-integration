@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.15.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
   <artifactId>kie-maven-plugin</artifactId>
-  <packaging>takari-maven-plugin</packaging>
+  <packaging>maven-plugin</packaging>
 
   <name>KIE :: Maven Plugin</name>
 
@@ -21,15 +21,6 @@
         <artifactId>maven-plugin-plugin</artifactId>
         <configuration>
           <goalPrefix>kie</goalPrefix>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-lifecycle-plugin</artifactId>
-        <version>${version.io.takari.maven.plugins.compiler}</version>
-        <extensions>true</extensions>
-        <configuration>
-          <proc>none</proc>
         </configuration>
       </plugin>
     </plugins>

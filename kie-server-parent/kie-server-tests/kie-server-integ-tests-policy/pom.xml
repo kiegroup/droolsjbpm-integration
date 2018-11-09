@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.15.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-policy</artifactId>
@@ -321,11 +321,7 @@
       <id>tomcat9</id>
     </profile>
     <profile>
-      <id>wildfly10</id>
-    </profile>
-    <profile>
-      <!-- temporary hack to let it test on jenkins <id>wildfly14</id>-->
-      <id>wildfly11</id>
+      <id>wildfly</id>
     </profile>
     <profile>
       <id>eap7</id>
