@@ -16,6 +16,8 @@
 
 package org.kie.server.springboot;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.kie.internal.identity.IdentityProvider;
@@ -37,6 +39,12 @@ public class SpringBootKieServerImpl extends KieServerImpl{
     @Override
     protected List<KieServerExtension> sortKnownExtensions() {
         getServerRegistry().registerIdentityProvider(identityProvider);
+        Collections.sort(extensions, new Comparator<KieServerExtension>() {
+            @Override
+            public int compare(KieServerExtension e1, KieServerExtension e2) {
+                return e1.getStartOrder().compareTo(e2.getStartOrder());
+            }
+        });
         return extensions;
     }
 
