@@ -36,7 +36,7 @@ public class JbpmMiscCommandSerializationIntegrationTest extends JbpmKieServerBa
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar-BXMSDOC-3365-jbpm", "1.0.0");
 
-    private static final String CONTAINER_ID = "stateful-session";
+    private static final String CONTAINER_ID = "BXMSDOC-3365-jbpm-stateful-session";
     private static final String PERSON_CLASS_NAME = "org.kie.server.testing.Person";
 
     private static ClassLoader kjarClassLoader;
@@ -50,8 +50,7 @@ public class JbpmMiscCommandSerializationIntegrationTest extends JbpmKieServerBa
     }
 
     @Before
-    public void cleanContainers() {
-        disposeAllContainers();
+    public void createContainer() {
         createContainer(CONTAINER_ID, releaseId);
     }
 

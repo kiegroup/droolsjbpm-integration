@@ -28,15 +28,16 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.junit.Assert.assertEquals;
 
-public class DroolsMiscCommandSerializationIntegrationTest extends MiscAllKieServerBaseIntegrationTest {
+public class DroolsMiscCommandSerializationIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar-BXMSDOC-3365-drools", "1.0.0");
 
-    private static final String CONTAINER_ID = "stateful-session";
+    private static final String CONTAINER_ID = "BXMSDOC-3365-drools-stateful-session";
     private static final String PERSON_1_OUT_IDENTIFIER = "person1";
     private static final String PERSON_CLASS_NAME = "org.kie.server.testing.Person";
 
@@ -51,8 +52,7 @@ public class DroolsMiscCommandSerializationIntegrationTest extends MiscAllKieSer
     }
 
     @Before
-    public void cleanContainers() {
-        disposeAllContainers();
+    public void createContainer() {
         createContainer(CONTAINER_ID, releaseId);
     }
 
