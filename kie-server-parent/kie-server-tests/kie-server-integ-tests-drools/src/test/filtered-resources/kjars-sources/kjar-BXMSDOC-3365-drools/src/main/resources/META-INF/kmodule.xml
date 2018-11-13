@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<kmodule xmlns="http://www.drools.org/xsd/kmodule">
-  <kbase name="kbase1" packages="kbase1" default="true">
-    <ksession name="kbase1.stateful" type="stateful" default="true"/>
-  </kbase>
-</kmodule>
