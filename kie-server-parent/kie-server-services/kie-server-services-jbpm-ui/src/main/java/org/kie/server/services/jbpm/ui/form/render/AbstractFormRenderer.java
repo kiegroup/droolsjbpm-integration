@@ -17,6 +17,7 @@
 package org.kie.server.services.jbpm.ui.form.render;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jbpm.casemgmt.api.model.CaseDefinition;
@@ -45,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import freemarker.cache.StringTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -63,6 +66,9 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     private Map<String, String> inputTypes;
     private StringTemplateLoader stringLoader = new StringTemplateLoader();
     private Configuration cfg;
+    
+    private StringTemplateLoader fieldLevelStringLoader = new StringTemplateLoader();
+    private Configuration fieldLevelCfg;
     
     private FormReader reader = new FormReader();
     
@@ -88,6 +94,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         cfg = new Configuration(Configuration.VERSION_2_3_26);
         cfg.setTemplateLoader(stringLoader);
         cfg.setDefaultEncoding("UTF-8");
+        
+        fieldLevelCfg = new Configuration(Configuration.VERSION_2_3_26);
+        fieldLevelCfg.setTemplateLoader(fieldLevelStringLoader);
+        fieldLevelCfg.setDefaultEncoding("UTF-8");
         
         loadTemplates();
     }
@@ -296,9 +306,22 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                 
                 for (LayoutItem item : column.getItems()) {
                     if (item.getValue() != null) {
-                        content.append(item.getValue());
+                        String output = item.getValue();
+                        if (output.contains("${")) {
+                            String uuid = UUID.randomUUID().toString();;
+                            loadTemplate(fieldLevelStringLoader, uuid, new ByteArrayInputStream(item.getValue().getBytes(Charset.forName("UTF-8"))));
+                            Map<String, Object> parameters = new HashMap<>();
+                            parameters.putAll(inputs);
+                            parameters.putAll(outputs);                        
+                            output = renderTemplate(fieldLevelCfg, uuid, parameters);
+                            
+                            
+                            fieldLevelStringLoader.removeTemplate(uuid);
+                        }
+                        content.append(output);
+                        
                     } else {
-                        FormField field = form.getField(item.getFieldId());
+                        FormField field = form.getField(item.getFieldId());                        
                         
                         if (field.getNestedForm() != null && !field.getNestedForm().isEmpty()) {
                             // handle subform
@@ -492,8 +515,13 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     
     protected void loadTemplate(String templateId, InputStream stream) {
         
+        loadTemplate(this.stringLoader, templateId, stream);
+    }
+    
+    protected void loadTemplate(StringTemplateLoader loader, String templateId, InputStream stream) {
+        
         try {
-            this.stringLoader.putTemplate(templateId, read(stream));
+            loader.putTemplate(templateId, read(stream));
             
             logger.debug("Loaded template {} from input stream", templateId);
         } catch (Exception e) {
@@ -512,6 +540,11 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     }
     
     protected String renderTemplate(String templateName, Map<String, Object> parameters) {
+        
+        return renderTemplate(this.cfg, templateName, parameters);
+    }
+    
+    protected String renderTemplate(Configuration cfg, String templateName, Map<String, Object> parameters) {
         StringWriter out = new StringWriter();
         try {
             Template template = cfg.getTemplate(templateName);

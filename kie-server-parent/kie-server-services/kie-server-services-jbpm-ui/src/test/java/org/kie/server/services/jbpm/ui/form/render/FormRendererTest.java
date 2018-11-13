@@ -297,6 +297,39 @@ public class FormRendererTest {
         writeToFile("testRenderOfMultiSubFormWithData.html", renderedForm);
     }
     
+    @Test
+    public void testRenderOfMultiSubFormWithDataAndHTMLExpression() {
+                               
+        FormReader reader = new FormReader();
+        FormInstance itemForm = reader.readFromStream(this.getClass().getResourceAsStream("/item-taskform.json"));
+        assertThat(itemForm).isNotNull();        
+        FormInstance orderForm = reader.readFromStream(this.getClass().getResourceAsStream("/order-taskform.json"));
+        assertThat(orderForm).isNotNull();
+        
+        FormInstance form = reader.readFromStream(this.getClass().getResourceAsStream("/add-items-taskform.json"));
+        assertThat(form).isNotNull();
+        form.addNestedForm(itemForm);
+        form.addNestedForm(orderForm);
+        
+        List<Item> items = new ArrayList<>();
+        items.add(new Item("test", 10, 125.50));
+        items.add(new Item("another", 4, 25.80));
+        
+        Map<String, Object> inputs = new HashMap<>();
+        inputs.put("items", items);
+        inputs.put("orderNumber", "XXX-ZZZ-YYY");
+        inputs.put("customer", "John");
+        inputs.put("address", "Main Street");
+        Map<String, Object> outputs = new HashMap<>();
+        
+        Task task = newTask(0L, "Ready");
+        
+        String renderedForm = renderer.renderTask("", task, form, inputs, outputs);
+        assertThat(renderedForm).isNotNull();
+        assertThat(renderedForm).contains("<div class=\"col-md-12\"><h2>Add items for order XXX-ZZZ-YYY</h2></div>");
+        writeToFile("testRenderOfMultiSubFormWithDataAndHTMLExpression.html", renderedForm);
+    }
+    
     protected void writeToFile(String fileName, String content) {
         try {
             Files.write(Paths.get("target/" + renderer.getName() + "_" + fileName), content.getBytes());
