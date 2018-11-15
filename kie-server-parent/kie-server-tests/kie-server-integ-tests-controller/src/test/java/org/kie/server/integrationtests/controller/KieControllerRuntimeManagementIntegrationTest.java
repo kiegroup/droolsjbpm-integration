@@ -44,7 +44,7 @@ public abstract class KieControllerRuntimeManagementIntegrationTest<T extends Ki
     @BeforeClass
     public static void initialize() throws Exception {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
     }
 
     protected abstract void assertNotFoundException(T exception);

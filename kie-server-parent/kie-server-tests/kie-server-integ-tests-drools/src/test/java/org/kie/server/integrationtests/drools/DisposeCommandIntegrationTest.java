@@ -50,7 +50,7 @@ public class DisposeCommandIntegrationTest extends DroolsKieServerBaseIntegratio
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/kjar-JBPM-5019").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/kjar-JBPM-5019");
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }

@@ -51,7 +51,7 @@ public class SpreadsheetIntegrationTest extends DroolsKieServerBaseIntegrationTe
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/spreadsheet").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/spreadsheet");
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
 

@@ -53,7 +53,7 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         // the parent will build and deploy also all of its modules, so no need to deploy them individually
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/multimodule-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/multimodule-project");
 
         createContainer(CONTAINER_1_ID, releaseIdRules1);
         createContainer(CONTAINER_2_ID, releaseIdRules2);

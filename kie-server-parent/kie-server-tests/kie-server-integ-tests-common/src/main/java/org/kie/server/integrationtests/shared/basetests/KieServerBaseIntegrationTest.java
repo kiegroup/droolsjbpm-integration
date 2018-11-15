@@ -93,7 +93,7 @@ public abstract class KieServerBaseIntegrationTest {
             String deploymentSettings = TestConfig.getKieClientDeploymentSettings();
 
             if (deploymentSettings == null) {
-                deploymentSettings = ClassLoader.class.getResource("/kie-server-testing-client-deployment-settings.xml").getFile();
+                deploymentSettings = KieServerBaseIntegrationTest.class.getResource("/kie-server-testing-client-deployment-settings.xml").getFile();
             }
 
             System.setProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS, deploymentSettings);

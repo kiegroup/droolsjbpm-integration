@@ -51,7 +51,7 @@ public class CaseSLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrati
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/case-sla").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/case-sla");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
