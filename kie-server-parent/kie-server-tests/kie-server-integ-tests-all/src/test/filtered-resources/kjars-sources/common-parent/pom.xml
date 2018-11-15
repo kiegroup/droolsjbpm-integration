@@ -10,7 +10,6 @@
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
     <version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec}</version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>
-    <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
