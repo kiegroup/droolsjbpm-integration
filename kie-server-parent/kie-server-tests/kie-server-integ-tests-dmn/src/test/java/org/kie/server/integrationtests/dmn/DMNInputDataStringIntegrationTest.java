@@ -55,8 +55,8 @@ public class DMNInputDataStringIntegrationTest
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/input-data-string" ).getFile() );
-        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/input-data-string-101" ).getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/input-data-string");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/input-data-string-101");
     }
     
     @Before

@@ -13,6 +13,14 @@
   <version>1.0.1.Final</version>
   <name>definition-project</name>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.spec.javax.xml.bind</groupId>
+      <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>

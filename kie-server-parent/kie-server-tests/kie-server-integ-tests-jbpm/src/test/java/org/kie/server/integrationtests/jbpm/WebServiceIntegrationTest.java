@@ -42,7 +42,7 @@ public class WebServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/webservice-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/webservice-project");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 

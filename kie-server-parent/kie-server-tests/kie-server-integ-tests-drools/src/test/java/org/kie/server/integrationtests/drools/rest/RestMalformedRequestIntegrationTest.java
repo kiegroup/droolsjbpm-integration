@@ -46,7 +46,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/state-is-kept-for-stateful-session");
 
         createContainer(CONTAINER_ID, releaseId);
     }

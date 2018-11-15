@@ -51,7 +51,7 @@ public class RuleTemplateIntegrationTest extends DroolsKieServerBaseIntegrationT
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/template-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/template-project");
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
 

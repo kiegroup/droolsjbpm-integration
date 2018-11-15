@@ -51,7 +51,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
     @Before
     public void initializeRemoteRepo() throws Exception {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
     }
 
     protected abstract void assertNotFoundException(T exception);
@@ -85,7 +85,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
         checkKieContainerResource(RELEASE_ID_LATEST,
                                   RELEASE_ID);
 
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar101").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar101");
         controllerClient.scanNow(container);
 
         KieServerSynchronization.waitForContainerWithReleaseId(client,
@@ -131,7 +131,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
         Assertions.assertThat(containerConfig.getScannerStatus()).isEqualTo(KieScannerStatus.STARTED);
         Assertions.assertThat(containerConfig.getPollInterval()).isEqualTo(1000L);
 
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar101").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar101");
 
         KieServerSynchronization.waitForContainerWithReleaseId(client, RELEASE_ID_101);
         checkKieContainerResource(RELEASE_ID_101, RELEASE_ID_101);

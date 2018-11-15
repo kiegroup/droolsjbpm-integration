@@ -75,7 +75,7 @@ public class DroolsJmsResponseHandlerIntegrationTest extends DroolsKieServerBase
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/ruleflow-group").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/ruleflow-group");
     }
 
     @Before

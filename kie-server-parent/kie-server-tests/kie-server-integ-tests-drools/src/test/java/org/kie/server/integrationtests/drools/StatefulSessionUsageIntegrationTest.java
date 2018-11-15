@@ -64,7 +64,7 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/state-is-kept-for-stateful-session");
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }

@@ -63,7 +63,7 @@ public class CaseAdminServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/case-insurance").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/case-insurance");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 

@@ -57,7 +57,7 @@ public class CaseServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationT
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/case-insurance").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/case-insurance");
 
         createContainer(CONTAINER_ID, releaseId);
     }

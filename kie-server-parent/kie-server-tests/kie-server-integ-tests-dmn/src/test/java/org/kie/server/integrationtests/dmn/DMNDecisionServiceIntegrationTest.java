@@ -55,7 +55,7 @@ public class DMNDecisionServiceIntegrationTest extends DMNKieServerBaseIntegrati
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/decision-services").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/decision-services");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
         createContainer(CONTAINER_1_ID, kjar1, CONTAINER_1_ALIAS);

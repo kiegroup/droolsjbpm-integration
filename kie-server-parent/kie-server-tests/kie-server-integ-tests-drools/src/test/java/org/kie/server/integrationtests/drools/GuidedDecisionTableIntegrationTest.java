@@ -51,7 +51,7 @@ public class GuidedDecisionTableIntegrationTest extends DroolsKieServerBaseInteg
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/gdst-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/gdst-project");
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
 

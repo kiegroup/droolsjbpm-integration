@@ -59,7 +59,7 @@ public class TimerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/timer-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/timer-project");
     }
 
     @After

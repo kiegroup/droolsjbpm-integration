@@ -38,8 +38,8 @@ public class ImageServiceIncludedKieBaseIntegrationTest extends JbpmKieServerBas
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/top-level-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/top-level-project");
 
         createContainer(CONTAINER_ID, releaseId, new KieServerConfigItem(KieServerConstants.PCFG_KIE_BASE, "customKB", ""));
     }

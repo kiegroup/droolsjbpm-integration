@@ -63,8 +63,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmKieServerBaseIntegrati
         KieServerSynchronization.waitForJobToFinish(jsc, id, 120000L);
         
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/definition-project" )
-                                                                       .getFile() );
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
 
         kieContainer = KieServices.Factory.get().newKieContainer( releaseId );
 

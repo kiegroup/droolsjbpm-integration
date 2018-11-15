@@ -53,7 +53,7 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/classes-included-kjar").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/classes-included-kjar");
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }

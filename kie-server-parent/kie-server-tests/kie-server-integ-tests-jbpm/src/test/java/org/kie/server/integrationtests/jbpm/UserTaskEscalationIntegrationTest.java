@@ -105,7 +105,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
 
         createContainer(CONTAINER_ID, releaseId);
     }

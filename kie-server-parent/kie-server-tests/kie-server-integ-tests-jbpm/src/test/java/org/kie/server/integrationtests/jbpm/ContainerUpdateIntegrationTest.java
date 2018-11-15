@@ -50,9 +50,9 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101").getFile());
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/broken-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project-101");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/broken-project");
     }
 
     @Before

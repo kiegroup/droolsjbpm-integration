@@ -42,7 +42,7 @@ public class DMNBkmJavaIntegrationTest
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/bkm-java-model").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/bkm-java-model");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
         createContainer(CONTAINER_1_ID, kjar1);

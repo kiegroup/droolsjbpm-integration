@@ -50,8 +50,8 @@ public class ContainerUpdateDifferentKBaseIntegrationTest extends DroolsKieServe
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar103").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/container-isolation-kjar1");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/container-isolation-kjar103");
     }
 
     @Before

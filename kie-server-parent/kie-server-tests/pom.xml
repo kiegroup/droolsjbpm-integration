@@ -62,7 +62,6 @@
     <!-- By default we use bundled H2 database jar -->
     <springboot.jdbc.driver.jar/>
 
-    <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
     <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified

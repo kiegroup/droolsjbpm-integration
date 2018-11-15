@@ -56,7 +56,7 @@ public class ContainerSnapshotUpdateIntegrationTest extends DroolsKieServerBaseI
     public void testKieSessionWithUpdatedContainer() throws Exception {
         // Create container with first version
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar-SNAPSHOT-1").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/container-isolation-kjar-SNAPSHOT-1");
         createContainer(CONTAINER_ID, kjar1);
 
         reinitClient(kjar1);
@@ -64,7 +64,7 @@ public class ContainerSnapshotUpdateIntegrationTest extends DroolsKieServerBaseI
         assertThat(executeCommand()).isEqualTo("Person from kjar1");
 
         // now build and deploy second container with same snapshot version.
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar-SNAPSHOT-2").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/container-isolation-kjar-SNAPSHOT-2");
         KieServerAssert.assertSuccess(client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STARTED, 1_000L)));
 
         reinitClient(kjar2);

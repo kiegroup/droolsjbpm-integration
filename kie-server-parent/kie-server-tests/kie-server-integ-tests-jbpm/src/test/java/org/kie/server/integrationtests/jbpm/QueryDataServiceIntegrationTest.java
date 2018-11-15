@@ -59,7 +59,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/query-definition-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/query-definition-project");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 

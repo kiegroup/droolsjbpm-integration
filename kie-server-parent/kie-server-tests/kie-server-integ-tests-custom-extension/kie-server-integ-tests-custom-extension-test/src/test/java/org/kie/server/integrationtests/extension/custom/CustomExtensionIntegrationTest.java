@@ -58,7 +58,7 @@ public class CustomExtensionIntegrationTest extends RestJmsSharedBaseIntegration
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 

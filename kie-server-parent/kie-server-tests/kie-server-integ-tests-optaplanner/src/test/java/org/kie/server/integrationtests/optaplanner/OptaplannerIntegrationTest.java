@@ -67,7 +67,7 @@ public class OptaplannerIntegrationTest
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/cloudbalance").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/cloudbalance");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 

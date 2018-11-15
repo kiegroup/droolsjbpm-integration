@@ -57,7 +57,7 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/ticket-support-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/ticket-support-project");
 
         createContainer(CONTAINER_ID, releaseId);
     }
