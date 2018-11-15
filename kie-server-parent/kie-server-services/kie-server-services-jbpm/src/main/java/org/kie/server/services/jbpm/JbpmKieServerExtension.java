@@ -91,6 +91,7 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.UserGroupCallback;
+import org.kie.internal.runtime.conf.AuditMode;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
@@ -652,13 +653,15 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     protected void addTaskBAMEventListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
         final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
-        descriptor.getBuilder().addTaskEventListener(
-                new ObjectModel(
-                        "mvel",
-                        "new org.jbpm.services.task.lifecycle.listeners.BAMTaskEventListener(false)"
-                )
-        );
-        unit.setDeploymentDescriptor(descriptor);
+        if (descriptor.getAuditMode() != AuditMode.NONE) {
+            descriptor.getBuilder().addTaskEventListener(
+                    new ObjectModel(
+                            "mvel",
+                            "new org.jbpm.services.task.lifecycle.listeners.BAMTaskEventListener(false)"
+                    )
+            );
+            unit.setDeploymentDescriptor(descriptor);
+        }
     }
 
     protected void addTaskCleanUpProcessListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
