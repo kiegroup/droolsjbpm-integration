@@ -60,7 +60,7 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rest-processes").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/rest-processes");
         // set the accepted formats with quality param to express preference
         acceptHeadersByFormat.put(MarshallingFormat.JAXB, "application/xml;q=0.9,application/json;q=0.3");// xml is preferred over json
         acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml

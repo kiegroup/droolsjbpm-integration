@@ -80,7 +80,7 @@ public class ContainerFailureRecoveryIntegrationTest extends JbpmKieServerBaseIn
 
         client.disposeContainer(CONTAINER_ID);
         KieServerDeployer.removeLocalArtifact(releaseId);
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
         
         client.createContainer(CONTAINER_ID, containerResource);
         

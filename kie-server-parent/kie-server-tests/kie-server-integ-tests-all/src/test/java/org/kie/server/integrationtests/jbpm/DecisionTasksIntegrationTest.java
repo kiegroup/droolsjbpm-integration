@@ -52,7 +52,7 @@ public class DecisionTasksIntegrationTest extends JbpmKieServerBaseIntegrationTe
             System.setProperty("kie.server.base.http.url", TestConfig.getEmbeddedKieServerHttpUrl());
         }
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/decision-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/decision-project");
         if (TestConfig.isLocalServer()) {
             System.clearProperty("kie.server.base.http.url");
         }

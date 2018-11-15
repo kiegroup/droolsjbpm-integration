@@ -47,7 +47,7 @@ public class KieServerRouterDroolsIntegrationTest extends KieServerRouterBaseInt
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/container-isolation-kjar1");
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
         createContainer(CONTAINER_ID, kjar1, CONTAINER_ALIAS);
     }

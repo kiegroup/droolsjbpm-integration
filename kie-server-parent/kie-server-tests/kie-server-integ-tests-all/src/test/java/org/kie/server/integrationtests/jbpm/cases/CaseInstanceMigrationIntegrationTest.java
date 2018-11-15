@@ -59,8 +59,8 @@ public class CaseInstanceMigrationIntegrationTest extends JbpmKieServerBaseInteg
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/case-insurance").getFile());
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/case-insurance-101").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/case-insurance");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/case-insurance-101");
     }
 
     @Before
