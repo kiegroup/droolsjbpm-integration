@@ -35,7 +35,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
@@ -52,6 +55,8 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
+    private static final KieServerConfigItem PPI_RUNTIME_STRATEGY = new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, RuntimeStrategy.PER_PROCESS_INSTANCE.name(), String.class.getName());
+
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
 
     @BeforeClass
@@ -62,8 +67,8 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId, CONTAINER_ID_ALIAS, null);
-        createContainer(CONTAINER_ID_V2, releaseId);
+        createContainer(CONTAINER_ID, releaseId, CONTAINER_ID_ALIAS, PPI_RUNTIME_STRATEGY);
+        createContainer(CONTAINER_ID_V2, releaseId, PPI_RUNTIME_STRATEGY);
 
     }
 
