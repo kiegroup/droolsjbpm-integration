@@ -69,6 +69,9 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.basedir}")
     private File projectDir;
 
+    @Parameter(required = true, defaultValue = "${project.build.testSourceDirectory}")
+    private File testDir;
+
     @Parameter
     private Map<String, String> properties;
 
@@ -132,7 +135,9 @@ public class GenerateModelMojo extends AbstractKieMojo {
             setSystemProperties(properties);
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(ExecutableModelMavenProject.class);
+            kieBuilder.buildAll(ExecutableModelMavenProject.SUPPLIER, s -> {
+                return !s.contains("src/test/java");
+            });
 
             InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
             List<String> generatedFiles = kieModule.getFileNames()
@@ -175,7 +180,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
             try {
                 if (!Files.exists(packagesDestinationPath)) {
-                    Files.createDirectories(packagesDestinationPath);
+                    Files.createDirectories(packagesDestinationPath.getParent());
                 }
                 Files.copy(packagesMemoryFile.getContents(), packagesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
