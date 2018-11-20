@@ -6,4 +6,7 @@
     <kbase name="FireAlarmKBase" packages="org.kie.firealarm">
         <ksession name="FireAlarmKBase.session" type="stateful"/>
     </kbase>
+    <kbase name="dmnTestKBase" packages="org.acme.test_generateModel_kjararchetype">
+        <ksession name="dmnTest.session" type="stateful" />
+    </kbase>
 </kmodule>

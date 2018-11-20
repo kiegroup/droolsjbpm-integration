@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<semantic:definitions xmlns:semantic="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns="http://www.trisotech.com/dmn/definitions/_73732c1d-f5ff-4219-a705-f551a5161f88" xmlns:feel="http://www.omg.org/spec/FEEL/20140401" xmlns:tc="http://www.omg.org/spec/DMN/20160719/testcase" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:trisofeed="http://trisotech.com/feed" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="DMN Modeler" exporterVersion="6.0.6" id="_73732c1d-f5ff-4219-a705-f551a5161f88" name="Bank monthly fees" namespace="http://www.trisotech.com/dmn/definitions/_73732c1d-f5ff-4219-a705-f551a5161f88" triso:logoChoice="Default">
+  <semantic:extensionElements/>
+  <semantic:itemDefinition label="tPerson" name="tPerson">
+    <semantic:itemComponent id="_67ecb5b1-bfcb-45a2-a294-1c057bfa183f" name="age">
+      <semantic:typeRef>feel:number</semantic:typeRef>
+    </semantic:itemComponent>
+    <semantic:itemComponent id="_2d9f1165-4161-4dc2-a371-dd159012f060" name="employed">
+      <semantic:typeRef>feel:boolean</semantic:typeRef>
+    </semantic:itemComponent>
+  </semantic:itemDefinition>
+  <semantic:itemDefinition label="tProfile" name="tProfile">
+    <semantic:typeRef>feel:string</semantic:typeRef>
+    <semantic:allowedValues triso:constraintsType="enumeration">
+      <semantic:text>"Standard","Defaulting","Premium"</semantic:text>
+    </semantic:allowedValues>
+  </semantic:itemDefinition>
+  <semantic:inputData id="_a69e86bf-4e59-444f-abf8-09d38f762bab" name="Account holder">
+    <semantic:variable id="_efb1a1e5-9e61-40e4-acbd-11d2dd3a53c3" name="Account holder" typeRef="tPerson"/>
+  </semantic:inputData>
+  <semantic:inputData id="_49d0849b-96fc-48c3-ab12-2ca7a7003018" name="Account balance">
+    <semantic:variable id="_29b59914-aea2-47a7-b516-f76420e02b0f" name="Account balance" typeRef="feel:number"/>
+  </semantic:inputData>
+  <semantic:decision id="_5fba245b-c964-45af-9781-9c3ee4ad00a8" name="Exemptions">
+    <semantic:variable id="_a300b9f2-c6e3-4b6e-8f54-2b03c910441a" name="Exemptions" typeRef="feel:string"/>
+    <semantic:informationRequirement>
+      <semantic:requiredInput href="#_a69e86bf-4e59-444f-abf8-09d38f762bab"/>
+    </semantic:informationRequirement>
+    <semantic:decisionTable hitPolicy="UNIQUE" id="_b950dde1-532a-4bfb-9bdd-1e3768b15fac" outputLabel="Exemptions">
+      <semantic:input id="_e2659f15-f658-41dc-ae2d-7e50abd1f555">
+        <semantic:inputExpression typeRef="feel:number">
+          <semantic:text>Account holder.age</semantic:text>
+        </semantic:inputExpression>
+      </semantic:input>
+      <semantic:input id="_e0f26f2a-b08a-4c68-9a5f-ab34f1ed6236">
+        <semantic:inputExpression typeRef="feel:boolean">
+          <semantic:text>Account holder.employed</semantic:text>
+        </semantic:inputExpression>
+      </semantic:input>
+      <semantic:output id="_15bb42a9-4650-40b1-b7c0-1dde877b4d3f"/>
+      <semantic:rule id="_a8532882-b9d8-4b02-aba1-dc46325e1f13">
+        <semantic:inputEntry id="_45266326-5e3d-4b5d-b7d9-00b65e184761">
+          <semantic:text>-</semantic:text>
+        </semantic:inputEntry>
+        <semantic:inputEntry id="_f20926db-fa83-42db-b3cd-8d3125f72515">
+          <semantic:text>false</semantic:text>
+        </semantic:inputEntry>
+        <semantic:outputEntry id="_cee58a10-8b69-4681-8054-848ccd3dfdcd">
+          <semantic:text>"Exempted"</semantic:text>
+        </semantic:outputEntry>
+      </semantic:rule>
+      <semantic:rule id="_1756441e-2a72-4cc4-b8ee-3615f69b1249">
+        <semantic:inputEntry id="_fb44a9b8-77f1-4fc6-b6c6-1649d12dc898">
+          <semantic:text>[18..25]</semantic:text>
+        </semantic:inputEntry>
+        <semantic:inputEntry id="_6c7d84c8-8313-4d8f-a94c-2a657aa7d395">
+          <semantic:text>true</semantic:text>
+        </semantic:inputEntry>
+        <semantic:outputEntry id="_f4675edb-5117-4c24-8a13-950d3607635f">
+          <semantic:text>"Exempted"</semantic:text>
+        </semantic:outputEntry>
+      </semantic:rule>
+      <semantic:rule id="_20443cbd-2bdd-4d16-a4ed-b1ca8a1049d5">
+        <semantic:inputEntry id="_088e5fa0-4a24-4587-91fb-f50eda34868a">
+          <semantic:text>&gt;65</semantic:text>
+        </semantic:inputEntry>
+        <semantic:inputEntry id="_a2dab899-8b81-4753-ab32-998efddb4b02">
+          <semantic:text>true</semantic:text>
+        </semantic:inputEntry>
+        <semantic:outputEntry id="_f07980c1-67be-4b5b-a2b4-6172f8061f9a">
+          <semantic:text>"Exempted"</semantic:text>
+        </semantic:outputEntry>
+      </semantic:rule>
+      <semantic:rule id="_c24b63f3-30f7-4db4-a628-29d2cddc58d8">
+        <semantic:inputEntry id="_d8fa4e91-2434-4b03-bb70-e9973bc18ad9">
+          <semantic:text>-</semantic:text>
+        </semantic:inputEntry>
+        <semantic:inputEntry id="_8a15280d-ac9c-40de-9db5-1a30028f11fe">
+          <semantic:text>true</semantic:text>
+        </semantic:inputEntry>
+        <semantic:outputEntry id="_40fe7e7b-3823-4250-b79a-f05a91c894a0">
+          <semantic:text>"Standard"</semantic:text>
+        </semantic:outputEntry>
+      </semantic:rule>
+    </semantic:decisionTable>
+  </semantic:decision>
+  <semantic:knowledgeSource id="_4e0c399b-ae1b-45ed-9688-97b0df3636b1" name="Guarantee laws">
+    <semantic:authorityRequirement>
+      <semantic:requiredDecision href="#_5fba245b-c964-45af-9781-9c3ee4ad00a8"/>
+    </semantic:authorityRequirement>
+  </semantic:knowledgeSource>
+  <semantic:decision id="_287a0042-cdd2-4a4b-902f-dc38c366cdf4" name="Account Profile">
+    <semantic:variable id="_9298a51b-3603-4258-801d-ddc20358976f" name="Account Profile" typeRef="tProfile"/>
+    <semantic:informationRequirement>
+      <semantic:requiredInput href="#_49d0849b-96fc-48c3-ab12-2ca7a7003018"/>
+    </semantic:informationRequirement>
+    <semantic:decisionTable hitPolicy="UNIQUE" id="_35bfb6de-9c9b-4e5d-9fb8-a7a183147939" outputLabel="Account Profile">
+      <semantic:input id="_cff5f09f-5d8d-4da2-9770-a4f10640069e">
+        <semantic:inputExpression typeRef="feel:number">
+          <semantic:text>Account balance</semantic:text>
+        </semantic:inputExpression>
+      </semantic:input>
+      <semantic:output id="_8f841f31-62cf-41e1-b2bb-57d3cdf0a588">
+        <semantic:outputValues triso:constraintsType="enumeration">
+          <semantic:text>"Standard","Defaulting","Premium"</semantic:text>
+        </semantic:outputValues>
+      </semantic:output>
+      <semantic:rule id="_464bbbbc-70ce-4bc2-9815-054bb4506593">
+        <semantic:inputEntry id="_25eb40a4-8a47-4f83-83ef-5b3dd4e416aa">
+          <semantic:text>&lt;0</semantic:text>
+        </semantic:inputEntry>
+        <semantic:outputEntry id="_18ed373d-4ce8-46b9-9798-cca5636883c1">
+          <semantic:text>"Defaulting"</semantic:text>
+        </semantic:outputEntry>
+      </semantic:rule>
+      <semantic:rule id="_0420917d-ee11-4042-95b3-d3c4670ca706">
+        <semantic:inputEntry id="_221efeb9-ddef-44b2-9b05-8e3b0104b8bd">
+          <semantic:text>[0..100000]</semantic:text>
+        </semantic:inputEntry>
+        <semantic:outputEntry id="_645beca2-6167-45c0-a7cd-701aa504e56b">
+          <semantic:text>"Standard"</semantic:text>
+        </semantic:outputEntry>
+      </semantic:rule>
+      <semantic:rule id="_755275b8-f89e-4cb9-a6d3-d2be2e0ebc18">
+        <semantic:inputEntry id="_06f74f3b-c59e-497b-a6df-9b9ff143c898">
+          <semantic:text>&gt;100000</semantic:text>
+        </semantic:inputEntry>
+        <semantic:outputEntry id="_f29db026-a921-4ed3-bb5f-cb7547245e33">
+          <semantic:text>"Premium"</semantic:text>
+        </semantic:outputEntry>
+      </semantic:rule>
+    </semantic:decisionTable>
+  </semantic:decision>
+  <semantic:decision id="_c2ec01eb-ee8e-4b3c-9c2d-349c0ac26768" name="Monthly fee">
+    <semantic:variable id="_c7ac35f3-1db2-4e14-bf90-d250aaea8d19" name="Monthly fee" typeRef="feel:number"/>
+    <semantic:informationRequirement>
+      <semantic:requiredInput href="#_49d0849b-96fc-48c3-ab12-2ca7a7003018"/>
+    </semantic:informationRequirement>
+    <semantic:informationRequirement>
+      <semantic:requiredDecision href="#_5fba245b-c964-45af-9781-9c3ee4ad00a8"/>
+    </semantic:informationRequirement>
+    <semantic:informationRequirement>
+      <semantic:requiredDecision href="#_287a0042-cdd2-4a4b-902f-dc38c366cdf4"/>
+    </semantic:informationRequirement>
+    <semantic:knowledgeRequirement>
+      <semantic:requiredKnowledge href="#_c2cca8e4-cbe9-4bc6-b190-541cf3c879ec"/>
+    </semantic:knowledgeRequirement>
+    <semantic:literalExpression id="_14252026-d747-44cd-ab5e-251d2b021dff">
+      <semantic:text>if Exemptions = "Exempted"
+  then
+    0
+  else
+    Fees calculator function(Account balance, Account Profile)</semantic:text>
+    </semantic:literalExpression>
+  </semantic:decision>
+  <semantic:businessKnowledgeModel id="_c2cca8e4-cbe9-4bc6-b190-541cf3c879ec" name="Fees calculator function">
+    <semantic:encapsulatedLogic xmlns:drools="http://www.drools.org/kie/dmn/1.1" drools:kind="F" id="_5a75e5ef-9d54-4b7c-a48f-e6be070d01eb">
+      <semantic:formalParameter id="_7b29883b-c72f-45e5-be07-7b97ad52bbaa" name="balance" typeRef="feel:number"/>
+      <semantic:formalParameter id="_e87f017b-4b05-4a93-b4ae-a90e80c67399" name="profile" typeRef="tProfile"/>
+      <semantic:context id="_ca4d3242-f8a8-42b5-bd55-ff5a0a960056">
+        <semantic:contextEntry>
+          <semantic:variable id="_6fd2fc28-06b6-42a1-b78a-644b5bf3e502" name="fees percentage" typeRef="feel:number"/>
+          <semantic:decisionTable hitPolicy="UNIQUE" id="_5730cdc2-fbc0-4484-9496-41e9546da18b" outputLabel="fees percentage">
+            <semantic:input id="_da1cb91f-b76f-478c-ad91-aa85ca32b1a9">
+              <semantic:inputExpression typeRef="tProfile">
+                <semantic:text>profile</semantic:text>
+              </semantic:inputExpression>
+              <semantic:inputValues triso:constraintsType="enumeration">
+                <semantic:text>"Standard","Defaulting","Premium"</semantic:text>
+              </semantic:inputValues>
+            </semantic:input>
+            <semantic:output id="_40e4bd71-b2dc-4b70-89e6-4a3de42b0932"/>
+            <semantic:rule id="_ec2f8e40-e777-48fb-a3d8-b234ae3aefb5">
+              <semantic:inputEntry id="_4217d27d-b38f-4fac-b665-900fe52ab5ca">
+                <semantic:text>"Standard"</semantic:text>
+              </semantic:inputEntry>
+              <semantic:outputEntry id="_fbad9481-fd18-40a9-b7fb-62d26f5463eb">
+                <semantic:text>0.5</semantic:text>
+              </semantic:outputEntry>
+            </semantic:rule>
+            <semantic:rule id="_5ed09988-2101-4daa-99e9-8dfff04d7065">
+              <semantic:inputEntry id="_e6bf3211-98b0-4537-b488-e0fb995e8a4f">
+                <semantic:text>"Defaulting"</semantic:text>
+              </semantic:inputEntry>
+              <semantic:outputEntry id="_0e4c5799-75fe-4d0d-8d25-a50f1babfd44">
+                <semantic:text>0.75</semantic:text>
+              </semantic:outputEntry>
+            </semantic:rule>
+            <semantic:rule id="_949011fc-d3d8-4cbe-b105-e702ba904d6e">
+              <semantic:inputEntry id="_62d65d39-7c41-4bdf-8187-ddb6c5ca4773">
+                <semantic:text>"Premium"</semantic:text>
+              </semantic:inputEntry>
+              <semantic:outputEntry id="_2ee5f8cd-a99b-4f06-b543-9a9c1a576c9e">
+                <semantic:text>0</semantic:text>
+              </semantic:outputEntry>
+            </semantic:rule>
+          </semantic:decisionTable>
+        </semantic:contextEntry>
+        <semantic:contextEntry>
+          <semantic:literalExpression id="_e94fedfb-d8a7-43c6-bd79-5c814c5f32d6">
+            <semantic:text>balance * ( fees percentage / 100 )</semantic:text>
+          </semantic:literalExpression>
+        </semantic:contextEntry>
+      </semantic:context>
+    </semantic:encapsulatedLogic>
+    <semantic:variable id="_20da26c6-9d3e-4fe7-9054-fb0880d64616" name="Fees calculator function" typeRef="feel:number"/>
+  </semantic:businessKnowledgeModel>
+</semantic:definitions>
