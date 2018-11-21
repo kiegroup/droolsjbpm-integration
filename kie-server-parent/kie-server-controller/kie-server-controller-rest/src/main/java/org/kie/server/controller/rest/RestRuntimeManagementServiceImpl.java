@@ -26,11 +26,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.kie.server.controller.api.KieServerControllerException;
 import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.runtime.ContainerList;
@@ -40,8 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.controller.rest.ControllerUtils.*;
+import static org.kie.server.controller.rest.docs.ParameterSamples.*;
 
-@Api(value = "Controller :: Runtime")
+@Api(value = "Controller :: KIE Server instances and KIE containers")
 @Path("/controller/runtime")
 public class RestRuntimeManagementServiceImpl {
 
@@ -50,18 +47,22 @@ public class RestRuntimeManagementServiceImpl {
 
     private RuntimeManagementServiceImpl runtimeManagementService;
 
-    @ApiOperation(value = "Retrieve all Kie Server instances connected to the controller for a given Server Template", response = ServerInstanceKeyList.class)
+    @ApiOperation(value = "Returns all KIE Server instances configured with the controller for a specified KIE Server template", response = ServerInstanceKeyList.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE Server instances", examples = @Example({
+                @ExampleProperty(mediaType = JSON, value = SERVER_INSTANCE_GET_JSON),
+                @ExampleProperty(mediaType = XML, value = SERVER_INSTANCE_GET_XML)
+            })),
+            @ApiResponse(code = 404, message = "KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @GET
-    @Path("servers/{id}/instances")
+    @Path("servers/{serverTemplateId}/instances")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerInstances(@Context HttpHeaders headers,
-                                       @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId) {
+                                       @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template for which you are retrieving KIE Server instances", required = true) @PathParam("serverTemplateId") String serverTemplateId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get server template with id {}", serverTemplateId);
@@ -81,19 +82,23 @@ public class RestRuntimeManagementServiceImpl {
 
     }
 
-    @ApiOperation(value = "Retrieve all Containers for a given Kie Server instance", response = ContainerList.class)
+    @ApiOperation(value = "Returns all KIE containers for a specified KIE Server template and a specified KIE Server instance", response = ContainerList.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template or Kie Server instance not found"),
+            @ApiResponse(code = 200, message = "KIE container instances", examples = @Example({
+                    @ExampleProperty(mediaType = JSON, value = CONTAINER_INSTANCE_LIST_JSON),
+                    @ExampleProperty(mediaType = XML, value = CONTAINER_INSTANCE_LIST_XML)
+            })),
+            @ApiResponse(code = 404, message = "Kie Server template or Kie Server instance not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @GET
-    @Path("servers/{id}/instances/{instanceId}/containers")
+    @Path("servers/{serverTemplateId}/instances/{serverInstanceId}/containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerInstanceContainers(@Context HttpHeaders headers,
-                                                @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                                @ApiParam(name = "Kie Server instance identifier", required = true) @PathParam("instanceId") String instanceId) {
+                                                @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE Server instance", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                                @ApiParam(name = "serverInstanceId", value = "ID of the KIE Server instance for which you are retrieving KIE containers (example: default-kieserver-instance@localhost:8080)", required = true) @PathParam("serverInstanceId") String instanceId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get containers for server template with id {} and instance id {}", serverTemplateId, instanceId);
@@ -113,19 +118,23 @@ public class RestRuntimeManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Retrieve all Containers with a given id in Kie Server instances from a specific Server Template", response = ContainerList.class)
+    @ApiOperation(value = "Returns all instances of a specified KIE container in a specified KIE Server template", response = ContainerList.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template or Kie Server instance not found"),
+            @ApiResponse(code = 200, message = "KIE container instances", examples = @Example({
+                    @ExampleProperty(mediaType = JSON, value = CONTAINER_INSTANCE_LIST_JSON),
+                    @ExampleProperty(mediaType = XML, value = CONTAINER_INSTANCE_LIST_XML)
+            })),
+            @ApiResponse(code = 404, message = "KIE Server template or KIE container not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @GET
-    @Path("servers/{id}/containers/{containerId}/instances")
+    @Path("servers/{serverTemplateId}/containers/{containerId}/instances")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerTemplateContainers(@Context HttpHeaders headers,
-                                                @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                                @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId) {
+                                                @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template for which you are retrieving KIE containers", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                                @ApiParam(name = "containerId", value = "ID of the KIE container to be retrieved", required = true) @PathParam("containerId") String containerId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
