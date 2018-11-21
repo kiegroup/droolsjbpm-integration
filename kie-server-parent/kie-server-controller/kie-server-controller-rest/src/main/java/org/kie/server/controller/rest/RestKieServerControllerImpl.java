@@ -24,7 +24,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.*;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.storage.KieServerControllerStorage;
@@ -34,9 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.controller.rest.ControllerUtils.*;
-import static org.kie.server.controller.rest.docs.ParameterSamples.*;
 
-@Api(value = "Controller :: Server Controller")
 @Path("/controller")
 public class RestKieServerControllerImpl extends KieServerControllerImpl {
 
@@ -44,19 +41,13 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
 
     private KieServerControllerStorage storage = InMemoryKieServerControllerStorage.getInstance();
 
-    @ApiOperation(value = "Connect a new Kie Server instance to Controller", response = KieServerSetup.class)
-    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error")})
     @PUT
-    @Path("server/{id}")
+    @Path("server/{serverInstanceId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response connectKieServer(@Context HttpHeaders headers,
-                                     @ApiParam(name = "Kie Server instance identifier", required = true) @PathParam("id") String id,
-                                     @ApiParam(name = "Kie Server instance information", required = true, examples =
-                                     @Example(value = {
-                                             @ExampleProperty(mediaType = JSON, value = KIE_SERVER_INFO_JSON),
-                                             @ExampleProperty(mediaType = XML, value = KIE_SERVER_INFO_XML)
-                                     })) String serverInfoPayload) {
+                                     @PathParam("serverInstanceId") String id,
+                                     String serverInfoPayload) {
         String contentType = getContentType(headers);
         logger.debug("Received connect request from server with id {}", id);
         KieServerInfo serverInfo = unmarshal(serverInfoPayload, contentType, KieServerInfo.class);
@@ -70,14 +61,12 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
         return createCorrectVariant(response, headers, Response.Status.CREATED);
     }
 
-    @ApiOperation(value = "Remove a Kie Server instance from Controller")
-    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error")})
     @DELETE
-    @Path("server/{id}")
+    @Path("server/{serverInstanceId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response disconnectKieServer(@Context HttpHeaders headers,
-                                        @ApiParam(name = "Kie Server instance identifier", required = true) @PathParam("id") String id,
-                                        @ApiParam(name = "Kie Server instance URL", required = true) @QueryParam("location") String serverLocation) {
+                                        @PathParam("serverInstanceId") String id,
+                                        @QueryParam("location") String serverLocation) {
         try {
             KieServerInfo serverInfo = new KieServerInfo(id, "", "", Collections.<String>emptyList(), URLDecoder.decode(serverLocation, "UTF-8"));
             disconnect(serverInfo);

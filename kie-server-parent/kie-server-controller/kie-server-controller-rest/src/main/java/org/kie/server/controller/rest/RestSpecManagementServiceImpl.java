@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.controller.rest.ControllerUtils.*;
 import static org.kie.server.controller.rest.docs.ParameterSamples.*;
 
-@Api(value = "Controller :: Management")
+@Api(value = "Controller :: KIE Server templates and KIE containers")
 @Path("/controller/management")
 public class RestSpecManagementServiceImpl {
 
@@ -41,22 +41,24 @@ public class RestSpecManagementServiceImpl {
 
     private SpecManagementServiceImpl specManagementService;
 
-    @ApiOperation(value = "Add new Container Specification to a given Server Template")
+    @ApiOperation(value = "Creates a KIE container in a specified KIE Server template. You set the KIE container configurations in the request body", code = 201)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template not found"),
+            @ApiResponse(code = 201, message = "KIE container successfully deployed"),
+            @ApiResponse(code = 404, message = "KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @PUT
-    @Path("servers/{id}/containers/{containerId}")
+    @Path("servers/{serverTemplateId}/containers/{containerId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveContainerSpec(@Context HttpHeaders headers,
-                                      @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                      @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId,
-                                      @ApiParam(name = "Container information", required = true, examples =
-                                      @Example(value = {
-                                              @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
-                                              @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
+                                      @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the new KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                      @ApiParam(name = "containerId", value = "ID of the new KIE container", required = true) @PathParam("containerId") String containerId,
+                                      @ApiParam(name = "body", value = "A map containing the container-name, relevant release-id (group ID, artifact ID, and version), configuration specifications (rule, process, planning), and other components of the new KIE container",
+                                              required = true, examples =
+                                                    @Example(value = {
+                                                          @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
+                                                          @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
                                       })) String containerSpecPayload) {
 
         String contentType = getContentType(headers);
@@ -78,19 +80,20 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Update Container Specification in a given Server Template")
+    @ApiOperation(value = "Updates information about a specified KIE container in a specified KIE Server template", code = 201)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template or Container not found"),
+            @ApiResponse(code = 201, message = "KIE container successfully updated"),
+            @ApiResponse(code = 404, message = "KIE Server template or KIE container not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @POST
-    @Path("servers/{id}/containers/{containerId}")
+    @Path("servers/{serverTemplateId}/containers/{containerId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateContainerSpec(@Context HttpHeaders headers,
-                                        @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                        @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId,
-                                        @ApiParam(name = "Container information", required = true, examples =
+                                        @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                        @ApiParam(name = "containerId", value = "ID of the KIE container to be updated", required = true) @PathParam("containerId") String containerId,
+                                        @ApiParam(name = "body", value = "A map containing the updated specifications for the KIE container", required = true, examples =
                                         @Example(value = {
                                                 @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
                                                 @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
@@ -115,17 +118,21 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Add new Server Template to Controller")
+    @ApiOperation(value = "Creates a new KIE Server template with a specified ID", code = 201)
     @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "KIE Server template successfully created", examples = @Example(value = {
+                    @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_SAVE_JSON),
+                    @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_SAVE_XML)
+            })),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @PUT
-    @Path("servers/{id}")
+    @Path("servers/{serverTemplateId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveServerTemplate(@Context HttpHeaders headers,
-                                       @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                       @ApiParam(name = "Kie Server Template information", required = true, examples =
+                                       @ApiParam(name = "serverTemplateId", value = "ID of the new KIE Server template", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                       @ApiParam(name = "body", value = "A map containing the server-name, capabilities, and other components of the new KIE Server template", required = true, examples =
                                        @Example(value = {
                                                @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_JSON),
                                                @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_XML)
@@ -150,18 +157,22 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Retrieve Server Template for a given id", response = ServerTemplate.class)
+    @ApiOperation(value = "Returns information about a specified KIE Server template", response = ServerTemplate.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE Server template", examples = @Example({
+                    @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_GET_JSON),
+                    @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_GET_XML)
+            })),
+            @ApiResponse(code = 404, message = "KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @GET
-    @Path("servers/{id}")
+    @Path("servers/{serverTemplateId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerTemplate(@Context HttpHeaders headers,
-                                      @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId) {
+                                      @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template to be retrieved", required = true) @PathParam("serverTemplateId") String serverTemplateId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get server template with id {}", serverTemplateId);
@@ -181,9 +192,13 @@ public class RestSpecManagementServiceImpl {
 
     }
 
-    @ApiOperation(value = "Retrieve all Server Templates", response = ServerTemplateList.class)
+    @ApiOperation(value = "Returns all KIE Server templates", response = ServerTemplateList.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE Server templates", examples = @Example(value = {
+                    @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_LIST_JSON),
+                    @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_LIST_XML)
+            })),
+            @ApiResponse(code = 404, message = "KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
@@ -211,18 +226,22 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Retrieve all Container Specification for a Server Template", response = ContainerSpecList.class)
+    @ApiOperation(value = "Returns all KIE containers for a specified KIE Server template", response = ContainerSpecList.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE containers", examples = @Example({
+                @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_LIST_JSON),
+                @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_LIST_XML)
+            })),
+            @ApiResponse(code = 404, message = "KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @GET
-    @Path("servers/{id}/containers")
+    @Path("servers/{serverTemplateId}/containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response listContainerSpec(@Context HttpHeaders headers,
-                                      @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId) {
+                                      @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template for which you are retrieving KIE containers", required = true) @PathParam("serverTemplateId") String serverTemplateId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get containers for server template with id {}", serverTemplateId);
@@ -241,19 +260,23 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Get Container Specification for a given id and Server Template", response = ContainerSpec.class)
+    @ApiOperation(value = "Returns information about a specified KIE container for a specified KIE Server template", response = ContainerSpec.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Container Specification or Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE container", examples = @Example({
+                    @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_GET_JSON),
+                    @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_GET_XML),
+            })),
+            @ApiResponse(code = 404, message = "Container Specification or KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @GET
-    @Path("servers/{id}/containers/{containerId}")
+    @Path("servers/{serverTemplateId}/containers/{containerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getContainerSpec(@Context HttpHeaders headers,
-                                     @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                     @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId) {
+                                     @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                     @ApiParam(name = "containerId", value = "ID of the KIE container to be retrieved", required = true) @PathParam("containerId") String containerId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
@@ -276,18 +299,19 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Remove Container Specification from a given Server Template")
+    @ApiOperation(value = "Disposes a specified KIE container in a specified KIE Server template.", code = 204)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Container Specification or Server Template not found"),
+            @ApiResponse(code = 204, message = "KIE container successfully disposed"),
+            @ApiResponse(code = 404, message = "Container Specification or KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @DELETE
-    @Path("servers/{id}/containers/{containerId}")
+    @Path("servers/{serverTemplateId}/containers/{containerId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteContainerSpec(@Context HttpHeaders headers,
-                                        @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                        @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerSpecId) {
+                                        @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                        @ApiParam(name = "containerId", value = "ID of the KIE container to be disposed", required = true) @PathParam("containerId") String containerSpecId) {
 
         try {
 
@@ -304,17 +328,18 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Remove Server Template")
+    @ApiOperation(value = "Deletes a specified KIE Server template", code = 204)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Server Template not found"),
+            @ApiResponse(code = 204, message = "KIE Server template successfully deleted"),
+            @ApiResponse(code = 404, message = "KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @DELETE
-    @Path("servers/{id}")
+    @Path("servers/{serverTemplateId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteServerTemplate(@Context HttpHeaders headers,
-                                         @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId) {
+                                         @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template to be deleted", required = true) @PathParam("serverTemplateId") String serverTemplateId) {
         try {
             specManagementService.deleteServerTemplate(serverTemplateId);
             // return null to produce 204
@@ -329,20 +354,21 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Update Container Specification for a given id and Server Template")
+    @ApiOperation(value = "Updates configurations for a specified KIE container in a specified KIE Server template", code = 201)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Container Specification or Server Template not found"),
+            @ApiResponse(code = 201, message = "KIE container successfully updated"),
+            @ApiResponse(code = 404, message = "KIE container or KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @POST
-    @Path("servers/{id}/containers/{containerId}/config/{capability}")
+    @Path("servers/{serverTemplateId}/containers/{containerId}/config/{capability}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateContainerConfig(@Context HttpHeaders headers,
-                                          @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                          @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerSpecId,
-                                          @ApiParam(name = "Container capability", required = true) @PathParam("capability") String capabilityStr,
-                                          @ApiParam(name = "Container configuration", required = true, examples =
+                                          @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                          @ApiParam(name = "containerId", value = "ID of the KIE container to be updated", required = true) @PathParam("containerId") String containerSpecId,
+                                          @ApiParam(name = "capability", value = "KIE container capability to be applied (RULE, PROCESS, or PLANNING, case sensitive)", required = true) @PathParam("capability") String capabilityStr,
+                                          @ApiParam(name = "body", value = "An org.kie.server.controller.api.model.spec.<capability>Config map containing the configurations for the specified KIE container capability, such as runtimeStrategy, kbase, ksession, and mergeMode for process configuration", required = true, examples =
                                           @Example(value = {
                                                   @ExampleProperty(mediaType = JSON, value = CONTAINER_CONFIG_JSON),
                                                   @ExampleProperty(mediaType = XML, value = CONTAINER_CONFIG_XML)
@@ -379,18 +405,19 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Stop Container for a given id and Server Template")
+    @ApiOperation(value = "Stops a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Container or Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE container successfully stopped"),
+            @ApiResponse(code = 404, message = "KIE container or KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @POST
-    @Path("servers/{id}/containers/{containerId}/status/stopped")
+    @Path("servers/{serverTemplateId}/containers/{containerId}/status/stopped")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response stopContainer(@Context HttpHeaders headers,
-                                  @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                  @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId) {
+                                  @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                  @ApiParam(name = "containerId", value = "ID of the KIE container to be stopped", required = true) @PathParam("containerId") String containerId) {
         logger.debug("Requesting stop container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
@@ -408,18 +435,19 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Start Container for a given id and Server Template")
+    @ApiOperation(value = "Starts a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Container or Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE Container successfully started"),
+            @ApiResponse(code = 404, message = "KIE container or KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @POST
-    @Path("servers/{id}/containers/{containerId}/status/started")
+    @Path("servers/{serverTemplateId}/containers/{containerId}/status/started")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startContainer(@Context HttpHeaders headers,
-                                   @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                   @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId) {
+                                   @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                   @ApiParam(name = "containerId", value = "ID of the KIE container to be started", required = true) @PathParam("containerId") String containerId) {
         logger.debug("Requesting start container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
@@ -437,18 +465,19 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Activate Container for a given id and Server Template")
+    @ApiOperation(value = "Activates a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Container or Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE container successfully activated"),
+            @ApiResponse(code = 404, message = "KIE container or KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @POST
-    @Path("servers/{id}/containers/{containerId}/status/activated")
+    @Path("servers/{serverTemplateId}/containers/{containerId}/status/activated")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response activateContainer(@Context HttpHeaders headers,
-                                      @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                      @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId) {
+                                      @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                      @ApiParam(name = "containerId", value = "ID of the KIE container to be activated", required = true) @PathParam("containerId") String containerId) {
         logger.debug("Requesting activate container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
@@ -466,18 +495,19 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @ApiOperation(value = "Deactivate Container for a given id and Server Template")
+    @ApiOperation(value = "Deactivates a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Container or Server Template not found"),
+            @ApiResponse(code = 200, message = "KIE container successfully deactivated"),
+            @ApiResponse(code = 404, message = "KIE container or KIE Server template not found"),
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
     @POST
-    @Path("servers/{id}/containers/{containerId}/status/deactivated")
+    @Path("servers/{serverTemplateId}/containers/{containerId}/status/deactivated")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deactivateContainer(@Context HttpHeaders headers,
-                                        @ApiParam(name = "Kie Server Template identifier", required = true) @PathParam("id") String serverTemplateId,
-                                        @ApiParam(name = "Container identifier", required = true) @PathParam("containerId") String containerId) {
+                                        @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true) @PathParam("serverTemplateId") String serverTemplateId,
+                                        @ApiParam(name = "containerId", value = "ID of the KIE container to be deactivated", required = true) @PathParam("containerId") String containerId) {
         logger.debug("Requesting deactivate container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
