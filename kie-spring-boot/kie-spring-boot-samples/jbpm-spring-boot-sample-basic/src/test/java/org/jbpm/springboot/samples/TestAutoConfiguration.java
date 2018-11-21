@@ -19,6 +19,8 @@ package org.jbpm.springboot.samples;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jbpm.springboot.samples.handlers.WidWorkItemHandler;
+import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.internal.identity.IdentityProvider;
 import org.springframework.context.annotation.Bean;
 
@@ -47,6 +49,11 @@ public class TestAutoConfiguration {
                 return "john";
             }
         };
+    }
+    
+    @Bean
+    public WorkItemHandler customWidHandler() {
+        return new WidWorkItemHandler();
     }
     
 }

@@ -30,6 +30,7 @@ import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.springboot.samples.handlers.CustomWorkItemHandler;
+import org.jbpm.springboot.samples.handlers.WidWorkItemHandler;
 import org.jbpm.springboot.samples.listeners.CustomProcessEventListener;
 import org.junit.After;
 import org.junit.Before;
@@ -122,6 +123,10 @@ public class ConfigurationTest {
         WorkItemHandler handler = ((JPAWorkItemManager) manager).getWorkItemHandler("Custom");
         assertNotNull(handler);
         assertTrue(handler instanceof CustomWorkItemHandler);
+        
+        handler = ((JPAWorkItemManager) manager).getWorkItemHandler("WidCustom");
+        assertNotNull(handler);
+        assertTrue(handler instanceof WidWorkItemHandler);
         
         runtimeManager.disposeRuntimeEngine(engine);
         

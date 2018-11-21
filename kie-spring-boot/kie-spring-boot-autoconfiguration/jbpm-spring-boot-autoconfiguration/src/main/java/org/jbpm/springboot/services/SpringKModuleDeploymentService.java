@@ -25,6 +25,7 @@ import org.jbpm.casemgmt.api.event.CaseEventListener;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.process.audit.event.AuditEventBuilder;
+import org.jbpm.process.workitem.core.util.Wid;
 import org.jbpm.runtime.manager.impl.PerCaseRuntimeManager;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.DeploymentUnit;
@@ -146,6 +147,9 @@ public class SpringKModuleDeploymentService extends KModuleDeploymentService {
         String name = null;
         if (component.getClass().isAnnotationPresent(Component.class)) {
             name = component.getClass().getAnnotation(Component.class).value();
+            
+        } else if (component.getClass().isAnnotationPresent(Wid.class)) {
+            name = component.getClass().getAnnotation(Wid.class).name();
         }
         
         return name;
