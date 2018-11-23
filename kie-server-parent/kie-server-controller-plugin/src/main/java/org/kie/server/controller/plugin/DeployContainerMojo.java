@@ -99,7 +99,7 @@ public class DeployContainerMojo extends KieControllerMojo {
         LogHelper.logContainer(getLog(), containerSpec);
         container = containerBuilder.getId();
 
-        kieControllerGateway.createContainer(templateId, container, containerSpec);
+        kieControllerGateway.createContainer(templateId, containerSpec);
         getLog().info("Container " + container + " CREATED on server template " + templateId);
 
         kieControllerGateway.startContainer(templateId, container);
