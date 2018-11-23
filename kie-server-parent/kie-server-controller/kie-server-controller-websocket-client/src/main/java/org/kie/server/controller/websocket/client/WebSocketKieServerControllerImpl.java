@@ -58,14 +58,11 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
 
     public WebSocketKieServerControllerImpl() {
         this.marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader());
-        
+
         this.client = new KieServerMessageHandlerWebSocketClient((WebSocketClient client) -> {
             try {
                 ((KieServerMessageHandlerWebSocketClient) client).sendTextWithInternalHandler(serialize(serverInfo),
-                                                                                              message -> {
-                                                                                                  logger.info("Successfully reconnected");
-                                                                                                  return null;
-                                                                                              });
+                        new WebSocketKieServerControllerReconnectHandler(context));
             } catch (IOException e) {
                 logger.warn("Error when trying to reconnect to Web Socket server - {}", e.getMessage());
             }
@@ -105,7 +102,6 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                             if (received && kieServerSetup.getContainers() != null) {
                                 // once there is non null list let's return it
                                 return kieServerSetup;
-    
                             }
     
                             break;
