@@ -70,14 +70,11 @@ public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegr
     private static final Logger logger = LoggerFactory.getLogger(BaseKieServerClientKarafIntegrationTest.class);
 
     protected String serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://localhost:8080/kie-server/services/rest/server");
-    protected String user = System.getProperty("org.kie.server.itest.user", "kieserver");
-    protected String password = System.getProperty("org.kie.server.itest.password", "kieserver@pwd1");
-
-    protected String containerId = System.getProperty("org.kie.server.itest.container", "evaluationproject");
-    protected String processId = System.getProperty("org.kie.server.itest.process", "evaluation");
 
     protected void testListContainers(MarshallingFormat marshallingFormat) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl, user, password);
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl,
+                                                                                         KieServerConstants.user,
+                                                                                         KieServerConstants.password);
 
         configuration.setMarshallingFormat(marshallingFormat);
 //        configuration.addJaxbClasses(extraClasses);
@@ -98,7 +95,9 @@ public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegr
 
 
     protected void testCompleteInteractionWithKieServer(MarshallingFormat marshallingFormat) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl, user, password);
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl,
+                                                                                         KieServerConstants.user,
+                                                                                         KieServerConstants.password);
 
         configuration.setMarshallingFormat(marshallingFormat);
 //        configuration.addJaxbClasses(extraClasses);
@@ -112,25 +111,27 @@ public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegr
 
         ProcessServicesClient processClient = kieServicesClient.getServicesClient(ProcessServicesClient.class);
         // get details of process definition
-        ProcessDefinition definition = processClient.getProcessDefinition(containerId, processId);
+        ProcessDefinition definition = processClient.getProcessDefinition(KieServerConstants.containerId,
+                                                                          KieServerConstants.processId);
         System.out.println("\t######### Definition details: " + definition);
 
         // start process instance
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("employee", user);
-        Long processInstanceId = processClient.startProcess(containerId, processId, params);
+        params.put("employee", KieServerConstants.user);
+        Long processInstanceId = processClient.startProcess(KieServerConstants.containerId,
+                                                            KieServerConstants.processId, params);
         System.out.println("\t######### Process instance id: " + processInstanceId);
 
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
         // find available tasks
-        List<TaskSummary> tasks = taskClient.findTasks(user, 0, 10);
+        List<TaskSummary> tasks = taskClient.findTasks(KieServerConstants.user, 0, 10);
         System.out.println("\t######### Tasks: " +tasks);
 
         // complete task
         Long taskId = tasks.get(0).getId();
 
-        taskClient.startTask(containerId, taskId, user);
-        taskClient.completeTask(containerId, taskId, user, null);
+        taskClient.startTask(KieServerConstants.containerId, taskId, KieServerConstants.user);
+        taskClient.completeTask(KieServerConstants.containerId, taskId, KieServerConstants.user, null);
 
         // work with rules
         List<ExecutableCommand<?>> commands = new ArrayList<ExecutableCommand<?>>();
@@ -147,11 +148,11 @@ public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegr
         commands.add(fireAllRulesCommand);
 
         RuleServicesClient ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
-        ruleClient.executeCommands(containerId, executionCommand);
+        ruleClient.executeCommands(KieServerConstants.containerId, executionCommand);
         System.out.println("\t######### Rules executed");
 
         // at the end abort process instance
-        processClient.abortProcessInstance(containerId, processInstanceId);
+        processClient.abortProcessInstance(KieServerConstants.containerId, processInstanceId);
 
         ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
         System.out.println("\t######### ProcessInstance: " + processInstance);

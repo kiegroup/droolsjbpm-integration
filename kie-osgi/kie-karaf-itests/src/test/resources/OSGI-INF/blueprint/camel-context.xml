@@ -12,6 +12,8 @@
     <!-- Allows to inject the camel context into the test -->
     <service id="sampleCamelContextService" ref="sampleCamelContext" interface="org.apache.camel.CamelContext"/>
 
+    <bean id="executionServerCommandProcessor" class="org.kie.karaf.itest.camel.kiecamel.tools.ExecutionServerCommandProcessor"/>
+
     <!-- Camel Route -->
     <camelContext id="sampleCamelContext" xmlns="http://camel.apache.org/schema/blueprint">
 
@@ -66,6 +68,12 @@
             <from uri="direct://ruleOnCommand"/>
             <bean method="insertAndFireAll" ref="droolsCommandHelper"/>
             <to uri="kie-local:example-command-ksession?action=execute"/>
+        </route>
+
+        <route id="kie-camel-remote">
+            <from uri="direct:remote"/>
+            <to uri="bean:executionServerCommandProcessor"/>
+            <to uri="kie:http://localhost:59400"/>
         </route>
     </camelContext>
 
