@@ -16,6 +16,17 @@
     Container tests for Camel integration
   </description>
 
+  <properties>
+    <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
+         is not able to override the value of the property. The port number would then always be the same
+         (the default one, unless changed from outside) -->
+    <kie.server.context>kie-server-services</kie.server.context>
+    <kie.server.classifier>ee7</kie.server.classifier>
+    <container.hostname>localhost</container.hostname>
+    <container.port>8080</container.port>
+    <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.cxf</groupId>
@@ -59,6 +70,21 @@
       <artifactId>camel-container-tests-module</artifactId>
       <type>war</type>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server</artifactId>
+      <!-- default, may be overridden in container specific profiles -->
+      <classifier>${kie.server.classifier}</classifier>
+      <type>war</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -133,14 +159,43 @@
               </container>
               <deployables>
                 <deployable>
+                  <groupId>org.kie.server</groupId>
+                  <artifactId>kie-server</artifactId>
+                  <!-- default, may be overridden in container specific profiles -->
+                  <classifier>${kie.server.classifier}</classifier>
+                  <type>war</type>
+                  <properties>
+                    <context>${kie.server.context}</context>
+                  </properties>
+                  <pingURL>${kie.server.base.http.url}</pingURL>
+                  <pingTimeout>6000000</pingTimeout>
+                </deployable>
+                <deployable>
                   <groupId>org.drools</groupId>
                   <artifactId>camel-container-tests-module</artifactId>
                   <type>war</type>
                 </deployable>
               </deployables>
               <configuration>
+                <users>
+                  <user>
+                    <name>yoda</name>
+                    <password>test</password>
+                    <roles>
+                      <role>kie-server</role>
+                      <role>guest</role>
+                    </roles>
+                  </user>
+                </users>
                 <properties>
-                  <cargo.jboss.configuration>standalone-camel</cargo.jboss.configuration>
+                  <cargo.jboss.configuration>standalone-full-camel</cargo.jboss.configuration>
+                  <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                  <!-- uncomment to enable remote debugger -->
+                  <!--<cargo.start.jvmargs>-->
+                    <!-- -Xdebug-->
+                    <!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787-->
+                    <!-- -Xnoagent-->
+                  <!--</cargo.start.jvmargs>-->
                 </properties>
               </configuration>
             </configuration>
@@ -209,11 +264,28 @@
                   <artifactId>camel-container-tests-module</artifactId>
                   <type>war</type>
                 </deployable>
+                <deployable>
+                  <location>${kie.server.war}</location>
+                  <type>war</type>
+                  <properties>
+                    <context>${kie.server.context}</context>
+                  </properties>
+                </deployable>
               </deployables>
               <configuration>
                 <properties>
                   <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                 </properties>
+                <users>
+                  <user>
+                    <name>yoda</name>
+                    <password>test</password>
+                    <roles>
+                      <role>kie-server</role>
+                      <role>guest</role>
+                    </roles>
+                  </user>
+                </users>
               </configuration>
             </configuration>
             <executions>

@@ -59,14 +59,13 @@ public class KieProducer extends DefaultProducer {
 
     private final KieEndpoint endpoint;
 
-    private final KieServicesClient client;
+    private KieServicesClient client;
 
     private final Map<String, InternalProducer> producers = new HashMap<>();
 
     public KieProducer( KieEndpoint endpoint ) {
         super(endpoint);
         this.endpoint = endpoint;
-        client = KieServicesFactory.newKieServicesClient( endpoint.getKieServicesConf() );
     }
 
     @Override
@@ -83,12 +82,19 @@ public class KieProducer extends DefaultProducer {
             try {
                 Class<?> producerClass = Class.forName( producerName );
                 return (InternalProducer) producerClass.getConstructor( KieServicesClient.class, String.class, KieEndpoint.class )
-                                                       .newInstance( client, clientName, endpoint );
+                                                       .newInstance( getKieServicesClient(), clientName, endpoint );
             } catch (Exception e) {
                 log.error( "Unknown client name: " + clientName );
                 return new DummyProducer();
             }
         } );
+    }
+
+    private KieServicesClient getKieServicesClient() {
+        if (client == null) {
+            client = KieServicesFactory.newKieServicesClient(endpoint.getKieServicesConf());
+        }
+        return client;
     }
 
     interface InternalProducer {

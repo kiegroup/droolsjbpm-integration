@@ -16,19 +16,15 @@
 
 package org.kie.camel.container.api.service;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
-import org.drools.core.command.runtime.process.StartProcessCommand;
-import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.kie.api.command.Command;
 import org.kie.camel.container.api.model.Person;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
 
 @Path("/kie-service")
 public interface KieCamelTestService {
@@ -44,4 +40,15 @@ public interface KieCamelTestService {
     @Consumes({MediaType.TEXT_PLAIN})
     @Produces({MediaType.TEXT_PLAIN})
     String runCommand(String command);
+
+    @POST
+    @Path("/es-list-containers")
+    @Produces({MediaType.APPLICATION_XML})
+    KieContainerResourceList esListContainers();
+
+    @POST
+    @Path("/es-create-container")
+    @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
+    KieContainerResource esCreateContainer(@QueryParam("id") String id, KieContainerResource resource);
 }
