@@ -12,7 +12,6 @@
     <version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec}</version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>
     <version.javax.jws>${version.javax.jws}</version.javax.jws>
     <version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.2_spec>${version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.2_spec}</version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.2_spec>
-    <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
