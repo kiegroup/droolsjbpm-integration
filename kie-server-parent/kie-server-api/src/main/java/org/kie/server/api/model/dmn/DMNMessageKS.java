@@ -20,11 +20,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.DMNMessageType;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.internal.builder.InternalMessage;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-message")
@@ -34,7 +34,14 @@ public class DMNMessageKS implements DMNMessage {
     
     // This is needed as the DMN's Severity would clash with the Kie server API Severity for marshalling scope
     public static enum DMNMessageSeverityKS {
-        TRACE, INFO, WARN, ERROR;
+        /**
+         * @deprecated use {@link #INFO} level.
+         */
+        @Deprecated
+        TRACE,
+        INFO,
+        WARN,
+        ERROR;
         
         public static DMNMessageSeverityKS of(Severity value) {
             switch ( value ) {
@@ -128,5 +135,72 @@ public class DMNMessageKS implements DMNMessage {
 
     public Object getSourceReference() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getKieBaseName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public InternalMessage setKieBaseName(String kieBaseName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getId() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getPath() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getLine() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getColumn() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Level getLevel() {
+        switch (severity) {
+            case ERROR:
+                return Level.ERROR;
+            case INFO:
+                return Level.INFO;
+            case TRACE:
+                return Level.INFO;
+            case WARN:
+                return Level.WARNING;
+            default:
+                return Level.ERROR;
+        }
+    }
+
+    @Override
+    public String getText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("DMN: ");
+        sb.append(this.message);
+        sb.append(" (");
+        if (this.getPath() != null) {
+            sb.append("resource: ");
+            sb.append(this.getPath());
+            sb.append(", ");
+        }
+        if (this.getSourceId() != null) { // if toString() via org.kie.api.builder.Message would be helpful to report this 
+            sb.append("DMN id: ");
+            sb.append(this.getSourceId());
+            sb.append(", ");
+        }
+        sb.append(this.getMessageType().getDescription());
+        sb.append(") ");
+        return sb.toString();
     }
 }
