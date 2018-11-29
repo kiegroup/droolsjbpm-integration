@@ -1,0 +1,34 @@
+thorntail:
+  port:
+    offset: 100
+  deployment:
+    process-migration.war:
+      jaxrs:
+        application-path: /
+      web:
+        login-config:
+          auth-method: BASIC
+          security-domain: pim
+        security-constraints:
+          - url-pattern: /*
+            roles: [ admin ]
+          - url-pattern: /health/*
+  security:
+    security-domains:
+      pim:
+        classic-authentication:
+          login-modules:
+            UsersRoles:
+              code: UsersRoles
+              flag: required
+              module-options:
+                usersProperties: application-users.properties
+                rolesProperties: application-roles.properties
+kieservers:
+  - host: localhost
+    port: 18080
+    protocol: http
+    contextRoot: /kie-server
+    path: /services/rest/server
+    username: yoda
+    password: usetheforce123@

@@ -79,8 +79,7 @@ public class PlanResource {
     @Path("/{id}")
     @ApiOperation(value = "Delete an existing migration plan")
     public Response delete(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id) throws PlanNotFoundException {
-        planService.delete(id);
-        return Response.ok().build();
+        return Response.ok(planService.delete(id)).build();
     }
 
 }

@@ -27,16 +27,12 @@ import javax.persistence.Embedded;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Embeddable
 public class MigrationDefinition {
 
-    @JsonProperty("plan_id")
     @Column(name = "plan_id")
     private Long planId;
 
-    @JsonProperty("process_instance_ids")
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
                      name = "process_instance_ids",
@@ -44,7 +40,6 @@ public class MigrationDefinition {
     )
     private List<Long> processInstanceIds;
 
-    @JsonProperty("kieserver_id")
     private String kieserverId;
 
     private String requester;

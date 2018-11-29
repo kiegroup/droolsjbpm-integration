@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.model;
+package org.kie.processmigration.model.exceptions;
 
-public class Health {
+public class ProcessNotFoundException extends InvalidMigrationException {
 
-    public enum HealthStatus {
-        UP,
-        DOWN
+    private static final long serialVersionUID = 8119544485261592740L;
+
+    public ProcessNotFoundException(String containerId) {
+        super(containerId);
     }
 
-    public static final Health UP = new Health(HealthStatus.UP);
-    public static final Health DOWN = new Health(HealthStatus.DOWN);
-
-    private final HealthStatus status;
-
-    public Health(HealthStatus status) {
-        this.status = status;
-    }
-
-    public HealthStatus getStatus() {
-        return status;
+    @Override
+    public String getMessage() {
+        return String.format("Missing Process with ContainerID: %s", super.getMessage());
     }
 
 }

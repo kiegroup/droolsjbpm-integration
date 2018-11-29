@@ -30,7 +30,7 @@ import org.kie.processmigration.model.Plan;
 import org.kie.processmigration.service.impl.PlanServiceImpl;
 
 
-public class PlanServiceImplTest extends PersistenceTest {
+public class PlanServiceImplTest extends AbstractPersistenceTest {
 
     @Rule
     public WeldInitiator weld = WeldInitiator

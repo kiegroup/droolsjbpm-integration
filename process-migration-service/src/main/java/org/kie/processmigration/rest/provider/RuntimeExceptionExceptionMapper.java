@@ -14,30 +14,22 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.service.impl;
+package org.kie.processmigration.rest.provider;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-import org.kie.processmigration.model.Status;
-import org.kie.processmigration.model.Status.HealthStatus;
-import org.kie.processmigration.service.KieService;
-import org.kie.processmigration.service.StatusService;
-
-@ApplicationScoped
-public class StatusServiceImpl implements StatusService {
-
-    @Inject
-    private KieService kieService;
+@Provider
+public class RuntimeExceptionExceptionMapper implements ExceptionMapper<RuntimeException> {
 
     @Override
-    public Status getStatus() {
-        return new Status(kieService.getConfigs().values());
-    }
-
-    @Override
-    public HealthStatus getHealth() {
-        return HealthStatus.UP;
+    public Response toResponse(RuntimeException exception) {
+        JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(json).type(MediaType.APPLICATION_JSON).build();
     }
 
 }

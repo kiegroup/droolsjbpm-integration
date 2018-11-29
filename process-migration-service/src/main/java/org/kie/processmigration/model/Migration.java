@@ -18,6 +18,7 @@ package org.kie.processmigration.model;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -28,6 +29,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -40,7 +42,6 @@ import org.kie.processmigration.model.Execution.ExecutionType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "migrations")
@@ -61,26 +62,22 @@ public class Migration implements Serializable {
     @Embedded
     private MigrationDefinition definition;
 
-    @JsonProperty("created_at")
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @JsonProperty("started_at")
     @Column(name = "started_at")
     private Instant startedAt;
 
-    @JsonProperty("finished_at")
     @Column(name = "finished_at")
     private Instant finishedAt;
 
     @JsonInclude(Include.NON_NULL)
-    @JsonProperty("cancelled_at")
     @Column(name = "cancelled_at")
     private Instant cancelledAt;
 
     @JsonInclude(Include.NON_NULL)
-    @JsonProperty("error_message")
-    @Column(name = "error_message", columnDefinition = "TEXT")
+    @Column(name = "error_message")
+    @Lob
     private String errorMessage;
 
     private ExecutionStatus status;
@@ -88,7 +85,7 @@ public class Migration implements Serializable {
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "migration_id")
-    private List<MigrationReport> reports;
+    private List<MigrationReport> reports = new ArrayList<>();
 
     public Migration() {}
 

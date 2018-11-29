@@ -20,12 +20,17 @@ import java.util.Map;
 
 import org.kie.processmigration.model.KieServerConfig;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
+import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
 
 public interface KieService {
 
     ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws InvalidKieServerException;
 
+    QueryServicesClient getQueryServicesClient(String kieserverId) throws InvalidKieServerException;
+
     Map<String, KieServerConfig> getConfigs();
+
+    boolean existsProcessDefinition(String containerId, String processId, String kieServerId) throws InvalidKieServerException;
 
 }

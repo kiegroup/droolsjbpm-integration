@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package org.kie.processmigration.service.impl;
+package org.kie.processmigration.service;
+
+import java.util.function.Supplier;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.kie.processmigration.model.Status;
-import org.kie.processmigration.model.Status.HealthStatus;
-import org.kie.processmigration.service.KieService;
-import org.kie.processmigration.service.StatusService;
+import javax.transaction.Transactional;
 
 @ApplicationScoped
-public class StatusServiceImpl implements StatusService {
+public class TransactionHelper {
 
-    @Inject
-    private KieService kieService;
-
-    @Override
-    public Status getStatus() {
-        return new Status(kieService.getConfigs().values());
+    @Transactional
+    public <T> T withTransaction(Supplier<T> supplier) {
+        return supplier.get();
     }
 
-    @Override
-    public HealthStatus getHealth() {
-        return HealthStatus.UP;
+    @Transactional
+    public void withTransaction(Runnable runnable) {
+        runnable.run();
     }
 
 }

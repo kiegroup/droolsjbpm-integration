@@ -24,7 +24,6 @@ import javax.persistence.Embeddable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Embeddable
 public class Execution {
@@ -43,18 +42,14 @@ public class Execution {
         CREATED
     }
 
-    public static final Execution SYNC = new Execution().setType(ExecutionType.SYNC);
-
     @Column(name = "execution_type")
     private ExecutionType type;
 
     @JsonInclude(Include.NON_NULL)
-    @JsonProperty("callback_url")
     @Column(name = "callback_url")
     private URI callbackUrl;
 
     @JsonInclude(Include.NON_NULL)
-    @JsonProperty("scheduled_start_time")
     @Column(name = "scheduled_start_time")
     private Instant scheduledStartTime;
 

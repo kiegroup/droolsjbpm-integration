@@ -18,17 +18,16 @@ package org.kie.processmigration.model;
 
 import java.util.Collection;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class Status {
 
-    private final Health health;
+    public enum HealthStatus {
+        UP,
+        DOWN
+    }
 
-    @JsonProperty("kie_servers")
     private final Collection<KieServerConfig> kieServers;
 
     public Status(Collection<KieServerConfig> kieServers) {
-        this.health = Health.UP;
         this.kieServers = kieServers;
     }
 
@@ -36,8 +35,8 @@ public class Status {
         return kieServers;
     }
 
-    public Health getHealth() {
-        return health;
+    public HealthStatus getHealth() {
+        return HealthStatus.UP;
     }
 
 }

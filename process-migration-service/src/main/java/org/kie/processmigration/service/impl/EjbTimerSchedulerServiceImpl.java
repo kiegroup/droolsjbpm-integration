@@ -51,8 +51,7 @@ public class EjbTimerSchedulerServiceImpl implements SchedulerService {
     public void doMigration(Timer timer) {
         Long migrationId = (Long) timer.getInfo();
         try {
-            Migration migration = migrationService.get(migrationId);
-            migrationService.migrate(migration);
+            migrationService.migrate(migrationService.get(migrationId));
         } catch (InvalidMigrationException | MigrationNotFoundException e) {
             logger.error("Unable to perform asynchronous migration", e);
         }

@@ -18,21 +18,17 @@ package org.kie.processmigration.service;
 
 import java.util.function.Function;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.jboss.weld.junit.MockBean;
-import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.mockito.Mockito;
 
-public abstract class PersistenceTest {
+public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
 
     protected EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("migration-test");
-    protected EntityManager entityManager = entityManagerFactory.createEntityManager();
+    protected EntityManager entityManager = Mockito.spy(entityManagerFactory.createEntityManager());
 
     protected EntityManager getEntityManager() {
         return entityManager;
@@ -42,16 +38,4 @@ public abstract class PersistenceTest {
         return ip -> entityManager;
     }
 
-    protected Function<InjectionPoint, Object> getPUFactory() {
-        return ip -> entityManagerFactory;
-    }
-//    
-//    @ApplicationScoped
-//    @Produces
-//    KieService produceKieService() {
-//        MockBean.builder()
-//        ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
-//        Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(containerId, processInstanceId, targetContainerId, targetProcessId))
-//        return Mockito.when(Mockito.mock(KieService.class).getProcessAdminServicesClient(Mockito.anyString())).thenReturn(mockProcessAdminServicesClient)
-//    }
 }

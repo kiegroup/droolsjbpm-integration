@@ -34,8 +34,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Entity
 @Table(name = "plans")
 @SequenceGenerator(name = "planIdSeq", sequenceName = "PLAN_ID_SEQ")
@@ -55,15 +53,12 @@ public class Plan implements Serializable {
 
     private String description;
 
-    @JsonProperty("source_container_id")
     @Column(name = "source_container_id")
     private String sourceContainerId;
 
-    @JsonProperty("target_container_id")
     @Column(name = "target_container_id")
     private String targetContainerId;
 
-    @JsonProperty("target_process_id")
     @Column(name = "target_process_id")
     private String targetProcessId;
 
@@ -132,4 +127,13 @@ public class Plan implements Serializable {
         this.mappings = mappings;
     }
 
+    public Plan copy(Plan plan) {
+        this.name = plan.getName();
+        this.description = plan.getDescription();
+        this.sourceContainerId = plan.getSourceContainerId();
+        this.targetContainerId = plan.getTargetContainerId();
+        this.targetProcessId = plan.getTargetProcessId();
+        this.mappings = plan.getMappings();
+        return this;
+    }
 }

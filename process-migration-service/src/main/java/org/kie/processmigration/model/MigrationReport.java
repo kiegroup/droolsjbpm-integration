@@ -31,14 +31,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.kie.server.api.model.admin.MigrationReportInstance;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "migration_reports", indexes = {@Index(columnList = "migration_id")})
@@ -54,26 +53,23 @@ public class MigrationReport implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "migRepIdSeq")
     private Long id;
 
-    @JsonProperty("migration_id")
     @Column(name = "migration_id")
     private Long migrationId;
 
-    @JsonProperty("process_instance_id")
     @Column(name = "process_instance_id")
     private Long processInstanceId;
 
-    @JsonProperty("start_date")
     @Column(name = "start_date")
     private Instant startDate;
 
-    @JsonProperty("end_date")
     @Column(name = "end_date")
     private Instant endDate;
 
     private Boolean successful;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Column(name = "log", columnDefinition = "TEXT")
+    @Column(name = "log")
+    @Lob
     @CollectionTable(
                      name = "migration_report_logs",
                      joinColumns = @JoinColumn(name = "report_id")
@@ -91,6 +87,7 @@ public class MigrationReport implements Serializable {
         if (reportInstance.getEndDate() != null) {
             this.endDate = reportInstance.getEndDate().toInstant();
         }
+        this.successful = reportInstance.isSuccessful();
         this.logs = new ArrayList<>(reportInstance.getLogs());
     }
 

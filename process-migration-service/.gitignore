@@ -2,4 +2,4 @@ target/
 .classpath
 .settings
 .project
-nb-configuration.xml
+.localconfigs
