@@ -51,10 +51,4 @@ public class KieServerApplication {
             }
         };
     }
-
-    // override user group callback to take advantage of keycloak managed roles
-    @Bean
-    public UserGroupCallback userGroupCallback(IdentityProvider identityProvider) {        
-        return new SpringSecurityUserGroupCallback(identityProvider);
-    }
 }
