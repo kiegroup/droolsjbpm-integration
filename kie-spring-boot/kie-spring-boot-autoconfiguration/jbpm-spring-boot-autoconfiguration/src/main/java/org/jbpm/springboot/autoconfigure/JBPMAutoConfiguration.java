@@ -288,7 +288,7 @@ public class JBPMAutoConfiguration {
     
     @Bean
     @ConditionalOnMissingBean(name = "userGroupCallback")
-    public UserGroupCallback userGroupCallback(IdentityProvider identityProvider) throws IOException {
+    public UserGroupCallback userGroupCallback(IdentityProvider identityProvider) {
         return new SpringSecurityUserGroupCallback(identityProvider);
     }
     
