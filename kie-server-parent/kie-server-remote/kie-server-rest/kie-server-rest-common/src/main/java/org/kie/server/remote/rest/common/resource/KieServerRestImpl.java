@@ -19,6 +19,14 @@ import static org.kie.server.remote.rest.common.util.RestUtils.buildConversation
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.serviceUnavailable;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_XML;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_RELEASE_ID_JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_RELEASE_ID_XML;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_SCANNER_JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_SCANNER_XML;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.XML;
 
 import java.util.List;
 
@@ -57,6 +65,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="KIE Server :: Core")
 @Path("server")
@@ -125,7 +135,9 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createContainer( @Context HttpHeaders headers, 
             @ApiParam(value = "Container id to be assigned to deployed KIE Container", required = true) @PathParam("id") String id, 
-            @ApiParam(value = "KIE Container resource to be deployed as KieContainerResource", required = true) String containerPayload ) {        
+            @ApiParam(value = "KIE Container resource to be deployed as KieContainerResource", required = true, examples=@Example(value= {
+                                      @ExampleProperty(mediaType=JSON, value=CREATE_CONTAINER_JSON),
+                                      @ExampleProperty(mediaType=XML, value=CREATE_CONTAINER_XML)})) String containerPayload ) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
@@ -242,7 +254,9 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateScanner( @Context HttpHeaders headers, 
             @ApiParam(value = "Container id for scanner to be updated", required = true) @PathParam("id") String id, 
-            @ApiParam(value = "Scanner information given as KieScannerResource type", required = true) String resourcePayload ) {        
+            @ApiParam(value = "Scanner information given as KieScannerResource type", required = true, examples=@Example(value= {
+                                     @ExampleProperty(mediaType=JSON, value=UPDATE_SCANNER_JSON),
+                                     @ExampleProperty(mediaType=XML, value=UPDATE_SCANNER_XML)})) String resourcePayload ) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
@@ -277,7 +291,9 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateReleaseId( @Context HttpHeaders headers, 
             @ApiParam(value = "Container id that release id should be upgraded", required = true) @PathParam("id") String id, 
-            @ApiParam(value = "Release Id to be upgraded to as ReleaseId type", required = true) String releaseIdPayload) {
+            @ApiParam(value = "Release Id to be upgraded to as ReleaseId type", required = true, examples=@Example(value= {
+                                   @ExampleProperty(mediaType=JSON, value=UPDATE_RELEASE_ID_JSON),
+                                   @ExampleProperty(mediaType=XML, value=UPDATE_RELEASE_ID_XML)})) String releaseIdPayload) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
