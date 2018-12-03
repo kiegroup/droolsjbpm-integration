@@ -51,9 +51,9 @@ public class DroolsKieServerExtension implements KieServerExtension {
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
     private static final Boolean filterRemoteable = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_FILTER_REMOTEABLE_CLASSES, "false"));
 
-    private RulesExecutionService rulesExecutionService;
-    private KieContainerCommandService batchCommandService;
-    private KieServerRegistry registry;
+    protected RulesExecutionService rulesExecutionService;
+    protected KieContainerCommandService batchCommandService;
+    protected KieServerRegistry registry;
 
     private List<Object> services = new ArrayList<Object>();
     private boolean initialized = false;
