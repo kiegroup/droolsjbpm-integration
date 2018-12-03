@@ -174,7 +174,8 @@ public class KieProducer extends DefaultProducer {
                 return null;
             }
 
-            String bodyParam = endpoint.getConfiguration().getBodyParam( clientName, operationName );
+            String bodyParam = endpoint.getConfiguration().getBodyParam( clientName, operationName )
+                    .orElseGet( () ->  exchange.getIn().getHeader( KIE_BODY_PARAM, String.class ) );
             Method method = methods.stream()
                                    .filter( m -> invokable( exchange, m, bodyParam ) )
                                    .findFirst()
