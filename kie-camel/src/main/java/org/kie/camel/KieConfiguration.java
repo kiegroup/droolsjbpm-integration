@@ -20,9 +20,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.spi.UriParam;
+
+import static java.util.Optional.ofNullable;
 
 public class KieConfiguration implements Cloneable {
 
@@ -45,8 +48,6 @@ public class KieConfiguration implements Cloneable {
         setBodyParam( "dmn", "evaluateAll", "dmnContext" );
         setBodyParam( "dmn", "evaluateDecisionByName", "dmnContext" );
         setBodyParam( "dmn", "evaluateDecisionById", "dmnContext" );
-
-        setBodyParam("kieServices", "createContainer", "resource");
     }
 
     public void configure(String remaining) {
@@ -105,8 +106,8 @@ public class KieConfiguration implements Cloneable {
         return this;
     }
 
-    public String getBodyParam(String serviceName, String methodName) {
-        return bodyParams.get(serviceName + "." + methodName);
+    public Optional<String> getBodyParam( String serviceName, String methodName) {
+        return ofNullable( bodyParams.get(serviceName + "." + methodName) );
     }
 
     public KieConfiguration clearBodyParams() {
