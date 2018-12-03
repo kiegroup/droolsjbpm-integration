@@ -16,7 +16,13 @@
 
 package org.kie.server.springboot.autoconfiguration.drools;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.drools.DroolsKieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.springboot.autoconfiguration.KieServerProperties;
@@ -41,8 +47,19 @@ public class DroolsKieServerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "droolsServerExtension")
     @ConditionalOnProperty(name = "kieserver.drools.enabled")
-    public KieServerExtension droolsServerExtension() {
+    public KieServerExtension droolsServerExtension(Optional<List<AgendaEventListener>> agendaEventListeners,
+            Optional<List<RuleRuntimeEventListener>> ruleRuntimeEventListeners) {
 
-        return new DroolsKieServerExtension();
+        return new DroolsKieServerExtension() {
+
+            @Override
+            public void init(KieServerImpl kieServer, KieServerRegistry registry) {
+                super.init(kieServer, registry);
+                
+                rulesExecutionService.setAgendaEventListeners(agendaEventListeners.orElse(null));
+                rulesExecutionService.setRuleRuntimeEventListeners(ruleRuntimeEventListeners.orElse(null));
+            }
+            
+        };
     }
 }
