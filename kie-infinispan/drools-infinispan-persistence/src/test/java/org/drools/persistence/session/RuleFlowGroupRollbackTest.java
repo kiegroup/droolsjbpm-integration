@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.common.InternalAgenda;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
@@ -36,6 +35,7 @@ import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.command.RegistryContext;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 
 import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
