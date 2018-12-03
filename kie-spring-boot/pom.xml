@@ -73,6 +73,11 @@
       <!-- spring boot auto configuration modules -->
       <dependency>
         <groupId>org.kie</groupId>
+        <artifactId>jbpm-spring-boot-data-sources</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
         <artifactId>jbpm-spring-boot-autoconfiguration</artifactId>
         <version>${project.version}</version>
       </dependency>
