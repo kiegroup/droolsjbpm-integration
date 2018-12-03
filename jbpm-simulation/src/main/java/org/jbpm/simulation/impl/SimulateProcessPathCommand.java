@@ -18,7 +18,6 @@ package org.jbpm.simulation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.event.DefaultProcessEventListener;
 import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.SimulationContext;
@@ -29,6 +28,7 @@ import org.kie.api.event.process.ProcessStartedEvent;
 import org.kie.api.runtime.Context;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.internal.command.RegistryContext;
 
 public class SimulateProcessPathCommand implements ExecutableCommand<KieSession> {
 

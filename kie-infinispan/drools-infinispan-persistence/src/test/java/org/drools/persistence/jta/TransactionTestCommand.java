@@ -20,7 +20,6 @@ import java.util.HashMap;
 
 import bitronix.tm.TransactionManagerServices;
 import org.drools.core.base.MapGlobalResolver;
-import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.impl.EnvironmentFactory;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
@@ -32,6 +31,7 @@ import org.kie.api.runtime.Context;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.command.RegistryContext;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
