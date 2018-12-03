@@ -15,8 +15,13 @@
 
 package org.kie.server.services.drools;
 
+import java.util.List;
+
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.event.KieRuntimeEventManager;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.services.api.KieContainerInstance;
@@ -29,6 +34,9 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 public class RulesExecutionService {
 
     private KieServerRegistry context;
+    
+    private List<AgendaEventListener> agendaEventListeners;
+    private List<RuleRuntimeEventListener> ruleRuntimeEventListeners;
 
     public RulesExecutionService(KieServerRegistry context) {
         this.context = context;
@@ -49,6 +57,7 @@ public class RulesExecutionService {
             }
 
             if (ks != null) {
+                applyListeners(ks);
                 ExecutionResults results = ks.execute(command);
 
                 return results;
@@ -58,5 +67,32 @@ public class RulesExecutionService {
         }
 
         throw new IllegalStateException("Unable to execute command " + command);
+    }
+    
+    protected void applyListeners(CommandExecutor ks) {
+        
+        if (ruleRuntimeEventListeners != null) {
+            ruleRuntimeEventListeners.forEach( listener ->((KieRuntimeEventManager) ks).addEventListener(listener));
+        }
+        
+        if (agendaEventListeners != null) {
+            agendaEventListeners.forEach( listener ->((KieRuntimeEventManager) ks).addEventListener(listener));
+        }
+    }
+
+    public List<AgendaEventListener> getAgendaEventListeners() {
+        return agendaEventListeners;
+    }
+
+    public void setAgendaEventListeners(List<AgendaEventListener> agendaEventListeners) {
+        this.agendaEventListeners = agendaEventListeners;
+    }
+
+    public List<RuleRuntimeEventListener> getRuleRuntimeEventListeners() {
+        return ruleRuntimeEventListeners;
+    }
+
+    public void setRuleRuntimeEventListeners(List<RuleRuntimeEventListener> ruleRuntimeEventListeners) {
+        this.ruleRuntimeEventListeners = ruleRuntimeEventListeners;
     }
 }
