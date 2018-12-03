@@ -22,6 +22,7 @@ public class KieCamelConstants {
 
     public static final String KIE_CLIENT = KIE_HEADERS_PREFIX + "Client";
     public static final String KIE_OPERATION = KIE_HEADERS_PREFIX + "Operation";
+    public static final String KIE_BODY_PARAM = KIE_HEADERS_PREFIX + "BodyParam";
 
     public static final String RESPONSE_TYPE = KIE_HEADERS_PREFIX + "ResponseType";
     public static final String RESPONSE_MESSAGE = KIE_HEADERS_PREFIX + "ResponseMessage";
