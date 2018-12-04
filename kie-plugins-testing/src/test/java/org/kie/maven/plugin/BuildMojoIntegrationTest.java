@@ -15,26 +15,18 @@
  */
 package org.kie.maven.plugin;
 
-import java.io.File;
-
-import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.junit.Test;
 
 public class BuildMojoIntegrationTest extends KieMavenPluginBaseIntegrationTest {
 
-    public BuildMojoIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
+    public BuildMojoIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) {
         super(builder);
     }
 
     @Test
     public void testCleanInstallWithAllSupportedResourceTypes() throws Exception {
-        File basedir = resources.getBasedir("kjar-2-all-resources");
-        MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install");
-        result.assertErrorFreeLog();
+        buildKJarProject("kjar-2-all-resources", "clean", "install");
     }
 }
 

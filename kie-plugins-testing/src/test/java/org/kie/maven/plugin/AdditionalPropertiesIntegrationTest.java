@@ -15,27 +15,22 @@
 
 package org.kie.maven.plugin;
 
-import java.io.File;
-
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.junit.Test;
 
 public class AdditionalPropertiesIntegrationTest extends KieMavenPluginBaseIntegrationTest {
 
-    public AdditionalPropertiesIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
+    public AdditionalPropertiesIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) {
         super(builder);
     }
 
     @Test
     public void testAdditionalPropertiesCorrectlySet() throws Exception {
-        File basedir = resources.getBasedir("kjar-3-properties-only");
-        MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install",
-                         "-X");
-        result.assertErrorFreeLog();
+        MavenExecutionResult result = buildKJarProject("kjar-3-properties-only",
+                                                       "clean",
+                                                       "install",
+                                                       "-X");
         // additional properties are logged during debug (-X) build
         // following string is created directly inside the KIE Maven plugin execution (the property names and values
         // are logged multiple by maven itself as well, so we should check directly against that string)
