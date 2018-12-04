@@ -15,9 +15,6 @@
 
 package org.kie.maven.plugin;
 
-import java.io.File;
-
-import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -32,11 +29,6 @@ public class SerializeMojoIntegrationTest extends KieMavenPluginBaseIntegrationT
 
     @Test
     public void testCleanInstallWithSerialize() throws Exception {
-        File basedir = getBasedir("kjar-1-with-serialize");
-        MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install");
-        result.assertErrorFreeLog();
+        buildKJarProject("kjar-1-with-serialize", "clean", "install");
     }
 }
