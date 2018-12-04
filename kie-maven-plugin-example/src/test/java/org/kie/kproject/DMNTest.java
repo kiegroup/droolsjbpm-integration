@@ -15,18 +15,18 @@ import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.core.util.DMNRuntimeUtil;
 import org.kie.dmn.feel.codegen.feel11.CompilerBytecodeLoader;
-import org.kie.kproject.util.DMNRuntimeUtil;
 import org.kie.kproject.util.MockEventListener;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
-import static org.kie.kproject.util.Utils.b;
-import static org.kie.kproject.util.Utils.entry;
-import static org.kie.kproject.util.Utils.mapOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.number.BigDecimalCloseTo.closeTo;
 import static org.junit.Assert.*;
+import static org.kie.dmn.core.util.DynamicTypeUtils.entry;
+import static org.kie.dmn.core.util.DynamicTypeUtils.mapOf;
+import static org.kie.kproject.util.Utils.b;
 
 public class DMNTest {
 
