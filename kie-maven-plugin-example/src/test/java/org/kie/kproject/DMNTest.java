@@ -1,7 +1,8 @@
-package org.acme.test_generateModel_kjararchetype;
+package org.kie.kproject;
 
 import java.math.BigDecimal;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
@@ -10,10 +11,12 @@ import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
+import org.kie.dmn.core.api.DMNFactory;
 
-import static org.acme.test_generateModel_kjararchetype.Utils.b;
-import static org.acme.test_generateModel_kjararchetype.Utils.entry;
-import static org.acme.test_generateModel_kjararchetype.Utils.mapOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.kie.kproject.Utils.b;
+import static org.kie.kproject.Utils.entry;
+import static org.kie.kproject.Utils.mapOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.number.BigDecimalCloseTo.closeTo;
 import static org.junit.Assert.*;
@@ -39,6 +42,24 @@ public class DMNTest {
                                                
         DMNResult dmnResult = dmnRuntime.evaluateAll(dmnModel, dmnContext);
         assertResult(dmnResult);
+    }
+
+    @Test
+    public void testSolutionCase1() {
+        DMNRuntime runtime = DMNRuntimeUtil.createRuntime("org/kie/example/0020-vacation-days.dmn", this.getClass());
+        DMNModel dmnModel = runtime.getModel("https://www.drools.org/kie-dmn", "0020-vacation-days");
+        assertThat(dmnModel, notNullValue());
+
+        DMNContext context = DMNFactory.newContext();
+
+        context.set("Age", 16);
+        context.set("Years of Service", 1);
+
+        DMNResult dmnResult = runtime.evaluateAll(dmnModel, context);
+
+        DMNContext result = dmnResult.getContext();
+
+        assertThat(result.get("Total Vacation Days"), CoreMatchers.is(BigDecimal.valueOf(27)));
     }
 
     public static void assertResult(DMNResult dmnResult) {

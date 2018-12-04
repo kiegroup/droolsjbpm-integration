@@ -1,4 +1,4 @@
-package org.acme.test_generateModel_kjararchetype;
+package org.kie.kproject;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
