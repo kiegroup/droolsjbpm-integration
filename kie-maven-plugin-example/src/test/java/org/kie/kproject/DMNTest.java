@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.javaparser.ast.CompilationUnit;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
@@ -32,6 +31,8 @@ public class DMNTest {
 
     @Test
     public void testBasic() {
+        List<CompilationUnit> generatedClasses = new ArrayList<>();
+        CompilerBytecodeLoader.generateClassListener = generatedClasses::add;
         KieServices kieServices = KieServices.Factory.get();
 
         KieContainer kieContainer = kieServices.getKieClasspathContainer();
@@ -46,13 +47,16 @@ public class DMNTest {
         dmnContext.set("Account holder", mapOf(entry("age", b(36)),
                                                entry("employed", true)));
         dmnContext.set("Account balance", 10000);
-                                               
+
         DMNResult dmnResult = dmnRuntime.evaluateAll(dmnModel, dmnContext);
         assertResult(dmnResult);
+        assertThat(generatedClasses, is(empty()));
     }
 
     @Test
     public void testSolutionCase1() {
+        List<CompilationUnit> generatedClasses = new ArrayList<>();
+        CompilerBytecodeLoader.generateClassListener = generatedClasses::add;
         DMNRuntime runtime = DMNRuntimeUtil.createRuntime("org/kie/example/0020-vacation-days.dmn", this.getClass());
         DMNModel dmnModel = runtime.getModel("https://www.drools.org/kie-dmn", "0020-vacation-days");
         assertThat(dmnModel, notNullValue());
@@ -66,7 +70,8 @@ public class DMNTest {
 
         DMNContext result = dmnResult.getContext();
 
-        assertThat(result.get("Total Vacation Days"), CoreMatchers.is(BigDecimal.valueOf(27)));
+        assertThat(result.get("Total Vacation Days"), is(BigDecimal.valueOf(27)));
+        assertThat(generatedClasses, is(empty()));
     }
 
     @Test
@@ -74,36 +79,38 @@ public class DMNTest {
         List<CompilationUnit> generatedClasses = new ArrayList<>();
         CompilerBytecodeLoader.generateClassListener = generatedClasses::add;
 
-        final DMNRuntime runtime = DMNRuntimeUtil.createRuntime( "decisiontable-default-value.dmn", this.getClass() );
+        final DMNRuntime runtime = DMNRuntimeUtil.createRuntime("decisiontable-default-value.dmn", this.getClass());
         final MockEventListener listener = new MockEventListener();
-        runtime.addListener( listener );
+        runtime.addListener(listener);
 
-        final DMNModel dmnModel = runtime.getModel( "https://github.com/kiegroup/kie-dmn", "decisiontable-default-value" );
-        assertThat( dmnModel, notNullValue() );
-        assertThat(dmnModel.getMessages().toString(), dmnModel.hasErrors(), CoreMatchers.is(false ) );
+        final DMNModel dmnModel = runtime.getModel("https://github.com/kiegroup/kie-dmn", "decisiontable-default-value");
+        assertThat(dmnModel, notNullValue());
+        assertThat(dmnModel.getMessages().toString(), dmnModel.hasErrors(), is(false));
 
         final DMNContext context = DMNFactory.newContext();
-        context.set( "Age", new BigDecimal( 16 ) );
-        context.set( "RiskCategory", "Medium" );
-        context.set( "isAffordable", true );
+        context.set("Age", new BigDecimal(16));
+        context.set("RiskCategory", "Medium");
+        context.set("isAffordable", true);
 
-        final DMNResult dmnResult = runtime.evaluateAll( dmnModel, context );
-        assertThat(dmnResult.getMessages().toString(), dmnResult.hasErrors(), CoreMatchers.is(false ) );
+        final DMNResult dmnResult = runtime.evaluateAll(dmnModel, context);
+        assertThat(dmnResult.getMessages().toString(), dmnResult.hasErrors(), is(false));
 
         final DMNContext result = dmnResult.getContext();
-        assertThat(result.get( "Approval Status" ), CoreMatchers.is("Declined" ) );
+        assertThat(result.get("Approval Status"), is("Declined"));
 
-        assertThat(listener.getMatches(), CoreMatchers.is(empty()));
-        assertThat(listener.getSelected(), CoreMatchers.is(empty()));
-        assertThat(generatedClasses, CoreMatchers.is(empty()));
+        assertThat(listener.getMatches(), is(empty()));
+        assertThat(listener.getSelected(), is(empty()));
+        assertThat(generatedClasses, is(empty()));
     }
 
     @Test
     public void testDMNv1_2_ch11Modified() {
+        List<CompilationUnit> generatedClasses = new ArrayList<>();
+        CompilerBytecodeLoader.generateClassListener = generatedClasses::add;
         final DMNRuntime runtime = DMNRuntimeUtil.createRuntime("v1_2/ch11MODIFIED.dmn", this.getClass());
         final DMNModel dmnModel = runtime.getModel("http://www.trisotech.com/definitions/_3068644b-d2c7-4b81-ab9d-64f011f81f47", "DMN Specification Chapter 11 Example");
         assertThat(dmnModel, notNullValue());
-        assertThat(DMNRuntimeUtil.formatMessages(dmnModel.getMessages()), dmnModel.hasErrors(), CoreMatchers.is(false));
+        assertThat(DMNRuntimeUtil.formatMessages(dmnModel.getMessages()), dmnModel.hasErrors(), is(false));
 
         final DMNContext context = DMNFactory.newContext();
         context.set("Applicant data", mapOf(entry("Age", new BigDecimal(51)),
@@ -121,13 +128,13 @@ public class DMNTest {
                                                entry("Amount", new BigDecimal(100_000))));
         context.set("Supporting documents", null);
         final DMNResult dmnResult = runtime.evaluateAll(dmnModel, context);
-        assertThat(DMNRuntimeUtil.formatMessages(dmnResult.getMessages()), dmnResult.hasErrors(), CoreMatchers.is(false));
+        assertThat(DMNRuntimeUtil.formatMessages(dmnResult.getMessages()), dmnResult.hasErrors(), is(false));
 
         final DMNContext result = dmnResult.getContext();
-        assertThat(result.get("Strategy"), CoreMatchers.is("THROUGH"));
-        assertThat(result.get("Routing"), CoreMatchers.is("ACCEPT"));
+        assertThat(result.get("Strategy"), is("THROUGH"));
+        assertThat(result.get("Routing"), is("ACCEPT"));
+        assertThat(generatedClasses, is(empty()));
     }
-
 
     public static void assertResult(DMNResult dmnResult) {
         System.out.println(dmnResult);
