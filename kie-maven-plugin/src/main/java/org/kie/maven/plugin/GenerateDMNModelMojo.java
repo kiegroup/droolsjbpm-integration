@@ -102,20 +102,9 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             KnowledgeBuilder knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
             for (String dmnFile : dmnFiles) {
-
                 compileDMNFile(kieModule, assemblerService, knowledgeBuilder, dmnFile);
-
-                final Path dmnCompiledClassFile = Paths.get(targetDirectory.getPath(), "classes", DMNRuleClassFile.RULE_CLASS_FILE_NAME);
-
-                try {
-                    if (!Files.exists(dmnCompiledClassFile)) {
-                        Files.createDirectories(dmnCompiledClassFile.getParent());
-                    }
-                    Files.write(dmnCompiledClassFile, compiledClassNames);
-                } catch (IOException e) {
-                    throw new RuntimeException("Unable to write file", e);
-                }
             }
+            createDMNFile(compiledClassNames);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -123,6 +112,19 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
         }
 
         getLog().info("DMN Model successfully generated");
+    }
+
+    private void createDMNFile(List<String> compiledClassNames) {
+        final Path dmnCompiledClassFile = Paths.get(targetDirectory.getPath(), "classes", DMNRuleClassFile.RULE_CLASS_FILE_NAME);
+
+        try {
+            if (!Files.exists(dmnCompiledClassFile)) {
+                Files.createDirectories(dmnCompiledClassFile.getParent());
+            }
+            Files.write(dmnCompiledClassFile, compiledClassNames);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to write file", e);
+        }
     }
 
     private List<String> getDMNFIles(InternalKieModule kieModule) {
