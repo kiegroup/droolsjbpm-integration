@@ -12,4 +12,7 @@
     <kbase name="dmnTestDefault" packages="org.kie.kproject">
         <ksession name="dmnTest.dmnTestDefault" type="stateful" />
     </kbase>
+  <kbase name="dmnTestv12" packages="org.kie.kproject.v1_2">
+        <ksession name="dmnTest.dmnTestv12" type="stateful" />
+    </kbase>
 </kmodule>

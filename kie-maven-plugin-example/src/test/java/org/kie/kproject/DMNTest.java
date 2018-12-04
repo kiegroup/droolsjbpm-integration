@@ -98,6 +98,36 @@ public class DMNTest {
         assertThat(generatedClasses, CoreMatchers.is(empty()));
     }
 
+    @Test
+    public void testDMNv1_2_ch11Modified() {
+        final DMNRuntime runtime = DMNRuntimeUtil.createRuntime("v1_2/ch11MODIFIED.dmn", this.getClass());
+        final DMNModel dmnModel = runtime.getModel("http://www.trisotech.com/definitions/_3068644b-d2c7-4b81-ab9d-64f011f81f47", "DMN Specification Chapter 11 Example");
+        assertThat(dmnModel, notNullValue());
+        assertThat(DMNRuntimeUtil.formatMessages(dmnModel.getMessages()), dmnModel.hasErrors(), CoreMatchers.is(false));
+
+        final DMNContext context = DMNFactory.newContext();
+        context.set("Applicant data", mapOf(entry("Age", new BigDecimal(51)),
+                                            entry("MaritalStatus", "M"),
+                                            entry("EmploymentStatus", "EMPLOYED"),
+                                            entry("ExistingCustomer", false),
+                                            entry("Monthly", mapOf(entry("Income", new BigDecimal(100_000)),
+                                                                   entry("Repayments", new BigDecimal(2_500)),
+                                                                   entry("Expenses", new BigDecimal(10_000)))))); // DMN v1.2 spec page 181, first image: errata corrige values for Income and Expenses are likely inverted, corrected here.
+        context.set("Bureau data", mapOf(entry("Bankrupt", false),
+                                         entry("CreditScore", new BigDecimal(600))));
+        context.set("Requested product", mapOf(entry("ProductType", "STANDARD LOAN"),
+                                               entry("Rate", new BigDecimal(0.08)),
+                                               entry("Term", new BigDecimal(36)),
+                                               entry("Amount", new BigDecimal(100_000))));
+        context.set("Supporting documents", null);
+        final DMNResult dmnResult = runtime.evaluateAll(dmnModel, context);
+        assertThat(DMNRuntimeUtil.formatMessages(dmnResult.getMessages()), dmnResult.hasErrors(), CoreMatchers.is(false));
+
+        final DMNContext result = dmnResult.getContext();
+        assertThat(result.get("Strategy"), CoreMatchers.is("THROUGH"));
+        assertThat(result.get("Routing"), CoreMatchers.is("ACCEPT"));
+    }
+
 
     public static void assertResult(DMNResult dmnResult) {
         System.out.println(dmnResult);
