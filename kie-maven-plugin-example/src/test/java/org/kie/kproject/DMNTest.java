@@ -12,11 +12,12 @@ import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.core.api.DMNFactory;
+import org.kie.kproject.util.DMNRuntimeUtil;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.kie.kproject.Utils.b;
-import static org.kie.kproject.Utils.entry;
-import static org.kie.kproject.Utils.mapOf;
+import static org.kie.kproject.util.Utils.b;
+import static org.kie.kproject.util.Utils.entry;
+import static org.kie.kproject.util.Utils.mapOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.number.BigDecimalCloseTo.closeTo;
 import static org.junit.Assert.*;

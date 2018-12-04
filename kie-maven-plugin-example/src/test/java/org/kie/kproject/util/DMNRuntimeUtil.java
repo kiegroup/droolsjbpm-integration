@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.kproject;
+package org.kie.kproject.util;
 
 import java.util.ArrayList;
 import java.util.List;

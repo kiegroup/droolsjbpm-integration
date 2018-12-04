@@ -1,4 +1,4 @@
-package org.kie.kproject;
+package org.kie.kproject.util;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
