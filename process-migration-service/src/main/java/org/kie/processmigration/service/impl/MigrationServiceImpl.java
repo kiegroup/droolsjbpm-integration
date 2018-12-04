@@ -267,6 +267,9 @@ public class MigrationServiceImpl implements MigrationService {
 
     private List<Long> getInstancesToMigrate(Migration migration) throws InvalidKieServerException, PlanNotFoundException {
         List<Long> instanceIds = migration.getDefinition().getProcessInstanceIds();
+        if (migration.getReports() == null || migration.getReports().isEmpty()) {
+            return instanceIds;
+        }
         Plan plan = planService.get(migration.getDefinition().getPlanId());
         if (instanceIds == null || instanceIds.isEmpty()) {
             boolean allFetched = false;
@@ -280,9 +283,6 @@ public class MigrationServiceImpl implements MigrationService {
                     allFetched = true;
                 }
             }
-        }
-        if (migration.getReports() == null || migration.getReports().isEmpty()) {
-            return instanceIds;
         }
         List<Long> migratedInstances = migration.getReports().stream().map(r -> r.getProcessInstanceId()).collect(Collectors.toList());
         return instanceIds.stream().filter(id -> !migratedInstances.contains(id)).collect(Collectors.toList());

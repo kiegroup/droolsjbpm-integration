@@ -52,7 +52,7 @@ public class RecoveryService {
         logger.info("Resuming ongoing migrations ...");
         TypedQuery<Migration> query = em.createNamedQuery("Migration.findByStatus", Migration.class);
         query.setParameter("statuses", PENDING_STATUSES);
-        query.getResultList().stream().forEach(m -> {
+        query.getResultList().forEach(m -> {
             try {
                 migrationService.migrate(m);
             } catch (InvalidMigrationException e) {
