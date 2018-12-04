@@ -152,7 +152,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             Files.createDirectories(newFile.getParent());
             Path newFilePath = Files.createFile(newFile);
             Files.write(newFilePath, sourceContent.getBytes());
-            getLog().info("Generating new DMN Invoker file" + newFilePath);
+            getLog().info("Generating new DMN file" + newFilePath);
         } catch (IOException e) {
             throw new RuntimeException("Unable to write file", e);
         }
