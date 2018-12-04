@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.jbpm.simulation;
 
@@ -22,7 +22,6 @@ import java.util.List;
 import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.fluent.impl.BaseBatchFluent;
 import org.drools.core.fluent.impl.PseudoClockRunner;
-import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.process.core.validation.ProcessValidatorRegistry;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
@@ -43,47 +42,46 @@ import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.builder.ExecutableBuilder;
-import org.kie.api.runtime.builder.KieSessionFluent;
 import org.kie.api.runtime.conf.ClockTypeOption;
+import org.kie.internal.builder.fluent.ExecutableBuilder;
+import org.kie.internal.builder.fluent.KieSessionFluent;
 import org.kie.internal.io.ResourceFactory;
 
 public class SimulationRunner {
-    
+
     static {
         ProcessValidatorRegistry.getInstance().registerAdditonalValidator(new SimulationProcessValidator());
     }
 
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, String... rules) {
-        
-        
+
         return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, false, rules);
     }
-    
+
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, boolean runRules, String... rules) {
-        
+
         Resource[] resources = new Resource[rules.length];
         for (int i = 0; i < rules.length; i++) {
             resources[i] = ResourceFactory.newClassPathResource(rules[i]);
         }
-        
+
         return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, runRules, resources);
     }
-    
+
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, boolean runRules, Resource... rules) {
 
         SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(bpmn2Container), new WorkingMemorySimulationRepository(runRules, rules));
         SimulationDataProvider provider = context.getDataProvider();
-        
+
         PathFinder finder = PathFinderFactory.getInstance(bpmn2Container);
-        
+
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter(provider));
-        
+
         // TODO when introduced configurable start time that should be used instead of currentTimeMillis
         context.getRepository().setSimulationInfo(new SimulationInfo(System.currentTimeMillis(), processId, numberOfAllInstances, interval));
-        
+
         final ReleaseId releaseId = createKJarWithMultipleResources(processId,
-                new String[]{bpmn2Container}, new ResourceType[]{ResourceType.BPMN2});
+                                                                    new String[]{bpmn2Container}, new ResourceType[]{ResourceType.BPMN2});
 
         PseudoClockRunner runner = new PseudoClockRunner();
         ExecutableBuilder f = ExecutableBuilder.create();
@@ -119,23 +117,23 @@ public class SimulationRunner {
 
                 for (int i = 0; i < instancesOfPath; i++) {
                     KieSessionFluent sessionFluent = f.after(pathStartTimes.get(i))
-                        .getKieContainer(releaseId)
+                            .getKieContainer(releaseId)
                             .newSession();
 
-                        ((BaseBatchFluent) sessionFluent).addCommand(new SimulateProcessPathCommand(processId, context, path));
+                    ((BaseBatchFluent) sessionFluent).addCommand(new SimulateProcessPathCommand(processId, context, path));
 //                        ((BaseBatchFluent) sessionFluent).addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));
-                        ((BaseBatchFluent) sessionFluent).addCommand(new DisposeCommand());
+                    ((BaseBatchFluent) sessionFluent).addCommand(new DisposeCommand());
                 }
             } else {
                 KieSessionFluent sessionFluent = f.after(interval)
-                .getKieContainer(releaseId)
-                .newSession();
+                        .getKieContainer(releaseId)
+                        .newSession();
                 ((BaseBatchFluent) sessionFluent).addCommand(new SimulateProcessPathCommand(processId, context, path));
 //                ((BaseBatchFluent) sessionFluent).addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));
                 ((BaseBatchFluent) sessionFluent).addCommand(new DisposeCommand());
                 break;
             }
-            
+
             counter++;
 // currently standalone paths within single definition are not supported
 //            if (probability == 1) {
@@ -146,12 +144,12 @@ public class SimulationRunner {
         }
         runner.execute(f.getExecutable());
         // @formatter:on
-        
+
         context.getRepository().getSimulationInfo().setEndTime(context.getMaxEndTime());
 
         return context.getRepository();
     }
-    
+
     protected static ReleaseId createKJarWithMultipleResources(String id, String[] resources, ResourceType[] types) {
         KieServices ks = KieServices.Factory.get();
         KieModuleModel kproj = ks.newKieModuleModel();
@@ -163,7 +161,7 @@ public class SimulationRunner {
             String type = types[i].getDefaultExtension();
 
             kfs.write("src/main/resources/" + id.replaceAll("\\.", "/")
-                    + "/org/test/res" + i + ".bpsim." + type, res);
+                              + "/org/test/res" + i + ".bpsim." + type, res);
         }
 
         KieBaseModel kBase1 = kproj.newKieBaseModel(id)
@@ -180,7 +178,7 @@ public class SimulationRunner {
         kfs.writeKModuleXML(kproj.toXML());
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
-        if(!kieBuilder.getResults().getMessages().isEmpty()) {
+        if (!kieBuilder.getResults().getMessages().isEmpty()) {
             for (Message msg : kieBuilder.getResults().getMessages()) {
                 System.out.println("[ERROR]" + msg.getText());
             }
