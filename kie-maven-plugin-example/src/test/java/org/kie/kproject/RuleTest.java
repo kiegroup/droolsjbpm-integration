@@ -13,11 +13,12 @@
  * limitations under the License.
 */
 
-package org.acme.test_generateModel_kjararchetype;
+package org.kie.kproject;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.acme.test_generateModel_kjararchetype.Measurement;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
