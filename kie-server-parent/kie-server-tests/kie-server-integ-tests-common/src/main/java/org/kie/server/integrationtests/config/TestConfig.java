@@ -195,6 +195,15 @@ public class TestConfig {
     }
 
     /**
+     * Reset all allocated ports so they can be dynamically reallocated again, to avoid BindException: Address already in use (Bind failed).
+     */
+    public static void resetAllocatedPorts() {
+        ALLOCATED_PORT = null;
+        CONTROLLER_ALLOCATED_PORT = null;
+        ROUTER_ALLOCATED_PORT = null;
+    }
+
+    /**
      * Get allocated port of embedded REST server.
      *
      * @return HTTP port number.

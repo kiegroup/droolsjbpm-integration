@@ -113,6 +113,7 @@ public abstract class KieServerBaseIntegrationTest {
             System.clearProperty(Context.INITIAL_CONTEXT_FACTORY);
         }
         router.stopKieRouter();
+        TestConfig.resetAllocatedPorts();
     }
 
     protected static void disposeAllContainers() {
