@@ -32,7 +32,6 @@ import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
 @ApplicationPath("/")
 public class StandaloneControllerApplication extends Application {
 
-    private static final Boolean SWAGGER_DISABLED = Boolean.parseBoolean(System.getProperty(KieServerControllerConstants.KIE_CONTROLLER_SWAGGER_DISABLED, "false"));
 
     private final Set<Object> instances;
     
@@ -43,7 +42,7 @@ public class StandaloneControllerApplication extends Application {
                 add(new StandaloneKieServerControllerImpl());
                 add(new StandaloneSpecManagementServiceImpl());
                 add(new StandaloneRuntimeManagementServiceImpl());
-                if(SWAGGER_DISABLED == false) {
+                if(SwaggerAPIScanner.SWAGGER_DISABLED == false) {
                     add(new SwaggerSerializers());
                     add(new KieSwaggerApiListingResource());
                 }

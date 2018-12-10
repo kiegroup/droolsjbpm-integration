@@ -16,26 +16,28 @@
 
 package org.kie.server.gateway;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import javax.ws.rs.core.Configuration;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.kie.server.api.marshalling.json.JSONMarshaller;
-import org.kie.server.common.rest.Authenticator;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ContainerSpecKey;
 import org.kie.server.controller.api.model.spec.ContainerSpecList;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
+import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.server.controller.client.KieServerControllerClientFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KieControllerGateway {
 
-    private final ResteasyClient client;
+    private static final Logger LOGGER = LoggerFactory.getLogger(KieControllerGateway.class);
+    private final KieServerControllerClient client;
     private final String targetUrl;
-    private final JSONMarshaller jsonMarshaller;
 
     public KieControllerGateway(String protocol, String hostname, Integer port, String username, String password, Integer connectionTimeout, Integer socketTimeout, String contextPath, String controllerPath) {
 
@@ -46,173 +48,69 @@ public class KieControllerGateway {
             .append(controllerPath)
             .toString();
 
-        client = new ResteasyClientBuilder()
-            .connectionPoolSize(1)
-            .establishConnectionTimeout(connectionTimeout, TimeUnit.SECONDS)
-            .socketTimeout(socketTimeout, TimeUnit.SECONDS)
-            .register(new Authenticator(username, password))
-            .register(new ErrorResponseFilter())
-            .build();
+        final Configuration configuration =
+                new ResteasyClientBuilder()
+                        .connectionPoolSize(1)
+                        .establishConnectionTimeout(connectionTimeout,
+                                                    TimeUnit.SECONDS)
+                        .socketTimeout(socketTimeout,
+                                       TimeUnit.SECONDS)
+                        .getConfiguration();
 
-
-        // using kie marshaller
-        jsonMarshaller = new JSONMarshaller(null, Thread.currentThread().getContextClassLoader());
-
+        client = KieServerControllerClientFactory.newRestClient(targetUrl,
+                                                                username,
+                                                                password,
+                                                                MarshallingFormat.JSON,
+                                                                configuration);
     }
 
     public ServerTemplateList getServerTemplateList() {
-
-        String response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .request(MediaType.APPLICATION_JSON)
-                .get(String.class);
-
-        return jsonMarshaller.unmarshall(response, ServerTemplateList.class);
+        return client.listServerTemplates();
 
     }
 
     public ServerTemplate getServerTemplate(String templateId) {
-
-        String response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(templateId)
-                .request(MediaType.APPLICATION_JSON)
-                .get(String.class);
-
-        return jsonMarshaller.unmarshall(response, ServerTemplate.class);
-
+        return client.getServerTemplate(templateId);
     }
 
     public void createServerTemplate(ServerTemplate serverTemplate) {
-
-        String payload = jsonMarshaller.marshall(serverTemplate);
-
-        Response response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(serverTemplate.getId())
-                .request(MediaType.APPLICATION_JSON)
-                .put(Entity.json(payload));
-
-        response.close();
-
+        client.saveServerTemplate(serverTemplate);
     }
 
     public void deleteServerTemplate(String templateId) {
-
-        Response response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(templateId)
-                .request(MediaType.APPLICATION_JSON)
-                .delete();
-
-        response.close();
-
+        client.deleteServerTemplate(templateId);
     }
 
     public ContainerSpecList getContainers(String templateId) {
-
-        String response = client.target(targetUrl)
-            .path("management")
-            .path("servers")
-            .path(templateId)
-            .path("containers")
-            .request(MediaType.APPLICATION_JSON)
-            .get(String.class);
-
-        return jsonMarshaller.unmarshall(response, ContainerSpecList.class);
-
+        return client.listContainerSpec(templateId);
     }
 
     public ContainerSpec getContainer(String templateId, String containerId) {
-
-        String response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(templateId)
-                .path("containers")
-                .path(containerId)
-                .request(MediaType.APPLICATION_JSON)
-                .get(String.class);
-
-        return jsonMarshaller.unmarshall(response, ContainerSpec.class);
-
+        return client.getContainerInfo(templateId, containerId);
     }
 
-    public void createContainer(String templateId, String containerId, ContainerSpec containerSpec) {
-
-        String payload = jsonMarshaller.marshall(containerSpec);
-
-        Response response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(templateId)
-                .path("containers")
-                .path(containerId)
-                .request(MediaType.APPLICATION_JSON)
-                .put(Entity.json(payload));
-
-        response.close();
-
+    public void createContainer(String templateId, ContainerSpec containerSpec) {
+        client.saveContainerSpec(templateId, containerSpec);
     }
 
     public void disposeContainer(String templateId, String containerId) {
-
-        Response response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(templateId)
-                .path("containers")
-                .path(containerId)
-                .request(MediaType.APPLICATION_JSON)
-                .delete();
-
-        response.close();
-
+        client.deleteContainerSpec(templateId, containerId);
     }
 
     public void startContainer(String templateId, String containerId) {
-
-        Response response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(templateId)
-                .path("containers")
-                .path(containerId)
-                .path("status")
-                .path("started")
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(null, MediaType.APPLICATION_JSON));
-
-        response.close();
-
+        client.startContainer(new ContainerSpecKey(containerId, containerId, new ServerTemplateKey(templateId, templateId)));
     }
 
     public void stopContainer(String templateId, String containerId) {
-
-        Response response = client.target(targetUrl)
-                .path("management")
-                .path("servers")
-                .path(templateId)
-                .path("containers")
-                .path(containerId)
-                .path("status")
-                .path("stopped")
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(null, MediaType.APPLICATION_JSON));
-
-        response.close();
-
+        client.stopContainer(new ContainerSpecKey(containerId, containerId, new ServerTemplateKey(templateId, templateId)));
     }
 
     public void close() {
-
-        client.close();
-        jsonMarshaller.dispose();
-
+        try {
+            client.close();
+        } catch (IOException ex){
+            LOGGER.warn("Failed to close Kie Server Controller Client due to: " + ex.getMessage(), ex);
+        }
     }
 
 }

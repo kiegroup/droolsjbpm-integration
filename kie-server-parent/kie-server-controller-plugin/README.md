@@ -28,7 +28,7 @@ On pom.xml of local project add plugin:
     <plugin>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-controller-plugin</artifactId>
-        <version>7.5.0-SNAPSHOT</version>
+        <version>${version.org.kie}</version>
         <configuration>
           <controllerUsername>${controller.username}</controllerUsername>
           <controllerPassword>${controller.password}</controllerPassword>
