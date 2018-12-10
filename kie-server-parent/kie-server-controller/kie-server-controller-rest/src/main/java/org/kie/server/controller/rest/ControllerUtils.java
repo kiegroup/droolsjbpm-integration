@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
 
 import org.kie.server.common.KeyStoreHelperUtil;
@@ -89,6 +90,11 @@ public class ControllerUtils {
         return responseBuilder.build();
     }
 
+    public static Response createCreatedVariant(String responseObj, HttpHeaders headers, UriBuilder builder) {
+        Variant v = getVariant(headers);
+
+        return Response.created(builder.build()).entity(responseObj).variant(v).build();
+    }
 
     public static Variant getVariant(HttpHeaders headers) {
         Variant v = RestEasy960Util.getVariant(headers);

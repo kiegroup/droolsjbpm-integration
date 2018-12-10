@@ -18,18 +18,8 @@ package org.kie.server.controller.common;
 
 import javax.ws.rs.Path;
 
-import io.swagger.annotations.Info;
-import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.jaxrs.listing.ApiListingResource;
 
-@SwaggerDefinition(
-        info = @Info(
-                version = "7.0",
-                title = "Controller API"
-        ),
-        consumes = {"application/json", "application/xml"},
-        produces = {"application/json", "application/xml"}
-)
 @Path("/swagger.{type:json|yaml}")
 public class KieSwaggerApiListingResource extends ApiListingResource {
 

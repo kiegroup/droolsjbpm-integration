@@ -70,17 +70,11 @@ public abstract class KieControllerMojo extends AbstractMojo {
         kieControllerGateway = new KieControllerGateway(protocol, hostname, port, controllerUsername, controllerPassword, connectionTimeout, socketTimeout, contextPath, controllerPath);
 
         try {
-
             executeCommand();
-
         } catch (ProcessingException pe) {
-
             throw new MojoFailureException(pe.getMessage(), pe);
-
         } finally {
-
             kieControllerGateway.close();
-
         }
 
     }

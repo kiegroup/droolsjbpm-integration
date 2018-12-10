@@ -20,6 +20,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import io.swagger.annotations.*;
 import org.kie.server.controller.api.KieServerControllerException;
@@ -41,7 +43,7 @@ public class RestSpecManagementServiceImpl {
 
     private SpecManagementServiceImpl specManagementService;
 
-    @ApiOperation(value = "Creates a KIE container in a specified KIE Server template. You set the KIE container configurations in the request body", code = 201)
+    @ApiOperation(value = "Creates a KIE container in a specified KIE Server template", notes = "You set the KIE container configurations in the request body", code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "KIE container successfully deployed"),
             @ApiResponse(code = 404, message = "KIE Server template not found"),
@@ -59,7 +61,8 @@ public class RestSpecManagementServiceImpl {
                                                     @Example(value = {
                                                           @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
                                                           @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
-                                      })) String containerSpecPayload) {
+                                      })) String containerSpecPayload,
+                                      @Context UriInfo uriInfo) {
 
         String contentType = getContentType(headers);
         try {
@@ -69,7 +72,7 @@ public class RestSpecManagementServiceImpl {
 
             specManagementService.saveContainerSpec(serverTemplateId, containerSpec);
             logger.debug("Returning response for save container spec request for server template with id '{}': CREATED", serverTemplateId);
-            return createCorrectVariant("", headers, Response.Status.CREATED);
+            return createCreatedVariant("", headers, uriInfo.getAbsolutePathBuilder());
         } catch (KieServerControllerIllegalArgumentException e) {
             return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
         } catch (KieServerControllerException e){
@@ -136,7 +139,8 @@ public class RestSpecManagementServiceImpl {
                                        @Example(value = {
                                                @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_JSON),
                                                @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_XML)
-                                       })) String serverTemplatePayload) {
+                                       })) String serverTemplatePayload,
+                                       @Context UriInfo uriInfo) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received save server template with id {}", serverTemplateId);
@@ -148,7 +152,8 @@ public class RestSpecManagementServiceImpl {
 
             specManagementService.saveServerTemplate(serverTemplate);
             logger.debug("Returning response for save server template with id '{}': CREATED", serverTemplateId);
-            return createCorrectVariant("", headers, Response.Status.CREATED);
+            UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+            return createCreatedVariant("", headers, builder);
         } catch (KieServerControllerException e){
             return createCorrectVariant(REQUEST_FAILED_TOBE_PROCESSED + e.getMessage(), headers, Response.Status.BAD_REQUEST);
         } catch (Exception e) {
