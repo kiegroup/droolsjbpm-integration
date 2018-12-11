@@ -25,10 +25,6 @@ thorntail:
                 usersProperties: application-users.properties
                 rolesProperties: application-roles.properties
 kieservers:
-  - host: localhost
-    port: 18080
-    protocol: http
-    contextRoot: /kie-server
-    path: /services/rest/server
+  - host: http://localhost:18080/kie-server/services/rest/server
     username: yoda
     password: usetheforce123@

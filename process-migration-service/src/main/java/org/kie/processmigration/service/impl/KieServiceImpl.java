@@ -45,10 +45,6 @@ import org.wildfly.swarm.spi.api.config.ConfigView;
 public class KieServiceImpl implements KieService {
 
     private static final String HOST = "host";
-    private static final String PORT = "port";
-    private static final String PROTOCOL = "protocol";
-    private static final String CONTEXT_ROOT = "contextRoot";
-    private static final String PATH = "path";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
 
@@ -96,10 +92,6 @@ public class KieServiceImpl implements KieService {
     private void loadConfig(Map<String, String> config) {
         KieServerConfig kieConfig = new KieServerConfig();
         kieConfig.setHost(config.get(HOST));
-        kieConfig.setPort(Integer.valueOf(config.get(PORT)));
-        kieConfig.setContextRoot(config.get(CONTEXT_ROOT));
-        kieConfig.setProtocol(config.get(PROTOCOL));
-        kieConfig.setPath(config.get(PATH));
         CredentialsProvider credentialsProvider = new EnteredCredentialsProvider(config.get(USERNAME), config.get(PASSWORD));
         kieConfig.setCredentialsProvider(credentialsProvider);
         try {
@@ -114,7 +106,7 @@ public class KieServiceImpl implements KieService {
     }
 
     private KieServicesClient createKieServicesClient(KieServerConfig config) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(config.getUrl(), config.getCredentialsProvider());
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(config.getHost(), config.getCredentialsProvider());
         configuration.setTimeout(60000);
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
         return KieServicesFactory.newKieServicesClient(configuration);

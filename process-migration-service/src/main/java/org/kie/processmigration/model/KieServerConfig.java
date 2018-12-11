@@ -24,10 +24,6 @@ public class KieServerConfig {
 
     private String id;
     private String host;
-    private Integer port;
-    private String contextRoot;
-    private String path;
-    private String protocol;
     @JsonIgnore
     private CredentialsProvider credentialsProvider;
 
@@ -47,38 +43,6 @@ public class KieServerConfig {
         this.host = host;
     }
 
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
-    public String getContextRoot() {
-        return contextRoot;
-    }
-
-    public void setContextRoot(String contextRoot) {
-        this.contextRoot = contextRoot;
-    }
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public CredentialsProvider getCredentialsProvider() {
         return credentialsProvider;
     }
@@ -87,22 +51,10 @@ public class KieServerConfig {
         this.credentialsProvider = credentialsProvider;
     }
 
-    public String getUrl() {
-        return new StringBuilder(protocol)
-                                          .append("://")
-                                          .append(host)
-                                          .append(":")
-                                          .append(port)
-                                          .append(contextRoot)
-                                          .append(path)
-                                          .toString();
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("KieServerConfig [id=").append(id).append(", host=").append(host).append(", port=").append(port).append(", contextRoot=")
-               .append(contextRoot).append(", path=").append(path).append(", protocol=").append(protocol).append("]");
+        builder.append("KieServerConfig [id=").append(id).append(", host=").append(host).append("]");
         return builder.toString();
     }
 

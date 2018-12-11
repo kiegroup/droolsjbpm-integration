@@ -9,7 +9,6 @@
         <class>org.kie.processmigration.model.Plan</class>
         <class>org.kie.processmigration.model.Migration</class>
         <class>org.kie.processmigration.model.MigrationReport</class>
-        <class>org.kie.processmigration.model.Credentials</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
              <!-- Configuring JDBC properties -->

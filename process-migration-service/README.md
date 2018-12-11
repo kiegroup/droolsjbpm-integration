@@ -118,18 +118,10 @@ The right way to configure the connection to one or more KIE Servers in order to
 
 ```
 kieservers:
-  - host: kieserver1.example.com
-    port: 8080
-    protocol: http
-    contextRoot: /kie-server
-    path: /services/rest/server
+  - host: http://kieserver1.example.com:8080/kie-server/services/rest/server
     username: joe
     password: secret
-  - host: kieserver2.example.com
-    port: 8080
-    protocol: http
-    contextRoot: /kie-server
-    path: /services/rest/server
+  - host: http://kieserver2.example.com:8080/kie-server/services/rest/server
     username: jim
     password: secret
 ```
@@ -148,3 +140,195 @@ thorntail:
 ```
 
 _Refer to the [Thorntail Datasource](https://docs.thorntail.io/2.2.1.Final/#creating-a-datasource_thorntail) configuration for further details_
+
+# Usage
+
+## Define the plan (without node mappings)
+
+Request:
+
+```
+URL: http://localhost:8180/plans
+Method: POST
+HTTP Headers:
+  Content-Type: application/json
+  Authorization: Basic a2VybWl0OnRoZWZyb2c=
+Body:
+{
+    "name": "Test plan",
+    "description": "Evaluation Process Test Plan",
+    "sourceContainerId": "evaluation_1.0",
+    "targetProcessId": "evaluation",
+    "targetContainerId": "evaluation_1.1"
+}
+```
+
+Response:
+
+```
+Status: 200 OK
+HTTP Headers:
+  Content-Type: application/json
+Body:
+{
+    "id": 1,
+    "name": "Test plan",
+    "description": "Evaluation Process Test Plan",
+    "sourceContainerId": "evaluation_1.0",
+    "targetProcessId": "evaluation",
+    "targetContainerId": "evaluation_1.1"
+}
+```
+
+## Deploy some processes to test the migration
+
+1. Start a KIE Server
+1. Deploy two versions of the evaluation project (evaluation_1.0 and evaluation_1.1)
+1. Start one instance of the evaluation process (evaluation_1.0)
+
+## Create a sync migration
+
+```
+URL: http://localhost:8180/migrations
+Method: POST
+HTTP Headers:
+  Content-Type: application/json
+  Authorization: Basic a2VybWl0OnRoZWZyb2c=
+Body:
+{
+    "planId": 1,
+    "processInstanceIds": [1],
+    "kieserverId": "sample-server",
+    "execution": {
+   	 "type": "SYNC"
+    }
+}
+```
+
+Response:
+
+```
+Status: 200 OK
+HTTP Headers:
+  Content-Type: application/json
+Body:
+{
+    "id": 1,
+    "definition": {
+        "planId": 1,
+        "processInstanceIds": [1],
+        "kieserverId": "sample-server",
+        "requester": "kermit",
+        "execution": {
+            "type": "SYNC"
+        }
+    },
+    "createdAt": "2018-11-29T13:47:07.839Z",
+    "startedAt": "2018-11-29T13:47:07.839Z",
+    "finishedAt": "2018-11-29T13:47:07.874Z",
+    "status": "COMPLETED"
+}
+```
+
+As it is a Synchronous migration, the result of the migration will be returned once it has finished.
+
+## Check the migration output
+
+The following request will fetch the overall result of the migration
+
+Request: 
+
+```
+URL: http://localhost:8180/migrations/1
+Method: GET
+HTTP Headers:
+  Content-Type: application/json
+  Authorization: Basic a2VybWl0OnRoZWZyb2c=
+```
+
+Response:
+
+```
+Status: 200 OK
+HTTP Headers:
+  Content-Type: application/json
+Body:
+{
+    "id": 1,
+    "definition": {
+        "planId": 1,
+        "processInstanceIds": [],
+        "kieserverId": "sample-server",
+        "requester": "kermit",
+        "execution": {
+            "type": "SYNC"
+        }
+    },
+    "createdAt": "2018-11-27T14:28:58.918Z",
+    "startedAt": "2018-11-27T14:28:59.861Z",
+    "finishedAt": "2018-11-27T14:29:00.167Z",
+    "status": "COMPLETED"
+}
+```
+
+To retrieve the individual results of the migration of each process instance
+
+```
+URL: http://localhost:8180/migrations/1/results
+Method: GET
+HTTP Headers:
+  Content-Type: application/json
+  Authorization: Basic a2VybWl0OnRoZWZyb2c=
+```
+
+## Create an Async migration
+
+1. Start two more processes
+1. Trigger the migration of all the existing active processes
+
+Request:
+
+```
+URL: http://localhost:8180/migrations
+Method: POST
+HTTP Headers:
+  Content-Type: application/json
+  Authorization: Basic a2VybWl0OnRoZWZyb2c=
+Body:
+{
+    "planId": 1,
+    "processInstanceIds": [],
+    "kieserverId": "sample-server",
+    "execution": {
+   	 "type": "ASYNC",
+   	 "scheduledStartTime": "2018-12-11T12:35:00.000Z"
+    }
+}
+```
+
+Response:
+
+```
+Status: 202 Accepted
+HTTP Headers:
+  Content-Type: application/json
+Body:
+{
+    "id": 2,
+    "definition": {
+        "execution": {
+            "type": "ASYNC",
+            "scheduled_start_time": "2018-12-11T12:35:00.000Z"
+        },
+        "plan_id": 1,
+        "process_instance_ids": [],
+        "kieserver_id": "sample-server",
+    },
+    "status": "SCHEDULED",
+    "created_at": "2018-11-07T11:28:43.828Z",
+    "started_at": null,
+    "finished_at": null
+}
+```
+
+The migration status can be checked using the migrations api with the id returned as done before 
