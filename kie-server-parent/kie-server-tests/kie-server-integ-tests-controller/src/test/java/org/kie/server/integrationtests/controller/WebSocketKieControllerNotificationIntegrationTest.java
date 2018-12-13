@@ -143,48 +143,51 @@ public class WebSocketKieControllerNotificationIntegrationTest extends KieServer
         server = new KieServerExecutor();
         server.startKieServer();
 
-        // Check that kie server is registered in controller.
-        instanceList = controllerClient.listServerTemplates();
-        assertNotNull(instanceList);
-        assertEquals(1,
-                     instanceList.getServerTemplates().length);
+        try {
+            // Check that kie server is registered in controller.
+            instanceList = controllerClient.listServerTemplates();
+            assertNotNull(instanceList);
+            assertEquals(1,
+                         instanceList.getServerTemplates().length);
 
-        // Verify instance creation events
-        verify(eventHandler, timeout(2000L)).onServerTemplateUpdated(any());
-        verify(eventHandler, timeout(2000L)).onServerInstanceUpdated(any());
-        verify(eventHandler, timeout(2000L)).onServerInstanceConnected(any());
+            // Verify instance creation events
+            verify(eventHandler, timeout(2000L)).onServerTemplateUpdated(any());
+            verify(eventHandler, timeout(2000L)).onServerInstanceUpdated(any());
+            verify(eventHandler, timeout(2000L)).onServerInstanceConnected(any());
 
-        // Deploy container to Kie Server
-        ServerTemplate template = instanceList.getServerTemplates()[0];
-        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID,
-                                                        CONTAINER_NAME,
-                                                        template,
-                                                        releaseId,
-                                                        KieContainerStatus.STOPPED,
-                                                        Collections.emptyMap());
-        controllerClient.saveContainerSpec(template.getId(),
-                                           containerSpec);
+            // Deploy container to Kie Server
+            ServerTemplate template = instanceList.getServerTemplates()[0];
+            ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID,
+                                                            CONTAINER_NAME,
+                                                            template,
+                                                            releaseId,
+                                                            KieContainerStatus.STOPPED,
+                                                            Collections.emptyMap());
+            controllerClient.saveContainerSpec(template.getId(),
+                                               containerSpec);
 
-        // Verify create container event
-        verify(eventHandler, timeout(2000L).times(2)).onServerTemplateUpdated(any());
+            // Verify create container event
+            verify(eventHandler, timeout(2000L).times(2)).onServerTemplateUpdated(any());
 
-        controllerClient.startContainer(containerSpec);
+            controllerClient.startContainer(containerSpec);
 
-        // Verify start container event
-        verify(eventHandler, timeout(2000L)).onContainerSpecUpdated(any());
+            // Verify start container event
+            verify(eventHandler, timeout(2000L)).onContainerSpecUpdated(any());
 
-        controllerClient.stopContainer(containerSpec);
+            controllerClient.stopContainer(containerSpec);
 
-        // Verify stop container event
-        verify(eventHandler, timeout(2000L).times(2)).onContainerSpecUpdated(any());
+            // Verify stop container event
+            verify(eventHandler, timeout(2000L).times(2)).onContainerSpecUpdated(any());
 
-        controllerClient.deleteContainerSpec(template.getId(),
-                                             containerSpec.getId());
+            controllerClient.deleteContainerSpec(template.getId(),
+                                                 containerSpec.getId());
 
-        // Verify delete container
-        verify(eventHandler, timeout(2000L).times(3)).onServerTemplateUpdated(any());
+            // Verify delete container
+            verify(eventHandler, timeout(2000L).times(3)).onServerTemplateUpdated(any());
 
-        server.stopKieServer();
+        } finally {
+            server.stopKieServer();
+        }
 
         // Verify disconnect
         verify(eventHandler, timeout(2000L)).onServerInstanceDeleted(any());
