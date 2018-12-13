@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>kie-server-controller</artifactId>
+    <groupId>org.kie.server</groupId>
+    <version>7.18.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-server-controller-openshift</artifactId>
+  <name>KIE :: Execution Server :: Controller :: OpenShift</name>
+  <description>KIE Execution Server Controller OpenShift Adaptor</description>
+
+  <properties>
+    <java.module.name>org.kie.server.controller.openshift</java.module.name>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client-bom</artifactId>
+        <version>${version.kubernetes-client}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Override fabric8 dependencies specified from parent pom with newer version -->
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-model</artifactId>
+        <version>${version.kubernetes-client}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client</artifactId>
+        <version>${version.kubernetes-client}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>openshift-client</artifactId>
+        <version>${version.kubernetes-client}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <!-- kie server dependencies -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-impl</artifactId>
+      <classifier>tests</classifier>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-openshift</artifactId>
+    </dependency>
+    
+    <!-- log -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <!-- fabric8 kubernetes and openshift java client dependencies -->
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>kubernetes-model</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>kubernetes-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>openshift-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>kubernetes-server-mock</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.sun</groupId>
+          <artifactId>tools</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>openshift-server-mock</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
+          <systemPropertyVariables>
+            <org.kie.server.controller.openshift.prefer.kieserver.service>true</org.kie.server.controller.openshift.prefer.kieserver.service>
+          </systemPropertyVariables>
+          <environmentVariables>
+            <MYAPP2_KIESERVER_SERVICE_HOST>172.30.99.129</MYAPP2_KIESERVER_SERVICE_HOST>
+            <MYAPP2_KIESERVER_SERVICE_PORT>8080</MYAPP2_KIESERVER_SERVICE_PORT>
+            <MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_HOST>172.30.99.129</MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_HOST>
+            <MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_PORT>8080</MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_PORT>
+            <KUBERNETES_MASTER />
+            <KUBERNETES_API_VERSION />
+            <KUBERNETES_TRUST_CERTIFICATES />
+            <KUBERNETES_CERTS_CA_FILE />
+            <KUBERNETES_CERTS_CA_DATA />
+            <KUBERNETES_CERTS_CLIENT_FILE />
+            <KUBERNETES_CERTS_CLIENT_DATA />
+            <KUBERNETES_CERTS_CLIENT_KEY_FILE />
+            <KUBERNETES_CERTS_CLIENT_KEY_DATA />
+            <KUBERNETES_CERTS_CLIENT_KEY_ALGO />
+            <KUBERNETES_CERTS_CLIENT_KEY_PASSPHRASE />
+            <KUBERNETES_AUTH_BASIC_USERNAME />
+            <KUBERNETES_AUTH_BASIC_PASSWORD />
+            <KUBERNETES_AUTH_TRYKUBECONFIG />
+            <KUBERNETES_AUTH_TRYSERVICEACCOUNT />
+            <KUBERNETES_AUTH_TOKEN />
+            <KUBERNETES_WATCH_RECONNECTINTERVAL />
+            <KUBERNETES_WATCH_RECONNECTLIMIT />
+            <KUBERNETES_REQUEST_TIMEOUT />
+            <KUBERNETES_NAMESPACE />
+            <KUBERNETES_TLS_VERSIONS>TLSv1.2,TLSv1.1,TLSv1</KUBERNETES_TLS_VERSIONS>
+          </environmentVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
