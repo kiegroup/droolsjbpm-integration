@@ -919,7 +919,7 @@
                   <type>installed</type>
                   <home>${weblogic.home}/wlserver</home>
                   <systemProperties>
-                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WeblogicJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.tm>Weblogic</org.kie.server.persistence.tm>
                     <org.kie.server.domain>OracleDefaultLoginConfiguration</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
@@ -1039,7 +1039,7 @@
                   <home>${websphere.home}</home>
                   <timeout>240000</timeout>
                   <systemProperties>
-                    <org.kie.server.persistence.tm>org.hibernate.engine.transaction.jta.platform.internal.WebSphereJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.tm>WebSphere</org.kie.server.persistence.tm>
                     <org.kie.server.domain>WSLogin</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
