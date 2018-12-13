@@ -79,9 +79,12 @@ public class KieServerImpl implements KieServer {
     private static final ServiceLoader<KieServerExtension> serverExtensions = ServiceLoader.load(KieServerExtension.class);
 
     private static final ServiceLoader<KieServerController> kieControllers = ServiceLoader.load(KieServerController.class);
+
+    private static final ServiceLoader<KieServerStateRepository> serverStateRepos = ServiceLoader.load(KieServerStateRepository.class);
+    
     private KieServerRegistry context;
     private PolicyManager policyManager;
-    private final KieServerStateRepository repository;
+    private KieServerStateRepository repository;
     // TODO figure out how to get actual URL of the kie server
     private String kieServerLocation = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION, "http://localhost:8230/kie-server/services/rest/server");
     private volatile AtomicBoolean kieServerActive = new AtomicBoolean(false);
@@ -107,6 +110,18 @@ public class KieServerImpl implements KieServer {
     }
     
     public void init() {
+        StartupStrategy startupStrategy = StartupStrategyProvider.get().getStrategy();
+        logger.info("Selected startup strategy {}", startupStrategy);
+
+        for (KieServerStateRepository repo : serverStateRepos) {
+            if (repo.getClass().getSimpleName().equals(startupStrategy.getRepositoryType())) {
+                this.repository = repo;
+                break;
+            }
+        }
+
+        logger.info("Configured '{}' server state repository", this.repository.getClass().getSimpleName());
+        
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
         this.context.registerStateRepository(repository);
@@ -148,8 +163,6 @@ public class KieServerImpl implements KieServer {
 
         startTimestamp = System.currentTimeMillis();
         
-        StartupStrategy startupStrategy = StartupStrategyProvider.get().getStrategy();
-        logger.info("Selected startup strategy {}", startupStrategy);
         startupStrategy.startup(this, containerManager, currentState, kieServerActive);
         
         eventSupport.fireAfterServerStarted(this);

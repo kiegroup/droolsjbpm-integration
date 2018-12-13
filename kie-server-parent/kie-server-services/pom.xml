@@ -23,6 +23,7 @@
     <module>kie-server-services-case-mgmt</module>
     <module>kie-server-services-dmn</module>
     <module>kie-server-services-swagger</module>
+    <module>kie-server-services-openshift</module>
   </modules>
 
 </project>

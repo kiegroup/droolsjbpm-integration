@@ -18,6 +18,7 @@ package org.kie.server.services.api;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.services.impl.ContainerManager;
 import org.kie.server.services.impl.KieServerImpl;
@@ -30,5 +31,9 @@ public interface StartupStrategy {
     default Set<KieContainerResource> prepareContainers(Set<KieContainerResource> containers) {
         // be default do nothing
         return containers;
+    }
+    
+    default String getRepositoryType() {
+        return KieServerConstants.KIE_SERVER_STATE_REPO_TYPE_DEFAULT;
     }
 }

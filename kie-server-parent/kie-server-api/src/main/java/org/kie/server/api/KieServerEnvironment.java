@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -21,16 +21,17 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class KieServerEnvironment {
-    
+
     private static final Pattern VERSION_PAT = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)([\\.-].*)?");
     private static Version version;
-    private static String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);
-    private static String name = System.getProperty(KieServerConstants.KIE_SERVER_ID);
+    private static String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID, System.getenv("KIE_SERVER_ID"));
+    private static String name;
     private static String contextRoot;
 
     static {
+        name = serverId;
+
         String kieServerString = KieServerEnvironment.class.getPackage().getImplementationVersion();
         if (kieServerString == null) {
             InputStream is = null;
@@ -41,7 +42,7 @@ public class KieServerEnvironment {
                 kieServerString = properties.get("kie.server.version").toString();
 
                 is.close();
-            } catch ( IOException e ) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
                 if (is != null) {
@@ -55,14 +56,14 @@ public class KieServerEnvironment {
         }
 
         Matcher m = VERSION_PAT.matcher(kieServerString);
-        if( m.matches() ) {
+        if (m.matches()) {
             try {
-                version = new Version( Integer.parseInt(m.group(1)), 
-                        Integer.parseInt(m.group(2)), 
-                        Integer.parseInt(m.group(3)),
-                        m.group(4) );
+                version = new Version(Integer.parseInt(m.group(1)),
+                                      Integer.parseInt(m.group(2)),
+                                      Integer.parseInt(m.group(3)),
+                                      m.group(4));
             } catch (NumberFormatException e) {
-                version = new Version(0,0,0,null);
+                version = new Version(0, 0, 0, null);
             }
         }
 
@@ -82,7 +83,7 @@ public class KieServerEnvironment {
             System.setProperty(KieServerConstants.KIE_SERVER_ID, serverIdIn);
         }
     }
-    
+
     public static String getServerName() {
         return name;
     }
@@ -91,12 +92,12 @@ public class KieServerEnvironment {
         name = nameIn;
     }
 
-	public static String getContextRoot() {
-		return contextRoot;
-	}
+    public static String getContextRoot() {
+        return contextRoot;
+    }
 
-	public static void setContextRoot(String contextRootIn) {
-		contextRoot = contextRootIn;
-	}
-    
+    public static void setContextRoot(String contextRootIn) {
+        contextRoot = contextRootIn;
+    }
+
 }
