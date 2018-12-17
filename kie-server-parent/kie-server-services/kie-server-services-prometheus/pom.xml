@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.server</groupId>
+    <artifactId>kie-server-services</artifactId>
+    <version>7.16.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-server-services-prometheus</artifactId>
+
+  <name>KIE :: Execution Server :: Services :: Prometheus Extension</name>
+  <description>KIE Execution Server Prometheus Extension</description>
+
+  <properties>
+    <java.module.name>org.kie.server.services.prometheus</java.module.name>
+    <version.io.micrometer>1.0.7</version.io.micrometer>
+    <version.io.prometheus>0.5.0</version.io.prometheus>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-common</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- Collides with xml-apis:xml-apis -->
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+      <version>${version.io.micrometer}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient</artifactId>
+      <version>${version.io.prometheus}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_httpserver</artifactId>
+      <version>${version.io.prometheus}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <dependency>
+    	<groupId>junit</groupId>
+    	<artifactId>junit</artifactId>
+    	<scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>
