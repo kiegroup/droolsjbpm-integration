@@ -17,6 +17,7 @@
 package org.kie.processmigration.service.impl;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -260,16 +261,13 @@ public class MigrationServiceImpl implements MigrationService {
         if (!kieService.existsProcessDefinition(plan.getSourceContainerId(), plan.getTargetProcessId(), definition.getKieserverId())) {
             throw new ProcessNotFoundException(plan.getSourceContainerId());
         }
-        if (!kieService.existsProcessDefinition(plan.getTargetContainerId(), plan.getTargetProcessId(), definition.getKieserverId())) {
-            throw new ProcessNotFoundException(plan.getTargetContainerId());
-        }
     }
 
     private List<Long> getInstancesToMigrate(Migration migration) throws InvalidKieServerException, PlanNotFoundException {
         List<Long> instanceIds = migration.getDefinition().getProcessInstanceIds();
+        List<Long> migratedInstances = new ArrayList<>();
         if (migration.getReports() != null && !migration.getReports().isEmpty()) {
-            List<Long> migratedInstances = migration.getReports().stream().map(r -> r.getProcessInstanceId()).collect(Collectors.toList());
-            return instanceIds.stream().filter(id -> !migratedInstances.contains(id)).collect(Collectors.toList());
+            migration.getReports().stream().map(r -> r.getProcessInstanceId()).forEach(id -> migratedInstances.add(id));
         }
         Plan plan = planService.get(migration.getDefinition().getPlanId());
         if (instanceIds == null || instanceIds.isEmpty()) {
@@ -285,7 +283,7 @@ public class MigrationServiceImpl implements MigrationService {
                 }
             }
         }
-        return instanceIds;
+        return instanceIds.stream().filter(id -> !migratedInstances.contains(id)).collect(Collectors.toList());
     }
 
     private MigrationReportInstance buildReport(Long instanceId) {
