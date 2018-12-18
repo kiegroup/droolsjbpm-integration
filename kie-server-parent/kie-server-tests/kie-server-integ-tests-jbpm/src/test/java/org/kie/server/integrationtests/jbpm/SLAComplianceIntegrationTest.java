@@ -32,6 +32,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -41,6 +44,8 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
+
+    private static final KieServerConfigItem PPI_RUNTIME_STRATEGY = new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, RuntimeStrategy.PER_PROCESS_INSTANCE.name(), String.class.getName());
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
 
@@ -52,7 +57,7 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, PPI_RUNTIME_STRATEGY);
     }
 
     @Test
