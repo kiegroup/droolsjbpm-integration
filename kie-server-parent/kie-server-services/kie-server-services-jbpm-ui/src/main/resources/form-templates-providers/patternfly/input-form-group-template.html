@@ -46,7 +46,7 @@
 <div class="form-group">
 	<#if item.value != "">
 	<#assign x=item.value?split("####")>
-	Download file <a href="${serverPath}/documents/${x[3]}/content">${x[0]}</a><br/>
+	Download file <a href="${documentPath?replace("DOC_ID", x[3])}">${x[0]}</a><br/>
 	</#if>
 	<label for="${item.id}">${item.label}</label> 
 	<#if item.required>
