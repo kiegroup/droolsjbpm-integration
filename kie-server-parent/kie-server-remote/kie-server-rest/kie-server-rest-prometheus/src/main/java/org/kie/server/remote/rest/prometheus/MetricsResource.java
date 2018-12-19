@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //@Api(value = "")
-@Path("server/metrics")
+@Path("pippo")
 public class MetricsResource {
 
     public static final Logger LOG = LoggerFactory.getLogger(MetricsResource.class);
@@ -43,7 +43,7 @@ public class MetricsResource {
             response = ServiceResponse.class, code = 200)
     @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "")})
     @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response getModels() {
         Set<String> includedNames = new HashSet<>();
         Enumeration<Collector.MetricFamilySamples> mfs = registry.filteredMetricFamilySamples(includedNames);

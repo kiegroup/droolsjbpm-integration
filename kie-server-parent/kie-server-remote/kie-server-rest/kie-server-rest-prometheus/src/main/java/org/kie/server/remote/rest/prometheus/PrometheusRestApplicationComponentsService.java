@@ -30,6 +30,8 @@ public class PrometheusRestApplicationComponentsService implements KieServerAppl
 
     @Override
     public Collection<Object> getAppComponents(String extension, SupportedTransports type, Object... services) {
+
+        System.out.println("------------------------ PrometheusRestApplicationComponentsService getAppComponents");
         // skip calls from other than owning extension
         if (!OWNER_EXTENSION.equals(extension)) {
             return Collections.emptyList();
