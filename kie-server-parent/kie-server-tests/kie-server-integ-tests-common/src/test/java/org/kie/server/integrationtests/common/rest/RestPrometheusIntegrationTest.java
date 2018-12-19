@@ -15,9 +15,7 @@
 
 package org.kie.server.integrationtests.common.rest;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.ServiceLoader;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -60,8 +58,13 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
 
         Response response = null;
         try {
-            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/prometheus");
-            System.out.println("+++++++++++++++ PROMETHEUS TEST");
+            String uriString = TestConfig.getKieServerHttpUrl() + "/prometheus";
+            System.out.println("uriString = " + uriString);
+
+            uriString = "http://localhost:38319/kie-server-services/services/rest/prometheus";
+            System.out.println("uriString = " + uriString);
+
+            WebTarget clientRequest = newRequest(uriString);
             response = clientRequest.request().get();
 
             System.out.println(response);
