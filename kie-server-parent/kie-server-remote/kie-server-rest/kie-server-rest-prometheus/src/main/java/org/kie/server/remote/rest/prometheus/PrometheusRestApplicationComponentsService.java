@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.remote.rest.prometheus;
 
@@ -23,24 +23,22 @@ import java.util.List;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PrometheusRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
-	private static final String OWNER_EXTENSION = PrometheusKieServerExtension.EXTENSION_NAME;
+    private static final String OWNER_EXTENSION = PrometheusKieServerExtension.EXTENSION_NAME;
 
-	@Override
-	public Collection<Object> getAppComponents(String extension, SupportedTransports type, Object... services) {
-		// skip calls from other than owning extension
-		if (!OWNER_EXTENSION.equals(extension)) {
-			return Collections.emptyList();
-		}
-				
-		List<Object> components = new ArrayList<Object>(2);
-		components.add(new KieApiListingResource());
+    @Override
+    public Collection<Object> getAppComponents(String extension, SupportedTransports type, Object... services) {
+        // skip calls from other than owning extension
+        if (!OWNER_EXTENSION.equals(extension)) {
+            return Collections.emptyList();
+        }
 
-		return components;
-	}
+        List<Object> components = new ArrayList<>(1);
 
+        components.add(new MetricsResource());
+
+        return components;
+    }
 }
