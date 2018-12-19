@@ -76,6 +76,25 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
             WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/");
             response = clientRequest.request(getMediaType()).get();
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            System.out.println("response.getEntity() = " + response.getEntity());
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected exception on empty body", e);
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+
+    @Test
+    public void testOkResponse2() throws Exception {
+        Response response = null;
+        try {
+            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl());
+            response = clientRequest.request(getMediaType()).get();
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            System.out.println("response.getEntity() = " + response.getEntity());
         } catch (Exception e) {
             throw new RuntimeException("Unexpected exception on empty body", e);
         } finally {

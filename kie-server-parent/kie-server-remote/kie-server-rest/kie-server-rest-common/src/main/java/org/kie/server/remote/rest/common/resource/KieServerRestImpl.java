@@ -127,6 +127,28 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.listContainers(containerFilter), headers);
     }
 
+    @ApiOperation(value="Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status",
+            response=ServiceResponse.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
+    @GET
+    @Path("containers2")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response listContainers2(@Context HttpHeaders headers,
+            @ApiParam(value = "optional groupId to filter containers by", required = false) @QueryParam("groupId") String groupId,
+            @ApiParam(value = "optional artifactId to filter containers by", required = false) @QueryParam("artifactId") String artifactId,
+            @ApiParam(value = "optional version to filter containers by", required = false) @QueryParam("version") String version,
+            @ApiParam(value = "optional status to filter containers by", required = false) @QueryParam("status") String status) {
+        ReleaseIdFilter releaseIdFilter = new ReleaseIdFilter.Builder()
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .build();
+
+        KieContainerStatusFilter statusFilter = KieContainerStatusFilter.parseFromNullableString(status);
+        KieContainerResourceFilter containerFilter = new KieContainerResourceFilter(releaseIdFilter, statusFilter);
+        return createCorrectVariant(server.listContainers(containerFilter), headers);
+    }
+
     @ApiOperation(value="Creates (deploys) new KIE container to this server",
             response=ServiceResponse.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 400, message = "container could not be created") })
