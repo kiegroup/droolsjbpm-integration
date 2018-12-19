@@ -15,9 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -25,12 +22,12 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.ObjectModel;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorImpl;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
@@ -38,6 +35,9 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Severity;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class ContainerFailureRecoveryIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
