@@ -17,10 +17,10 @@ package org.kie.spring.jbpm;
 
 import java.util.Arrays;
 import java.util.Collection;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.persistence.api.TransactionManagerFactory;
-import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.runtime.manager.impl.migration.MigrationException;
 import org.jbpm.runtime.manager.impl.migration.MigrationManager;
@@ -35,8 +35,11 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.InternalRuntimeManager;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorImpl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class KieSpringProcessInstanceMigrationServiceImplTest extends AbstractJbpmSpringParameterizedTest {

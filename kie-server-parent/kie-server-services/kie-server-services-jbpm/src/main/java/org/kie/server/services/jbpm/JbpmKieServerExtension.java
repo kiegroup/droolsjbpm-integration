@@ -63,7 +63,7 @@ import org.jbpm.kie.services.impl.admin.UserTaskAdminServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.kie.services.impl.query.QueryServiceImpl;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
-import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManager;
+import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManagerUtil;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorMerger;
 import org.jbpm.runtime.manager.impl.identity.UserDataServiceProvider;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
@@ -97,6 +97,7 @@ import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorManager;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
@@ -689,7 +690,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     protected DeploymentDescriptor getDeploymentDescriptor(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
         DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
         if (descriptor == null) {
-            List<DeploymentDescriptor> descriptorHierarchy = deploymentDescriptorManager.getDeploymentDescriptorHierarchy(kieContainer);
+            List<DeploymentDescriptor> descriptorHierarchy = DeploymentDescriptorManagerUtil.getDeploymentDescriptorHierarchy(deploymentDescriptorManager, kieContainer);
             descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
         }
         return descriptor;
