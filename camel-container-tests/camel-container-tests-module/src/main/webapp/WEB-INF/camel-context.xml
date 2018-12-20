@@ -15,6 +15,7 @@
   <bean id="batchExecutionHelperProvider" class="org.drools.core.runtime.help.impl.BatchExecutionHelperProviderImpl" />
   <bean id="xstreamBean" factory-bean="batchExecutionHelperProvider" factory-method="newJSonMarshaller" />
   <bean id="listProcessInstancesProcessor" class="org.kie.camel.container.module.ListProcessInstancesProcessor"/>
+  <bean id="executionServerCommandProcessor" class="org.kie.camel.container.module.ExecutionServerCommandProcessor"/>
 
   <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
   <kie:kmodule id="test-kmodule">
@@ -39,12 +40,8 @@
           <to uri="direct:runCommand"/>
         </when>
         <when>
-          <simple>${header.operationName} == 'esListContainers'</simple>
-          <to uri="direct:esListContainer"/>
-        </when>
-        <when>
-          <simple>${header.operationName} == 'esCreateContainer'</simple>
-          <to uri="direct:esCreateContainer"/>
+          <simple>${header.operationName} == 'runOnExecServer'</simple>
+          <to uri="direct:runOnExecServer"/>
         </when>
       </choice>
     </route>
@@ -83,38 +80,13 @@
       <to uri="bean:xstreamBean?method=toXML(Object)"/>
     </route>
 
-    <route id="esListContainer">
-      <from uri="direct:esListContainer"/>
-      <setHeader headerName="CamelKieClient">
-        <constant>kieServices</constant>
-      </setHeader>
-      <setHeader headerName="CamelKieOperation">
-        <constant>listContainers</constant>
-      </setHeader>
-      <to uri="direct:es"/>
-    </route>
-    <route id="esCreateContainer">
-      <from uri="direct:esCreateContainer"/>
-      <setHeader headerName="CamelKieClient">
-        <constant>kieServices</constant>
-      </setHeader>
-      <setHeader headerName="CamelKieOperation">
-        <constant>createContainer</constant>
-      </setHeader>
-      <setHeader headerName="CamelKieBodyParam">
-        <constant>resource</constant>
-      </setHeader>
-      <setHeader headerName="CamelKieId">
-        <simple>${body.get(0)}</simple>
-      </setHeader>
-      <transform>
-        <simple>${body.get(1)}</simple>
-      </transform>
-      <to uri="direct:es"/>
-    </route>
-    <route id="esRoute">
-      <from uri="direct:es"/>
+    <route id="execServerRoute">
+      <from uri="direct:runOnExecServer"/>
+      <convertBodyTo type="java.lang.String"/>
+      <to uri="bean:xstreamBean?method=fromXML(String)"/>
+      <to uri="bean:executionServerCommandProcessor"/>
       <to uri="kie:http://yoda:test@localhost:8080/kie-server-services/services/rest/server"/>
+      <to uri="bean:xstreamBean?method=toXML(Object)"/>
     </route>
   </camelContext>
 </beans>
