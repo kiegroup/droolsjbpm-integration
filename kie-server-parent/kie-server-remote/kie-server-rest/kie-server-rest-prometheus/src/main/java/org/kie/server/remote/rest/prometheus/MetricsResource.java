@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.services.prometheus.PrometheusKieServerExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +33,7 @@ public class MetricsResource {
     private CollectorRegistry registry;
 
     public MetricsResource() {
-        this.registry = CollectorRegistry.defaultRegistry;
-    }
-
-    public MetricsResource(CollectorRegistry registry) {
-        this.registry = registry;
+        this.registry = PrometheusKieServerExtension.registry;
     }
 
     @ApiOperation(value = "Retrieve prometheus metrics",
@@ -45,8 +42,10 @@ public class MetricsResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getModels() {
-        Set<String> includedNames = new HashSet<>();
-        Enumeration<Collector.MetricFamilySamples> mfs = registry.filteredMetricFamilySamples(includedNames);
+
+        LOG.info("Collecton Registry test: " + registry.hashCode());
+
+        Enumeration<Collector.MetricFamilySamples> mfs = registry.metricFamilySamples();
 
         StreamingOutput stream = os -> {
             Writer writer = new BufferedWriter(new OutputStreamWriter(os));

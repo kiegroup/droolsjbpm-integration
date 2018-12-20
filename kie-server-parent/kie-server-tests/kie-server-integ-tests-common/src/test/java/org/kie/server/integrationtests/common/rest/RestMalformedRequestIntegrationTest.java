@@ -19,6 +19,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
@@ -28,6 +29,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 @Category(RESTOnly.class)
+@Ignore
 public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @Test

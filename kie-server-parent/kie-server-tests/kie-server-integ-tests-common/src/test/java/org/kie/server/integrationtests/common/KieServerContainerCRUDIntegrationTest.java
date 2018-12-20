@@ -19,6 +19,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
@@ -35,6 +36,7 @@ import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegra
 import java.util.List;
 import java.util.Set;
 
+@Ignore
 public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
