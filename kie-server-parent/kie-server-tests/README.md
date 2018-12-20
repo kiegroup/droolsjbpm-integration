@@ -1,7 +1,7 @@
 Kie server integration tests
 =====================
 
-**This test suite tests the Kie server deployed on various containers like WildFly 10, EAP 7, Tomcat 8,
+**This test suite tests the Kie server deployed on various containers like WildFly 14, EAP 7, Tomcat 8,
 Oracle WebLogic 12 and IBM WebSphere 9, using Maven Cargo plugin.** Tests cover mainly functionality of Kie server clients, Kie server controller and Kie server router, also contain several REST tests.
 
 Every extension has own dedicated test module. kie-server-integ-tests-all contains tests covering usage of several extensions in one test.
