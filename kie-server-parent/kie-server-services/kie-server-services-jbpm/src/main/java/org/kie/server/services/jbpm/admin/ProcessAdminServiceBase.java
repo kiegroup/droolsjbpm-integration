@@ -301,6 +301,7 @@ public class ProcessAdminServiceBase {
                 .processInstanceId(timerInstance.getProcessInstanceId())
                 .repeatLimit(timerInstance.getRepeatLimit())
                 .sessionId(timerInstance.getSessionId())
+                .id(timerInstance.getId())
                 .timerId(timerInstance.getTimerId())
                 .timerName(timerInstance.getTimerName())
                 .build();
