@@ -263,6 +263,7 @@
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.kie.swagger.server.ext.disabled>true</org.kie.swagger.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>true</org.kie.prometheus.server.ext.disabled>
             </systemPropertyVariables>
           </configuration>
         </plugin>

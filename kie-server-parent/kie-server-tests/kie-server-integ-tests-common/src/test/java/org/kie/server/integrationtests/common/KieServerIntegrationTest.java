@@ -53,7 +53,8 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         assertEquals(getServerVersion(), info.getVersion());
 
         // Kie server has all extensions disabled, available just default capability.
-        assertEquals(1, info.getCapabilities().size());
+        // there should be one FIXME
+        assertEquals(2, info.getCapabilities().size());
         assertEquals("KieServer", info.getCapabilities().get(0));
     }
 

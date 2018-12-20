@@ -32,7 +32,7 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     @Override
     public boolean isActive() {
-        return disabled == false;
+        return !disabled;
     }
 
     @Override

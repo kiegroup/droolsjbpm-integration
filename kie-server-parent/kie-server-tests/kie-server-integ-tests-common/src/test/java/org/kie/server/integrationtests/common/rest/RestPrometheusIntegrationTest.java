@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.category.RESTOnly;
@@ -50,6 +51,7 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @Test
     public void testPrometheusEndpoint() {
+        System.setProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "false");
         KieContainerResource resource = new KieContainerResource("container", RELEASE_ID_1);
 
         Response response = null;
