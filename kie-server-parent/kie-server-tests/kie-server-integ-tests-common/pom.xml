@@ -87,13 +87,11 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-prometheus</artifactId>
-      <version>7.16.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-prometheus</artifactId>
-      <version>7.16.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
