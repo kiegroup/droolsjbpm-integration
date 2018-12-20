@@ -11,12 +11,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.integrationtests.common.rest;
 
-import java.util.Collection;
-import java.util.ServiceLoader;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
@@ -28,9 +26,6 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.category.RESTOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
-import org.kie.server.services.api.KieServerApplicationComponentsService;
-import org.kie.server.services.api.SupportedTransports;
-import org.kie.server.services.prometheus.PrometheusKieServerExtension;
 
 @Category(RESTOnly.class)
 public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -45,7 +40,7 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
         } catch (Exception e) {
             throw new RuntimeException("Unexpected exception on empty body", e);
         } finally {
-            if(response != null) {
+            if (response != null) {
                 response.close();
             }
         }
@@ -55,38 +50,14 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @Test
     public void testPrometheusEndpoint() {
-
-        ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
-                = ServiceLoader.load(KieServerApplicationComponentsService.class);
-
-        for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
-
-            Collection<Object> appComponents = appComponentsService.getAppComponents(
-                    PrometheusKieServerExtension.EXTENSION_NAME,
-                    SupportedTransports.REST);
-
-            for(Object c : appComponents) {
-                System.out.println("c = " + c);
-            }
-        }
-
-
-
-        KieContainerResource resource = new KieContainerResource("container",RELEASE_ID_1);
+        KieContainerResource resource = new KieContainerResource("container", RELEASE_ID_1);
 
         Response response = null;
         try {
-            String uriString = TestConfig.getKieServerHttpUrl() + "/prometheus";
-            System.out.println("uriString = " + uriString);
-
-            uriString = uriString.replaceAll("/server", "");
-            System.out.println("uriString = " + uriString);
-
+            String uriString = TestConfig.getKieServerHttpUrl().replaceAll("/server", "") + "/prometheus";
+            logger.info("testPrometheusEndpoint using uri:" + uriString);
             WebTarget clientRequest = newRequest(uriString);
             response = clientRequest.request().get();
-
-            System.out.println(response);
-
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
 //            System.out.println("waiting for requests");
@@ -96,10 +67,9 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
                     e);
         } finally {
-            if(response != null) {
+            if (response != null) {
                 response.close();
             }
         }
     }
-
 }
