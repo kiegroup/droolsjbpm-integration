@@ -42,7 +42,7 @@ public class PatternflyFormRenderer extends AbstractFormRenderer {
         loadTemplate(CASE_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/patternfly/case-layout-template.html"));
         loadTemplate(TABLE_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/patternfly/table-template.html"));
         
-        logger.info("PatternFly Form renderer templates loaded successfully.");
+        logger.info(getName() + " Form renderer templates loaded successfully.");
     }
 
     @Override

@@ -1,2 +1,3 @@
 org.kie.server.services.jbpm.ui.form.render.BootstrapFormRenderer
 org.kie.server.services.jbpm.ui.form.render.PatternflyFormRenderer
+org.kie.server.services.jbpm.ui.form.render.WorkbenchFormRenderer
