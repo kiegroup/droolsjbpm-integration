@@ -218,13 +218,52 @@ public class RenderFormServiceIntegrationTest extends KieServerBaseIntegrationTe
     }
     
     @Test
+    public void testRenderProcessFormViaUIClientWorkbenchRendererTest() throws Exception {
+        String result = uiServicesClient.renderProcessForm(CONTAINER_ID, HIRING_PROCESS_ID, UIServicesClient.WORKBENCH_FORM_RENDERER);
+        logger.debug("Form content is '{}'", result);
+        assertThat(result).isNotNull().isNotEmpty();
+        
+        // it has the patternfly (default renderer) css
+        assertThat(result).contains("/files/patternfly/css/patternfly.min.css\" rel=\"stylesheet\">");
+        assertThat(result).contains("/files/patternfly/css/patternfly-additions.min.css\" rel=\"stylesheet\">");
+        
+        // it has required js files
+        assertThat(result).contains("/files/patternfly/js/jquery.min.js\"></script>");
+        assertThat(result).contains("/files/patternfly/js/patternfly.min.js\"></script>");
+        assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                
+        // it has the form header
+        assertThat(result).contains("<h3 class=\"panel-title\">hiring-taskform.frm</h3>");
+        
+        // it has single input field
+        assertThat(result).contains("<input name=\"name\" type=\"text\" class=\"form-control\" id=\"field_2225717094101704E12\" placeholder=\"\" value=\"\" pattern=\"\"  >");
+        
+        // it has start process button
+        assertThat(result).contains("<button type=\"button\" class=\"btn btn-primary\" onclick=\"startProcess(this);\">Submit</button>");
+        
+        // it has the endpoint suffix method
+        assertThat(result).contains("function endpointSuffix() {");
+        assertThat(result).contains("return 'templateid=");        
+    }
+    
+    @Test
     public void testRenderProcessFormViaUIClientNoFrmFoundTest() throws Exception {
         
-        assertClientException(
-                () -> uiServicesClient.renderProcessForm(CONTAINER_ID, USERTASK_PROCESS_ID),
-                404,
-                "Form for process " + USERTASK_PROCESS_ID + " not found with supported suffix -taskform.frm",
-                "Form for process " + USERTASK_PROCESS_ID + " not found with supported suffix -taskform.frm");
+        String result = uiServicesClient.renderProcessForm(CONTAINER_ID, USERTASK_PROCESS_ID);
+        logger.debug("Form content is '{}'", result);
+        assertThat(result).isNotNull().isNotEmpty();
+        
+        // it has the patternfly (default renderer) css
+        assertThat(result).contains("/files/patternfly/css/patternfly.min.css\" rel=\"stylesheet\">");
+        assertThat(result).contains("/files/patternfly/css/patternfly-additions.min.css\" rel=\"stylesheet\">");
+        
+        // it has required js files
+        assertThat(result).contains("/files/patternfly/js/jquery.min.js\"></script>");
+        assertThat(result).contains("/files/patternfly/js/patternfly.min.js\"></script>");
+        assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                
+        // it has the form header
+        assertThat(result).contains("<h3 class=\"panel-title\">Default form - usertask</h3>");                  
     }
   
     @Test
@@ -353,6 +392,74 @@ public class RenderFormServiceIntegrationTest extends KieServerBaseIntegrationTe
     }
     
     @Test
+    public void testRenderTaskFormViaUIClientTestWorkbench() throws Exception {
+        changeUser(USER_JOHN);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", "john");
+        parameters.put("age", 33);
+        parameters.put("mail", "john@doe.org");
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID, parameters);
+        try {
+            
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertThat(tasks).isNotNull().hasSize(1);
+
+            Long taskId = tasks.get(0).getId();
+            parameters.put("out_age", 33);
+            parameters.put("out_mail", "john@doe.org");
+            taskClient.completeAutoProgress(CONTAINER_ID, taskId, USER_JOHN, parameters);
+
+            tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertThat(tasks).isNotNull().hasSize(1);
+
+            taskId = tasks.get(0).getId();
+            taskClient.completeAutoProgress(CONTAINER_ID, taskId, USER_JOHN, parameters);
+
+            tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertThat(tasks).isNotNull().hasSize(1);
+
+            taskId = tasks.get(0).getId();
+
+            String result = uiServicesClient.renderTaskForm(CONTAINER_ID, taskId, UIServicesClient.WORKBENCH_FORM_RENDERER);
+            logger.debug("Form content is '{}'", result);
+            assertThat(result).isNotNull().isNotEmpty();
+            
+            // it has the patternfly (default renderer) css
+            assertThat(result).contains("/files/patternfly/css/patternfly.min.css\" rel=\"stylesheet\">");
+            assertThat(result).contains("/files/patternfly/css/patternfly-additions.min.css\" rel=\"stylesheet\">");
+            
+            // it has required js files
+            assertThat(result).contains("/files/patternfly/js/jquery.min.js\"></script>");
+            assertThat(result).contains("/files/patternfly/js/patternfly.min.js\"></script>");
+            assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                    
+            // it has the form header
+            assertThat(result).contains("<h3 class=\"panel-title\">CreateProposal-taskform.frm</h3>");
+               
+            // it has three input fields
+            assertThat(result).contains("<input name=\"offering\" type=\"text\" class=\"form-control\" id=\"field_3367047850452004E12\" placeholder=\"\" value=\"\" pattern=\"^\\d+$\"  >");
+            assertThat(result).contains("<input name=\"tech_score\" type=\"text\" class=\"form-control\" id=\"field_4298972052332983E11\" placeholder=\"\" value=\"\" pattern=\"^\\d+$\"  >");
+            assertThat(result).contains("<input name=\"hr_score\" type=\"text\" class=\"form-control\" id=\"field_800259544288992E11\" placeholder=\"\" value=\"\" pattern=\"^\\d+$\"  >");
+            
+            // it has life cycle buttons process button
+            assertThat(result).contains("<button id=\"claimButton\" type=\"button\" class=\"btn btn-default\" onclick=\"claimTask();\">Claim</button>");
+            assertThat(result).contains("<button id=\"releaseButton\" type=\"button\" class=\"btn btn-default\" onclick=\"releaseTask();\">Release</button>");
+            assertThat(result).contains("<button id=\"startButton\" type=\"button\" class=\"btn btn-default\" onclick=\"startTask();\">Start</button>");
+            assertThat(result).contains("<button id=\"stopButton\" type=\"button\" class=\"btn btn-default\" onclick=\"stopTask();\">Stop</button>");
+            assertThat(result).contains("<button id=\"saveButton\" type=\"button\" class=\"btn btn-default\" onclick=\"saveTask();\">Save</button>");
+            assertThat(result).contains("<button id=\"completeButton\" type=\"button\" class=\"btn btn-primary\" onclick=\"completeTask();\">Complete</button>");
+            
+
+            // it has the endpoint suffix method
+            assertThat(result).contains("function endpointSuffix() {");
+            assertThat(result).contains("return 'templateid=");  
+        } finally {
+            changeUser(USER_YODA);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    @Test
     public void testRenderTaskFormViaUIClientNoFrmFoundTest() throws Exception {
         changeUser(USER_JOHN);
         Map<String, Object> parameters = new HashMap<>();
@@ -366,11 +473,21 @@ public class RenderFormServiceIntegrationTest extends KieServerBaseIntegrationTe
             assertThat(tasks).isNotNull().hasSize(1);
 
             Long taskId = tasks.get(0).getId();          
-            assertClientException(
-                () -> uiServicesClient.renderTaskForm(CONTAINER_ID, taskId),
-                404,
-                "Form for task " + taskId + " not found with supported suffix -taskform.frm",
-                "Form for task " + taskId + " not found with supported suffix -taskform.frm");
+            String result = uiServicesClient.renderTaskForm(CONTAINER_ID, taskId);
+            logger.debug("Form content is '{}'", result);
+            assertThat(result).isNotNull().isNotEmpty();
+            
+            // it has the patternfly (default renderer) css
+            assertThat(result).contains("/files/patternfly/css/patternfly.min.css\" rel=\"stylesheet\">");
+            assertThat(result).contains("/files/patternfly/css/patternfly-additions.min.css\" rel=\"stylesheet\">");
+            
+            // it has required js files
+            assertThat(result).contains("/files/patternfly/js/jquery.min.js\"></script>");
+            assertThat(result).contains("/files/patternfly/js/patternfly.min.js\"></script>");
+            assertThat(result).contains("/files/js/kieserver-ui.js\"></script>");
+                    
+            // it has the form header
+            assertThat(result).contains("<h3 class=\"panel-title\">Default form - HR Interview</h3>");                
         
         } finally {
             changeUser(USER_YODA);

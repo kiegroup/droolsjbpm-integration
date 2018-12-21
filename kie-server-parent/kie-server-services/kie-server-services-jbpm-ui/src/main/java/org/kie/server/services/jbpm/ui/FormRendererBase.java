@@ -17,10 +17,13 @@
 package org.kie.server.services.jbpm.ui;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ServiceLoader;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -41,7 +44,13 @@ import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.kie.server.services.jbpm.ui.form.render.FormReader;
 import org.kie.server.services.jbpm.ui.form.render.FormRenderer;
+import org.kie.server.services.jbpm.ui.form.render.model.FormField;
 import org.kie.server.services.jbpm.ui.form.render.model.FormInstance;
+import org.kie.server.services.jbpm.ui.form.render.model.FormLayout;
+import org.kie.server.services.jbpm.ui.form.render.model.FormModel;
+import org.kie.server.services.jbpm.ui.form.render.model.LayoutColumn;
+import org.kie.server.services.jbpm.ui.form.render.model.LayoutItem;
+import org.kie.server.services.jbpm.ui.form.render.model.LayoutRow;
 
 public class FormRendererBase {
     
@@ -112,12 +121,16 @@ public class FormRendererBase {
             throw new ProcessDefinitionNotFoundException("Process definition " + resolvedContainerId + " : " + processId + " not found");
         }
         
-        String formStructure = formManagerService.getFormByKey(resolvedContainerId, processId + SUPPORTED_FORM_SUFFIX);
-        if (formStructure == null) {
-            throw new IllegalArgumentException("Form for process " + processId + " not found with supported suffix " + SUPPORTED_FORM_SUFFIX);
-        }
+        String formStructure = formManagerService.getFormByKey(resolvedContainerId, processId + SUPPORTED_FORM_SUFFIX);   
         
         FormInstance form = formReader.readFromString(formStructure);
+        
+        if (form == null) {
+            // generate default form as there is none existing
+            
+            form = generateDefaultProcessForm(processDesc);
+        }
+        
         form.setNestedFormsLookup(formId -> {
             Map<String, String> forms = indexedForms.get(resolvedContainerId);
             String formStructureNested = forms.get(formId);
@@ -142,11 +155,14 @@ public class FormRendererBase {
         String name = getTaskFormName(task);
 
         String formStructure = formManagerService.getFormByKey(resolvedContainerId, name);
-        if (formStructure == null) {
-            throw new IllegalArgumentException("Form for task " + taskId + " not found with supported suffix " + SUPPORTED_FORM_SUFFIX);
-        }
 
         FormInstance form = formReader.readFromString(formStructure);
+        if (form == null) {
+            // generate default form as there is none existing
+            Map<String, String> inputs = definitionService.getTaskInputMappings(resolvedContainerId, task.getTaskData().getProcessId(), task.getName());
+            Map<String, String> outputs = definitionService.getTaskOutputMappings(resolvedContainerId, task.getTaskData().getProcessId(), task.getName());
+            form = generateDefaultTaskForm(task, inputs, outputs);
+        }
         form.setNestedFormsLookup(formId -> {
             Map<String, String> forms = indexedForms.get(resolvedContainerId);
             String formStructureNested = forms.get(formId);
@@ -215,5 +231,133 @@ public class FormRendererBase {
             }
         }
         return null;
+    }
+    
+    protected FormInstance generateDefaultProcessForm(ProcessDefinition processDesc) {
+        FormInstance form = new FormInstance();
+        form.setId(UUID.randomUUID().toString());
+        form.setName("Default form - " + processDesc.getName());
+        
+        form.setModel(new FormModel());
+        
+        form.setFields(new ArrayList<>());
+        
+        FormLayout layout = new FormLayout();
+        layout.setRows(new ArrayList<>());
+        form.setLayout(layout);
+        
+        Map<String, String> variables = processDesc.getProcessVariables();
+        
+        if (variables != null) {
+            
+            for (Entry<String, String> entry : variables.entrySet()) {
+            
+                FormField field = new FormField();
+                field.setId(UUID.randomUUID().toString());
+                field.setBinding(entry.getKey());
+                field.setCode(entry.getValue().contains("Boolean")?"CheckBox" :"TextBox");
+                field.setLabel(entry.getKey());
+                field.setName(entry.getKey());
+                field.setType(entry.getValue());
+                
+                form.getFields().add(field);
+                
+                LayoutRow row = new LayoutRow();
+                layout.getRows().add(row);
+                row.setColumns(new ArrayList<>());
+                
+                LayoutColumn column = new LayoutColumn();
+                column.setSpan("12");
+                column.setItems(new ArrayList<>());                    
+                row.getColumns().add(column);
+                
+                LayoutItem item = new LayoutItem();
+                item.setFieldId(field.getId());
+                item.setFormId(form.getId());
+                
+                column.getItems().add(item);
+            }
+        }
+        
+        return form;
+    }
+    
+    protected FormInstance generateDefaultTaskForm(Task task, Map<String, String> inputs, Map<String, String> outputs) {
+        FormInstance form = new FormInstance();
+        form.setId(UUID.randomUUID().toString());
+        form.setName("Default form - " + task.getName());
+        
+        form.setModel(new FormModel());
+        
+        form.setFields(new ArrayList<>());
+        
+        FormLayout layout = new FormLayout();
+        layout.setRows(new ArrayList<>());
+        form.setLayout(layout);
+        
+        if (inputs != null) {
+            
+            for (Entry<String, String> entry : inputs.entrySet()) {
+            
+                FormField field = new FormField();
+                field.setId(UUID.randomUUID().toString());
+                field.setBinding(entry.getKey());
+                field.setCode(entry.getValue().contains("Boolean")?"CheckBox" :"TextBox");
+                field.setLabel(entry.getKey());
+                field.setName(entry.getKey());
+                field.setType(entry.getValue());
+                field.setReadOnly(true);
+                
+                form.getFields().add(field);
+                
+                LayoutRow row = new LayoutRow();
+                layout.getRows().add(row);
+                row.setColumns(new ArrayList<>());
+                
+                LayoutColumn column = new LayoutColumn();
+                column.setSpan("12");
+                column.setItems(new ArrayList<>());                    
+                row.getColumns().add(column);
+                
+                LayoutItem item = new LayoutItem();
+                item.setFieldId(field.getId());
+                item.setFormId(form.getId());
+                
+                column.getItems().add(item);
+            }
+        }
+        
+        if (outputs != null) {
+            
+            for (Entry<String, String> entry : outputs.entrySet()) {
+            
+                FormField field = new FormField();
+                field.setId(UUID.randomUUID().toString());
+                field.setBinding(entry.getKey());
+                field.setCode(entry.getValue().contains("Boolean")?"CheckBox" :"TextBox");
+                field.setLabel(entry.getKey());
+                field.setName(entry.getKey());
+                field.setType(entry.getValue());
+                
+                form.getFields().add(field);
+                
+                LayoutRow row = new LayoutRow();
+                layout.getRows().add(row);
+                row.setColumns(new ArrayList<>());
+                
+                LayoutColumn column = new LayoutColumn();
+                column.setSpan("12");
+                column.setItems(new ArrayList<>());                    
+                row.getColumns().add(column);
+                
+                LayoutItem item = new LayoutItem();
+                item.setFieldId(field.getId());
+                item.setFormId(form.getId());
+                
+                column.getItems().add(item);
+            }
+        }
+        
+        return form;
     }
 }
