@@ -26,6 +26,7 @@ public interface UIServicesClient {
     
     public static final String BOOTSTRAP_FORM_RENDERER = "bootstrap";
     public static final String PATTERNFLY_FORM_RENDERER = "patternfly";
+    public static final String WORKBENCH_FORM_RENDERER = "workbench";
 
     /**
      * Returns process form for given process id that resides in given container. It returns default form type

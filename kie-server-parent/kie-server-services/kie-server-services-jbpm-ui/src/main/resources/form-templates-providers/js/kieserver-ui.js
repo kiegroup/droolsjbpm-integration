@@ -31,7 +31,6 @@ function clearNotifications() {
 	failureAlert.addClass('hidden');
 }
 
-
 function startProcess(button) {
 	if (validate()) {
 		button.disabled = true;
@@ -40,20 +39,20 @@ function startProcess(button) {
 		
 		$.ajax({
 		    method: 'POST',
-		    url: getProcessEndpoint(),
+		    url: getProcessEndpoint() + '?' + endpointSuffix(),
 		    data: JSON.stringify(getData())
 		}).done(function( msg ) {
 			console.log('Process started with data ' + JSON.stringify(getData()) +  ' process instance id ' + msg );
 		    showSuccess('Process successfully started with instance id ' + msg);
-
 		    // if we are inline
 		    if(typeof afterProcessStarted === "function") {
-            	afterProcessStarted();
+            	afterProcessStarted(msg);
 			}
 			// if we are embedded
 		    if(typeof parent.afterProcessStarted === "function") {
-                parent.afterProcessStarted();
+                parent.afterProcessStarted(msg);
             }
+		    
 		}).fail(function( xhr, msg, error ) {
 			showFailure('Something went wrong ' + error + ' ( ' + xhr.responseText + ')');
 			button.disabled = false;
@@ -67,19 +66,18 @@ function startCase(button) {
 			
 		$.ajax({
 		    method: 'POST',
-		    url: getCaseEndpoint(),
+		    url: getCaseEndpoint() + '?' + endpointSuffix(),
 		    data: JSON.stringify(getData())
 		}).done(function( msg ) {
 			console.log('Case started with data ' + JSON.stringify(getData()) +  ' case id ' + msg );
 			showSuccess('Case successfully started with case id ' + msg);
-
             // if we are inline
             if(typeof afterCaseStarted === "function") {
-                afterCaseStarted();
+                afterCaseStarted(msg);
             }
             // if we are embedded
             if(typeof parent.afterCaseStarted === "function") {
-                parent.afterCaseStarted();
+                parent.afterCaseStarted(msg);
             }
 		}).fail(function( xhr, msg, error ) {
 			showFailure('Something went wrong ' + error + ' ( ' + xhr.responseText + ')');
@@ -144,7 +142,7 @@ function claimTask() {
 	$.ajax({
 	    method: 'PUT',
 	    dataType: 'text',
-	    url: getTaskEndpoint() + '/states/claimed'	    
+	    url: getTaskEndpoint() + '/states/claimed?' + endpointSuffix()	    
 	}).done(function( msg ) {
 		console.log('Task claimed');
 	
@@ -170,7 +168,7 @@ function releaseTask() {
 	$.ajax({
 	    method: 'PUT',
 	    dataType: 'text',
-	    url: getTaskEndpoint() + '/states/released'	    
+	    url: getTaskEndpoint() + '/states/released?' + endpointSuffix()    
 	}).done(function( msg ) {
 		console.log('Task released');
 	
@@ -196,7 +194,7 @@ function startTask() {
 	$.ajax({
 	    method: 'PUT',
 	    dataType: 'text',
-	    url: getTaskEndpoint() + '/states/started'	    
+	    url: getTaskEndpoint() + '/states/started?' + endpointSuffix()	    
 	}).done(function( msg ) {
 		console.log('Task started');
 	
@@ -221,7 +219,7 @@ function stopTask() {
 	$.ajax({
 	    method: 'PUT',
 	    dataType: 'text',
-	    url: getTaskEndpoint() + '/states/stopped'	    
+	    url: getTaskEndpoint() + '/states/stopped?' + endpointSuffix()	    
 	}).done(function( msg ) {
 		console.log('Task stopped');
 	
@@ -246,7 +244,7 @@ function saveTask() {
 	$.ajax({
 	    method: 'PUT',
 	    dataType: 'text',
-	    url: getTaskEndpoint() + '/contents/output',
+	    url: getTaskEndpoint() + '/contents/output?' + endpointSuffix(),
 	    data: JSON.stringify(getData())
 	}).done(function( msg ) {
 		console.log('Saved data ' + JSON.stringify(getData()));	
@@ -271,7 +269,7 @@ function completeTask() {
 		$.ajax({
 		    method: 'PUT',
 		    dataType: 'text',
-		    url: getTaskEndpoint() + '/states/completed?auto-progress=true',
+		    url: getTaskEndpoint() + '/states/completed?auto-progress=true&' + endpointSuffix(),
 		    data: JSON.stringify(getData())
 		}).done(function( msg ) {
 			console.log('Task completed with data ' + JSON.stringify(getData()));

@@ -47,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import freemarker.cache.StringTemplateLoader;
-import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -141,7 +140,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         }
         StringBuilder caseEndpoint = new StringBuilder();
         caseEndpoint
-            .append(serverPath)
+            .append(getServerEndpointPath())
             .append("/containers/")
             .append(containerId)
             .append("/cases/")
@@ -151,6 +150,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getCaseEndpoint", "return '" + caseEndpoint.toString() + "';"));
         scriptDataList.add(buildFunctionWithBody("initializeForm", ""));
+        scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
         Map<String, Object> parameters = new HashMap<>();
@@ -185,12 +185,15 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         processFormLayout(form, form, Collections.emptyMap(), Collections.emptyMap(), PROCESS_LAYOUT_TEMPLATE, jsonTemplate, true, scriptDataList);
         
         // finish json template
-        jsonTemplate
-            .deleteCharAt(jsonTemplate.length() - 1)
+        if (jsonTemplate.length() > 1) {
+            jsonTemplate
+            .deleteCharAt(jsonTemplate.length() - 1);
+        }
+        jsonTemplate        
             .append("}");
         StringBuilder processEndpoint = new StringBuilder();
         processEndpoint
-            .append(serverPath)
+            .append(getServerEndpointPath())
             .append("/containers/")
             .append(containerId)
             .append("/processes/")
@@ -200,6 +203,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getProcessEndpoint", "return '" + processEndpoint.toString() + "';"));
         scriptDataList.add(buildFunctionWithBody("initializeForm", ""));
+        scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
         Map<String, Object> parameters = new HashMap<>();
@@ -231,13 +235,16 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         processFormLayout(form, form, inputs, outputs, TASK_LAYOUT_TEMPLATE, jsonTemplate, true, scriptDataList);
 
         // finish json template
-        jsonTemplate
-            .deleteCharAt(jsonTemplate.length() - 1)
+        if (jsonTemplate.length() > 1) {
+            jsonTemplate
+            .deleteCharAt(jsonTemplate.length() - 1);
+        }
+        jsonTemplate        
             .append("}");
         
         StringBuilder taskEndpoint = new StringBuilder();
         taskEndpoint
-            .append(serverPath)
+            .append(getServerEndpointPath())
             .append("/containers/")
             .append(containerId)
             .append("/tasks/")
@@ -246,6 +253,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getTaskEndpoint", "return '" + taskEndpoint.toString() + "';"));
         scriptDataList.add(buildFunctionWithBody("initializeForm", "taskStatus = '" + task.getTaskData().getStatus().name() + "';initTaskButtons();"));
+        scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
         Map<String, Object> parameters = new HashMap<>();
@@ -361,7 +369,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             // generate column content                    
                             Map<String, Object> parameters = new HashMap<>();
                             parameters.put("item", item);
-                            parameters.put("serverPath", serverPath); // used to generate link for documents
+                            parameters.put("documentPath", getDocumentPath()); // used to generate link for documents
                             String output = renderTemplate(FORM_GROUP_LAYOUT_TEMPLATE, parameters);
                             // append rendered content to the column content
                             content.append(output);
@@ -693,6 +701,22 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         }
         
         return value;
+    }
+    
+    protected String getServerEndpointPath() {
+        return serverPath;
+    }
+    
+    /**
+     * Additional (and optional) suffix to be added to an endpoint
+     * (used when starting process or case or interacting with user task)
+     */
+    protected String getEndpointSuffix() {
+        return "";
+    }
+    
+    protected String getDocumentPath() {
+        return serverPath + "/documents/DOC_ID/content";
     }
 }
 
