@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.kie.api.pmml.PMML4Result;
 import org.kie.server.api.model.admin.*;
 import org.kie.server.api.model.cases.*;
 import org.kie.server.api.model.definition.*;
@@ -160,7 +161,10 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             // Kie DMN
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),
             @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class),
-            @XmlElement(name = "dmn-model-info-list" , type = DMNModelInfoList.class)
+            @XmlElement(name = "dmn-model-info-list" , type = DMNModelInfoList.class),
+            
+            // PMML
+            @XmlElement(name = "pmml-result", type = PMML4Result.class)
 
             })
     @JsonProperty
