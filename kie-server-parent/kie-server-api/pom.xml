@@ -118,6 +118,10 @@
       <artifactId>jaxb-impl</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>org.drools</groupId>
+    	<artifactId>kie-pmml</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

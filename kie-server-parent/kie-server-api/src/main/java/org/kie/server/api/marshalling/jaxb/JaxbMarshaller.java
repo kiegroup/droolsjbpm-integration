@@ -49,6 +49,12 @@ import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
+import org.kie.api.pmml.DoubleFieldOutput;
+import org.kie.api.pmml.IntegerFieldOutput;
+import org.kie.api.pmml.PMML4OutputField;
+import org.kie.api.pmml.PMML4Result;
+import org.kie.api.pmml.StringFieldOutput;
+import org.kie.pmml.pmml_4_2.model.ScoreCard;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -181,6 +187,7 @@ import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class JaxbMarshaller implements Marshaller {
 
@@ -368,7 +375,14 @@ public class JaxbMarshaller implements Marshaller {
                 DMNModelInfo.class,
                 DMNDecisionInfo.class,
                 DMNInputDataInfo.class,
-                DMNItemDefinitionInfo.class
+                DMNItemDefinitionInfo.class,
+                
+                // Kie PMML
+                PMML4Result.class,
+                IntegerFieldOutput.class,
+                DoubleFieldOutput.class,
+                StringFieldOutput.class,
+                ScoreCard.class
         };
     }
 
