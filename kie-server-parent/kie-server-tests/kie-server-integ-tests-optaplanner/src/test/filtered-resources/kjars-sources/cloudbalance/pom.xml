@@ -11,11 +11,6 @@
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.optaplanner</groupId>
@@ -40,6 +35,11 @@
       <artifactId>jackson-core-asl</artifactId>
       <scope>provided</scope>
       <version>${version.org.codehaus.jackson}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.spec.javax.xml.bind</groupId>
+      <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

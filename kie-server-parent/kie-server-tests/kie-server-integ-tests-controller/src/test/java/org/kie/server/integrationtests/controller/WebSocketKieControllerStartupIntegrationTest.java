@@ -65,7 +65,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
     @BeforeClass
     public static void initialize() throws Exception {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
     }
 
     @Before

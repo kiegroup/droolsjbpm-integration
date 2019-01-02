@@ -31,7 +31,9 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -40,6 +42,7 @@ import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
@@ -55,6 +58,8 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
+    private static final KieServerConfigItem PPI_RUNTIME_STRATEGY = new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, RuntimeStrategy.PER_PROCESS_INSTANCE.name(), String.class.getName());
+
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
@@ -64,11 +69,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, PPI_RUNTIME_STRATEGY);
     }
 
     @Override

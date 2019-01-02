@@ -32,9 +32,12 @@ public class StartupStrategyProvider {
     private static StartupStrategyProvider INSTANCE = new StartupStrategyProvider();
 
     private Map<String, StartupStrategy> foundStrategies = new HashMap<>();
-    private String strategyName = System.getProperty(KieServerConstants.KIE_SERVER_STARTUP_STRATEGY, ControllerBasedStartupStrategy.class.getSimpleName());
-
+    private String strategyName = System.getProperty(KieServerConstants.KIE_SERVER_STARTUP_STRATEGY, 
+                                                     System.getenv("KIE_SERVER_STARTUP_STRATEGY"));
     private StartupStrategyProvider() {
+        if (strategyName == null || strategyName.length() == 0) {
+            strategyName = ControllerBasedStartupStrategy.class.getSimpleName();
+        }
 
         strategies.forEach( s -> {
                     foundStrategies.put(s.getClass().getSimpleName(), s);

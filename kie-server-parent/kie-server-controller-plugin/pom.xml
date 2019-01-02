@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.15.0-SNAPSHOT</version>
+    <version>7.16.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-controller-plugin</artifactId>
   <packaging>maven-plugin</packaging>
@@ -124,6 +124,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>

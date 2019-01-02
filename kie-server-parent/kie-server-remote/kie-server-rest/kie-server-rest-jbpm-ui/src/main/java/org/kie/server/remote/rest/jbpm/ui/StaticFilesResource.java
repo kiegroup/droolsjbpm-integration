@@ -16,8 +16,8 @@
 
 package org.kie.server.remote.rest.jbpm.ui;
 
-import static org.kie.server.api.rest.RestURI.STATIC_FILES_URI;
 import static org.kie.server.api.rest.RestURI.STATIC_BY_TYPE_GET_URI;
+import static org.kie.server.api.rest.RestURI.STATIC_FILES_URI;
 import static org.kie.server.api.rest.RestURI.STATIC_RENDERER_BY_TYPE_GET_URI;
 
 import java.io.IOException;
@@ -29,6 +29,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -73,7 +74,11 @@ public class StaticFilesResource {
                 IOUtils.copy(resourceStream, output);                
             }
         };      
-        return Response.ok().entity(entity).header("Content-Type", getContentType(file)).build();
+        ResponseBuilder builder = Response.ok().entity(entity);
+        setHeaders(builder);
+        return builder
+                .header("Content-Type", getContentType(file))
+                .build();
         
     }
 
@@ -99,9 +104,23 @@ public class StaticFilesResource {
                 
                 IOUtils.copy(resourceStream, output);                
             }
-        };      
-        return Response.ok().entity(entity).header("Content-Type", getContentType(file)).build();
+        };    
         
+        ResponseBuilder builder = Response.ok().entity(entity);
+        setHeaders(builder);
+        return builder
+                .header("Content-Type", getContentType(file))
+                .build();
+        
+    }
+    
+    protected void setHeaders(ResponseBuilder builder) {
+        builder
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT")
+        .header("Access-Control-Allow-Headers", "accept, authorization, content-type, x-requested-with")
+        .header("Access-Control-Allow-Credentials", "true")
+        .header("Access-Control-Max-Age", "1");
     }
     
     protected String getContentType(String file) {

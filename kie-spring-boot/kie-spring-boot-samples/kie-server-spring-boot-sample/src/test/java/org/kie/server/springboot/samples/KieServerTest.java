@@ -110,7 +110,9 @@ public class KieServerTest {
     
     @After
     public void cleanup() {
-        kieServicesClient.disposeContainer(containerId);        
+        if (kieServicesClient != null) {
+            kieServicesClient.disposeContainer(containerId);
+        }
     }
     
     @Test

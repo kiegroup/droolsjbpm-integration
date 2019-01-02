@@ -27,34 +27,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
 
     @Test
     public void testBasicBytecodeInjection() throws Exception {
-        File basedir = resources.getBasedir("kjar-4-bytecode-inject");
-        MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install");
-        result.assertErrorFreeLog();
-
-        File classDir = new File(basedir,
-                                 "target/classes");
-
-        logger.info(classDir.toString());
-
-        List<URL> classloadingURLs = new ArrayList<>();
-        classloadingURLs.add(classDir.toURI().toURL());
-        classloadingURLs.add(new File(BytecodeInjectReactive.classpathFromClass(ReactiveObject.class)).toURI().toURL());
-        File libDir = new File(basedir,
-                               "target/lib");
-        for (File jar : libDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir,
-                                  String name) {
-                return name.endsWith(".jar");
-            }
-        })) {
-            classloadingURLs.add(jar.toURI().toURL());
-        }
-
-        ClassLoader cl = new URLClassLoader(classloadingURLs.toArray(new URL[]{}),
-                                            null);
+        ClassLoader cl = createClassLoaderFromProject("kjar-4-bytecode-inject");
 
         assertTrue(looksLikeInstrumentedClass(cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.Adult")));
         assertTrue(looksLikeInstrumentedClass(cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.UsingADependencyClass")));
@@ -67,34 +40,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
 
     @Test
     public void testBasicBytecodeInjectionSelected() throws Exception {
-        File basedir = resources.getBasedir("kjar-5-bytecode-inject-selected");
-        MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install");
-        result.assertErrorFreeLog();
-
-        File classDir = new File(basedir,
-                                 "target/classes");
-
-        logger.info(classDir.toString());
-
-        List<URL> classloadingURLs = new ArrayList<>();
-        classloadingURLs.add(classDir.toURI().toURL());
-        classloadingURLs.add(new File(BytecodeInjectReactive.classpathFromClass(ReactiveObject.class)).toURI().toURL());
-        File libDir = new File(basedir,
-                               "target/lib");
-        for (File jar : libDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir,
-                                  String name) {
-                return name.endsWith(".jar");
-            }
-        })) {
-            classloadingURLs.add(jar.toURI().toURL());
-        }
-
-        ClassLoader cl = new URLClassLoader(classloadingURLs.toArray(new URL[]{}),
-                                            null);
+        ClassLoader cl = createClassLoaderFromProject("kjar-5-bytecode-inject-selected");
 
         assertTrue(looksLikeInstrumentedClass(cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.Adult")));
         assertTrue(looksLikeInstrumentedClass(cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.UsingADependencyClass")));
@@ -114,6 +60,23 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         assertFalse(looksLikeInstrumentedClass(cl.loadClass("to.not.instrument.TMFile")));
         assertFalse(looksLikeInstrumentedClass(cl.loadClass("to.not.instrument.TMFileSet")));
         assertFalse(looksLikeInstrumentedClass(cl.loadClass("to.not.instrument.ImmutablePojo")));
+    }
+
+    private ClassLoader createClassLoaderFromProject(String kjarProjectName) throws Exception {
+        MavenExecutionResult result = buildKJarProject(kjarProjectName, "clean", "install");
+        File classDir = new File(result.getBasedir(), "target/classes");
+
+        logger.info(classDir.toString());
+
+        List<URL> classloadingURLs = new ArrayList<>();
+        classloadingURLs.add(classDir.toURI().toURL());
+        classloadingURLs.add(new File(BytecodeInjectReactive.classpathFromClass(ReactiveObject.class)).toURI().toURL());
+        File libDir = new File(result.getBasedir(), "target/lib");
+        for (File jar : libDir.listFiles((dir, name) -> name.endsWith(".jar"))) {
+            classloadingURLs.add(jar.toURI().toURL());
+        }
+
+        return new URLClassLoader(classloadingURLs.toArray(new URL[]{}), null);
     }
 
     private boolean looksLikeInstrumentedClass(Class<?> personClass) {

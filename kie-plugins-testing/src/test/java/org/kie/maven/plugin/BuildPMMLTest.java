@@ -26,9 +26,6 @@ import java.util.jar.JarFile;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -36,7 +33,6 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.definition.KiePackage;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.kie.maven.plugin.BuildMojoIntegrationTest;
 
 public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
@@ -52,28 +48,18 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
     private static final String PMML_FILE_NAME = "PMMLResources/simple-pmml.pmml";
     private static final String EXAMPLE_PMML_CLASS = "org/kie/scorecards/example/SampleScore/OverallScore.class";
 
-    public BuildPMMLTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
+    public BuildPMMLTest(MavenRuntime.MavenRuntimeBuilder builder) {
         super(builder);
     }
 
     @Test
     public void testCleanInstallWithPMML() throws Exception {
-        final File basedir = resources.getBasedir(PROJECT_NAME);
-        final MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install");
-        result.assertErrorFreeLog();
+        buildKJarProject(PROJECT_NAME, "clean", "install");
     }
 
     @Test
     public void testUseBuildKjarWithPMML() throws Exception {
-        final File basedir = resources.getBasedir(PROJECT_NAME);
-        final MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install");
-        result.assertErrorFreeLog();
+        buildKJarProject(PROJECT_NAME, "clean", "install");
 
         final KieServices kieServices = KieServices.Factory.get();
         final ReleaseId releaseId = kieServices.newReleaseId(GAV_GROUP_ID, GAV_ARTIFACT_ID, GAV_VERSION);
@@ -91,13 +77,9 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
     @Test
     public void testContentKjarWithPMML() throws Exception {
-        final File basedir = resources.getBasedir(PROJECT_NAME);
-        final MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute("clean",
-                         "install");
-        result.assertErrorFreeLog();
+        final MavenExecutionResult result = buildKJarProject(PROJECT_NAME, "clean", "install");
 
+        final File basedir = result.getBasedir();
         final File kjarFile = new File(basedir, "target/" + GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
         Assertions.assertThat(kjarFile.exists()).isTrue();
 
@@ -105,7 +87,7 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
         final Set<String> jarContent = new HashSet<>();
         final Enumeration<JarEntry> kjarEntries = jarFile.entries();
         while (kjarEntries.hasMoreElements()) {
-            String entryName = kjarEntries.nextElement().getName();
+            final String entryName = kjarEntries.nextElement().getName();
             jarContent.add(entryName);
         }
 

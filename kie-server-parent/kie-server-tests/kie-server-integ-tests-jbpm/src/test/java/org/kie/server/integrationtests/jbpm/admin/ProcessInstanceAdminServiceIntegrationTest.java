@@ -23,12 +23,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.TimerInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
@@ -39,6 +42,8 @@ import static org.junit.Assert.*;
 
 public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
+    private static final KieServerConfigItem PPI_RUNTIME_STRATEGY = new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, RuntimeStrategy.PER_PROCESS_INSTANCE.name(), String.class.getName());
+
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
@@ -47,11 +52,11 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, PPI_RUNTIME_STRATEGY);
     }
 
     @Override

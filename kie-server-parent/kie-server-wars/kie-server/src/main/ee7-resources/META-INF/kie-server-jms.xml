@@ -28,7 +28,15 @@
         <entry name="java:jboss/exported/jms/queue/KIE.SERVER.SIGNAL" />
       </jms-queue>
       -->
-
+      
+      <!-- JMS queue for audit -->
+      <!-- enable when jms mode for audit is required -->
+      <!--
+      <jms-queue name="KIE.SERVER.AUDIT">
+        <entry name="queue/KIE.SERVER.AUDIT"/>
+        <entry name="java:jboss/exported/jms/queue/KIE.SERVER.AUDIT"/>
+      </jms-queue>
+      -->
     </jms-destinations>
   </server>
 </messaging-deployment>

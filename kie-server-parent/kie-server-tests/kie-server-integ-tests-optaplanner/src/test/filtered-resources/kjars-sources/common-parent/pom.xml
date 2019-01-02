@@ -11,7 +11,9 @@
     <version.org.kie>${version.org.kie}</version.org.kie>
     <version.org.codehaus.jackson>${version.org.codehaus.jackson}</version.org.codehaus.jackson>
     <version.org.javassist>${version.org.javassist}</version.org.javassist>
-    <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
+    <version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec}</version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -28,6 +30,11 @@
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
         <version>${version.org.javassist}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.spec.javax.xml.bind</groupId>
+        <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
+        <version>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

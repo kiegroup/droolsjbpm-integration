@@ -10,7 +10,7 @@
 
   <cxf:rsServer id="cxfConsumer"
                 address="http://localhost:8080/rest"
-                serviceClass="org.kie.camel.container.api.service.KieCamelTestService" />
+                serviceClass="org.kie.camel.container.api.service.KieCamelTestService"/>
 
   <bean id="batchExecutionHelperProvider" class="org.drools.core.runtime.help.impl.BatchExecutionHelperProviderImpl" />
   <bean id="xstreamBean" factory-bean="batchExecutionHelperProvider" factory-method="newJSonMarshaller" />
@@ -27,7 +27,6 @@
   </kie:kmodule>
 
   <camelContext id="camel-context" xmlns="http://camel.apache.org/schema/spring">
-    <!-- Routes requests from CXF endpoint -->
     <route id="cxfConsumerToProcessorRoute">
       <from id="cxfrsConsumer" uri="cxfrs:bean:cxfConsumer" />
       <choice>
@@ -39,10 +38,17 @@
           <simple>${header.operationName} == 'runCommand'</simple>
           <to uri="direct:runCommand"/>
         </when>
+        <when>
+          <simple>${header.operationName} == 'esListContainers'</simple>
+          <to uri="direct:esListContainer"/>
+        </when>
+        <when>
+          <simple>${header.operationName} == 'esCreateContainer'</simple>
+          <to uri="direct:esCreateContainer"/>
+        </when>
       </choice>
     </route>
 
-    <!-- Route for age verfication service -->
     <route id="ageVerificationRoute">
       <from uri="direct:ageVerification" />
       <transform><simple>${body[0]}</simple></transform>
@@ -75,6 +81,40 @@
       <from uri="direct:runOtherCommand" />
       <to uri="kie-local:stateful-session?action=execute"/>
       <to uri="bean:xstreamBean?method=toXML(Object)"/>
+    </route>
+
+    <route id="esListContainer">
+      <from uri="direct:esListContainer"/>
+      <setHeader headerName="CamelKieClient">
+        <constant>kieServices</constant>
+      </setHeader>
+      <setHeader headerName="CamelKieOperation">
+        <constant>listContainers</constant>
+      </setHeader>
+      <to uri="direct:es"/>
+    </route>
+    <route id="esCreateContainer">
+      <from uri="direct:esCreateContainer"/>
+      <setHeader headerName="CamelKieClient">
+        <constant>kieServices</constant>
+      </setHeader>
+      <setHeader headerName="CamelKieOperation">
+        <constant>createContainer</constant>
+      </setHeader>
+      <setHeader headerName="CamelKieBodyParam">
+        <constant>resource</constant>
+      </setHeader>
+      <setHeader headerName="CamelKieId">
+        <simple>${body.get(0)}</simple>
+      </setHeader>
+      <transform>
+        <simple>${body.get(1)}</simple>
+      </transform>
+      <to uri="direct:es"/>
+    </route>
+    <route id="esRoute">
+      <from uri="direct:es"/>
+      <to uri="kie:http://yoda:test@localhost:8080/kie-server-services/services/rest/server"/>
     </route>
   </camelContext>
 </beans>

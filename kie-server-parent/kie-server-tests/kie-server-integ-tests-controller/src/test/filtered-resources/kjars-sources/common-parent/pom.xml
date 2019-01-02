@@ -9,7 +9,8 @@
   <properties>
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
-    <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

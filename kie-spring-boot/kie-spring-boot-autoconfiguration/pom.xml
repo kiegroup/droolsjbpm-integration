@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot</artifactId>
-    <version>7.15.0-SNAPSHOT</version>
+    <version>7.16.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-spring-boot-autoconfiguration</artifactId>
   <name>KIE :: Spring :: Boot :: Auto Configuration</name>
@@ -12,11 +12,12 @@
 
   <packaging>pom</packaging>
   <modules>
+    <module>jbpm-spring-boot-data-sources</module>
     <module>jbpm-spring-boot-autoconfiguration</module>
     <module>kie-server-spring-boot-autoconfiguration</module>
     <module>kie-server-spring-boot-autoconfiguration-drools</module>
     <module>kie-server-spring-boot-autoconfiguration-jbpm</module>
-    <module>kie-server-spring-boot-autoconfiguration-optaplanner</module>
+    <module>kie-server-spring-boot-autoconfiguration-optaplanner</module>    
   </modules>
 
 </project>

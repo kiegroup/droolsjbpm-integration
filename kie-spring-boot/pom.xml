@@ -16,7 +16,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.15.0-SNAPSHOT</version>
+    <version>7.16.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -36,7 +36,6 @@
     <version.spring-boot>1.5.12.RELEASE</version.spring-boot>
     <version.cxf.jaxrs>3.1.11</version.cxf.jaxrs>
     <version.me.snowdrop.narayana>1.0.1</version.me.snowdrop.narayana>
-    <version.org.jboss.narayana.tomcat>5.9.0.Final</version.org.jboss.narayana.tomcat>
     <version.org.apache.commons-dbcp2>2.4.0</version.org.apache.commons-dbcp2>
   </properties>
 
@@ -72,6 +71,11 @@
       </dependency>
 
       <!-- spring boot auto configuration modules -->
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>jbpm-spring-boot-data-sources</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.kie</groupId>
         <artifactId>jbpm-spring-boot-autoconfiguration</artifactId>

@@ -362,7 +362,7 @@
         <bpmn2:ioSpecification id="_aVxzNmVZEeavbo3IsNuQ1g">
           <bpmn2:dataInput id="_C88DB70F-951D-4F4F-BE06-651EBFC184AB__claimReportInputX" drools:dtype="org.kie.server.testing.ClaimReport" name="Parameter"/>
           <bpmn2:dataInput id="_C88DB70F-951D-4F4F-BE06-651EBFC184AB__parameterTypeInputX" drools:dtype="String" name="ParameterType"/>
-          <bpmn2:dataOutput id="_C88DB70F-951D-4F4F-BE06-651EBFC184AB_claimReport_OutputX" drools:dtype="org.kie.server.testing.ClaimReport" name="name"/>
+          <bpmn2:dataOutput id="_C88DB70F-951D-4F4F-BE06-651EBFC184AB_claimReport_OutputX" drools:dtype="org.kie.server.testing.ClaimReport" name="Result"/>
           <bpmn2:inputSet id="_aVxzN2VZEeavbo3IsNuQ1g">
             <bpmn2:dataInputRefs>_C88DB70F-951D-4F4F-BE06-651EBFC184AB__claimReportInputX</bpmn2:dataInputRefs>
             <bpmn2:dataInputRefs>_C88DB70F-951D-4F4F-BE06-651EBFC184AB__parameterTypeInputX</bpmn2:dataInputRefs>

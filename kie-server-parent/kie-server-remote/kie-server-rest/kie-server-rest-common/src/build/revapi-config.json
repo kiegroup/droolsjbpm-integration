@@ -31,7 +31,53 @@
   "ignores": {
     "revapi": {
       "_comment": "Changes between 7.11.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": []
+      "ignore": [
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::createContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::createContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===)",
+          "annotationType": "io.swagger.annotations.ApiParam",
+          "annotation": "@io.swagger.annotations.ApiParam(value = \"KIE Container resource to be deployed as KieContainerResource\", required = true, examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"container-id\" : \"baz\",\n    \"release-id\" : {\n        \"group-id\" : \"foo\",\n        \"artifact-id\" : \"bar\",\n        \"version\" : \"1.0\"\n    }\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<kie-container container-id=\"baz\">\n    <release-id>\n        <group-id>foo<\/group-id>\n        <artifact-id>bar<\/artifact-id>\n        <version>1.0<\/version>\n    <\/release-id>\n<\/kie-container>\n\")}))",
+          "attribute": "examples",
+          "value": "@io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"container-id\" : \"baz\",\n    \"release-id\" : {\n        \"group-id\" : \"foo\",\n        \"artifact-id\" : \"bar\",\n        \"version\" : \"1.0\"\n    }\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<kie-container container-id=\"baz\">\n    <release-id>\n        <group-id>foo<\/group-id>\n        <artifact-id>bar<\/artifact-id>\n        <version>1.0<\/version>\n    <\/release-id>\n<\/kie-container>\n\")})",
+          "package": "org.kie.server.remote.rest.common.resource",
+          "classSimpleName": "KieServerRestImpl",
+          "methodName": "createContainer",
+          "parameterIndex": "2",
+          "elementKind": "parameter",
+          "justification": "Add Swagger examples for creating container."
+        },
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateReleaseId(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateReleaseId(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===)",
+          "annotationType": "io.swagger.annotations.ApiParam",
+          "annotation": "@io.swagger.annotations.ApiParam(value = \"Release Id to be upgraded to as ReleaseId type\", required = true, examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"group-id\" : \"foo\",\n    \"artifact-id\" : \"bar\",\n    \"version\" : \"1.0\"\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<release-id>\n    <group-id>foo<\/group-id>\n    <artifact-id>bar<\/artifact-id>\n    <version>1.0<\/version>\n<\/release-id>\n\")}))",
+          "attribute": "examples",
+          "value": "@io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"group-id\" : \"foo\",\n    \"artifact-id\" : \"bar\",\n    \"version\" : \"1.0\"\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<release-id>\n    <group-id>foo<\/group-id>\n    <artifact-id>bar<\/artifact-id>\n    <version>1.0<\/version>\n<\/release-id>\n\")})",
+          "package": "org.kie.server.remote.rest.common.resource",
+          "classSimpleName": "KieServerRestImpl",
+          "methodName": "updateReleaseId",
+          "parameterIndex": "2",
+          "elementKind": "parameter",
+          "justification": "Add Swagger examples for updating release ids."
+        },
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateScanner(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateScanner(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===)",
+          "annotationType": "io.swagger.annotations.ApiParam",
+          "annotation": "@io.swagger.annotations.ApiParam(value = \"Scanner information given as KieScannerResource type\", required = true, examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"status\" : \"STARTED\",\n    \"poll-interval\" : \"10000\"\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<kie-scanner poll-interval=\"10000\" status=\"STARTED\"\/>\n\")}))",
+          "attribute": "examples",
+          "value": "@io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"status\" : \"STARTED\",\n    \"poll-interval\" : \"10000\"\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<kie-scanner poll-interval=\"10000\" status=\"STARTED\"\/>\n\")})",
+          "package": "org.kie.server.remote.rest.common.resource",
+          "classSimpleName": "KieServerRestImpl",
+          "methodName": "updateScanner",
+          "parameterIndex": "2",
+          "elementKind": "parameter",
+          "justification": "Add Swagger examples for updating scanner."
+        }
+      ]
     }
   }
 }

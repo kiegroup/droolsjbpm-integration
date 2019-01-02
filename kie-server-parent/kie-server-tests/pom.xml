@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.15.0-SNAPSHOT</version>
+    <version>7.16.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -62,7 +62,6 @@
     <!-- By default we use bundled H2 database jar -->
     <springboot.jdbc.driver.jar/>
 
-    <version.org.jboss.marshalling>2.0.2.Final</version.org.jboss.marshalling>
     <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
@@ -920,7 +919,7 @@
                   <type>installed</type>
                   <home>${weblogic.home}/wlserver</home>
                   <systemProperties>
-                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WeblogicJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.tm>Weblogic</org.kie.server.persistence.tm>
                     <org.kie.server.domain>OracleDefaultLoginConfiguration</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
@@ -1040,7 +1039,7 @@
                   <home>${websphere.home}</home>
                   <timeout>240000</timeout>
                   <systemProperties>
-                    <org.kie.server.persistence.tm>org.hibernate.engine.transaction.jta.platform.internal.WebSphereJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.tm>WebSphere</org.kie.server.persistence.tm>
                     <org.kie.server.domain>WSLogin</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>

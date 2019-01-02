@@ -50,7 +50,7 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/deployment-descriptor-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/deployment-descriptor-project");
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 

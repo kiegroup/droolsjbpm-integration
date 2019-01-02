@@ -17,6 +17,7 @@
 package org.kie.server.services.jbpm.ui.form.render;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jbpm.casemgmt.api.model.CaseDefinition;
@@ -64,6 +66,9 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     private StringTemplateLoader stringLoader = new StringTemplateLoader();
     private Configuration cfg;
     
+    private StringTemplateLoader fieldLevelStringLoader = new StringTemplateLoader();
+    private Configuration fieldLevelCfg;
+    
     private FormReader reader = new FormReader();
     
     private String serverPath;
@@ -88,6 +93,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         cfg = new Configuration(Configuration.VERSION_2_3_26);
         cfg.setTemplateLoader(stringLoader);
         cfg.setDefaultEncoding("UTF-8");
+        
+        fieldLevelCfg = new Configuration(Configuration.VERSION_2_3_26);
+        fieldLevelCfg.setTemplateLoader(fieldLevelStringLoader);
+        fieldLevelCfg.setDefaultEncoding("UTF-8");
         
         loadTemplates();
     }
@@ -131,7 +140,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         }
         StringBuilder caseEndpoint = new StringBuilder();
         caseEndpoint
-            .append(serverPath)
+            .append(getServerEndpointPath())
             .append("/containers/")
             .append(containerId)
             .append("/cases/")
@@ -141,6 +150,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getCaseEndpoint", "return '" + caseEndpoint.toString() + "';"));
         scriptDataList.add(buildFunctionWithBody("initializeForm", ""));
+        scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
         Map<String, Object> parameters = new HashMap<>();
@@ -175,12 +185,15 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         processFormLayout(form, form, Collections.emptyMap(), Collections.emptyMap(), PROCESS_LAYOUT_TEMPLATE, jsonTemplate, true, scriptDataList);
         
         // finish json template
-        jsonTemplate
-            .deleteCharAt(jsonTemplate.length() - 1)
+        if (jsonTemplate.length() > 1) {
+            jsonTemplate
+            .deleteCharAt(jsonTemplate.length() - 1);
+        }
+        jsonTemplate        
             .append("}");
         StringBuilder processEndpoint = new StringBuilder();
         processEndpoint
-            .append(serverPath)
+            .append(getServerEndpointPath())
             .append("/containers/")
             .append(containerId)
             .append("/processes/")
@@ -190,6 +203,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getProcessEndpoint", "return '" + processEndpoint.toString() + "';"));
         scriptDataList.add(buildFunctionWithBody("initializeForm", ""));
+        scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
         Map<String, Object> parameters = new HashMap<>();
@@ -221,13 +235,16 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         processFormLayout(form, form, inputs, outputs, TASK_LAYOUT_TEMPLATE, jsonTemplate, true, scriptDataList);
 
         // finish json template
-        jsonTemplate
-            .deleteCharAt(jsonTemplate.length() - 1)
+        if (jsonTemplate.length() > 1) {
+            jsonTemplate
+            .deleteCharAt(jsonTemplate.length() - 1);
+        }
+        jsonTemplate        
             .append("}");
         
         StringBuilder taskEndpoint = new StringBuilder();
         taskEndpoint
-            .append(serverPath)
+            .append(getServerEndpointPath())
             .append("/containers/")
             .append(containerId)
             .append("/tasks/")
@@ -236,6 +253,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getTaskEndpoint", "return '" + taskEndpoint.toString() + "';"));
         scriptDataList.add(buildFunctionWithBody("initializeForm", "taskStatus = '" + task.getTaskData().getStatus().name() + "';initTaskButtons();"));
+        scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
         Map<String, Object> parameters = new HashMap<>();
@@ -296,9 +314,22 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                 
                 for (LayoutItem item : column.getItems()) {
                     if (item.getValue() != null) {
-                        content.append(item.getValue());
+                        String output = item.getValue();
+                        if (output.contains("${")) {
+                            String uuid = UUID.randomUUID().toString();;
+                            loadTemplate(fieldLevelStringLoader, uuid, new ByteArrayInputStream(item.getValue().getBytes(Charset.forName("UTF-8"))));
+                            Map<String, Object> parameters = new HashMap<>();
+                            parameters.putAll(inputs);
+                            parameters.putAll(outputs);                        
+                            output = renderTemplate(fieldLevelCfg, uuid, parameters);
+                            
+                            
+                            fieldLevelStringLoader.removeTemplate(uuid);
+                        }
+                        content.append(output);
+                        
                     } else {
-                        FormField field = form.getField(item.getFieldId());
+                        FormField field = form.getField(item.getFieldId());                        
                         
                         if (field.getNestedForm() != null && !field.getNestedForm().isEmpty()) {
                             // handle subform
@@ -338,7 +369,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             // generate column content                    
                             Map<String, Object> parameters = new HashMap<>();
                             parameters.put("item", item);
-                            parameters.put("serverPath", serverPath); // used to generate link for documents
+                            parameters.put("documentPath", getDocumentPath()); // used to generate link for documents
                             String output = renderTemplate(FORM_GROUP_LAYOUT_TEMPLATE, parameters);
                             // append rendered content to the column content
                             content.append(output);
@@ -492,8 +523,13 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     
     protected void loadTemplate(String templateId, InputStream stream) {
         
+        loadTemplate(this.stringLoader, templateId, stream);
+    }
+    
+    protected void loadTemplate(StringTemplateLoader loader, String templateId, InputStream stream) {
+        
         try {
-            this.stringLoader.putTemplate(templateId, read(stream));
+            loader.putTemplate(templateId, read(stream));
             
             logger.debug("Loaded template {} from input stream", templateId);
         } catch (Exception e) {
@@ -512,6 +548,11 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     }
     
     protected String renderTemplate(String templateName, Map<String, Object> parameters) {
+        
+        return renderTemplate(this.cfg, templateName, parameters);
+    }
+    
+    protected String renderTemplate(Configuration cfg, String templateName, Map<String, Object> parameters) {
         StringWriter out = new StringWriter();
         try {
             Template template = cfg.getTemplate(templateName);
@@ -660,6 +701,22 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         }
         
         return value;
+    }
+    
+    protected String getServerEndpointPath() {
+        return serverPath;
+    }
+    
+    /**
+     * Additional (and optional) suffix to be added to an endpoint
+     * (used when starting process or case or interacting with user task)
+     */
+    protected String getEndpointSuffix() {
+        return "";
+    }
+    
+    protected String getDocumentPath() {
+        return serverPath + "/documents/DOC_ID/content";
     }
 }
 

@@ -37,7 +37,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -60,6 +63,8 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     private static final String EMAIL_DOMAIN = "@domain.com";
     private static final int SMTP_PORT = 2525;
     private static final String SMTP_HOST = "localhost";
+
+    private static final KieServerConfigItem PPI_RUNTIME_STRATEGY = new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, RuntimeStrategy.PER_PROCESS_INSTANCE.name(), String.class.getName());
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
@@ -105,9 +110,9 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, PPI_RUNTIME_STRATEGY);
     }
 
     @Test

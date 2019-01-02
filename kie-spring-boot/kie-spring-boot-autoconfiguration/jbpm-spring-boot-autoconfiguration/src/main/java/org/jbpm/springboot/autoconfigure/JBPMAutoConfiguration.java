@@ -18,10 +18,8 @@ package org.jbpm.springboot.autoconfigure;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -33,7 +31,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 
 import org.dashbuilder.dataprovider.sql.SQLDataSetProvider;
 import org.dashbuilder.dataprovider.sql.SQLDataSourceLocator;
@@ -102,23 +99,16 @@ import org.kie.spring.jbpm.services.SpringTransactionalCommandService;
 import org.kie.spring.manager.SpringRuntimeManagerFactoryImpl;
 import org.kie.spring.persistence.KieSpringTransactionManager;
 import org.kie.spring.persistence.KieSpringTransactionManagerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-import org.springframework.boot.bind.RelaxedDataBinder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.jdbc.DatabaseDriver;
-import org.springframework.boot.jta.XADataSourceWrapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -132,11 +122,10 @@ import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
 import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 @Configuration
 @ConditionalOnClass({ KModuleDeploymentService.class })
@@ -158,20 +147,15 @@ public class JBPMAutoConfiguration {
     private static final String TX_FACTORY_CLASS = "org.kie.txm.factory.class";
     private static final String SPRING_TX_FACTORY_CLASS = "org.kie.spring.persistence.KieSpringTransactionManagerFactory";
   
-
-    private XADataSource xaDataSource;
-    private XADataSourceWrapper wrapper;
     
     private JBPMProperties properties;
     
     private PlatformTransactionManager transactionManager;
  
-    public JBPMAutoConfiguration(XADataSourceWrapper wrapper, 
-                                 PlatformTransactionManager transactionManager,
+    public JBPMAutoConfiguration(PlatformTransactionManager transactionManager,
                                  JBPMProperties properties,
                                  ApplicationContext applicationContext) {
-        
-        this.wrapper = wrapper;
+                
         this.transactionManager = transactionManager;
         this.properties = properties;
         System.setProperty(TX_FACTORY_CLASS, SPRING_TX_FACTORY_CLASS);
@@ -194,20 +178,7 @@ public class JBPMAutoConfiguration {
         }
     }  
     
-    @Bean
-    @Primary
-    @ConfigurationProperties("spring.datasource")
-    public DataSourceProperties dataSourceProperties() {
-        return new DataSourceProperties();
-    }
-
-    @Bean
-    @Primary
-    @ConfigurationProperties("spring.datasource")
-    public DataSource dataSource() throws Exception {
-        this.xaDataSource = createXaDataSource();        
-        return this.wrapper.wrapDataSource(xaDataSource);
-    }    
+   
     
     @Bean
     @ConditionalOnMissingBean(name = "entityManagerFactory")
@@ -217,6 +188,7 @@ public class JBPMAutoConfiguration {
         factoryBean.setPersistenceXmlLocation(PERSISTENCE_XML_LOCATION);
         factoryBean.setJtaDataSource(dataSource);
         factoryBean.setJpaPropertyMap(jpaProperties.getProperties());
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         String packagesToScan = jpaProperties.getProperties().get("entity-scan-packages");
         if (packagesToScan != null) {
@@ -288,7 +260,7 @@ public class JBPMAutoConfiguration {
     
     @Bean
     @ConditionalOnMissingBean(name = "userGroupCallback")
-    public UserGroupCallback userGroupCallback(IdentityProvider identityProvider) throws IOException {
+    public UserGroupCallback userGroupCallback(IdentityProvider identityProvider) {
         return new SpringSecurityUserGroupCallback(identityProvider);
     }
     
@@ -567,85 +539,12 @@ public class JBPMAutoConfiguration {
         return caseInstanceMigrationService;
     }
     
-    /*
-     * Optional quartz configuration - by default same data source is used for transactional Quartz work
-     * and new one (from properties quartz.datasource) for unmanaged access
-     */
-    
-    @Bean
-    @ConditionalOnMissingBean(name = "quartzDataSource")
-    @ConditionalOnProperty(name = {"jbpm.quartz.enabled", "jbpm.quartz.db"}, havingValue="true")
-    public DataSource quartzDataSource(DataSource dataSource) {
-        return dataSource;
-    }
-    
-    @Bean
-    @ConditionalOnMissingBean(name = "quartzDatasourceProperties")
-    @ConfigurationProperties("quartz.datasource")
-    public DataSourceProperties quartzDatasourceProperties() {
-        return new DataSourceProperties();
-    }
-    
-    @Bean
-    @ConditionalOnMissingBean(name = "quartzPoolProperties")
-    @ConfigurationProperties("quartz.datasource.dbcp2")
-    public Map<String, Object> quartzPoolProperties() {
-        return new HashMap<>();
-    }
 
-    @Bean
-    @ConditionalOnMissingBean(name = "quartzNotManagedDataSource")
-    @ConditionalOnProperty(name = {"jbpm.quartz.enabled", "jbpm.quartz.db"}, havingValue="true")
-    public DataSource quartzNotManagedDataSource() {
-        DataSource ds = quartzDatasourceProperties().initializeDataSourceBuilder().build();
-        Map<String, Object> poolProperties = quartzPoolProperties();
-        
-        MutablePropertyValues properties = new MutablePropertyValues(poolProperties);
-        new RelaxedDataBinder(ds).bind(properties);
-        
-        return ds;
-    }
     
     /*
      * Helper methods
      */
 
-    private XADataSource createXaDataSource() {
-        DataSourceProperties dataSourceProperties = dataSourceProperties();
-        
-        String className = dataSourceProperties.getXa().getDataSourceClassName();
-        if (!StringUtils.hasLength(className)) {
-            className = DatabaseDriver.fromJdbcUrl(dataSourceProperties.determineUrl())
-                    .getXaDataSourceClassName();
-        }
-        Assert.state(StringUtils.hasLength(className),
-                "No XA DataSource class name specified");
-        XADataSource dataSource = createXaDataSourceInstance(className);
-        bindXaProperties(dataSource, dataSourceProperties);
-        return dataSource;
-    }
-
-    private XADataSource createXaDataSourceInstance(String className) {
-        try {
-            Class<?> dataSourceClass = ClassUtils.forName(className, this.getClass().getClassLoader());
-            Object instance = BeanUtils.instantiate(dataSourceClass);
-            Assert.isInstanceOf(XADataSource.class, instance);
-            return (XADataSource) instance;
-        }
-        catch (Exception ex) {
-            throw new IllegalStateException(
-                    "Unable to create XADataSource instance from '" + className + "'", ex);
-        }
-    }
-
-    private void bindXaProperties(XADataSource target, DataSourceProperties properties) {
-        MutablePropertyValues values = new MutablePropertyValues();
-        values.add("user", properties.determineUsername());
-        values.add("password", properties.determinePassword());
-        values.add("url", properties.determineUrl());
-        values.addPropertyValues(properties.getXa().getProperties());
-        new RelaxedDataBinder(target).withAlias("user", "username").bind(values);
-    }
     
     protected Object extractFromOptional(Optional<?> optionalList) {
         if (optionalList.isPresent()) {

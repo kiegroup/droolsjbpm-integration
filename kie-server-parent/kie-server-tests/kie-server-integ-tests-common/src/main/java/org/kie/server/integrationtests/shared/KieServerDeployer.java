@@ -56,6 +56,10 @@ public class KieServerDeployer {
      */
     private static boolean commonParentDeployed = false;
 
+    public static void buildAndDeployMavenProjectFromResource(String resourcePath) {
+        buildAndDeployMavenProject(KieServerDeployer.class.getResource(resourcePath).getFile());
+    }
+
     public static void buildAndDeployMavenProject(String basedir) {
         // need to backup (and later restore) the current class loader, because the Maven/Plexus does some classloader
         // magic which then results in CNFE in RestEasy client
@@ -97,7 +101,7 @@ public class KieServerDeployer {
     public static void buildAndDeployCommonMavenParent() {
         // deploy only once as it is not needed to do that with every request
         if (!commonParentDeployed) {
-            buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/common-parent").getFile());
+            buildAndDeployMavenProjectFromResource("/kjars-sources/common-parent");
         } else {
             logger.debug("Common parent project already deployed, nothing to do here.");
         }
