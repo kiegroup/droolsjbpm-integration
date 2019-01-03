@@ -23,6 +23,10 @@
       <artifactId>camel-container-tests-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>camel-container-tests-model</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
       <scope>provided</scope>
@@ -96,6 +100,10 @@
           <artifactId>camel-cxf-transport</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>

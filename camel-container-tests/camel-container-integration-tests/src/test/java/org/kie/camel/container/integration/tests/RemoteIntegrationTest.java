@@ -36,7 +36,6 @@ import org.drools.core.util.FileManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -159,7 +158,6 @@ public class RemoteIntegrationTest extends AbstractKieCamelIntegrationTest {
     }
 
     @Test
-    @Ignore("RHPAM-1800")
     public void testExecuteCommand() {
         final Person person = new Person();
         person.setName("John");

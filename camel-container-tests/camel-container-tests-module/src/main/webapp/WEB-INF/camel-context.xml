@@ -12,6 +12,17 @@
                 address="http://localhost:8080/rest"
                 serviceClass="org.kie.camel.container.api.service.KieCamelTestService"/>
 
+  <!-- add custom class to the configuration so it can be marshalled -->
+  <bean id="kieConfiguration" class="org.kie.camel.KieConfiguration">
+    <property name="kieServicesConfigurationCustomizer">
+      <bean class="org.kie.camel.container.module.CamelKieServiceConfigurationCustomizer" />
+    </property>
+  </bean>
+    
+  <bean id="kie" class="org.kie.camel.KieComponent" >
+    <property name="configuration" ref="kieConfiguration" /> 
+  </bean>
+
   <bean id="batchExecutionHelperProvider" class="org.drools.core.runtime.help.impl.BatchExecutionHelperProviderImpl" />
   <bean id="xstreamBean" factory-bean="batchExecutionHelperProvider" factory-method="newJSonMarshaller" />
   <bean id="listProcessInstancesProcessor" class="org.kie.camel.container.module.ListProcessInstancesProcessor"/>
