@@ -340,6 +340,15 @@ public class KieServerImpl implements KieServer {
                     }
                     
                     kci.setStatus(KieContainerStatus.STARTED);
+                    // store the current state of the server
+                    KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+                    
+                    for (KieContainerResource containerResource : currentState.getContainers()) {
+                        if (containerId.equals(containerResource.getContainerId())) {
+                            containerResource.setStatus(KieContainerStatus.STARTED);
+                        }
+                    }
+                    repository.store(KieServerEnvironment.getServerId(), currentState);
                     
                     eventSupport.fireAfterContainerActivated(this, kci);
                     
@@ -379,6 +388,16 @@ public class KieServerImpl implements KieServer {
                     }
                     
                     kci.setStatus(KieContainerStatus.DEACTIVATED);
+                    
+                    // store the current state of the server
+                    KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+                    
+                    for (KieContainerResource containerResource : currentState.getContainers()) {
+                        if (containerId.equals(containerResource.getContainerId())) {
+                            containerResource.setStatus(KieContainerStatus.DEACTIVATED);
+                        }
+                    }
+                    repository.store(KieServerEnvironment.getServerId(), currentState);
                     
                     eventSupport.fireAfterContainerDeactivated(this, kci);
                     
