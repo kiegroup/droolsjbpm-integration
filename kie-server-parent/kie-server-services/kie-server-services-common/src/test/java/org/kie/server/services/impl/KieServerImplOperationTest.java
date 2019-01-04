@@ -15,7 +15,13 @@
 
 package org.kie.server.services.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
@@ -27,7 +33,10 @@ import org.kie.api.builder.KieScanner;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.services.impl.storage.KieServerState;
+import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
 import org.mockito.Mockito;
 
@@ -38,6 +47,7 @@ public class KieServerImplOperationTest {
  
     private KieServerImpl kieServer;    
     private String origServerId = null;
+    private KieServerStateRepository repository;
 
     @Before
     public void setupKieServerImpl() throws Exception {
@@ -47,7 +57,16 @@ public class KieServerImplOperationTest {
 
         FileUtils.deleteDirectory(REPOSITORY_DIR);
         FileUtils.forceMkdir(REPOSITORY_DIR);
-        kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+        repository = new KieServerStateFileRepository(REPOSITORY_DIR);
+        kieServer = new KieServerImpl(repository) {
+
+            @Override
+            protected Map<String, Object> getContainerParameters(org.kie.api.builder.ReleaseId releaseId, List<Message> messages) {
+                
+                return Collections.emptyMap();
+            }
+            
+        };
         kieServer.init();
     }
 
@@ -101,6 +120,49 @@ public class KieServerImplOperationTest {
         
         Mockito.verify(kieContainerInstance, Mockito.times(0)).stopScanner();
         
+    }
+    
+    @Test
+    public void testActivateAndDeactivateContainer() {
+        
+        InternalKieContainer mockedKieContainer = Mockito.mock(InternalKieContainer.class);
+        Mockito.when(mockedKieContainer.getReleaseId()).thenReturn(new ReleaseId("g", "a", "v"));        
+        
+        KieContainerResource container = new KieContainerResource("id", new ReleaseId("g", "a", "v"));
+        KieContainerInstanceImpl kieContainerInstance = Mockito.mock(KieContainerInstanceImpl.class);
+        Mockito.when(kieContainerInstance.getContainerId()).thenReturn("id");
+        Mockito.when(kieContainerInstance.getStatus()).thenReturn(KieContainerStatus.STARTED);
+        Mockito.when(kieContainerInstance.getKieContainer()).thenReturn(mockedKieContainer);
+        Mockito.when(kieContainerInstance.getResource()).thenReturn(container);        
+        
+        kieServer.getServerRegistry().registerContainer("id", kieContainerInstance);
+        KieServerState currentState = repository.load(KIE_SERVER_ID);
+        currentState.getContainers().add(container);
+        repository.store(KIE_SERVER_ID, currentState);
+        
+        kieServer.deactivateContainer("id");
+        
+        currentState = repository.load(KIE_SERVER_ID);
+        assertNotNull(currentState);
+        assertNotNull(currentState.getContainers());
+        assertEquals(1, currentState.getContainers().size());
+        
+        container = currentState.getContainers().iterator().next();
+        assertNotNull(container);
+        assertEquals(KieContainerStatus.DEACTIVATED, container.getStatus());
+        
+        
+        Mockito.when(kieContainerInstance.getStatus()).thenReturn(KieContainerStatus.DEACTIVATED);
+        kieServer.activateContainer("id");
+        
+        currentState = repository.load(KIE_SERVER_ID);
+        assertNotNull(currentState);
+        assertNotNull(currentState.getContainers());
+        assertEquals(1, currentState.getContainers().size());
+        
+        container = currentState.getContainers().iterator().next();
+        assertNotNull(container);
+        assertEquals(KieContainerStatus.STARTED, container.getStatus());
     }
     
 }
