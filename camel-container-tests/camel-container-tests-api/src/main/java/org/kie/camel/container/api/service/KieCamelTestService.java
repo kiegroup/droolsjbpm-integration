@@ -51,4 +51,10 @@ public interface KieCamelTestService {
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
     KieContainerResource esCreateContainer(@QueryParam("id") String id, KieContainerResource resource);
+
+    @POST
+    @Path("/es-run")
+    @Consumes({MediaType.TEXT_PLAIN})
+    @Produces({MediaType.TEXT_PLAIN})
+    String runOnExecServer(String command);
 }
