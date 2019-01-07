@@ -22,8 +22,8 @@ import org.kie.api.runtime.process.WorkItemManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component("Custom")
-public class CustomWorkItemHandler implements WorkItemHandler {
+@Component("Log")
+public class LogWorkItemHandler implements WorkItemHandler {
 
     @Autowired
     private ProcessService processService;
