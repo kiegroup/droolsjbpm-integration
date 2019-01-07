@@ -37,16 +37,27 @@ import org.apache.camel.impl.DefaultProducer;
 import org.kie.api.KieServices;
 import org.kie.api.command.Command;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.CaseServicesClient;
 import org.kie.server.client.DMNServicesClient;
+import org.kie.server.client.DocumentServicesClient;
+import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
+import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
+import org.kie.server.client.SolverServicesClient;
+import org.kie.server.client.UIServicesClient;
+import org.kie.server.client.UserTaskServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.kie.camel.KieCamelConstants.*;
+import static org.kie.camel.KieCamelConstants.KIE_BODY_PARAM;
+import static org.kie.camel.KieCamelConstants.KIE_CLIENT;
+import static org.kie.camel.KieCamelConstants.KIE_OPERATION;
+import static org.kie.camel.KieCamelConstants.RESPONSE_MESSAGE;
+import static org.kie.camel.KieCamelConstants.RESPONSE_TYPE;
 import static org.kie.camel.KieCamelUtils.asCamelKieName;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
 import static org.kie.camel.KieCamelUtils.ucFirst;
@@ -283,4 +294,54 @@ public class KieProducer extends DefaultProducer {
             super( client.getServicesClient(DMNServicesClient.class), clientName, endpoint );
         }
     }
+
+    static class CaseProducer extends AbstractReflectiveProducer<CaseServicesClient> {
+
+        public CaseProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
+            super(client.getServicesClient(CaseServicesClient.class), clientName, endpoint);
+        }
+    }
+
+    static class DocumentProducer extends AbstractReflectiveProducer<DocumentServicesClient> {
+
+        public DocumentProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
+            super(client.getServicesClient(DocumentServicesClient.class), clientName, endpoint);
+        }
+    }
+
+    static class JobProducer extends AbstractReflectiveProducer<JobServicesClient> {
+
+        public JobProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
+            super(client.getServicesClient(JobServicesClient.class), clientName, endpoint);
+        }
+    }
+
+    static class QueryProducer extends AbstractReflectiveProducer<QueryServicesClient> {
+
+        public QueryProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
+            super(client.getServicesClient(QueryServicesClient.class), clientName, endpoint);
+        }
+    }
+
+    static class SolverProducer extends AbstractReflectiveProducer<SolverServicesClient> {
+
+        public SolverProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
+            super(client.getServicesClient(SolverServicesClient.class), clientName, endpoint);
+        }
+    }
+
+    static class UiProducer extends AbstractReflectiveProducer<UIServicesClient> {
+
+        public UiProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
+            super(client.getServicesClient(UIServicesClient.class), clientName, endpoint);
+        }
+    }
+
+    static class UserTaskProducer extends AbstractReflectiveProducer<UserTaskServicesClient> {
+
+        public UserTaskProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
+            super(client.getServicesClient(UserTaskServicesClient.class), clientName, endpoint);
+        }
+    }
+
 }
