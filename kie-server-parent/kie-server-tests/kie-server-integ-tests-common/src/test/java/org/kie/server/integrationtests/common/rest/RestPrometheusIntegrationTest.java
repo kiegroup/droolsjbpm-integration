@@ -44,13 +44,17 @@ public class RestPrometheusIntegrationTest extends RestTextOnlyBaseIntegrationTe
 
         Response response = null;
         try {
-            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/prometheus/");
+            String kieServerHttpUrl = TestConfig.getKieServerHttpUrl();
+            String uriString = kieServerHttpUrl.replaceAll("/services/rest/server", "/services/rest") + "/prometheus";
+
+            WebTarget clientRequest = newRequest(uriString);
             response = clientRequest.request(getMediaType()).get();
 
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             String res = response.readEntity(String.class);
             String[] split = res.split("\\n");
+            logger.info("res = " + res);
             Assert.assertEquals(10, split.length);
         } catch (Exception e) {
             throw new RuntimeException(
