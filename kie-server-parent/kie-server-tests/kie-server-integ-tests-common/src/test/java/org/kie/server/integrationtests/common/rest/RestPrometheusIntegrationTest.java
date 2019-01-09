@@ -18,8 +18,6 @@ package org.kie.server.integrationtests.common.rest;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Histogram;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -39,13 +37,9 @@ public class RestPrometheusIntegrationTest extends RestTextOnlyBaseIntegrationTe
     public void testPrometheusEndpoint() throws InterruptedException {
         System.setProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "false");
         KieContainerResource resource = new KieContainerResource("container", RELEASE_ID_1);
-
-        recordMetric();
-
         Response response = null;
         try {
-            String kieServerHttpUrl = TestConfig.getKieServerHttpUrl();
-            String uriString = kieServerHttpUrl.replaceAll("/services/rest/server", "/services/rest") + "/prometheus";
+            String uriString = TestConfig.getKieServerHttpUrl() + "/prometheus";
 
             WebTarget clientRequest = newRequest(uriString);
             response = clientRequest.request(getMediaType()).get();
@@ -67,32 +61,4 @@ public class RestPrometheusIntegrationTest extends RestTextOnlyBaseIntegrationTe
         }
     }
 
-    public void recordMetric() {
-
-        CollectorRegistry registry = CollectorRegistry.defaultRegistry;
-
-        logger.info("Recording metrics: " + registry.hashCode());
-
-        Histogram histogram = Histogram.build().name("dmn_evaluate_decision_nanosecond" + System.nanoTime())
-                .help("DMN Evaluation Time")
-                .labelNames("decision_name")
-                .buckets(HALF_SECOND_NANO, toNano(1), toNano(2), toNano(3), toNano(4))
-                .register();
-
-        int amt = 123456789;
-        histogram.labels("prova")
-                .observe(amt);
-
-        logger.info("inserted = " + amt);
-    }
-
-    /**
-     * Number of nanoseconds in a second.
-     */
-    public static final long NANOSECONDS_PER_SECOND = 1_000_000_000;
-    public static final long HALF_SECOND_NANO = 500_000_000;
-
-    public static long toNano(long second) {
-        return second * NANOSECONDS_PER_SECOND;
-    }
 }

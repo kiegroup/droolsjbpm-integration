@@ -40,6 +40,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Histogram;
 import io.prometheus.client.exporter.common.TextFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -85,6 +86,8 @@ public class KieServerRestImpl {
     private MarshallerHelper marshallerHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerRestImpl.class);
+
+    public static CollectorRegistry prometheusRegistry = CollectorRegistry.defaultRegistry;
 
     public KieServerRestImpl() {
         // for now, if no server impl is passed as parameter, create one
@@ -137,8 +140,35 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.listContainers(containerFilter), headers);
     }
 
-    CollectorRegistry registry = CollectorRegistry.defaultRegistry;
 
+    public void recordMetric() {
+
+        CollectorRegistry registry = KieServerRestImpl.prometheusRegistry;
+
+        logger.info("\"------------------ Recording metrics: " + registry.getClass().getClassLoader().toString());
+
+        Histogram histogram = Histogram.build().name("dmn_evaluate_decision_nanosecond" + System.nanoTime())
+                .help("DMN Evaluation Time")
+                .labelNames("decision_name")
+                .buckets(HALF_SECOND_NANO, toNano(1), toNano(2), toNano(3), toNano(4))
+                .register();
+
+        int amt = 123456789;
+        histogram.labels("prova")
+                .observe(amt);
+
+        logger.info("inserted = " + amt);
+    }
+
+    /**
+     * Number of nanoseconds in a second.
+     */
+    public static final long NANOSECONDS_PER_SECOND = 1_000_000_000;
+    public static final long HALF_SECOND_NANO = 500_000_000;
+
+    public static long toNano(long second) {
+        return second * NANOSECONDS_PER_SECOND;
+    }
     @ApiOperation(value="Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status",
             response=ServiceResponse.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
@@ -147,9 +177,10 @@ public class KieServerRestImpl {
     @Produces({MediaType.TEXT_PLAIN})
     public Response getModels() {
 
-        logger.info("Collecton Registry test: " + registry.hashCode());
+        recordMetric();
+        logger.info("------------------ Collecton Registry test: " + prometheusRegistry.getClass().getClassLoader().toString());
 
-        Enumeration<Collector.MetricFamilySamples> mfs = registry.metricFamilySamples();
+        Enumeration<Collector.MetricFamilySamples> mfs = prometheusRegistry.metricFamilySamples();
 
         StreamingOutput stream = os -> {
             Writer writer = new BufferedWriter(new OutputStreamWriter(os));
