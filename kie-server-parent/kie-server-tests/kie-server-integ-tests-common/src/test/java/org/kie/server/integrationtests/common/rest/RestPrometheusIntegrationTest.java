@@ -52,7 +52,7 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
     private static final ReleaseId RELEASE_ID_1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
 
     @Test
-    public void testPrometheusEndpoint() {
+    public void testPrometheusEndpoint() throws InterruptedException {
         System.setProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "false");
         KieContainerResource resource = new KieContainerResource("container", RELEASE_ID_1);
 
@@ -62,16 +62,19 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
             extension.recordMetric();
         }
 
-
         logger.info(configuration.getUserName());
         logger.info(configuration.getPassword());
         Response response = null;
         try {
-            String uriString = TestConfig.getKieServerHttpUrl().replaceAll("/server", "") + "/prometheus";
-            logger.info("testPrometheusEndpoint using uri:" + uriString);
-            WebTarget clientRequest = newRequest(uriString);
-            response = clientRequest.request().get();
+            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/prometheus/");
+            response = clientRequest.request(getMediaType()).get();
+
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            Object res = response.readEntity(String.class);
+            Assert.assertEquals("pippo", res);
+
+
         } catch (Exception e) {
             throw new RuntimeException(
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
