@@ -15,13 +15,10 @@
 
 package org.kie.server.integrationtests.common.rest;
 
-import java.util.Collection;
 import java.util.ServiceLoader;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Histogram;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -31,9 +28,6 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.category.RESTOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
-import org.kie.server.services.api.KieServer;
-import org.kie.server.services.api.KieServerApplicationComponentsService;
-import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
 
 @Category(RESTOnly.class)
@@ -68,6 +62,9 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
             extension.recordMetric();
         }
 
+
+        logger.info(configuration.getUserName());
+        logger.info(configuration.getPassword());
         Response response = null;
         try {
             String uriString = TestConfig.getKieServerHttpUrl().replaceAll("/server", "") + "/prometheus";
@@ -75,9 +72,6 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
             WebTarget clientRequest = newRequest(uriString);
             response = clientRequest.request().get();
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            System.out.println("waiting for requests");
-            Thread.sleep(Long.MAX_VALUE);
         } catch (Exception e) {
             throw new RuntimeException(
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
