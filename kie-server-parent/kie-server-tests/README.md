@@ -14,7 +14,11 @@ where `<container-profile>` is simply a particular container. Another container-
 WildFly14, EAP 7 and Tomcat 8 do not have to be pre-installed, they will be downloaded automatically (in case of EAP 7, download URL has to be provided).
 Oracle WebLogic 12 and IBM WebSphere 9 have to be pre-installed and the installation path has to be provided using a Maven property `weblogic.home` or `websphere.home` respectively.
 Tests are executed using Failsafe plugin. To run specific test class use `-Dit.test=<Test class name>`
+
 Most of the tests can be executed locally as JUnit tests, in this case embedded server is used and only REST endpoints are tested.
+To run a test locally in Intellij IDEA add this string to the configuration, it will clear the property that triggers a Cargo build due to probably a bug in the IDE.
+
+```-Dkie.server.base.http.url=```
 
 The following table lists all currently supported combinations of parameters:
 
