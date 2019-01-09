@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-custom-extension</artifactId>
