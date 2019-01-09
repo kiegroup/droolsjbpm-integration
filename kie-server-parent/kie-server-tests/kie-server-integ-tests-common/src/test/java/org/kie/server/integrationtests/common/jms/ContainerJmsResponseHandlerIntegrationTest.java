@@ -21,7 +21,6 @@ import java.util.HashSet;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
@@ -49,7 +48,6 @@ import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegra
 import static org.assertj.core.api.Assertions.*;
 
 @Category({JMSOnly.class})
-@Ignore
 public class ContainerJmsResponseHandlerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static final ReleaseId RELEASE_ID_1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
