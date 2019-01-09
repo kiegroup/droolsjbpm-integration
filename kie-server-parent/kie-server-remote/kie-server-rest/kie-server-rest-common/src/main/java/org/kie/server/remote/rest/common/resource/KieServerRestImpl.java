@@ -16,6 +16,12 @@
 
 package org.kie.server.remote.rest.common.resource;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -32,7 +38,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 
+import io.prometheus.client.Collector;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.exporter.common.TextFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -53,6 +63,8 @@ import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_JSON;
 import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_XML;
@@ -73,6 +85,8 @@ public class KieServerRestImpl {
 
     private KieServerImpl server;
     private MarshallerHelper marshallerHelper;
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerRestImpl.class);
 
     public KieServerRestImpl() {
         // for now, if no server impl is passed as parameter, create one
@@ -125,18 +139,35 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.listContainers(containerFilter), headers);
     }
 
+    CollectorRegistry registry = CollectorRegistry.defaultRegistry;
+
     @ApiOperation(value="Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status",
             response=ServiceResponse.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("prometheus")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response listPrometheus(@Context HttpHeaders headers,
-            @ApiParam(value = "optional groupId to filter containers by", required = false) @QueryParam("groupId") String groupId,
-            @ApiParam(value = "optional artifactId to filter containers by", required = false) @QueryParam("artifactId") String artifactId,
-            @ApiParam(value = "optional version to filter containers by", required = false) @QueryParam("version") String version,
-            @ApiParam(value = "optional status to filter containers by", required = false) @QueryParam("status") String status) {
-       return Response.ok("pippo").build();
+    public Response getModels() {
+
+        logger.info("Collecton Registry test: " + registry.hashCode());
+
+        registry.register(new Collector() {
+            @Override
+            public List<MetricFamilySamples> collect() {
+                return Collections.singletonList(new MetricFamilySamples("ciao", Type.COUNTER, "prova", new ArrayList<>()));
+            }
+        });
+
+        Enumeration<Collector.MetricFamilySamples> mfs = registry.metricFamilySamples();
+
+        StreamingOutput stream = os -> {
+            Writer writer = new BufferedWriter(new OutputStreamWriter(os));
+            TextFormat.write004(writer, mfs);
+            writer.flush();
+        };
+
+        return Response.ok(stream).build();
+
     }
 
     @ApiOperation(value="Creates (deploys) new KIE container to this server",

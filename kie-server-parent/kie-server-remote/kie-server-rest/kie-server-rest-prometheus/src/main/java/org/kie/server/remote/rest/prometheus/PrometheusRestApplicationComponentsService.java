@@ -38,8 +38,6 @@ public class PrometheusRestApplicationComponentsService implements KieServerAppl
 
         List<Object> components = new ArrayList<>(1);
 
-        components.add(new MetricsResource());
-
         return components;
     }
 }
