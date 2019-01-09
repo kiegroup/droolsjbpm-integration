@@ -19,8 +19,6 @@ package org.kie.server.remote.rest.common.resource;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import javax.ws.rs.Consumes;
@@ -150,13 +148,6 @@ public class KieServerRestImpl {
     public Response getModels() {
 
         logger.info("Collecton Registry test: " + registry.hashCode());
-
-        registry.register(new Collector() {
-            @Override
-            public List<MetricFamilySamples> collect() {
-                return Collections.singletonList(new MetricFamilySamples("ciao", Type.COUNTER, "prova", new ArrayList<>()));
-            }
-        });
 
         Enumeration<Collector.MetricFamilySamples> mfs = registry.metricFamilySamples();
 
