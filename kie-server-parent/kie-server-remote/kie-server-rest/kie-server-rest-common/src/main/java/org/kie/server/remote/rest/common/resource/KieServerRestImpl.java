@@ -144,7 +144,7 @@ public class KieServerRestImpl {
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("prometheus")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.TEXT_PLAIN})
     public Response getModels() {
 
         logger.info("Collecton Registry test: " + registry.hashCode());

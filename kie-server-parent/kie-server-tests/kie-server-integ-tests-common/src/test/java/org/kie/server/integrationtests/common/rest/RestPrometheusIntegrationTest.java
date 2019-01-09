@@ -28,28 +28,12 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.category.RESTOnly;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.basetests.RestTextOnlyBaseIntegrationTest;
 
 @Category(RESTOnly.class)
-public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
+public class RestPrometheusIntegrationTest extends RestTextOnlyBaseIntegrationTest {
 
-    @Test
-    public void testOkResponse() {
-        Response response = null;
-        try {
-            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/");
-            response = clientRequest.request(getMediaType()).get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        } catch (Exception e) {
-            throw new RuntimeException("Unexpected exception on empty body", e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-    }
-
-    private static final ReleaseId RELEASE_ID_1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
+    private static final ReleaseId RELEASE_ID_1 = new ReleaseId("org.kie.server.testing", "container-prometheus-tests1", "2.1.0.GA");
 
     @Test
     public void testPrometheusEndpoint() throws InterruptedException {
@@ -58,8 +42,6 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
 
         recordMetric();
 
-        logger.info(configuration.getUserName());
-        logger.info(configuration.getPassword());
         Response response = null;
         try {
             WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/prometheus/");
@@ -93,7 +75,7 @@ public class RestPrometheusIntegrationTest extends RestOnlyBaseIntegrationTest {
                 .buckets(HALF_SECOND_NANO, toNano(1), toNano(2), toNano(3), toNano(4))
                 .register();
 
-        int amt = 123456789 ;
+        int amt = 123456789;
         histogram.labels("prova")
                 .observe(amt);
 
