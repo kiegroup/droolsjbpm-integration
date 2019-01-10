@@ -14,6 +14,7 @@
     <java.module.name>org.kie.server.itests.dmn</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.kie.dmn.server.ext.disabled>false</org.kie.dmn.server.ext.disabled>
+    <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
   </properties>
 
   <dependencies>
@@ -194,6 +195,7 @@
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <!-- Added: -->
               <org.kie.dmn.server.ext.disabled>${org.kie.dmn.server.ext.disabled}</org.kie.dmn.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
@@ -239,6 +241,7 @@
               <!-- Added: -->
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.kie.dmn.server.ext.disabled>${org.kie.dmn.server.ext.disabled}</org.kie.dmn.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
             </systemProperties>
           </container>
         </configuration>
@@ -281,6 +284,11 @@
         <dependency>
           <groupId>org.kie.server</groupId>
           <artifactId>kie-server-rest-dmn</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-prometheus</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

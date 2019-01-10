@@ -1,4 +1,4 @@
-package org.kie.server.services.dmn.metrics;
+package org.kie.server.services.prometheus;
 
 import io.prometheus.client.Histogram;
 import org.kie.dmn.api.core.event.AfterEvaluateBKMEvent;

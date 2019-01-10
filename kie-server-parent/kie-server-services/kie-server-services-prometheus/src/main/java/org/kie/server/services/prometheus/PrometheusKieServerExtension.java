@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import io.prometheus.client.CollectorRegistry;
+import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
@@ -20,8 +21,9 @@ import org.slf4j.LoggerFactory;
 
 public class PrometheusKieServerExtension implements KieServerExtension {
     public static final String EXTENSION_NAME = "Prometheus";
+    private static DMNRuntimeEventListener LISTENER = null;
 
-    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "true"));
 
     public static final CollectorRegistry registry = CollectorRegistry.defaultRegistry;
 
@@ -31,6 +33,13 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     private List<Object> services = new ArrayList<Object>();
     private boolean initialized = false;
+
+    public static DMNRuntimeEventListener getListener() {
+        if(LISTENER == null) {
+            LISTENER = new PrometheusMetricsListener();
+        }
+        return LISTENER;
+    }
 
     @Override
     public boolean isInitialized() {
