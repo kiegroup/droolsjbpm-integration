@@ -375,5 +375,29 @@
         </pluginManagement>
       </build>
     </profile>
+
+    <profile>
+      <id>kie-maven-settings-custom</id>
+      <activation>
+        <property>
+          <name>kie.maven.settings.custom</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+              <container>
+                <systemProperties combine.children="append">
+                  <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
+                </systemProperties>
+              </container>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
