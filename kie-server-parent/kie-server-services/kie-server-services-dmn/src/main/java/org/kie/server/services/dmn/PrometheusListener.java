@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class PrometheusListener implements DMNRuntimeEventListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PrometheusListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(PrometheusListener.class);
 
     /**
      * Number of nanoseconds in a second.
@@ -53,6 +53,9 @@ public class PrometheusListener implements DMNRuntimeEventListener {
         long elapsed = System.nanoTime() - startTime;
         histogram.labels(decisionName)
                 .observe(elapsed);
+        if(logger.isDebugEnabled()) {
+            logger.debug("Elapsed time: " + elapsed);
+        }
     }
 
     private AfterEvaluateDecisionEventImpl getAfterImpl(AfterEvaluateDecisionEvent e) {
