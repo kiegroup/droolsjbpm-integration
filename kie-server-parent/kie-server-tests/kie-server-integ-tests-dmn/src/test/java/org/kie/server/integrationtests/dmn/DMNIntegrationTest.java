@@ -40,7 +40,9 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.*;
 
 public class DMNIntegrationTest
@@ -128,9 +130,7 @@ public class DMNIntegrationTest
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             String res = response.readEntity(String.class);
-            String[] split = res.split("\\n");
-            logger.info("res = " + res);
-            Assert.assertEquals(13, split.length);
+            Assert.assertThat(res, not(isEmptyOrNullString()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
