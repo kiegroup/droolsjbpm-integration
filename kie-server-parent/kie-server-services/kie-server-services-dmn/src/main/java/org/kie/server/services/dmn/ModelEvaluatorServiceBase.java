@@ -158,6 +158,8 @@ public class ModelEvaluatorServiceBase {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
             DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
+
+            dmnRuntime.addListener(new PrometheusListener());
             
             LOG.debug("Will deserialize payload: {}", contextPayload);
             DMNContextKS evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNContextKS.class);
