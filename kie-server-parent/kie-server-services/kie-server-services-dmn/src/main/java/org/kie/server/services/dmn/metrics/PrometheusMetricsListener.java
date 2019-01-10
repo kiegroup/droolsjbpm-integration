@@ -22,20 +22,19 @@ public class PrometheusMetricsListener implements DMNRuntimeEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsListener.class);
 
-    /**
-     * Number of nanoseconds in a second.
-     */
-    private static final long NANOSECONDS_PER_SECOND = 1_000_000_000;
-    private static final long HALF_SECOND_NANO = 500_000_000;
+    private static final double[] DECISION_TIME_BUCKETS = new double[]{1_000_000, 2_000_000, 3_000_000, 100_000_000, 200_000_000, 300_000_000, 400_000_000, 500_000_000};
 
-    private static long toNano(long second) {
+    public static final long NANOSECONDS_PER_SECOND = 1_000_000_000;
+    public static final long HALF_SECOND_NANO = 500_000_000;
+
+    public static long toNano(long second) {
         return second * NANOSECONDS_PER_SECOND;
     }
 
     private static final Histogram histogram = Histogram.build().name("dmn_evaluate_decision_nanosecond")
             .help("DMN Evaluation Time")
             .labelNames("decision_name")
-            .buckets(HALF_SECOND_NANO, toNano(1), toNano(2), toNano(3), toNano(4))
+            .buckets(DECISION_TIME_BUCKETS)
             .register();
 
     @Override
@@ -53,7 +52,7 @@ public class PrometheusMetricsListener implements DMNRuntimeEventListener {
         long elapsed = System.nanoTime() - startTime;
         histogram.labels(decisionName)
                 .observe(elapsed);
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("Elapsed time: " + elapsed);
         }
     }
