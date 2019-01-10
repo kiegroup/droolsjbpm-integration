@@ -130,7 +130,7 @@ public class DMNIntegrationTest
             String res = response.readEntity(String.class);
             String[] split = res.split("\\n");
             logger.info("res = " + res);
-            Assert.assertEquals(10, split.length);
+            Assert.assertEquals(13, split.length);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
