@@ -22,9 +22,12 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.persistence.api.TransactionManager;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.api.command.Command;
+import org.springframework.orm.jpa.EntityManagerFactoryInfo;
+import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  *
@@ -91,6 +94,17 @@ public class SpringTransactionalCommandService extends TransactionalCommandServi
         if (sharedEntityManager != null) {
             return sharedEntityManager;
         }
+
+        EntityManagerHolder emHolder = ((EntityManagerHolder) TransactionSynchronizationManager.getResource("cmdEM"));
+        if (emHolder != null) {
+            EntityManager em = emHolder.getEntityManager();
+            EntityManagerFactory nativeEmf = ((EntityManagerFactoryInfo) emf).getNativeEntityManagerFactory();
+            if (em != null && em.isOpen() && em.getEntityManagerFactory().equals(nativeEmf)) {
+
+                return em;
+            }
+        }
+
         return super.getEntityManager(command);
     }
 }
