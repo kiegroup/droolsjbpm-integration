@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
@@ -49,6 +48,7 @@ import org.kie.server.api.model.dmn.DMNQNameInfo;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.dmn.DMNUnaryTestsInfo;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.dmn.metrics.PrometheusMetricsListener;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -159,7 +159,7 @@ public class ModelEvaluatorServiceBase {
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
             DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
 
-            dmnRuntime.addListener(new PrometheusListener());
+            dmnRuntime.addListener(new PrometheusMetricsListener());
             
             LOG.debug("Will deserialize payload: {}", contextPayload);
             DMNContextKS evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNContextKS.class);

@@ -1,4 +1,4 @@
-package org.kie.server.services.dmn;
+package org.kie.server.services.dmn.metrics;
 
 import io.prometheus.client.Histogram;
 import org.kie.dmn.api.core.event.AfterEvaluateBKMEvent;
@@ -18,9 +18,9 @@ import org.kie.dmn.model.api.Decision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PrometheusListener implements DMNRuntimeEventListener {
+public class PrometheusMetricsListener implements DMNRuntimeEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(PrometheusListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsListener.class);
 
     /**
      * Number of nanoseconds in a second.

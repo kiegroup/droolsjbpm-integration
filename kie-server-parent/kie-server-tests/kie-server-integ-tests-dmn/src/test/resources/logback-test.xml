@@ -18,7 +18,8 @@
   <logger name="org.kie.server" level="INFO" />
   <logger name="org.apache.http" level="WARN" />
   <logger name="org.apache.maven" level="WARN" />
-<!--   
+  <logger name="org.kie.server.services.dmn.metrics.PrometheusMetricsListener" level="DEBUG" />
+<!--
   <logger name="org.kie.server.services.dmn" level="DEBUG" />
   <logger name="org.kie.server.remote.rest.dmn" level="DEBUG" />
   <logger name="org.kie.server.client.impl.AbstractKieServicesClientImpl" level="DEBUG">
