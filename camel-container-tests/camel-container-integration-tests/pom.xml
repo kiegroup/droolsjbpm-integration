@@ -182,7 +182,7 @@
                     <context>${kie.server.context}</context>
                   </properties>
                   <pingURL>${kie.server.base.http.url}</pingURL>
-                  <pingTimeout>6000000</pingTimeout>
+                  <pingTimeout>300000</pingTimeout>
                 </deployable>
                 <deployable>
                   <groupId>org.drools</groupId>
@@ -287,7 +287,7 @@
                     <context>${kie.server.context}</context>
                   </properties>
                   <pingURL>${kie.server.base.http.url}</pingURL>
-                  <pingTimeout>6000000</pingTimeout>
+                  <pingTimeout>300000</pingTimeout>
                 </deployable>
               </deployables>
               <configuration>
