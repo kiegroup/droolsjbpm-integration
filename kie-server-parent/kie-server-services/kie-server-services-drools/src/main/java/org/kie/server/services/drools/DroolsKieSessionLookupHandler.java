@@ -17,10 +17,13 @@ package org.kie.server.services.drools;
 
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.event.rule.RuleRuntimeEventManager;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.server.services.api.KieContainerInstance;
+import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieSessionLookupHandler;
+import org.kie.server.services.prometheus.PrometheusKieServerExtension;
 
 public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
 
@@ -28,7 +31,7 @@ public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
     public CommandExecutor lookupKieSession(String kieSessionId, KieContainerInstance containerInstance, KieServerRegistry registry) {
         CommandExecutor ks = null;
         if( kieSessionId != null ) {
-            KieSessionModel ksm = ((KieContainerImpl)containerInstance.getKieContainer()).getKieSessionModel(kieSessionId);
+            KieSessionModel ksm = containerInstance.getKieContainer().getKieSessionModel(kieSessionId);
             if( ksm != null ) {
                 switch (ksm.getType() ) {
                     case STATEFUL:
@@ -36,10 +39,16 @@ public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
                         break;
                     case STATELESS:
                         ks = ((KieContainerImpl)containerInstance.getKieContainer()).getStatelessKieSession(kieSessionId);
+
                         break;
                 }
             }
 
+            KieServerExtension extension = registry.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
+            if (extension != null && ks != null) {
+                RuleRuntimeEventManager eventManager = (RuleRuntimeEventManager)ks;
+                eventManager.addEventListener(PrometheusKieServerExtension.getDroolsListener());
+            }
             return ks;
         }
 

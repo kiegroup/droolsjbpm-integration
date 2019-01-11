@@ -1,5 +1,6 @@
 package org.kie.server.services.prometheus;
 
+import io.prometheus.client.Histogram;
 import org.drools.core.event.rule.impl.AfterActivationFiredEventImpl;
 import org.drools.core.event.rule.impl.BeforeActivationFiredEventImpl;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
@@ -13,7 +14,6 @@ import org.kie.api.event.rule.RuleFlowGroupActivatedEvent;
 import org.kie.api.event.rule.RuleFlowGroupDeactivatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.prometheus.client.Histogram;
 
 public class PrometheusMetricsDroolsListener implements AgendaEventListener {
 
@@ -25,7 +25,7 @@ public class PrometheusMetricsDroolsListener implements AgendaEventListener {
     private static final Histogram evaluationTimeHistogram = Histogram.build()
             .name("drl_match_fired_nanosecond")
             .help("Drools Firing Time")
-            .labelNames("Rule Name")
+            .labelNames("rule_name")
             .buckets(RULE_TIME_BUCKETS)
             .register();
 

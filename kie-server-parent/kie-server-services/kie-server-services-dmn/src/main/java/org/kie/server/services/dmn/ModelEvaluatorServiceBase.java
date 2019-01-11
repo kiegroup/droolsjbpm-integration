@@ -163,7 +163,7 @@ public class ModelEvaluatorServiceBase {
 
             KieServerExtension extension = context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
             if (extension != null) {
-                dmnRuntime.addListener(PrometheusKieServerExtension.getListener());
+                dmnRuntime.addListener(PrometheusKieServerExtension.getDMNListener());
             }
 
             LOG.debug("Will deserialize payload: {}", contextPayload);
