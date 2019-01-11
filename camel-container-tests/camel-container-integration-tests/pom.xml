@@ -286,6 +286,8 @@
                   <properties>
                     <context>${kie.server.context}</context>
                   </properties>
+                  <pingURL>${kie.server.base.http.url}</pingURL>
+                  <pingTimeout>6000000</pingTimeout>
                 </deployable>
               </deployables>
               <configuration>
