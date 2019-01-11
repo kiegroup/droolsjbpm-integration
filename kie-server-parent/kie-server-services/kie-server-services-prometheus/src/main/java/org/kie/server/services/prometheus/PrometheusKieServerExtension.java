@@ -36,7 +36,7 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     public static DMNRuntimeEventListener getListener() {
         if(LISTENER == null) {
-            LISTENER = new PrometheusMetricsListener();
+            LISTENER = new PrometheusMetricsDMNListener();
         }
         return LISTENER;
     }

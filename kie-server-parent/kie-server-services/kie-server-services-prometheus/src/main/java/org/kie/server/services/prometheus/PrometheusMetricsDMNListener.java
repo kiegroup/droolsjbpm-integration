@@ -18,9 +18,9 @@ import org.kie.dmn.model.api.Decision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PrometheusMetricsListener implements DMNRuntimeEventListener {
+public class PrometheusMetricsDMNListener implements DMNRuntimeEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsDMNListener.class);
 
     private static final double[] DECISION_TIME_BUCKETS = new double[]{1_000_000, 2_000_000, 3_000_000, 100_000_000, 200_000_000, 300_000_000, 400_000_000, 500_000_000};
 
@@ -31,7 +31,7 @@ public class PrometheusMetricsListener implements DMNRuntimeEventListener {
         return second * NANOSECONDS_PER_SECOND;
     }
 
-    private static final Histogram histogram = Histogram.build().name("dmn_evaluate_decision_nanosecond")
+    private static final Histogram evaluationTimeHistogram = Histogram.build().name("dmn_evaluate_decision_nanosecond")
             .help("DMN Evaluation Time")
             .labelNames("decision_name")
             .buckets(DECISION_TIME_BUCKETS)
@@ -50,7 +50,7 @@ public class PrometheusMetricsListener implements DMNRuntimeEventListener {
         String decisionName = getDecisionName(e.getDecision().getDecision());
         long startTime = event.getTimestamp();
         long elapsed = System.nanoTime() - startTime;
-        histogram.labels(decisionName)
+        evaluationTimeHistogram.labels(decisionName)
                 .observe(elapsed);
         if (logger.isDebugEnabled()) {
             logger.debug("Elapsed time: " + elapsed);
