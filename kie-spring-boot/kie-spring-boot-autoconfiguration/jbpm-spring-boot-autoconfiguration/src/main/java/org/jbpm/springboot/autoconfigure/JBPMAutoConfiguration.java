@@ -41,7 +41,6 @@ import org.drools.persistence.api.TransactionManagerFactory;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
 import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
-import org.jbpm.casemgmt.api.event.CaseEventListener;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
@@ -80,15 +79,10 @@ import org.jbpm.springboot.quartz.SpringConnectionProvider;
 import org.jbpm.springboot.security.SpringSecurityIdentityProvider;
 import org.jbpm.springboot.security.SpringSecurityUserGroupCallback;
 import org.jbpm.springboot.services.SpringKModuleDeploymentService;
-import org.kie.api.event.process.ProcessEventListener;
-import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.executor.ExecutorService;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
-import org.kie.api.runtime.process.WorkItemHandler;
-import org.kie.api.task.TaskLifeCycleEventListener;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.identity.IdentityProvider;
@@ -147,7 +141,7 @@ public class JBPMAutoConfiguration {
     private static final String TX_FACTORY_CLASS = "org.kie.txm.factory.class";
     private static final String SPRING_TX_FACTORY_CLASS = "org.kie.spring.persistence.KieSpringTransactionManagerFactory";
   
-    
+    private ApplicationContext applicationContext;
     private JBPMProperties properties;
     
     private PlatformTransactionManager transactionManager;
@@ -158,6 +152,7 @@ public class JBPMAutoConfiguration {
                 
         this.transactionManager = transactionManager;
         this.properties = properties;
+        this.applicationContext = applicationContext;
         System.setProperty(TX_FACTORY_CLASS, SPRING_TX_FACTORY_CLASS);
         TransactionManagerFactory transactionManagerFactory = TransactionManagerFactory.get();
         if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
@@ -319,17 +314,9 @@ public class JBPMAutoConfiguration {
         return new SpringTransactionalCommandService(entityManagerFactory, kieTransactionManager, (AbstractPlatformTransactionManager) transactionManager);
     }
     
-    @SuppressWarnings("unchecked")
     @Bean(destroyMethod="shutdown")
     @ConditionalOnMissingBean(name = "deploymentService")
-    public DeploymentService deploymentService(DefinitionService definitionService, RuntimeManagerFactory runtimeManagerFactory, FormManagerService formService, EntityManagerFactory entityManagerFactory, IdentityProvider identityProvider, 
-            Optional<List<WorkItemHandler>> handlers,
-            Optional<List<ProcessEventListener>> processEventListeners,
-            Optional<List<AgendaEventListener>> agendaEventListeners,
-            Optional<List<RuleRuntimeEventListener>> ruleRuntimeEventListeners,
-            Optional<List<TaskLifeCycleEventListener>> taskListeners,
-            Optional<List<CaseEventListener>> caseEventListeners
-            ) {
+    public DeploymentService deploymentService(DefinitionService definitionService, RuntimeManagerFactory runtimeManagerFactory, FormManagerService formService, EntityManagerFactory entityManagerFactory, IdentityProvider identityProvider            ) {
         
         EntityManagerFactoryManager.get().addEntityManagerFactory(PERSISTENCE_UNIT_NAME, entityManagerFactory);
         
@@ -339,14 +326,8 @@ public class JBPMAutoConfiguration {
         ((SpringKModuleDeploymentService) deploymentService).setIdentityProvider(identityProvider);
         ((SpringKModuleDeploymentService) deploymentService).setManagerFactory(runtimeManagerFactory);
         ((SpringKModuleDeploymentService) deploymentService).setFormManagerService(formService);
-        
-        ((SpringKModuleDeploymentService) deploymentService).registerWorkItemHandlers((List<WorkItemHandler>) extractFromOptional(handlers));        
-        ((SpringKModuleDeploymentService) deploymentService).registerAgendaEventListeners((List<AgendaEventListener>) extractFromOptional(agendaEventListeners));        
-        ((SpringKModuleDeploymentService) deploymentService).registerCaseEventListeners((List<CaseEventListener>) extractFromOptional(caseEventListeners));
-        ((SpringKModuleDeploymentService) deploymentService).registerProcessEventListeners((List<ProcessEventListener>) extractFromOptional(processEventListeners));
-        ((SpringKModuleDeploymentService) deploymentService).registerRuleRuntimeEventListeners((List<RuleRuntimeEventListener>) extractFromOptional(ruleRuntimeEventListeners));
-        ((SpringKModuleDeploymentService) deploymentService).registerTaskListeners((List<TaskLifeCycleEventListener>) extractFromOptional(taskListeners));        
-        
+        ((SpringKModuleDeploymentService) deploymentService).setContext(applicationContext);
+
         ((SpringKModuleDeploymentService) deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
         
         return deploymentService;

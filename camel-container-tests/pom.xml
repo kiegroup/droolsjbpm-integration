@@ -5,7 +5,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -21,6 +21,7 @@
     <module>camel-container-tests-api</module>
     <module>camel-container-tests-module</module>
     <module>camel-container-integration-tests</module>
+    <module>camel-container-tests-model</module>
   </modules>
 
   <dependencyManagement>
@@ -36,6 +37,11 @@
         <version>${version.org.apache.cxf}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>camel-container-tests-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.drools</groupId>
         <artifactId>camel-container-tests-api</artifactId>

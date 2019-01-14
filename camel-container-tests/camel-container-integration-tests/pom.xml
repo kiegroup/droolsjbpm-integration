@@ -5,7 +5,7 @@
   <parent>
     <artifactId>camel-container-tests</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -59,6 +59,10 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-bpmn2</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.codehaus.jettison</groupId>
@@ -100,6 +104,16 @@
   </dependencies>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -168,7 +182,7 @@
                     <context>${kie.server.context}</context>
                   </properties>
                   <pingURL>${kie.server.base.http.url}</pingURL>
-                  <pingTimeout>6000000</pingTimeout>
+                  <pingTimeout>300000</pingTimeout>
                 </deployable>
                 <deployable>
                   <groupId>org.drools</groupId>
@@ -190,12 +204,14 @@
                 <properties>
                   <cargo.jboss.configuration>standalone-full-camel</cargo.jboss.configuration>
                   <cargo.servlet.port>${container.port}</cargo.servlet.port>
-                  <!-- uncomment to enable remote debugger -->
-                  <!--<cargo.start.jvmargs>-->
-                    <!-- -Xdebug-->
-                    <!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787-->
-                    <!-- -Xnoagent-->
-                  <!--</cargo.start.jvmargs>-->
+
+                  <!--
+                  <cargo.start.jvmargs>
+                    -Xdebug
+                    -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787
+                    -Xnoagent
+                  </cargo.start.jvmargs>
+                  -->
                 </properties>
               </configuration>
             </configuration>
@@ -270,6 +286,8 @@
                   <properties>
                     <context>${kie.server.context}</context>
                   </properties>
+                  <pingURL>${kie.server.base.http.url}</pingURL>
+                  <pingTimeout>300000</pingTimeout>
                 </deployable>
               </deployables>
               <configuration>
@@ -357,6 +375,30 @@
             </plugin>
           </plugins>
         </pluginManagement>
+      </build>
+    </profile>
+
+    <profile>
+      <id>kie-maven-settings-custom</id>
+      <activation>
+        <property>
+          <name>kie.maven.settings.custom</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+              <container>
+                <systemProperties combine.children="append">
+                  <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
+                </systemProperties>
+              </container>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>

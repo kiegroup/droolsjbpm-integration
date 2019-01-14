@@ -15,17 +15,22 @@
 
 package org.jbpm.springboot.samples.handlers;
 
+import org.jbpm.services.api.ProcessService;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component("Custom")
 public class CustomWorkItemHandler implements WorkItemHandler {
 
+    @Autowired
+    private ProcessService processService;
+    
     @Override
     public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
-        
+        System.out.println(processService);
         manager.completeWorkItem(workItem.getId(), null);
     }
 

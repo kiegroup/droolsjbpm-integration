@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -156,6 +156,11 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-case-mgmt-cmmn</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
