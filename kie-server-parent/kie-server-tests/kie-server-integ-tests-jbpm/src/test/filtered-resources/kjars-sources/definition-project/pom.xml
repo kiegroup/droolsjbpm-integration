@@ -13,7 +13,18 @@
   <version>1.0.0.Final</version>
   <name>definition-project</name>
 
+   <properties>    
+    <kie.api.path>${settings.localRepository}/org/kie/kie-api/${version.org.kie}/kie-api-${version.org.kie}.jar</kie.api.path>
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+      <version>${version.org.kie}</version>
+      <scope>system</scope>
+      <systemPath>${kie.api.path}</systemPath>
+    </dependency>
     <dependency>
       <groupId>org.jboss.spec.javax.xml.bind</groupId>
       <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
