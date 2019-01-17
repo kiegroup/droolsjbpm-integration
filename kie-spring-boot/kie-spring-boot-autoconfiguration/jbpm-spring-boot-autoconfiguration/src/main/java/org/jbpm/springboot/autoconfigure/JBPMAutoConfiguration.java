@@ -183,7 +183,9 @@ public class JBPMAutoConfiguration {
         factoryBean.setPersistenceXmlLocation(PERSISTENCE_XML_LOCATION);
         factoryBean.setJtaDataSource(dataSource);
         factoryBean.setJpaPropertyMap(jpaProperties.getProperties());
-        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
+        adapter.setPrepareConnection(false);
+        factoryBean.setJpaVendorAdapter(adapter);
 
         String packagesToScan = jpaProperties.getProperties().get("entity-scan-packages");
         if (packagesToScan != null) {
