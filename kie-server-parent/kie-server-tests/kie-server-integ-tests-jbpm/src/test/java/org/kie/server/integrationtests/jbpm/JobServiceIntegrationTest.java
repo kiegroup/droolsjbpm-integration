@@ -52,6 +52,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     protected static final String BUSINESS_KEY = "test key";
     protected static final String PRINT_OUT_COMMAND = "org.jbpm.executor.commands.PrintOutCommand";
     protected static final String LOG_CLEANUP_COMMAND = "org.jbpm.executor.commands.LogCleanupCommand";
+    protected static final String CUSTOM_COMMAND = "org.jbpm.data.CustomCommand";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -551,5 +552,59 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
                                                                      false),
                               404,
                               "Request with id: " + jobId + " doesn't exist");
+    }
+    
+    @Test
+    public void testScheduleAndRunJobWithCustomCommandFromContainer() throws Exception {
+        int currentNumberOfDone = jobServicesClient.getRequestsByContainer(CONTAINER_ID, Collections.singletonList(STATUS.DONE.toString()), 0, 100).size();
+        Class<?> personClass = Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader());
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("businessKey", BUSINESS_KEY);
+        data.put("person", createPersonInstance(USER_JOHN));
+
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(CUSTOM_COMMAND);
+        jobRequestInstance.setData(data);
+
+        Long jobId = jobServicesClient.scheduleRequest(CONTAINER_ID, jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue( jobId.longValue() > 0);
+
+        RequestInfoInstance jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+        assertNotNull(jobRequest);
+        assertEquals(jobId, jobRequest.getId());
+        assertEquals(BUSINESS_KEY, jobRequest.getBusinessKey());
+        assertThat(jobRequest.getStatus(),anyOf(
+            equalTo(STATUS.QUEUED.toString()),
+            equalTo(STATUS.RUNNING.toString()),
+            equalTo(STATUS.DONE.toString())));
+        assertEquals(CUSTOM_COMMAND, jobRequest.getCommandName());
+
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
+
+        jobRequest = jobServicesClient.getRequestById(jobId, false, true);
+        assertNotNull(jobRequest);
+        assertEquals(jobId, jobRequest.getId());
+        assertEquals(BUSINESS_KEY, jobRequest.getBusinessKey());
+        assertEquals(STATUS.DONE.toString(), jobRequest.getStatus());
+        assertEquals(CUSTOM_COMMAND, jobRequest.getCommandName());
+
+        Map<String, Object> responseData = jobRequest.getResponseData();
+        assertNotNull(responseData);
+        assertEquals(1, responseData.size());
+        
+        assertTrue(responseData.containsKey("output"));
+        assertTrue(personClass.isAssignableFrom(responseData.get("output").getClass()));
+        assertEquals(USER_JOHN, KieServerReflections.valueOf(responseData.get("output"), "name"));
+
+        List<RequestInfoInstance> result = jobServicesClient.getRequestsByContainer(CONTAINER_ID, Arrays.asList(STATUS.QUEUED.name()), 0, 100);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+
+        result = jobServicesClient.getRequestsByContainer(CONTAINER_ID, Arrays.asList(STATUS.DONE.name()), 0, 100);
+        assertNotNull(result);
+        assertEquals(1 + currentNumberOfDone, result.size());
+
     }
 }

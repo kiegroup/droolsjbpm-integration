@@ -61,20 +61,22 @@ public class ExecutorServiceBase {
     // operations
     public String scheduleRequest(String containerId, String payload, String marshallingType) {
 
-
+        ClassLoader classLoader = this.getClass().getClassLoader();
         JobRequestInstance jobRequest = null;
         if (containerId != null && !containerId.isEmpty()) {
             logger.debug("About to unmarshal job request from payload: '{}' using container {} marshaller", payload, containerId);
             jobRequest = marshallerHelper.unmarshal(containerId, payload, marshallingType, JobRequestInstance.class);
             // set deployment id which is given by container id
             jobRequest.getData().put("deploymentId", containerId);
+            
+            classLoader = context.getContainer(containerId).getKieContainer().getClassLoader();
         } else {
             logger.debug("About to unmarshal job request from payload: '{}' using server marshaller", payload);
             jobRequest = marshallerHelper.unmarshal(payload, marshallingType, JobRequestInstance.class);
         }
         Long requestId = null;
 
-        if(!validateCommand(jobRequest.getCommand())){
+        if(!validateCommand(jobRequest.getCommand(), classLoader)){
             throw new IllegalArgumentException("Invalid command type "+jobRequest.getCommand());
         }
 
@@ -302,9 +304,9 @@ public class ExecutorServiceBase {
         return new QueryContext(page * pageSize, pageSize);
     }
 
-    protected boolean validateCommand(String command) {
+    protected boolean validateCommand(String command, ClassLoader classLoader) {
         try {
-            Class.forName(command);
+            Class.forName(command, true, classLoader);
             return true;
         } catch (ClassNotFoundException e) {
             return false;
