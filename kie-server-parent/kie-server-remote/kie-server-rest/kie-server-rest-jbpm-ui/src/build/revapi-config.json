@@ -25,19 +25,8 @@
 
   "ignores": {
     "revapi": {
-      "_comment": "Changes between 7.11.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": [
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method void org.kie.server.remote.rest.jbpm.ui.FormResource::<init>(org.kie.server.services.jbpm.ui.FormServiceBase, org.kie.server.services.api.KieServerRegistry)",
-                    "new": "method void org.kie.server.remote.rest.jbpm.ui.FormResource::<init>(org.kie.server.services.jbpm.ui.FormServiceBase, org.kie.server.services.jbpm.ui.FormRendererBase, org.kie.server.services.api.KieServerRegistry)",
-                    "package": "org.kie.server.remote.rest.jbpm.ui",
-                    "classSimpleName": "FormResource",
-                    "methodName": "<init>",
-                    "elementKind": "constructor",
-                    "justification": "Support for rendering forms in kie server"
-                  }
-                ]
+      "_comment": "Changes between 7.14.0.Final and the current branch. These changes are desired and thus ignored.",
+      "ignore": []
     }
   }
 }
