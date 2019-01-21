@@ -49,8 +49,6 @@ import javassist.CtClass;
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
-@Execute(goal = "injectreactive",
-        phase = LifecyclePhase.COMPILE)
 public class InjectReactiveMojo extends AbstractKieMojo {
 
     private List<File> sourceSet = new ArrayList<File>();
