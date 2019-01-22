@@ -23,7 +23,7 @@ public class PrometheusMetricsDMNListener implements DMNRuntimeEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsDMNListener.class);
 
-    final PrometheusDMNMetrics metrics;
+    private final PrometheusDMNMetrics metrics;
     private final KieContainerInstanceImpl kieContainer;
 
     public PrometheusMetricsDMNListener(PrometheusDMNMetrics metrics, KieContainerInstanceImpl kieContainer) {
