@@ -139,14 +139,11 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.listContainers(containerFilter), headers);
     }
 
-    @ApiOperation(value="Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status",
-            response=ServiceResponse.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Path("prometheus")
     @Produces({MediaType.TEXT_PLAIN})
     public Response getModels() {
-        logger.info("------------------ Collecton Registry test: " + prometheusRegistry.getClass().getClassLoader().toString());
+        logger.info("Prometheus is scraping");
 
         Enumeration<Collector.MetricFamilySamples> mfs = prometheusRegistry.metricFamilySamples();
 

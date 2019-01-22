@@ -15,7 +15,14 @@
 
 package org.kie.server.integrationtests.dmn;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -106,4 +113,70 @@ public class DMNMetricTest
             }
         }
     }
+
+    @Test
+    public void test_evaluateAllWithMetricsLoop() throws InterruptedException {
+        String uriString = TestConfig.getKieServerHttpUrl() + "/prometheus";
+        logger.info("SERVER_URL: " + uriString);
+
+        logger.info("Starting in four seconds");
+        Thread.sleep(4000);
+
+
+        while(true) {
+            logger.info("1 thread: " + uriString);
+            runParallel(1);
+            Thread.sleep(10000);
+
+            logger.info("2 thread: " + uriString);
+            runParallel(2);
+            Thread.sleep(10000);
+
+            logger.info("4 thread: " + uriString);
+            runParallel(4);
+            Thread.sleep(10000);
+        }
+
+    }
+
+    public void runParallel(int parallelism) {
+        final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+        final CyclicBarrier started = new CyclicBarrier(parallelism);
+        final Callable<Long> task = () -> {
+            started.await();
+            final Thread current = Thread.currentThread();
+            long executions = 0;
+            while (!current.isInterrupted()) {
+                evaluateDMNWithPause();
+                executions++;
+            }
+            return executions;
+        };
+        final ArrayList<Future<Long>> tasks = new ArrayList<>(parallelism);
+        for (int i = 0; i < parallelism; i++) {
+            tasks.add(executor.submit(task));
+        }
+        executor.shutdown();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            tasks.forEach(future -> future.cancel(true));
+        }));
+
+    }
+
+    private void evaluateDMNWithPause() {
+        DMNContext dmnContext = dmnClient.newContext();
+
+        ThreadLocalRandom salaryRandom = ThreadLocalRandom.current();
+
+        int a = salaryRandom.nextInt(1000, 100000 / 12);
+        int b = salaryRandom.nextInt(1000, 100000 / 12);
+
+        dmnContext.set("a", a);
+        dmnContext.set("b", b);
+        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
+//        logger.info("result" + evaluateAll);
+    }
+
+
+
 }

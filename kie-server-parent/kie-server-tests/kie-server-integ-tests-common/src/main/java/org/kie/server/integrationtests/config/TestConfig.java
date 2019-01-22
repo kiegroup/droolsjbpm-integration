@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeMap;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -191,7 +190,7 @@ public class TestConfig {
             LOGGER.debug("Allocating port {}.", +ALLOCATED_PORT);
         }
 
-        return ALLOCATED_PORT;
+        return 42563;
     }
 
     /**
