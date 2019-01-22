@@ -28,6 +28,8 @@ public class TimerInstance {
     @XmlElement(name="name")
     private String timerName;
     @XmlElement(name="id")
+    private long id;
+    @XmlElement(name="timer-id")
     private long timerId;
     @XmlElement(name="activation-time")
     private Date activationTime;
@@ -60,6 +62,14 @@ public class TimerInstance {
 
     public void setTimerId(long timerId) {
         this.timerId = timerId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public Date getActivationTime() {
@@ -143,6 +153,11 @@ public class TimerInstance {
             return this;
         }
 
+        public Builder id(long id) {
+            timerInstance.setId(id);
+            return this;
+        }
+
         public Builder timerId(long timerId) {
             timerInstance.setTimerId(timerId);
             return this;
@@ -193,6 +208,7 @@ public class TimerInstance {
     public String toString() {
         return "TimerInstance{" +
                 "timerName='" + timerName + '\'' +
+                ", id=" + id +
                 ", timerId=" + timerId +
                 ", activationTime=" + activationTime +
                 ", lastFireTime=" + lastFireTime +

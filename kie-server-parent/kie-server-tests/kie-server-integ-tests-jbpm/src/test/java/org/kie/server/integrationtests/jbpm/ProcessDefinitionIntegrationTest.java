@@ -27,6 +27,7 @@ import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
 import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
+import org.kie.server.api.model.definition.TimerDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
@@ -98,6 +99,35 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         // assert type of the services task for 'Email results' name
         assertEquals("Email", result.getServiceTasks().get("Email results"));
 
+        assertNotNull(result.getNodes());
+        assertEquals(4, result.getNodes().size());
+
+        assertNotNull(result.getTimers());
+        assertTrue(result.getTimers().isEmpty());
+    }
+
+    @Test
+    public void testTimerProcessDefinition() {
+        ProcessDefinition result = processClient.getProcessDefinition(CONTAINER_ID, PROCESS_ID_TIMER);
+
+        assertNotNull(result);
+        assertEquals(PROCESS_ID_TIMER, result.getId());
+        assertEquals("Timer Process", result.getName());
+        assertEquals("com.sample", result.getPackageName());
+        assertEquals("1", result.getVersion());
+        assertEquals(CONTAINER_ID, result.getContainerId());
+
+        assertNotNull(result.getNodes());
+        assertEquals(3, result.getNodes().size());
+
+        assertNotNull(result.getTimers());
+        assertEquals(1, result.getTimers().size());
+
+        TimerDefinition timer = result.getTimers().iterator().next();
+        assertEquals(0, timer.getId().longValue());
+        assertEquals(2l, timer.getNodeId().longValue());
+        assertEquals("timer", timer.getNodeName());
+        assertEquals("_2", timer.getUniqueId());
     }
 
     @Test
@@ -137,6 +167,11 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         // assert services tasks
         assertEquals(0, result.getServiceTasks().size());
 
+        assertNotNull(result.getNodes());
+        assertEquals(5, result.getNodes().size());
+
+        assertNotNull(result.getTimers());
+        assertTrue(result.getTimers().isEmpty());
     }
 
 

@@ -166,8 +166,10 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             TimerInstance timerInstance = timers.get(0);
             assertNotNull(timerInstance);
             assertEquals("timer", timerInstance.getTimerName());
+            assertNotNull(timerInstance.getId());
+            assertNotNull(timerInstance.getTimerId());
 
-            processAdminClient.updateTimer(CONTAINER_ID, processInstanceId, timerInstance.getTimerId(), 3, 0, 0);
+            processAdminClient.updateTimer(CONTAINER_ID, processInstanceId, timerInstance.getId(), 3, 0, 0);
 
             KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, processInstanceId);
 
@@ -197,8 +199,10 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             TimerInstance timerInstance = timers.get(0);
             assertNotNull(timerInstance);
             assertEquals("timer", timerInstance.getTimerName());
+            assertNotNull(timerInstance.getId());
+            assertNotNull(timerInstance.getTimerId());
 
-            processAdminClient.updateTimerRelative(CONTAINER_ID, processInstanceId, timerInstance.getTimerId(), 3, 0, 0);
+            processAdminClient.updateTimerRelative(CONTAINER_ID, processInstanceId, timerInstance.getId(), 3, 0, 0);
 
             KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, processInstanceId);
 

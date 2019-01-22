@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.ItemList;
-import org.kie.server.api.model.definition.ProcessDefinition;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "case-milestone-list")

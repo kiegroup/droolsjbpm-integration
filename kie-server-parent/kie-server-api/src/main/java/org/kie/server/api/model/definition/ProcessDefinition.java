@@ -15,10 +15,8 @@
 
 package org.kie.server.api.model.definition;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -53,6 +51,10 @@ public class ProcessDefinition {
     private Map<String, String> processVariables;
     @XmlElementWrapper(name="process-subprocesses")
     private Collection<String> reusableSubProcesses;
+    @XmlElementWrapper(name="nodes")
+    private Collection<NodeDefinition> nodes;
+    @XmlElementWrapper(name="timers")
+    private Collection<TimerDefinition> timers;
 
     @XmlElement(name="dynamic")
     private boolean dynamic;
@@ -144,14 +146,37 @@ public class ProcessDefinition {
         this.dynamic = dynamic;
     }
 
+    public Collection<NodeDefinition> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(Collection<NodeDefinition> nodes) {
+        this.nodes = nodes;
+    }
+
+    public Collection<TimerDefinition> getTimers() {
+        return timers;
+    }
+
+    public void setTimers(Collection<TimerDefinition> timers) {
+        this.timers = timers;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinition{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", version='" + version + '\'' +
+                ", packageName='" + packageName + '\'' +
                 ", containerId='" + containerId + '\'' +
-                ", dynamic='" + dynamic + '\'' +
+                ", associatedEntities=" + associatedEntities +
+                ", serviceTasks=" + serviceTasks +
+                ", processVariables=" + processVariables +
+                ", reusableSubProcesses=" + reusableSubProcesses +
+                ", nodes=" + nodes +
+                ", timers=" + timers +
+                ", dynamic=" + dynamic +
                 '}';
     }
 
@@ -165,31 +190,26 @@ public class ProcessDefinition {
 
         public Builder id(String id) {
             definition.setId(id);
-
             return this;
         }
 
         public Builder name(String name) {
             definition.setName(name);
-
             return this;
         }
 
         public Builder version(String version) {
             definition.setVersion(version);
-
             return this;
         }
 
         public Builder packageName(String packageName) {
             definition.setPackageName(packageName);
-
             return this;
         }
 
         public Builder containerId(String containerId) {
             definition.setContainerId(containerId);
-
             return this;
         }
 
@@ -206,33 +226,37 @@ public class ProcessDefinition {
         }
 
         public Builder entities(Map<String, String[]> entities) {
-
             definition.setAssociatedEntities(entities);
-
             return this;
         }
 
         public Builder serviceTasks(Map<String, String> serviceTasks) {
             definition.setServiceTasks(serviceTasks);
-
             return this;
         }
 
         public Builder variables(Map<String, String> variables) {
             definition.setProcessVariables(variables);
-
             return this;
         }
 
         public Builder subprocesses(Collection<String> subprocesses) {
             definition.setReusableSubProcesses(subprocesses);
-
             return this;
         }
 
         public Builder dynamic(boolean dynamic) {
             definition.setDynamic(dynamic);
+            return this;
+        }
 
+        public Builder nodes(Collection<NodeDefinition> nodes) {
+            definition.setNodes(nodes);
+            return this;
+        }
+
+        public Builder timers(Collection<TimerDefinition> timers) {
+            definition.setTimers(timers);
             return this;
         }
     }

@@ -125,6 +125,7 @@ import org.kie.server.api.model.cases.CaseRoleAssignmentList;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
@@ -133,6 +134,7 @@ import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.api.model.definition.TimerDefinition;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
@@ -252,6 +254,9 @@ public class JaxbMarshaller implements Marshaller {
 
                 ProcessDefinition.class,
                 ProcessDefinitionList.class,
+
+                NodeDefinition.class,
+                TimerDefinition.class,
 
                 ProcessInstance.class,
                 ProcessInstanceList.class,
