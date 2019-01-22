@@ -115,6 +115,7 @@ public class MetricTest extends DroolsKieServerBaseIntegrationTest {
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             String res = response.readEntity(String.class);
+            logger.info("response: " + res);
             Assert.assertThat(res, not(isEmptyOrNullString()));
         } catch (Exception e) {
             throw new RuntimeException(e);

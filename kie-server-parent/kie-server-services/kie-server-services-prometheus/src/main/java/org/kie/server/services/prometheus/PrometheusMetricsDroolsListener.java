@@ -11,6 +11,8 @@ import org.kie.api.event.rule.MatchCancelledEvent;
 import org.kie.api.event.rule.MatchCreatedEvent;
 import org.kie.api.event.rule.RuleFlowGroupActivatedEvent;
 import org.kie.api.event.rule.RuleFlowGroupDeactivatedEvent;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.services.api.KieContainerInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +20,13 @@ public class PrometheusMetricsDroolsListener implements AgendaEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsDroolsListener.class);
     private final PrometheusMetrics metrics;
+    private final String kieSessionId;
+    private final KieContainerInstance containerInstance;
 
-    public PrometheusMetricsDroolsListener(PrometheusMetrics metrics) {
+    public PrometheusMetricsDroolsListener(PrometheusMetrics metrics, String kieSessionId, KieContainerInstance containerInstance) {
         this.metrics = metrics;
+        this.kieSessionId = kieSessionId;
+        this.containerInstance = containerInstance;
     }
 
     @Override
@@ -47,7 +53,9 @@ public class PrometheusMetricsDroolsListener implements AgendaEventListener {
         long startTime = beforeImpl.getTimestamp();
         long elapsed = System.nanoTime() - startTime;
         String ruleName = event.getMatch().getRule().getName();
-        metrics.getDroolsEvaluationTimeHistogram().labels(ruleName)
+        ReleaseId releaseId = containerInstance.getResource().getReleaseId();
+        metrics.getDroolsEvaluationTimeHistogram()
+                .labels(containerInstance.getContainerId(), kieSessionId, releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion(), ruleName)
                 .observe(elapsed);
         if (logger.isDebugEnabled()) {
             logger.debug("Elapsed time: " + elapsed);

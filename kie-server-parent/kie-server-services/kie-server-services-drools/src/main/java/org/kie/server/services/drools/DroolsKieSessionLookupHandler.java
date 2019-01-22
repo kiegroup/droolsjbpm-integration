@@ -50,7 +50,7 @@ public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
             if (extension != null && ks != null) {
                 RuleRuntimeEventManager eventManager = (RuleRuntimeEventManager)ks;
                 PrometheusMetrics metrics = PrometheusKieServerExtension.getMetrics();
-                PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(metrics);
+                PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(metrics, kieSessionId, containerInstance);
                 eventManager.addEventListener(listener);
             }
             return ks;
