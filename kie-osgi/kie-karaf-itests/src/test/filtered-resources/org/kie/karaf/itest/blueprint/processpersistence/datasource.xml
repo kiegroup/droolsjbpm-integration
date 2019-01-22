@@ -11,10 +11,10 @@
 
   <bean id="dataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource">
     <property name="transactionManager" ref="transactionManager"/>
-    <property name="driverClassName" value="org.h2.Driver"/>
-    <property name="url" value="jdbc:h2:file:${project.build.directory}/process-persistence.db"/>
-    <property name="username" value="sa"/>
-    <property name="password" value="sa"/>
+    <property name="driverClassName" value="${maven.jdbc.driver.class}"/>
+    <property name="url" value="${maven.jdbc.url}"/>
+    <property name="username" value="${maven.jdbc.username}"/>
+    <property name="password" value="${maven.jdbc.password}"/>
   </bean>
 
   <service id="dataSourceService" interface="javax.sql.DataSource" ref="dataSource">
