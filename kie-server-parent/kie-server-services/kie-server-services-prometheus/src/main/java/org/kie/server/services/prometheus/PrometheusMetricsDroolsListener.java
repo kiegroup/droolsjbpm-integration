@@ -1,6 +1,5 @@
 package org.kie.server.services.prometheus;
 
-import io.prometheus.client.Histogram;
 import org.drools.core.event.rule.impl.AfterActivationFiredEventImpl;
 import org.drools.core.event.rule.impl.BeforeActivationFiredEventImpl;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
@@ -18,16 +17,11 @@ import org.slf4j.LoggerFactory;
 public class PrometheusMetricsDroolsListener implements AgendaEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsDroolsListener.class);
+    private final PrometheusMetrics metrics;
 
-
-    private static final double[] RULE_TIME_BUCKETS = new double[]{1_000_000, 2_000_000, 3_000_000, 100_000_000, 200_000_000, 300_000_000, 400_000_000, 500_000_000};
-
-    private static final Histogram evaluationTimeHistogram = Histogram.build()
-            .name("drl_match_fired_nanosecond")
-            .help("Drools Firing Time")
-            .labelNames("rule_name")
-            .buckets(RULE_TIME_BUCKETS)
-            .register();
+    public PrometheusMetricsDroolsListener(PrometheusMetrics metrics) {
+        this.metrics = metrics;
+    }
 
     @Override
     public void matchCreated(MatchCreatedEvent event) {
@@ -53,7 +47,7 @@ public class PrometheusMetricsDroolsListener implements AgendaEventListener {
         long startTime = beforeImpl.getTimestamp();
         long elapsed = System.nanoTime() - startTime;
         String ruleName = event.getMatch().getRule().getName();
-        evaluationTimeHistogram.labels(ruleName)
+        metrics.getDroolsEvaluationTimeHistogram().labels(ruleName)
                 .observe(elapsed);
         if (logger.isDebugEnabled()) {
             logger.debug("Elapsed time: " + elapsed);

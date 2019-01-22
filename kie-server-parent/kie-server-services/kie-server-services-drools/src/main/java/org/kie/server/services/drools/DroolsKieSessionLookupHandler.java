@@ -24,6 +24,8 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieSessionLookupHandler;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
+import org.kie.server.services.prometheus.PrometheusMetrics;
+import org.kie.server.services.prometheus.PrometheusMetricsDroolsListener;
 
 public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
 
@@ -47,7 +49,9 @@ public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
             KieServerExtension extension = registry.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
             if (extension != null && ks != null) {
                 RuleRuntimeEventManager eventManager = (RuleRuntimeEventManager)ks;
-                eventManager.addEventListener(PrometheusKieServerExtension.getDroolsListener());
+                PrometheusMetrics metrics = PrometheusKieServerExtension.getMetrics();
+                PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(metrics);
+                eventManager.addEventListener(listener);
             }
             return ks;
         }

@@ -52,8 +52,8 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.kie.server.services.prometheus.PrometheusDMNMetrics;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
+import org.kie.server.services.prometheus.PrometheusMetrics;
 import org.kie.server.services.prometheus.PrometheusMetricsDMNListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,7 +165,7 @@ public class ModelEvaluatorServiceBase {
 
             KieServerExtension extension = context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
             if (extension != null) {
-                PrometheusDMNMetrics dmnMetrics = PrometheusKieServerExtension.getDMNMetrics();
+                PrometheusMetrics dmnMetrics = PrometheusKieServerExtension.getMetrics();
                 PrometheusMetricsDMNListener listener = new PrometheusMetricsDMNListener(dmnMetrics, kContainer);
                 dmnRuntime.addListener(listener);
             }

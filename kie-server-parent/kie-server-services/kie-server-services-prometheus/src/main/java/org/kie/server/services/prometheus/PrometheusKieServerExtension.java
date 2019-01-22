@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import io.prometheus.client.CollectorRegistry;
-import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
@@ -16,10 +15,9 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PrometheusKieServerExtension implements KieServerExtension {
+
     public static final String EXTENSION_NAME = "Prometheus";
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "true"));
@@ -28,25 +26,16 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     private KieServerRegistry context;
 
-    Logger logger = LoggerFactory.getLogger(PrometheusKieServerExtension.class);
-
-    private List<Object> services = new ArrayList<Object>();
+    private List<Object> services = new ArrayList<>();
     private boolean initialized = false;
 
-    private static PrometheusDMNMetrics DMN_METRICS = null;
-    public static PrometheusDMNMetrics getDMNMetrics() {
-        if(DMN_METRICS == null) {
-            DMN_METRICS = new PrometheusDMNMetrics();
-        }
-        return DMN_METRICS;
-    }
+    private static PrometheusMetrics METRICS = null;
 
-    private static AgendaEventListener DROOLS_LISTENER = null;
-    public static AgendaEventListener getDroolsListener() {
-        if(DROOLS_LISTENER == null) {
-            DROOLS_LISTENER = new PrometheusMetricsDroolsListener();
+    public static PrometheusMetrics getMetrics() {
+        if (METRICS == null) {
+            METRICS = new PrometheusMetrics();
         }
-        return DROOLS_LISTENER;
+        return METRICS;
     }
 
     @Override
@@ -94,11 +83,11 @@ public class PrometheusKieServerExtension implements KieServerExtension {
     public List<Object> getAppComponents(SupportedTransports type) {
 
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
-                = ServiceLoader.load(KieServerApplicationComponentsService.class );
+                = ServiceLoader.load(KieServerApplicationComponentsService.class);
         List<Object> appComponentsList = new ArrayList<Object>();
         Object[] services = {context};
-        for ( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
-            appComponentsList.addAll( appComponentsService.getAppComponents( EXTENSION_NAME, type, services ) );
+        for (KieServerApplicationComponentsService appComponentsService : appComponentsServices) {
+            appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
         }
         return appComponentsList;
     }
@@ -142,5 +131,4 @@ public class PrometheusKieServerExtension implements KieServerExtension {
         }
         return messages;
     }
-
 }
