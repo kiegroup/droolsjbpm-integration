@@ -1,6 +1,6 @@
 package org.kie.server.services.prometheus;
 
-import io.prometheus.client.Histogram;
+import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.event.AfterEvaluateBKMEvent;
 import org.kie.dmn.api.core.event.AfterEvaluateContextEntryEvent;
 import org.kie.dmn.api.core.event.AfterEvaluateDecisionEvent;
@@ -14,7 +14,8 @@ import org.kie.dmn.api.core.event.BeforeEvaluateDecisionTableEvent;
 import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
 import org.kie.dmn.core.impl.AfterEvaluateDecisionEventImpl;
 import org.kie.dmn.core.impl.BeforeEvaluateDecisionEventImpl;
-import org.kie.dmn.model.api.Decision;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,20 +23,13 @@ public class PrometheusMetricsDMNListener implements DMNRuntimeEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsDMNListener.class);
 
-    private static final double[] DECISION_TIME_BUCKETS = new double[]{1_000_000, 2_000_000, 3_000_000, 100_000_000, 200_000_000, 300_000_000, 400_000_000, 500_000_000};
+    final PrometheusDMNMetrics metrics;
+    private final KieContainerInstanceImpl kieContainer;
 
-    public static final long NANOSECONDS_PER_SECOND = 1_000_000_000;
-    public static final long HALF_SECOND_NANO = 500_000_000;
-
-    public static long toNano(long second) {
-        return second * NANOSECONDS_PER_SECOND;
+    public PrometheusMetricsDMNListener(PrometheusDMNMetrics metrics, KieContainerInstanceImpl kieContainer) {
+        this.metrics = metrics;
+        this.kieContainer = kieContainer;
     }
-
-    private static final Histogram evaluationTimeHistogram = Histogram.build().name("dmn_evaluate_decision_nanosecond")
-            .help("DMN Evaluation Time")
-            .labelNames("decision_name")
-            .buckets(DECISION_TIME_BUCKETS)
-            .register();
 
     @Override
     public void beforeEvaluateDecision(BeforeEvaluateDecisionEvent e) {
@@ -46,11 +40,14 @@ public class PrometheusMetricsDMNListener implements DMNRuntimeEventListener {
 
     @Override
     public void afterEvaluateDecision(AfterEvaluateDecisionEvent e) {
-        BeforeEvaluateDecisionEventImpl event = getBeforeImpl(getAfterImpl(e).getBeforeEvent());
-        String decisionName = getDecisionName(e.getDecision().getDecision());
+        AfterEvaluateDecisionEventImpl afterImpl = getAfterImpl(e);
+        BeforeEvaluateDecisionEventImpl event = getBeforeImpl(afterImpl.getBeforeEvent());
+        DecisionNode decisionNode = e.getDecision();
         long startTime = event.getTimestamp();
         long elapsed = System.nanoTime() - startTime;
-        evaluationTimeHistogram.labels(decisionName)
+        ReleaseId releaseId = kieContainer.getResource().getReleaseId();
+        metrics.getEvaluationTimeHistogram()
+                .labels(kieContainer.getContainerId(), releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion(), decisionNode.getModelName(), decisionNode.getModelNamespace())
                 .observe(elapsed);
         if (logger.isDebugEnabled()) {
             logger.debug("Elapsed time: " + elapsed);
@@ -95,9 +92,5 @@ public class PrometheusMetricsDMNListener implements DMNRuntimeEventListener {
 
     private BeforeEvaluateDecisionEventImpl getBeforeImpl(BeforeEvaluateDecisionEvent e) {
         return (BeforeEvaluateDecisionEventImpl) e;
-    }
-
-    private String getDecisionName(Decision decision) {
-        return decision.getName();
     }
 }

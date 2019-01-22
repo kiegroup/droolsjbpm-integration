@@ -7,7 +7,6 @@ import java.util.ServiceLoader;
 
 import io.prometheus.client.CollectorRegistry;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
@@ -34,12 +33,12 @@ public class PrometheusKieServerExtension implements KieServerExtension {
     private List<Object> services = new ArrayList<Object>();
     private boolean initialized = false;
 
-    private static DMNRuntimeEventListener DMN_LISTENER = null;
-    public static DMNRuntimeEventListener getDMNListener() {
-        if(DMN_LISTENER == null) {
-            DMN_LISTENER = new PrometheusMetricsDMNListener();
+    private static PrometheusDMNMetrics DMN_METRICS = null;
+    public static PrometheusDMNMetrics getDMNMetrics() {
+        if(DMN_METRICS == null) {
+            DMN_METRICS = new PrometheusDMNMetrics();
         }
-        return DMN_LISTENER;
+        return DMN_METRICS;
     }
 
     private static AgendaEventListener DROOLS_LISTENER = null;

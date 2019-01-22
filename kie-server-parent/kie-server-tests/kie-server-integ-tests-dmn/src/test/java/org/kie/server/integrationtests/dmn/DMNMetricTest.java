@@ -96,6 +96,7 @@ public class DMNMetricTest
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             String res = response.readEntity(String.class);
+            logger.info("Response: " + res);
             Assert.assertThat(res, not(isEmptyOrNullString()));
         } catch (Exception e) {
             throw new RuntimeException(e);
