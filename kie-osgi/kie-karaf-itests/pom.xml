@@ -16,6 +16,17 @@
     <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
     <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
     <version.org.apache.servicemix.bundles.javax-inject>1_2</version.org.apache.servicemix.bundles.javax-inject>
+
+    <maven.hibernate.dialect>org.hibernate.dialect.H2Dialect</maven.hibernate.dialect>
+    <maven.jdbc.driver.class>org.h2.Driver</maven.jdbc.driver.class>
+    <maven.jdbc.db.name/>
+    <maven.jdbc.db.port/>
+    <maven.jdbc.db.server/>
+    <maven.jdbc.driver.jar/>
+    <maven.jdbc.username>sa</maven.jdbc.username>
+    <maven.jdbc.password>sa</maven.jdbc.password>
+    <maven.jdbc.url>jdbc:h2:tcp://localhost/${project.basedir}/target/kie-karaf-itests;MVCC=TRUE</maven.jdbc.url>
+    <maven.jdbc.schema>public</maven.jdbc.schema>
   </properties>
 
   <dependencyManagement>
@@ -302,6 +313,15 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <jdbc.driver.path>${maven.jdbc.driver.jar}</jdbc.driver.path>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
     </plugins>
   </build>
