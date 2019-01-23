@@ -20,19 +20,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
+import org.kie.server.services.impl.storage.KieServerStateRepositoryUtils;
 import org.kie.soup.commons.xstream.XStreamUtils;
 
 public class KieServerStateFileRepository implements KieServerStateRepository {
@@ -100,31 +99,15 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
                     kieServerState.setControllers(controllers);
                 }
 
-                populateWithSystemProperties(kieServerState.getConfiguration());
+                KieServerStateRepositoryUtils.populateWithSystemProperties(kieServerState.getConfiguration());
             } else {
                 KieServerConfig config = new KieServerConfig();
-                populateWithSystemProperties(config);
+                KieServerStateRepositoryUtils.populateWithSystemProperties(config);
                 kieServerState.setConfiguration(config);
             }
             knownStates.put(serverId, kieServerState);
 
             return kieServerState;
-        }
-    }
-
-    protected void populateWithSystemProperties(KieServerConfig config) {
-        // populate the config state with system properties that are valid to kie server
-        populateWithProperties(config, System.getProperties());
-    }
-
-    void populateWithProperties(KieServerConfig config, Properties properties) {
-        // populate the config state with properties that are valid to kie server
-        for (String property : properties.stringPropertyNames()) {
-
-            if (property.startsWith("org.kie.server") || property.startsWith("org.kie.executor")) {
-                KieServerConfigItem configItem = new KieServerConfigItem(property, properties.getProperty(property), String.class.getName());
-                config.addConfigItem(configItem);
-            }
         }
     }
 

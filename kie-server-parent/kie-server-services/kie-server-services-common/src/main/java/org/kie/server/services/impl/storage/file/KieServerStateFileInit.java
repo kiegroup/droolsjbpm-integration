@@ -31,6 +31,8 @@ import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.services.impl.KieServerContainerDeployment;
 import org.kie.server.services.impl.storage.KieServerState;
+import org.kie.server.services.impl.storage.KieServerStateRepository;
+import org.kie.server.services.impl.storage.KieServerStateRepositoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +64,7 @@ public class KieServerStateFileInit {
                     serverStateFile,
                     KieServerStateFileInit.class.getSimpleName()));
         }
-        KieServerStateFileRepository repository = new KieServerStateFileRepository(serverRepoDir);
+        KieServerStateRepository repository = new KieServerStateFileRepository(serverRepoDir);
         KieServerState serverState = new KieServerState();
 
         KieServerConfig config = new KieServerConfig();
@@ -70,7 +72,7 @@ public class KieServerStateFileInit {
         properties.putAll(System.getProperties());
         properties.put(KIE_SERVER_STATE_REPO, serverRepo);
         properties.put(KIE_SERVER_ID, serverId);
-        repository.populateWithProperties(config, properties);
+        KieServerStateRepositoryUtils.populateWithProperties(config, properties);
         serverState.setConfiguration(config);
 
         Set<KieContainerResource> containers = new LinkedHashSet<KieContainerResource>();
