@@ -28,6 +28,7 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import javax.naming.InitialContext;
 
@@ -35,9 +36,9 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.appformer.maven.support.DependencyFilter;
 import org.drools.core.impl.InternalKieContainer;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieScanner.Status;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
-import org.kie.api.builder.KieScanner.Status;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
@@ -277,11 +278,11 @@ public class KieServerImpl implements KieServer {
                             logger.info("Container {} (for release id {}) successfully started", containerId, releaseId);
 
                             // store the current state of the server
-                            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-                            container.setStatus(KieContainerStatus.STARTED);
-                            currentState.getContainers().add(container);
-
-                            repository.store(KieServerEnvironment.getServerId(), currentState);
+                            storeServerState(currentState -> {
+                                container.setStatus(KieContainerStatus.STARTED);
+                                currentState.getContainers().add(container);
+                            });
+                            
                             // add successful message only when there are no errors
                             if (!messages.stream().filter(m -> m.getSeverity().equals(Severity.ERROR)).findAny().isPresent()) {
                                 messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully created with module " + releaseId + "."));
@@ -340,16 +341,16 @@ public class KieServerImpl implements KieServer {
                     }
                     
                     kci.setStatus(KieContainerStatus.STARTED);
+
                     // store the current state of the server
-                    KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-                    
-                    for (KieContainerResource containerResource : currentState.getContainers()) {
-                        if (containerId.equals(containerResource.getContainerId())) {
-                            containerResource.setStatus(KieContainerStatus.STARTED);
-                        }
-                    }
-                    repository.store(KieServerEnvironment.getServerId(), currentState);
-                    
+                    storeServerState(currentState -> {
+                        currentState.getContainers().forEach(containerResource -> {
+                            if (containerId.equals(containerResource.getContainerId())) {
+                                containerResource.setStatus(KieContainerStatus.STARTED);
+                            }
+                        });
+                    });
+                   
                     eventSupport.fireAfterContainerActivated(this, kci);
                     
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " activated successfully."));
@@ -390,15 +391,14 @@ public class KieServerImpl implements KieServer {
                     kci.setStatus(KieContainerStatus.DEACTIVATED);
                     
                     // store the current state of the server
-                    KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-                    
-                    for (KieContainerResource containerResource : currentState.getContainers()) {
-                        if (containerId.equals(containerResource.getContainerId())) {
-                            containerResource.setStatus(KieContainerStatus.DEACTIVATED);
-                        }
-                    }
-                    repository.store(KieServerEnvironment.getServerId(), currentState);
-                    
+                    storeServerState(currentState -> {
+                        currentState.getContainers().forEach(containerResource -> {
+                            if (containerId.equals(containerResource.getContainerId())) {
+                                containerResource.setStatus(KieContainerStatus.DEACTIVATED);
+                            }
+                        });
+                    });
+
                     eventSupport.fireAfterContainerDeactivated(this, kci);
                     
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " deactivated successfully."));
@@ -520,17 +520,16 @@ public class KieServerImpl implements KieServer {
                         logger.info("Container {} (for release id {}) successfully stopped", containerId, kci.getResource().getReleaseId());
 
                         // store the current state of the server
-                        KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-
-                        List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
-                        for (KieContainerResource containerResource : currentState.getContainers()) {
-                            if (!containerId.equals(containerResource.getContainerId())) {
-                                containers.add(containerResource);
-                            }
-                        }
-                        currentState.setContainers(new HashSet<KieContainerResource>(containers));
-
-                        repository.store(KieServerEnvironment.getServerId(), currentState);
+                        storeServerState(currentState -> {
+                            List<KieContainerResource> containers = new ArrayList<>();
+                            currentState.getContainers().forEach(containerResource -> {
+                                if (!containerId.equals(containerResource.getContainerId())) {
+                                    containers.add(containerResource);
+                                }
+                            });
+                            currentState.setContainers(new HashSet<KieContainerResource>(containers));
+                        });
+                        
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully stopped."));
 
                         eventSupport.fireAfterContainerStopped(this, kci);
@@ -589,7 +588,15 @@ public class KieServerImpl implements KieServer {
                 // synchronize over the container instance to avoid inconsistent state in case of concurrent updateScanner calls
                 synchronized (kci) {
                     ServiceResponse<KieScannerResource> scannerResponse = configureScanner(id, kci, resource);
-                    storeScannerState(kci.getContainerId(), kci.getResource().getScanner());
+                    storeServerState(currentState -> {
+                        String containerId = kci.getContainerId();
+                        KieScannerResource scannerState = kci.getResource().getScanner();
+                        currentState.getContainers().forEach(containerResource -> {
+                            if (containerId.equals(containerResource.getContainerId())) {
+                                containerResource.setScanner(scannerState);
+                            }
+                        });
+                    });
                     return scannerResponse;
                 }
             } else {
@@ -635,17 +642,12 @@ public class KieServerImpl implements KieServer {
     }
 
     /**
-     * Stores (persists) new scanner state for the specified KIE container.
-     * @param containerId container ID to update the scanner for
-     * @param scannerState new scanner state
+     * Persists updated KieServer state. 
+     * @param kieServerStateConsumer
      */
-    private void storeScannerState(String containerId, KieScannerResource scannerState) {
+    private void storeServerState(Consumer<KieServerState> kieServerStateConsumer) {
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-        for (KieContainerResource containerResource : currentState.getContainers()) {
-            if (containerId.equals(containerResource.getContainerId())) {
-                containerResource.setScanner(scannerState);
-            }
-        }
+        kieServerStateConsumer.accept(currentState);
         repository.store(KieServerEnvironment.getServerId(), currentState);
     }
 
@@ -784,15 +786,15 @@ public class KieServerImpl implements KieServer {
         }
     }
 
-    public ServiceResponse<ReleaseId> updateContainerReleaseId(String id, ReleaseId releaseId) {
+    public ServiceResponse<ReleaseId> updateContainerReleaseId(String containerId, ReleaseId releaseId) {
         if (releaseId == null) {
-            logger.error("Error updating releaseId for container '" + id + "'. ReleaseId is null.");
-            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ". ReleaseId is null. ");
+            logger.error("Error updating releaseId for container '" + containerId + "'. ReleaseId is null.");
+            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + containerId + ". ReleaseId is null. ");
         }
-        List<Message> messages = getMessagesForContainer(id);
+        List<Message> messages = getMessagesForContainer(containerId);
         messages.clear();
         try {
-            KieContainerInstanceImpl kci = context.getContainer(id);
+            KieContainerInstanceImpl kci = context.getContainer(containerId);
             // the following code is subject to a concurrent call to dispose(), but the cost of synchronizing it
             // would likely not be worth it. At this point a decision was made to fail the execution if a concurrent 
             // call do dispose() is executed.
@@ -802,70 +804,68 @@ public class KieServerImpl implements KieServer {
                 // process server extensions
                 List<KieServerExtension> extensions = context.getServerExtensions();
                 for (KieServerExtension extension : extensions) {
-                    boolean allowed = extension.isUpdateContainerAllowed(id, kci, parameters);
+                    boolean allowed = extension.isUpdateContainerAllowed(containerId, kci, parameters);
                     if (!allowed) {
                         String message = (String) parameters.get(KieServerConstants.FAILURE_REASON_PROP);
-                        logger.warn("Container {} (for release id {}) on {} cannot be updated due to {}", id, releaseId, extension, message);
+                        logger.warn("Container {} (for release id {}) on {} cannot be updated due to {}", containerId, releaseId, extension, message);
                         if (messages != null) {
                             messages.add(new Message(Severity.WARN, message));
                         }
                         return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, message);
                     }
-                    logger.debug("Container {} (for release id {}) on {} ready to be updated", id, releaseId, extension);
+                    logger.debug("Container {} (for release id {}) on {} ready to be updated", containerId, releaseId, extension);
                 }
 
                 ReleaseId originalReleaseId = kci.getResource().getReleaseId();
                 Message updateMessage = updateKieContainerToVersion(kci, releaseId);
                 if (updateMessage.getSeverity().equals(Severity.WARN)) {
                     messages.add(updateMessage);
-                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + id + " to " + releaseId, kci.getResource().getReleaseId());
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + containerId + " to " + releaseId, kci.getResource().getReleaseId());
                 }
                 updateExtensions(kci, releaseId, messages);
 
                 // If extension update fails then restore previous container
                 if (messages.stream().anyMatch(m -> m.getSeverity().equals(Severity.ERROR))) {
-                    logger.warn("Update of container {} (for release id {}) failed, putting it back to original release id {}", id, releaseId, originalReleaseId);
+                    logger.warn("Update of container {} (for release id {}) failed, putting it back to original release id {}", containerId, releaseId, originalReleaseId);
 
                     updateMessage = updateKieContainerToVersion(kci, originalReleaseId);
                     if (updateMessage.getSeverity().equals(Severity.WARN)) {
                         messages.add(updateMessage);
-                        return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error reverting release id update on container " + id + " to original release id " + originalReleaseId, kci.getResource().getReleaseId());
+                        return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error reverting release id update on container " + containerId + " to original release id " + originalReleaseId, kci.getResource().getReleaseId());
                     }
                     updateExtensions(kci, originalReleaseId, messages);
 
-                    messages.add(new Message(Severity.WARN, "Error updating release id on container " + id + " to " + releaseId + ", release id returned back to " + kci.getResource().getReleaseId()));
-                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + id + " to " + releaseId + ", release id returned back to " + kci.getResource().getReleaseId(), kci.getResource().getReleaseId());
+                    messages.add(new Message(Severity.WARN, "Error updating release id on container " + containerId + " to " + releaseId + ", release id returned back to " + kci.getResource().getReleaseId()));
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + containerId + " to " + releaseId + ", release id returned back to " + kci.getResource().getReleaseId(), kci.getResource().getReleaseId());
                 }
 
                 // store the current state of the server
-                KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-
-                List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
-                for (KieContainerResource containerResource : currentState.getContainers()) {
-                    if (id.equals(containerResource.getContainerId())) {
-                        containerResource.setReleaseId(releaseId);
-                        containerResource.setResolvedReleaseId(new ReleaseId(kci.getKieContainer().getContainerReleaseId()));
-                    }
-                    containers.add(containerResource);
-                }
-
-                currentState.setContainers(new HashSet<KieContainerResource>(containers));
-                repository.store(KieServerEnvironment.getServerId(), currentState);
-
-                logger.info("Container {} successfully updated to release id {}", id, releaseId);
+                storeServerState(currentState -> {
+                    List<KieContainerResource> containers = new ArrayList<>();
+                    currentState.getContainers().forEach(containerResource -> {
+                        if (containerId.equals(containerResource.getContainerId())) {
+                            containerResource.setReleaseId(releaseId);
+                            containerResource.setResolvedReleaseId(new ReleaseId(kci.getKieContainer().getContainerReleaseId()));
+                        }
+                        containers.add(containerResource);
+                    });
+                    currentState.setContainers(new HashSet<KieContainerResource>(containers));
+                });
+                
+                logger.info("Container {} successfully updated to release id {}", containerId, releaseId);
                 ks.getRepository().removeKieModule(originalReleaseId);
 
-                messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + id));
+                messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + containerId));
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
             } else {
-                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
+                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
             }
         } catch (Exception e) {
             if (messages != null) {
-                messages.add(new Message(Severity.WARN, "Error updating releaseId for container '" + id + "' due to " + e.getMessage()));
+                messages.add(new Message(Severity.WARN, "Error updating releaseId for container '" + containerId + "' due to " + e.getMessage()));
             }
-            logger.error("Error updating releaseId for container '" + id + "'", e);
-            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ": " +
+            logger.error("Error updating releaseId for container '" + containerId + "'", e);
+            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + containerId + ": " +
                     e.getClass().getName() + ": " + e.getMessage());
         }
     }

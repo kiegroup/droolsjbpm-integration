@@ -68,17 +68,14 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
         public void run() {
             try (OpenShiftClient client = clouldClientHelper.get()) {
                 logger.info("Watching ConfigMap in namespace: [{}]", client.getNamespace());
-                try (Watch watchable = client.configMaps().watch(new Watcher<ConfigMap>() {
+                try (Watch watchable = client.configMaps().withName(kieServerId).watch(new Watcher<ConfigMap>() {
                     @Override
                     public void eventReceived(Action action, ConfigMap kieServerState) {
                         logger.debug("Event - Action: {}, {} on ConfigMap ",
                                     action, kieServerState.getMetadata().getName());
 
                         DeploymentConfig dc = client.deploymentConfigs().withName(kieServerId).get();
-                        if (kieServerId.equals(kieServerState.getMetadata().getName()) 
-                                && action.equals(Action.MODIFIED) 
-                                && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
-
+                        if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
                             ObjectMeta md = dc.getSpec().getTemplate().getMetadata();
                             Map<String, String> ann = md.getAnnotations() == null ? new HashMap<>() : md.getAnnotations();
                             md.setAnnotations(ann);
@@ -157,7 +154,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                     ann.remove(KieServerStateCloudRepository.ROLLOUT_REQUIRED);
                     client.configMaps().createOrReplace(cm);
                 } catch (KubernetesClientException kce) {
-                    logger.info("Mark DC rollout failed", kce);
+                    logger.debug("Mark DC rollout failed", kce);
                 }
             }
             return pullTrigger;
@@ -170,8 +167,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                         KieServerState currentState,
                         AtomicBoolean kieServerActive) {
 
-        String kieServerId = currentState.getConfiguration()
-                                         .getConfigItem(KieServerConstants.KIE_SERVER_ID).getValue();
+        String kieServerId = currentState.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_ID);
 
         try (OpenShiftClient client = clouldClientHelper.get()) {
 
