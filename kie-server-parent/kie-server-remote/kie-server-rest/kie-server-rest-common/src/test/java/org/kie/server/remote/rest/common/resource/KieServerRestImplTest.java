@@ -106,7 +106,7 @@ public class KieServerRestImplTest {
   
         KieServerRestImpl restServer = new KieServerRestImpl(kieServer);
         
-        Response response = restServer.updateReleaseId(headers, "test", "");        
+        Response response = restServer.updateReleaseId(headers, "test", "", false);
         assertForbiddenResponse(response);
     }
     

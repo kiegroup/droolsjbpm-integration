@@ -285,34 +285,47 @@ public class KieServerInstanceManager {
 
     public List<Container> upgradeContainer(final ServerTemplate serverTemplate,
                                             final ContainerSpec containerSpec) {
+        return upgradeContainer(serverTemplate, containerSpec, false);
+    }
+
+    public List<Container> upgradeContainer(final ServerTemplate serverTemplate,
+                                            final ContainerSpec containerSpec,
+                                            final boolean resetBeforeUpdate) {
 
         return callRemoteKieServerOperation(serverTemplate,
                                             containerSpec,
-                                            makeUpgradeContainerOperation(containerSpec));
+                                            makeUpgradeContainerOperation(containerSpec, resetBeforeUpdate));
     }
 
     public List<Container> upgradeAndStartContainer(final ServerTemplate serverTemplate,
                                                     final ContainerSpec containerSpec) {
 
-        return callRemoteKieServerOperation(serverTemplate,
-                                            containerSpec,
-                                            makeUpgradeAndStartContainerOperation(containerSpec));
+        return upgradeAndStartContainer(serverTemplate, containerSpec, false);
     }
 
-    RemoteKieServerOperation<Void> makeUpgradeContainerOperation(final ContainerSpec containerSpec) {
+    public List<Container> upgradeAndStartContainer(final ServerTemplate serverTemplate,
+                                                    final ContainerSpec containerSpec,
+                                                    final boolean resetBeforeUpdate) {
+
+        return callRemoteKieServerOperation(serverTemplate,
+                                            containerSpec,
+                                            makeUpgradeAndStartContainerOperation(containerSpec, resetBeforeUpdate));
+    }
+
+    RemoteKieServerOperation<Void> makeUpgradeContainerOperation(final ContainerSpec containerSpec, final boolean resetBeforeUpdate) {
         return new RemoteKieServerOperation<Void>() {
             @Override
             public Void doOperation(final KieServicesClient client,
                                     final Container container) {
 
-                remoteUpgradeContainer(client, container, containerSpec);
+                remoteUpgradeContainer(client, container, containerSpec, resetBeforeUpdate);
 
                 return null;
             }
         };
     }
 
-    RemoteKieServerOperation<Void> makeUpgradeAndStartContainerOperation(final ContainerSpec containerSpec) {
+    RemoteKieServerOperation<Void> makeUpgradeAndStartContainerOperation(final ContainerSpec containerSpec, final boolean resetBeforeUpdate) {
         return new RemoteKieServerOperation<Void>() {
             @Override
             public Void doOperation(final KieServicesClient client,
@@ -321,7 +334,7 @@ public class KieServerInstanceManager {
                 final KieContainerResource containerResource = makeContainerResource(container, containerSpec);
 
                 remoteCreateContainer(client, containerResource, containerSpec);
-                remoteUpgradeContainer(client, container, containerSpec);
+                remoteUpgradeContainer(client, container, containerSpec, resetBeforeUpdate);
 
                 return null;
             }
@@ -332,8 +345,8 @@ public class KieServerInstanceManager {
         client.createContainer(containerSpec.getId(), containerResource);
     }
 
-    private void remoteUpgradeContainer(final KieServicesClient client, final Container container, final ContainerSpec containerSpec) {
-        final ServiceResponse<ReleaseId> response = client.updateReleaseId(containerSpec.getId(), containerSpec.getReleasedId());
+    private void remoteUpgradeContainer(final KieServicesClient client, final Container container, final ContainerSpec containerSpec, final boolean resetBeforeUpdate) {
+        final ServiceResponse<ReleaseId> response = client.updateReleaseId(containerSpec.getId(), containerSpec.getReleasedId(), resetBeforeUpdate);
 
         if (response.getType() != ServiceResponse.ResponseType.SUCCESS) {
             log("Container {} failed to upgrade on server instance {} due to {}", containerSpec.getId(), container.getUrl(), response.getMsg());

@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,11 @@
 
 package org.kie.server.controller.client.rest;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -25,7 +29,9 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
@@ -106,7 +112,16 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
     @Override
     public void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec) {
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, containerSpec, Object.class);
+        updateContainerSpec(serverTemplateId, containerId, containerSpec, false);
+    }
+
+    @Override
+    public void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec, Boolean resetBeforeUpdate) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put(KieServerConstants.RESET_CONTAINER_BEFORE_UPDATE, resetBeforeUpdate);
+
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, containerSpec, Object.class, params);
     }
 
     @Override
@@ -295,7 +310,17 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
     }
 
     private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
+        return makePostRequestAndCreateCustomResponse(uri, bodyObject, resultType, new HashMap<>());
+    }
+
+    private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType, Map<String, Object> params) {
         WebTarget clientRequest = httpClient.target(uri);
+
+        for(Iterator<Map.Entry<String, Object>> it = params.entrySet().iterator(); it.hasNext(); ){
+            Map.Entry<String, Object> entry = it.next();
+
+            clientRequest = clientRequest.queryParam(entry.getKey(), entry.getValue());
+        }
 
         Response response;
         try {

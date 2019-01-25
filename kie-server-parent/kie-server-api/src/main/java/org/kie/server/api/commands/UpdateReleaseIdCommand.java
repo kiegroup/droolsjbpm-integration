@@ -15,8 +15,9 @@
 
 package org.kie.server.api.commands;
 
+import java.util.Objects;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ReleaseId;
 
@@ -38,13 +39,22 @@ public class UpdateReleaseIdCommand
     @XmlElement
     private ReleaseId releaseId;
 
+    @XStreamAlias("reset-before-update")
+    @XmlElement
+    private boolean resetBeforeUpdate;
+
     public UpdateReleaseIdCommand() {
         super();
     }
 
     public UpdateReleaseIdCommand(String containerId, ReleaseId releaseId) {
+        this(containerId, releaseId, false);
+    }
+
+    public UpdateReleaseIdCommand(String containerId, ReleaseId releaseId, boolean resetBeforeUpdate) {
         this.containerId = containerId;
         this.releaseId = releaseId;
+        this.resetBeforeUpdate = resetBeforeUpdate;
     }
 
     public String getContainerId() {
@@ -63,24 +73,31 @@ public class UpdateReleaseIdCommand
         this.releaseId = releaseId;
     }
 
+    public boolean isResetBeforeUpdate() {
+        return resetBeforeUpdate;
+    }
+
+    public void setResetBeforeUpdate(boolean resetBeforeUpdate) {
+        this.resetBeforeUpdate = resetBeforeUpdate;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if ( this == o ) return true;
-        if ( !(o instanceof UpdateReleaseIdCommand) ) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         UpdateReleaseIdCommand that = (UpdateReleaseIdCommand) o;
-
-        if ( containerId != null ? !containerId.equals( that.containerId ) : that.containerId != null ) return false;
-        if ( releaseId != null ? !releaseId.equals( that.releaseId ) : that.releaseId != null ) return false;
-
-        return true;
+        return resetBeforeUpdate == that.resetBeforeUpdate &&
+                Objects.equals(containerId, that.containerId) &&
+                Objects.equals(releaseId, that.releaseId);
     }
 
     @Override
     public int hashCode() {
-        int result = containerId != null ? containerId.hashCode() : 0;
-        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
-        return result;
+        return Objects.hash(containerId, releaseId, resetBeforeUpdate);
     }
 
     @Override
@@ -88,6 +105,7 @@ public class UpdateReleaseIdCommand
         return "UpdateReleaseIdCommand{" +
                "containerId='" + containerId + '\'' +
                ", releaseId=" + releaseId +
+                ", resetBeforeUpdate=" + resetBeforeUpdate +
                '}';
     }
 }

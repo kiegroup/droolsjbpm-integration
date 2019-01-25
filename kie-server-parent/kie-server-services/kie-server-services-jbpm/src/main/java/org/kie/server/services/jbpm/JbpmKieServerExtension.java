@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.naming.InitialContext;
 import javax.persistence.EntityManagerFactory;
@@ -116,6 +117,7 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.util.KieServerUtils;
 import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
@@ -472,6 +474,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+
+        // Allowing container updates for SNAPSHOTS
+        if(KieServerUtils.isSnapshot(kieContainerInstance.getKieContainer().getReleaseId())) {
+            return true;
+        }
+
         // first check if there are any active process instances
         List<Integer> states = new ArrayList<Integer>();
         states.add(ProcessInstance.STATE_ACTIVE);
@@ -511,13 +519,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
             logger.info("No container with id {} found", id);
             return;
         }
-        List<Integer> states = new ArrayList<Integer>();
-        states.add(ProcessInstance.STATE_ACTIVE);
-        states.add(ProcessInstance.STATE_PENDING);
-        states.add(ProcessInstance.STATE_SUSPENDED);
+
+        // Checking if we need to abort the existing process instances before disposing container, by default it should be false
+        Boolean abortInstances = (Boolean) parameters.getOrDefault(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, Boolean.FALSE);
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
-        deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
+        deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), abortInstances);
 
         // remove any query result mappers for container
         List<String> addedMappers = containerMappers.get(id);

@@ -100,7 +100,8 @@ public class RestSpecManagementServiceImpl {
                                         @Example(value = {
                                                 @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
                                                 @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
-                                        })) String containerSpecPayload) {
+                                        })) String containerSpecPayload,
+                                        @ApiParam(value = "Optional param to reset current environment before updating on dev mode, defaults to false") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
 
         String contentType = getContentType(headers);
         try {
@@ -108,7 +109,7 @@ public class RestSpecManagementServiceImpl {
             ContainerSpec containerSpec = unmarshal(containerSpecPayload, contentType, ContainerSpec.class);
             logger.debug("Container spec is {}", containerSpec);
 
-            specManagementService.updateContainerSpec(serverTemplateId, containerId, containerSpec);
+            specManagementService.updateContainerSpec(serverTemplateId, containerId, containerSpec, resetBeforeUpdate);
             logger.debug("Returning response for update container spec request for server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
         } catch (KieServerControllerIllegalArgumentException e) {
