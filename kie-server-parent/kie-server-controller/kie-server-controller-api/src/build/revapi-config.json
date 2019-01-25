@@ -16,27 +16,8 @@
   },
   "ignores": {
     "revapi": {
-      "_comment": "Changes between 7.11.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": [
-        {
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.controller.api.service.SpecManagementService::activateContainer(org.kie.server.controller.api.model.spec.ContainerSpecKey)",
-		  "package": "org.kie.server.controller.api.service",
-		  "classSimpleName": "SpecManagementService",
-		  "methodName": "activateContainer",
-		  "elementKind": "method",
-		  "justification": "Enable activate and deactivate for KIE Containers"
-		},
-		{
-		  "code": "java.method.addedToInterface",
-		  "new": "method void org.kie.server.controller.api.service.SpecManagementService::deactivateContainer(org.kie.server.controller.api.model.spec.ContainerSpecKey)",
-		  "package": "org.kie.server.controller.api.service",
-		  "classSimpleName": "SpecManagementService",
-		  "methodName": "deactivateContainer",
-		  "elementKind": "method",
-		  "justification": "Enable activate and deactivate for KIE Containers"
-		 }
-      ]
+      "_comment": "Changes between 7.14.0.Final and the current branch. These changes are desired and thus ignored.",
+      "ignore": []
     }
   }
 }
