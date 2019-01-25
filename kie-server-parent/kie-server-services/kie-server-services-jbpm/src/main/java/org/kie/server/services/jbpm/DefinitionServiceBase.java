@@ -23,14 +23,18 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.UserTaskDefinition;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
+import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
 import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
+import org.kie.server.api.model.definition.TimerDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+
+import static java.util.stream.Collectors.toSet;
 
 public class DefinitionServiceBase {
 
@@ -59,9 +63,10 @@ public class DefinitionServiceBase {
                 .subprocesses(procDef.getReusableSubProcesses())
                 .variables(procDef.getProcessVariables())
                 .dynamic(procDef.isDynamic())
+                .nodes(procDef.getNodes().stream().map(node -> NodeDefinition.builder().id(node.getId()).name(node.getName()).type(node.getNodeType()).uniqueId(node.getUniqueId()).build()).collect(toSet()))
+                .timers(procDef.getTimers().stream().map(timer -> TimerDefinition.builder().id(timer.getId()).nodeId(timer.getNodeId()).nodeName(timer.getNodeName()).uniqueId(timer.getUniqueId()).build()).collect(toSet()))
                 .build();
         return responseObject;
-
     }
 
     public SubProcessesDefinition getReusableSubProcesses(String containerId, String processId) {

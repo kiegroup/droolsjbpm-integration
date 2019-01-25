@@ -26,7 +26,9 @@ import java.util.concurrent.TimeoutException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -48,10 +50,17 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerExecutor;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebSocketKieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
 
+    public static final Logger logger = LoggerFactory.getLogger(WebSocketKieControllerStartupIntegrationTest.class);
+
     private String origControllerUrl;
+
+    @Rule
+    public TestName testName= new TestName();
 
     @Override
     protected KieServicesClient createDefaultClient() {
@@ -71,6 +80,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
     @Before
     @Override
     public void setup() throws Exception {
+        logger.info("********** Test name " + testName.getMethodName() + " ***********");
         
         // Start embedded kie server to be correctly initialized and cleaned before tests.
         if (!TestConfig.isLocalServer()) {
@@ -246,9 +256,15 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         ServerTemplateList instanceList = controllerClient.listServerTemplates();
         assertEquals(1, instanceList.getServerTemplates().length);
 
+        ServerTemplate returnedServerTemplate = controllerClient.getServerTemplate(kieServerInfo.getResult().getServerId());
+        logger.info("+++++++++++++++++++++++" + returnedServerTemplate.getServerInstanceKeys());
+
         // Turn kie server off, dispose container and start kie server again.
         server.stopKieServer();
         KieServerSynchronization.waitForServerInstanceSynchronization(controllerClient, kieServerInfo.getResult().getServerId(), 0);
+
+        returnedServerTemplate = controllerClient.getServerTemplate(kieServerInfo.getResult().getServerId());
+        logger.info("------------------------" + returnedServerTemplate.getServerInstanceKeys());
 
         controllerClient.stopContainer(containerSpec);
         controllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);

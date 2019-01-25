@@ -82,7 +82,7 @@ public class KieServerStateTest {
 
     @Test
     public void testLoadKieServerStateWithProperties() {
-        KieServerStateFileRepository repository = new KieServerStateFileRepository(REPOSITORY_DIR);
+        KieServerStateRepository repository = new KieServerStateFileRepository(REPOSITORY_DIR);
 
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DS, "jdbc/jbpm");

@@ -32,6 +32,7 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.impl.storage.KieServerState;
+import org.kie.server.services.impl.storage.KieServerStateRepository;
 
 public class KieServerStateFileInitTest {
 
@@ -88,7 +89,7 @@ public class KieServerStateFileInitTest {
         File serverStateFile = KieServerStateFileInit.init();
         String serverRepo = getServerRepo(serverStateFile);
         String serverId = getServerId(serverStateFile);
-        KieServerStateFileRepository repository = new KieServerStateFileRepository(new File(serverRepo));
+        KieServerStateRepository repository = new KieServerStateFileRepository(new File(serverRepo));
         KieServerState serverState = repository.load(getServerId(serverStateFile));
 
         KieServerConfig config = serverState.getConfiguration();
