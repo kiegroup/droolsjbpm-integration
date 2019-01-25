@@ -136,6 +136,28 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
     }
 
     @Test
+    public void testUpdateContainer() {
+        stubFor(post(urlPathEqualTo("/containers/kie1/release-id"))
+                        .withHeader("Accept", equalTo("application/xml"))
+                        .willReturn(aResponse()
+                                            .withStatus(200)
+                                            .withHeader("Content-Type", "application/xml")
+                                            .withBody("<response type=\"SUCCESS\" msg=\"Container successfully deployed\">\n" +
+                                                              "    <release-id>\n" +
+                                                              "      <group-id>org.kie.server.testing</group-id>\n" +
+                                                              "      <artifact-id>kjar2</artifact-id>\n" +
+                                                              "      <version>1.0</version>\n" +
+                                                              "    </release-id>\n" +
+                                                              "</response>")));
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar2", "1.0");
+        ServiceResponse<ReleaseId> response = client.updateReleaseId("kie1", releaseId);
+        assertSuccess(response);
+        ReleaseId result = response.getResult();
+        assertEquals("Release id", releaseId, result);
+    }
+
+    @Test
     public void testGetServerInfoWithSingletonExtraClass() {
         stubFor(get(urlEqualTo("/"))
                 .withHeader("Accept", equalTo("application/json"))

@@ -252,29 +252,43 @@ public abstract class AbstractKieServicesClientImpl {
         }
     }
 
-    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(
-            String uri, Object bodyObject,
-            Class<T> resultType) {
-        return makeHttpPostRequestAndCreateServiceResponse( uri, serialize( bodyObject ), resultType );
+    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri,
+                                                                                 Object bodyObject,
+                                                                                 Class<T> resultType) {
+        return makeHttpPostRequestAndCreateServiceResponseWithParams(uri, bodyObject, resultType, new HashMap<>());
     }
 
-    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(
-            String uri, Object bodyObject,
-            Class<T> resultType, Map<String, String> headers) {
-        return makeHttpPostRequestAndCreateServiceResponse( uri, serialize( bodyObject ), resultType, headers );
+    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponseWithParams(String uri,
+                                                                                           Object bodyObject,
+                                                                                           Class<T> resultType,
+                                                                                           Map<String, Object> params) {
+        return makeHttpPostRequestAndCreateServiceResponse(uri, serialize( bodyObject ), resultType, new HashMap<>(), params);
     }
 
-    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
-        return  makeHttpPostRequestAndCreateServiceResponse( uri, body, resultType, new HashMap<String, String>() );
+    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri,
+                                                                                 Object bodyObject,
+                                                                                 Class<T> resultType,
+                                                                                 Map<String, String> headers) {
+        return makeHttpPostRequestAndCreateServiceResponse(uri, serialize( bodyObject ), resultType, headers, new HashMap<>());
+    }
+
+    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri,
+                                                                                 String body,
+                                                                                 Class<T> resultType) {
+        return  makeHttpPostRequestAndCreateServiceResponse(uri, body, resultType, new HashMap<>());
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
+    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri,
+                                                                                 String body,
+                                                                                 Class<T> resultType,
+                                                                                 Map<String, String> headers,
+                                                                                 Map<String, Object> params) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest( uri ).headers(headers).body(body).post();
+                return newRequest(uri).query(params).headers(headers).body(body).post();
             }
         });
 

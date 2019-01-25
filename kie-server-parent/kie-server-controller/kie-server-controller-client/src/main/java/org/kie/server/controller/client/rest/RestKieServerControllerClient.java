@@ -16,7 +16,6 @@
 
 package org.kie.server.controller.client.rest;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,7 +28,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;

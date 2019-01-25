@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.integrationtests.jbpm;
 
@@ -25,15 +25,16 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-
-import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
-            "1.0.0.Final");
+                                                       "1.0.0.Final");
 
     private static final String DISPOSE_FAILURE_MSG = "Container definition-project failed to dispose, exception was raised: java.lang.IllegalStateException:" +
             " Undeploy forbidden - there are active processes instances for deployment definition-project";
@@ -80,5 +81,28 @@ public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseI
         // and now proceed with dispose again which must be successful
         disposeContainerResponse = client.disposeContainer(CONTAINER_ID);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, disposeContainerResponse.getType());
+    }
+
+    @Test
+    public void testAllowedDisposeContainerWithoutActiveProcessInstances() throws Exception {
+
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        // let's abort the active instance
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+        // dispose not allowed as there is active process instance
+        ServiceResponse<Void> disposeContainerResponse = client.disposeContainer(CONTAINER_ID);
+
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, disposeContainerResponse.getType());
+
+        // after disposing a container it shouldn't be available
+        assertEquals(ServiceResponse.ResponseType.FAILURE, client.getContainerInfo(CONTAINER_ID).getType());
     }
 }

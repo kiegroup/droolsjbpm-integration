@@ -366,7 +366,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 return;
             }
 
-            
             boolean hasStatefulSession = false;
             boolean hasDefaultSession = false;
             // let validate if they are any stateful sessions defined and in case there are not, skip this container
@@ -521,10 +520,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
 
         // Checking if we need to abort the existing process instances before disposing container, by default it should be false
+        Boolean isSnapshot = KieServerUtils.isSnapshot(kieContainerInstance.getKieContainer().getReleaseId());
         Boolean abortInstances = (Boolean) parameters.getOrDefault(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, Boolean.FALSE);
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
-        deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), abortInstances);
+        deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), isSnapshot && abortInstances);
 
         // remove any query result mappers for container
         List<String> addedMappers = containerMappers.get(id);

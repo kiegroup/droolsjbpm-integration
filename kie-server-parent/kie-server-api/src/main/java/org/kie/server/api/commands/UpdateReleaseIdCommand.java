@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.*;
 public class UpdateReleaseIdCommand
         implements KieServerCommand {
 
-    private static final long serialVersionUID = -1803374525440238478L;
+    private static final long serialVersionUID = 1048407484222065032L;
 
     @XStreamAlias("container-id")
     @XmlAttribute(name = "container-id")
