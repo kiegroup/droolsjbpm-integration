@@ -82,42 +82,46 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     private void init() {
         setOwner(this);
         List<String> serverCapabilities = config.getCapabilities();
-
-        if (serverCapabilities == null) {
-            serverCapabilities = getCapabilitiesFromServer();
-        }
-        if (serverCapabilities != null && !serverCapabilities.isEmpty()) {
-            // process available client builders
-            Map<String, KieServicesClientBuilder> clientBuildersByCapability = new HashMap<String, KieServicesClientBuilder>();
-            for (KieServicesClientBuilder builder : loadedClientBuilders) {
-                clientBuildersByCapability.put(builder.getImplementedCapability(), builder);
+        try {
+            if (serverCapabilities == null) {
+                serverCapabilities = getCapabilitiesFromServer();
             }
-
-            // build client based on server capabilities
-            for (String capability : serverCapabilities) {
-                logger.debug("Building services client for server capability {}", capability);
-                KieServicesClientBuilder builder = clientBuildersByCapability.get(capability);
-
-                if (builder != null) {
-                    try {
-                        logger.debug("Builder '{}' for capability '{}'", builder, capability);
-                        Map<Class<?>, Object> clients = builder.build(config, classLoader);
-
-                        for (Object serviceClient : clients.values()) {
-                            if (serviceClient instanceof AbstractKieServicesClientImpl) {
-                                ((AbstractKieServicesClientImpl) serviceClient).setOwner(this);
+            if (serverCapabilities != null && !serverCapabilities.isEmpty()) {
+                // process available client builders
+                Map<String, KieServicesClientBuilder> clientBuildersByCapability = new HashMap<String, KieServicesClientBuilder>();
+                for (KieServicesClientBuilder builder : loadedClientBuilders) {
+                    clientBuildersByCapability.put(builder.getImplementedCapability(), builder);
+                }
+    
+                // build client based on server capabilities
+                for (String capability : serverCapabilities) {
+                    logger.debug("Building services client for server capability {}", capability);
+                    KieServicesClientBuilder builder = clientBuildersByCapability.get(capability);
+    
+                    if (builder != null) {
+                        try {
+                            logger.debug("Builder '{}' for capability '{}'", builder, capability);
+                            Map<Class<?>, Object> clients = builder.build(config, classLoader);
+    
+                            for (Object serviceClient : clients.values()) {
+                                if (serviceClient instanceof AbstractKieServicesClientImpl) {
+                                    ((AbstractKieServicesClientImpl) serviceClient).setOwner(this);
+                                }
                             }
+    
+                            logger.debug("Capability implemented by {}", clients);
+                            servicesClients.putAll(clients);
+                        } catch (Exception e) {
+                            logger.warn("Builder {} throw exception while setting up clients, no {} capabilities will be available", builder, capability);
                         }
-
-                        logger.debug("Capability implemented by {}", clients);
-                        servicesClients.putAll(clients);
-                    } catch (Exception e) {
-                        logger.warn("Builder {} throw exception while setting up clients, no {} capabilities will be available", builder, capability);
+                    } else {
+                        logger.debug("No builder found for '{}' capability", capability);
                     }
-                } else {
-                    logger.debug("No builder found for '{}' capability", capability);
                 }
             }
+        } catch (Exception e) {
+            close();
+            throw new RuntimeException(e);
         }
 
     }
@@ -306,6 +310,17 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetServerStateCommand()));
             ServiceResponse<KieServerStateInfo> response = (ServiceResponse<KieServerStateInfo>) executeJmsCommand(script).getResponses().get(0);
             return getResponseOrNullIfNoResponse(response);
+        }
+    }
+    
+    @Override
+    public void close() {
+        super.close();
+                
+        for (Object serviceClient : servicesClients.values()) {
+            if (serviceClient instanceof AbstractKieServicesClientImpl) {
+                ((AbstractKieServicesClientImpl) serviceClient).close();
+            }
         }
     }
 
