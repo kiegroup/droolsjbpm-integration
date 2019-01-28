@@ -82,7 +82,7 @@ public class KieSpringjBPMPersistenceKarafIntegrationTest extends AbstractKieSpr
 
     // this is the way to get actual Spring Application Context through "bridging" Blueprint Container
     @Inject
-    @Filter(value = "(osgi.blueprint.container.symbolicname=Test-Kie-Spring-Bundle)", timeout = 60000)
+    @Filter(value = "(osgi.blueprint.container.symbolicname=Test-Kie-Spring-Bundle)", timeout = 120000)
     private BlueprintContainer container;
 
     @Before
