@@ -25,6 +25,7 @@
     <container.hostname>localhost</container.hostname>
     <container.port>8080</container.port>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
+    <kie.maven.settings.custom>${user.home}/.m2/settings.xml</kie.maven.settings.custom>
   </properties>
 
   <dependencies>
@@ -170,6 +171,9 @@
                 <containerId>wildfly14x</containerId>
                 <home>${project.build.directory}/application-server/wildfly-${version.org.wildfly}</home>
                 <type>installed</type>
+                <systemProperties>
+                  <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
+                </systemProperties>
               </container>
               <deployables>
                 <deployable>
@@ -273,6 +277,9 @@
                 <containerId>wildfly14x</containerId>
                 <home>${project.build.directory}/application-server</home>
                 <type>installed</type>
+                <systemProperties>
+                  <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
+                </systemProperties>
               </container>
               <deployables>
                 <deployable>
@@ -375,30 +382,6 @@
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-
-    <profile>
-      <id>kie-maven-settings-custom</id>
-      <activation>
-        <property>
-          <name>kie.maven.settings.custom</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration>
-              <container>
-                <systemProperties combine.children="append">
-                  <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
-                </systemProperties>
-              </container>
-            </configuration>
-          </plugin>
-        </plugins>
       </build>
     </profile>
   </profiles>
