@@ -8,7 +8,7 @@ public class ExecutionServerCommand {
     private String client;
     private String operation;
     private String bodyParam;
-    private Map<String, String> parameters = new HashMap<>();
+    private Map<String, Object> parameters = new HashMap<>();
     private Object body;
 
     public String getClient() {
@@ -35,11 +35,11 @@ public class ExecutionServerCommand {
         this.bodyParam = bodyParam;
     }
 
-    public Map<String, String> getParameters() {
+    public Map<String, Object> getParameters() {
         return parameters;
     }
 
-    public void setParameters(Map<String, String> parameters) {
+    public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 
