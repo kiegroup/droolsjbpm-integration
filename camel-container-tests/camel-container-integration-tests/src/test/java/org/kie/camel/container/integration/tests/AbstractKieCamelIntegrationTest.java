@@ -46,13 +46,13 @@ public class AbstractKieCamelIntegrationTest {
         kieCommands = KieServices.Factory.get().getCommands();
 
         final BatchExecutionHelperProviderImpl batchExecutionHelperProvider = new BatchExecutionHelperProviderImpl();
-        xstreamMarshaller = batchExecutionHelperProvider.newJSonMarshaller();
+        xstreamMarshaller = batchExecutionHelperProvider.newXStreamMarshaller();
     }
 
     protected ExecutionResults runCommand(Command command) {
-        final String commandJSON = xstreamMarshaller.toXML(command);
-        final String resultsJSON = kieCamelTestService.runCommand(commandJSON);
-        final ExecutionResults executionResults = (ExecutionResults) xstreamMarshaller.fromXML(resultsJSON);
+        final String commandXML = xstreamMarshaller.toXML(command);
+        final String resultsXML = kieCamelTestService.runCommand(commandXML);
+        final ExecutionResults executionResults = (ExecutionResults) xstreamMarshaller.fromXML(resultsXML);
 
         return executionResults;
     }
@@ -60,14 +60,11 @@ public class AbstractKieCamelIntegrationTest {
     protected List<Long> listProcesses() {
         final GetProcessInstancesCommand getProcessInstancesCommand = new GetProcessInstancesCommand();
         getProcessInstancesCommand.setOutIdentifier(DEFAULT_OUT_ID);
-        final String commandJSON = xstreamMarshaller.toXML(getProcessInstancesCommand);
-        final String resultsJSON = kieCamelTestService.runCommand(commandJSON);
+        final String commandXML = xstreamMarshaller.toXML(getProcessInstancesCommand);
+        final String resultsXML = kieCamelTestService.runCommand(commandXML);
 
-        final List results = (List) xstreamMarshaller.fromXML(resultsJSON);
-        if (results.size() == 0) {
-            return new ArrayList<>();
-        }
-        final List<Long> processIds = (List<Long>) results.get(0);
+        final List results = (List) xstreamMarshaller.fromXML(resultsXML);
+        final List<Long> processIds = (List<Long>) results;
         return processIds;
     }
 }

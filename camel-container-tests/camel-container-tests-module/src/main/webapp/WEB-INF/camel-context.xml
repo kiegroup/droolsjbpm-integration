@@ -24,7 +24,8 @@
   </bean>
 
   <bean id="batchExecutionHelperProvider" class="org.drools.core.runtime.help.impl.BatchExecutionHelperProviderImpl" />
-  <bean id="xstreamBean" factory-bean="batchExecutionHelperProvider" factory-method="newJSonMarshaller" />
+  <bean id="xstreamBean" factory-bean="batchExecutionHelperProvider" factory-method="newXStreamMarshaller" />
+  <bean id="executionServerMarshaller" class="org.kie.camel.container.module.Marshaller" />
   <bean id="listProcessInstancesProcessor" class="org.kie.camel.container.module.ListProcessInstancesProcessor"/>
   <bean id="executionServerCommandProcessor" class="org.kie.camel.container.module.ExecutionServerCommandProcessor"/>
 
@@ -94,10 +95,10 @@
     <route id="execServerRoute">
       <from uri="direct:runOnExecServer"/>
       <convertBodyTo type="java.lang.String"/>
-      <to uri="bean:xstreamBean?method=fromXML(String)"/>
+      <to uri="bean:executionServerMarshaller?method=unmarshall(String)"/>
       <to uri="bean:executionServerCommandProcessor"/>
       <to uri="kie:http://yoda:test@localhost:8080/kie-server-services/services/rest/server"/>
-      <to uri="bean:xstreamBean?method=toXML(Object)"/>
+      <to uri="bean:executionServerMarshaller?method=marshall(Object)"/>
     </route>
   </camelContext>
 </beans>

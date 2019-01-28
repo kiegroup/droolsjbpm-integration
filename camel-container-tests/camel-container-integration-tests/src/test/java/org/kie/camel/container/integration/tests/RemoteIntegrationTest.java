@@ -20,11 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
@@ -46,10 +48,13 @@ import org.kie.api.command.ExecutableCommand;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.camel.container.api.model.Person;
 import org.kie.scanner.KieMavenRepository;
+import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.instance.ProcessInstance;
 
 import static org.kie.scanner.KieMavenRepository.getKieMavenRepository;
 
@@ -59,11 +64,20 @@ public class RemoteIntegrationTest extends AbstractKieCamelIntegrationTest {
     private static final String KJAR_TEST_PACKAGE_PATH = "/src/main/resources/org/test/";
     private static final String PATH_POM = KJAR_RESOURCES_PATH + "pom.xml";
     private static final String PROCESS_FILE_NAME = "process1.bpmn2";
+    private static final String PROCESS_WITH_SIGNAL_FILE_NAME = "processWithSignal.bpmn2";
     private static final String RULES_FILE_NAME = "rules.drl";
     private static final ReleaseId RELEASE_ID =
             new ReleaseId("org.drools", "camel-container-tests-kjar", "1.0.0");
     private static final String CONTAINER_ID = "test-container";
     private static final String PROCESS_ID = "process1";
+    private static final String PROCESS_WITH_SIGNAL_ID = "processWithSignal";
+    private static final String SIGNAL_NAME = "signal1";
+    private static final String INITIATOR = "yoda";
+
+    private static final String SIMPLE_QUERY_NAME = "process-instances-query";
+    private static final String SIMPLE_QUERY_EXPRESSION = "select * from ProcessInstanceLog";
+    private static final String SIMPLE_QUERY_TARGET = "PROCESS";
+    private static final String SIMPLE_QUERY_DATASOURCE = "java:jboss/datasources/ExampleDS";
 
     @BeforeClass
     public static void createKieJar() throws IOException {
@@ -72,6 +86,8 @@ public class RemoteIntegrationTest extends AbstractKieCamelIntegrationTest {
         kfs.writePomXML(loadResource(PATH_POM));
         kfs = addClasspathResourceToKjar(KJAR_RESOURCES_PATH + PROCESS_FILE_NAME,
                                          KJAR_TEST_PACKAGE_PATH + PROCESS_FILE_NAME, kfs);
+        kfs = addClasspathResourceToKjar(KJAR_RESOURCES_PATH + PROCESS_WITH_SIGNAL_FILE_NAME,
+                                         KJAR_TEST_PACKAGE_PATH + PROCESS_WITH_SIGNAL_FILE_NAME, kfs);
         kfs = addClasspathResourceToKjar(KJAR_RESOURCES_PATH + RULES_FILE_NAME,
                                          KJAR_TEST_PACKAGE_PATH + RULES_FILE_NAME, kfs);
 
@@ -121,8 +137,221 @@ public class RemoteIntegrationTest extends AbstractKieCamelIntegrationTest {
     }
 
     @Test
+    public void testFindProcessByContainerIdProcessId() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", CONTAINER_ID);
+        parameters.put("processId", PROCESS_ID);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessByContainerIdProcessId");
+        executionServerCommand.setParameters(parameters);
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(ProcessDefinition.class);
+        final ProcessDefinition processDefinition = (ProcessDefinition) response;
+        Assertions.assertThat(processDefinition.getContainerId()).isEqualTo(CONTAINER_ID);
+        Assertions.assertThat(processDefinition.getId()).isEqualTo(PROCESS_ID);
+    }
+
+    @Test
+    public void testFindProcesses() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("page", "0");
+        parameters.put("pageSize", "10");
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcesses");
+        executionServerCommand.setParameters(parameters);
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessDefinition> processDefinitions = (List<ProcessDefinition>) response;
+        Assertions.assertThat(processDefinitions).isNotEmpty();
+        final List<String> processIds = processDefinitions.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Assertions.assertThat(processIds).contains(PROCESS_ID);
+    }
+
+    @Test
+    public void testFindProcessesByContainerId() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", CONTAINER_ID);
+        parameters.put("page", "0");
+        parameters.put("pageSize", "10");
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessesByContainerId");
+        executionServerCommand.setParameters(parameters);
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessDefinition> processDefinitions = (List<ProcessDefinition>) response;
+        Assertions.assertThat(processDefinitions).isNotEmpty();
+        final List<String> processIds = processDefinitions.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Assertions.assertThat(processIds).contains(PROCESS_ID);
+    }
+
+    @Test
+    public void testFindProcessesByContainerIdWrongId() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", "wrong-container-id");
+        parameters.put("page", "0");
+        parameters.put("pageSize", "10");
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessesByContainerId");
+        executionServerCommand.setParameters(parameters);
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessDefinition> processDefinitions = (List<ProcessDefinition>) response;
+        Assertions.assertThat(processDefinitions).isEmpty();
+    }
+
+    @Test
+    public void testFindProcessesById() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("processId", PROCESS_ID);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessesById");
+        executionServerCommand.setParameters(parameters);
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessDefinition> processDefinitions = (List<ProcessDefinition>) response;
+        Assertions.assertThat(processDefinitions).isNotEmpty();
+        final List<String> processIds = processDefinitions.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Assertions.assertThat(processIds).contains(PROCESS_ID);
+    }
+
+    @Test
+    public void testFindProcessInstances() {
+        final Long processInstanceId = startProcess(CONTAINER_ID, PROCESS_WITH_SIGNAL_ID);
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("page", "0");
+        parameters.put("pageSize", "10");
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessInstances");
+        executionServerCommand.setParameters(parameters);
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessInstance> processInstances = (List<ProcessInstance>) response;
+        Assertions.assertThat(processInstances).isNotEmpty();
+        final List<Long> processInstancesIds =
+                processInstances.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Assertions.assertThat(processInstancesIds).contains(processInstanceId);
+
+        sendSignalToProcessInstance(CONTAINER_ID, processInstanceId, SIGNAL_NAME);
+    }
+
+    @Test
+    public void testFindProcessInstancesByContainerId() {
+        final Long processInstanceId = startProcess(CONTAINER_ID, PROCESS_WITH_SIGNAL_ID);
+
+        final List<Integer> statuses = Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", CONTAINER_ID);
+        parameters.put("page", "0");
+        parameters.put("pageSize", "10");
+        parameters.put("status", statuses);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessInstancesByContainerId");
+        executionServerCommand.setParameters(parameters);
+
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessInstance> processInstances = (List<ProcessInstance>) response;
+        Assertions.assertThat(processInstances).isNotEmpty();
+        final List<Long> processInstancesIds =
+                processInstances.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Assertions.assertThat(processInstancesIds).contains(processInstanceId);
+
+        sendSignalToProcessInstance(CONTAINER_ID, processInstanceId, SIGNAL_NAME);
+    }
+
+    @Test
+    public void testFindProcessInstancesByStatus() {
+        final Long processInstanceId = startProcess(CONTAINER_ID, PROCESS_WITH_SIGNAL_ID);
+
+        final List<Integer> statuses = Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("status", statuses);
+        parameters.put("page", "0");
+        parameters.put("pageSize", "10");
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessInstancesByStatus");
+        executionServerCommand.setParameters(parameters);
+
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessInstance> processInstances = (List<ProcessInstance>) response;
+        Assertions.assertThat(processInstances).isNotEmpty();
+        final List<Long> processInstancesIds =
+                processInstances.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Assertions.assertThat(processInstancesIds).contains(processInstanceId);
+
+        sendSignalToProcessInstance(CONTAINER_ID, processInstanceId, SIGNAL_NAME);
+    }
+
+    @Test
+    public void testFindProcessInstanceByInitiator() {
+        final Long processInstanceId = startProcess(CONTAINER_ID, PROCESS_WITH_SIGNAL_ID);
+
+        final List<Integer> statuses = Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("initiator", INITIATOR);
+        parameters.put("status", statuses);
+        parameters.put("page", "0");
+        parameters.put("pageSize", "10");
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessInstancesByInitiator");
+        executionServerCommand.setParameters(parameters);
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        final List<ProcessInstance> processInstances = (List<ProcessInstance>) response;
+        Assertions.assertThat(processInstances).isNotEmpty();
+        final List<Long> processInstancesIds =
+                processInstances.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Assertions.assertThat(processInstancesIds).contains(processInstanceId);
+
+        sendSignalToProcessInstance(CONTAINER_ID, processInstanceId, SIGNAL_NAME);
+    }
+
+    @Test
+    public void testListQueries() {
+        registerQuery(getSimpleQueryDefinition());
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("page", 0);
+        parameters.put("pageSize", 10);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("getQueries");
+        executionServerCommand.setParameters(parameters);
+
+        Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+        List<QueryDefinition> queryDefinitionList = (List<QueryDefinition>) response;
+        Assertions.assertThat(queryDefinitionList).isNotEmpty();
+        List<String> queryNames = queryDefinitionList.stream().map(q -> q.getName()).collect(Collectors.toList());
+        Assertions.assertThat(queryNames).contains(SIMPLE_QUERY_NAME);
+
+        unregisterQuery(SIMPLE_QUERY_NAME);
+    }
+
+    @Test
     public void testGetProcessDefinition() {
-        final Map<String, String> parameters = new HashMap<>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put("containerId", CONTAINER_ID);
         parameters.put("processId", PROCESS_ID);
         final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
@@ -136,25 +365,12 @@ public class RemoteIntegrationTest extends AbstractKieCamelIntegrationTest {
 
         final ProcessDefinition processDefinition = (ProcessDefinition) response;
         Assertions.assertThat(processDefinition.getName()).isEqualTo(PROCESS_ID);
-        Assertions.assertThat(processDefinition.getVersion()).isEqualTo("1");
+        Assertions.assertThat(processDefinition.getVersion()).isEqualTo("1.0");
     }
 
     @Test
     public void testStartProcess() {
-        final Map<String, String> parameters = new HashMap<>();
-        parameters.put("containerId", CONTAINER_ID);
-        parameters.put("processId", PROCESS_ID);
-        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
-        executionServerCommand.setClient("process");
-        executionServerCommand.setOperation("startProcess");
-        executionServerCommand.setParameters(parameters);
-
-        final Object response = runOnExecutionServer(executionServerCommand);
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response).isInstanceOf(Long.class);
-
-        final Long processInstanceId = (Long) response;
-        Assertions.assertThat(processInstanceId).isGreaterThan(0);
+        startProcess(CONTAINER_ID, PROCESS_ID);
     }
 
     @Test
@@ -172,7 +388,7 @@ public class RemoteIntegrationTest extends AbstractKieCamelIntegrationTest {
         executionCommand.addCommand(insertObjectCommand);
         executionCommand.addCommand(fireAllRulesCommand);
 
-        Map<String, String> parameters = new HashMap<>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("id", CONTAINER_ID);
         final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
         executionServerCommand.setClient("rule");
@@ -190,13 +406,84 @@ public class RemoteIntegrationTest extends AbstractKieCamelIntegrationTest {
     }
 
     private Object runOnExecutionServer(ExecutionServerCommand executionServerCommand) {
-        final BatchExecutionHelperProviderImpl batchExecutionHelperProvider = new BatchExecutionHelperProviderImpl();
-        final XStream xstreamMarshaller = batchExecutionHelperProvider.newJSonMarshaller();
-        final String commandJSON = xstreamMarshaller.toXML(executionServerCommand);
-        final String resultString = kieCamelTestService.runOnExecServer(commandJSON);
-        final Object result = xstreamMarshaller.fromXML(resultString);
+        final XStreamMarshaller marshaller = new XStreamMarshaller(new HashSet<>(),
+                                                                RemoteIntegrationTest.class.getClassLoader());
+        final String commandXML = marshaller.marshall(executionServerCommand);
+        final String resultString = kieCamelTestService.runOnExecServer(commandXML);
+        final Object result = marshaller.unmarshall(resultString, Object.class);
 
         return result;
+    }
+
+    private Long startProcess(final String containerId, final String processId) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", containerId);
+        parameters.put("processId", processId);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("process");
+        executionServerCommand.setOperation("startProcess");
+        executionServerCommand.setParameters(parameters);
+
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(Long.class);
+
+        final Long processInstanceId = (Long) response;
+        Assertions.assertThat(processInstanceId).isGreaterThan(0);
+
+        return processInstanceId;
+    }
+
+    private void sendSignalToProcessInstance(final String containerId, final Long processInstanceId,
+                                             final String signalName) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", containerId);
+        parameters.put("processInstanceId", processInstanceId);
+        parameters.put("signalName", signalName);
+        parameters.put("event", null);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("process");
+        executionServerCommand.setOperation("signalProcessInstance");
+        executionServerCommand.setParameters(parameters);
+
+        runOnExecutionServer(executionServerCommand);
+    }
+
+    private QueryDefinition registerQuery(final QueryDefinition queryDefinition) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("queryDefinition", queryDefinition);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("registerQuery");
+        executionServerCommand.setParameters(parameters);
+
+        Object object = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(object).isNotNull();
+        Assertions.assertThat(object).isInstanceOf(QueryDefinition.class);
+        QueryDefinition response = (QueryDefinition) object;
+
+        return response;
+    }
+
+    private void unregisterQuery(final String queryName) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("queryName", queryName);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("unregisterQuery");
+        executionServerCommand.setParameters(parameters);
+
+        runOnExecutionServer(executionServerCommand);
+    }
+
+    private static final QueryDefinition getSimpleQueryDefinition() {
+        final QueryDefinition simpleQueryDefinition = new QueryDefinition();
+        simpleQueryDefinition.setName(SIMPLE_QUERY_NAME);
+        simpleQueryDefinition.setExpression(SIMPLE_QUERY_EXPRESSION);
+        simpleQueryDefinition.setTarget(SIMPLE_QUERY_TARGET);
+        simpleQueryDefinition.setSource(SIMPLE_QUERY_DATASOURCE);
+
+        return simpleQueryDefinition;
     }
 
     private static KieFileSystem createKieFileSystemWithKProject(KieServices ks) {
