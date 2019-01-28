@@ -2,6 +2,7 @@ package org.kie.server.services.prometheus;
 
 import java.util.stream.IntStream;
 
+import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -41,8 +42,17 @@ public class PrometheusMetrics {
             .buckets(DECISION_TIME_BUCKETS)
             .register();
 
-    public Histogram getEvaluationTimeHistogram() {
+    Histogram getEvaluationTimeHistogram() {
         return dmnEvaluationTimeHistogram;
+    }
+
+    private static final Counter dmnNumberOfEvaluationFailed = Counter.build()
+            .help("DMN Evaluation Failed")
+            .labelNames("container_id", "group_id", "artifact_id", "version", "decision_namespace", "decision_name")
+            .register();
+
+    Counter getDMNNumberOfEvaluationFailed() {
+        return dmnNumberOfEvaluationFailed;
     }
 
     private static final double[] RULE_TIME_BUCKETS;
@@ -58,7 +68,7 @@ public class PrometheusMetrics {
             .buckets(RULE_TIME_BUCKETS)
             .register();
 
-    public Histogram getDroolsEvaluationTimeHistogram() {
+    Histogram getDroolsEvaluationTimeHistogram() {
         return droolsEvaluationTimeHistogram;
     }
 }

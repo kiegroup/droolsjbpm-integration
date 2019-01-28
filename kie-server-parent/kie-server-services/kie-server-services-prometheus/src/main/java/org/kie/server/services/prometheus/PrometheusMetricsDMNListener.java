@@ -1,5 +1,6 @@
 package org.kie.server.services.prometheus;
 
+import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.event.AfterEvaluateBKMEvent;
 import org.kie.dmn.api.core.event.AfterEvaluateContextEntryEvent;
@@ -49,6 +50,13 @@ public class PrometheusMetricsDMNListener implements DMNRuntimeEventListener {
         metrics.getEvaluationTimeHistogram()
                 .labels(kieContainer.getContainerId(), releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion(), decisionNode.getModelName(), decisionNode.getModelNamespace())
                 .observe(elapsed);
+        DMNDecisionResult decisionResultById = e.getResult().getDecisionResultById(decisionNode.getId());
+        if(decisionResultById != null && decisionResultById.hasErrors()) {
+            metrics.getDMNNumberOfEvaluationFailed()
+                    .labels(kieContainer.getContainerId(), releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion(), decisionNode.getModelName(), decisionNode.getModelNamespace())
+                    .inc();
+        }
+
         if (logger.isDebugEnabled()) {
             logger.debug("Elapsed time: " + elapsed);
         }
