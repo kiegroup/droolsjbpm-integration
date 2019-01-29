@@ -16,7 +16,7 @@
 package org.kie.server.services.jbpm.xstream;
 
 import org.hibernate.collection.internal.PersistentBag;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 import org.kie.server.api.marshalling.Marshaller;
@@ -30,7 +30,7 @@ public class HibernateXStreamMarshallerExtensionTest {
 
     @Test
     public void testMarshallDummyHibernatePersistenceBag() {
-        SessionImplementor session = Mockito.mock(SessionImplementor.class);
+        SharedSessionContractImplementor session = Mockito.mock(SharedSessionContractImplementor.class);
         Mockito.when(session.isOpen()).thenReturn(true);
         Mockito.when(session.isConnected()).thenReturn(true);
         PersistentBag bag = new PersistentBag(session, new ArrayList<String>());
