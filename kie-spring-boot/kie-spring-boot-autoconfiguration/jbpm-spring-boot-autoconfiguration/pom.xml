@@ -55,6 +55,12 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-workitems-email</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
