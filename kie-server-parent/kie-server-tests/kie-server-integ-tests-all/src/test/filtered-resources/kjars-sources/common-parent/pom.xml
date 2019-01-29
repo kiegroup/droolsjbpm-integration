@@ -9,7 +9,7 @@
   <properties>
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
-    <version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec}</version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec>
+    <version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec}</version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
@@ -20,8 +20,8 @@
     <dependencies>
       <dependency>
         <groupId>org.jboss.spec.javax.xml.bind</groupId>
-        <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
-        <version>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.2_spec}</version>
+        <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+        <version>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
