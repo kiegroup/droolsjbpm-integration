@@ -75,6 +75,8 @@
         <include>com.google.inject.extensions:guice-servlet</include>
         
         <include>xerces:xercesImpl</include>
+
+        <include>com.sun.xml.bind:jaxb-xjc</include>
       </includes>
       <excludes>
         <exclude>org.jboss.resteasy:*</exclude>
