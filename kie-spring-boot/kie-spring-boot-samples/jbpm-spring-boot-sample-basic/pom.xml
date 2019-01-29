@@ -30,7 +30,7 @@
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>jbpm-spring-boot-starter-basic</artifactId>
+      <artifactId>jbpm-spring-boot-starter-basic</artifactId>     
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

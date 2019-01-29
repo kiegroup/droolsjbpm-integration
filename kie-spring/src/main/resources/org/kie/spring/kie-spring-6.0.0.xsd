@@ -400,7 +400,7 @@
     <xsd:choice minOccurs="0" maxOccurs="1">
       <xsd:element ref="spring:bean"/>
     </xsd:choice>
-    <xsd:attribute name="ref" use="optional" type="xsd:IDREF"/>
+    <xsd:attribute name="ref" use="optional" type="xsd:string"/>
   </xsd:complexType>
 
   <xsd:complexType name="generic-scoped-entitymanager">
@@ -408,7 +408,7 @@
       <xsd:element ref="spring:bean"/>
     </xsd:choice>
     <xsd:attribute name="scope" use="required" type="scopedEntityManagerTypeEnum"/>
-    <xsd:attribute name="ref" use="optional" type="xsd:IDREF"/>
+    <xsd:attribute name="ref" use="optional" type="xsd:string"/>
   </xsd:complexType>
 
   <xsd:simpleType name="scopedEntityManagerTypeEnum">
@@ -449,7 +449,7 @@
     <xsd:choice minOccurs="0" maxOccurs="1">
       <xsd:element ref="strategy-acceptor"/>
     </xsd:choice>
-    <xsd:attribute name="strategy-acceptor-ref" use="optional" type="xsd:IDREF"/>
+    <xsd:attribute name="strategy-acceptor-ref" use="optional" type="xsd:string"/>
   </xsd:complexType>
 
   <xsd:element name="serializable-placeholder-resolver-strategy" type="generic-resolver-strategy"/>
