@@ -421,8 +421,8 @@
             <artifactId>dom4j</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -441,8 +441,8 @@
             <artifactId>dom4j</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -547,8 +547,8 @@
         <version>${project.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -560,8 +560,8 @@
         <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -571,8 +571,8 @@
         <version>${project.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -584,8 +584,8 @@
         <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -607,8 +607,8 @@
         <version>${project.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -620,8 +620,8 @@
         <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -631,8 +631,8 @@
         <version>${project.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -644,8 +644,8 @@
         <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -659,8 +659,8 @@
             <artifactId>activation</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
           <exclusion>
             <groupId>javax.mail</groupId>
@@ -680,8 +680,8 @@
             <artifactId>activation</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
           <exclusion>
             <groupId>javax.mail</groupId>
@@ -1294,8 +1294,8 @@
         <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -1314,8 +1314,8 @@
         <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.jboss.spec.javax.transaction</groupId>

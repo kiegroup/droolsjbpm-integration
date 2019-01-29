@@ -67,12 +67,12 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         assertProcessInstance(pid, STATE_ACTIVE, SLA_PENDING);
 
         // Yoda should have one task available without SLA
-        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         assertThat(tasks).hasSize(1);
         TaskSummary task = tasks.get(0);
         assertThat(task.getName()).isEqualTo("Hello");
 
-        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).hasSize(1);
         NodeInstance taskNode = activeNodes.get(0);
         assertNodeInstance(taskNode, "Hello", SLA_NA);
@@ -85,9 +85,9 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
         assertThat(tasks).isEmpty();
 
-        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).isEmpty();
-        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 0), taskNode.getId());
+        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 10), taskNode.getId());
         assertNodeInstance(taskNode, "Hello", SLA_NA);
 
         // Process should be completed, but SLA should still be violated
@@ -101,12 +101,12 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         assertProcessInstance(pid, STATE_ACTIVE, SLA_PENDING);
 
         // Yoda should have one task available without SLA
-        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         assertThat(tasks).hasSize(1);
         TaskSummary task = tasks.get(0);
         assertThat(task.getName()).isEqualTo("Hello");
 
-        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).hasSize(1);
         NodeInstance taskNode = activeNodes.get(0);
         assertNodeInstance(taskNode, "Hello", SLA_NA);
@@ -116,9 +116,9 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
         assertThat(tasks).isEmpty();
 
-        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).isEmpty();
-        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 0), taskNode.getId());
+        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 10), taskNode.getId());
         assertNodeInstance(taskNode, "Hello", SLA_NA);
 
         // Process should be completed and SLA should be met
@@ -133,12 +133,12 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         assertProcessInstance(pid, STATE_ACTIVE, SLA_NA);
 
         // Yoda should have one task available with SLA
-        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         TaskSummary task = tasks.get(0);
         assertThat(tasks).hasSize(1);
         assertThat(task.getName()).isEqualTo("Hello");
 
-        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).hasSize(1);
 
         NodeInstance taskNode = activeNodes.get(0);
@@ -149,18 +149,18 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
 
         assertProcessInstance(pid, STATE_ACTIVE, SLA_NA);
 
-        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).hasSize(1);
         taskNode = activeNodes.get(0);
         assertNodeInstance(taskNode, "Hello", SLA_VIOLATED);
 
         taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, null);
-        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
+        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         assertThat(tasks).isEmpty();
 
-        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).isEmpty();
-        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 0), taskNode.getId());
+        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 10), taskNode.getId());
         assertNodeInstance(taskNode, "Hello", SLA_VIOLATED);
 
         assertProcessInstance(pid, STATE_COMPLETED, SLA_NA);
@@ -173,24 +173,24 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         assertProcessInstance(pid, STATE_ACTIVE, SLA_NA);
 
         // Yoda should have one task available with SLA
-        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         TaskSummary task = tasks.get(0);
         assertThat(tasks).hasSize(1);
         assertThat(task.getName()).isEqualTo("Hello");
 
-        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).hasSize(1);
 
         NodeInstance taskNode = activeNodes.get(0);
         assertNodeInstance(taskNode, "Hello", SLA_PENDING);
 
         taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, null);
-        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 0);
+        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         assertThat(tasks).isEmpty();
 
-        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 0);
+        activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).isEmpty();
-        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 0), taskNode.getId());
+        taskNode = getNodeInstanceById(queryClient.findCompletedNodeInstances(pid, 0, 10), taskNode.getId());
         assertNodeInstance(taskNode, "Hello", SLA_MET);
 
         assertProcessInstance(pid, STATE_COMPLETED, SLA_NA);

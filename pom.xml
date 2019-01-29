@@ -124,7 +124,11 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
+      <dependency>
+        <groupId>javax.persistence</groupId>
+        <artifactId>javax.persistence-api</artifactId>
+        <version>${version.javax.persistence-api}</version>
+      </dependency>
       <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-karaf-itests-domain-model</artifactId>
