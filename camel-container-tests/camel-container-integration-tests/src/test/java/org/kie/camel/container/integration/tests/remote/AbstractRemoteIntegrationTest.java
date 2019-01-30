@@ -18,10 +18,12 @@ package org.kie.camel.container.integration.tests.remote;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
@@ -41,6 +43,8 @@ import org.kie.scanner.KieMavenRepository;
 import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.VariableInstance;
 
 import static org.kie.scanner.KieMavenRepository.getKieMavenRepository;
 
@@ -51,19 +55,24 @@ public class AbstractRemoteIntegrationTest extends AbstractKieCamelIntegrationTe
     protected static final String PATH_POM = KJAR_RESOURCES_PATH + "pom.xml";
     protected static final String PROCESS_FILE_NAME = "process1.bpmn2";
     protected static final String PROCESS_WITH_SIGNAL_FILE_NAME = "processWithSignal.bpmn2";
+    protected static final String PROCESS_WITH_HUMAN_TASK_FILE_NAME = "processWithHumanTask.bpmn2";
     protected static final String RULES_FILE_NAME = "rules.drl";
     protected static final ReleaseId RELEASE_ID =
             new ReleaseId("org.drools", "camel-container-tests-kjar", "1.0.0");
     protected static final String CONTAINER_ID = "test-container";
     protected static final String PROCESS_ID = "process1";
     protected static final String PROCESS_WITH_SIGNAL_ID = "processWithSignal";
+    protected static final String PROCESS_WITH_HUMAN_TASK = "processWithHumanTask";
     protected static final String SIGNAL_NAME = "signal1";
+    protected static final String PROCESS_VARIABLE_NAME = "var1";
     protected static final String INITIATOR = "yoda";
 
     protected static final String SIMPLE_QUERY_NAME = "process-instances-query";
     protected static final String SIMPLE_QUERY_EXPRESSION = "select * from ProcessInstanceLog";
     protected static final String SIMPLE_QUERY_TARGET = "PROCESS";
     protected static final String SIMPLE_QUERY_DATASOURCE = "java:jboss/datasources/ExampleDS";
+
+    protected static final String DEFAULT_USER = "yoda";
 
     @BeforeClass
     public static void createKieJar() throws IOException {
@@ -76,6 +85,8 @@ public class AbstractRemoteIntegrationTest extends AbstractKieCamelIntegrationTe
                                          KJAR_TEST_PACKAGE_PATH + PROCESS_WITH_SIGNAL_FILE_NAME, kfs);
         kfs = addClasspathResourceToKjar(KJAR_RESOURCES_PATH + RULES_FILE_NAME,
                                          KJAR_TEST_PACKAGE_PATH + RULES_FILE_NAME, kfs);
+        kfs = addClasspathResourceToKjar(KJAR_RESOURCES_PATH + PROCESS_WITH_HUMAN_TASK_FILE_NAME,
+                                         KJAR_TEST_PACKAGE_PATH + PROCESS_WITH_HUMAN_TASK_FILE_NAME, kfs);
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs);
         List<Message> messageList = kieBuilder.buildAll().getResults().getMessages();
@@ -137,6 +148,77 @@ public class AbstractRemoteIntegrationTest extends AbstractKieCamelIntegrationTe
         return processInstanceId;
     }
 
+    protected Long startProcess(final String containerId, final String processId,
+                                final Map<String, Object> processVariables) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", containerId);
+        parameters.put("processId", processId);
+        parameters.put("variables", processVariables);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("process");
+        executionServerCommand.setOperation("startProcess");
+        executionServerCommand.setParameters(parameters);
+
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(Long.class);
+
+        final Long processInstanceId = (Long) response;
+        Assertions.assertThat(processInstanceId).isGreaterThan(0);
+
+        return processInstanceId;
+    }
+
+    protected HashMap<String, String> getProcessVariables(String containerId, long processInstanceId) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", containerId);
+        parameters.put("processInstanceId", processInstanceId);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("process");
+        executionServerCommand.setOperation("findVariablesCurrentState");
+        executionServerCommand.setParameters(parameters);
+
+        final Object response = runOnExecutionServer(executionServerCommand);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response).isInstanceOf(List.class);
+
+        final List<VariableInstance> variableInstances = (List<VariableInstance>) response;
+        final HashMap<String, String> variablesMap = new HashMap<>();
+        for (VariableInstance variable : variableInstances) {
+            variablesMap.put(variable.getVariableName(), variable.getValue());
+        }
+
+        return variablesMap;
+    }
+
+    protected List<ProcessInstance> findActiveProcesses() {
+        final List<Integer> statuses = Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("status", statuses);
+        parameters.put("page", "0");
+        parameters.put("pageSize", "100");
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("query");
+        executionServerCommand.setOperation("findProcessInstancesByStatus");
+        executionServerCommand.setParameters(parameters);
+
+        final Object response = runOnExecutionServer(executionServerCommand);
+        final List<ProcessInstance> processInstances = (List<ProcessInstance>) response;
+
+        return processInstances;
+    }
+
+    protected void abortProcess(final String containerId, final String processInstanceId) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("containerId", containerId);
+        parameters.put("processInstanceId", processInstanceId);
+        final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
+        executionServerCommand.setClient("process");
+        executionServerCommand.setOperation("abortProcessInstance");
+        executionServerCommand.setParameters(parameters);
+        runOnExecutionServer(executionServerCommand);
+    }
+
     protected void sendSignalToProcessInstance(final String containerId, final Long processInstanceId,
                                              final String signalName) {
         final Map<String, Object> parameters = new HashMap<>();
@@ -150,6 +232,14 @@ public class AbstractRemoteIntegrationTest extends AbstractKieCamelIntegrationTe
         executionServerCommand.setParameters(parameters);
 
         runOnExecutionServer(executionServerCommand);
+    }
+
+    @After
+    public void abortAllProcesses() {
+        final List<ProcessInstance> activeProcesses = findActiveProcesses();
+        for (ProcessInstance processInstance : activeProcesses) {
+            abortProcess(CONTAINER_ID, String.valueOf(processInstance.getId()));
+        }
     }
 
     private static KieFileSystem createKieFileSystemWithKProject(KieServices ks) {
