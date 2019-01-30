@@ -221,6 +221,12 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-services-ejb-timer</artifactId>
     </dependency>
+    
+    <!-- openshift -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-openshift</artifactId>
+    </dependency>
 
     <!-- image -->
     <dependency>
