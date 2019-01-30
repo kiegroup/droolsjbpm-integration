@@ -210,6 +210,13 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server</artifactId>
+      <classifier>ee8</classifier>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-standalone-impl</artifactId>
     </dependency>
 
