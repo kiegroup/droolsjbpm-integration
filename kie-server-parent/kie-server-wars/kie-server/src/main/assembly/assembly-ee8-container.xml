@@ -20,7 +20,7 @@
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
   <!-- including a . in the id will modify the *classifier* of the artifact, instead of the name/id of the artifact -->
-  <id>ee7</id>
+  <id>ee8</id>
   <formats>
     <format>war</format>
     <format>dir</format>
@@ -31,10 +31,6 @@
     <fileSet>
       <directory>${project.basedir}/src/main/ee-resources</directory>
       <outputDirectory>.</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/ee7-hibernate</directory>
-      <outputDirectory>WEB-INF/lib</outputDirectory>
     </fileSet>
   </fileSets>
 
@@ -68,10 +64,10 @@
 
         <include>org.jbpm:jbpm-services-ejb-timer</include>
 
-        <!-- hibernate core and entity manager are added via maven-dependency-pluging:copy to include JPA 2.1 versions -->
         <include>org.hibernate.common:hibernate-commons-annotations</include>
+        <include>org.hibernate:hibernate-entitymanager</include>
+        <include>org.hibernate:hibernate-core</include>
         <include>org.hibernate:hibernate-validator</include>
-        
         <include>dom4j:dom4j</include>
 
         <include>org.quartz-scheduler:quartz</include>
@@ -79,8 +75,6 @@
         <include>com.google.inject.extensions:guice-servlet</include>
         
         <include>xerces:xercesImpl</include>
-
-        <include>com.sun.xml.bind:jaxb-xjc</include>
       </includes>
       <excludes>
         <exclude>org.jboss.resteasy:*</exclude>
@@ -94,6 +88,7 @@
         <exclude>javax.validation:validation-api</exclude>
         <exclude>stax:stax-api</exclude>
         <exclude>javax.activation:activation</exclude>
+        <exclude>javax.persistence:javax.persistence-api</exclude>
         <exclude>xml-apis:xml-apis:jar</exclude>
         <exclude>javax.mail:mail</exclude>
         <exclude>org.apache.cxf:cxf-rt-ws-policy</exclude>

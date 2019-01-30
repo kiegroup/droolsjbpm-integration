@@ -316,10 +316,71 @@
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-xjc</artifactId>
     </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-hibernate-for-ee7</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.hibernate</groupId>
+                  <artifactId>hibernate-entitymanager</artifactId>
+                  <version>${version.org.hibernate-4ee7}</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.hibernate</groupId>
+                  <artifactId>hibernate-core</artifactId>
+                  <version>${version.org.hibernate-4ee7}</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jboss.logging</groupId>
+                  <artifactId>jboss-logging</artifactId>
+                  <version>${version.org.jboss.logging-4ee7}</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.javassist</groupId>
+                  <artifactId>javassist</artifactId>
+                  <version>${version.org.javassist-4ee7}</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>antlr</groupId>
+                  <artifactId>antlr</artifactId>
+                  <version>${version.antlr-4ee7}</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jboss</groupId>
+                  <artifactId>jandex</artifactId>
+                  <version>${version.org.jboss.jandex-4ee7}</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.fasterxml</groupId>
+                  <artifactId>classmate</artifactId>
+                  <version>${version.com.fasterxml.classmate-4ee7}</version>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/ee7-hibernate</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -334,6 +395,7 @@
         <configuration>
           <finalName>kie-server-${project.version}</finalName>
           <descriptors>
+            <descriptor>src/main/assembly/assembly-ee8-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-ee7-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-servlet-container.xml</descriptor>
           </descriptors>

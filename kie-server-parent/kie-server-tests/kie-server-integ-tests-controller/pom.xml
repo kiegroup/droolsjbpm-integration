@@ -161,6 +161,13 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server</artifactId>
+      <classifier>ee8</classifier>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>webc</classifier>
       <type>war</type>
@@ -225,7 +232,7 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>kie-server-controller-standalone</artifactId>
                 <!-- default, may be overriden in container specific profiles -->
-                <classifier>${kie.server.classifier}</classifier>
+                <classifier>${kie.server.controller.classifier}</classifier>
                 <type>war</type>
                 <properties>
                   <context>${kie.server.controller.context}</context>
@@ -271,6 +278,9 @@
     </profile>
     <profile>
       <id>tomcat9</id>
+      <properties>
+        <kie.server.controller.classifier>webc</kie.server.controller.classifier>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>
