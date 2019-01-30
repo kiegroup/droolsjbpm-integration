@@ -26,9 +26,10 @@
     <kie.server.context>kie-server-services</kie.server.context>
     <cargo.container.id>valid-id-needs-to-be-specified-in-appropriate-container-profile</cargo.container.id>
     <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
-    <kie.server.classifier>ee7</kie.server.classifier>
+    <kie.server.classifier>ee8</kie.server.classifier>
+    <kie.server.controller.classifier>ee7</kie.server.controller.classifier>
     <!-- Path to Kie server WAR file. Used for referencing WAR file in on-demand deployment/undeployment. -->
-    <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
+    <kie.server.war.path>${org.kie.server:kie-server:war:ee8}</kie.server.war.path>
     <org.kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml</org.kie.server.controller.templatefile>
     <webservice.http.url>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</webservice.http.url>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
@@ -907,6 +908,8 @@
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>weblogic122x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
+        <kie.server.classifier>ee7</kie.server.classifier>
+        <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
       </properties>
       <build>
         <pluginManagement>
@@ -1026,6 +1029,7 @@
         <kie.server.classifier>ee7</kie.server.classifier>
         <cargo.container.id>websphere85x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
+        <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
       </properties>
       <build>
         <pluginManagement>
