@@ -314,9 +314,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
     private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType, Map<String, Object> params) {
         WebTarget clientRequest = httpClient.target(uri);
 
-        for(Iterator<Map.Entry<String, Object>> it = params.entrySet().iterator(); it.hasNext(); ){
-            Map.Entry<String, Object> entry = it.next();
-
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
             clientRequest = clientRequest.queryParam(entry.getKey(), entry.getValue());
         }
 

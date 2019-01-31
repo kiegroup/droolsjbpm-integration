@@ -115,7 +115,7 @@ public abstract class AbstractKieServerImplTest {
 
         origServerId = KieServerEnvironment.getServerId();
         System.setProperty(KieServerConstants.KIE_SERVER_MODE, mode.name());
-        System.setProperty("org.kie.server.id", KIE_SERVER_ID);
+        System.setProperty(KieServerConstants.KIE_SERVER_ID, KIE_SERVER_ID);
         KieServerEnvironment.setServerId(KIE_SERVER_ID);
 
 
