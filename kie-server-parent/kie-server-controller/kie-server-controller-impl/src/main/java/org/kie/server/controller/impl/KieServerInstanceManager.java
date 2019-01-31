@@ -536,6 +536,7 @@ public class KieServerInstanceManager {
             KieContainerResource containerResource = serviceResponse.getResult();
             container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
             container.setMessages(containerResource.getMessages());
+            container.setStatus(containerResource.getStatus());
         }
     }
 
