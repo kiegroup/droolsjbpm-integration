@@ -143,7 +143,7 @@ public class KieServerRestImpl {
     @Path("prometheus")
     @Produces({MediaType.TEXT_PLAIN})
     public Response getModels() {
-        logger.info("Prometheus is scraping");
+        logger.trace("Prometheus is scraping");
 
         Enumeration<Collector.MetricFamilySamples> mfs = prometheusRegistry.metricFamilySamples();
 
