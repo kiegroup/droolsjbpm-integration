@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.server.testing</groupId>
+    <artifactId>common-parent</artifactId>
+    <version>1.0.0.Final</version>
+  </parent>
+
+  <artifactId>decision-tree-model</artifactId>
+  <version>1.0.0.Final</version>
+  <packaging>kjar</packaging>
+  
+  <properties>
+    <drools.version>7.17.0-SNAPSHOT</drools.version>
+  </properties>
+
+<!-- there should be no need for Kie, Kie-DMN, etc dependencies here -->
+<!-- dependencies>
+  <dependency>
+    <groupId>org.drools</groupId>
+    <artifactId>kie-pmml</artifactId>
+    <version>${drools.version}</version>
+  </dependency>
+</dependencies-->
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <usesPMML>true</usesPMML>
+          <properties>
+            <drools.dialect.java.compiler.lnglevel>1.6</drools.dialect.java.compiler.lnglevel>
+          </properties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
