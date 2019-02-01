@@ -20,7 +20,7 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     public static final String EXTENSION_NAME = "Prometheus";
 
-    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "true"));
 
     public static final CollectorRegistry registry = CollectorRegistry.defaultRegistry;
 
