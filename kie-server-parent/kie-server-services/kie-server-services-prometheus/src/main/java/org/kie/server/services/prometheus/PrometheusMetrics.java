@@ -36,7 +36,8 @@ public class PrometheusMetrics {
         DECISION_TIME_BUCKETS = ArrayUtils.addAll(rangeMicro(1, 10), ONE_TO_FIVE);
     }
 
-    private static final Histogram dmnEvaluationTimeHistogram = Histogram.build().name("dmn_evaluate_decision_nanosecond")
+    private static final Histogram dmnEvaluationTimeHistogram = Histogram.build()
+            .name("dmn_evaluate_decision_nanosecond")
             .help("DMN Evaluation Time")
             .labelNames("container_id", "group_id", "artifact_id", "version", "decision_namespace", "decision_name")
             .buckets(DECISION_TIME_BUCKETS)
@@ -47,6 +48,7 @@ public class PrometheusMetrics {
     }
 
     private static final Counter dmnNumberOfEvaluationFailed = Counter.build()
+            .name("dmn_evaluate_failed_count")
             .help("DMN Evaluation Failed")
             .labelNames("container_id", "group_id", "artifact_id", "version", "decision_namespace", "decision_name")
             .register();
