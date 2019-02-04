@@ -250,6 +250,7 @@ public class JSONMarshaller implements Marshaller {
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         objectMapper.registerModule(javaTimeModule);
         deserializeObjectMapper.registerModule(javaTimeModule);
+        customSerializationMapper.registerModule(javaTimeModule);
 
         this.classesSet = classes;
 
