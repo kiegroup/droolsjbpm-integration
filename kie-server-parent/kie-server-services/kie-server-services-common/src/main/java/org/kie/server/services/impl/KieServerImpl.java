@@ -152,6 +152,7 @@ public class KieServerImpl implements KieServer {
         List<KieServerExtension> extensions = sortKnownExtensions();
 
         for (KieServerExtension extension : extensions) {
+            logger.info("{} processing", extension);
             if (!extension.isActive()) {
                 continue;
             }
