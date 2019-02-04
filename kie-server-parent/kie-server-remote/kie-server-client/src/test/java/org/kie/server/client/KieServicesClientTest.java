@@ -18,7 +18,9 @@ package org.kie.server.client;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -27,6 +29,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.credentials.EnteredTokenCredentialsProvider;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -252,6 +255,34 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
         assertEquals("Artifact ID", ARTIFACT_ID, releaseId.getArtifactId());
         assertEquals("Group ID", GROUP_ID, releaseId.getGroupId());
         assertEquals("Version", VERSION, releaseId.getVersion());
+    }
+    
+    @Test
+    public void testCloseClientOnFailure() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"FAILURE\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
+
+        LoadBalancer loadBalancer = LoadBalancer.getDefault(config.getServerUrl());
+        config.setCapabilities(null);
+        config.setLoadBalancer(loadBalancer);        
+        
+        Assertions.assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
+            KieServicesFactory.newKieServicesClient(config);;
+        }).withMessageContaining("FAILURE");
+        
+        // now the load balancer should be closed and thus not allowing to schedule jobs
+        Assertions.assertThatExceptionOfType(RejectedExecutionException.class).isThrownBy(() -> {
+            loadBalancer.checkFailedEndpoints();
+        }).withMessageContaining("Terminated");
+        
     }
 
     // TODO create more tests for other operations

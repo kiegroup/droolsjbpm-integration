@@ -830,4 +830,9 @@ public abstract class AbstractKieServicesClientImpl {
 
         public abstract KieServerHttpRequest doOperation(String url);
     }
+    
+    
+    protected void close() {
+        this.loadBalancer.close();
+    }
 }
