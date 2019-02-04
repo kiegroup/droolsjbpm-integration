@@ -63,8 +63,10 @@ public class ByTaskIdContainerLocator implements ContainerLocator {
             logger.debug("Found container id '{}' for task id {}", containerId, taskId);
             return containerId;
 
-        } catch (NoResultException | NonUniqueResultException e) {
+        } catch (NoResultException e) {
             throw new IllegalArgumentException("Task with id " + taskId + " not found");
+        } catch (NonUniqueResultException e) {
+            throw new IllegalArgumentException("Multiple containerIds found for taskId " + taskId);
         } finally {
             em.close();
         }
