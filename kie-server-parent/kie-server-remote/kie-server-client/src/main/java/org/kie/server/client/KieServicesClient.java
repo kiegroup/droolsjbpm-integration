@@ -59,6 +59,8 @@ public interface KieServicesClient {
     ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId);
 
     ServiceResponse<KieServerStateInfo> getServerState();
+    
+    void close();
 
     // for backward compatibility reason
 

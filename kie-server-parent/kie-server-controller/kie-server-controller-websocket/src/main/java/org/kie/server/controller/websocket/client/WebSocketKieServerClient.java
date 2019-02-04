@@ -584,5 +584,10 @@ public class WebSocketKieServerClient implements KieServicesClient {
         
         return response;
     }
+    
+    @Override
+    public void close() {
+        // no-op
+    }
 
 }
