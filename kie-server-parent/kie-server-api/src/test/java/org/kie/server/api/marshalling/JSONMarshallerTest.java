@@ -77,7 +77,6 @@ public class JSONMarshallerTest {
 
     @Test
     public void testMarshallDateObjectUnannotated() {
-        System.setProperty("org.kie.server.json.format.date", "true");
         String expectedString = String.format("{%n" +
                 "  \"localDate\" : \"2017-01-01\",%n" +
                 "  \"localDateTime\" : \"2017-01-01T10:10:10\",%n" +
@@ -101,7 +100,6 @@ public class JSONMarshallerTest {
 
     @Test
     public void testUnmarshallDateObjectUnannotated() {
-        System.setProperty("org.kie.server.json.format.date", "true");
         String expectedString = "{\n" +
                 "  \"localDate\" : \"2017-01-01\",\n" +
                 "  \"localDateTime\" : \"2017-01-01T10:10:10\",\n" +
