@@ -69,6 +69,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.jsontype.impl.AsWrapperTypeDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import org.drools.core.xml.jaxb.util.JaxbListAdapter;
 import org.drools.core.xml.jaxb.util.JaxbListWrapper;
@@ -245,6 +246,10 @@ public class JSONMarshaller implements Marshaller {
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
             customSerializationMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         }
+
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        objectMapper.registerModule(javaTimeModule);
+        deserializeObjectMapper.registerModule(javaTimeModule);
 
         this.classesSet = classes;
 
