@@ -23,6 +23,8 @@ import org.kie.soup.commons.xstream.OffsetDateTimeXStreamConverter;
 
 /**
  * TODO Remove @XStreamConverter for java.time attributes once converters are provided by XStream out of the box.
+ * Maybe keep this for backward compatibility (KIE Soup converters should keep working even if they're no longer needed)
+ * and use {@link DateObjectUnannotated} when testing out-of-the-box time (un)marshalling.
  *
  * @see <a href="https://github.com/x-stream/xstream/issues/75">XStream#75</a>
  */

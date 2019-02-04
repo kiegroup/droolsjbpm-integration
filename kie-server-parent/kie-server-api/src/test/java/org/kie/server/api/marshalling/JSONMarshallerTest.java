@@ -1,9 +1,5 @@
 package org.kie.server.api.marshalling;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -17,13 +13,17 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.junit.After;
 import org.junit.Test;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
+import org.kie.server.api.marshalling.objects.DateObjectUnannotated;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JSONMarshallerTest {
     
@@ -74,6 +74,51 @@ public class JSONMarshallerTest {
         assertEquals( LocalTime.of( 10, 10, 10 ), dateObject.getLocalTime() );
         assertEquals( OffsetDateTime.of( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ), ZoneOffset.ofHours( 1 ) ), dateObject.getOffsetDateTime() );
     }
+
+    @Test
+    public void testMarshallDateObjectUnannotated() {
+        System.setProperty("org.kie.server.json.format.date", "true");
+        String expectedString = String.format("{%n" +
+                "  \"localDate\" : \"2017-01-01\",%n" +
+                "  \"localDateTime\" : \"2017-01-01T10:10:10\",%n" +
+                "  \"localTime\" : \"10:10:10\",%n" +
+                "  \"offsetDateTime\" : \"2017-01-01T10:10:10+0100\"%n" +
+                "}");
+
+        Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, getClass().getClassLoader());
+
+        DateObjectUnannotated dateObject = new DateObjectUnannotated();
+        dateObject.setLocalDate(LocalDate.of(2017, 1, 1));
+        dateObject.setLocalDateTime(LocalDateTime.of(2017, 1, 1, 10, 10, 10));
+        dateObject.setLocalTime(LocalTime.of(10, 10, 10));
+        dateObject.setOffsetDateTime(OffsetDateTime.of(2017, 1, 1, 10, 10, 10, 0, ZoneOffset.ofHours(1)));
+
+        String dateObjectString = marshaller.marshall(dateObject);
+        assertNotNull(dateObjectString);
+
+        assertEquals(expectedString, dateObjectString);
+    }
+
+    @Test
+    public void testUnmarshallDateObjectUnannotated() {
+        System.setProperty("org.kie.server.json.format.date", "true");
+        String expectedString = "{\n" +
+                "  \"localDate\" : \"2017-01-01\",\n" +
+                "  \"localDateTime\" : \"2017-01-01T10:10:10\",\n" +
+                "  \"localTime\" : \"10:10:10\",\n" +
+                "  \"offsetDateTime\" : \"2017-01-01T10:10:10+0100\"\n" +
+                "}";
+
+        Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, getClass().getClassLoader());
+
+        DateObjectUnannotated dateObject = marshaller.unmarshall(expectedString, DateObjectUnannotated.class);
+        assertNotNull(dateObject);
+
+        assertEquals(LocalDate.of(2017, 1, 1), dateObject.getLocalDate());
+        assertEquals(LocalDateTime.of(2017, 1, 1, 10, 10, 10), dateObject.getLocalDateTime());
+        assertEquals(LocalTime.of(10, 10, 10), dateObject.getLocalTime());
+        assertEquals(OffsetDateTime.of(2017, 1, 1, 10, 10, 10, 0, ZoneOffset.ofHours(1)), dateObject.getOffsetDateTime());
+    }
     
     public static class Holder {
         private String h;
@@ -104,8 +149,8 @@ public class JSONMarshallerTest {
     
     @Test
     public void testRecursiveMap() {
-        Map outerMap = new HashMap<>();
-        Map innerMap = new HashMap<>();
+        Map<String, Map<String, Holder>> outerMap = new HashMap<>();
+        Map<String, Holder> innerMap = new HashMap<>();
         Holder holder = new Holder();
         holder.setH("myValueInH");
         
