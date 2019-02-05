@@ -16,9 +16,8 @@
 
 package org.kie.server.api.marshalling.json;
 
-import org.kie.server.api.model.cases.CaseFile;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.kie.server.api.model.cases.CaseFile;
 
 @JsonSerialize(using = StringContentSerializer.class)
 public class StringContentCaseFile extends CaseFile implements StringContent {

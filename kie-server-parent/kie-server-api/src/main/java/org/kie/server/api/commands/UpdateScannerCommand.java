@@ -15,10 +15,15 @@
 
 package org.kie.server.api.commands;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import javax.xml.bind.annotation.*;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "update-scanner")
 @XStreamAlias( "update-scanner" )

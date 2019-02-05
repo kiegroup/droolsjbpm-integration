@@ -15,14 +15,13 @@
 
 package org.kie.server.api.marshalling.xstream;
 
-import static org.kie.server.api.KieServerConstants.SYSTEM_XSTREAM_ENABLED_PACKAGES;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import com.thoughtworks.xstream.security.WildcardTypePermission;
 import org.kie.internal.utils.KieTypeResolver;
 
-import com.thoughtworks.xstream.security.WildcardTypePermission;
+import static org.kie.server.api.KieServerConstants.SYSTEM_XSTREAM_ENABLED_PACKAGES;
 
 /**
  * Kie Server specific type permission implementation that allows:

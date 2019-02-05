@@ -15,13 +15,13 @@
 
 package org.kie.server.api.commands;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.KieServerCommand;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name="get-scanner-info")
 @XStreamAlias("get-scanner-info")

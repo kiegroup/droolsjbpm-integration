@@ -15,8 +15,6 @@
 
 package org.kie.server.api.marshalling.json;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +22,8 @@ import org.junit.Test;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
+
+import static org.junit.Assert.assertEquals;
 
 public class StringContentJSONTest {
     

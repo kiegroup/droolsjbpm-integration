@@ -15,10 +15,10 @@
 
 package org.kie.server.api.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlRootElement(name = "kie-scanner")
 @XStreamAlias( "kie-scanner" )

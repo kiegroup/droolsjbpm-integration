@@ -19,9 +19,6 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.kie.server.api.marshalling.jaxb.JaxbMarshaller;
-import org.kie.server.api.marshalling.json.JSONMarshaller;
-import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

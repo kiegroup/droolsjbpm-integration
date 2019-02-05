@@ -15,14 +15,14 @@
 
 package org.kie.server.api.model.type;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class JaxbMapTest {
 

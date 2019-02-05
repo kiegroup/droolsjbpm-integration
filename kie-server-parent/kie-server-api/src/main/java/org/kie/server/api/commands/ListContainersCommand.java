@@ -15,14 +15,14 @@
 
 package org.kie.server.api.commands;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.KieContainerResourceFilter;
-import org.kie.server.api.model.KieServerCommand;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "list-containers")
 @XStreamAlias("list-containers")
