@@ -22,7 +22,6 @@ import java.util.List;
 import org.kie.server.api.model.definition.ProcessInstanceField;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
-import org.kie.server.api.model.definition.TaskField;
 
 /**
  * QueryFilterSpecBuilder targeted at filters for Process Instances.

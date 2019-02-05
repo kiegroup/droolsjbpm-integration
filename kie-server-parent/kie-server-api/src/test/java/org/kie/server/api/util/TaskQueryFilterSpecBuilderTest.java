@@ -1,7 +1,5 @@
 package org.kie.server.api.util;
 
-import static org.junit.Assert.*;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,6 +9,8 @@ import org.junit.Test;
 import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.definition.TaskField;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
+
+import static org.junit.Assert.assertEquals;
 
 public class TaskQueryFilterSpecBuilderTest {
 	

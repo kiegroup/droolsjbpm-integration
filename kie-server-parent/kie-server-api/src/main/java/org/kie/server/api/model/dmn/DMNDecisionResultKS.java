@@ -25,13 +25,12 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-decision-result")

@@ -15,20 +15,6 @@
 
 package org.kie.server.api.model;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.kie.api.executor.Command;
-import org.kie.internal.runtime.manager.context.EmptyContext;
-import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.DisposeContainerCommand;
-import org.kie.server.api.commands.ListContainersCommand;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.marshalling.MarshallingFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +22,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DisposeContainerCommand;
+import org.kie.server.api.commands.ListContainersCommand;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingFormat;
 
 /**
  * Roundtrip tests which make sure that the input object is the same as the object created by marshalling + unmarshalling.

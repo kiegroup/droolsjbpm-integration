@@ -15,10 +15,6 @@
 
 package org.kie.server.api.marshalling.xstream;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.kie.server.api.KieServerConstants.SYSTEM_XSTREAM_ENABLED_PACKAGES;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,6 +28,10 @@ import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.dmn.DMNModelInfo;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.kie.server.api.KieServerConstants.SYSTEM_XSTREAM_ENABLED_PACKAGES;
 
 public class KieServerTypePermissionTest {
 

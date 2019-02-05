@@ -15,12 +15,12 @@
 
 package org.kie.server.api.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Enables filtering of {@link ReleaseId}s based on provided constraints (groupId, artifactId, version).

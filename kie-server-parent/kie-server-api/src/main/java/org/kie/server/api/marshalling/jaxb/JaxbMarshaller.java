@@ -51,7 +51,6 @@ import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.kie.api.pmml.DoubleFieldOutput;
 import org.kie.api.pmml.IntegerFieldOutput;
-import org.kie.api.pmml.PMML4OutputField;
 import org.kie.api.pmml.PMML4Result;
 import org.kie.api.pmml.StringFieldOutput;
 import org.kie.pmml.pmml_4_2.model.ScoreCard;

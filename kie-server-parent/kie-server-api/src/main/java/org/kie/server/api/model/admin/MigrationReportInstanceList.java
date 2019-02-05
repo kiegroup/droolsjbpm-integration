@@ -18,13 +18,13 @@ package org.kie.server.api.model.admin;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.ItemList;
-import org.kie.server.api.model.instance.DocumentInstance;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "migration-report-instance-list")

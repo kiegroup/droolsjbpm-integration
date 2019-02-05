@@ -15,10 +15,6 @@
 
 package org.kie.server.api.marshalling;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +32,10 @@ import org.kie.internal.utils.KieHelper;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNResultKS;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class DecisionMarshallingTest {

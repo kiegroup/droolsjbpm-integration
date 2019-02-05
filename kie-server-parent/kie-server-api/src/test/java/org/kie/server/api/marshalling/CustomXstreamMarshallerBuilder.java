@@ -17,13 +17,12 @@ package org.kie.server.api.marshalling;
 
 import java.util.Set;
 
-import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
-import org.kie.soup.commons.xstream.XStreamUtils;
-
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.thoughtworks.xstream.security.WildcardTypePermission;
+import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
+import org.kie.soup.commons.xstream.XStreamUtils;
 
 public class CustomXstreamMarshallerBuilder extends BaseMarshallerBuilder {
 
