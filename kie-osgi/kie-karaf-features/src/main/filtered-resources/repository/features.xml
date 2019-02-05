@@ -163,6 +163,7 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${version.com.fasterxml.jackson}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${version.com.fasterxml.jackson}</bundle>
     <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${version.com.fasterxml.jackson}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${karaf.servicemix.version.com.thoughtworks.xmlpull}</bundle>
