@@ -41,7 +41,6 @@ public class ScoreWrapper {
 
     /**
      * Returns score representation of the object.
-     *
      * @return Score representation of the object. Returns null if the score has not been assigned by the solver yet.
      * @throws IllegalArgumentException If <code>scoreClass</code> is not one of the out-of-box score implementations.
      * In this case clients may implement their own way to extract the score object.
@@ -61,5 +60,4 @@ public class ScoreWrapper {
                 + ", scoreString='" + scoreString + '\''
                 + '}';
     }
-
 }

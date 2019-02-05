@@ -11,34 +11,34 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.definition;
 
 /**
  * HumanTask fields.
  * <p/>
- * These are the filterable fields in our TaskQuery API. 
+ * These are the filterable fields in our TaskQuery API.
  */
 public enum TaskField {
 
-	//@formatter:off
-	ID,			
-	ACTIVATIONTIME,		
-	ACTUALOWNER,			
-	CREATEDBY,			
-	CREATEDON,			
-	DEPLOYMENTID,			
-	DESCRIPTION,			
-	DUEDATE,			
-	NAME,			
-	PARENTID,			
-	PRIORITY,			
-	PROCESSID,			
-	PROCESSINSTANCEID,			
-	PROCESSSESSIONID,			
-	STATUS,			
-	TASKID,			
-	WORKITEMID
-	//@formatter:on
+    //@formatter:off
+    ID,
+    ACTIVATIONTIME,
+    ACTUALOWNER,
+    CREATEDBY,
+    CREATEDON,
+    DEPLOYMENTID,
+    DESCRIPTION,
+    DUEDATE,
+    NAME,
+    PARENTID,
+    PRIORITY,
+    PROCESSID,
+    PROCESSINSTANCEID,
+    PROCESSSESSIONID,
+    STATUS,
+    TASKID,
+    WORKITEMID
+    //@formatter:on
 }

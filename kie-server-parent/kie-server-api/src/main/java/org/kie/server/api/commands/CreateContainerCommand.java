@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.commands;
 
@@ -25,14 +25,14 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "create-container")
-@XStreamAlias( "create-container" )
+@XStreamAlias("create-container")
 @XmlAccessorType(XmlAccessType.NONE)
 public class CreateContainerCommand implements KieServerCommand {
 
-    private static final long    serialVersionUID = -1803374525440238478L;
+    private static final long serialVersionUID = -1803374525440238478L;
 
     @XmlElement
-    @XStreamAlias( "kie-container" )
+    @XStreamAlias("kie-container")
     private KieContainerResource container;
 
     public CreateContainerCommand() {
@@ -61,18 +61,23 @@ public class CreateContainerCommand implements KieServerCommand {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         CreateContainerCommand other = (CreateContainerCommand) obj;
         if (container == null) {
-            if (other.container != null)
+            if (other.container != null) {
                 return false;
-        } else if (!container.equals(other.container))
+            }
+        } else if (!container.equals(other.container)) {
             return false;
+        }
         return true;
     }
 
@@ -80,5 +85,4 @@ public class CreateContainerCommand implements KieServerCommand {
     public String toString() {
         return "CreateContainerCommand [container=" + container + "]";
     }
-
 }

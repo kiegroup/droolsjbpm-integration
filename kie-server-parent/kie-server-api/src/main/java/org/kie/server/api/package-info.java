@@ -15,18 +15,18 @@
  */
 
 @XmlJavaTypeAdapters({
-    @XmlJavaTypeAdapter(type = BendableScore.class, value = BendableScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = BendableLongScore.class, value = BendableLongScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = HardMediumSoftScore.class, value = HardMediumSoftScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = HardMediumSoftLongScore.class, value = HardMediumSoftLongScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = HardSoftScore.class, value = HardSoftScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = HardSoftLongScore.class, value = HardSoftLongScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = HardSoftDoubleScore.class, value = HardSoftDoubleScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = HardSoftBigDecimalScore.class, value = HardSoftBigDecimalScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = SimpleScore.class, value = SimpleScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = SimpleLongScore.class, value = SimpleLongScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = SimpleDoubleScore.class, value = SimpleDoubleScoreJaxbXmlAdapter.class),
-    @XmlJavaTypeAdapter(type = SimpleBigDecimalScore.class, value = SimpleBigDecimalScoreJaxbXmlAdapter.class)
+        @XmlJavaTypeAdapter(type = BendableScore.class, value = BendableScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = BendableLongScore.class, value = BendableLongScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = HardMediumSoftScore.class, value = HardMediumSoftScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = HardMediumSoftLongScore.class, value = HardMediumSoftLongScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = HardSoftScore.class, value = HardSoftScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = HardSoftLongScore.class, value = HardSoftLongScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = HardSoftDoubleScore.class, value = HardSoftDoubleScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = HardSoftBigDecimalScore.class, value = HardSoftBigDecimalScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = SimpleScore.class, value = SimpleScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = SimpleLongScore.class, value = SimpleLongScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = SimpleDoubleScore.class, value = SimpleDoubleScoreJaxbXmlAdapter.class),
+        @XmlJavaTypeAdapter(type = SimpleBigDecimalScore.class, value = SimpleBigDecimalScoreJaxbXmlAdapter.class)
 })
 package org.kie.server.api;
 

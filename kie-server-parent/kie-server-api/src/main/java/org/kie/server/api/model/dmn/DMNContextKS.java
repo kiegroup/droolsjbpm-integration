@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.dmn;
 
@@ -36,41 +36,41 @@ import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 @XStreamAlias("dmn-evaluation-context")
 public class DMNContextKS {
 
-    @XmlElement(name="model-namespace")
+    @XmlElement(name = "model-namespace")
     @XStreamAlias("model-namespace")
     private String namespace;
 
-    @XmlElement(name="model-name")
+    @XmlElement(name = "model-name")
     @XStreamAlias("model-name")
     private String modelName;
 
-    @XmlElement(name="decision-name")
+    @XmlElement(name = "decision-name")
     @XStreamImplicit(itemFieldName = "decision-name")
-    @JsonFormat(with = { JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED })
+    @JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
     private List<String> decisionNames = new ArrayList<>();
-    
-    @XmlElement(name="decision-id")
+
+    @XmlElement(name = "decision-id")
     @XStreamImplicit(itemFieldName = "decision-id")
-    @JsonFormat(with = { JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED })
+    @JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
     private List<String> decisionIds = new ArrayList<>();
 
     @XmlElement(name = "decision-service-name")
     @XStreamAlias("decision-service-name")
     private String decisionServiceName;
 
-    @XmlElement(name="dmn-context")
+    @XmlElement(name = "dmn-context")
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, Object> dmnContext = new HashMap<>();
-    
+
     public DMNContextKS() {
         // no-arg constructor for marshalling
     }
-    
+
     public DMNContextKS(Map<String, Object> dmnContext) {
-        this.dmnContext.putAll( dmnContext );
+        this.dmnContext.putAll(dmnContext);
     }
-    
+
     public DMNContextKS(String namespace, String modelName, Map<String, Object> dmnContext) {
         this(dmnContext);
         this.namespace = namespace;
@@ -80,15 +80,15 @@ public class DMNContextKS {
     public String getNamespace() {
         return namespace;
     }
-    
+
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
-    
+
     public String getModelName() {
         return modelName;
     }
-    
+
     public void setModelName(String modelName) {
         this.modelName = modelName;
     }
@@ -96,7 +96,7 @@ public class DMNContextKS {
     public List<String> getDecisionNames() {
         return decisionNames;
     }
-    
+
     public void setDecisionNames(List<String> decisionName) {
         this.decisionNames = decisionName;
     }
@@ -104,7 +104,7 @@ public class DMNContextKS {
     public List<String> getDecisionIds() {
         return decisionIds;
     }
-    
+
     public void setDecisionIds(List<String> decisionId) {
         this.decisionIds = decisionId;
     }
@@ -112,7 +112,7 @@ public class DMNContextKS {
     public Map<String, Object> getDmnContext() {
         return dmnContext;
     }
-    
+
     public void setDmnContext(Map<String, Object> dmnContext) {
         this.dmnContext = dmnContext;
     }
@@ -120,13 +120,13 @@ public class DMNContextKS {
     @Override
     public String toString() {
         return new StringBuilder("DMNContextKS [")
-               .append("namespace=").append(namespace)
-               .append(", modelName=").append(modelName)
-               .append(", decisionServiceName=").append(decisionServiceName)
-               .append(", decisionNames=").append(decisionNames)
-               .append(", decisionIds=").append(decisionIds)
-               .append(", dmnContext=").append(dmnContext)
-               .append("]").toString();
+                .append("namespace=").append(namespace)
+                .append(", modelName=").append(modelName)
+                .append(", decisionServiceName=").append(decisionServiceName)
+                .append(", decisionNames=").append(decisionNames)
+                .append(", decisionIds=").append(decisionIds)
+                .append(", dmnContext=").append(dmnContext)
+                .append("]").toString();
     }
 
     public String getDecisionServiceName() {
@@ -136,5 +136,4 @@ public class DMNContextKS {
     public void setDecisionServiceName(String decisionServiceName) {
         this.decisionServiceName = decisionServiceName;
     }
-
 }

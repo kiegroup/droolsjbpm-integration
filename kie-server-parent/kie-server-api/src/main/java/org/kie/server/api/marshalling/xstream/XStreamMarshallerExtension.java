@@ -24,20 +24,18 @@ public interface XStreamMarshallerExtension {
 
     /**
      * Extends the provided marshaller, with e.g. custom converters.
-     *
      * @param xStreamMarshaller the marshaller which should be extended
      */
     void extend(XStreamMarshaller xStreamMarshaller);
 
     /**
      * Enables additional {@link MapperWrapper}s by chaining them to the provided one.
-     *
+     * <p>
      * Example: {@code return new HibernateWrapper(next)}
-     *   - this will add the HibernateWrapper into the chain. Note that it is important to pass the {@code next}
-     *     MapperWrapper into the constructor to make sure the chain does not get broken
-     *
+     * - this will add the HibernateWrapper into the chain. Note that it is important to pass the {@code next}
+     * MapperWrapper into the constructor to make sure the chain does not get broken
+     * <p>
      * Default implementation: identity
-     *
      * @param next the next {@link MapperWrapper} in the chain
      */
     default MapperWrapper chainMapperWrapper(MapperWrapper next) {

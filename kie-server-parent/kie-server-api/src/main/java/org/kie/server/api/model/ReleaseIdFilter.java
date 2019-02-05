@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -35,6 +35,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("release-id-filter")
 @XmlAccessorType(XmlAccessType.NONE)
 public class ReleaseIdFilter {
+
     @XmlElement(name = "group-id")
     @XStreamAlias("group-id")
     private final String groupId;
@@ -59,7 +60,7 @@ public class ReleaseIdFilter {
     }
 
     public ReleaseIdFilter(ReleaseId releaseId) {
-        this(releaseId.getGroupId(), releaseId.getArtifactId(),releaseId.getVersion());
+        this(releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion());
     }
 
     public String getGroupId() {
@@ -76,7 +77,6 @@ public class ReleaseIdFilter {
 
     /**
      * Checks whether the specified releaseId matches (is accepted by) this filter.
-     *
      * @param releaseId releaseId to match against
      * @return true if this filter accepts the specified releaseId, otherwise false
      */
@@ -93,9 +93,8 @@ public class ReleaseIdFilter {
      * Checks whether the string filter matches the provided value.
      * <p>
      * Filter can be null, which means "match all".
-     *
      * @param filter string filter
-     * @param value  value to match against
+     * @param value value to match against
      * @return true if the filter matches the value, otherwise false
      */
     private boolean matches(String filter, String value) {
@@ -143,6 +142,7 @@ public class ReleaseIdFilter {
     }
 
     public static class Builder {
+
         private String groupId;
         private String artifactId;
         private String version;
@@ -173,5 +173,4 @@ public class ReleaseIdFilter {
             return new ReleaseIdFilter(groupId, artifactId, version);
         }
     }
-
 }

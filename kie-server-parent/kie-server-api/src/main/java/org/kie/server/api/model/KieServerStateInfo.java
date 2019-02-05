@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -26,17 +26,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="kie-server-state-info")
-@XStreamAlias( "kie-server-state-info" )
+@XmlRootElement(name = "kie-server-state-info")
+@XStreamAlias("kie-server-state-info")
 public class KieServerStateInfo {
 
-    @XmlElement(name="controller")
+    @XmlElement(name = "controller")
     private Set<String> controllers = new HashSet<String>();
 
-    @XmlElement(name="config")
+    @XmlElement(name = "config")
     private KieServerConfig configuration;
 
-    @XmlElement(name="containers")
+    @XmlElement(name = "containers")
     private Set<KieContainerResource> containers = new HashSet<KieContainerResource>();
 
     public KieServerStateInfo() {

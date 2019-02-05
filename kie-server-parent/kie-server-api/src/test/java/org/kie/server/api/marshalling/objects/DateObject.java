@@ -25,12 +25,11 @@ import org.kie.soup.commons.xstream.OffsetDateTimeXStreamConverter;
  * TODO Remove @XStreamConverter for java.time attributes once converters are provided by XStream out of the box.
  * Maybe keep this for backward compatibility (KIE Soup converters should keep working even if they're no longer needed)
  * and use {@link DateObjectUnannotated} when testing out-of-the-box time (un)marshalling.
- *
  * @see <a href="https://github.com/x-stream/xstream/issues/75">XStream#75</a>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "date-object")
-@XStreamAlias( "date-object" )
+@XStreamAlias("date-object")
 public class DateObject {
 
     @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
@@ -53,7 +52,7 @@ public class DateObject {
         return localDate;
     }
 
-    public void setLocalDate( LocalDate localDate ) {
+    public void setLocalDate(LocalDate localDate) {
         this.localDate = localDate;
     }
 
@@ -61,7 +60,7 @@ public class DateObject {
         return localDateTime;
     }
 
-    public void setLocalDateTime( LocalDateTime localDateTime ) {
+    public void setLocalDateTime(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
     }
 
@@ -69,7 +68,7 @@ public class DateObject {
         return localTime;
     }
 
-    public void setLocalTime( LocalTime localTime ) {
+    public void setLocalTime(LocalTime localTime) {
         this.localTime = localTime;
     }
 
@@ -77,8 +76,7 @@ public class DateObject {
         return offsetDateTime;
     }
 
-    public void setOffsetDateTime( OffsetDateTime offsetDateTime ) {
+    public void setOffsetDateTime(OffsetDateTime offsetDateTime) {
         this.offsetDateTime = offsetDateTime;
     }
-
 }

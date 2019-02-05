@@ -19,7 +19,9 @@ package org.kie.server.api.model;
 public interface KieServiceResponse<T> {
 
     enum ResponseType {
-        SUCCESS, FAILURE, NO_RESPONSE
+        SUCCESS,
+        FAILURE,
+        NO_RESPONSE
     }
 
     ResponseType getType();
@@ -27,5 +29,4 @@ public interface KieServiceResponse<T> {
     String getMsg();
 
     T getResult();
-
 }

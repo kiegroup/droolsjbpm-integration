@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.admin;
 
@@ -27,23 +27,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "task-notification")
 public class TaskNotification {
 
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     private Long id;
-    @XmlElement(name="name")
+    @XmlElement(name = "name")
     private String name;
-    @XmlElement(name="notify-at")
+    @XmlElement(name = "notify-at")
     private Date date;
-    @XmlElement(name="users")
+    @XmlElement(name = "users")
     private List<String> users;
-    @XmlElement(name="groups")
+    @XmlElement(name = "groups")
     private List<String> groups;
-    @XmlElement(name="active")
+    @XmlElement(name = "active")
     private boolean active;
-    @XmlElement(name="subject")
+    @XmlElement(name = "subject")
     private String subject;
-    @XmlElement(name="content")
+    @XmlElement(name = "content")
     private String content;
-
 
     public Long getId() {
         return id;

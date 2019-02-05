@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,15 +11,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api;
 
 public class Version {
 
-    private final int    major;
-    private final int    minor;
-    private final int    revision;
+    private final int major;
+    private final int minor;
+    private final int revision;
     private final String classifier;
 
     public Version(int major, int minor, int revision, String classifier) {
@@ -59,24 +59,32 @@ public class Version {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Version other = (Version) obj;
         if (classifier == null) {
-            if (other.classifier != null)
+            if (other.classifier != null) {
                 return false;
-        } else if (!classifier.equals(other.classifier))
+            }
+        } else if (!classifier.equals(other.classifier)) {
             return false;
-        if (major != other.major)
+        }
+        if (major != other.major) {
             return false;
-        if (minor != other.minor)
+        }
+        if (minor != other.minor) {
             return false;
-        if (revision != other.revision)
+        }
+        if (revision != other.revision) {
             return false;
+        }
         return true;
     }
 
@@ -84,5 +92,4 @@ public class Version {
     public String toString() {
         return major + "." + minor + "." + revision + (classifier != null ? classifier : "");
     }
-
 }

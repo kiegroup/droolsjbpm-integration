@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.rest;
 
@@ -63,7 +63,7 @@ public class RestURI {
     public static final String JOB_URI = "jobs";
     public static final String TASK_URI = "containers/{" + CONTAINER_ID + "}/tasks";
     public static final String QUERY_URI = "queries";
-    public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";    
+    public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";
     public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
     public static final String QUERY_DEF_URI = "queries/definitions";
     public static final String DOCUMENT_URI = "documents";
@@ -303,7 +303,7 @@ public class RestURI {
     public static final String CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/processes/{" + PROCESS_ID + "}";
     public static final String CASE_DYNAMIC_TASK_PUT_URI = "instances/{" + CASE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
     public static final String CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
-    
+
     public static final String MIGRATE_CASE_INST_PUT_URI = "containers/{" + CONTAINER_ID + "}/cases/instances/{" + CASE_ID + "}";
 
     // case queries
@@ -317,7 +317,7 @@ public class RestURI {
     public static final String CASE_ALL_PROCESSES_INSTANCES_GET_URI = "processes";
     public static final String CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI = "{" + CONTAINER_ID + "}/processes";
     public static final String ADMIN_CASE_ALL_INSTANCES_GET_URI = "cases/instances";
-    
+
     // static files 
     public static final String STATIC_BY_TYPE_GET_URI = "{type}/{file}";
     public static final String STATIC_RENDERER_BY_TYPE_GET_URI = "{provider}/{type}/{file}";

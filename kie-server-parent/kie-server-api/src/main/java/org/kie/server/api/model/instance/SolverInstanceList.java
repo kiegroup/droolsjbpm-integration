@@ -50,5 +50,4 @@ public class SolverInstanceList {
     public void setContainers(List<SolverInstance> solvers) {
         this.solvers = solvers;
     }
-
 }

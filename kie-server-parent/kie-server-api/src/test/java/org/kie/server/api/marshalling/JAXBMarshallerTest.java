@@ -28,18 +28,18 @@ public class JAXBMarshallerTest {
 
         Set<Class<?>> extraClasses = new HashSet<Class<?>>();
         extraClasses.add(DateObject.class);
-        Marshaller marshaller = MarshallerFactory.getMarshaller( extraClasses, MarshallingFormat.JAXB, getClass().getClassLoader() );
+        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JAXB, getClass().getClassLoader());
 
         DateObject dateObject = new DateObject();
-        dateObject.setLocalDate( LocalDate.of( 2017, 1, 1 ) );
-        dateObject.setLocalDateTime( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ) );
-        dateObject.setLocalTime( LocalTime.of( 10, 10, 10 ) );
-        dateObject.setOffsetDateTime( OffsetDateTime.of( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ), ZoneOffset.ofHours( 1 ) ) );
+        dateObject.setLocalDate(LocalDate.of(2017, 1, 1));
+        dateObject.setLocalDateTime(LocalDateTime.of(2017, 1, 1, 10, 10, 10));
+        dateObject.setLocalTime(LocalTime.of(10, 10, 10));
+        dateObject.setOffsetDateTime(OffsetDateTime.of(LocalDateTime.of(2017, 1, 1, 10, 10, 10), ZoneOffset.ofHours(1)));
 
-        String dateObjectString = marshaller.marshall( dateObject );
-        assertNotNull( dateObjectString );
+        String dateObjectString = marshaller.marshall(dateObject);
+        assertNotNull(dateObjectString);
 
-        assertEquals( expectedString, dateObjectString );
+        assertEquals(expectedString, dateObjectString);
     }
 
     @Test
@@ -54,15 +54,14 @@ public class JAXBMarshallerTest {
 
         Set<Class<?>> extraClasses = new HashSet<Class<?>>();
         extraClasses.add(DateObject.class);
-        Marshaller marshaller = MarshallerFactory.getMarshaller( extraClasses, MarshallingFormat.JAXB, getClass().getClassLoader() );
+        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JAXB, getClass().getClassLoader());
 
-        DateObject dateObject = marshaller.unmarshall( expectedString, DateObject.class );
-        assertNotNull( dateObject );
+        DateObject dateObject = marshaller.unmarshall(expectedString, DateObject.class);
+        assertNotNull(dateObject);
 
-        assertEquals( LocalDate.of( 2017, 1, 1 ), dateObject.getLocalDate() );
-        assertEquals( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ), dateObject.getLocalDateTime() );
-        assertEquals( LocalTime.of( 10, 10, 10 ), dateObject.getLocalTime() );
-        assertEquals( OffsetDateTime.of( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ), ZoneOffset.ofHours( 1 ) ), dateObject.getOffsetDateTime() );
+        assertEquals(LocalDate.of(2017, 1, 1), dateObject.getLocalDate());
+        assertEquals(LocalDateTime.of(2017, 1, 1, 10, 10, 10), dateObject.getLocalDateTime());
+        assertEquals(LocalTime.of(10, 10, 10), dateObject.getLocalTime());
+        assertEquals(OffsetDateTime.of(LocalDateTime.of(2017, 1, 1, 10, 10, 10), ZoneOffset.ofHours(1)), dateObject.getOffsetDateTime());
     }
-
 }

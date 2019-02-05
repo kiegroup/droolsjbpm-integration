@@ -25,16 +25,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "timer-definition")
 public class TimerDefinition {
 
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     private Long id;
 
-    @XmlElement(name="node-name")
+    @XmlElement(name = "node-name")
     private String nodeName;
 
-    @XmlElement(name="unique-id")
+    @XmlElement(name = "unique-id")
     private String uniqueId;
 
-    @XmlElement(name="nodeId")
+    @XmlElement(name = "nodeId")
     private Long nodeId;
 
     public TimerDefinition() {

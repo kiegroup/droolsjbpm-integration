@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling.xstream;
 
@@ -78,8 +78,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.soup.commons.xstream.XStreamUtils.createNonTrustingXStream;
 
-public class XStreamMarshaller
-        implements Marshaller {    
+public class XStreamMarshaller implements Marshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(XStreamMarshaller.class);
     protected XStream xstream;
@@ -87,7 +86,7 @@ public class XStreamMarshaller
     protected Map<String, Class> classNames = new HashMap<String, Class>();
 
     // Optional marshaller extensions to handle new types / configure custom behavior
-    private static final List<XStreamMarshallerExtension> EXTENSIONS;        
+    private static final List<XStreamMarshallerExtension> EXTENSIONS;
 
     static {
         logger.debug("XStreamMarshaller extensions init");
@@ -115,20 +114,21 @@ public class XStreamMarshaller
 
     protected void buildMarshaller(Set<Class<?>> classes,
                                    final ClassLoader classLoader) {
-        this.xstream = XStreamXML.newXStreamMarshaller(createNonTrustingXStream(new PureJavaReflectionProvider(),
-                                                                     next -> {
-                                                                         return new MapperWrapper(chainMapperWrappers(new ArrayList<>(EXTENSIONS),
-                                                                                                                      next)) {
-                                                                             public Class realClass(String elementName) {
+        this.xstream = XStreamXML.newXStreamMarshaller(createNonTrustingXStream(
+                new PureJavaReflectionProvider(),
+                next -> {
+                    return new MapperWrapper(chainMapperWrappers(new ArrayList<>(EXTENSIONS),
+                                                                 next)) {
+                        public Class realClass(String elementName) {
 
-                                                                                 Class customClass = classNames.get(elementName);
-                                                                                 if (customClass != null) {
-                                                                                     return customClass;
-                                                                                 }
-                                                                                 return super.realClass(elementName);
-                                                                             }
-                                                                         };
-                                                                     }));
+                            Class customClass = classNames.get(elementName);
+                            if (customClass != null) {
+                                return customClass;
+                            }
+                            return super.realClass(elementName);
+                        }
+                    };
+                }));
     }
 
     private MapperWrapper chainMapperWrappers(List<XStreamMarshallerExtension> extensions,

@@ -34,7 +34,7 @@ public class StringContentMap implements Map<String, Object>, StringContent {
         this.content = content;
     }
 
-    @Override    
+    @Override
     public String getContent() {
         return content;
     }
@@ -50,7 +50,7 @@ public class StringContentMap implements Map<String, Object>, StringContent {
 
     @Override
     public int size() {
-       throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -107,5 +107,4 @@ public class StringContentMap implements Map<String, Object>, StringContent {
     public Set<Entry<String, Object>> entrySet() {
         throw new UnsupportedOperationException();
     }
-
 }

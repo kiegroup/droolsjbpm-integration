@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.dmn;
 
@@ -31,7 +31,7 @@ import org.kie.internal.builder.InternalMessage;
 @XStreamAlias("dmn-message")
 //@XmlType(namespace="org.kie.server.api.model.dmn", name = "DMNMessageKS")
 public class DMNMessageKS implements DMNMessage {
-    
+
     // This is needed as the DMN's Severity would clash with the Kie server API Severity for marshalling scope
     public static enum DMNMessageSeverityKS {
         /**
@@ -42,9 +42,9 @@ public class DMNMessageKS implements DMNMessage {
         INFO,
         WARN,
         ERROR;
-        
+
         public static DMNMessageSeverityKS of(Severity value) {
-            switch ( value ) {
+            switch (value) {
                 case ERROR:
                     return DMNMessageSeverityKS.ERROR;
                 case INFO:
@@ -57,9 +57,9 @@ public class DMNMessageKS implements DMNMessage {
                     return DMNMessageSeverityKS.ERROR;
             }
         }
-        
+
         public Severity asSeverity() {
-            switch ( this ) {
+            switch (this) {
                 case ERROR:
                     return Severity.ERROR;
                 case INFO:
@@ -74,29 +74,29 @@ public class DMNMessageKS implements DMNMessage {
         }
     }
 
-    @XmlElement(name="dmn-message-severity")
+    @XmlElement(name = "dmn-message-severity")
     @XStreamAlias("dmn-message-severity")
-    private DMNMessageSeverityKS  severity;
-    
-    @XmlElement(name="message")
-    @XStreamAlias("message")
-    private String    message;
+    private DMNMessageSeverityKS severity;
 
-    @XmlElement(name="message-type")
+    @XmlElement(name = "message")
+    @XStreamAlias("message")
+    private String message;
+
+    @XmlElement(name = "message-type")
     @XStreamAlias("message-type")
     private DMNMessageType messageType;
-    
-    @XmlElement(name="source-id")
+
+    @XmlElement(name = "source-id")
     @XStreamAlias("source-id")
-    private String    sourceId;
+    private String sourceId;
 
     public DMNMessageKS() {
         // no-arg constructor for marshalling
     }
-    
+
     public static DMNMessageKS of(DMNMessage value) {
         DMNMessageKS res = new DMNMessageKS();
-        res.severity = DMNMessageSeverityKS.of( value.getSeverity() );
+        res.severity = DMNMessageSeverityKS.of(value.getSeverity());
         res.message = value.getMessage();
         res.messageType = value.getMessageType();
         res.sourceId = value.getSourceId();
@@ -112,7 +112,7 @@ public class DMNMessageKS implements DMNMessage {
     public String getMessage() {
         return message;
     }
-    
+
     @Override
     public DMNMessageType getMessageType() {
         return this.messageType;

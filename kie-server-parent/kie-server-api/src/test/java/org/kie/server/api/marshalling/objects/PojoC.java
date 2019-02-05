@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling.objects;
 
@@ -29,7 +29,7 @@ public class PojoC implements Serializable {
     public PojoC() {
     }
 
-    public PojoC( String name ) {
+    public PojoC(String name) {
         this.name = name;
     }
 
@@ -37,7 +37,7 @@ public class PojoC implements Serializable {
         return name;
     }
 
-    public void setName( String name ) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -55,20 +55,24 @@ public class PojoC implements Serializable {
     }
 
     @Override
-    public boolean equals( Object obj ) {
-        if ( this == obj )
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
-        if ( obj == null )
+        }
+        if (obj == null) {
             return false;
-        if ( getClass() != obj.getClass() )
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         PojoC other = (PojoC) obj;
-        if ( name == null ) {
-            if ( other.name != null )
+        if (name == null) {
+            if (other.name != null) {
                 return false;
-        } else if ( !name.equals( other.name ) )
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         return true;
     }
-
 }

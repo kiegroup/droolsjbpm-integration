@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -28,13 +28,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "job-request-instance")
 public class JobRequestInstance {
 
-    @XmlElement(name="job-command")
+    @XmlElement(name = "job-command")
     private String command;
 
-    @XmlElement(name="scheduled-date")
+    @XmlElement(name = "scheduled-date")
     private Date scheduledDate;
 
-    @XmlElement(name="request-data")
+    @XmlElement(name = "request-data")
     private Map<String, Object> data;
 
     public JobRequestInstance() {
@@ -87,7 +87,6 @@ public class JobRequestInstance {
         public JobRequestInstance build() {
             return jobRequestInstance;
         }
-
 
         public Builder command(String command) {
             jobRequestInstance.setCommand(command);

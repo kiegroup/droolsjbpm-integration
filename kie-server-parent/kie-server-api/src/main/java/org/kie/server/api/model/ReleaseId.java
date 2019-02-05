@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -23,28 +23,28 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * This is a JAXB friendly ReleaseId implementation
- * used for JAXB marshalling/unmarshalling only 
+ * used for JAXB marshalling/unmarshalling only
  */
-@XmlRootElement(name="release-id")
-@XStreamAlias( "release-id" )
+@XmlRootElement(name = "release-id")
+@XStreamAlias("release-id")
 @JsonIgnoreProperties({"snapshot"})
 public class ReleaseId implements org.kie.api.builder.ReleaseId {
 
-    @XStreamAlias( "group-id" )
+    @XStreamAlias("group-id")
     private String groupId;
 
-    @XStreamAlias( "artifact-id" )
+    @XStreamAlias("artifact-id")
     private String artifactId;
 
-    @XStreamAlias( "version" )
+    @XStreamAlias("version")
     private String version;
 
     public ReleaseId() {
         super();
     }
-    
-    public ReleaseId( org.kie.api.builder.ReleaseId releaseId ) {
-        this( releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion() );
+
+    public ReleaseId(org.kie.api.builder.ReleaseId releaseId) {
+        this(releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion());
     }
 
     public ReleaseId(String groupId, String artifactId, String version) {
@@ -106,28 +106,37 @@ public class ReleaseId implements org.kie.api.builder.ReleaseId {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ReleaseId other = (ReleaseId) obj;
         if (artifactId == null) {
-            if (other.artifactId != null)
+            if (other.artifactId != null) {
                 return false;
-        } else if (!artifactId.equals(other.artifactId))
+            }
+        } else if (!artifactId.equals(other.artifactId)) {
             return false;
+        }
         if (groupId == null) {
-            if (other.groupId != null)
+            if (other.groupId != null) {
                 return false;
-        } else if (!groupId.equals(other.groupId))
+            }
+        } else if (!groupId.equals(other.groupId)) {
             return false;
+        }
         if (version == null) {
-            if (other.version != null)
+            if (other.version != null) {
                 return false;
-        } else if (!version.equals(other.version))
+            }
+        } else if (!version.equals(other.version)) {
             return false;
+        }
         return true;
     }
 }

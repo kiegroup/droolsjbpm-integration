@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
@@ -27,23 +27,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "case-definition")
 public class CaseDefinition {
 
-    @XmlElement(name="name")
+    @XmlElement(name = "name")
     private String name;
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     private String identifier;
-    @XmlElement(name="version")
+    @XmlElement(name = "version")
     private String version;
-    @XmlElement(name="case-id-prefix")
+    @XmlElement(name = "case-id-prefix")
     private String caseIdPrefix;
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
-    @XmlElement(name="adhoc-fragments")
+    @XmlElement(name = "adhoc-fragments")
     private List<CaseAdHocFragment> adHocFragments;
-    @XmlElement(name="roles")
+    @XmlElement(name = "roles")
     private Map<String, Integer> roles;
-    @XmlElement(name="milestones")
+    @XmlElement(name = "milestones")
     private List<CaseMilestoneDefinition> milestones;
-    @XmlElement(name="stages")
+    @XmlElement(name = "stages")
     private List<CaseStageDefinition> caseStages;
 
     public CaseDefinition() {

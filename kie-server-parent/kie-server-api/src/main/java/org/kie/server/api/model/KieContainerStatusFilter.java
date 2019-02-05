@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -39,9 +39,8 @@ public class KieContainerStatusFilter {
 
     /**
      * Creates status filter from the specified string. The expected format is "status1,status2,status3,...".
-     *
+     * <p>
      * Important: in case the specified string is empty or null, the default ACCEPT_ALL filter is created
-     *
      * @param inputStr string representation of the filter
      * @return new filter parsed from the string or ACCEPT_ALL filter in case the string is empty or null
      */
@@ -98,7 +97,6 @@ public class KieContainerStatusFilter {
         KieContainerStatusFilter that = (KieContainerStatusFilter) o;
 
         return acceptedStatuses != null ? acceptedStatuses.equals(that.acceptedStatuses) : that.acceptedStatuses == null;
-
     }
 
     @Override

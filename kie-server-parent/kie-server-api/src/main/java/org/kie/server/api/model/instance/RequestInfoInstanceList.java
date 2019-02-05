@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -30,7 +30,7 @@ import org.kie.server.api.model.ItemList;
 @XmlRootElement(name = "request-info-instance-list")
 public class RequestInfoInstanceList implements ItemList<RequestInfoInstance> {
 
-    @XmlElement(name="request-info-instance")
+    @XmlElement(name = "request-info-instance")
     private RequestInfoInstance[] requestInfoInstances;
 
     public RequestInfoInstanceList() {

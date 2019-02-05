@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.dmn;
 
@@ -34,7 +34,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 public class DMNModelInfoList {
 
     // note Jackson annotation is needed on this field and getter, in order for Jackson to NOT use JAXB annotation but proper Jackson annotation
-    @XmlElement(name="model")
+    @XmlElement(name = "model")
     @JsonIgnore
     @XStreamImplicit(itemFieldName = "model")
     private DMNModelInfo[] models;
@@ -45,7 +45,7 @@ public class DMNModelInfoList {
     public DMNModelInfoList(List<DMNModelInfo> models) {
         this.models = models.toArray(new DMNModelInfo[]{});
     }
-    
+
     @JsonProperty("models")
     public List<DMNModelInfo> getModels() {
         return Arrays.asList(models);
@@ -53,6 +53,5 @@ public class DMNModelInfoList {
 
     public void setModels(List<DMNModelInfo> models) {
         this.models = models.toArray(new DMNModelInfo[]{});
-    }    
-
+    }
 }

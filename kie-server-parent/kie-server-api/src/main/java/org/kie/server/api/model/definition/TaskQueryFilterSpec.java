@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.definition;
 
@@ -27,18 +27,18 @@ import org.kie.server.api.model.Wrapped;
 @XmlRootElement(name = "task-query-filter-spec")
 public class TaskQueryFilterSpec extends QueryFilterSpec implements Wrapped<TaskQueryFilterSpec> {
 
-	public TaskQueryFilterSpec() {
-	}
+    public TaskQueryFilterSpec() {
+    }
 
-	@Override
-	public String toString() {
-		return "TaskQueryFilterSpec{" + "orderBy='" + getOrderBy() + '\'' + ", ascending=" + isAscending() + ", parameters="
-				+ Arrays.toString(getParameters()) + '}';
-	}
+    @Override
+    public String toString() {
+        return "TaskQueryFilterSpec{" + "orderBy='" + getOrderBy() + '\'' + ", ascending=" + isAscending() + ", parameters="
+                + Arrays.toString(getParameters()) + '}';
+    }
 
-	@Override
-	public TaskQueryFilterSpec unwrap() {
-		unwrapParameters();
-		return this;
-	}
+    @Override
+    public TaskQueryFilterSpec unwrap() {
+        unwrapParameters();
+        return this;
+    }
 }

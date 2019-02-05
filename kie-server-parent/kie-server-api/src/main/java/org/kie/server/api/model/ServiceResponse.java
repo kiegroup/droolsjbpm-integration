@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -117,7 +117,7 @@ import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.api.model.type.JaxbShort;
 import org.kie.server.api.model.type.JaxbString;
 
-@XmlRootElement(name="response")
+@XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.NONE)
 @XStreamAlias("response")
 public class ServiceResponse<T> implements KieServiceResponse<T> {
@@ -239,13 +239,12 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
 
             // Kie DMN
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),
-            @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class),
-            @XmlElement(name = "dmn-model-info-list" , type = DMNModelInfoList.class),
-            
+            @XmlElement(name = "dmn-evaluation-result", type = DMNResultKS.class),
+            @XmlElement(name = "dmn-model-info-list", type = DMNModelInfoList.class),
+
             // PMML
             @XmlElement(name = "pmml-result", type = PMML4Result.class)
-
-            })
+    })
     @JsonProperty
     private T result;
 
@@ -292,6 +291,6 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
 
     @Override
     public String toString() {
-        return "ServiceResponse[" + type + ", msg='" + msg + "', result='"+ result +"']";
+        return "ServiceResponse[" + type + ", msg='" + msg + "', result='" + result + "']";
     }
 }

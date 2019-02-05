@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling.objects;
 
@@ -34,7 +34,7 @@ public class PojoA implements Serializable {
     public PojoA() {
     }
 
-    public PojoA( String name ) {
+    public PojoA(String name) {
         this.name = name;
     }
 
@@ -42,7 +42,7 @@ public class PojoA implements Serializable {
         return pojoBList;
     }
 
-    public void setPojoBList( List<PojoB> pojoBList ) {
+    public void setPojoBList(List<PojoB> pojoBList) {
         this.pojoBList = pojoBList;
     }
 
@@ -50,7 +50,7 @@ public class PojoA implements Serializable {
         return stringList;
     }
 
-    public void setStringList( List<String> stringList ) {
+    public void setStringList(List<String> stringList) {
         this.stringList = stringList;
     }
 
@@ -58,7 +58,7 @@ public class PojoA implements Serializable {
         return name;
     }
 
-    public void setName( String name ) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -78,30 +78,38 @@ public class PojoA implements Serializable {
     }
 
     @Override
-    public boolean equals( Object obj ) {
-        if ( this == obj )
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
-        if ( obj == null )
+        }
+        if (obj == null) {
             return false;
-        if ( getClass() != obj.getClass() )
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         PojoA other = (PojoA) obj;
-        if ( name == null ) {
-            if ( other.name != null )
+        if (name == null) {
+            if (other.name != null) {
                 return false;
-        } else if ( !name.equals( other.name ) )
+            }
+        } else if (!name.equals(other.name)) {
             return false;
-        if ( pojoBList == null ) {
-            if ( other.pojoBList != null )
+        }
+        if (pojoBList == null) {
+            if (other.pojoBList != null) {
                 return false;
-        } else if ( !pojoBList.equals( other.pojoBList ) )
+            }
+        } else if (!pojoBList.equals(other.pojoBList)) {
             return false;
-        if ( stringList == null ) {
-            if ( other.stringList != null )
+        }
+        if (stringList == null) {
+            if (other.stringList != null) {
                 return false;
-        } else if ( !stringList.equals( other.stringList ) )
+            }
+        } else if (!stringList.equals(other.stringList)) {
             return false;
+        }
         return true;
     }
-
 }

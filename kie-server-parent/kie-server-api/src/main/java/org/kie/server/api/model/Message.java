@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XmlRootElement(name="kie-message")
+@XmlRootElement(name = "kie-message")
 @XmlType(name = "kie-message")
-@XStreamAlias( "kie-message" )
+@XStreamAlias("kie-message")
 public class Message {
 
     private Severity severity;
@@ -50,12 +50,12 @@ public class Message {
         this.timestamp = new Date();
     }
 
-    @XmlElement(name="severity")
+    @XmlElement(name = "severity")
     public Severity getSeverity() {
         return severity;
     }
 
-    @XmlElement(name="content")
+    @XmlElement(name = "content")
     public Collection<String> getMessages() {
         return messages;
     }
@@ -72,7 +72,7 @@ public class Message {
         this.messages.add(message);
     }
 
-    @XmlElement(name="timestamp")
+    @XmlElement(name = "timestamp")
     public Date getTimestamp() {
         return timestamp;
     }

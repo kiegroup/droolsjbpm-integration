@@ -33,6 +33,5 @@ public class KieServicesException
     public KieServicesException(Throwable cause) {
         super(cause);
     }
-
 }
 

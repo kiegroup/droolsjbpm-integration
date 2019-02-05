@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -27,8 +27,8 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class KieContainerResourceFilterMatchTest {
 
-    private static final ReleaseId MATCHING_RELEASE_ID = new ReleaseId("org.example","test-artifact", "2.0.0.Final");
-    private static final ReleaseId NON_MATCHING_RELEASE_ID = new ReleaseId("foo","bar", "baz");
+    private static final ReleaseId MATCHING_RELEASE_ID = new ReleaseId("org.example", "test-artifact", "2.0.0.Final");
+    private static final ReleaseId NON_MATCHING_RELEASE_ID = new ReleaseId("foo", "bar", "baz");
 
     private static final KieContainerResourceFilter RELEASE_ID_FILTER =
             new KieContainerResourceFilter.Builder().releaseId(MATCHING_RELEASE_ID).build();
@@ -47,7 +47,6 @@ public class KieContainerResourceFilterMatchTest {
                         {RELEASE_ID_FILTER, NON_MATCHING_CONTAINER, false},
                         {STATUS_FILTER, MATCHING_CONTAINER, true},
                         {STATUS_FILTER, NON_MATCHING_CONTAINER, false}
-
                 }
         ));
 

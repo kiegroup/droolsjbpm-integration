@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -62,29 +62,26 @@ public class MarshallingRoundTripNestedClassesWithAnnotationsTest {
 
     @Test
     public void testJaxb() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller( getCustomClasses(), MarshallingFormat.JAXB, getClass().getClassLoader() );
-        verifyMarshallingRoundTrip( marshaller, createTestObject() );
+        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.JAXB, getClass().getClassLoader());
+        verifyMarshallingRoundTrip(marshaller, createTestObject());
     }
 
     @Test
     public void testXStream() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller( getCustomClasses(), MarshallingFormat.XSTREAM, getClass().getClassLoader() );
-        verifyMarshallingRoundTrip( marshaller, createTestObject() );
-
+        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.XSTREAM, getClass().getClassLoader());
+        verifyMarshallingRoundTrip(marshaller, createTestObject());
     }
 
     @Test
     public void testJSON() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller( getCustomClasses(), MarshallingFormat.JSON, getClass().getClassLoader() );
-        verifyMarshallingRoundTrip( marshaller, createTestObject() );
+        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.JSON, getClass().getClassLoader());
+        verifyMarshallingRoundTrip(marshaller, createTestObject());
     }
 
-    private void verifyMarshallingRoundTrip( Marshaller marshaller, Object inputObject ) {
-        String rawContent = marshaller.marshall( inputObject );
+    private void verifyMarshallingRoundTrip(Marshaller marshaller, Object inputObject) {
+        String rawContent = marshaller.marshall(inputObject);
         logger.info(rawContent);
-        Object testObjectAfterMarshallingTurnAround = marshaller.unmarshall( rawContent, inputObject.getClass() );
-        Assertions.assertThat( testObjectAfterMarshallingTurnAround ).isEqualTo( inputObject );
+        Object testObjectAfterMarshallingTurnAround = marshaller.unmarshall(rawContent, inputObject.getClass());
+        Assertions.assertThat(testObjectAfterMarshallingTurnAround).isEqualTo(inputObject);
     }
-
-
 }

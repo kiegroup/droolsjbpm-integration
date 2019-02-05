@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.definition;
 
@@ -27,18 +27,18 @@ import org.kie.server.api.model.Wrapped;
 @XmlRootElement(name = "process-instance-query-filter-spec")
 public class ProcessInstanceQueryFilterSpec extends QueryFilterSpec implements Wrapped<ProcessInstanceQueryFilterSpec> {
 
-	public ProcessInstanceQueryFilterSpec() {
-	}
+    public ProcessInstanceQueryFilterSpec() {
+    }
 
-	@Override
-	public String toString() {
-		return "ProcessInstanceQueryFilterSpec{" + "orderBy='" + getOrderBy() + '\'' + ", ascending=" + isAscending() + ", parameters="
-				+ Arrays.toString(getParameters()) + '}';
-	}
+    @Override
+    public String toString() {
+        return "ProcessInstanceQueryFilterSpec{" + "orderBy='" + getOrderBy() + '\'' + ", ascending=" + isAscending() + ", parameters="
+                + Arrays.toString(getParameters()) + '}';
+    }
 
-	@Override
-	public ProcessInstanceQueryFilterSpec unwrap() {
-		unwrapParameters();
-		return this;
-	}
+    @Override
+    public ProcessInstanceQueryFilterSpec unwrap() {
+        unwrapParameters();
+        return this;
+    }
 }

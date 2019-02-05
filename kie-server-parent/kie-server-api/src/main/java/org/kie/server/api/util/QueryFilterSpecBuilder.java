@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.util;
 
@@ -60,13 +60,13 @@ public class QueryFilterSpecBuilder {
         return this;
     }
 
-    public QueryFilterSpecBuilder equalsTo(String column, Comparable<?>...values) {
+    public QueryFilterSpecBuilder equalsTo(String column, Comparable<?>... values) {
         parameters.add(new QueryParam(column, "EQUALS_TO", Arrays.asList(values)));
 
         return this;
     }
 
-    public QueryFilterSpecBuilder notEqualsTo(String column, Comparable<?>...values) {
+    public QueryFilterSpecBuilder notEqualsTo(String column, Comparable<?>... values) {
         parameters.add(new QueryParam(column, "NOT_EQUALS_TO", Arrays.asList(values)));
 
         return this;
