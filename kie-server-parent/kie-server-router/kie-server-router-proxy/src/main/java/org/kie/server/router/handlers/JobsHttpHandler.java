@@ -30,12 +30,12 @@ public class JobsHttpHandler extends AbstractAggregateHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         if (!exchange.getRequestMethod().equals(HttpString.tryFromString("GET"))) {
-            exchange.setRelativePath(PREFIX + exchange.getRelativePath());
+            exchange.setResolvedPath(PREFIX + exchange.getResolvedPath());
             
         }
         if (exchange.getRequestMethod().equals(HttpString.tryFromString("GET"))
                 && exchange.getQueryParameters().containsKey("containerId")) {
-            exchange.setRelativePath(PREFIX + exchange.getRelativePath());
+            exchange.setResolvedPath(PREFIX + exchange.getResolvedPath());
             httpHandler.handleRequest(exchange);
             
             return;
