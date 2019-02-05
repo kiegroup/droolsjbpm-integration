@@ -14,6 +14,8 @@
   <description>KIE Execution Server API</description>
 
   <properties>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
     <java.module.name>org.kie.server.api</java.module.name>
   </properties>
 
@@ -53,7 +55,7 @@
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-jaxb</artifactId>
     </dependency>
-    
+
     <!-- Needed only for the DMNResult, DMNContext, etc and FEELEvent so should be possible later to migrate to kie-dmn-API -->
     <dependency>
       <groupId>org.kie</groupId>
@@ -105,7 +107,7 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-core</artifactId>
@@ -123,8 +125,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.drools</groupId>
-    	<artifactId>kie-pmml</artifactId>
+      <groupId>org.drools</groupId>
+      <artifactId>kie-pmml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
