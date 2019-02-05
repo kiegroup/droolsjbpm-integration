@@ -22,7 +22,7 @@ public class KieContainerResourceFilterTest {
 
     private static final String GROUP_ID = "org.example";
     private static final String ARTIFACT_ID = "project";
-    private static final String VERSION= "1.0.0.Final";
+    private static final String VERSION = "1.0.0.Final";
 
     private static final ReleaseId RELEASE_ID = new ReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
 

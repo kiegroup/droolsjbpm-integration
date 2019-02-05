@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -26,21 +26,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "work-item-instance")
 public class WorkItemInstance {
 
-    @XmlElement(name="work-item-id")
+    @XmlElement(name = "work-item-id")
     private Long id;
-    @XmlElement(name="work-item-name")
+    @XmlElement(name = "work-item-name")
     private String name;
-    @XmlElement(name="work-item-state")
+    @XmlElement(name = "work-item-state")
     private Integer state = 0;
-    @XmlElement(name="work-item-params")
+    @XmlElement(name = "work-item-params")
     private Map<String, Object> parameters;
-    @XmlElement(name="process-instance-id")
+    @XmlElement(name = "process-instance-id")
     private Long processInstanceId;
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
-    @XmlElement(name="node-instance-id")
+    @XmlElement(name = "node-instance-id")
     private Long nodeInstanceId;
-    @XmlElement(name="node-id")
+    @XmlElement(name = "node-id")
     private Long nodeId;
 
     public WorkItemInstance() {

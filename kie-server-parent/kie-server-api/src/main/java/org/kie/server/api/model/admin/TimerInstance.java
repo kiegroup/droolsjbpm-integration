@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.admin;
 
@@ -26,27 +26,27 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "timer-instance")
 public class TimerInstance {
 
-    @XmlElement(name="name")
+    @XmlElement(name = "name")
     private String timerName;
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     private long id;
-    @XmlElement(name="timer-id")
+    @XmlElement(name = "timer-id")
     private long timerId;
-    @XmlElement(name="activation-time")
+    @XmlElement(name = "activation-time")
     private Date activationTime;
-    @XmlElement(name="last-fire-time")
+    @XmlElement(name = "last-fire-time")
     private Date lastFireTime;
-    @XmlElement(name="next-fire-time")
+    @XmlElement(name = "next-fire-time")
     private Date nextFireTime;
-    @XmlElement(name="delay")
+    @XmlElement(name = "delay")
     private long delay;
-    @XmlElement(name="period")
+    @XmlElement(name = "period")
     private long period;
-    @XmlElement(name="repeat-limit")
+    @XmlElement(name = "repeat-limit")
     private int repeatLimit;
-    @XmlElement(name="process-instance-id")
+    @XmlElement(name = "process-instance-id")
     private long processInstanceId;
-    @XmlElement(name="session-id")
+    @XmlElement(name = "session-id")
     private long sessionId;
 
     public String getTimerName() {

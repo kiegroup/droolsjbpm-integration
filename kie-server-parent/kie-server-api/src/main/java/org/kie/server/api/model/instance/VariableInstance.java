@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -26,19 +26,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "variable-instance")
 public class VariableInstance {
 
-    @XmlElement(name="name")
+    @XmlElement(name = "name")
     private String variableName;
 
-    @XmlElement(name="old-value")
+    @XmlElement(name = "old-value")
     private String oldValue;
 
-    @XmlElement(name="value")
+    @XmlElement(name = "value")
     private String value;
 
-    @XmlElement(name="process-instance-id")
+    @XmlElement(name = "process-instance-id")
     private Long processInstanceId;
 
-    @XmlElement(name="modification-date")
+    @XmlElement(name = "modification-date")
     private Date date;
 
     public VariableInstance() {

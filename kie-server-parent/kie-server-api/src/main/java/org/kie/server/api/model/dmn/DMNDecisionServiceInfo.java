@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.dmn;
 
@@ -39,11 +39,11 @@ public class DMNDecisionServiceInfo {
         // To avoid the need for kie-server-api to depend on kie-dmn-backend, in order to access DMN's Definitions and DMN's Decision element
         // build this as DTO and only on server-side leverage setters to populate data as needed.
     }
-    
+
     public String getId() {
         return id;
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }
@@ -51,9 +51,8 @@ public class DMNDecisionServiceInfo {
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
 }

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.definition;
 
@@ -26,11 +26,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "query-param")
 public class QueryParam {
 
-    @XmlElement(name="cond-column")
+    @XmlElement(name = "cond-column")
     private String column;
-    @XmlElement(name="cond-operator")
+    @XmlElement(name = "cond-operator")
     private String operator;
-    @XmlElement(name="cond-values")
+    @XmlElement(name = "cond-values")
     private List<?> value;
 
     public QueryParam() {

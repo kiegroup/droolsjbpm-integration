@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -26,19 +26,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "error-info-instance")
 public class ErrorInfoInstance {
 
-    @XmlElement(name="error-instance-id")
+    @XmlElement(name = "error-instance-id")
     private Long id;
 
-    @XmlElement(name="request-instance-id")
+    @XmlElement(name = "request-instance-id")
     private Long requestInfoId;
 
-    @XmlElement(name="error-message")
+    @XmlElement(name = "error-message")
     private String message;
 
-    @XmlElement(name="error-stacktrace")
+    @XmlElement(name = "error-stacktrace")
     private String stacktrace;
 
-    @XmlElement(name="error-date")
+    @XmlElement(name = "error-date")
     private Date errorDate;
 
     public ErrorInfoInstance() {
@@ -97,6 +97,7 @@ public class ErrorInfoInstance {
                 ", errorDate=" + errorDate +
                 '}';
     }
+
     public static class Builder {
 
         private ErrorInfoInstance errorInfoInstance = new ErrorInfoInstance();

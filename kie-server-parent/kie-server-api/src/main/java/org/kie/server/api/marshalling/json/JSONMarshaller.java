@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling.json;
 
@@ -86,7 +86,7 @@ import org.slf4j.LoggerFactory;
 
 public class JSONMarshaller implements Marshaller {
 
-    private static final Logger logger = LoggerFactory.getLogger( MarshallerFactory.class );
+    private static final Logger logger = LoggerFactory.getLogger(MarshallerFactory.class);
 
     private boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
@@ -116,7 +116,7 @@ public class JSONMarshaller implements Marshaller {
 
         ServiceLoader<JSONMarshallerExtension> plugins = ServiceLoader.load(JSONMarshallerExtension.class);
         List<JSONMarshallerExtension> loadedPlugins = new ArrayList<>();
-        plugins.forEach( plugin -> {
+        plugins.forEach(plugin -> {
             logger.info("JSONMarshallerExtension implementation found: {}", plugin.getClass().getName());
             loadedPlugins.add(plugin);
         });
@@ -130,13 +130,13 @@ public class JSONMarshaller implements Marshaller {
         configureMarshaller(classes, classLoader);
     }
 
-    protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+    protected void buildMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
 
         objectMapper = new ObjectMapper();
         deserializeObjectMapper = new ObjectMapper();
     }
 
-    protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+    protected void configureMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
         ObjectMapper customSerializationMapper = new ObjectMapper();
         if (classes == null) {
             classes = new HashSet<Class<?>>();
@@ -162,17 +162,15 @@ public class JSONMarshaller implements Marshaller {
                 .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
 
-
         // setup custom serialization mapper with jaxb adapters
         customSerializationMapper.setConfig(customSerializationMapper.getDeserializationConfig().with(introspectorPair));
         customSerializationMapper.setConfig(customSerializationMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
-
 
         // in case there are custom classes register module to deal with them both for serialization and deserialization
         // this module makes sure that only custom classes are equipped with type information
         if (classes != null && !classes.isEmpty()) {
             ObjectMapper customObjectMapper = new ObjectMapper();
-            TypeResolverBuilder<?> typer = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL){
+            TypeResolverBuilder<?> typer = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL) {
                 @Override
                 public boolean useForType(JavaType t) {
                     if (classesSet.contains(t.getRawClass())) {
@@ -184,7 +182,7 @@ public class JSONMarshaller implements Marshaller {
             typer = typer.init(JsonTypeInfo.Id.CLASS, null);
             typer = typer.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
             customObjectMapper.setDefaultTyping(typer);
-            
+
             customObjectMapper.setConfig(customObjectMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
 
             SimpleModule mod = new SimpleModule("custom-object-mapper", Version.unknownVersion());
@@ -195,7 +193,7 @@ public class JSONMarshaller implements Marshaller {
             }
 
             objectMapper.registerModule(mod);
-            TypeResolverBuilder<?> typer2 = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL){
+            TypeResolverBuilder<?> typer2 = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL) {
                 @Override
                 public boolean useForType(JavaType t) {
                     if (classesSet.contains(t.getRawClass())) {
@@ -215,19 +213,15 @@ public class JSONMarshaller implements Marshaller {
                         switch (_includeAs) {
                             case WRAPPER_OBJECT:
                                 return new CustomAsWrapperTypeDeserializer(baseType, idRes, _typeProperty, true, baseType);
-
                         }
                     }
 
                     return super.buildTypeDeserializer(config, baseType, subtypes);
                 }
-
-
             };
             typer2 = typer2.init(JsonTypeInfo.Id.CLASS, null);
             typer2 = typer2.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
             deserializeObjectMapper.setDefaultTyping(typer2);
-            
 
             SimpleModule modDeser = new SimpleModule("custom-object-unmapper", Version.unknownVersion());
             modDeser.addDeserializer(Object.class, new CustomObjectDeserializer(classes));
@@ -256,7 +250,7 @@ public class JSONMarshaller implements Marshaller {
         this.classesSet = classes;
 
         // Extend the marshaller with optional extensions
-        for(JSONMarshallerExtension extension : EXTENSIONS){
+        for (JSONMarshallerExtension extension : EXTENSIONS) {
             extension.extend(this, objectMapper, deserializeObjectMapper);
         }
     }
@@ -276,7 +270,6 @@ public class JSONMarshaller implements Marshaller {
     public String marshall(Object objectInput) {
         try {
             return objectMapper.writeValueAsString(wrap(objectInput));
-
         } catch (IOException e) {
             throw new MarshallingException("Error marshalling input", e);
         }
@@ -321,7 +314,6 @@ public class JSONMarshaller implements Marshaller {
         return data;
     }
 
-
     class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {
 
         private List<NamedType> customClasses;
@@ -352,7 +344,7 @@ public class JSONMarshaller implements Marshaller {
             // replace JaxbUnknownAdapter as it breaks JSON marshaller for list and maps with wrapping serializer
             XmlJavaTypeAdapter adapterInfo = findAnnotation(XmlJavaTypeAdapter.class, am, true, false, false);
             if (adapterInfo != null && adapterInfo.value().isAssignableFrom(JaxbUnknownAdapter.class)) {
-                if ( findAnnotation(JsonSerialize.class, am, true, false, false) != null ) {
+                if (findAnnotation(JsonSerialize.class, am, true, false, false) != null) {
                     // .. unless there is also an explicitly specified serializer, in such case use the specified one:
                     return super.findSerializer(am);
                 }
@@ -360,15 +352,13 @@ public class JSONMarshaller implements Marshaller {
             }
 
             return super.findSerializer(am);
-
         }
 
         @Override
-        public Object findSerializationConverter(Annotated a)
-        {
+        public Object findSerializationConverter(Annotated a) {
             Class<?> serType = _rawSerializationType(a);
             // Can apply to both container and regular type; no difference yet here
-            XmlAdapter<?,?> adapter = findAdapter(a, true, serType);
+            XmlAdapter<?, ?> adapter = findAdapter(a, true, serType);
             if (adapter != null) {
                 return _converter(adapter, true);
             }
@@ -377,44 +367,44 @@ public class JSONMarshaller implements Marshaller {
 
         private <A extends Annotation> A findAnnotation(Class<A> annotationClass, Annotated annotated, boolean includePackage, boolean includeClass, boolean includeSuperclasses) {
             Annotation annotation = annotated.getAnnotation(annotationClass);
-            if(annotation != null) {
+            if (annotation != null) {
                 return (A) annotation;
             } else {
                 Class memberClass = null;
-                if(annotated instanceof AnnotatedParameter) {
-                    memberClass = ((AnnotatedParameter)annotated).getDeclaringClass();
+                if (annotated instanceof AnnotatedParameter) {
+                    memberClass = ((AnnotatedParameter) annotated).getDeclaringClass();
                 } else {
                     AnnotatedElement pkg = annotated.getAnnotated();
-                    if(pkg instanceof Member) {
-                        memberClass = ((Member)pkg).getDeclaringClass();
-                        if(includeClass) {
+                    if (pkg instanceof Member) {
+                        memberClass = ((Member) pkg).getDeclaringClass();
+                        if (includeClass) {
                             annotation = memberClass.getAnnotation(annotationClass);
-                            if(annotation != null) {
+                            if (annotation != null) {
                                 return (A) annotation;
                             }
                         }
                     } else {
-                        if(!(pkg instanceof Class)) {
+                        if (!(pkg instanceof Class)) {
                             throw new IllegalStateException("Unsupported annotated member: " + annotated.getClass().getName());
                         }
 
-                        memberClass = (Class)pkg;
+                        memberClass = (Class) pkg;
                     }
                 }
 
-                if(memberClass != null) {
-                    if(includeSuperclasses) {
-                        for(Class pkg1 = memberClass.getSuperclass(); pkg1 != null && pkg1 != Object.class; pkg1 = pkg1.getSuperclass()) {
+                if (memberClass != null) {
+                    if (includeSuperclasses) {
+                        for (Class pkg1 = memberClass.getSuperclass(); pkg1 != null && pkg1 != Object.class; pkg1 = pkg1.getSuperclass()) {
                             annotation = pkg1.getAnnotation(annotationClass);
-                            if(annotation != null) {
+                            if (annotation != null) {
                                 return (A) annotation;
                             }
                         }
                     }
 
-                    if(includePackage) {
+                    if (includePackage) {
                         Package pkg2 = memberClass.getPackage();
-                        if(pkg2 != null) {
+                        if (pkg2 != null) {
                             return memberClass.getPackage().getAnnotation(annotationClass);
                         }
                     }
@@ -424,7 +414,7 @@ public class JSONMarshaller implements Marshaller {
             }
         }
 
-        private XmlAdapter<Object,Object> findAdapter(Annotated am, boolean forSerialization, Class<?> type) {
+        private XmlAdapter<Object, Object> findAdapter(Annotated am, boolean forSerialization, Class<?> type) {
             // First of all, are we looking for annotations for class?
             if (am instanceof AnnotatedClass) {
                 return findAdapterForClass((AnnotatedClass) am, forSerialization);
@@ -432,7 +422,7 @@ public class JSONMarshaller implements Marshaller {
             // Otherwise for a member. First, let's figure out type of property
             XmlJavaTypeAdapter adapterInfo = findAnnotation(XmlJavaTypeAdapter.class, am, true, false, false);
             if (adapterInfo != null) {
-                XmlAdapter<Object,Object> adapter = checkAdapter(adapterInfo, type, forSerialization);
+                XmlAdapter<Object, Object> adapter = checkAdapter(adapterInfo, type, forSerialization);
                 if (adapter != null) {
                     return adapter;
                 }
@@ -440,7 +430,7 @@ public class JSONMarshaller implements Marshaller {
             XmlJavaTypeAdapters adapters = findAnnotation(XmlJavaTypeAdapters.class, am, true, false, false);
             if (adapters != null) {
                 for (XmlJavaTypeAdapter info : adapters.value()) {
-                    XmlAdapter<Object,Object> adapter = checkAdapter(info, type, forSerialization);
+                    XmlAdapter<Object, Object> adapter = checkAdapter(info, type, forSerialization);
                     if (adapter != null) {
                         return adapter;
                     }
@@ -449,7 +439,7 @@ public class JSONMarshaller implements Marshaller {
             return null;
         }
 
-        private final XmlAdapter<Object,Object> checkAdapter(XmlJavaTypeAdapter adapterInfo, Class<?> typeNeeded, boolean forSerialization) {
+        private final XmlAdapter<Object, Object> checkAdapter(XmlJavaTypeAdapter adapterInfo, Class<?> typeNeeded, boolean forSerialization) {
             // if annotation has no type, it's applicable; if it has, must match
             Class<?> adaptedType = adapterInfo.type();
 
@@ -470,7 +460,7 @@ public class JSONMarshaller implements Marshaller {
         }
 
         @SuppressWarnings("unchecked")
-        private XmlAdapter<Object,Object> findAdapterForClass(AnnotatedClass ac, boolean forSerialization) {
+        private XmlAdapter<Object, Object> findAdapterForClass(AnnotatedClass ac, boolean forSerialization) {
             XmlJavaTypeAdapter adapterInfo = ac.getAnnotated().getAnnotation(XmlJavaTypeAdapter.class);
             if (adapterInfo != null) {
                 @SuppressWarnings("rawtypes")
@@ -485,6 +475,7 @@ public class JSONMarshaller implements Marshaller {
      * Simple utility Serializer which can be used to override replacement of JaxbUnknownAdapter with WrappingObjectSerializer
      */
     public static class PassThruSerializer extends JsonSerializer<Object> {
+
         @Override
         public void serialize(Object p0, JsonGenerator p1, SerializerProvider p2) throws IOException, JsonProcessingException {
             p1.writeObject(p0);
@@ -540,7 +531,7 @@ public class JSONMarshaller implements Marshaller {
             }
         }
 
-        private String writeArray(Object[] value, ObjectMapper customObjectMapper) throws IOException{
+        private String writeArray(Object[] value, ObjectMapper customObjectMapper) throws IOException {
             StringBuilder builder = new StringBuilder();
             builder.append("[");
 
@@ -564,16 +555,16 @@ public class JSONMarshaller implements Marshaller {
             }
             builder.append("]");
 
-            return  builder.toString();
+            return builder.toString();
         }
 
-        private String writeMap(Map value, ObjectMapper customObjectMapper) throws IOException{
+        private String writeMap(Map value, ObjectMapper customObjectMapper) throws IOException {
             StringBuilder builder = new StringBuilder();
             builder.append("{");
 
-            int size = ((Map<?, ?>)value).size();
+            int size = ((Map<?, ?>) value).size();
 
-            for (Map.Entry<?, ?> entry : ((Map<?, ?>)value).entrySet()) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
                 size--;
                 // handle map key
                 Object key = entry.getKey();
@@ -634,14 +625,13 @@ public class JSONMarshaller implements Marshaller {
             }
             builder.append("]");
 
-            return  builder.toString();
+            return builder.toString();
         }
     }
 
     class CustomObjectDeserializer extends UntypedObjectDeserializer {
 
         private final Pattern VALID_JAVA_IDENTIFIER = Pattern.compile("(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.)*\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
-
 
         private static final long serialVersionUID = 7764405880012867708L;
 
@@ -714,8 +704,8 @@ public class JSONMarshaller implements Marshaller {
                 // in case nested jaxb list wrapper was not recognized automatically map it manually
                 if (result.containsKey("type") && result.containsKey("componentType") && result.containsKey("element")) {
                     JaxbListWrapper wrapper = new JaxbListWrapper();
-                    wrapper.setType(JaxbListWrapper.JaxbWrapperType.valueOf((String)result.get("type")));
-                    wrapper.setComponentType((String)result.get("componentType"));
+                    wrapper.setType(JaxbListWrapper.JaxbWrapperType.valueOf((String) result.get("type")));
+                    wrapper.setComponentType((String) result.get("componentType"));
                     wrapper.setElements(toArray(result.get("element")));
 
                     try {
@@ -735,7 +725,6 @@ public class JSONMarshaller implements Marshaller {
                     } catch (Exception e) {
 
                     }
-
                 }
                 return result;
             }
@@ -807,7 +796,6 @@ public class JSONMarshaller implements Marshaller {
             } finally {
                 Thread.currentThread().setContextClassLoader(current);
             }
-
         }
 
         @Override
@@ -837,46 +825,45 @@ public class JSONMarshaller implements Marshaller {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
-            if (classesSet.contains(_baseType.getRawClass())) {
-                try {
-                    return super.deserializeTypedFromAny(jp, ctxt);
-                } catch (Exception e) {
-                    JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
-                    Object value = deser.deserialize(jp, ctxt);
-                    return value;
-                }
-            }
-
-            if (_baseType.isMapLikeType() && jp.getCurrentToken() == JsonToken.START_ARRAY) {
-
-                LinkedHashMap<Object, Object> data = new LinkedHashMap<Object, Object>();
-                jp.nextToken();
-
-                if (jp.getCurrentToken() == JsonToken.END_ARRAY) {
-                    return data;
-                }
-                JsonDeserializer<Object> deser = _findDeserializer(ctxt, LinkedHashMap.class.getName());
-                Map<Object, Object> value = (Map) deser.deserialize(jp, ctxt);
-                jp.nextToken();
-
-                if (value != null) {
-                    Collection<Object> values = value.values();
-                    if (values.size() == 2) {
-
-                        Iterator<Object> it = values.iterator();
-                        data.put(it.next(), it.next());
-
-                        return data;
+                if (classesSet.contains(_baseType.getRawClass())) {
+                    try {
+                        return super.deserializeTypedFromAny(jp, ctxt);
+                    } catch (Exception e) {
+                        JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                        Object value = deser.deserialize(jp, ctxt);
+                        return value;
                     }
                 }
-                return value;
 
-            } else {
-                JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
-                Object value = deser.deserialize(jp, ctxt);
+                if (_baseType.isMapLikeType() && jp.getCurrentToken() == JsonToken.START_ARRAY) {
 
-                return value;
-            }
+                    LinkedHashMap<Object, Object> data = new LinkedHashMap<Object, Object>();
+                    jp.nextToken();
+
+                    if (jp.getCurrentToken() == JsonToken.END_ARRAY) {
+                        return data;
+                    }
+                    JsonDeserializer<Object> deser = _findDeserializer(ctxt, LinkedHashMap.class.getName());
+                    Map<Object, Object> value = (Map) deser.deserialize(jp, ctxt);
+                    jp.nextToken();
+
+                    if (value != null) {
+                        Collection<Object> values = value.values();
+                        if (values.size() == 2) {
+
+                            Iterator<Object> it = values.iterator();
+                            data.put(it.next(), it.next());
+
+                            return data;
+                        }
+                    }
+                    return value;
+                } else {
+                    JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                    Object value = deser.deserialize(jp, ctxt);
+
+                    return value;
+                }
             } finally {
                 Thread.currentThread().setContextClassLoader(current);
             }
@@ -885,7 +872,7 @@ public class JSONMarshaller implements Marshaller {
         @Override
         public TypeDeserializer forProperty(BeanProperty prop) {
             if (prop != null) {
-                if (useForType(prop.getType()) || useForType(prop.getType().getContentType()) ) {
+                if (useForType(prop.getType()) || useForType(prop.getType().getContentType())) {
                     return new CustomAsWrapperTypeDeserializer(this, prop);
                 }
             }

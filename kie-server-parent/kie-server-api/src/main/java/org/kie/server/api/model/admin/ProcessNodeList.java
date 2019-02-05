@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.admin;
 
@@ -30,7 +30,7 @@ import org.kie.server.api.model.ItemList;
 @XmlRootElement(name = "process-node-list")
 public class ProcessNodeList implements ItemList<ProcessNode> {
 
-    @XmlElement(name="process-node")
+    @XmlElement(name = "process-node")
     private ProcessNode[] processNodes;
 
     public ProcessNodeList() {

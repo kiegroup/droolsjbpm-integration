@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
@@ -24,9 +24,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "case-adhoc-fragment")
 public class CaseAdHocFragment {
 
-    @XmlElement(name="name")
+    @XmlElement(name = "name")
     private String name;
-    @XmlElement(name="type")
+    @XmlElement(name = "type")
     private String type;
 
     public CaseAdHocFragment() {

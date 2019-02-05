@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.definition;
 
@@ -27,26 +27,26 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "user-task-definition")
 public class UserTaskDefinition {
 
-    @XmlElement(name="task-id")
+    @XmlElement(name = "task-id")
     private String id;
-    @XmlElement(name="task-name")
+    @XmlElement(name = "task-name")
     private String name;
-    @XmlElement(name="task-priority")
+    @XmlElement(name = "task-priority")
     private Integer priority;
-    @XmlElement(name="task-comment")
+    @XmlElement(name = "task-comment")
     private String comment;
-    @XmlElement(name="task-created-by")
+    @XmlElement(name = "task-created-by")
     private String createdBy;
-    @XmlElement(name="task-skippable")
+    @XmlElement(name = "task-skippable")
     private boolean skippable;
-    @XmlElement(name="task-form-name")
+    @XmlElement(name = "task-form-name")
     private String formName;
 
-    @XmlElementWrapper(name="associated-entities")
+    @XmlElementWrapper(name = "associated-entities")
     private String[] associatedEntities;
-    @XmlElementWrapper(name="task-inputs")
+    @XmlElementWrapper(name = "task-inputs")
     private Map<String, String> taskInputMappings;
-    @XmlElementWrapper(name="task-outputs")
+    @XmlElementWrapper(name = "task-outputs")
     private Map<String, String> taskOutputMappings;
 
     public static Builder builder() {
@@ -60,7 +60,7 @@ public class UserTaskDefinition {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -100,7 +100,7 @@ public class UserTaskDefinition {
     public void setSkippable(boolean skippable) {
         this.skippable = skippable;
     }
-    
+
     public String getFormName() {
         return formName;
     }
@@ -151,7 +151,7 @@ public class UserTaskDefinition {
         public UserTaskDefinition build() {
             return definition;
         }
-        
+
         public Builder id(String id) {
             definition.setId(id);
 
@@ -187,7 +187,7 @@ public class UserTaskDefinition {
 
             return this;
         }
-        
+
         public Builder formName(String formName) {
             definition.setFormName(formName);
 
@@ -212,6 +212,5 @@ public class UserTaskDefinition {
 
             return this;
         }
-
     }
 }

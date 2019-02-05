@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
@@ -26,15 +26,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "case-milestone")
 public class CaseMilestone {
 
-    @XmlElement(name="milestone-name")
+    @XmlElement(name = "milestone-name")
     private String name;
-    @XmlElement(name="milestone-id")
+    @XmlElement(name = "milestone-id")
     private String identifier;
-    @XmlElement(name="milestone-achieved")
+    @XmlElement(name = "milestone-achieved")
     private boolean achieved;
-    @XmlElement(name="milestone-achieved-at")
+    @XmlElement(name = "milestone-achieved-at")
     private Date achievedAt;
-    @XmlElement(name="milestone-status")
+    @XmlElement(name = "milestone-status")
     private String status;
 
     public CaseMilestone() {

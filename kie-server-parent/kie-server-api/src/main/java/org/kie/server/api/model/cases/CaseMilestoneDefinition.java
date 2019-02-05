@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
@@ -24,11 +24,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "case-milestone-def")
 public class CaseMilestoneDefinition {
 
-    @XmlElement(name="milestone-name")
+    @XmlElement(name = "milestone-name")
     private String name;
-    @XmlElement(name="milestone-id")
+    @XmlElement(name = "milestone-id")
     private String identifier;
-    @XmlElement(name="milestone-mandatory")
+    @XmlElement(name = "milestone-mandatory")
     private boolean mandatory;
 
     public CaseMilestoneDefinition() {
@@ -58,7 +58,6 @@ public class CaseMilestoneDefinition {
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
     }
-
 
     public static Builder builder() {
         return new Builder();

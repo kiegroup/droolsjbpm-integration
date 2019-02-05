@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
@@ -119,12 +119,10 @@ public class CaseMigrationReportInstance {
             reportInstance.setReports(reports);
             return this;
         }
-
     }
 
     @Override
     public String toString() {
         return "CaseMigrationReportInstance [caseId=" + caseId + ", successful=" + successful + ", startDate=" + startDate + ", endDate=" + endDate + "]";
     }
-
 }

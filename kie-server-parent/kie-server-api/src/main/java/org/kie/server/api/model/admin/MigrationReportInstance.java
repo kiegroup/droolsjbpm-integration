@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.admin;
 
@@ -28,19 +28,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "migration-report-instance")
 public class MigrationReportInstance {
 
-    @XmlElement(name="migration-successful")
+    @XmlElement(name = "migration-successful")
     private boolean successful;
 
-    @XmlElement(name="migration-start")
+    @XmlElement(name = "migration-start")
     private Date startDate;
 
-    @XmlElement(name="migration-end")
+    @XmlElement(name = "migration-end")
     private Date endDate;
 
-    @XmlElement(name="migration-logs")
+    @XmlElement(name = "migration-logs")
     private List<String> logs;
-    
-    @XmlElement(name="migration-process-instance")
+
+    @XmlElement(name = "migration-process-instance")
     private Long processInstanceId;
 
     public MigrationReportInstance() {
@@ -84,11 +84,11 @@ public class MigrationReportInstance {
     public void setLogs(List<String> logs) {
         this.logs = logs;
     }
-    
+
     public Long getProcessInstanceId() {
         return processInstanceId;
     }
-    
+
     public void setProcessInstanceId(Long processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
@@ -125,7 +125,7 @@ public class MigrationReportInstance {
             reportInstance.getLogs().add(log);
             return this;
         }
-        
+
         public Builder processInstanceId(Long processInstanceId) {
             reportInstance.setProcessInstanceId(processInstanceId);
             return this;

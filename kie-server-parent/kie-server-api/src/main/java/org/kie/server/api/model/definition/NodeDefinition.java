@@ -25,16 +25,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "node-definition")
 public class NodeDefinition {
 
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     private Long id;
 
-    @XmlElement(name="name")
+    @XmlElement(name = "name")
     private String name;
 
-    @XmlElement(name="unique-id")
+    @XmlElement(name = "unique-id")
     private String uniqueId;
 
-    @XmlElement(name="type")
+    @XmlElement(name = "type")
     private String type;
 
     public NodeDefinition() {

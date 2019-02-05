@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.admin;
 
@@ -30,7 +30,7 @@ import org.kie.server.api.model.ItemList;
 @XmlRootElement(name = "timer-instance-list")
 public class TimerInstanceList implements ItemList<TimerInstance> {
 
-    @XmlElement(name="timer-instance")
+    @XmlElement(name = "timer-instance")
     private TimerInstance[] timerInstances;
 
     public TimerInstanceList() {

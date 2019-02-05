@@ -27,38 +27,37 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "execution-error")
 public class ExecutionErrorInstance {
 
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     private String errorId;
-    @XmlElement(name="type")
+    @XmlElement(name = "type")
     private String type;
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
-    @XmlElement(name="process-instance-id")
+    @XmlElement(name = "process-instance-id")
     private Long processInstanceId;
-    @XmlElement(name="process-id")
+    @XmlElement(name = "process-id")
     private String processId;
-    @XmlElement(name="activity-id")
+    @XmlElement(name = "activity-id")
     private Long activityId;
-    @XmlElement(name="activity-name")
+    @XmlElement(name = "activity-name")
     private String activityName;
-    @XmlElement(name="job-id")
+    @XmlElement(name = "job-id")
     private Long jobId;
 
-    @XmlElement(name="error-msg")
+    @XmlElement(name = "error-msg")
     private String errorMessage;
-    @XmlElement(name="error")
+    @XmlElement(name = "error")
     private String error;
 
-    @XmlElement(name="acknowledged")
+    @XmlElement(name = "acknowledged")
     private boolean acknowledged;
-    @XmlElement(name="acknowledged-by")
+    @XmlElement(name = "acknowledged-by")
     private String acknowledgedBy;
-    @XmlElement(name="acknowledged-at")
+    @XmlElement(name = "acknowledged-at")
     private Date acknowledgedAt;
 
-    @XmlElement(name="error-date")
+    @XmlElement(name = "error-date")
     private Date errorDate;
-
 
     public ExecutionErrorInstance() {
     }
@@ -187,8 +186,8 @@ public class ExecutionErrorInstance {
                 ", acknowledgedAt=" + acknowledgedAt + "]";
     }
 
-
     public static class Builder {
+
         private ExecutionErrorInstance error = new ExecutionErrorInstance();
 
         public ExecutionErrorInstance build() {

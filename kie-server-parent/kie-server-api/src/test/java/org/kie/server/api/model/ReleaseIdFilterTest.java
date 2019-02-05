@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -26,6 +26,7 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ReleaseIdFilterTest {
+
     private static final ReleaseIdFilter FULL_FILTER = new ReleaseIdFilter("org.test", "example-artifactId", "1.0.0.Final");
     private static final ReleaseIdFilter GROUP_ID_ARTIFACT_ID_FILTER = new ReleaseIdFilter.Builder().groupId("org.test").artifactId("example-artifactId").build();
     private static final ReleaseIdFilter GROUP_ID_VERSION_FILTER = new ReleaseIdFilter.Builder().groupId("org.test").version("1.0.0.Final").build();

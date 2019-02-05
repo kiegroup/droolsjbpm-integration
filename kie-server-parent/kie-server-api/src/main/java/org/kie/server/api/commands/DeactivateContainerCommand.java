@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.commands;
 
@@ -23,20 +23,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieServerCommand;
 
-@XmlRootElement(name="deactivate-container")
+@XmlRootElement(name = "deactivate-container")
 @XStreamAlias("deactivate-container")
 @XmlAccessorType(XmlAccessType.NONE)
 public class DeactivateContainerCommand implements KieServerCommand {
+
     private static final long serialVersionUID = -1803374525440238478L;
-    
-    @XmlAttribute(name="container-id")
-    @XStreamAlias( "container-id" )
-    private String    containerId;
-    
+
+    @XmlAttribute(name = "container-id")
+    @XStreamAlias("container-id")
+    private String containerId;
+
     public DeactivateContainerCommand() {
         super();
     }
-    
+
     public DeactivateContainerCommand(String containerId) {
         this.containerId = containerId;
     }
@@ -68,7 +69,6 @@ public class DeactivateContainerCommand implements KieServerCommand {
         DeactivateContainerCommand that = (DeactivateContainerCommand) o;
 
         return containerId != null ? containerId.equals(that.containerId) : that.containerId == null;
-
     }
 
     @Override

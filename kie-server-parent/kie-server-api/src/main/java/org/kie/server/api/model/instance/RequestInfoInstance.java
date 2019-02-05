@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -27,29 +27,29 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "request-info-instance")
 public class RequestInfoInstance {
 
-    @XmlElement(name="request-instance-id")
+    @XmlElement(name = "request-instance-id")
     private Long id;
-    @XmlElement(name="request-status")
+    @XmlElement(name = "request-status")
     private String status;
-    @XmlElement(name="request-business-key")
+    @XmlElement(name = "request-business-key")
     private String businessKey;
-    @XmlElement(name="request-message")
+    @XmlElement(name = "request-message")
     private String message;
-    @XmlElement(name="request-retries")
+    @XmlElement(name = "request-retries")
     private Integer retries;
-    @XmlElement(name="request-executions")
+    @XmlElement(name = "request-executions")
     private Integer executions;
-    @XmlElement(name="request-command")
+    @XmlElement(name = "request-command")
     private String commandName;
-    @XmlElement(name="request-scheduled-date")
+    @XmlElement(name = "request-scheduled-date")
     private Date scheduledDate;
-    @XmlElement(name="request-data")
+    @XmlElement(name = "request-data")
     private Map<String, Object> data;
-    @XmlElement(name="response-data")
+    @XmlElement(name = "response-data")
     private Map<String, Object> responseData;
-    @XmlElement(name="request-errors")
+    @XmlElement(name = "request-errors")
     private ErrorInfoInstanceList errors;
-    @XmlElement(name="request-container-id")
+    @XmlElement(name = "request-container-id")
     private String containerId;
 
     public RequestInfoInstance() {
@@ -150,7 +150,7 @@ public class RequestInfoInstance {
     public String getContainerId() {
         return containerId;
     }
-    
+
     public void setContainerId(String containerId) {
         this.containerId = containerId;
     }
@@ -230,7 +230,7 @@ public class RequestInfoInstance {
             requestInfoInstance.setErrors(errors);
             return this;
         }
-        
+
         public Builder containerId(String containerId) {
             requestInfoInstance.setContainerId(containerId);
             return this;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling;
 
@@ -36,12 +36,12 @@ public class ScoresMarshallingTest {
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
-        Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(new Object[][]
-                        {
-                                {MarshallingFormat.JAXB},
-                                {MarshallingFormat.JSON},
-                                {MarshallingFormat.XSTREAM}
-                        }
+        Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(
+                new Object[][]{
+                        {MarshallingFormat.JAXB},
+                        {MarshallingFormat.JSON},
+                        {MarshallingFormat.XSTREAM}
+                }
         ));
 
         return parameterData;

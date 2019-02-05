@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
@@ -26,17 +26,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "case-comment")
 public class CaseComment {
 
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     private String id;
-    @XmlElement(name="author")
+    @XmlElement(name = "author")
     private String author;
-    @XmlElement(name="text")
+    @XmlElement(name = "text")
     private String text;
-    @XmlElement(name="added-at")
+    @XmlElement(name = "added-at")
     private Date addedAt;
-    @XmlElement(name="restricted-to")
+    @XmlElement(name = "restricted-to")
     private String[] restrictedTo;
-    
 
     public CaseComment() {
 
@@ -73,11 +72,11 @@ public class CaseComment {
     public void setAddedAt(Date addedAt) {
         this.addedAt = addedAt;
     }
-    
+
     public String[] getRestrictedTo() {
         return restrictedTo;
     }
-    
+
     public void setRestrictedTo(String[] restrictedTo) {
         this.restrictedTo = restrictedTo;
     }
@@ -113,7 +112,7 @@ public class CaseComment {
             adHocFragment.setAddedAt(addedAt);
             return this;
         }
-        
+
         public Builder restrictedTo(String[] restrictedTo) {
             adHocFragment.setRestrictedTo(restrictedTo);
             return this;

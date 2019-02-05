@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling.objects;
 
@@ -26,13 +26,13 @@ public class Top implements Serializable {
 
     private NestedLevel1 nestedLevel1;
 
-	public NestedLevel1 getNestedLevel1() {
-		return nestedLevel1;
-	}
+    public NestedLevel1 getNestedLevel1() {
+        return nestedLevel1;
+    }
 
-	public void setNestedLevel1(NestedLevel1 nestedLevel1) {
-		this.nestedLevel1 = nestedLevel1;
-	}
+    public void setNestedLevel1(NestedLevel1 nestedLevel1) {
+        this.nestedLevel1 = nestedLevel1;
+    }
 
     @Override
     public int hashCode() {
@@ -44,19 +44,23 @@ public class Top implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Top other = (Top) obj;
         if (nestedLevel1 == null) {
-            if (other.nestedLevel1 != null)
+            if (other.nestedLevel1 != null) {
                 return false;
-        } else if (!nestedLevel1.equals(other.nestedLevel1))
+            }
+        } else if (!nestedLevel1.equals(other.nestedLevel1)) {
             return false;
+        }
         return true;
     }
-
 }

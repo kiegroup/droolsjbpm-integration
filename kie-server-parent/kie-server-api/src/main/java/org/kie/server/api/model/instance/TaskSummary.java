@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -28,41 +28,40 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XmlRootElement(name = "task-summary")
 public class TaskSummary {
 
-    @XmlElement(name="task-id")
+    @XmlElement(name = "task-id")
     private Long id;
-    @XmlElement(name="task-name")
+    @XmlElement(name = "task-name")
     private String name;
-    @XmlElement(name="task-subject")
+    @XmlElement(name = "task-subject")
     private String subject;
-    @XmlElement(name="task-description")
+    @XmlElement(name = "task-description")
     private String description;
-    @XmlElement(name="task-status")
+    @XmlElement(name = "task-status")
     private String status;
-    @XmlElement(name="task-priority")
+    @XmlElement(name = "task-priority")
     private Integer priority;
-    @XmlElement(name="task-is-skipable")
+    @XmlElement(name = "task-is-skipable")
     private Boolean skipable;
-    @XmlElement(name="task-actual-owner")
+    @XmlElement(name = "task-actual-owner")
     private String actualOwner;
-    @XmlElement(name="task-created-by")
+    @XmlElement(name = "task-created-by")
     private String createdBy;
     @XStreamAlias("date")
-    @XmlElement(name="task-created-on")
+    @XmlElement(name = "task-created-on")
     private Date createdOn;
     @XStreamAlias("date")
-    @XmlElement(name="task-activation-time")
+    @XmlElement(name = "task-activation-time")
     private Date activationTime;
-    @XmlElement(name="task-expiration-time")
+    @XmlElement(name = "task-expiration-time")
     private Date expirationTime;
-    @XmlElement(name="task-proc-inst-id")
+    @XmlElement(name = "task-proc-inst-id")
     private Long processInstanceId;
-    @XmlElement(name="task-proc-def-id")
+    @XmlElement(name = "task-proc-def-id")
     private String processId;
-    @XmlElement(name="task-container-id")
+    @XmlElement(name = "task-container-id")
     private String containerId;
-    @XmlElement(name="task-parent-id")
+    @XmlElement(name = "task-parent-id")
     private Long parentId;
-
 
     public static Builder builder() {
         return new Builder();
@@ -316,6 +315,4 @@ public class TaskSummary {
             return this;
         }
     }
-
-
 }

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.definition;
 
@@ -22,22 +22,22 @@ package org.kie.server.api.model.definition;
  */
 public enum ProcessInstanceField {
 
-	//@formatter:off
-	ID,
-	CORRELATIONKEY,
-	DURATION,
-	END_DATE,
-	EXTERNALID,
-	USER_IDENTITY,
-	OUTCOME,
-	PARENTPROCESSINSTANCEID,
-	PROCESSID,
-	PROCESSINSTANCEDESCRIPTION,
-	PROCESSINSTANCEID,
-	PROCESSNAME,
-	PROCESSTYPE,
-	PROCESSVERSION,
-	START_DATE,
-	STATUS
-	//@formatter:on
+    //@formatter:off
+    ID,
+    CORRELATIONKEY,
+    DURATION,
+    END_DATE,
+    EXTERNALID,
+    USER_IDENTITY,
+    OUTCOME,
+    PARENTPROCESSINSTANCEID,
+    PROCESSID,
+    PROCESSINSTANCEDESCRIPTION,
+    PROCESSINSTANCEID,
+    PROCESSNAME,
+    PROCESSTYPE,
+    PROCESSVERSION,
+    START_DATE,
+    STATUS
+    //@formatter:on
 }

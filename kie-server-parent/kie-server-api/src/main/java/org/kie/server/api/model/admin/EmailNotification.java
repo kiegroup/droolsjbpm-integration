@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.admin;
 
@@ -26,17 +26,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "email-notification")
 public class EmailNotification {
 
-    @XmlElement(name="from")
+    @XmlElement(name = "from")
     private String from;
-    @XmlElement(name="reply-to")
+    @XmlElement(name = "reply-to")
     private String replyTo;
-    @XmlElement(name="users")
+    @XmlElement(name = "users")
     private List<String> users;
-    @XmlElement(name="groups")
+    @XmlElement(name = "groups")
     private List<String> groups;
-    @XmlElement(name="subject")
+    @XmlElement(name = "subject")
     private String subject;
-    @XmlElement(name="body")
+    @XmlElement(name = "body")
     private String body;
 
     public String getFrom() {

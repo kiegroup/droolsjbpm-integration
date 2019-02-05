@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -88,7 +88,6 @@ public class KieContainerResourceFilter {
 
     /**
      * Creates representation of this filter which can be used as part of the URL (e.g. the "?" query part).
-     *
      * @return string representation that can be directly used in URL (as query params), without the leading '?'
      */
     public String toURLQueryString() {
@@ -133,10 +132,10 @@ public class KieContainerResourceFilter {
 
         KieContainerResourceFilter that = (KieContainerResourceFilter) o;
 
-        if (releaseIdFilter != null ? !releaseIdFilter.equals(that.releaseIdFilter) : that.releaseIdFilter != null)
+        if (releaseIdFilter != null ? !releaseIdFilter.equals(that.releaseIdFilter) : that.releaseIdFilter != null) {
             return false;
+        }
         return statusFilter != null ? statusFilter.equals(that.statusFilter) : that.statusFilter == null;
-
     }
 
     @Override
@@ -147,6 +146,7 @@ public class KieContainerResourceFilter {
     }
 
     public static class Builder {
+
         private ReleaseIdFilter releaseIdFilter = ReleaseIdFilter.ACCEPT_ALL;
         private KieContainerStatusFilter statusFilter = KieContainerStatusFilter.ACCEPT_ALL;
 
@@ -177,5 +177,4 @@ public class KieContainerResourceFilter {
             return new KieContainerResourceFilter(releaseIdFilter, statusFilter);
         }
     }
-
 }

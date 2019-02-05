@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling;
 
@@ -42,6 +42,7 @@ import org.kie.server.api.model.type.JaxbString;
 public class ModelWrapper {
 
     protected static Map<Class, Class> wrapperPrimitives = new HashMap<Class, Class>();
+
     static {
         wrapperPrimitives.put(Boolean.class, JaxbBoolean.class);
         wrapperPrimitives.put(Byte.class, JaxbByte.class);
@@ -53,7 +54,6 @@ public class ModelWrapper {
         wrapperPrimitives.put(Float.class, JaxbFloat.class);
         wrapperPrimitives.put(String.class, JaxbString.class);
         wrapperPrimitives.put(byte[].class, JaxbByteArray.class);
-
     }
 
     public static Object wrap(Object object) {
@@ -76,16 +76,16 @@ public class ModelWrapper {
         } else if (object instanceof Date) {
             return new JaxbDate((Date) object);
         } else if (object instanceof CommandScript) {
-             for (KieServerCommand cmd : ((CommandScript) object).getCommands()) {
-                 if (cmd instanceof DescriptorCommand) {
-                     List<Object> arguments = new ArrayList<Object>();
-                     for (Object o : ((DescriptorCommand) cmd).getArguments()) {
-                         arguments.add(wrap(o));
-                     }
-                     ((DescriptorCommand) cmd).setArguments(arguments);
-                 }
-             }
-         }
+            for (KieServerCommand cmd : ((CommandScript) object).getCommands()) {
+                if (cmd instanceof DescriptorCommand) {
+                    List<Object> arguments = new ArrayList<Object>();
+                    for (Object o : ((DescriptorCommand) cmd).getArguments()) {
+                        arguments.add(wrap(o));
+                    }
+                    ((DescriptorCommand) cmd).setArguments(arguments);
+                }
+            }
+        }
 
         return object;
     }

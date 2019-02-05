@@ -16,7 +16,6 @@
 
 package org.kie.server.api.marshalling.json;
 
-
 public interface StringContent {
 
     String getContent();

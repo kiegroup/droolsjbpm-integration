@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
@@ -42,17 +42,15 @@ public class MarshallingRoundTripTest {
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
-        Object[][] data = new Object[][] {
-                { createKieContainerResourceFilter()},
-                { createReleaseIdFilter() },
-                { createKieContainerResourceFilter() },
-                { createListContainersCommand() },
-                { createCommandScript() }
+        Object[][] data = new Object[][]{
+                {createKieContainerResourceFilter()},
+                {createReleaseIdFilter()},
+                {createKieContainerResourceFilter()},
+                {createListContainersCommand()},
+                {createCommandScript()}
         };
         return Arrays.asList(data);
     }
-
-
 
     private static KieContainerStatusFilter createKieContainerStatusFilter() {
         return new KieContainerStatusFilter();
@@ -94,7 +92,6 @@ public class MarshallingRoundTripTest {
     public void testXStream() {
         Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM, getClass().getClassLoader());
         verifyMarshallingRoundTrip(marshaller, testObject);
-
     }
 
     @Test
@@ -118,5 +115,4 @@ public class MarshallingRoundTripTest {
 
         verifyMarshallingRoundTrip(marshaller, map);
     }
-
- }
+}

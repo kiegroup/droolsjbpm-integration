@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling.xstream;
 
@@ -39,45 +39,43 @@ public class KieServerTypePermissionTest {
     public void cleanup() {
         System.clearProperty(SYSTEM_XSTREAM_ENABLED_PACKAGES);
     }
-    
+
     @Test
     public void testDefaultAcceptableClasses() {
-        
+
         KieServerTypePermission permission = new KieServerTypePermission(new HashSet<>());
-        
+
         assertTrue(permission.allows(KieContainerResource.class));
         assertTrue(permission.allows(ProcessDefinition.class));
         assertTrue(permission.allows(EmailNotification.class));
         assertTrue(permission.allows(CaseDefinition.class));
         assertTrue(permission.allows(DMNModelInfo.class));
     }
-    
+
     @Test
     public void testDefaultForbiddenClasses() {
-        
+
         KieServerTypePermission permission = new KieServerTypePermission(new HashSet<>());
-        
+
         assertFalse(permission.allows(Top.class));
-        
     }
-    
+
     @Test
     public void testExplicitlyGivenClasses() {
         Set<Class<?>> classes = new HashSet<>();
         classes.add(Top.class);
         KieServerTypePermission permission = new KieServerTypePermission(classes);
-        
+
         assertTrue(permission.allows(Top.class));
-        
     }
-    
+
     @Test
     public void testSystemPropertyGivenClasses() {
         System.setProperty(SYSTEM_XSTREAM_ENABLED_PACKAGES, "org.kie.server.api.marshalling.objects.Top,org.kie.server.api.marshalling.objects.Message");
-        
-        Set<Class<?>> classes = new HashSet<>();    
+
+        Set<Class<?>> classes = new HashSet<>();
         KieServerTypePermission permission = new KieServerTypePermission(classes);
-        
+
         assertTrue(permission.allows(Top.class));
         assertTrue(permission.allows(Message.class));
         assertFalse(permission.allows(AnotherMessage.class));

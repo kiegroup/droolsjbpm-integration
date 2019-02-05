@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.commands;
 
@@ -26,7 +26,7 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "update-scanner")
-@XStreamAlias( "update-scanner" )
+@XStreamAlias("update-scanner")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UpdateScannerCommand
         implements KieServerCommand {
@@ -68,13 +68,21 @@ public class UpdateScannerCommand
 
     @Override
     public boolean equals(Object o) {
-        if ( this == o ) return true;
-        if ( !(o instanceof UpdateScannerCommand) ) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof UpdateScannerCommand)) {
+            return false;
+        }
 
         UpdateScannerCommand that = (UpdateScannerCommand) o;
 
-        if ( containerId != null ? !containerId.equals( that.containerId ) : that.containerId != null ) return false;
-        if ( scanner != null ? !scanner.equals( that.scanner ) : that.scanner != null ) return false;
+        if (containerId != null ? !containerId.equals(that.containerId) : that.containerId != null) {
+            return false;
+        }
+        if (scanner != null ? !scanner.equals(that.scanner) : that.scanner != null) {
+            return false;
+        }
 
         return true;
     }
@@ -89,8 +97,8 @@ public class UpdateScannerCommand
     @Override
     public String toString() {
         return "UpdateScannerCommand{" +
-               "containerId='" + containerId + '\'' +
-               ", scanner=" + scanner +
-               '}';
+                "containerId='" + containerId + '\'' +
+                ", scanner=" + scanner +
+                '}';
     }
 }

@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -27,37 +27,37 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "process-instance")
 public class ProcessInstance {
 
-    @XmlElement(name="process-instance-id")
+    @XmlElement(name = "process-instance-id")
     private Long id;
-    @XmlElement(name="process-id")
+    @XmlElement(name = "process-id")
     private String processId;
-    @XmlElement(name="process-name")
+    @XmlElement(name = "process-name")
     private String processName;
-    @XmlElement(name="process-version")
+    @XmlElement(name = "process-version")
     private String processVersion;
-    @XmlElement(name="process-instance-state")
+    @XmlElement(name = "process-instance-state")
     private Integer state;
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
-    @XmlElement(name="initiator")
+    @XmlElement(name = "initiator")
     private String initiator;
-    @XmlElement(name="start-date")
+    @XmlElement(name = "start-date")
     private Date date;
-    @XmlElement(name="process-instance-desc")
+    @XmlElement(name = "process-instance-desc")
     private String processInstanceDescription;
-    @XmlElement(name="correlation-key")
+    @XmlElement(name = "correlation-key")
     private String correlationKey;
-    @XmlElement(name="parent-instance-id")
+    @XmlElement(name = "parent-instance-id")
     private Long parentId;
-    @XmlElement(name="sla-compliance")
-    private Integer slaCompliance;   
-    @XmlElement(name="sla-due-date")
+    @XmlElement(name = "sla-compliance")
+    private Integer slaCompliance;
+    @XmlElement(name = "sla-due-date")
     private Date slaDueDate;
 
-    @XmlElement(name="active-user-tasks")
+    @XmlElement(name = "active-user-tasks")
     private TaskSummaryList activeUserTasks;
 
-    @XmlElement(name="process-instance-variables")
+    @XmlElement(name = "process-instance-variables")
     private Map<String, Object> variables;
 
     public ProcessInstance() {
@@ -170,19 +170,19 @@ public class ProcessInstance {
     public void setActiveUserTasks(TaskSummaryList activeUserTasks) {
         this.activeUserTasks = activeUserTasks;
     }
-    
+
     public Integer getSlaCompliance() {
         return slaCompliance;
     }
-    
+
     public void setSlaCompliance(Integer slaCompliance) {
         this.slaCompliance = slaCompliance;
     }
-    
+
     public Date getSlaDueDate() {
         return slaDueDate;
     }
-    
+
     public void setSlaDueDate(Date slaDueDate) {
         this.slaDueDate = slaDueDate;
     }
@@ -200,6 +200,7 @@ public class ProcessInstance {
     }
 
     public static class Builder {
+
         private ProcessInstance processInstance = new ProcessInstance();
 
         public ProcessInstance build() {
@@ -270,12 +271,12 @@ public class ProcessInstance {
             processInstance.setActiveUserTasks(activeUserTasks);
             return this;
         }
-        
+
         public Builder slaDueDate(Date slaDueDate) {
             processInstance.setSlaDueDate(slaDueDate);
             return this;
         }
-        
+
         public Builder slaCompliance(Integer slaCompliance) {
             processInstance.setSlaCompliance(slaCompliance);
             return this;
