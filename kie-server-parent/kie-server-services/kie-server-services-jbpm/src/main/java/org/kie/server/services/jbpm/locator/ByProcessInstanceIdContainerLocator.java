@@ -64,8 +64,10 @@ public class ByProcessInstanceIdContainerLocator implements ContainerLocator {
             logger.debug("Found container id '{}' for process instance id {}", containerId, processInstanceId);
             return containerId;
 
-        } catch (NoResultException | NonUniqueResultException e) {
+        } catch (NoResultException e) {
             throw new IllegalArgumentException("ProcessInstance with id " + processInstanceId + " not found");
+        } catch (NonUniqueResultException e) {
+            throw new IllegalArgumentException("Multiple containerIds found for processInstanceId " + processInstanceId);
         } finally {
             em.close();
         }
