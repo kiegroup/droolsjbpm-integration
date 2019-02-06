@@ -23,13 +23,13 @@ import org.apache.commons.lang3.text.StrSubstitutor;
 public class RestURI {
 
     //parameters
-    public static final String CONTAINER_ID = "id";
-    public static final String PROCESS_ID = "pId";
-    public static final String PROCESS_INST_ID = "pInstanceId";
-    public static final String SIGNAL_NAME = "sName";
+    public static final String CONTAINER_ID = "containerId";
+    public static final String PROCESS_ID = "processId";
+    public static final String PROCESS_INST_ID = "processInstanceId";
+    public static final String SIGNAL_NAME = "signalName";
     public static final String VAR_NAME = "varName";
     public static final String TASK_NAME = "taskName";
-    public static final String TASK_INSTANCE_ID = "tInstanceId";
+    public static final String TASK_INSTANCE_ID = "taskInstanceId";
     public static final String CONTENT_ID = "contentId";
     public static final String COMMENT_ID = "commentId";
     public static final String ATTACHMENT_ID = "attachmentId";

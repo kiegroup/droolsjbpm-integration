@@ -1765,7 +1765,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskClient.findTasksByStatusByProcessInstanceId(null, Arrays.asList("Ready"), 0, 10);
             fail("Method should throw missing InstanceId exception");
         } catch (IllegalArgumentException e) {
-            assertEquals("Missing value for pInstanceId", e.getMessage());
+            assertEquals("Missing value for processInstanceId", e.getMessage());
         }
 
     }

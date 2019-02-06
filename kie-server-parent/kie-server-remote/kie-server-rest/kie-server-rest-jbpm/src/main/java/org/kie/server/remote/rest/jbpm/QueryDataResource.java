@@ -15,6 +15,7 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.CREATE_QUERY_DEF_POST_URI;
 import static org.kie.server.api.rest.RestURI.DROP_QUERY_DEF_DELETE_URI;
 import static org.kie.server.api.rest.RestURI.QUERY_DEF_GET_URI;
@@ -32,8 +33,11 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_DEF_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_DEF_LIST_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_DEF_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_DEF_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_FILTER_SPEC_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_FILTER_SPEC_XML;
@@ -82,7 +86,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 
-@Api(value="Custom queries :: BPM")
+@Api(value="Custom queries")
 @Path("server/" + QUERY_DEF_URI)
 public class QueryDataResource {
 
@@ -101,11 +105,13 @@ public class QueryDataResource {
         this.context = context;
     }
 
-    @ApiOperation(value="Retruns all custom queries defined in the system",
+    @ApiOperation(value="Returns all custom query definitions.",
             response=QueryDefinitionList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_LIST_RESPONSE_JSON)})) })
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getQueries( @Context HttpHeaders headers,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize ) {
@@ -125,16 +131,18 @@ public class QueryDataResource {
                                      conversationIdHeader );
     }
 
-    @ApiOperation(value="Registers new query definition in the system with given queryName",
+    @ApiOperation(value="Registers a custom query definition.",
             response=QueryDefinition.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 409, message = "Query with given name already exists")})
+            @ApiResponse(code = 409, message = "Query with given name already exists"), 
+            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
     @POST
     @Path(CREATE_QUERY_DEF_POST_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "identifier of the query definition to be registered", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "identifier of the query definition to be registered", required = true, example = "customQuery") @PathParam("queryName") String queryName,
             @ApiParam(value = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
                     @ExampleProperty(mediaType=XML, value=QUERY_DEF_XML)})) String payload ) {
@@ -172,15 +180,17 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Replaces existing query definition or registers new if not exists in the system with given queryName",
+    @ApiOperation(value="Replaces existing custom query definition or registers it as new if the query does not already exist.",
             response=QueryDefinition.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
     @PUT
     @Path(REPLACE_QUERY_DEF_PUT_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response replaceQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "identifier of the query definition to be replaced", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "identifier of the query definition to be replaced", required = true, example = "customQuery") @PathParam("queryName") String queryName,
             @ApiParam(value = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
                     @ExampleProperty(mediaType=XML, value=QUERY_DEF_XML)})) String payload ) {
@@ -212,15 +222,15 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Deletes existing query definition from the system with given queryName",
+    @ApiOperation(value="Deletes a specified custom query.",
             response=Void.class, code=204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Query definition with given name not found")})
     @DELETE
     @Path(DROP_QUERY_DEF_DELETE_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response dropQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "identifier of the query definition to be deleted", required = true) @PathParam("queryName") String queryName ) {
+            @ApiParam(value = "identifier of the query definition to be deleted", required = true, example = "customQuery") @PathParam("queryName") String queryName ) {
         Variant v = getVariant( headers );
         // no container id available so only used to transfer conversation id if
         // given by client
@@ -248,15 +258,17 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Retrieves existing query definition from the system with given queryName",
+    @ApiOperation(value="Returns information about a specified custom query.",
             response=QueryDefinition.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Query definition with given name not found")})
+            @ApiResponse(code = 404, message = "Query definition with given name not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
     @GET
     @Path(QUERY_DEF_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getQuery( @Context HttpHeaders headers,
-            @ApiParam(value = "identifier of the query definition to be retrieved", required = true) @PathParam("queryName") String queryName ) {
+            @ApiParam(value = "identifier of the query definition to be retrieved", required = true, example = "customQuery") @PathParam("queryName") String queryName ) {
         Variant v = getVariant( headers );
         // no container id available so only used to transfer conversation id if
         // given by client
@@ -286,15 +298,17 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Queries using query definition identified by queryName. Maps the result to concrete objects based on provided mapper.",
+    @ApiOperation(value="Returns the results of a specified custom query.",
             response=Object.class, responseContainer="List", code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Query definition with given name not found")})
+            @ApiResponse(code = 404, message = "Query definition with given name not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @GET
     @Path(RUN_QUERY_DEF_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response runQuery( @Context HttpHeaders headers,
-            @ApiParam(value = "identifier of the query definition to be used for query", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam("queryName") String queryName,
             @ApiParam(value = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
             @ApiParam(value = "optional sort order", required = false) @QueryParam("orderBy") String orderBy,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
@@ -320,16 +334,18 @@ public class QueryDataResource {
                                      conversationIdHeader );
     }
 
-    @ApiOperation(value="Queries using query definition identified by queryName. Maps the result to concrete objects based on provided mapper. Query is additional altered by the filter spec and/or builder",
+    @ApiOperation(value="Returns the results of a specified custom query and filters the results based on a provided builder or filter request body.",
             response=Object.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions")})
+            @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_POST_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response runQueryFiltered( @Context HttpHeaders headers,
-            @ApiParam(value = "identifier of the query definition to be used for query", required = true) @PathParam("queryName") String queryName,
+            @ApiParam(value = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam("queryName") String queryName,
             @ApiParam(value = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
             @ApiParam(value = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
@@ -400,17 +416,19 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Queries using query definition identified by queryName filtered by container. Maps the result to concrete objects based on provided mapper. Query is additional altered by the filter spec and/or builder",
+    @ApiOperation(value="Returns the results of a specified custom query on a specified KIE container and filters the results based on a provided builder or filter request body.",
             response=Object.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions")})
+            @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response runQueryFilteredByDeploymentId( @Context HttpHeaders headers,
-                                                    @ApiParam(value = "container id to filter queries", required = true) @PathParam("id") String containerId,
-                                                    @ApiParam(value = "identifier of the query definition to be used for query", required = true) @PathParam("queryName") String queryName,
+                                                    @ApiParam(value = "container id to filter queries", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+                                                    @ApiParam(value = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam("queryName") String queryName,
                                                     @ApiParam(value = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
                                                     @ApiParam(value = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
                                                     @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,

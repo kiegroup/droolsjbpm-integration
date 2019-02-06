@@ -15,6 +15,9 @@
 
 package org.kie.server.remote.rest.common.resource;
 
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.EXECUTE_CMD_JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.EXECUTE_CMD_RESPONSE_JSON;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
 import javax.ws.rs.Consumes;
@@ -36,8 +39,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
-@Api(value="KIE Server Script :: Core")
+@Api(value="KIE Server and KIE containers")
 @Path("server/config")
 public class KieServerResource {
 
@@ -52,14 +57,17 @@ public class KieServerResource {
         this.delegate = delegate;
     }
 
-    @ApiOperation(value="Executes command script on execution server, usually used as a batch to configure KIE Server",
+    @ApiOperation(value="Executes one or more KIE Server commands for server-related or container-related operations",
             response=ServiceResponsesList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_RESPONSE_JSON)})) })
     @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response executeCommands(@Context HttpHeaders headers, 
-            @ApiParam(value = "command script payload", required = true) String commandScriptPayload ) {
+            @ApiParam(value = "command script payload", required = true, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_JSON)})) String commandScriptPayload ) {
 
         String contentType = getContentType(headers);
 

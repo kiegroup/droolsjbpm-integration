@@ -380,7 +380,7 @@ function getDateFormated(id) {
 	
 	
 	var wrappedDate = {
-			'Date' : d.getTime()						
+			'java.util.Date' : d.getTime()						
 		};
 	return wrappedDate;
 }
