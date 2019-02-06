@@ -42,6 +42,7 @@
       <web-resource-name>Swagger web resources</web-resource-name>
       <url-pattern>/services/rest/server/swagger.json</url-pattern>
       <url-pattern>/services/rest/server/files/*</url-pattern>
+      <url-pattern>/docs/*</url-pattern>
       <http-method>GET</http-method>
     </web-resource-collection>
     <!-- No authentication -->

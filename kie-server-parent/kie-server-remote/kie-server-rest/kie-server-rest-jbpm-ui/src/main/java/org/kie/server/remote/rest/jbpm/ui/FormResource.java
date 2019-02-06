@@ -16,8 +16,24 @@
 package org.kie.server.remote.rest.jbpm.ui;
 
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.api.rest.RestURI.CASE_FORM_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.FORM_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_FORM_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_FORM_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.TASK_FORM_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_FORM_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.permissionDenied;
+import static org.kie.server.remote.rest.jbpm.ui.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.ui.docs.ParameterSamples.PROCESS_FORM_DEF_JSON;
+import static org.kie.server.remote.rest.jbpm.ui.docs.ParameterSamples.TASK_FORM_DEF_JSON;
 
 import java.text.MessageFormat;
 
@@ -30,8 +46,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Variant;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jbpm.services.api.DeploymentNotFoundException;
@@ -54,8 +70,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
-@Api(value="Process and task forms :: BPM")
+@Api(value="Process and task forms")
 @Path("server/" + FORM_URI)
 public class FormResource {
 
@@ -80,16 +98,18 @@ public class FormResource {
         this.context = context;
     }
 
-    @ApiOperation(value="Retrieves form for process definition within a container",
+    @ApiOperation(value="Returns the form information for a specified process definition.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process definition, form or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process definition, form or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=PROCESS_FORM_DEF_JSON)})) })
     @GET
     @Path(PROCESS_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that process definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true) @PathParam(PROCESS_ID) String processId,
+            @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
             @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
             @ApiParam(value = "optional filter flag if form should be filtered or returned as is", required = false) @QueryParam("filter") boolean filter,
             @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType, 
@@ -119,16 +139,18 @@ public class FormResource {
         }
     }
 
-    @ApiOperation(value="Retrieves form for task instance within a container",
+    @ApiOperation(value="Returns the form information for a specified task instance.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Task, form or Container Id not found") })
+            @ApiResponse(code = 404, message = "Task, form or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=TASK_FORM_DEF_JSON)})) })
     @GET
     @Path(TASK_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId,
+            @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId,
             @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
             @ApiParam(value = "optional filter flag if form should be filtered or returned as is", required = false) @QueryParam("filter") boolean filter,
             @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType, 
@@ -159,7 +181,7 @@ public class FormResource {
         }
     }
     
-    @ApiOperation(value="Retrieves form for process definition within a container that is completely rendered and ready for use",
+    @ApiOperation(value="Returns the rendered form for a specified process definition",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process, form or Container Id not found") })
@@ -167,8 +189,8 @@ public class FormResource {
     @Path(PROCESS_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
     public Response getProcessRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that process definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true) @PathParam(PROCESS_ID) String processId, 
+            @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -193,7 +215,7 @@ public class FormResource {
         
     }
     
-    @ApiOperation(value="Retrieves form for task instance within a container that is completely rendered and ready for use",
+    @ApiOperation(value="Returns the rendered form for a specified task instance.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task, form or Container Id not found") })
@@ -201,8 +223,8 @@ public class FormResource {
     @Path(TASK_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
     public Response getTaskRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId, 
+            @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -229,7 +251,7 @@ public class FormResource {
         
     }
     
-    @ApiOperation(value="Retrieves form for case definition within a container that is completely rendered and ready for use",
+    @ApiOperation(value="Returns the rendered form for a specified case definition.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case, form or Container Id not found") })
@@ -237,8 +259,8 @@ public class FormResource {
     @Path(CASE_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
     public Response getCaseRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of case definition that form should be fetched for", required = true) @PathParam("caseDefId") String caseDefId, 
+            @ApiParam(value = "container id that case definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of case definition that form should be fetched for", required = true, example = "orderhardware") @PathParam("caseDefId") String caseDefId, 
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);

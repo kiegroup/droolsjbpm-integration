@@ -17,6 +17,8 @@ package org.kie.server.remote.rest.jbpm;
 
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INSTANCES_DEL_URI;
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INST_DEL_URI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_PARENT_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_NODE_INSTANCES_GET_URI;
@@ -32,7 +34,9 @@ import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEMS_BY_PRO
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_URI;
+import static org.kie.server.api.rest.RestURI.SIGNAL_NAME;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INSTANCES_PORT_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INST_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
@@ -46,6 +50,16 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_VAR_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_WORK_ITEMS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_WORK_ITEM_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.LONG_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.LONG_RESPONSE_XML;
@@ -109,7 +123,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 
-@Api(value="Process instances :: BPM")
+@Api(value="Process instances")
 @Path("server/" + PROCESS_URI)
 public class ProcessResource  {
 
@@ -135,7 +149,7 @@ public class ProcessResource  {
         return url;
     }
 
-    @ApiOperation(value="Starts new process instance of given process definition within given container with optional variables",
+    @ApiOperation(value="Starts a new process instance of a specified process.",
             response=Long.class, code=201)
     @ApiResponses(value = { 
             @ApiResponse(code = 201, response=Long.class, message = "Process instance started", examples=@Example(value= {
@@ -145,11 +159,11 @@ public class ProcessResource  {
             @ApiResponse(code = 404, message = "Process ID or Container Id not found") })
     @POST
     @Path(START_PROCESS_POST_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true) @PathParam("id") String containerId, 
-            @ApiParam(value = "process id that new instance should be created from", required = true) @PathParam("pId") String processId, 
+            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
             @ApiParam(value = "optional map of process variables", required = false, examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
                                     @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) @DefaultValue("") String payload) {
@@ -178,18 +192,21 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Starts new process instance with correlation key of given process definition within given container with optional variables",
+    @ApiOperation(value="Starts a new process instance of a specified process and assigns a new correlation key to the process instance.",
             response=Long.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+    @ApiResponses(value = { @ApiResponse(code = 201, response=Long.class, message = "Process instance started", examples=@Example(value= {
+            @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
+            @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
+            @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process ID or Container Id not found") })
     @POST
     @Path(START_PROCESS_WITH_CORRELATION_KEY_POST_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response startProcessWithCorrelation(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true) @PathParam("id") String containerId, 
-            @ApiParam(value = "process id that new instance should be created from", required = true) @PathParam("pId") String processId,
-            @ApiParam(value = "correlation key to be assigned to process instance", required = true) @PathParam("correlationKey") String correlationKey, 
+            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
+            @ApiParam(value = "correlation key to be assigned to process instance", required = true, example = "john-evaluation-2019") @PathParam("correlationKey") String correlationKey, 
             @ApiParam(value = "optional map of process variables", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
                     @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)}))  @DefaultValue("") String payload) {
@@ -218,16 +235,16 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Aborts active process instance identified by given id",
+    @ApiOperation(value="Aborts a specified process instance in a specified KIE container.",
             response=Void.class, code=204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @DELETE
     @Path(ABORT_PROCESS_INST_DEL_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
-            @ApiParam(value = "identifier of the process instance to be aborted", required = true) @PathParam("pInstanceId") Long processInstanceId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of the process instance to be aborted", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -247,15 +264,15 @@ public class ProcessResource  {
     }
 
 
-    @ApiOperation(value="Aborts active process instances identified by given list of identifiers",
+    @ApiOperation(value="Aborts multiple specified process instances in a specified KIE container.",
             response=Void.class, code=204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @DELETE
     @Path(ABORT_PROCESS_INSTANCES_DEL_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "list of identifiers of the process instances to be aborted", required = true) @QueryParam("instanceId") List<Long> processInstanceIds) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -275,18 +292,18 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Signals active process instance identified by given id with singal name and optional event data",
+    @ApiOperation(value="Signals a specified process instance with a specified signal name and optional signal data.",
             response=Void.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @POST
     @Path(SIGNAL_PROCESS_INST_POST_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response signalProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance to be signaled", required = true) @PathParam("pInstanceId") Long processInstanceId, 
-            @ApiParam(value = "signal name to be send to process instance", required = true) @PathParam("sName") String signalName, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance to be signaled", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
+            @ApiParam(value = "signal name to be send to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
             @ApiParam(value = "optional event data - any type can be provided", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON),
                     @ExampleProperty(mediaType=XML, value=VAR_XML)}))  String eventPayload) {
@@ -310,18 +327,18 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Signals active process instances identified by given ids with singal name and optional event data",
+    @ApiOperation(value="Signals multiple process instances with a specified signal name.",
             response=Void.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @POST
     @Path(SIGNAL_PROCESS_INSTANCES_PORT_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response signalProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "list of identifiers of the process instances to be signaled", required = true) @QueryParam("instanceId") List<Long> processInstanceIds, 
-            @ApiParam(value = "signal name to be send to process instance", required = true) @PathParam("sName") String signalName, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "list of identifiers of the process instances to be signaled", required = false) @QueryParam("instanceId") List<Long> processInstanceIds, 
+            @ApiParam(value = "signal name to be send to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
             @ApiParam(value = "optional event data - any type can be provided", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON),
                     @ExampleProperty(mediaType=XML, value=VAR_XML)})) String eventPayload) {
@@ -349,16 +366,18 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves process instance identified by given id optionally with variables (variables will be loaded only for active process instance)",
+    @ApiOperation(value="Returns information about a specified process instance in a specified KIE container.",
             response=ProcessInstance.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance to be fetched", required = true) @PathParam("pInstanceId") Long processInstanceId, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance to be fetched", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "indicates if process instance variables should be loaded or not", required = false) @QueryParam("withVars") boolean withVars) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -380,18 +399,18 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Updates active process instance's (identified by given id) variable with given name",
+    @ApiOperation(value="Creates or updates a variable for a specified process instance.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @PUT
     @Path(PROCESS_INSTANCE_VAR_PUT_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response setProcessVariable(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance to be updated", required = true) @PathParam("pInstanceId") Long processInstanceId, 
-            @ApiParam(value = "name of the variable to be set/updated", required = true) @PathParam("varName") String varName, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance to be updated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
+            @ApiParam(value = "name of the variable to be set/updated", required = true, example = "name") @PathParam("varName") String varName, 
             @ApiParam(value = "variable data - any type can be provided", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON),
                     @ExampleProperty(mediaType=XML, value=VAR_XML)})) String variablePayload) {
@@ -414,17 +433,17 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Updates active process instance's (identified by given id) variables given as map in the body",
+    @ApiOperation(value="Updates the values of one or more variable for a specified process instance. The request is a map in which the key is the variable name and the value is the new variable value.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
     @POST
     @Path(PROCESS_INSTANCE_VARS_POST_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response setProcessVariables(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance to be updated", required = true) @PathParam("pInstanceId") Long processInstanceId, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance to be updated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "variable data give as map", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
                     @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)}))  String variablePayload) {
@@ -446,17 +465,19 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves active process instance's (identified by given id) variable given as variable name",
+    @ApiOperation(value="Returns the value of a specified variable in a specified process instance.",
             response=Object.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VAR_RESPONSE_JSON)}) )})
     @GET
     @Path(PROCESS_INSTANCE_VAR_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Object getProcessInstanceVariable(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance that variable should be retrieved from", required = true) @PathParam("pInstanceId") Long processInstanceId, 
-            @ApiParam(value = "variable name to be retrieved", required = true) @PathParam("varName") String varName) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that variable should be retrieved from", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
+            @ApiParam(value = "variable name to be retrieved", required = true, example = "person") @PathParam("varName") String varName) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -479,16 +500,18 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves active process instance's (identified by given id) variables, variables are returned as map where key is the variable name (string) and value is variable value (any type)",
+    @ApiOperation(value="Retrieves all variables for a specified process instance as a map in which the key is the variable name and the value is the variable value.",
             response=Map.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_VARS_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstanceVariables(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance that variables should be retrieved from", required = true) @PathParam("pInstanceId") Long processInstanceId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that variables should be retrieved from", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -512,16 +535,18 @@ public class ProcessResource  {
 
     }
 
-    @ApiOperation(value="Retrieves active process instance's (identified by given id) active signals",
+    @ApiOperation(value="Returns all available signal names for a specified process instance.",
             response=String.class, responseContainer="List", code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_SIGNALS_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAvailableSignals(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance that signals should be collected for", required = true) @PathParam("pInstanceId") Long processInstanceId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that signals should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -543,18 +568,18 @@ public class ProcessResource  {
 
     }
 
-    @ApiOperation(value="Completes work item identified by workItemId within process instance and container. Optionally completion can provide outcome data - as map",
+    @ApiOperation(value="Completes a specified work item for a specified process instance.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found") })
     @PUT
     @Path(PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response completeWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance that work item belongs to", required = true) @PathParam("pInstanceId") Long processInstanceId, 
-            @ApiParam(value = "identifier of the work item to complete", required = true) @PathParam("workItemId") Long workItemId, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
+            @ApiParam(value = "identifier of the work item to complete", required = true, example = "567") @PathParam("workItemId") Long workItemId, 
             @ApiParam(value = "optional outcome data give as map", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
                     @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String resultPayload) {
@@ -579,17 +604,17 @@ public class ProcessResource  {
     }
 
 
-    @ApiOperation(value="Aborts work item identified by workItemId within process instance and container",
+    @ApiOperation(value="Aborts a specified work item for a specified process instance.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found") })
     @PUT
     @Path(PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response abortWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance that work item belongs to", required = true) @PathParam("pInstanceId") Long processInstanceId, 
-            @ApiParam(value = "identifier of the work item to abort", required = true) @PathParam("workItemId") Long workItemId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
+            @ApiParam(value = "identifier of the work item to abort", required = true, example = "567") @PathParam("workItemId") Long workItemId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -610,17 +635,19 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves work item identified by workItemId within process instance and container",
+    @ApiOperation(value="Returns information about a specified work item for a specified process instance.",
             response=WorkItemInstance.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEM_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance that work item belongs to", required = true) @PathParam("pInstanceId") Long processInstanceId, 
-            @ApiParam(value = "identifier of the work item to retrieve", required = true) @PathParam("workItemId") Long workItemId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
+            @ApiParam(value = "identifier of the work item to retrieve", required = true, example = "567") @PathParam("workItemId") Long workItemId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -643,16 +670,18 @@ public class ProcessResource  {
 
     }
 
-    @ApiOperation(value="Retrieves work items within process instance and container",
+    @ApiOperation(value="Returns all work items for a specified process instance.",
             response=WorkItemInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEMS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getWorkItemByProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
-            @ApiParam(value = "identifier of the process instance that work items belong to", required = true) @PathParam("pInstanceId") Long processInstanceId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that work items belong to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -672,15 +701,17 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves process instances that belong to given container",
+    @ApiOperation(value="Returns a list of process instances in a specified KIE container.",
             response=ProcessInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-                            @ApiResponse(code = 404, message = "Container Id not found")})
+                            @ApiResponse(code = 404, message = "Container Id not found"), 
+                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByDeploymentId(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -702,14 +733,16 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves process definitions that belong to given container",
+    @ApiOperation(value="Returns a list of process definitions in a specified KIE container.",
             response=ProcessDefinitionList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-                            @ApiResponse(code = 404, message = "Container Id not found")})
+                            @ApiResponse(code = 404, message = "Container Id not found"), 
+                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessesByDeploymentId(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId,
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -731,16 +764,18 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves node instances for given process instance. Depending on provided query parameters (activeOnly or completedOnly) will return active and/or completes nodes",
+    @ApiOperation(value="Returns node instances for the specified process instance.",
             response=NodeInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found")})
+                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found"), 
+                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCES_NODE_INSTANCES_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getProcessInstanceHistory(@Context HttpHeaders headers, @PathParam("id") 
-            @ApiParam(value = "container id that process instance belongs to", required = true) String containerId, 
-            @ApiParam(value = "identifier of the process instance that history should be collected for", required = true) @PathParam("pInstanceId") long processInstanceId,
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response getProcessInstanceHistory(@Context HttpHeaders headers, @PathParam(CONTAINER_ID) 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") String containerId, 
+            @ApiParam(value = "identifier of the process instance that history should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) long processInstanceId,
             @ApiParam(value = "instructs if active nodes only should be collected, defaults to false", required = false) @QueryParam("activeOnly")Boolean active, 
             @ApiParam(value = "instructs if completed nodes only should be collected, defaults to false", required = false) @QueryParam("completedOnly")Boolean completed,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
@@ -762,16 +797,18 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves variables last value (from audit logs) for given process instance",
+    @ApiOperation(value="Returns the current variable values of a specified process instance in a specified KIE container.",
             response=VariableInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found")})
+                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found"), 
+                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCES_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getVariablesCurrentState(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
-            @ApiParam(value = "identifier of the process instance that variables state should be collected for", required = true) @PathParam("pInstanceId") long processInstanceId) {
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of the process instance that variables state should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) long processInstanceId) {
 
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -790,17 +827,19 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves variable history (from audit logs) for given variable name that belongs to process instance",
+    @ApiOperation(value="Returns the history of a specified variable in a specified process instance.",
             response=VariableInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found")})
+                            @ApiResponse(code = 404, message = "Process Instance or Container Id not found"), 
+                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getVariableHistory(@Context HttpHeaders headers,  
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
-            @ApiParam(value = "identifier of the process instance that variable history should be collected for", required = true) @PathParam("pInstanceId") long processInstanceId,
-            @ApiParam(value = "name of the variables that history should be collected for", required = true) @PathParam("varName") String variableName,
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of the process instance that variable history should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) long processInstanceId,
+            @ApiParam(value = "name of the variables that history should be collected for", required = true, example = "person") @PathParam("varName") String variableName,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
@@ -821,15 +860,17 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves process instances that belong to given container and have given parent process instance, optionally allow to filter by process instance state.",
+    @ApiOperation(value="Returns a list of process instances for which a specified process instance is a parent process instance",
             response=ProcessInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCES_BY_PARENT_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstances(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process instance belongs to", required = true) @PathParam("id") String containerId, 
-            @ApiParam(value = "identifier of the parent process instance that process instances should be collected for", required = true) @PathParam("pInstanceId") long parentProcessInstanceId,
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of the parent process instance that process instances should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) long parentProcessInstanceId,
             @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,

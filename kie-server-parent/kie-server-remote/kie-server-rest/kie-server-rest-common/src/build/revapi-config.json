@@ -101,7 +101,20 @@
            "methodName": "updateReleaseId",
            "elementKind": "method",
            "justification": "AF-1685: Development Lifecycle Streamline"
+         },
+		 {
+           "code": "java.annotation.attributeValueChanged",          
+           "justification": "Improved KIE Server Swagger docs"
+         },
+         {
+           "code": "java.annotation.attributeAdded",          
+           "justification": "Improved KIE Server Swagger docs"
+         },
+         {
+           "code": "java.field.constantValueChanged",          
+           "justification": "Improved KIE Server Swagger docs"
          }
+         
       ]
     }
   }

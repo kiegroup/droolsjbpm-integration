@@ -17,9 +17,12 @@ package org.kie.server.remote.rest.casemgmt;
 
 import static org.kie.server.api.rest.RestURI.ADMIN_CASE_ALL_INSTANCES_GET_URI;
 import static org.kie.server.api.rest.RestURI.ADMIN_CASE_URI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.MIGRATE_CASE_INST_PUT_URI;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_INSTANCES_JSON;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_JSON;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_XML;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_REPORT_JSON;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
@@ -56,7 +59,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 
-@Api(value="Administration of cases :: Case Management")
+@Api(value="Case instance administration")
 @Path("server/" + ADMIN_CASE_URI)
 public class CaseAdminResource extends AbstractCaseResource {
 
@@ -77,12 +80,14 @@ public class CaseAdminResource extends AbstractCaseResource {
         this.caseAdminServiceBase = caseAdminServiceBase;
     }
 
-    @ApiOperation(value="Retrieves case instances without authentication checks and applies pagination",
+    @ApiOperation(value="Returns case instances without authentication checks.",
             response=CaseInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
+            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(ADMIN_CASE_ALL_INSTANCES_GET_URI)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
                                      @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
                                      @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
@@ -114,17 +119,19 @@ public class CaseAdminResource extends AbstractCaseResource {
                                    });
     }
     
-    @ApiOperation(value="Migrates case instance to new container and case definition with required process mapping to migrate all process instances belonging to a case instance with optional node mapping",
+    @ApiOperation(value="Migrates a specified case instance to another KIE container and case definition.",
             response=CaseMigrationReportInstance.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Case instance or Container Id not found"), 
+            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=CASE_MIGRATION_REPORT_JSON)})) })
     @PUT
     @Path(MIGRATE_CASE_INST_PUT_URI)
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response migrateCaseInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that case instance belongs to", required = true) @PathParam("id") String containerId, 
-            @ApiParam(value = "identifier of case instance to be migrated", required = true) @PathParam("caseId") String caseId,
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of case instance to be migrated", required = true, example = "CASE-000000001") @PathParam("caseId") String caseId,
             @ApiParam(value = "container id that new case definition should be migrated to to", required = true) @QueryParam("targetContainerId") String targetContainerId,             
             @ApiParam(value = "process and node mapping - unique ids of old definition to new definition given as Map of Maps - ProcessMapping should provide map of process definitions (mandatory), NodeMapping should provide map of node mappings (optional)",
             required = false, examples=@Example(value= {

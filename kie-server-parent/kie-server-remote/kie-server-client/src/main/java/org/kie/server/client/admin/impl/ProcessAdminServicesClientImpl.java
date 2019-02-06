@@ -98,7 +98,7 @@ public class ProcessAdminServicesClientImpl extends AbstractKieServicesClientImp
             valuesMap.put(CONTAINER_ID, containerId);
 
             Map<String, String> headers = new HashMap<String, String>();
-            String queryStringBase = buildQueryString("pInstanceId", processInstancesId);
+            String queryStringBase = buildQueryString(PROCESS_INST_ID, processInstancesId);
             String queryString = queryStringBase + "&targetContainerId=" + targetContainerId + "&targetProcessId=" + targetProcessId;
 
             reportInstanceList = makeHttpPutRequestAndCreateCustomResponse(
