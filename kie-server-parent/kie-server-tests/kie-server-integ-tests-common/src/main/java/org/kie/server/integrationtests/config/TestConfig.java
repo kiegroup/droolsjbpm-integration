@@ -190,7 +190,7 @@ public class TestConfig {
             LOGGER.debug("Allocating port {}.", +ALLOCATED_PORT);
         }
 
-        return 42563;
+        return ALLOCATED_PORT;
     }
 
     /**
