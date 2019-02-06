@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.naming.InitialContext;
 import javax.persistence.EntityManagerFactory;
@@ -63,6 +62,7 @@ import org.jbpm.kie.services.impl.admin.ProcessInstanceMigrationServiceImpl;
 import org.jbpm.kie.services.impl.admin.UserTaskAdminServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.kie.services.impl.query.QueryServiceImpl;
+import org.jbpm.kie.services.impl.utils.PreUndeployOperations;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManagerUtil;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorMerger;
@@ -107,6 +107,7 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -520,11 +521,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
 
         // Checking if we need to abort the existing process instances before disposing container, by default it should be false
-        Boolean isSnapshot = KieServerUtils.isSnapshot(kieContainerInstance.getKieContainer().getReleaseId());
         Boolean abortInstances = (Boolean) parameters.getOrDefault(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, Boolean.FALSE);
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
-        deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), isSnapshot && abortInstances);
+
+        if(kieServer.getInfo().getResult().getMode().equals(KieServerMode.REGULAR)) {
+            deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
+        } else {
+            if(abortInstances) {
+                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
+            } else {
+                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.doNothing());
+            }
+        }
 
         // remove any query result mappers for container
         List<String> addedMappers = containerMappers.get(id);
