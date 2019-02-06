@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         version="2.5"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+         version="3.1"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd">
   <display-name>KieServer</display-name>
   <listener>
     <listener-class>org.jboss.narayana.tomcat.jta.NarayanaJtaServletContextListener</listener-class>
@@ -44,7 +44,7 @@
       <url-pattern>/services/rest/server/files/*</url-pattern>
       <http-method>GET</http-method>
     </web-resource-collection>
-    <!-- No authentication. Swagger resources should be accessible without authentication and files (form rendering). -->
+    <!-- No authentication -->
   </security-constraint>
   <security-constraint>
     <web-resource-collection>
@@ -60,6 +60,14 @@
       <role-name>user</role-name>
     </auth-constraint>
   </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>REST web resources</web-resource-name>
+      <url-pattern>/services/rest/*</url-pattern>
+      <http-method>OPTIONS</http-method>
+    </web-resource-collection>
+    <!-- No authentication-->
+  </security-constraint>
   <login-config>
     <auth-method>BASIC</auth-method>
     <realm-name>KIE Server</realm-name>
@@ -70,5 +78,7 @@
   <security-role>
     <role-name>user</role-name>
   </security-role>
+
+  <deny-uncovered-http-methods />
 
 </web-app>
