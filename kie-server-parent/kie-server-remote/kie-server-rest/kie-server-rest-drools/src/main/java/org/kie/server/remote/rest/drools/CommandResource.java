@@ -15,6 +15,12 @@
 
 package org.kie.server.remote.rest.drools;
 
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getClassType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,6 +34,7 @@ import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
@@ -42,10 +49,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-
-@Api(value="Rules evaluation :: BRM")
-@Path("server/containers/instances/{id}")
+@Api(value="KIE session assets")
+@Path("server/containers/instances/{" + RestURI.CONTAINER_ID + "}")
 public class CommandResource {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandResource.class);
@@ -64,14 +69,14 @@ public class CommandResource {
         this.marshallerHelper = new MarshallerHelper(registry);
     }
 
-    @ApiOperation(value="Evaluates rules by executing commands on the rule session",
+    @ApiOperation(value="Executes one or more runtime commands",
             response=ServiceResponse.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response manageContainer(@Context HttpHeaders headers, 
-            @ApiParam(value = "Container id where rules should be evaluated on", required = true) @PathParam("id") String id, 
+            @ApiParam(value = "Container id where rules should be evaluated on", required = true) @PathParam(RestURI.CONTAINER_ID) String id, 
             @ApiParam(value = "Commands to be executed on rule engine given as BatchExecutionCommand type", required = true) String cmdPayload) {
 
         Variant v = getVariant(headers);

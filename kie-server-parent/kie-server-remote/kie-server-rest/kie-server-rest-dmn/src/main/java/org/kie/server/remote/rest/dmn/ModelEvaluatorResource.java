@@ -51,7 +51,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(value="Decision Service :: DMN")
+@Api(value="DMN models")
 @Path("server/"+ RestURI.DMN_URI )
 public class ModelEvaluatorResource {
 
