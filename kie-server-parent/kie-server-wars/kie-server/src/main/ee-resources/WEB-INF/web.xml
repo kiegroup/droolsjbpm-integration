@@ -24,6 +24,15 @@
   </security-constraint>
   <security-constraint>
     <web-resource-collection>
+      <web-resource-name>KIE Server Health and Readiness Probes</web-resource-name>
+      <url-pattern>/services/rest/server/readycheck</url-pattern>
+      <url-pattern>/services/rest/server/healthcheck</url-pattern>
+      <http-method>GET</http-method>
+    </web-resource-collection>
+    <!-- No authentication KIE Server Health and Readiness Probes  -->
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
       <web-resource-name>REST web resources</web-resource-name>
       <url-pattern>/services/rest/*</url-pattern>
       <http-method>GET</http-method>
