@@ -15,16 +15,16 @@
 
 package org.kie.server.integrationtests.drools.pmml;
 
-import java.util.Map;
-
 import org.drools.core.command.impl.CommandFactoryServiceImpl;
 import org.drools.core.command.runtime.pmml.ApplyPmmlModelCommand;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.pmml.PMML4Result;
 import org.kie.api.pmml.PMMLRequestData;
 import org.kie.api.runtime.ExecutionResults;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -58,13 +58,10 @@ public class ApplyDecisionTreeModelIntegrationTest extends PMMLApplyModelBaseTes
         createContainer(CONTAINER_ID, releaseId);
     }
 
-    @Override
-    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
-        // unused at this time
-    }
-
     @Test
     public void testApplyPmmlDecisionTree() {
+        Assume.assumeTrue(marshallingFormat == MarshallingFormat.JAXB); // RHPAM-1875
+
         PMMLRequestData request = new PMMLRequestData("123", "TreeTest");
         request.addRequestParam("fld1", 30.0);
         request.addRequestParam("fld2", 60.0);
@@ -73,24 +70,16 @@ public class ApplyDecisionTreeModelIntegrationTest extends PMMLApplyModelBaseTes
 
         ApplyPmmlModelCommand command = (ApplyPmmlModelCommand) ((CommandFactoryServiceImpl) commandsFactory).newApplyPmmlModel(request);
 
-        try {
-            createRuleServicesClient();
-            ServiceResponse<ExecutionResults> results = rulesClient.executeCommandsWithResults(CONTAINER_ID, command);
+        ServiceResponse<ExecutionResults> results = ruleClient.executeCommandsWithResults(CONTAINER_ID, command);
 
-            assertNotNull(results);
-            PMML4Result resultHolder = (PMML4Result) results.getResult().getValue("results");
-            assertNotNull(resultHolder);
-            assertEquals("OK", resultHolder.getResultCode());
-            Object obj = resultHolder.getResultValue("Fld5", null);
-            assertNotNull(obj);
+        PMML4Result resultHolder = (PMML4Result) results.getResult().getValue("results");
+        assertNotNull(resultHolder);
+        assertEquals("OK", resultHolder.getResultCode());
+        Object obj = resultHolder.getResultValue("Fld5", null);
+        assertNotNull(obj);
 
-            String targetValue = resultHolder.getResultValue("Fld5", "value", String.class).orElse(null);
-            assertEquals("tgtY", targetValue);
-            logger.info("ApplyDecisionTreeModelIntegrationTest#testApplyPmmlDecisionTree completed successfully");
-        } catch (Exception e) {
-            fail("Error occurred during test of ApplyPmmlModelCommand: " + e.getMessage());
-            logger.error("Error occurred during test of ApplyPmmlModelCommand", e);
-        }
-
+        String targetValue = resultHolder.getResultValue("Fld5", "value", String.class).orElse(null);
+        assertEquals("tgtY", targetValue);
+        logger.info("ApplyDecisionTreeModelIntegrationTest#testApplyPmmlDecisionTree completed successfully");
     }
 }

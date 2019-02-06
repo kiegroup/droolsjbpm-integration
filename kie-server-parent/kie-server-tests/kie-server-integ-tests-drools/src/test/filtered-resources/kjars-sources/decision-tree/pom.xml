@@ -20,9 +20,6 @@
         <extensions>true</extensions>
         <configuration>
           <usesPMML>true</usesPMML>
-          <properties>
-            <drools.dialect.java.compiler.lnglevel>1.6</drools.dialect.java.compiler.lnglevel>
-          </properties>
         </configuration>
       </plugin>
     </plugins>

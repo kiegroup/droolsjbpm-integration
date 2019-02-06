@@ -228,9 +228,6 @@ public class RestURI {
     // DMN URI
     public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";
     
-    // PMML URI
-    public static final String PMML_URI = "containers/{" + CONTAINER_ID + "}/pmml";
-
     // document related
     public static final String DOCUMENT_INSTANCE_GET_URI = "{" + DOCUMENT_ID + "}";
     public static final String DOCUMENT_INSTANCE_CONTENT_GET_URI = "{" + DOCUMENT_ID + "}/content";
