@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.*;
 
-public class MetricTest extends DroolsKieServerBaseIntegrationTest {
+public class MetricIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar",
             "1.0.0");

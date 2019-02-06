@@ -40,7 +40,7 @@ import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.*;
 
-public class DMNMetricTest
+public class DMNMetricIntegrationTest
         extends DMNKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
