@@ -306,6 +306,7 @@ public class KieServerRestImpl {
 
         ReleaseId releaseId = marshallerHelper.unmarshal(releaseIdPayload, contentType, ReleaseId.class);
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+
         return createCorrectVariant(server.updateContainerReleaseId(id, releaseId, resetBeforeUpdate), headers, conversationIdHeader);
     }
 

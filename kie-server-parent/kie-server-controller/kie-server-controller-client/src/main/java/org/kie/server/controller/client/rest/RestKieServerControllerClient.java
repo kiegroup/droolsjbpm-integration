@@ -16,11 +16,9 @@
 
 package org.kie.server.controller.client.rest;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -47,7 +45,18 @@ import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
-import org.kie.server.controller.api.model.spec.*;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerConfig;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ContainerSpecKey;
+import org.kie.server.controller.api.model.spec.ContainerSpecList;
+import org.kie.server.controller.api.model.spec.ProcessConfig;
+import org.kie.server.controller.api.model.spec.RuleConfig;
+import org.kie.server.controller.api.model.spec.ServerConfig;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.ServerTemplateKeyList;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 import org.slf4j.Logger;
@@ -89,7 +98,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
     public RestKieServerControllerClient(String controllerBaseUrl, String login, String password, MarshallingFormat format, Configuration configuration) {
         this.controllerBaseUrl = controllerBaseUrl;
-        httpClient = (configuration == null ? ClientBuilder.newClient() : ClientBuilder.newClient(configuration) ).register(new Authenticator(login, password));
+        httpClient = (configuration == null ? ClientBuilder.newClient() : ClientBuilder.newClient(configuration)).register(new Authenticator(login, password));
         setMarshallingFormat(format);
     }
 
@@ -99,12 +108,12 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
     }
 
     @Override
-    public void saveContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
+    public void saveContainerSpec(String serverTemplateId, ContainerSpec containerSpec) {
         makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerSpec.getId(), containerSpec, Object.class);
     }
 
     @Override
-    public void updateContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
+    public void updateContainerSpec(String serverTemplateId, ContainerSpec containerSpec) {
         updateContainerSpec(serverTemplateId, containerSpec.getId(), containerSpec);
     }
 
@@ -115,11 +124,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
 
     @Override
     public void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec, Boolean resetBeforeUpdate) {
-
-        Map<String, Object> params = new HashMap<>();
-        params.put(KieServerConstants.RESET_CONTAINER_BEFORE_UPDATE, resetBeforeUpdate);
-
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, containerSpec, Object.class, params);
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + "?" + KieServerConstants.RESET_CONTAINER_BEFORE_UPDATE + "=" + resetBeforeUpdate, containerSpec, Object.class);
     }
 
     @Override
@@ -161,7 +166,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
     public void stopContainer(ContainerSpecKey containerSpecKey) {
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + containerSpecKey.getServerTemplateKey().getId() + CONTAINERS_URI_PART + containerSpecKey.getId() + STOPPED_STATUS_URI_PART, "", null);
     }
-    
+
     @Override
     public void activateContainer(ContainerSpecKey containerSpecKey) {
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + containerSpecKey.getServerTemplateKey().getId() + CONTAINERS_URI_PART + containerSpecKey.getId() + ACTIVATED_STATUS_URI_PART, "", null);
@@ -177,7 +182,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + CONFIG_URI_PART + capability.toString(), config, Object.class);
     }
 
-    private <T> T throwUnsupportedException(){
+    private <T> T throwUnsupportedException() {
         throw new UnsupportedOperationException("Not supported for REST implementation");
     }
 
@@ -308,15 +313,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
     }
 
     private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
-        return makePostRequestAndCreateCustomResponse(uri, bodyObject, resultType, new HashMap<>());
-    }
-
-    private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType, Map<String, Object> params) {
         WebTarget clientRequest = httpClient.target(uri);
-
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-            clientRequest = clientRequest.queryParam(entry.getKey(), entry.getValue());
-        }
 
         Response response;
         try {
@@ -410,7 +407,7 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
         controllerClasses.add(ServerTemplateList.class);
         controllerClasses.add(ContainerSpecList.class);
 
-        switch ( format ) {
+        switch (format) {
             case JAXB:
                 this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, RestKieServerControllerClient.class.getClassLoader());
                 break;
@@ -420,14 +417,16 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
             default:
                 this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, RestKieServerControllerClient.class.getClassLoader());
         }
-
     }
 
-    private String getMediaType( MarshallingFormat format ) {
-        switch ( format ) {
-            case JAXB: return MediaType.APPLICATION_XML;
-            case JSON: return MediaType.APPLICATION_JSON;
-            default: return MediaType.APPLICATION_XML;
+    private String getMediaType(MarshallingFormat format) {
+        switch (format) {
+            case JAXB:
+                return MediaType.APPLICATION_XML;
+            case JSON:
+                return MediaType.APPLICATION_JSON;
+            default:
+                return MediaType.APPLICATION_XML;
         }
     }
 
@@ -437,15 +436,15 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
         }
 
         try {
-            return marshaller.marshall( object );
-        } catch ( MarshallingException e ) {
-            throw new RuntimeException( "Error while serializing request data!", e );
+            return marshaller.marshall(object);
+        } catch (MarshallingException e) {
+            throw new RuntimeException("Error while serializing request data!", e);
         }
     }
 
     protected <T> T deserialize(Response response, Class<T> type) {
         try {
-            if(type == null) {
+            if (type == null) {
                 return null;
             }
             String content = response.readEntity(String.class);
@@ -455,12 +454,12 @@ public class RestKieServerControllerClient implements KieServerControllerClient 
             }
 
             return deserialize(content, type);
-        } catch ( MarshallingException e ) {
-            throw new RuntimeException( "Error while deserializing data received from server!", e );
+        } catch (MarshallingException e) {
+            throw new RuntimeException("Error while deserializing data received from server!", e);
         }
     }
 
     protected <T> T deserialize(String content, Class<T> type) {
-        return marshaller.unmarshall( content, type );
+        return marshaller.unmarshall(content, type);
     }
 }

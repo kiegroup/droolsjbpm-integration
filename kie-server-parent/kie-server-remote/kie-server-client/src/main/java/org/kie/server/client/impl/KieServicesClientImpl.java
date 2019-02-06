@@ -298,10 +298,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     @Override
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId, boolean resetBeforeUpdate) {
         if (config.isRest()) {
-            Map<String, Object> params = new HashMap<>();
-            params.put(KieServerConstants.RESET_CONTAINER_BEFORE_UPDATE, resetBeforeUpdate);
-            return makeHttpPostRequestAndCreateServiceResponseWithParams(
-                    loadBalancer.getUrl() + "/containers/" + id + "/release-id", releaseId, ReleaseId.class, params);
+            return makeHttpPostRequestAndCreateServiceResponse(loadBalancer.getUrl() + "/containers/" + id + "/release-id?" + KieServerConstants.RESET_CONTAINER_BEFORE_UPDATE + "=" + resetBeforeUpdate, releaseId, ReleaseId.class);
         } else {
             CommandScript script = new CommandScript(Collections.singletonList(new UpdateReleaseIdCommand(id, releaseId, resetBeforeUpdate)));
             ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) executeJmsCommand(script, null, null, id).getResponses().get(0);
