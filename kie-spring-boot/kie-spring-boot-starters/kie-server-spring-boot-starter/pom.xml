@@ -36,6 +36,10 @@
           <groupId>org.apache.tomcat</groupId>
           <artifactId>tomcat-juli</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>com.zaxxer</groupId>
+          <artifactId>HikariCP</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -88,7 +92,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${version.spring-boot}</version>
+        <version>${version.org.spring-boot}</version>
       </plugin>
     </plugins>
   </build>

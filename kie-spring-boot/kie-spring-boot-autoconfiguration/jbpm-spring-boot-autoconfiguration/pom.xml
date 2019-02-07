@@ -73,6 +73,12 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-kie-services</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.validation</groupId>
+          <artifactId>validation-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
@@ -81,6 +87,12 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
@@ -101,6 +113,12 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-runtime-manager</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -119,6 +137,10 @@
         <exclusion>
           <groupId>aopalliance</groupId>
           <artifactId>aopalliance</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

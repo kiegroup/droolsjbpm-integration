@@ -50,9 +50,9 @@
   <!-- additions for environment -->
   <bean id="globals" class="org.drools.core.base.MapGlobalResolver"/>
 
-  <kie:environment id="env">
-    <kie:entity-manager-factory ref="myEmf"/>
+  <kie:environment id="env">    
     <kie:transaction-manager ref="txManager"/>
+    <kie:entity-manager-factory ref="myEmf"/>
     <kie:globals ref="globals"/>
 
     <kie:object-marshalling-strategies>
@@ -61,9 +61,9 @@
     </kie:object-marshalling-strategies>
   </kie:environment>
 
-  <kie:environment id="env2">
-    <kie:entity-manager-factory ref="myEmf"/>
+  <kie:environment id="env2">    
     <kie:transaction-manager ref="txManager"/>
+    <kie:entity-manager-factory ref="myEmf"/>
     <kie:globals>
       <bean class="org.drools.core.base.MapGlobalResolver"/>
     </kie:globals>

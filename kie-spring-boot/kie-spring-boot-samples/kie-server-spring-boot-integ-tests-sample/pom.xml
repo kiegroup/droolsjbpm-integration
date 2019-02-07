@@ -36,6 +36,10 @@
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
   </dependencies>

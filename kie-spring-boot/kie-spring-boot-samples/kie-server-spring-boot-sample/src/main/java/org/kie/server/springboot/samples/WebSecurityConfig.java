@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration("kieServerSecurity")
 @EnableWebSecurity
@@ -24,7 +26,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("kieserver").password("kieserver1!").roles("kie-server");        
-        auth.inMemoryAuthentication().withUser("john").password("john@pwd1").roles("kie-server", "PM", "HR");        
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        
+        auth.inMemoryAuthentication()
+            .withUser("kieserver").password(encoder.encode("kieserver1!")).roles("kie-server")
+            .and()        
+            .withUser("john").password(encoder.encode("john@pwd1")).roles("kie-server", "PM", "HR");        
     }
 }
