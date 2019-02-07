@@ -24,6 +24,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
@@ -56,10 +58,15 @@ public class IntegrationTestsWebSecurityConfig extends WebSecurityConfigurerAdap
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         // Configuration is the same as in the kie-server-tests module
-        auth.inMemoryAuthentication().withUser("yoda").password("usetheforce123@").roles("kie-server", "guest");
-        auth.inMemoryAuthentication().withUser("Administrator").password("usetheforce123@").roles("kie-server", "guest", "Administrators");
-        auth.inMemoryAuthentication().withUser("john").password("usetheforce123@").roles("kie-server", "guest", "engineering", "HR", "IT", "Accounting");
-        auth.inMemoryAuthentication().withUser("mary").password("usetheforce123@").roles("kie-server", "guest", "engineering", "HR", "IT", "Accounting");
+        auth.inMemoryAuthentication().withUser("yoda").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest")
+        .and()        
+        .withUser("Administrator").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "Administrators")
+        .and()        
+        .withUser("john").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "engineering", "HR", "IT", "Accounting")
+        .and()        
+        .withUser("mary").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "engineering", "HR", "IT", "Accounting");
     }
+    
 }

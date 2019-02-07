@@ -33,10 +33,13 @@
   </modules>
 
   <properties>
-    <version.spring-boot>1.5.12.RELEASE</version.spring-boot>
-    <version.cxf.jaxrs>3.1.11</version.cxf.jaxrs>
-    <version.me.snowdrop.narayana>1.0.1</version.me.snowdrop.narayana>
+    <version.org.springframework>5.1.3.RELEASE</version.org.springframework>
+    <version.org.spring-boot>2.1.1.RELEASE</version.org.spring-boot>
+    <version.org.apache.cxf>3.2.6</version.org.apache.cxf>
+    <version.me.snowdrop.narayana>2.1.0</version.me.snowdrop.narayana>
     <version.org.apache.commons-dbcp2>2.4.0</version.org.apache.commons-dbcp2>
+    
+    <version.javax.validation>2.0.1.Final</version.javax.validation>
   </properties>
 
   <dependencyManagement>
@@ -44,7 +47,7 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>${version.spring-boot}</version>
+        <version>${version.org.spring-boot}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -123,17 +126,17 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-spring-boot-starter-jaxrs</artifactId>
-        <version>${version.cxf.jaxrs}</version>
+        <version>${version.org.apache.cxf}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-core</artifactId>
-        <version>${version.cxf.jaxrs}</version>
+        <version>${version.org.apache.cxf}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-        <version>${version.cxf.jaxrs}</version>
+        <version>${version.org.apache.cxf}</version>
       </dependency>
 
       <dependency>

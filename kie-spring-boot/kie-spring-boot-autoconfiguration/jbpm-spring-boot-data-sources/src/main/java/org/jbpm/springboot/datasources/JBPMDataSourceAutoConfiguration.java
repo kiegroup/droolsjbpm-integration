@@ -24,15 +24,18 @@ import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.bind.RelaxedDataBinder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyNameAliases;
+import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.boot.jdbc.DatabaseDriver;
-import org.springframework.boot.jta.XADataSourceWrapper;
+import org.springframework.boot.jdbc.XADataSourceWrapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -99,8 +102,9 @@ public class JBPMDataSourceAutoConfiguration {
         DataSource ds = quartzDatasourceProperties().initializeDataSourceBuilder().build();
         Map<String, Object> poolProperties = quartzPoolProperties();
         
-        MutablePropertyValues properties = new MutablePropertyValues(poolProperties);
-        new RelaxedDataBinder(ds).bind(properties);
+        MapConfigurationPropertySource properties = new MapConfigurationPropertySource(poolProperties);
+        Binder binder = new Binder(properties);
+        binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(ds));
         
         return ds;
     }
@@ -138,11 +142,16 @@ public class JBPMDataSourceAutoConfiguration {
     }
 
     private void bindXaProperties(XADataSource target, DataSourceProperties properties) {
-        MutablePropertyValues values = new MutablePropertyValues();
-        values.add("user", properties.determineUsername());
-        values.add("password", properties.determinePassword());
-        values.add("url", properties.determineUrl());
-        values.addPropertyValues(properties.getXa().getProperties());
-        new RelaxedDataBinder(target).withAlias("user", "username").bind(values);
+        MapConfigurationPropertySource values = new MapConfigurationPropertySource();
+        values.put("user", properties.determineUsername());
+        values.put("password", properties.determinePassword());
+        values.put("url", properties.determineUrl());
+        values.putAll(properties.getXa().getProperties());
+        
+        ConfigurationPropertyNameAliases aliases = new ConfigurationPropertyNameAliases();
+        aliases.addAliases("user", "username");
+        
+        Binder binder = new Binder(values.withAliases(aliases));
+        binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(target));
     }
 }

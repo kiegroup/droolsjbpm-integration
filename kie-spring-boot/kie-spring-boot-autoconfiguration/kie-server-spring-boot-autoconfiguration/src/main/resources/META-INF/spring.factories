@@ -1,1 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.kie.server.springboot.autoconfiguration.KieServerAutoConfiguration,org.kie.server.springboot.autoconfiguration.security.DefaultWebSecurityConfig
+
+org.springframework.boot.env.EnvironmentPostProcessor=org.kie.server.springboot.autoconfiguration.KieServerEnvironmentPostProcessor
