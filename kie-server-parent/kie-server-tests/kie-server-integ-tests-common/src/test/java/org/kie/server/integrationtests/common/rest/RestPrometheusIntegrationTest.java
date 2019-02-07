@@ -49,7 +49,7 @@ public class RestPrometheusIntegrationTest extends RestTextOnlyBaseIntegrationTe
             String res = response.readEntity(String.class);
             String[] split = res.split("\\n");
             logger.info("res = " + res);
-            Assert.assertEquals(10, split.length);
+            Assert.assertThat(res, not(isEmptyOrNullString()));
         } catch (Exception e) {
             throw new RuntimeException(
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
