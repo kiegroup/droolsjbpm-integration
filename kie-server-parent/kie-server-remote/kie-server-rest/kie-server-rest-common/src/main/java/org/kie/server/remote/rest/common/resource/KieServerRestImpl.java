@@ -16,10 +16,6 @@
 
 package org.kie.server.remote.rest.common.resource;
 
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Enumeration;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -36,11 +32,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
 
-import io.prometheus.client.Collector;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.exporter.common.TextFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -61,8 +53,6 @@ import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_JSON;
 import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_XML;
@@ -83,10 +73,6 @@ public class KieServerRestImpl {
 
     private KieServerImpl server;
     private MarshallerHelper marshallerHelper;
-
-    private static final Logger logger = LoggerFactory.getLogger(KieServerRestImpl.class);
-
-    public static CollectorRegistry prometheusRegistry = CollectorRegistry.defaultRegistry;
 
     public KieServerRestImpl() {
         // for now, if no server impl is passed as parameter, create one
@@ -137,24 +123,6 @@ public class KieServerRestImpl {
         KieContainerStatusFilter statusFilter = KieContainerStatusFilter.parseFromNullableString(status);
         KieContainerResourceFilter containerFilter = new KieContainerResourceFilter(releaseIdFilter, statusFilter);
         return createCorrectVariant(server.listContainers(containerFilter), headers);
-    }
-
-    @GET
-    @Path("prometheus")
-    @Produces({MediaType.TEXT_PLAIN})
-    public Response getModels() {
-        logger.trace("Prometheus is scraping");
-
-        Enumeration<Collector.MetricFamilySamples> mfs = prometheusRegistry.metricFamilySamples();
-
-        StreamingOutput stream = os -> {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(os));
-            TextFormat.write004(writer, mfs);
-            writer.flush();
-        };
-
-        return Response.ok(stream).build();
-
     }
 
     @ApiOperation(value="Creates (deploys) new KIE container to this server",

@@ -36,7 +36,11 @@ public class PrometheusRestApplicationComponentsService implements KieServerAppl
             return Collections.emptyList();
         }
 
-        List<Object> components = new ArrayList<>(1);
+
+        List<Object> components = new ArrayList<Object>(1);
+        if( SupportedTransports.REST.equals(type) ) {
+            components.add(new MetricsResource());
+        }
 
         return components;
     }

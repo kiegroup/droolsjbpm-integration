@@ -107,7 +107,7 @@ public class MetricIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
         Response response = null;
         try {
-            String uriString = TestConfig.getKieServerHttpUrl() + "/prometheus";
+            String uriString = TestConfig.getKieServerHttpUrl().replaceAll("/server", "") + "/metrics";
 
             WebTarget clientRequest = newRequest(uriString);
             response = clientRequest.request(MediaType.TEXT_PLAIN_TYPE).get();

@@ -293,6 +293,11 @@
           <artifactId>kie-server-rest-drools</artifactId>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-prometheus</artifactId>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
