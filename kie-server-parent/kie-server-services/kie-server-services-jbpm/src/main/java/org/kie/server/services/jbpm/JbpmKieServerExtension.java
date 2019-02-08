@@ -62,6 +62,7 @@ import org.jbpm.kie.services.impl.admin.ProcessInstanceMigrationServiceImpl;
 import org.jbpm.kie.services.impl.admin.UserTaskAdminServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.kie.services.impl.query.QueryServiceImpl;
+import org.jbpm.kie.services.impl.utils.PreUndeployOperations;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManagerUtil;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorMerger;
@@ -106,6 +107,7 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -116,6 +118,7 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.util.KieServerUtils;
 import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
@@ -364,7 +367,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 return;
             }
 
-            
             boolean hasStatefulSession = false;
             boolean hasDefaultSession = false;
             // let validate if they are any stateful sessions defined and in case there are not, skip this container
@@ -472,6 +474,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+
+        // Allowing container updates for SNAPSHOTS
+        if(KieServerUtils.isSnapshot(kieContainerInstance.getKieContainer().getReleaseId())) {
+            return true;
+        }
+
         // first check if there are any active process instances
         List<Integer> states = new ArrayList<Integer>();
         states.add(ProcessInstance.STATE_ACTIVE);
@@ -511,13 +519,21 @@ public class JbpmKieServerExtension implements KieServerExtension {
             logger.info("No container with id {} found", id);
             return;
         }
-        List<Integer> states = new ArrayList<Integer>();
-        states.add(ProcessInstance.STATE_ACTIVE);
-        states.add(ProcessInstance.STATE_PENDING);
-        states.add(ProcessInstance.STATE_SUSPENDED);
+
+        // Checking if we need to abort the existing process instances before disposing container, by default it should be false
+        Boolean abortInstances = (Boolean) parameters.getOrDefault(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, Boolean.FALSE);
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
-        deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
+
+        if(kieServer.getInfo().getResult().getMode().equals(KieServerMode.REGULAR)) {
+            deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
+        } else {
+            if(abortInstances) {
+                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
+            } else {
+                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.doNothing());
+            }
+        }
 
         // remove any query result mappers for container
         List<String> addedMappers = containerMappers.get(id);

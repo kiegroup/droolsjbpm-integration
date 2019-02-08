@@ -58,6 +58,7 @@
     <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
     <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
+    <org.kie.server.mode.regular>REGULAR</org.kie.server.mode.regular>
 
     <!-- Springboot specific property which is overridden by production DBs profile -->
     <!-- By default we use bundled H2 database jar -->
@@ -230,6 +231,7 @@
                 <!-- Persistence configuration -->
                 <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
                 <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}</org.kie.server.persistence.dialect>
+                <org.kie.server.mode>${org.kie.server.mode.regular}</org.kie.server.mode>
               </systemProperties>
             </container>
             <deployables>

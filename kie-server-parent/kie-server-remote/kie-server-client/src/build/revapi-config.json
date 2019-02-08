@@ -50,6 +50,15 @@
           "methodName": "close",
           "elementKind": "method",
           "justification": "Added close method of kie services client to allow to release resources"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.api.model.ServiceResponse<org.kie.server.api.model.ReleaseId> org.kie.server.client.KieServicesClient::updateReleaseId(java.lang.String, org.kie.server.api.model.ReleaseId, boolean)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "KieServicesClient",
+          "methodName": "updateReleaseId",
+          "elementKind": "method",
+          "justification": "AF-1685: Development Lifecycle Streamline"
         }
       ]
     }

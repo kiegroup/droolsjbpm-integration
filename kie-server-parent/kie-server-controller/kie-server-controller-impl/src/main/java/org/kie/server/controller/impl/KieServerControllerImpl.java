@@ -181,6 +181,8 @@ public abstract class KieServerControllerImpl implements KieServerController {
             }
             serverTemplate.setCapabilities(capabilities);
 
+            serverTemplate.setMode(serverInfo.getMode());
+
             // add newly connected server instance
             serverTemplate.addServerInstance(serverInstanceKey);
 

@@ -205,6 +205,11 @@ public class KieServerRouterEventListenerRetryTest {
             }
 
             @Override
+            public ServiceResponse<ReleaseId> updateContainerReleaseId(String id, ReleaseId releaseId, boolean reset) {
+                return null;
+            }
+
+            @Override
             public ServiceResponse<KieServerStateInfo> getServerState() {
                 return null;
             }

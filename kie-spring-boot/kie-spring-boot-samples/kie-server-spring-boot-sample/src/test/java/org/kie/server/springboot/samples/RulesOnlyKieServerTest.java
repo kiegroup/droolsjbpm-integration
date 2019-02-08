@@ -27,6 +27,7 @@ import org.appformer.maven.integration.MavenRepository;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.core.io.impl.ClassPathResource;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,8 +40,10 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
@@ -79,7 +82,13 @@ public class RulesOnlyKieServerTest {
     
     @BeforeClass
     public static void generalSetup() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.name());
         createKJar();
+    }
+
+    @AfterClass
+    public static void generalCleanup() {
+        System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
 
     @Before

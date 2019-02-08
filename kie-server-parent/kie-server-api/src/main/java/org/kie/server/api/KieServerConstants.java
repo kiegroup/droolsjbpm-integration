@@ -1,17 +1,18 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api;
 
@@ -51,6 +52,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
     public static final String KIE_SERVER_MGMT_API_DISABLED = "org.kie.server.mgmt.api.disabled";
     public static final String KIE_SERVER_STARTUP_STRATEGY = "org.kie.server.startup.strategy";
+    public static final String KIE_SERVER_MODE = "org.kie.server.mode";
 
     // configuration parameters
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";
@@ -103,6 +105,7 @@ public class KieServerConstants {
 
     public static final String KIE_SERVER_PARAM_MODULE_METADATA = "KieModuleMetaData";
     public static final String KIE_SERVER_PARAM_MESSAGES = "ContainerMessages";
+    public static final String KIE_SERVER_PARAM_RESET_BEFORE_UPDATE = "KieServerResetBeforeUpdate";
 
     public static final String KIE_SERVER_ROUTER = "org.kie.server.router";
     public static final String KIE_SERVER_ROUTER_ATTEMPT_INTERVAL = "org.kie.server.router.connect";
@@ -146,4 +149,5 @@ public class KieServerConstants {
     // System variable to store the enabled packages for the XStreamMarshaller
     public static final String SYSTEM_XSTREAM_ENABLED_PACKAGES = "org.kie.server.xstream.enabled.packages";
 
+    public static final String RESET_CONTAINER_BEFORE_UPDATE = "resetBeforeUpdate";
 }

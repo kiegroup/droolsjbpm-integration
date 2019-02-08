@@ -16,6 +16,7 @@
 package org.kie.server.client.impl;
 
 import org.kie.api.command.Command;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.GetReleaseIdCommand;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.commands.ActivateContainerCommand;
@@ -291,12 +292,15 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     @Override
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
+        return updateReleaseId(id, releaseId, false);
+    }
+
+    @Override
+    public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId, boolean resetBeforeUpdate) {
         if (config.isRest()) {
-            return makeHttpPostRequestAndCreateServiceResponse(
-                    loadBalancer.getUrl() + "/containers/" + id + "/release-id", releaseId,
-                    ReleaseId.class );
+            return makeHttpPostRequestAndCreateServiceResponse(loadBalancer.getUrl() + "/containers/" + id + "/release-id?" + KieServerConstants.RESET_CONTAINER_BEFORE_UPDATE + "=" + resetBeforeUpdate, releaseId, ReleaseId.class);
         } else {
-            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateReleaseIdCommand(id, releaseId)));
+            CommandScript script = new CommandScript(Collections.singletonList(new UpdateReleaseIdCommand(id, releaseId, resetBeforeUpdate)));
             ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) executeJmsCommand(script, null, null, id).getResponses().get(0);
             return getResponseOrNullIfNoResponse(response);
         }

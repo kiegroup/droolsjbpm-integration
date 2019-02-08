@@ -27,14 +27,17 @@ import java.util.Map;
 
 import org.appformer.maven.integration.MavenRepository;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -74,13 +77,18 @@ public class KieServerMigrationTest {
    
     @BeforeClass
     public static void generalSetup() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.name());
         KieServices ks = KieServices.Factory.get();
         org.kie.api.builder.ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
         File kjar = new File("../kjars/evaluation/jbpm-module.jar");
         File pom = new File("../kjars/evaluation/pom.xml");
         MavenRepository repository = getMavenRepository();
         repository.installArtifact(releaseId, kjar, pom);
+    }
 
+    @AfterClass
+    public static void generalCleanup() {
+        System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
     
     @Before

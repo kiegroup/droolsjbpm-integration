@@ -18,13 +18,16 @@ package org.kie.karaf.itest.camel.kiecamel;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.bean.PojoProxyHelper;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
 import org.kie.karaf.itest.camel.kiecamel.model.Cheese;
 import org.kie.karaf.itest.camel.kiecamel.proxy.CheeseAssessmentService;
 import org.kie.karaf.itest.camel.kiecamel.tools.CheeseFactory;
+import org.kie.server.api.KieServerConstants;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -73,6 +76,16 @@ public class KieCamelBlueprintDTIntegrationTest extends AbstractKarafIntegration
                 // (simulates for instance a bundle with domain classes used in rules)
                 wrappedBundle(mavenBundle().groupId("junit").artifactId("junit").versionAsInProject())
         };
+    }
+
+    @BeforeClass
+    public static void generalSetup() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, "regular");
+    }
+
+    @AfterClass
+    public static void generalCleanup() {
+        System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
 
     @Test(timeout = 60000)

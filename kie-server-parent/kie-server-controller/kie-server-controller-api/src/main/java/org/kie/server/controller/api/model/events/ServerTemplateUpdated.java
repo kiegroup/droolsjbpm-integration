@@ -15,17 +15,25 @@
 
 package org.kie.server.controller.api.model.events;
 
+import java.util.Objects;
+
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 
 public class ServerTemplateUpdated implements KieServerControllerEvent {
 
     private ServerTemplate serverTemplate;
+    private boolean resetBeforeUpdate;
 
     public ServerTemplateUpdated() {
     }
 
     public ServerTemplateUpdated(ServerTemplate serverTemplate) {
+        this(serverTemplate, false);
+    }
+
+    public ServerTemplateUpdated(ServerTemplate serverTemplate, boolean resetBeforeUpdate) {
         this.serverTemplate = serverTemplate;
+        this.resetBeforeUpdate = resetBeforeUpdate;
     }
 
     public ServerTemplate getServerTemplate() {
@@ -36,10 +44,19 @@ public class ServerTemplateUpdated implements KieServerControllerEvent {
         this.serverTemplate = serverInstance;
     }
 
+    public boolean isResetBeforeUpdate() {
+        return resetBeforeUpdate;
+    }
+
+    public void setResetBeforeUpdate(boolean resetBeforeUpdate) {
+        this.resetBeforeUpdate = resetBeforeUpdate;
+    }
+
     @Override
     public String toString() {
         return "Updated server template{" +
-                 serverTemplate +
+                "serverTemplate=" + serverTemplate +
+                ", resetBeforeUpdate=" + resetBeforeUpdate +
                 '}';
     }
 
@@ -51,18 +68,13 @@ public class ServerTemplateUpdated implements KieServerControllerEvent {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         ServerTemplateUpdated that = (ServerTemplateUpdated) o;
 
-        if (serverTemplate != null ? !serverTemplate.equals(that.serverTemplate) : that.serverTemplate != null) {
-            return false;
-        }
-
-        return true;
+        return resetBeforeUpdate == that.resetBeforeUpdate && Objects.equals(serverTemplate, that.serverTemplate);
     }
 
     @Override
     public int hashCode() {
-        return serverTemplate != null ? serverTemplate.hashCode() : 0;
+        return Objects.hash(serverTemplate, resetBeforeUpdate);
     }
 }

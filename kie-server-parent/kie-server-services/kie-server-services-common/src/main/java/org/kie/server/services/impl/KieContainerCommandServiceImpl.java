@@ -184,7 +184,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                         responses.add(forbidden);
                         continue;
                     }
-                    responses.add(this.kieServer.updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId()));
+                    responses.add(this.kieServer.updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId(), ((UpdateReleaseIdCommand) command).isResetBeforeUpdate()));
                 } else if (command instanceof GetServerStateCommand) {
                     responses.add(this.kieServer.getServerState());
                 } else if (command instanceof ActivateContainerCommand) {

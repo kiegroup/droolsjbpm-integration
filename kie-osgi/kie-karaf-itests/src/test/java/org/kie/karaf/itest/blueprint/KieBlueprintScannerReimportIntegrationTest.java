@@ -26,6 +26,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
 import org.kie.karaf.itest.util.KieScannerTestUtils;
 import org.kie.karaf.itest.util.TimerUtils;
@@ -38,6 +40,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieScanner;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
+import org.kie.server.api.KieServerConstants;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -78,6 +81,16 @@ public class KieBlueprintScannerReimportIntegrationTest extends AbstractKarafInt
         kieScannerTestUtils.setUp();
         kieScannerTestUtils.createAndInstallKJar(RELEASE_ID, "rule_0");
         kieScannerTestUtils.tearDown();
+    }
+
+    @BeforeClass
+    public static void generalSetup() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, "regular");
+    }
+
+    @AfterClass
+    public static void generalCleanup() {
+        System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
 
     @After

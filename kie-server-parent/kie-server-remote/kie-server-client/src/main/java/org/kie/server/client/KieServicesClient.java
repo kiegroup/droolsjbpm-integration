@@ -58,6 +58,8 @@ public interface KieServicesClient {
 
     ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId);
 
+    ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId, boolean resetBeforeUpdate);
+
     ServiceResponse<KieServerStateInfo> getServerState();
     
     void close();

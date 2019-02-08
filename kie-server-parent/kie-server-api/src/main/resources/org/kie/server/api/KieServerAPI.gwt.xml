@@ -17,6 +17,7 @@
     <include name="KieServerConfigItem.java"/>
     <include name="KieContainerResourceList.java"/>
     <include name="KieServerInfo.java"/>
+    <include name="KieServerMode.java"/>
   </source>
 
   <source path="exception">

@@ -48,6 +48,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -246,14 +248,14 @@ public class KieServerInstanceManagerTest {
         doReturn(containerId).when(containerSpec).getId();
         doReturn(releaseId).when(containerSpec).getReleasedId();
         doReturn(containerResource).when(instanceManager).makeContainerResource(container, containerSpec);
-        doReturn(response).when(client).updateReleaseId(containerId, releaseId);
+        doReturn(response).when(client).updateReleaseId(containerId, releaseId, false);
         doReturn(responseType).when(response).getType();
         doNothing().when(instanceManager).collectContainerInfo(containerSpec, client, container);
 
-        instanceManager.makeUpgradeContainerOperation(containerSpec).doOperation(client, container);
+        instanceManager.makeUpgradeContainerOperation(containerSpec, false).doOperation(client, container);
 
         verify(client, never()).createContainer(anyString(), any(KieContainerResource.class));
-        verify(client).updateReleaseId(containerId, releaseId);
+        verify(client).updateReleaseId(containerId, releaseId, false);
         verify(instanceManager).collectContainerInfo(containerSpec, client, container);
         verify(instanceManager, never()).log(any(), any(), any(), any());
     }
@@ -270,16 +272,16 @@ public class KieServerInstanceManagerTest {
         doReturn(containerId).when(containerSpec).getId();
         doReturn(releaseId).when(containerSpec).getReleasedId();
         doReturn(containerResource).when(instanceManager).makeContainerResource(container, containerSpec);
-        doReturn(response).when(client).updateReleaseId(containerId, releaseId);
+        doReturn(response).when(client).updateReleaseId(containerId, releaseId, false);
         doReturn(responseType).when(response).getType();
         doReturn(msg).when(response).getMsg();
         doReturn(url).when(container).getUrl();
         doNothing().when(instanceManager).collectContainerInfo(containerSpec, client, container);
 
-        instanceManager.makeUpgradeContainerOperation(containerSpec).doOperation(client, container);
+        instanceManager.makeUpgradeContainerOperation(containerSpec, false).doOperation(client, container);
 
         verify(client, never()).createContainer(anyString(), any(KieContainerResource.class));
-        verify(client).updateReleaseId(containerId, releaseId);
+        verify(client).updateReleaseId(containerId, releaseId, false);
         verify(instanceManager).collectContainerInfo(containerSpec, client, container);
         verify(instanceManager).log("Container {} failed to upgrade on server instance {} due to {}", containerId, url, msg);
     }
@@ -294,14 +296,14 @@ public class KieServerInstanceManagerTest {
         doReturn(containerId).when(containerSpec).getId();
         doReturn(releaseId).when(containerSpec).getReleasedId();
         doReturn(containerResource).when(instanceManager).makeContainerResource(container, containerSpec);
-        doReturn(response).when(client).updateReleaseId(containerId, releaseId);
+        doReturn(response).when(client).updateReleaseId(containerId, releaseId, false);
         doReturn(responseType).when(response).getType();
         doNothing().when(instanceManager).collectContainerInfo(containerSpec, client, container);
 
-        instanceManager.makeUpgradeAndStartContainerOperation(containerSpec).doOperation(client, container);
+        instanceManager.makeUpgradeAndStartContainerOperation(containerSpec, false).doOperation(client, container);
 
         verify(client).createContainer(containerId, containerResource);
-        verify(client).updateReleaseId(containerId, releaseId);
+        verify(client).updateReleaseId(containerId, releaseId, false);
         verify(instanceManager).collectContainerInfo(containerSpec, client, container);
         verify(instanceManager, never()).log(any(), any(), any(), any());
     }
@@ -318,16 +320,16 @@ public class KieServerInstanceManagerTest {
         doReturn(containerId).when(containerSpec).getId();
         doReturn(releaseId).when(containerSpec).getReleasedId();
         doReturn(containerResource).when(instanceManager).makeContainerResource(container, containerSpec);
-        doReturn(response).when(client).updateReleaseId(containerId, releaseId);
+        doReturn(response).when(client).updateReleaseId(containerId, releaseId, false);
         doReturn(responseType).when(response).getType();
         doReturn(msg).when(response).getMsg();
         doReturn(url).when(container).getUrl();
         doNothing().when(instanceManager).collectContainerInfo(containerSpec, client, container);
 
-        instanceManager.makeUpgradeAndStartContainerOperation(containerSpec).doOperation(client, container);
+        instanceManager.makeUpgradeAndStartContainerOperation(containerSpec, false).doOperation(client, container);
 
         verify(client).createContainer(containerId, containerResource);
-        verify(client).updateReleaseId(containerId, releaseId);
+        verify(client).updateReleaseId(containerId, releaseId, false);
         verify(instanceManager).collectContainerInfo(containerSpec, client, container);
         verify(instanceManager).log("Container {} failed to upgrade on server instance {} due to {}", containerId, url, msg);
     }
@@ -465,7 +467,7 @@ public class KieServerInstanceManagerTest {
     @Test
     public void testUpgradeContainer() {
 
-        doReturn(operation).when(instanceManager).makeUpgradeContainerOperation(containerSpec);
+        doReturn(operation).when(instanceManager).makeUpgradeContainerOperation(containerSpec, false);
 
         instanceManager.upgradeContainer(serverTemplate, containerSpec);
 
@@ -475,7 +477,7 @@ public class KieServerInstanceManagerTest {
     @Test
     public void testUpgradeAndStartContainer() {
 
-        doReturn(operation).when(instanceManager).makeUpgradeAndStartContainerOperation(containerSpec);
+        doReturn(operation).when(instanceManager).makeUpgradeAndStartContainerOperation(containerSpec, false);
 
         instanceManager.upgradeAndStartContainer(serverTemplate, containerSpec);
 

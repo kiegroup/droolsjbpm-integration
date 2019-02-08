@@ -16,6 +16,7 @@
 
 package org.kie.server.controller.client.websocket;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -23,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
@@ -43,6 +45,9 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WebSocketKieServerControllerClientTest {
+    private final static String UPDATE_CONTAINER_SPEC_METHOD = "updateContainerSpec";
+    private final static String SERVER_TEMPLATE_ID = "templateId";
+    private final static String CONTAINER_ID = "containerId";
 
     @Mock
     private KieServerMessageHandlerWebSocketClient client;
@@ -103,5 +108,45 @@ public class WebSocketKieServerControllerClientTest {
 
         verify(client).close();
         verify(notificationClient).close();
+    }
+
+    @Test
+    public void testUpdateContainerSpecDefaultMethod() throws IOException {
+        controllerClient.updateContainerSpec(SERVER_TEMPLATE_ID, CONTAINER_ID, new ContainerSpec());
+
+        checkUpdateContainerSpec(false);
+    }
+
+    @Test
+    public void testUpdateContainerSpecWithoutAbortingInstances() throws IOException {
+        controllerClient.updateContainerSpec(SERVER_TEMPLATE_ID, CONTAINER_ID, new ContainerSpec(), false);
+
+        checkUpdateContainerSpec(false);
+    }
+
+    @Test
+    public void testUpdateContainerSpecAbortingInstances() throws IOException {
+        controllerClient.updateContainerSpec(SERVER_TEMPLATE_ID, CONTAINER_ID, new ContainerSpec(), true);
+
+        checkUpdateContainerSpec(true);
+    }
+
+    private void checkUpdateContainerSpec(boolean expected) throws IOException {
+        verify(controllerClient).updateContainerSpec(eq(SERVER_TEMPLATE_ID), eq(CONTAINER_ID), any(ContainerSpec.class), eq(expected));
+
+        ArgumentCaptor<String> contentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(client).sendTextWithInternalHandler(contentCaptor.capture(), any(InternalMessageHandler.class));
+
+        final DescriptorCommand command = WebSocketUtils.unmarshal(contentCaptor.getValue(), DescriptorCommand.class);
+
+        assertNotNull(command);
+
+        assertEquals(UPDATE_CONTAINER_SPEC_METHOD, command.getMethod());
+
+        assertEquals(4, command.getArguments().size());
+
+        assertEquals(SERVER_TEMPLATE_ID, command.getArguments().get(0));
+        assertEquals(CONTAINER_ID, command.getArguments().get(1));
+        assertEquals(expected, command.getArguments().get(3));
     }
 }

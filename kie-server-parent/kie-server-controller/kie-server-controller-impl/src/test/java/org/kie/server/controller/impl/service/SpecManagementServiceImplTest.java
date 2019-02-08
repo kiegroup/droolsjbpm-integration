@@ -39,6 +39,7 @@ import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerInstanceManager;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -673,6 +674,73 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
         assertEquals(expectedContainers, actualContainers);
     }
+
+    @Test
+    public void testUpdateAndStartContainerSpecDefault() {
+        testUpdateAndStartContainerSpec(false, true);
+    }
+
+    @Test
+    public void testUpdateContainerSpecDefault() {
+        testUpdateAndStartContainerSpec(false, false);
+    }
+
+    @Test
+    public void testUpdateAndStartContainerSpecResetBeforeUpdate() {
+        testUpdateAndStartContainerSpec(true, true);
+    }
+
+    @Test
+    public void testUpdateContainerSpecResetBeforeUpdate() {
+        testUpdateAndStartContainerSpec(true, false);
+    }
+
+    private void testUpdateAndStartContainerSpec(boolean resetBeforeUpdate, boolean started) {
+        final String serverTemplateId = "serverTemplateId";
+        final String serverTemplateName = "serverTemplateName";
+        final String containerSpecId = "containerSpecId";
+
+        ServerTemplate template = new ServerTemplate(serverTemplateId, serverTemplateName);
+
+        ContainerSpec containerSpec = new ContainerSpec();
+        containerSpec.setId(containerSpecId);
+        containerSpec.setServerTemplateKey(new ServerTemplateKey(template.getId(), template.getName()));
+        containerSpec.setReleasedId(new ReleaseId("org.kie", "kie-server-kjar", "1.0"));
+        containerSpec.setStatus(started ? KieContainerStatus.STARTED : KieContainerStatus.STOPPED);
+
+        template.addContainerSpec(containerSpec);
+
+        when(templateStorage.load(eq(serverTemplateId))).thenReturn(template);
+
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+
+        specManagementService.setTemplateStorage(templateStorage);
+        specManagementService.setNotificationService(notificationService);
+
+        specManagementService.updateContainerSpec(serverTemplateId, containerSpecId, containerSpec, resetBeforeUpdate);
+
+        verify(templateStorage).update(eq(template));
+
+        ArgumentCaptor<ServerTemplateUpdated> captor = ArgumentCaptor.forClass(ServerTemplateUpdated.class);
+
+        verify(notificationService).notify(captor.capture());
+
+        ServerTemplateUpdated serverTemplateUpdated = captor.getValue();
+
+        assertNotNull(serverTemplateUpdated);
+        assertEquals(template, serverTemplateUpdated.getServerTemplate());
+
+        if(!resetBeforeUpdate) {
+            assertFalse(serverTemplateUpdated.isResetBeforeUpdate());
+        } else {
+            assertTrue(serverTemplateUpdated.isResetBeforeUpdate());
+        }
+
+        verify(kieServerInstanceManager, started ? times(1) : never()).upgradeAndStartContainer(eq(template), eq(containerSpec), eq(resetBeforeUpdate));
+        verify(notificationService, started ? times(1) : never()).notify(eq(template), eq(containerSpec), anyList());
+    }
+
+
 
     @Test
     public void testUpdateContainerRuleConfigWhenKieScannerStatusIsStarted() {

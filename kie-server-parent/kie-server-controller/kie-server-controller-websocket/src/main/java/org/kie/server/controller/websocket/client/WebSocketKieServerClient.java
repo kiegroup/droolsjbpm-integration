@@ -508,13 +508,18 @@ public class WebSocketKieServerClient implements KieServicesClient {
 
     @Override
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
-        CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateReleaseIdCommand(id, releaseId)));
+        return updateReleaseId(id, releaseId, false);
+    }
+
+    @Override
+    public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId, boolean resetBeforeUpdate) {
+        CommandScript script = new CommandScript(Collections.singletonList(new UpdateReleaseIdCommand(id, releaseId, resetBeforeUpdate)));
         ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) sendCommandToAllSessions(script, new WebSocketServiceResponse(true, (message) -> {
             ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
             return list.getResponses().get(0);
         })).getResponses().get(0);
-        
-        return response; 
+
+        return response;
     }
 
     @Override
