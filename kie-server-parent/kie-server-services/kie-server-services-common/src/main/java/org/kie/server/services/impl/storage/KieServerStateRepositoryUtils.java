@@ -15,10 +15,14 @@
 
 package org.kie.server.services.impl.storage;
 
+import java.io.File;
 import java.util.Properties;
 
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
+
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_ID;
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_STATE_REPO;
 
 public class KieServerStateRepositoryUtils {
 
@@ -36,10 +40,51 @@ public class KieServerStateRepositoryUtils {
         for (String property : properties.stringPropertyNames()) {
 
             if (property.startsWith("org.kie.server") || property.startsWith("org.kie.executor")) {
-                KieServerConfigItem configItem = new KieServerConfigItem(property, properties.getProperty(property), String.class.getName());
+                KieServerConfigItem configItem = new KieServerConfigItem(
+                    property, properties.getProperty(property).replaceAll("^\"|\"$", ""), String.class.getName());
                 config.addConfigItem(configItem);
             }
         }
+    }
+    
+    public static String getFileRepoPath() {
+        return getValue(KIE_SERVER_STATE_REPO, "KIE_SERVER_REPO", ".");
+    }
+    
+    public static String getServerId() {
+        return getValue(KIE_SERVER_ID, "KIE_SERVER_ID", "kieserver");
+    }
+    
+    public static File getFileRepoDir() {
+        return new File(getFileRepoPath());
+    }
+
+    public static File getStateFile() {
+        return new File(getFileRepoDir(), getServerId() + ".xml");
+    }
+    
+    public static String getValue(String propName, String envName, String defaultValue) {
+        String value = null;
+        if (propName != null) {
+            value = trimToNull(System.getProperty(propName));
+        }
+        if (value == null && envName != null) {
+            value = trimToNull(System.getenv(envName));
+        }
+        if (value == null) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    public static String trimToNull(String s) {
+        if (s != null) {
+            s = s.trim();
+            if (s.isEmpty()) {
+                s = null;
+            }
+        }
+        return s;
     }
 
 }

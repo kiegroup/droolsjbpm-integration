@@ -33,7 +33,8 @@ public abstract class KieServerStateCloudRepository implements KieServerStateRep
     public static final String ROLLOUT_REQUIRED = "services.server.kie.org/openshift-startup-strategy.rolloutRequired";
     public static final String CFG_MAP_DATA_KEY = "kie-server-state";
     public static final String CFG_MAP_LABEL_NAME = "services.server.kie.org/kie-server-state";
-    public static final String CFG_MAP_LABEL_VALUE = "USED";
+    public static final String CFG_MAP_LABEL_VALUE_USED = "USED";
+    public static final String CFG_MAP_LABEL_VALUE_IMMUTABLE = "IMMUTABLE";
 
     protected static final String STATE_CHANGE_TIMESTAMP = "services.server.kie.org/kie-server-state.changeTimestamp";
     private static final Logger logger = LoggerFactory.getLogger(KieServerStateCloudRepository.class);

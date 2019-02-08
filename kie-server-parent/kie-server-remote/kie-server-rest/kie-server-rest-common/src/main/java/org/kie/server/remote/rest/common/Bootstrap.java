@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.services;
+package org.kie.server.remote.rest.common;
 
 import java.nio.charset.Charset;
 import java.util.UUID;

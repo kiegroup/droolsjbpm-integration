@@ -78,7 +78,7 @@ public class KieServerStateOpenShiftRepositoryTest {
         // Load testing KieServerState ConfigMap data into mock server from file
         ConfigMap cfm = client.configMaps()
                               .load(KieServerStateOpenShiftRepositoryTest.class
-                              .getResourceAsStream("/test-kieserver-state-config-map.yml")).get();
+                              .getResourceAsStream("/test-kieserver-state-config-map-used.yml")).get();
 
         client.configMaps().inNamespace(testNamespace).createOrReplace(cfm);
 
