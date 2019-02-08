@@ -51,6 +51,9 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
 
     @Override
     protected KieServicesClient createDefaultClient() throws Exception {
+        if (TestConfig.isLocalServer()) {
+            configuration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);
+        }
         return createDefaultClient(configuration, marshallingFormat);
     }
 
