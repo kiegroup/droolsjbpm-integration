@@ -1,17 +1,18 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.remote.rest.common.resource;
 
@@ -293,7 +294,8 @@ public class KieServerRestImpl {
             @ApiParam(value = "Container id that release id should be upgraded", required = true) @PathParam("id") String id, 
             @ApiParam(value = "Release Id to be upgraded to as ReleaseId type", required = true, examples=@Example(value= {
                                    @ExampleProperty(mediaType=JSON, value=UPDATE_RELEASE_ID_JSON),
-                                   @ExampleProperty(mediaType=XML, value=UPDATE_RELEASE_ID_XML)})) String releaseIdPayload) {
+                                   @ExampleProperty(mediaType=XML, value=UPDATE_RELEASE_ID_XML)})) String releaseIdPayload,
+            @ApiParam(value = "Allows to reset the current environment aborting active process instances before updating when the server runs on development mode. Optional, defaults to false") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
@@ -304,7 +306,8 @@ public class KieServerRestImpl {
 
         ReleaseId releaseId = marshallerHelper.unmarshal(releaseIdPayload, contentType, ReleaseId.class);
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
-        return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers, conversationIdHeader);
+
+        return createCorrectVariant(server.updateContainerReleaseId(id, releaseId, resetBeforeUpdate), headers, conversationIdHeader);
     }
 
     @ApiOperation(value="Retrieves server state - configuration that the server is currently running with",

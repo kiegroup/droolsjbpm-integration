@@ -48,12 +48,12 @@ public class KieServerRestImplTest {
 
     private static final File REPOSITORY_DIR = new File("target/repository-dir");
     private static final String KIE_SERVER_ID = "kie-server-impl-test";
-    
+
     private KieServerImpl kieServer;
     private String origServerId = null;
-    
+
     private Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader());
-    
+
     @Mock
     private HttpHeaders headers;
 
@@ -68,7 +68,7 @@ public class KieServerRestImplTest {
         FileUtils.forceMkdir(REPOSITORY_DIR);
         kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
         kieServer.init();
-        
+
         MultivaluedHashMap<String, String> mockedRequestHeaders = new MultivaluedHashMap<>();
         mockedRequestHeaders.add("Accept", "application/json");
         when(headers.getRequestHeaders()).thenReturn(mockedRequestHeaders);
@@ -82,31 +82,31 @@ public class KieServerRestImplTest {
         KieServerEnvironment.setServerId(origServerId);
         System.clearProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED);
     }
-    
+
     @Test
     public void testCreateContainerWithManagementDisabled() {
-  
+
         KieServerRestImpl restServer = new KieServerRestImpl(kieServer);
-        
-        Response response = restServer.createContainer(headers, "test", "");        
+
+        Response response = restServer.createContainer(headers, "test", "");
         assertForbiddenResponse(response);
     }
-    
+
     @Test
     public void testDisposeContainerWithManagementDisabled() {
-  
+
         KieServerRestImpl restServer = new KieServerRestImpl(kieServer);
-        
-        Response response = restServer.disposeContainer(headers, "test");        
+
+        Response response = restServer.disposeContainer(headers, "test");
         assertForbiddenResponse(response);
     }
-    
+
     @Test
     public void testUpdateReleaseIdWithManagementDisabled() {
-  
+
         KieServerRestImpl restServer = new KieServerRestImpl(kieServer);
-        
-        Response response = restServer.updateReleaseId(headers, "test", "");        
+
+        Response response = restServer.updateReleaseId(headers, "test", "", false);
         assertForbiddenResponse(response);
     }
     

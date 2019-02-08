@@ -76,7 +76,32 @@
           "parameterIndex": "2",
           "elementKind": "parameter",
           "justification": "Add Swagger examples for updating scanner."
-        }
+        },
+        {
+           "code": "java.annotation.attributeAdded",
+           "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateReleaseId(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===)",
+           "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateReleaseId(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.String===, boolean)",
+           "annotationType": "io.swagger.annotations.ApiParam",
+           "annotation": "@io.swagger.annotations.ApiParam(value = \"Release Id to be upgraded to as ReleaseId type\", required = true, examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"group-id\" : \"foo\",\n    \"artifact-id\" : \"bar\",\n    \"version\" : \"1.0\"\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<release-id>\n    <group-id>foo<\/group-id>\n    <artifact-id>bar<\/artifact-id>\n    <version>1.0<\/version>\n<\/release-id>\n\")}))",
+           "attribute": "examples",
+           "value": "@io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"group-id\" : \"foo\",\n    \"artifact-id\" : \"bar\",\n    \"version\" : \"1.0\"\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<release-id>\n    <group-id>foo<\/group-id>\n    <artifact-id>bar<\/artifact-id>\n    <version>1.0<\/version>\n<\/release-id>\n\")})",
+           "package": "org.kie.server.remote.rest.common.resource",
+           "classSimpleName": "KieServerRestImpl",
+           "methodName": "updateReleaseId",
+           "parameterIndex": "2",
+           "elementKind": "parameter",
+           "justification": "AF-1685: Development Lifecycle Streamline"
+        },
+        {
+           "code": "java.method.numberOfParametersChanged",
+           "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateReleaseId(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
+           "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::updateReleaseId(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, boolean)",
+           "package": "org.kie.server.remote.rest.common.resource",
+           "classSimpleName": "KieServerRestImpl",
+           "methodName": "updateReleaseId",
+           "elementKind": "method",
+           "justification": "AF-1685: Development Lifecycle Streamline"
+         }
       ]
     }
   }

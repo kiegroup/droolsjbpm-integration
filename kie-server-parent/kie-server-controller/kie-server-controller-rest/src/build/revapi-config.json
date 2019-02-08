@@ -2356,6 +2356,47 @@
           "elementKind": "method",
           "justification": "JBPM-7934 - Update Controller REST API endpoint data to Swagger"
         },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, ===java.lang.String===, java.lang.String, java.lang.String)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, ===java.lang.String===, java.lang.String, java.lang.String, boolean)",
+          "annotationType": "javax.ws.rs.PathParam",
+          "annotation": "@javax.ws.rs.PathParam(\"serverTemplateId\")",
+          "attribute": "value",
+          "oldValue": "\"id\"",
+          "newValue": "\"serverTemplateId\"",
+          "package": "org.kie.server.controller.rest",
+          "classSimpleName": "RestSpecManagementServiceImpl",
+          "methodName": "updateContainerSpec",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "AF-1685: Development Lifecycle Streamline"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean)",
+          "package": "org.kie.server.controller.rest",
+          "classSimpleName": "RestSpecManagementServiceImpl",
+          "methodName": "updateContainerSpec",
+          "elementKind": "method",
+          "justification": "AF-1685: Development Lifecycle Streamline"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean)",
+          "annotationType": "javax.ws.rs.Path",
+          "annotation": "@javax.ws.rs.Path(\"servers\/{serverTemplateId}\/containers\/{containerId}\")",
+          "attribute": "value",
+          "oldValue": "\"servers\/{id}\/containers\/{containerId}\"",
+          "newValue": "\"servers\/{serverTemplateId}\/containers\/{containerId}\"",
+          "package": "org.kie.server.controller.rest",
+          "classSimpleName": "RestSpecManagementServiceImpl",
+          "methodName": "updateContainerSpec",
+          "elementKind": "method",
+          "justification": "AF-1685: Development Lifecycle Streamline"
+        }
       ]
     }
   }

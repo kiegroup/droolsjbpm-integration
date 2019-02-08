@@ -1,17 +1,18 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.controller.impl.service;
 
@@ -82,6 +83,11 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
     @Override
     public synchronized void updateContainerSpec(final String serverTemplateId, final String containerId, final ContainerSpec containerSpec) {
+        updateContainerSpec(serverTemplateId, containerId, containerSpec, false);
+    }
+
+    @Override
+    public synchronized void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec, Boolean resetBeforeUpdate) {
         ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
 
         if (serverTemplate == null) {
@@ -110,10 +116,10 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         templateStorage.update(serverTemplate);
 
-        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate, resetBeforeUpdate));
         // in case container was started before it was update or update comes with status started update container in running servers
         if (currentVersion.getStatus().equals(KieContainerStatus.STARTED) || containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
-            List<Container> containers = kieServerInstanceManager.upgradeAndStartContainer(serverTemplate, containerSpec);
+            List<Container> containers = kieServerInstanceManager.upgradeAndStartContainer(serverTemplate, containerSpec, resetBeforeUpdate);
             notificationService.notify(serverTemplate, containerSpec, containers);
         }
     }
