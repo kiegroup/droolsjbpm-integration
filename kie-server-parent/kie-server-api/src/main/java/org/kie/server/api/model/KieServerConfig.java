@@ -79,19 +79,14 @@ public class KieServerConfig {
 
         if (item != null) {
             return item.getValue();
+        } else {
+            return System.getProperty(name);
         }
-
-        return null;
     }
 
     public String getConfigItemValue(String name, String defaultValue) {
-        KieServerConfigItem item = getConfigItem(name);
-
-        if (item != null) {
-            return item.getValue();
-        }
-
-        return defaultValue;
+        String value = getConfigItemValue(name);
+        return value == null ? defaultValue : value;
     }
 
     @Override

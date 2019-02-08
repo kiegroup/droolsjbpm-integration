@@ -24,6 +24,7 @@
     <module>kie-server-controller-websocket-client</module>
     <module>kie-server-controller-websocket-common</module>
     <module>kie-server-controller-client</module>
+    <module>kie-server-controller-openshift</module>
   </modules>
 
 </project>

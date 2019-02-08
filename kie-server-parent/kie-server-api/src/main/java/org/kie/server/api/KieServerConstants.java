@@ -44,6 +44,8 @@ public class KieServerConstants {
     public static final String KIE_SERVER_STATE_REPO_TYPE_DEFAULT = "KieServerStateFileRepository";
     public static final String KIE_SERVER_STATE_REPO_TYPE_CLOUD = "KieServerStateCloudRepository";
     public static final String KIE_SERVER_STATE_REPO_TYPE_OPENSHIFT = "KieServerStateOpenShiftRepository";
+    public static final String KIE_SERVER_STATE_IMMUTABLE = "org.kie.server.state.immutable";
+    public static final String KIE_SERVER_STATE_IMMUTABLE_INIT = "org.kie.server.state.immutable.init";
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "org.kie.server.container.deployment";
     public static final String KIE_SERVER_CONTAINER_LOCATOR = "org.kie.server.container.locator";
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
