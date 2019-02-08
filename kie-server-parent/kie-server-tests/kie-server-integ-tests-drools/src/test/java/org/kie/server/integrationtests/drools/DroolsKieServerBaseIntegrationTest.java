@@ -34,5 +34,4 @@ public abstract class DroolsKieServerBaseIntegrationTest extends RestJmsSharedBa
     protected void setupClients(KieServicesClient kieServicesClient) {
         this.ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
     }
-
 }
