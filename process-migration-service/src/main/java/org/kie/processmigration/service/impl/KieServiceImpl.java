@@ -38,7 +38,9 @@ import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.kie.server.client.credentials.EnteredCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wildfly.swarm.spi.api.config.ConfigKey;
 import org.wildfly.swarm.spi.api.config.ConfigView;
+import org.wildfly.swarm.spi.api.config.SimpleKey;
 
 @ApplicationScoped
 @Startup
@@ -52,6 +54,7 @@ public class KieServiceImpl implements KieService {
 
     private Map<String, KieServerConfig> configs = new HashMap<>();
     private Map<String, KieServicesClient> kieServices = new HashMap<>();
+    private ConfigKey kieServersKey = new SimpleKey("kieservers");
 
     @Inject
     private ConfigView configView;
@@ -59,8 +62,10 @@ public class KieServiceImpl implements KieService {
     @SuppressWarnings("unchecked")
     @PostConstruct
     public void loadConfigs() {
-        List<Map<String, String>> value = configView.resolve("kieservers").as(List.class).getValue();
-        value.stream().forEach(this::loadConfig);
+        if (configView.hasKeyOrSubkeys(kieServersKey)) {
+            List<Map<String, String>> value = configView.resolve(kieServersKey).as(List.class).getValue();
+            value.stream().forEach(this::loadConfig);
+        }
         if (kieServices.size() == 0) {
             logger.warn("Process Instance Migration service running in DISCONNECTED mode. It won't be able to run any migration.");
         }
