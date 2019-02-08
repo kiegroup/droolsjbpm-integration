@@ -78,7 +78,7 @@ public class DMNMetricIntegrationTest
     }
 
     @Test
-    public void test_evaluateAllWithMetrics() {
+    public void evaluateAllWithMetrics() {
         DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set("a", 10);
         dmnContext.set("b", 5);
