@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package  org.drools.springframework
+package  test1
 
 
 declare Person3
