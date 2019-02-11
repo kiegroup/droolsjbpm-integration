@@ -12,6 +12,24 @@
       <artifactId>camel-container-tests-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-persistence-xstream</artifactId>
+      <scope>provided</scope>
+      <version>${version.org.kie}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-persistence-jaxb</artifactId>
+      <scope>provided</scope>
+      <version>${version.org.kie}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <scope>provided</scope>
+      <version>${version.org.codehaus.jackson}</version>
+    </dependency>
   </dependencies>
 
 </project>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+  <!-- Domain model configuration -->
+  <solutionClass>org.kie.camel.container.api.model.cloudbalance.CloudBalance</solutionClass>
+  <entityClass>org.kie.camel.container.api.model.cloudbalance.CloudProcess</entityClass>
+
+  <!-- Score configuration -->
+  <scoreDirectorFactory>
+    <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+  </scoreDirectorFactory>
+
+  <!-- Termination configuration -->
+  <termination>
+    <secondsSpentLimit>2</secondsSpentLimit>
+  </termination>
+</solver>
