@@ -59,6 +59,7 @@ public class AbstractRemoteIntegrationTest extends AbstractKieCamelIntegrationTe
     protected static final String RULES_FILE_NAME = "rules.drl";
     protected static final String CLOUD_BALANCE_SOLVER_CONFIG = "cloudbalance-solver.xml";
     protected static final String CLOUD_BALANCE_SCORE_RULES = "cloudBalancingScoreRules.drl";
+    protected static final String DMN_FUNCTION_DEFINITION = "FunctionDefinition.dmn";
     protected static final ReleaseId RELEASE_ID =
             new ReleaseId("org.drools", "camel-container-tests-kjar", "1.0.0");
     protected static final String CONTAINER_ID = "test-container";
@@ -93,6 +94,8 @@ public class AbstractRemoteIntegrationTest extends AbstractKieCamelIntegrationTe
                                          KJAR_TEST_PACKAGE_PATH + CLOUD_BALANCE_SOLVER_CONFIG, kfs);
         kfs = addClasspathResourceToKjar(KJAR_RESOURCES_PATH + CLOUD_BALANCE_SCORE_RULES,
                                          KJAR_TEST_PACKAGE_PATH + CLOUD_BALANCE_SCORE_RULES, kfs);
+        kfs = addClasspathResourceToKjar(KJAR_RESOURCES_PATH + DMN_FUNCTION_DEFINITION,
+                                         KJAR_TEST_PACKAGE_PATH + DMN_FUNCTION_DEFINITION, kfs);
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs);
         List<Message> messageList = kieBuilder.buildAll().getResults().getMessages();
