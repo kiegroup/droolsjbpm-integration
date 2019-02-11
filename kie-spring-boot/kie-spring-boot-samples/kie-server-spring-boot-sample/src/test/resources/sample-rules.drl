@@ -1,7 +1,3 @@
-package defaultPackge
-
-
-
 rule "Your First Rule"
     when
         $s : String()
