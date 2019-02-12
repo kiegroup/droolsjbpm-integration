@@ -34,7 +34,7 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
@@ -78,7 +78,7 @@
           <artifactId>jboss-transaction-api_1.1_spec</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
@@ -96,7 +96,7 @@
           <artifactId>jboss-transaction-api_1.1_spec</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
@@ -114,7 +114,7 @@
           <artifactId>jboss-transaction-api_1.1_spec</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
@@ -250,7 +250,7 @@
       <artifactId>hibernate-entitymanager</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
@@ -278,7 +278,7 @@
       <artifactId>hibernate-commons-annotations</artifactId>
     </dependency>
     <dependency>
-      <groupId>dom4j</groupId>
+      <groupId>org.dom4j</groupId>
       <artifactId>dom4j</artifactId>
     </dependency>
     <dependency>
