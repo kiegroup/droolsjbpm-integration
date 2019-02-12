@@ -96,7 +96,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
         me.setName("Hadrian");
 
         String rule = "";
-        rule += "package org.kie.pipeline.camel \n";
+        rule += "import " + Person.class.getCanonicalName() + ";\n";
         rule += "import org.kie.pipeline.camel.Person\n";
         rule += "import org.kie.pipeline.camel.WrappedList\n";
         rule += "global WrappedList list\n";
