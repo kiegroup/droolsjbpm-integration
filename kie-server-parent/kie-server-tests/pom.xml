@@ -1236,6 +1236,7 @@
                       <argument>-Dorg.kie.server.persistence.ds=${org.kie.server.persistence.ds}</argument>
                       <argument>-Dorg.jbpm.document.storage=${org.jbpm.document.storage}</argument>
                       <argument>-Dkie.server.base.http.url=${kie.server.base.http.url}</argument>
+                      <argument>-Dorg.kie.server.mode=REGULAR</argument>
                       <argument>org.springframework.boot.loader.JarLauncher</argument>
                     </arguments>
                   </configuration>
