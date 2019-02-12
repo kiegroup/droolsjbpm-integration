@@ -83,6 +83,18 @@
       <artifactId>kie-server-router-proxy</artifactId>
     </dependency>
 
+    <!-- Prometheus Extension -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-prometheus</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-prometheus</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -251,6 +263,7 @@
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.kie.swagger.server.ext.disabled>true</org.kie.swagger.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>true</org.kie.prometheus.server.ext.disabled>
             </systemPropertyVariables>
           </configuration>
         </plugin>

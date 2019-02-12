@@ -31,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
 import javax.naming.InitialContext;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -152,6 +151,7 @@ public class KieServerImpl implements KieServer {
         List<KieServerExtension> extensions = sortKnownExtensions();
 
         for (KieServerExtension extension : extensions) {
+            logger.trace("{} processing", extension);
             if (!extension.isActive()) {
                 continue;
             }

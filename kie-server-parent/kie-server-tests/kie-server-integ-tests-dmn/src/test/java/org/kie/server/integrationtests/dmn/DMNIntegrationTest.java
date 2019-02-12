@@ -15,24 +15,24 @@
 
 package org.kie.server.integrationtests.dmn;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNMessageType;
 import org.kie.dmn.api.core.DMNResult;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.KieServiceResponse.ResponseType;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-import java.math.BigDecimal;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
+import static org.junit.Assert.*;
 
 public class DMNIntegrationTest
         extends DMNKieServerBaseIntegrationTest {

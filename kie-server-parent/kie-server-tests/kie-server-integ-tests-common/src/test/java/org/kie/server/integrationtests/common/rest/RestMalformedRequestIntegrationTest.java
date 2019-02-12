@@ -68,5 +68,5 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
             }
         }
     }
-    
+
 }

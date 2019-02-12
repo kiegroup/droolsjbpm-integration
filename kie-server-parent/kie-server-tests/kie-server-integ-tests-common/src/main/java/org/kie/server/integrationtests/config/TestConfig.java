@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeMap;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
