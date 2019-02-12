@@ -143,5 +143,12 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-dmn</artifactId>
     </dependency>
+
+    <!-- Prometheus -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-prometheus</artifactId>
+    </dependency>
+
   </dependencies>
 </project>

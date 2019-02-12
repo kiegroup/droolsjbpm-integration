@@ -23,6 +23,7 @@
     <module>kie-server-rest-case-mgmt</module>
     <module>kie-server-rest-dmn</module>
     <module>kie-server-rest-swagger</module>
+    <module>kie-server-rest-prometheus</module>
   </modules>
 
 </project>

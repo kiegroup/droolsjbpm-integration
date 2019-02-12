@@ -374,6 +374,11 @@
         </dependency>
         <dependency>
           <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-prometheus</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
           <artifactId>kie-server-rest-jbpm</artifactId>
           <scope>test</scope>
         </dependency>

@@ -18,7 +18,6 @@ package org.kie.server.integrationtests.shared.basetests;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -32,7 +31,6 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.common.rest.Authenticator;
 import org.kie.server.integrationtests.config.TestConfig;
 
 @RunWith(Parameterized.class)

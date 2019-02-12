@@ -16,21 +16,7 @@
 
 package org.kie.server.remote.rest.common.resource;
 
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
-import static org.kie.server.remote.rest.common.util.RestUtils.serviceUnavailable;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.JSON;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_JSON;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_XML;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_RELEASE_ID_JSON;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_RELEASE_ID_XML;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_SCANNER_JSON;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_SCANNER_XML;
-import static org.kie.server.remote.rest.common.docs.ParameterSamples.XML;
-
 import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -47,6 +33,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerStatusFilter;
@@ -61,13 +54,18 @@ import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_XML;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_RELEASE_ID_JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_RELEASE_ID_XML;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_SCANNER_JSON;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.UPDATE_SCANNER_XML;
+import static org.kie.server.remote.rest.common.docs.ParameterSamples.XML;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.serviceUnavailable;
 
 @Api(value="KIE Server :: Core")
 @Path("server")

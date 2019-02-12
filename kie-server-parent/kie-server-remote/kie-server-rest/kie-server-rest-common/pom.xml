@@ -77,7 +77,24 @@
     	<groupId>io.swagger</groupId>
     	<artifactId>swagger-annotations</artifactId>
     </dependency>
-    
+
+    <!-- Prometheus -->
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_httpserver</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <build>
