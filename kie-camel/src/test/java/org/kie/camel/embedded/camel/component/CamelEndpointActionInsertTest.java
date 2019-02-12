@@ -117,7 +117,7 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         String rule = "";
-        rule += "package org.kie.pipeline.camel \n";
+        rule += "import " + Person.class.getCanonicalName() + ";\n";
         rule += "import org.apache.camel.Exchange \n";
         rule += "import org.apache.camel.Message \n";
         rule += "rule rule1 \n";

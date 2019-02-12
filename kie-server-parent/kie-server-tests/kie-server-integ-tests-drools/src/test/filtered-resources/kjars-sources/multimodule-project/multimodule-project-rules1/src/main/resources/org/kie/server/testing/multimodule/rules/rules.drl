@@ -13,7 +13,6 @@
  * limitations under the License.
 */
 
-package org.kie.server.testing.multimodule.rules1;
 import org.kie.server.testing.multimodule.domain.Vehicle;
 
 rule "Drive the vehicle"

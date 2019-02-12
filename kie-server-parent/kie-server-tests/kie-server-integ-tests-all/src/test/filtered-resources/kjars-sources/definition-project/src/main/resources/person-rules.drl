@@ -1,6 +1,3 @@
-package defaultPackge
-
-
 import org.jbpm.data.Person;
 
 global java.util.List people;
