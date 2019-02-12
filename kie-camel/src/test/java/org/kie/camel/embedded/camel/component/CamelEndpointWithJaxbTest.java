@@ -340,7 +340,6 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
         me.setName("Hadrian");
 
         String rule = "";
-        rule += "package org.kie.pipeline.camel \n";
         rule += "import org.kie.pipeline.camel.Person \n";
         rule += "global java.util.List list \n";
         rule += "query persons \n";

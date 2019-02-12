@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package kiesample;
+package drl_kiesample2;
 
 import org.kie.aries.blueprint.beans.Person;
 

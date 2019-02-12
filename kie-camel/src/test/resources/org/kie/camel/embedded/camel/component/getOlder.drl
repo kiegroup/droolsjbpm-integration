@@ -1,4 +1,4 @@
-package org.drools.camel.component
+package org.kie.camel.embedded.camel.component
 
 import org.kie.camel.embedded.camel.testdomain.Person;
 

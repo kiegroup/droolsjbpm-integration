@@ -19,7 +19,7 @@ age[]
 log
 coolness
 
-package This_is_a_ruleset;
+package decisiontables.templates;
 //generated from Decision Table
 import example.model.User;
 import example.model.Car;

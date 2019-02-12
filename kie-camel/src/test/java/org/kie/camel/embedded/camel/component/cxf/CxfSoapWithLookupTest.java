@@ -87,10 +87,10 @@ public class CxfSoapWithLookupTest extends CamelSpringTestSupport {
         String cmd2 = "";
         cmd2 += "<batch-execution lookup=\"ksession2\">\n";
         cmd2 += "  <insert out-identifier=\"salaboy\" disconnected=\"true\">\n";
-        cmd2 += "      <org.kie.springframework.Person3>\n";
+        cmd2 += "      <test1.Person3>\n";
         cmd2 += "         <name>salaboy</name>\n";
         cmd2 += "         <age>27</age>\n";
-        cmd2 += "      </org.kie.springframework.Person3>\n";
+        cmd2 += "      </test1.Person3>\n";
         cmd2 += "   </insert>\n";
         cmd2 += "   <fire-all-rules/>\n";
         cmd2 += "</batch-execution>\n";

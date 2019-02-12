@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.test;
+package drl_persistence_rb;
 
 global java.util.List list;
 

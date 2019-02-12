@@ -1,5 +1,3 @@
-package org.test.rules;
-
 import org.kie.camel.container.api.model.Person;
 
 global java.lang.String testGlobal

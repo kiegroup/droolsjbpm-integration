@@ -82,7 +82,7 @@ public class KieEmbeddedEndpointChannelTest extends KieCamelTestSupport {
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         String rule = "";
-        rule += "package org.kie.pipeline.camel \n";
+        rule += "import " + Person.class.getCanonicalName() + ";\n";
         rule += "rule rule1 \n";
         rule += "  when \n";
         rule += "    $p : Person( name == 'bob' ) \n";
