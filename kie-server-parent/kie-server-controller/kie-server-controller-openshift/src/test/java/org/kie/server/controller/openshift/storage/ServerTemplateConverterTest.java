@@ -31,6 +31,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
@@ -148,10 +149,12 @@ public class ServerTemplateConverterTest {
         boolean result = true;
         String id = null;
         String url = null;
+        String mode = null;
         try {
             id = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_ID);
             url = ServerTemplateConverter.resolveServerUrl(state);
-
+            mode = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_MODE);
+            
             if (!template.getId().equals(id)) {
                 fail("Id doesn't match!");
             }
@@ -183,6 +186,10 @@ public class ServerTemplateConverterTest {
 
             if (!template.getServerInstance(id).getUrl().equals(url)) {
                 fail("Server URL doesn't match!");
+            }
+
+            if (template.getMode() == null || !template.getMode().equals(KieServerMode.valueOf(mode))) {
+                fail("Server MODE doesn't match!");
             }
 
             // ContainerSpec and ContainerResource mapping check

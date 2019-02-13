@@ -29,11 +29,14 @@ metadata:
 data:
   kie-server-state: |-
     <kie-server-state>
-      <controllers>
-        <string>ws://172.30.111.77:8080/websocket/controller</string>
-      </controllers>
+      <controllers/>
       <configuration>
         <configItems>
+          <config-item>
+            <name>org.kie.server.mode</name>
+            <value>DEVELOPMENT</value>
+            <type>java.lang.String</type>
+          </config-item>
           <config-item>
             <name>org.kie.server.persistence.ds</name>
             <value>java:/jboss/datasources/ExampleDS</value>

@@ -30,6 +30,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
@@ -64,6 +65,7 @@ public class ServerTemplateConverter {
         ServerTemplate template = new ServerTemplate();
         String id = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_ID);
         String url = resolveServerUrl(state);
+        String mode = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_MODE, KieServerMode.DEVELOPMENT.name());
 
         template.setId(id);
         template.setName(id);
@@ -118,17 +120,20 @@ public class ServerTemplateConverter {
         }
 
         template.setCapabilities(capabilities);
+        template.setMode(KieServerMode.valueOf(mode));
 
         return template;
     }
 
     public static KieServerState toState(ServerTemplate template) {
         String id = template.getId();
+        KieServerMode mode = template.getMode() == null ? KieServerMode.DEVELOPMENT : template.getMode();
         KieServerState state = new KieServerState();
         KieServerConfig config = new KieServerConfig();
         Set<KieContainerResource> containers = new HashSet<>();
 
         config.addConfigItem(new KieServerConfigItem(KieServerConstants.KIE_SERVER_ID, id, String.class.getName()));
+        config.addConfigItem(new KieServerConfigItem(KieServerConstants.KIE_SERVER_MODE, mode.name(), String.class.getName()));
 
         if (template.getServerInstance(id) != null) {
             config.addConfigItem(new KieServerConfigItem(KieServerConstants.KIE_SERVER_LOCATION,
