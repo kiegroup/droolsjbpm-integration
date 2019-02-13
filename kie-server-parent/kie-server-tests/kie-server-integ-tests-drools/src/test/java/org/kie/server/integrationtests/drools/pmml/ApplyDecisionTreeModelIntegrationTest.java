@@ -20,20 +20,21 @@ import org.drools.core.command.runtime.pmml.ApplyPmmlModelCommand;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.KieServices;
 import org.kie.api.pmml.PMML4Result;
 import org.kie.api.pmml.PMMLRequestData;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * Test used for applying a PMML model to input data.
@@ -46,16 +47,17 @@ public class ApplyDecisionTreeModelIntegrationTest extends PMMLApplyModelBaseTes
 
     private static final String CONTAINER_ID = "decision-tree";
 
-    private static ClassLoader kjarClassLoader;
+    private static final long EXTENDED_TIMEOUT = 300000L;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/decision-tree");
 
-        kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
-
-        createContainer(CONTAINER_ID, releaseId);
+        // Having timeout issues due to pmml -> raised timeout.
+        KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
+        ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+        KieServerAssert.assertSuccess(reply);
     }
 
     @Test
