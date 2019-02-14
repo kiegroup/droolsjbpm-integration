@@ -154,11 +154,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>kie-pmml</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
       <scope>runtime</scope>
