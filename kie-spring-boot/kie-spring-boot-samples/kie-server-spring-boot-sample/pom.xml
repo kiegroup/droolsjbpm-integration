@@ -108,8 +108,8 @@
 
     <!--Java 11 test dependencies-->
     <dependency>
-      <groupId>javax.xml.ws</groupId>
-      <artifactId>jaxws-api</artifactId>
+      <groupId>org.jboss.spec.javax.xml.ws</groupId>
+      <artifactId>jboss-jaxws-api_2.3_spec</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
