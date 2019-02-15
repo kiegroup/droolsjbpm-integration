@@ -105,13 +105,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <!--Java 11 test dependencies-->
-    <dependency>
-      <groupId>org.jboss.spec.javax.xml.ws</groupId>
-      <artifactId>jboss-jaxws-api_2.3_spec</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
