@@ -1163,6 +1163,7 @@
         <kieserver.optaplanner.enabled>false</kieserver.optaplanner.enabled>
         <kieserver.swagger.enabled>false</kieserver.swagger.enabled>
         <jbpm.executor.enabled>false</jbpm.executor.enabled>
+        <kieserver.prometheus.enabled>false</kieserver.prometheus.enabled>
         <!-- Springboot GAV -->
         <springboot.app.group.id>org.kie</springboot.app.group.id>
         <springboot.app.artifact.id>kie-server-spring-boot-integ-tests-sample</springboot.app.artifact.id>
@@ -1236,6 +1237,9 @@
                       <argument>-Dorg.kie.server.persistence.ds=${org.kie.server.persistence.ds}</argument>
                       <argument>-Dorg.jbpm.document.storage=${org.jbpm.document.storage}</argument>
                       <argument>-Dkie.server.base.http.url=${kie.server.base.http.url}</argument>
+                      <argument>-Dorg.kie.server.mode=REGULAR</argument>
+                      <!-- Enable Prometheus extension by system property as only enabled extensions can be used and published by Kie server SpringBoot in current implementation. -->
+                      <argument>-Dorg.kie.prometheus.server.ext.disabled=false</argument>
                       <argument>org.springframework.boot.loader.JarLauncher</argument>
                     </arguments>
                   </configuration>

@@ -318,6 +318,7 @@
       <properties>
         <kieserver.drools.enabled>true</kieserver.drools.enabled>
         <kieserver.dmn.enabled>true</kieserver.dmn.enabled>
+        <kieserver.prometheus.enabled>true</kieserver.prometheus.enabled>
       </properties>
     </profile>
   </profiles>

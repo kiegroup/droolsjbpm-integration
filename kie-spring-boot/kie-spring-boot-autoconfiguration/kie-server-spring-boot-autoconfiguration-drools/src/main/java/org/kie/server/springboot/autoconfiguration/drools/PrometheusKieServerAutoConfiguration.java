@@ -37,7 +37,7 @@ public class PrometheusKieServerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "prometheusServerExtension")
     @ConditionalOnProperty(name = "kieserver.prometheus.enabled")
-    public KieServerExtension droolsServerExtension() {
+    public KieServerExtension prometheusServerExtension() {
         return new PrometheusKieServerExtension();
     }
 }

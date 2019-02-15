@@ -319,6 +319,7 @@
       <id>springboot</id>
       <properties>
         <kieserver.drools.enabled>true</kieserver.drools.enabled>
+        <kieserver.prometheus.enabled>true</kieserver.prometheus.enabled>
       </properties>
     </profile>
   </profiles>
