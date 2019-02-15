@@ -174,6 +174,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             // migrate process instance to evaluation 2 in container 2
             List<MigrationReportInstance> reports = processAdminClient.migrateProcessInstances(CONTAINER_ID, ids, CONTAINER_ID_2, PROCESS_ID_EVALUATION_2);
             assertNotNull(reports);
+            assertEquals(5, reports.size());
 
             for (MigrationReportInstance report : reports) {
                 assertTrue(report.isSuccessful());
@@ -238,6 +239,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             // migrate process instance to evaluation 2 in container 2
             List<MigrationReportInstance> reports = processAdminClient.migrateProcessInstances(CONTAINER_ID, ids, CONTAINER_ID_2, PROCESS_ID_EVALUATION_2, nodeMapping);
             assertNotNull(reports);
+            assertEquals(5, reports.size());
 
             for (MigrationReportInstance report : reports) {
                 assertTrue(report.isSuccessful());
