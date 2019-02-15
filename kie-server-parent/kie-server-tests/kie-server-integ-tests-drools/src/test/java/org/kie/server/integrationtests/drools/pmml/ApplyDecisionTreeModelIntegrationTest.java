@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * Test used for applying a PMML model to input data.
@@ -60,7 +59,7 @@ public class ApplyDecisionTreeModelIntegrationTest extends PMMLApplyModelBaseTes
 
     @Test
     public void testApplyPmmlDecisionTree() {
-        Assume.assumeTrue(marshallingFormat == MarshallingFormat.JAXB); // RHPAM-1875
+        Assume.assumeTrue((marshallingFormat == MarshallingFormat.JSON) || (marshallingFormat == MarshallingFormat.JAXB)); // RHPAM-1875
 
         PMMLRequestData request = new PMMLRequestData("123", "TreeTest");
         request.addRequestParam("fld1", 30.0);

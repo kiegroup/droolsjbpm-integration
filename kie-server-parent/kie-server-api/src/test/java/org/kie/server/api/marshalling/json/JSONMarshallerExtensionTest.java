@@ -23,11 +23,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+import org.kie.api.pmml.PMMLRequestData;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class JSONMarshallerExtensionTest {
     private static final DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -43,6 +44,14 @@ public class JSONMarshallerExtensionTest {
         
         GregorianCalendar unmarshall = marshaller.unmarshall(marshall, GregorianCalendar.class);
         assertEquals(unmarshall, calendar);
+
+        PMMLRequestData request = new PMMLRequestData("123", "SimpleScorecard");
+        request.addRequestParam("param1", 10.0);
+        request.addRequestParam("param2", 15.0);
+        String mshl = marshaller.marshall(request);
+        PMMLRequestData rd = marshaller.unmarshall(mshl, PMMLRequestData.class);
+        assertEquals(rd, request);
+        System.out.println(rd);
     }
     
 }

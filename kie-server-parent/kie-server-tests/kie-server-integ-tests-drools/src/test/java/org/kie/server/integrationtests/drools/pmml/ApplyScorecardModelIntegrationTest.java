@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * Test used for applying a PMML model to input data.
@@ -63,7 +62,7 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
 
     @Test
     public void testApplyPmmlScorecard() {
-        Assume.assumeTrue(marshallingFormat == MarshallingFormat.JAXB); // RHPAM-1875
+        Assume.assumeTrue((marshallingFormat == MarshallingFormat.JSON) || (marshallingFormat == MarshallingFormat.JAXB)); // RHPAM-1875
 
         PMMLRequestData request = new PMMLRequestData("123", "SimpleScorecard");
         request.addRequestParam("param1", 10.0);
@@ -77,6 +76,7 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
         PMML4Result resultHolder = (PMML4Result) results.getResult().getValue("results");
         assertNotNull(resultHolder);
         assertEquals("OK", resultHolder.getResultCode());
+
         double score = resultHolder.getResultValue("ScoreCard", "score", Double.class).get();
         Assertions.assertThat(score).isEqualTo(40.8);
         Map<String, Double> rankingMap = (Map<String, Double>) resultHolder.getResultValue("ScoreCard", "ranking");
