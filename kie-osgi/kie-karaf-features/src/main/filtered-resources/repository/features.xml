@@ -157,6 +157,7 @@
     <bundle>mvn:org.kie.server/kie-server-client/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie/kie-dmn-model/${version.org.kie}</bundle> <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api, which needs kie-dmn-model -->
     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>   <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api -->
+    <bundle>mvn:org.drools/kie-pmml/${version.org.kie}</bundle>
     <bundle>wrap:mvn:org.jboss.spec.javax.ws.rs/jboss-jaxrs-api_2.0_spec/${version.org.jboss.spec.javax.ws.rs.jboss-jaxrs-api_2.0_spec}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
