@@ -11,7 +11,6 @@
 
   <groupId>org.kie</groupId>
   <artifactId>kie-gwthelper-maven-plugin</artifactId>
-  <version>1.0</version>
   <packaging>maven-plugin</packaging>
 
   <name>KIE :: Gwt Helper Maven Plugin</name>
