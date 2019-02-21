@@ -39,11 +39,10 @@ import org.codehaus.plexus.util.StringUtils;
 public class AddSourceMojo  extends AbstractMojo {
 
     private final static String SRC_MAIN_JAVA = "/src/main/java".replace("/", System.getProperty("file.separator"));
-    private final static String SRC_MAIN_RESOURCES = "/src/main/resources".replace("/", System.getProperty("file.separator"));
+    private final static String SRC_MAIN_RESOURCES = "/src/main/resources".replace("/", File.separator);
 
     /**
      * Comma-separated additional source directories.
-     * @since 0.1
      */
     @Parameter(required = true)
     private String rootDirectories;
@@ -51,7 +50,6 @@ public class AddSourceMojo  extends AbstractMojo {
     /**
      * Comma-separated pattern to match for including modules.
      * Does not use regex, but simple string
-     * @since 0.1
      */
     @Parameter(required = false)
     private String includes;
@@ -59,14 +57,11 @@ public class AddSourceMojo  extends AbstractMojo {
     /**
      * Comma-separated pattern to match for excluding modules.
      * Does not use regex, but simple string
-     * @since 0.1
+     *
      */
     @Parameter(required = false)
     private String excludes;
 
-    /**
-     * @since 0.1
-     */
     @Parameter(readonly = true, defaultValue = "${project}")
     private MavenProject project;
 
@@ -126,7 +121,7 @@ public class AddSourceMojo  extends AbstractMojo {
      * Method to check if in the given directory is a <i>valid</i> <b>Gwt</b> module, i.e. it contains a "src/main/resources/./.gwt.xml" file
      * eventually matching the <b>includes/excludes</b> patterns
      * @param toCheck
-     * @return
+     * @return <code>true</code> if the given directory contains a <b>Gwt</b> module, <code>false</code> otherwise
      * @throws MojoExecutionException
      */
     private boolean isValidGwtModule(File toCheck) throws MojoExecutionException {
@@ -161,7 +156,7 @@ public class AddSourceMojo  extends AbstractMojo {
     /**
      * Method to check if the given directory is a <b>Maven</b> module (it contains <b>pom.xml</b>)
      * @param toCheck
-     * @return
+     * @return <code>true</code> if the given directory contains a <b>Maven</b> module, <code>false</code> otherwise
      */
     private boolean isMavenModule(File toCheck) {
         return toCheck.isDirectory() && toCheck.list() != null && Arrays.asList(toCheck.list()).contains("pom.xml");
@@ -172,7 +167,7 @@ public class AddSourceMojo  extends AbstractMojo {
      * Matching is done with String.contains()
      * @param toCheck
      * @param pattern
-     * @return
+     * @return <code>true</code> if the <b>toCheck</b> String contains the <b>pattern</b> one, <code>false</code> otherwise
      */
     private boolean matchPattern(String toCheck, String pattern) {
         return Arrays.stream(pattern.split(",")).anyMatch(toCheck::contains);
