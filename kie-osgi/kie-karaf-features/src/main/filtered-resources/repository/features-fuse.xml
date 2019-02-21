@@ -107,6 +107,7 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">optaplanner-engine</feature>
     <feature>kie7-remote-dependencies</feature>
+    <bundle>mvn:org.drools/kie-pmml/${version.org.kie}</bundle>
     <bundle>mvn:org.kie.server/kie-server-api/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie.server/kie-server-common/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie.server/kie-server-client/${version.org.drools.droolsjbpm-integration}</bundle>
