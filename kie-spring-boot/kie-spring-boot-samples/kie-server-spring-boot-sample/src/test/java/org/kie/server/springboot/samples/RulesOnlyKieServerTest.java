@@ -82,7 +82,7 @@ public class RulesOnlyKieServerTest {
     
     @BeforeClass
     public static void generalSetup() {
-        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.name());
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.PRODUCTION.name());
         createKJar();
     }
 

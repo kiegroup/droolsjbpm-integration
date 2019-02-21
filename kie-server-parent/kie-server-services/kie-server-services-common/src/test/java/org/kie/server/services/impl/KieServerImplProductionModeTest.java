@@ -1,11 +1,10 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,70 +30,51 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class KieServerImplDevelopmentModeTest extends AbstractKieServerImplTest {
+public class KieServerImplProductionModeTest extends AbstractKieServerImplTest {
 
     @Override
     KieServerMode getTestMode() {
-        return KieServerMode.DEVELOPMENT;
+        return KieServerMode.PRODUCTION;
     }
 
     @Test
-    public void testCreateContainerValidationSNAPSHOT() {
-        testCreateContainer(getVersion(KieServerMode.DEVELOPMENT));
-    }
-
-    @Test
-    public void testCreateContainerValidationNonSNAPSHOT() {
-        testCreateContainer(getVersion(KieServerMode.PRODUCTION));
-    }
-
-    @Test
-    public void testUpdateContainerNonSnapshot() {
-        testUpdateContainer(getVersion(KieServerMode.PRODUCTION));
-    }
-
-    @Test
-    public void testUpdateContainerSNAPSHOT() {
-        testUpdateContainer(getVersion(KieServerMode.DEVELOPMENT));
-    }
-
-    private void testCreateContainer(String version) {
+    public void testCreateContainerValidationGAVConflict() {
         String containerId = "container-to-create";
 
         createEmptyKjar(containerId);
 
-        ReleaseId testReleaseId = new ReleaseId(GROUP_ID, containerId, version);
+        ReleaseId testReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(KieServerMode.DEVELOPMENT));
 
         // create the container (provide scanner info as well)
         KieContainerResource kieContainerResource = new KieContainerResource(containerId, testReleaseId);
         KieScannerResource kieScannerResource = new KieScannerResource(KieScannerStatus.STARTED, 20000L);
         kieContainerResource.setScanner(kieScannerResource);
         ServiceResponse<KieContainerResource> createResponse = kieServer.createContainer(containerId, kieContainerResource);
-        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
-
-        kieServer.disposeContainer(containerId);
+        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
     }
 
-    private void testUpdateContainer(String version) {
+    @Test
+    public void testUpdateContainerWithGAVConflict() {
         KieServerExtension extension = mock(KieServerExtension.class);
-        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(true);
+        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(false);
         extensions.add(extension);
 
         String containerId = "container-to-update";
 
         startContainerToUpdate(containerId);
 
-        ReleaseId updateReleaseId = new ReleaseId(GROUP_ID, containerId, version);
+        ReleaseId updateReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(KieServerMode.DEVELOPMENT));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, updateReleaseId, true);
-        Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+        Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
 
-        verify(extension).isUpdateContainerAllowed(anyString(), any(), any());
-        verify(extension).updateContainer(any(), any(), any());
+        verify(extension, never()).isUpdateContainerAllowed(anyString(), any(), any());
+        verify(extension, never()).updateContainer(any(), any(), any());
 
         kieServer.disposeContainer(containerId);
     }
