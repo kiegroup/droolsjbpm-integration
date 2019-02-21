@@ -40,7 +40,7 @@ import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.ContainerManager;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
-import org.kie.server.services.openshift.api.KieServerReadinessProbe;
+import org.kie.server.services.openshift.api.KieServerOpenShift;
 import org.kie.server.services.openshift.impl.storage.cloud.CloudClientFactory;
 import org.kie.server.services.openshift.impl.storage.cloud.KieServerStateCloudRepository;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
     private static Supplier<OpenShiftClient> clouldClientHelper = () -> (new CloudClientFactory() {}).createOpenShiftClient();
 
-    private static class WatchRunner implements Runnable, KieServerReadinessProbe {
+    private static class WatchRunner implements Runnable, KieServerOpenShift {
 
         private boolean isWatchRunning = true;
         private String kieServerId;
@@ -74,7 +74,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                         logger.debug("Event - Action: {}, {} on ConfigMap ",
                                     action, kieServerState.getMetadata().getName());
 
-                        DeploymentConfig dc = client.deploymentConfigs().withName(kieServerId).get();
+                        DeploymentConfig dc = getKieServerDC(client, kieServerId).orElseThrow(IllegalStateException::new);
                         if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
                             ObjectMeta md = dc.getSpec().getTemplate().getMetadata();
                             Map<String, String> ann = md.getAnnotations() == null ? new HashMap<>() : md.getAnnotations();

@@ -18,12 +18,16 @@ package org.kie.server.controller.api;
 
 public final class KieServerControllerConstants {
 
-    private KieServerControllerConstants(){}
+    private KieServerControllerConstants() {}
 
     public static final String KIE_CONTROLLER_SWAGGER_DISABLED = "org.kie.server.controller.swagger.disabled";
 
     public static final String KIE_CONTROLLER_TEMPLATE_CACHE_TTL = "org.kie.server.controller.template.cache.ttl";
 
-    public static final String KIE_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE = 
+    public static final String KIE_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE =
             "org.kie.server.controller.openshift.prefer.kieserver.service";
+
+    public static final String KIE_CONTROLLER_OCP_GLOBAL_DISCOVERY_ENABLED =
+            "org.kie.server.controller.openshift.global.discovery.enabled";
+
 }
