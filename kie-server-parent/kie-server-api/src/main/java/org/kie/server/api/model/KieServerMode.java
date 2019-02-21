@@ -17,5 +17,5 @@
 package org.kie.server.api.model;
 
 public enum KieServerMode {
-    REGULAR, DEVELOPMENT
+    PRODUCTION, DEVELOPMENT
 }
