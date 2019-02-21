@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
 import javax.naming.InitialContext;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -85,7 +86,7 @@ public class KieServerImpl implements KieServer {
     private static final ServiceLoader<KieServerController> kieControllers = ServiceLoader.load(KieServerController.class);
 
     private static final ServiceLoader<KieServerStateRepository> serverStateRepos = ServiceLoader.load(KieServerStateRepository.class);
-    
+
     private KieServerRegistry context;
     private PolicyManager policyManager;
     private KieServerStateRepository repository;
@@ -100,9 +101,9 @@ public class KieServerImpl implements KieServer {
     private KieServerEventSupport eventSupport = new KieServerEventSupport();
 
     private KieServices ks = KieServices.Factory.get();
-    
+
     private long startTimestamp;
-    
+
     private boolean managementDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "false"));
 
     private KieServerMode mode;
@@ -114,17 +115,17 @@ public class KieServerImpl implements KieServer {
     public KieServerImpl(KieServerStateRepository stateRepository) {
         this.repository = stateRepository;
 
-        String modeParam = System.getProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.DEVELOPMENT.toString());
+        String modeParam = System.getProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.toString());
 
         try {
             mode = KieServerMode.valueOf(modeParam.toUpperCase());
             logger.info("Starting server in '" + mode.name() + "' mode.");
         } catch (Exception ex) {
-            mode = KieServerMode.DEVELOPMENT;
-            logger.warn("Unable to parse value of " + KieServerConstants.KIE_SERVER_MODE + " = " + modeParam + "; supported values are 'REGULAR' or 'DEVELOPMENT'. Falling back to 'DEVELOPMENT' mode.");
+            mode = KieServerMode.REGULAR;
+            logger.warn("Unable to parse value of " + KieServerConstants.KIE_SERVER_MODE + " = " + modeParam + "; supported values are 'REGULAR' or 'DEVELOPMENT'. Falling back to 'REGULAR' mode.");
         }
     }
-    
+
     public void init() {
         StartupStrategy startupStrategy = StartupStrategyProvider.get().getStrategy();
         logger.info("Selected startup strategy {}", startupStrategy);
@@ -137,7 +138,7 @@ public class KieServerImpl implements KieServer {
         }
 
         logger.info("Configured '{}' server state repository", this.repository.getClass().getSimpleName());
-        
+
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
         this.context.registerStateRepository(repository);
@@ -179,12 +180,11 @@ public class KieServerImpl implements KieServer {
         eventSupport.fireBeforeServerStarted(this);
 
         startTimestamp = System.currentTimeMillis();
-        
+
         startupStrategy.startup(this, containerManager, currentState, kieServerActive);
-        
+
         eventSupport.fireAfterServerStarted(this);
     }
-    
 
     public KieServerRegistry getServerRegistry() {
         return context;
@@ -362,29 +362,23 @@ public class KieServerImpl implements KieServer {
 
         boolean isSnapshot = KieServerUtils.isSnapshot(releaseId);
 
-        if (isSnapshot) {
-            if (mode.equals(KieServerMode.REGULAR)) {
-                return new ServiceResponse<>(ResponseType.FAILURE, preffix + " KieServer running on REGULAR mode doesn't support deploying SNAPSHOT modules.");
-            }
-        } else {
-            if (mode.equals(KieServerMode.DEVELOPMENT)) {
-                return new ServiceResponse<>(ResponseType.FAILURE, preffix + " KieServer running on DEVELOPMENT mode only support deploying SNAPSHOT modules.");
-            }
+        if (isSnapshot && mode.equals(KieServerMode.REGULAR)) {
+            return new ServiceResponse<>(ResponseType.FAILURE, preffix + " Kie Server running on REGULAR mode doesn't support deploying SNAPSHOT modules.");
         }
 
         return null;
     }
 
     public ServiceResponse<KieContainerResource> activateContainer(String containerId) {
-     
+
         List<Message> messages = new CopyOnWriteArrayList<Message>();
         try {
             KieContainerInstanceImpl kci = context.getContainer(containerId);
-            if (kci != null && kci.getStatus().equals(KieContainerStatus.DEACTIVATED)) { 
-                
+            if (kci != null && kci.getStatus().equals(KieContainerStatus.DEACTIVATED)) {
+
                 synchronized (kci) {
                     eventSupport.fireBeforeContainerActivated(this, kci);
-                    
+
                     Map<String, Object> parameters = getContainerParameters(kci.getKieContainer().getContainerReleaseId(), messages);
                     // process server extensions
                     List<KieServerExtension> extensions = context.getServerExtensions();
@@ -392,7 +386,7 @@ public class KieServerImpl implements KieServer {
                         extension.activateContainer(containerId, kci, parameters);
                         logger.debug("Container {} (for release id {}) {} activation: DONE", containerId, kci.getKieContainer().getContainerReleaseId(), extension);
                     }
-                    
+
                     kci.setStatus(KieContainerStatus.STARTED);
 
                     // store the current state of the server
@@ -405,7 +399,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerActivated(this, kci);
-                    
+
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " activated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " activated successfully.", kci.getResource());
                 }
@@ -422,17 +416,17 @@ public class KieServerImpl implements KieServer {
             this.containerMessages.put(containerId, messages);
         }
     }
-    
+
     public ServiceResponse<KieContainerResource> deactivateContainer(String containerId) {
-        
+
         List<Message> messages = new CopyOnWriteArrayList<Message>();
         try {
             KieContainerInstanceImpl kci = context.getContainer(containerId);
-            if (kci != null && kci.getStatus().equals(KieContainerStatus.STARTED)) { 
-                
+            if (kci != null && kci.getStatus().equals(KieContainerStatus.STARTED)) {
+
                 synchronized (kci) {
                     eventSupport.fireBeforeContainerDeactivated(this, kci);
-                    
+
                     Map<String, Object> parameters = getContainerParameters(kci.getKieContainer().getContainerReleaseId(), messages);
                     // process server extensions
                     List<KieServerExtension> extensions = context.getServerExtensions();
@@ -440,9 +434,9 @@ public class KieServerImpl implements KieServer {
                         extension.deactivateContainer(containerId, kci, parameters);
                         logger.debug("Container {} (for release id {}) {} deactivation: DONE", containerId, kci.getKieContainer().getContainerReleaseId(), extension);
                     }
-                    
+
                     kci.setStatus(KieContainerStatus.DEACTIVATED);
-                    
+
                     // store the current state of the server
                     storeServerState(currentState -> {
                         currentState.getContainers().forEach(containerResource -> {
@@ -453,7 +447,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerDeactivated(this, kci);
-                    
+
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " deactivated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " deactivated successfully.", kci.getResource());
                 }
@@ -487,9 +481,9 @@ public class KieServerImpl implements KieServer {
                     e.getClass().getName() + ": " + e.getMessage());
         }
     }
-    
+
     protected List<KieContainerInstanceImpl> getContainers() {
-        
+
         return context.getContainers();
     }
 
@@ -997,7 +991,7 @@ public class KieServerImpl implements KieServer {
     protected Map<String, Object> getReleaseUpdateParameters(final org.kie.api.builder.ReleaseId releaseId, final List<Message> messages, final boolean resetBeforeUpdate) {
         Map<String, Object> parameters = getContainerParameters(releaseId, messages);
 
-        if(mode.equals(KieServerMode.DEVELOPMENT) && KieServerUtils.isSnapshot(releaseId)) {
+        if (mode.equals(KieServerMode.DEVELOPMENT) && KieServerUtils.isSnapshot(releaseId)) {
             parameters.put(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, resetBeforeUpdate);
         } else {
             parameters.put(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, false);
@@ -1084,7 +1078,7 @@ public class KieServerImpl implements KieServer {
     public PolicyManager getPolicyManager() {
         return this.policyManager;
     }
-    
+
     public boolean isKieServerReady() {
         return kieServerReady.get();
     }
@@ -1092,7 +1086,7 @@ public class KieServerImpl implements KieServer {
     public void markAsReady() {
         kieServerReady.set(true);
         logger.info("KieServer {} is ready to receive requests", KieServerEnvironment.getServerId());
-        
+
         for (KieServerExtension extension : context.getServerExtensions()) {
 
             try {
@@ -1102,7 +1096,7 @@ public class KieServerImpl implements KieServer {
             }
         }
     }
-    
+
     public List<Message> healthCheck(boolean report) throws IllegalStateException {
         List<Message> healthMessages = new ArrayList<>();
         long start = System.currentTimeMillis();
@@ -1110,14 +1104,14 @@ public class KieServerImpl implements KieServer {
             healthMessages.add(new Message(Severity.ERROR, String.format("KIE Server '%s' is not ready to serve requests",
                                                                          KieServerEnvironment.getServerId())));
         }
-        
+
         if (report) {
             List<String> mainInfo = new ArrayList<>();
-            mainInfo.add(String.format("KIE Server '%s' is ready to serve requests %s", 
-                                       KieServerEnvironment.getServerId(), 
+            mainInfo.add(String.format("KIE Server '%s' is ready to serve requests %s",
+                                       KieServerEnvironment.getServerId(),
                                        isKieServerReady()));
             mainInfo.add("Server is up for " + calculateUptime());
-            
+
             Message header = new Message(Severity.INFO, mainInfo);
             healthMessages.add(header);
         }
@@ -1125,39 +1119,37 @@ public class KieServerImpl implements KieServer {
         for (KieContainerInstance container : getContainers()) {
             if (container.getStatus().equals(KieContainerStatus.FAILED)) {
                 healthMessages.add(new Message(Severity.ERROR, String.format("KIE Container '%s' is in FAILED state",
-                                                                             container.getContainerId()) ));
+                                                                             container.getContainerId())));
             }
         }
         // next check all extensions for their health
         for (KieServerExtension extension : getServerExtensions()) {
             List<Message> extensionMessages = extension.healthCheck(report);
-            healthMessages.addAll(extensionMessages);        
+            healthMessages.addAll(extensionMessages);
         }
-        
-        if (report) {           
+
+        if (report) {
             Message footer = new Message(Severity.INFO, "Health check done in " + (System.currentTimeMillis() - start) + " ms");
             healthMessages.add(footer);
         }
-        
+
         return healthMessages;
- 
     }
-    
+
     private String calculateUptime() {
 
         long different = System.currentTimeMillis() - startTimestamp;
         return DurationFormatUtils.formatDurationWords(different, false, false);
-
     }
-    
+
     public ServiceResponse<?> checkAccessability() {
         if (managementDisabled) {
             return new ServiceResponse<Void>(ServiceResponse.ResponseType.FAILURE, "KIE Server management api is disabled");
         }
-        
+
         return null;
     }
-    
+
     @Override
     public String toString() {
         return "KieServer{" +
@@ -1167,5 +1159,4 @@ public class KieServerImpl implements KieServer {
                 "location='" + kieServerLocation + '\'' +
                 '}';
     }
-
 }

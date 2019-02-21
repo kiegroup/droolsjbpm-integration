@@ -15,7 +15,6 @@
  */
 package org.kie.server.integrationtests.shared;
 
-import org.kie.server.api.model.KieServerMode;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,7 +72,6 @@ public class KieServerExecutor {
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getEmbeddedKieServerHttpUrl());
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
         System.setProperty(KieServerConstants.CFG_SYNC_DEPLOYMENT, Boolean.toString(syncWithController));
-        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.name());
 
         // kie server policy settings
         System.setProperty(KieServerConstants.KIE_SERVER_ACTIVATE_POLICIES, "KeepLatestOnly");

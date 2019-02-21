@@ -34,7 +34,7 @@ data:
         <configItems>
           <config-item>
             <name>org.kie.server.mode</name>
-            <value>DEVELOPMENT</value>
+            <value>REGULAR</value>
             <type>java.lang.String</type>
           </config-item>
           <config-item>

@@ -65,7 +65,7 @@ public class ServerTemplateConverter {
         ServerTemplate template = new ServerTemplate();
         String id = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_ID);
         String url = resolveServerUrl(state);
-        String mode = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_MODE, KieServerMode.DEVELOPMENT.name());
+        String mode = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.name());
 
         template.setId(id);
         template.setName(id);

@@ -69,8 +69,6 @@ import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -79,9 +77,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -118,7 +114,6 @@ public abstract class AbstractKieServerImplTest {
         System.setProperty(KieServerConstants.KIE_SERVER_ID, KIE_SERVER_ID);
         KieServerEnvironment.setServerId(KIE_SERVER_ID);
 
-
         FileUtils.deleteDirectory(REPOSITORY_DIR);
         FileUtils.forceMkdir(REPOSITORY_DIR);
         kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR)) {
@@ -130,7 +125,7 @@ public abstract class AbstractKieServerImplTest {
         kieServer.init();
     }
 
-    private String getVersion(KieServerMode mode) {
+    protected String getVersion(KieServerMode mode) {
         return mode.equals(KieServerMode.DEVELOPMENT) ? DEVELOPMENT_MODE_VERSION : REGULAR_MODE_VERSION;
     }
 
@@ -152,7 +147,7 @@ public abstract class AbstractKieServerImplTest {
         assertTrue(kieServer.isKieServerReady());
     }
 
-    @Test(timeout=10000)
+    @Test(timeout = 10000)
     public void testReadinessCheckDelayedStart() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         CountDownLatch startedlatch = new CountDownLatch(1);
@@ -189,7 +184,7 @@ public abstract class AbstractKieServerImplTest {
         assertEquals(1, footer.getMessages().size());
     }
 
-    @Test(timeout=10000)
+    @Test(timeout = 10000)
     public void testHealthCheckDelayedStart() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         CountDownLatch startedlatch = new CountDownLatch(1);
@@ -226,7 +221,6 @@ public abstract class AbstractKieServerImplTest {
                 containers.add(container);
                 return containers;
             }
-
         };
         kieServer.init();
         List<Message> healthMessages = kieServer.healthCheck(false);
@@ -372,7 +366,6 @@ public abstract class AbstractKieServerImplTest {
 
                 assertForbiddenResponse(forbidden);
             }
-
         } finally {
             System.clearProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED);
         }
@@ -455,22 +448,6 @@ public abstract class AbstractKieServerImplTest {
     }
 
     @Test
-    public void testCreateContainerValidationModeConflict() {
-        String containerId = "container-to-create";
-
-        createEmptyKjar(containerId);
-
-        ReleaseId testReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(mode.equals(KieServerMode.DEVELOPMENT) ? KieServerMode.REGULAR : KieServerMode.DEVELOPMENT));
-
-        // create the container (provide scanner info as well)
-        KieContainerResource kieContainerResource = new KieContainerResource(containerId, testReleaseId);
-        KieScannerResource kieScannerResource = new KieScannerResource(KieScannerStatus.STARTED, 20000L);
-        kieContainerResource.setScanner(kieScannerResource);
-        ServiceResponse<KieContainerResource> createResponse = kieServer.createContainer(containerId, kieContainerResource);
-        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
-    }
-
-    @Test
     public void testUpdateContainer() {
         KieServerExtension extension = mock(KieServerExtension.class);
         when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(true);
@@ -509,27 +486,6 @@ public abstract class AbstractKieServerImplTest {
     }
 
     @Test
-    public void testUpdateContainerWithModeConflict() {
-        KieServerExtension extension = mock(KieServerExtension.class);
-        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(false);
-        extensions.add(extension);
-
-        String containerId = "container-to-update";
-
-        startContainerToUpdate(containerId);
-
-        ReleaseId updateReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(mode.equals(KieServerMode.DEVELOPMENT) ? KieServerMode.REGULAR : KieServerMode.DEVELOPMENT));
-
-        ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, updateReleaseId, true);
-        Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
-
-        verify(extension, never()).isUpdateContainerAllowed(anyString(), any(), any());
-        verify(extension, never()).updateContainer(any(), any(), any());
-
-        kieServer.disposeContainer(containerId);
-    }
-
-    @Test
     public void testUpdateContainerWithNullReleaseID() {
         KieServerExtension extension = mock(KieServerExtension.class);
         when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(false);
@@ -548,7 +504,7 @@ public abstract class AbstractKieServerImplTest {
         kieServer.disposeContainer(containerId);
     }
 
-    private void startContainerToUpdate(String containerId) {
+    protected void startContainerToUpdate(String containerId) {
         createEmptyKjar(containerId);
 
         ReleaseId releaseId = new ReleaseId(this.releaseId);
@@ -649,10 +605,8 @@ public abstract class AbstractKieServerImplTest {
                             throw new KieControllerNotConnectedException("Unable to connect to any controller");
                         }
                     }
-
                 };
             }
-
         };
         server.init();
         return server;
@@ -684,7 +638,6 @@ public abstract class AbstractKieServerImplTest {
                                 "expected: releaseId=" + configuredReleaseId + ", resolvedReleaseId=" + resolvedReleaseId);
     }
 
-
     protected void createEmptyKjar(String artifactId) {
         createEmptyKjar(artifactId, testVersion);
     }
@@ -694,8 +647,8 @@ public abstract class AbstractKieServerImplTest {
         KieServices kieServices = KieServices.Factory.get();
         KieFileSystem kfs = kieServices.newKieFileSystem();
         releaseId = kieServices.newReleaseId(GROUP_ID, artifactId, version);
-        KieModule kieModule = kieServices.newKieBuilder(kfs ).buildAll().getKieModule();
-        KieMavenRepository.getKieMavenRepository().installArtifact(releaseId, (InternalKieModule)kieModule, createPomFile(artifactId, version ) );
+        KieModule kieModule = kieServices.newKieBuilder(kfs).buildAll().getKieModule();
+        KieMavenRepository.getKieMavenRepository().installArtifact(releaseId, (InternalKieModule) kieModule, createPomFile(artifactId, version));
         kieServices.getRepository().addKieModule(kieModule);
     }
 
@@ -718,5 +671,4 @@ public abstract class AbstractKieServerImplTest {
             throw new RuntimeException(e);
         }
     }
-
 }

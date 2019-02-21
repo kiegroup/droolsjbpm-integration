@@ -177,7 +177,6 @@
                 <type>installed</type>
                 <systemProperties>
                   <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
-                  <org.kie.server.mode>regular</org.kie.server.mode>
                 </systemProperties>
               </container>
               <deployables>
@@ -284,7 +283,6 @@
                 <type>installed</type>
                 <systemProperties>
                   <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
-                  <org.kie.server.mode>regular</org.kie.server.mode>
                 </systemProperties>
               </container>
               <deployables>

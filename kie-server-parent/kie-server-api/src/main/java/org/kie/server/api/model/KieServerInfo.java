@@ -36,7 +36,7 @@ public class KieServerInfo {
 
     private List<Message> messages;
 
-    private KieServerMode mode = KieServerMode.DEVELOPMENT;
+    private KieServerMode mode = KieServerMode.REGULAR;
     
     public KieServerInfo() {
         super();
@@ -49,7 +49,7 @@ public class KieServerInfo {
     }
 
     public KieServerInfo(String serverId, String name, String version, List<String> capabilities, String location) {
-        this(serverId, name, version, capabilities, location, KieServerMode.DEVELOPMENT);
+        this(serverId, name, version, capabilities, location, KieServerMode.REGULAR);
     }
 
     public KieServerInfo(String serverId, String name, String version, List<String> capabilities, String location, KieServerMode mode) {

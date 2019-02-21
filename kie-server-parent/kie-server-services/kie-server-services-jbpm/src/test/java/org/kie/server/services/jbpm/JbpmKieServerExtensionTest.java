@@ -203,14 +203,25 @@ public class JbpmKieServerExtensionTest {
     }
 
     @Test
-    public void testIsUpdateAllowedSNAPSHOT() throws IOException {
+    public void testIsUpdateAllowedDevModeSNAPSHOT() throws IOException {
         testDeployContainer(VERSION_SNAPSHOT);
+
+        mode = KieServerMode.DEVELOPMENT;
 
         assertTrue(extension.isUpdateContainerAllowed(CONTAINER_ID, new KieContainerInstanceImpl(CONTAINER_ID, KieContainerStatus.STARTED, kieContainer), new HashMap<>()));
     }
 
     @Test
-    public void testIsUpdateAllowedWithoutProcessInstances() throws IOException {
+    public void testIsUpdateAllowedDevModeNonSNAPSHOT() throws IOException {
+        testDeployContainer(VERSION);
+
+        mode = KieServerMode.DEVELOPMENT;
+
+        assertTrue(extension.isUpdateContainerAllowed(CONTAINER_ID, new KieContainerInstanceImpl(CONTAINER_ID, KieContainerStatus.STARTED, kieContainer), new HashMap<>()));
+    }
+
+    @Test
+    public void testIsUpdateAllowedRegularModeWithoutProcessInstances() throws IOException {
         testIsUpdateAllowed(false);
     }
 
@@ -237,17 +248,31 @@ public class JbpmKieServerExtensionTest {
     }
 
     @Test
-    public void testUpdateSNAPSHOTContainer() throws IOException {
+    public void testUpdateDevModeSNAPSHOTContainer() throws IOException {
         testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, false, false);
     }
 
     @Test
-    public void testUpdateSNAPSHOTContainerWithForcedCeanup() throws IOException {
+    public void testUpdateDevModeSNAPSHOTContainerWithForcedCeanup() throws IOException {
         activeProcessInstances.add(mockProcessInstance());
         activeProcessInstances.add(mockProcessInstance());
         activeProcessInstances.add(mockProcessInstance());
 
         testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, true, true);
+    }
+
+    @Test
+    public void testUpdateDevModeNonSNAPSHOTContainer() throws IOException {
+        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION, false, false);
+    }
+
+    @Test
+    public void testUpdateDevModeNonSNAPSHOTContainerWithForcedCeanup() throws IOException {
+        activeProcessInstances.add(mockProcessInstance());
+        activeProcessInstances.add(mockProcessInstance());
+        activeProcessInstances.add(mockProcessInstance());
+
+        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION, true, true);
     }
 
     private ProcessInstanceDesc mockProcessInstance() {
@@ -271,7 +296,7 @@ public class JbpmKieServerExtensionTest {
 
         extension.updateContainer(CONTAINER_ID, new KieContainerInstanceImpl(CONTAINER_ID, KieContainerStatus.STARTED, kieContainer), params);
 
-        if(mode.equals(KieServerMode.REGULAR)) {
+        if (mode.equals(KieServerMode.REGULAR)) {
             verify(deploymentService).undeploy(any());
         } else {
             verify(deploymentService).undeploy(any(), beforeUndeployCaptor.capture());
@@ -282,7 +307,7 @@ public class JbpmKieServerExtensionTest {
 
             assertTrue(function.apply(deploymentUnit));
 
-            if(expectedCleanup) {
+            if (expectedCleanup) {
                 verify(runtimeDataService).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
                 verify(runimeManager, times(activeProcessInstances.size())).getRuntimeEngine(any());
                 verify(engine, times(activeProcessInstances.size())).getKieSession();
@@ -322,6 +347,8 @@ public class JbpmKieServerExtensionTest {
     }
 
     private void testIsUpdateAllowed(boolean existingInstances) throws IOException {
+        mode = KieServerMode.REGULAR;
+
         List<ProcessInstanceDesc> activeProcesses = new ArrayList<>();
         if (existingInstances) {
             activeProcesses.add(mock(ProcessInstanceDesc.class));

@@ -16,9 +16,23 @@
 
 package org.kie.server.services.impl;
 
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerMode;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.services.api.KieServerExtension;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KieServerImplDevelopmentModeTest extends AbstractKieServerImplTest {
@@ -28,4 +42,60 @@ public class KieServerImplDevelopmentModeTest extends AbstractKieServerImplTest 
         return KieServerMode.DEVELOPMENT;
     }
 
+    @Test
+    public void testCreateContainerValidationSNAPSHOT() {
+        testCreateContainer(getVersion(KieServerMode.DEVELOPMENT));
+    }
+
+    @Test
+    public void testCreateContainerValidationNonSNAPSHOT() {
+        testCreateContainer(getVersion(KieServerMode.REGULAR));
+    }
+
+    @Test
+    public void testUpdateContainerNonSnapshot() {
+        testUpdateContainer(getVersion(KieServerMode.REGULAR));
+    }
+
+    @Test
+    public void testUpdateContainerSNAPSHOT() {
+        testUpdateContainer(getVersion(KieServerMode.DEVELOPMENT));
+    }
+
+    private void testCreateContainer(String version) {
+        String containerId = "container-to-create";
+
+        createEmptyKjar(containerId);
+
+        ReleaseId testReleaseId = new ReleaseId(GROUP_ID, containerId, version);
+
+        // create the container (provide scanner info as well)
+        KieContainerResource kieContainerResource = new KieContainerResource(containerId, testReleaseId);
+        KieScannerResource kieScannerResource = new KieScannerResource(KieScannerStatus.STARTED, 20000L);
+        kieContainerResource.setScanner(kieScannerResource);
+        ServiceResponse<KieContainerResource> createResponse = kieServer.createContainer(containerId, kieContainerResource);
+        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+
+        kieServer.disposeContainer(containerId);
+    }
+
+    private void testUpdateContainer(String version) {
+        KieServerExtension extension = mock(KieServerExtension.class);
+        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(true);
+        extensions.add(extension);
+
+        String containerId = "container-to-update";
+
+        startContainerToUpdate(containerId);
+
+        ReleaseId updateReleaseId = new ReleaseId(GROUP_ID, containerId, version);
+
+        ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, updateReleaseId, true);
+        Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+
+        verify(extension).isUpdateContainerAllowed(anyString(), any(), any());
+        verify(extension).updateContainer(any(), any(), any());
+
+        kieServer.disposeContainer(containerId);
+    }
 }
