@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.drools</groupId>
+    <artifactId>droolsjbpm-integration</artifactId>
+    <version>7.19.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.kie</groupId>
+  <artifactId>kie-gwthelper-maven-plugin</artifactId>
+  <version>1.0</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>KIE :: Gwt Helper Maven Plugin</name>
+
+  <prerequisites>
+    <maven>${maven.required.version}</maven>
+  </prerequisites>
+
+  <properties>
+    <maven.required.version>3.0</maven.required.version>
+    <maven.version>3.6.0</maven.version>
+    <plexus.component.annotations>1.7.1</plexus.component.annotations>
+    <plexus.utils.version>3.1.0</plexus.utils.version>
+    <maven.artifact.version>3.6.0</maven.artifact.version>
+    <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
+    <maven.javadoc.plugin.version>3.0.1</maven.javadoc.plugin.version>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>${plexus.component.annotations}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus.utils.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-artifact</artifactId>
+        <version>${maven.artifact.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>${maven.version}</version>
+        <configuration>
+          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>${maven.source.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>${maven.javadoc.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+
+</project>
