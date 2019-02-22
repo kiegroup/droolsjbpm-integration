@@ -458,7 +458,7 @@ public abstract class AbstractKieServerImplTest {
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
+        startContainerToUpdate(containerId, getVersion(mode));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, new ReleaseId(releaseId), true);
         Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
@@ -477,7 +477,7 @@ public abstract class AbstractKieServerImplTest {
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
+        startContainerToUpdate(containerId, getVersion(mode));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, new ReleaseId(this.releaseId), true);
         Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
@@ -496,7 +496,7 @@ public abstract class AbstractKieServerImplTest {
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
+        startContainerToUpdate(containerId, getVersion(mode));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, null, true);
         Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
@@ -507,8 +507,8 @@ public abstract class AbstractKieServerImplTest {
         kieServer.disposeContainer(containerId);
     }
 
-    protected void startContainerToUpdate(String containerId) {
-        createEmptyKjar(containerId);
+    protected void startContainerToUpdate(String containerId, String version) {
+        createEmptyKjar(containerId, version);
 
         ReleaseId releaseId = new ReleaseId(this.releaseId);
 

@@ -65,7 +65,7 @@ public class KieServerImplDevelopmentModeTest extends AbstractKieServerImplTest 
     private void testCreateContainer(String version) {
         String containerId = "container-to-create";
 
-        createEmptyKjar(containerId);
+        createEmptyKjar(containerId, version);
 
         ReleaseId testReleaseId = new ReleaseId(GROUP_ID, containerId, version);
 
@@ -86,7 +86,7 @@ public class KieServerImplDevelopmentModeTest extends AbstractKieServerImplTest 
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
+        startContainerToUpdate(containerId, version);
 
         ReleaseId updateReleaseId = new ReleaseId(GROUP_ID, containerId, version);
 

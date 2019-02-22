@@ -46,9 +46,9 @@ public class KieServerImplProductionModeTest extends AbstractKieServerImplTest {
     public void testCreateContainerValidationGAVConflict() {
         String containerId = "container-to-create";
 
-        createEmptyKjar(containerId);
-
         ReleaseId testReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(KieServerMode.DEVELOPMENT));
+
+        createEmptyKjar(containerId, testReleaseId.getVersion());
 
         // create the container (provide scanner info as well)
         KieContainerResource kieContainerResource = new KieContainerResource(containerId, testReleaseId);
@@ -66,8 +66,6 @@ public class KieServerImplProductionModeTest extends AbstractKieServerImplTest {
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
-
         ReleaseId updateReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(KieServerMode.DEVELOPMENT));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, updateReleaseId, true);
@@ -75,7 +73,5 @@ public class KieServerImplProductionModeTest extends AbstractKieServerImplTest {
 
         verify(extension, never()).isUpdateContainerAllowed(anyString(), any(), any());
         verify(extension, never()).updateContainer(any(), any(), any());
-
-        kieServer.disposeContainer(containerId);
     }
 }
