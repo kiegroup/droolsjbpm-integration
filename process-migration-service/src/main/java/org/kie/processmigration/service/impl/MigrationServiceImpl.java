@@ -145,7 +145,7 @@ public class MigrationServiceImpl implements MigrationService {
             throw new ReScheduleException("The migration execution type MUST be ASYNC");
         }
         migration.setDefinition(definition);
-        txHelper.withTransaction(() -> em.persist(migration));
+        txHelper.withTransaction(() -> em.merge(migration));
         schedulerService.reScheduleMigration(migration);
         return migration;
     }
