@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.StringUtils;
 @Mojo(name = "add-source", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class AddSourceMojo  extends AbstractMojo {
 
-    private final static String SRC_MAIN_JAVA = "/src/main/java".replace("/", System.getProperty("file.separator"));
+    private final static String SRC_MAIN_JAVA = "/src/main/java".replace("/", File.separator);
     private final static String SRC_MAIN_RESOURCES = "/src/main/resources".replace("/", File.separator);
 
     /**
