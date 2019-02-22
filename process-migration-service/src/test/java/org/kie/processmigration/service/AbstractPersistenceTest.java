@@ -23,12 +23,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.kie.processmigration.persistence.TestEntityManager;
 import org.mockito.Mockito;
 
 public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
 
     protected EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("migration-test");
-    protected EntityManager entityManager = Mockito.spy(entityManagerFactory.createEntityManager());
+    protected EntityManager entityManager = Mockito.spy(new TestEntityManager(entityManagerFactory));
 
     protected EntityManager getEntityManager() {
         return entityManager;

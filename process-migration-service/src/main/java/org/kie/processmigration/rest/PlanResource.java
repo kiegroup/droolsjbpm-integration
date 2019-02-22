@@ -63,6 +63,9 @@ public class PlanResource {
     @ApiOperation(value = "Create a migration plan")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(value = "Plan") Plan plan) {
+        if (plan.getId() != 0) {
+            throw new IllegalArgumentException("The plan ID must not be provided when creating a new plan");
+        }
         return Response.ok(planService.create(plan)).build();
     }
 

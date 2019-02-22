@@ -57,6 +57,7 @@ import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.InvalidMigrationException;
 import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
 import org.kie.processmigration.model.exceptions.ProcessNotFoundException;
+import org.kie.processmigration.model.exceptions.ReScheduleException;
 import org.kie.processmigration.service.impl.MigrationServiceImpl;
 import org.kie.processmigration.service.impl.PlanServiceImpl;
 import org.kie.server.api.model.admin.MigrationReportInstance;
@@ -371,6 +372,45 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         getEntityManager().getTransaction().commit();
 
         verify(schedulerServiceMock, times(1)).scheduleMigration(m);
+    }
+
+    @Test
+    public void testUpdateMigration() throws InvalidMigrationException, MigrationNotFoundException, URISyntaxException, ReScheduleException {
+        // Given
+        Plan plan = createPlan();
+        Execution execution = new Execution()
+                                              .setType(ExecutionType.ASYNC)
+                                              .setScheduledStartTime(LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.UTC))
+                                              .setCallbackUrl(new URI("http://test.com/callback"));
+        MigrationDefinition def = createMigrationDefinition(plan, execution);
+
+        // Setup mock
+        ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        for (long i = 1; i <= 3; i++) {
+            Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
+                                                                               eq(i),
+                                                                               anyString(),
+                                                                               anyString(),
+                                                                               anyMapOf(String.class, String.class)))
+                   .thenReturn(createReport(i));
+        }
+        Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
+        addMockConfigs(kieServiceMock);
+
+        getEntityManager().getTransaction().begin();
+        Migration m = migrationService.submit(def);
+        getEntityManager().getTransaction().commit();
+
+        // When
+        MigrationDefinition updatedMigrationDef = createMigrationDefinition(plan, execution);
+        updatedMigrationDef.getExecution().setScheduledStartTime(LocalDateTime.now().plusDays(1).toInstant(ZoneOffset.UTC));
+        Migration updatedMigration = migrationService.update(m.getId(), updatedMigrationDef);
+
+        // Then
+        verify(schedulerServiceMock, times(1)).scheduleMigration(m);
+        verify(schedulerServiceMock, times(1)).scheduleMigration(updatedMigration);
+        assertEquals(updatedMigrationDef.getExecution().getScheduledStartTime(), migrationService.get(updatedMigration.getId()).getDefinition().getExecution().getScheduledStartTime());
     }
 
     @Test
