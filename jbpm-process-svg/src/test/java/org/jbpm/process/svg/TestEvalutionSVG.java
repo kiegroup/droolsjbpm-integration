@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.util.XMLResourceDescriptor;
+import org.jbpm.process.svg.processor.SVGProcessor;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,8 +51,8 @@ public class TestEvalutionSVG {
 
         // verify transformation
         Document svgDocument = readSVG(svg);
-        validateNodesMarkedAsActive(svgDocument, active);
-        validateNodesMarkedAsCompleted(svgDocument, completed);
+        validateNodesMarkedAsActive(svgDocument, active, SVGProcessor.ACTIVE_BORDER_COLOR);
+        validateNodesMarkedAsCompleted(svgDocument, completed, SVGProcessor.COMPLETED_COLOR );
     }
 
     @Test
@@ -69,8 +70,8 @@ public class TestEvalutionSVG {
 
         // verify transformation
         Document svgDocument = readSVG(svg);
-        validateNodesMarkedAsActive(svgDocument, activeID);
-        validateNodesMarkedAsCompleted(svgDocument, completedID);
+        validateNodesMarkedAsActive(svgDocument, activeID, SVGProcessor.ACTIVE_BORDER_COLOR);
+        validateNodesMarkedAsCompleted(svgDocument, completedID, SVGProcessor.COMPLETED_COLOR );
     }
 
     @Test
@@ -84,10 +85,10 @@ public class TestEvalutionSVG {
 
         // verify transformation
         Document svgDocument = readSVG(svg);
-        validateNodesMarkedAsActive(svgDocument, active);
+        validateNodesMarkedAsActive(svgDocument, active, SVGProcessor.ACTIVE_BORDER_COLOR);
         // remove it as it should be not considered completed and was already asserted as active
         completed.remove("_6063D302-9D81-4C86-920B-E808A45377C2");
-        validateNodesMarkedAsCompleted(svgDocument, completed);
+        validateNodesMarkedAsCompleted(svgDocument, completed, SVGProcessor.COMPLETED_COLOR );
     }
 
     @Test
@@ -102,13 +103,32 @@ public class TestEvalutionSVG {
 
         // verify transformation
         Document svgDocument = readSVG(svg);
-        validateNodesMarkedAsActive(svgDocument, active);
+        validateNodesMarkedAsActive(svgDocument, active, SVGProcessor.ACTIVE_BORDER_COLOR);
         validateCallActivityLinked(svgDocument, active, links);
+    }
+
+    @Test
+    public void testCustomColor() throws Exception {
+        String completedNodeColor = "#888888";
+        String completedNodeBorderColor = "#888887";
+        String activeNodeBorderColor = "#888886";
+        List<String> completed = new ArrayList<String>();
+        completed.add("_343B16DA-961A-49BF-8697-9A86DEAFBAF4");
+        List<String> active = new ArrayList<String>();
+        active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
+        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"),
+                                                 completed , active, null, completedNodeColor,
+                                                 completedNodeBorderColor, activeNodeBorderColor);
+
+        // verify transformation
+        Document svgDocument = readSVG(svg);
+        validateNodesMarkedAsActive(svgDocument, active, activeNodeBorderColor);
+        validateNodesMarkedAsCompleted(svgDocument, completed, completedNodeColor);
     }
 
     // helper methods for verifying svg transformation
 
-    private void validateNodesMarkedAsActive(Document svgDocument, List<String> activeNodes) throws XPathExpressionException {
+    private void validateNodesMarkedAsActive(Document svgDocument, List<String> activeNodes, String activeNodeBorderColor) throws XPathExpressionException {
         for (String activeNode : activeNodes) {
 
             XPathExpression expr = xpath.compile("//*[@bpmn2nodeid='" + activeNode + "']");
@@ -123,7 +143,7 @@ public class TestEvalutionSVG {
 
             String marker = border.getAttribute("stroke");
             assertNotNull(marker);
-            assertEquals("#FF0000", marker);
+            assertEquals(activeNodeBorderColor, marker);
             String markerWidth = border.getAttribute("stroke-width");
             assertNotNull(markerWidth);
             assertEquals("2", markerWidth);
@@ -131,7 +151,7 @@ public class TestEvalutionSVG {
         }
     }
 
-    private void validateNodesMarkedAsCompleted(Document svgDocument, List<String> completedNodes) throws XPathExpressionException {
+    private void validateNodesMarkedAsCompleted(Document svgDocument, List<String> completedNodes, String completedNodeColor) throws XPathExpressionException {
 
         for (String completedNode : completedNodes) {
             XPathExpression expr = xpath.compile("//*[@bpmn2nodeid='" + completedNode + "']");
@@ -145,7 +165,7 @@ public class TestEvalutionSVG {
 
             String marker = background.getAttribute("stop-color");
             assertNotNull(marker);
-            assertEquals("#C0C0C0", marker);
+            assertEquals(completedNodeColor, marker);
 
         }
     }

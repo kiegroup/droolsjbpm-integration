@@ -211,6 +211,45 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
     }
 
     @Override
+    public String getProcessInstanceImageCustomColor(String containerId, Long processInstanceId, String completeNodeColor,
+                                                     String completeNodeBorderColor, String activeNodeBorderColor) {
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(RestURI.CONTAINER_ID, containerId);
+            valuesMap.put(RestURI.PROCESS_INST_ID, processInstanceId);
+
+            StringBuffer params = new StringBuffer();
+            params.append(RestURI.SVG_NODE_COMPLETED_COLOR + "=").append(encode(completeNodeColor));
+            params.append("&" + RestURI.SVG_NODE_COMPLETED_BORDER_COLOR + "=").append(encode(completeNodeBorderColor));
+            params.append("&" + RestURI.SVG_NODE_ACTIVE_COLOR + "=").append(encode(activeNodeBorderColor));
+
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put("Accept", MediaType.APPLICATION_SVG_XML);
+
+            return makeHttpGetRequestAndCreateRawResponse(
+                    build(loadBalancer.getUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI + "?" + params.toString(),
+                          valuesMap), headers);
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("ImageService",
+                                                             "getActiveProcessImage",
+                                                             new Object[]{
+                                                                     containerId,
+                                                                     processInstanceId,
+                                                                     StringUtils.defaultString(completeNodeColor),
+                                                                     StringUtils.defaultString(completeNodeBorderColor),
+                                                                     StringUtils.defaultString(activeNodeBorderColor)})));
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM-UI", containerId).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            return response.getResult();
+        }
+    }
+
+    @Override
     public String renderProcessForm(String containerId, String processId) {
         return renderProcessForm(containerId, processId, PATTERNFLY_FORM_RENDERER);
     }
@@ -221,15 +260,15 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.PROCESS_ID, processId);
-            
+
             StringBuffer params = new StringBuffer();
             if (renderer != null) {
                 params.append("?renderer=").append(renderer);
             }
-            
+
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("Accept", MediaType.TEXT_HTML);
-            
+
             return makeHttpGetRequestAndCreateRawResponse(
                     build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_CONTENT_GET_URI + params.toString(), valuesMap), headers);
 
@@ -257,15 +296,15 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.CASE_DEF_ID, caseDefinitionId);
-            
+
             StringBuffer params = new StringBuffer();
             if (renderer != null) {
                 params.append("?renderer=").append(renderer);
             }
-            
+
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("Accept", MediaType.TEXT_HTML);
-            
+
             return makeHttpGetRequestAndCreateRawResponse(
                     build(loadBalancer.getUrl(), FORM_URI + "/" + CASE_FORM_CONTENT_GET_URI + params.toString(), valuesMap), headers);
 
@@ -293,15 +332,15 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
-            
+
             StringBuffer params = new StringBuffer();
             if (renderer != null) {
                 params.append("?renderer=").append(renderer);
             }
-            
+
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("Accept", MediaType.TEXT_HTML);
-            
+
             return makeHttpGetRequestAndCreateRawResponse(
                     build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_CONTENT_GET_URI + params.toString(), valuesMap), headers);
 

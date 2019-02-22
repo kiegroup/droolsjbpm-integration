@@ -139,7 +139,20 @@ public interface UIServicesClient {
      * @return svg (xml) representing process image annotated with active (in red) and completed (in grey) nodes
      */
     String getProcessInstanceImage(String containerId, Long processInstanceId);
-    
+
+    /**
+     * Returns process image (svg) with annotated active and completed nodes for given process instance
+     * that belongs to given container
+     * @param containerId container identifier where process resides
+     * @param processInstanceId unique process instance id
+     * @param completeNodeColor process instance image complete node color
+     * @param completeNodeBorderColor process instance image complete node border color
+     * @param activeNodeBorderColor process instance image active node border color
+     * @return svg (xml) representing process image annotated with custom colors
+     */
+    String getProcessInstanceImageCustomColor(String containerId, Long processInstanceId, String completeNodeColor,
+                                              String completeNodeBorderColor, String activeNodeBorderColor);
+
     /**
      * Returns process form for given process id that resides in given container - completely rendered so the output is HTML
      * @param containerId container identifier where process resides

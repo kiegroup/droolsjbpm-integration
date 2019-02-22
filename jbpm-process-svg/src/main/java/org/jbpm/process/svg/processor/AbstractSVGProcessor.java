@@ -59,4 +59,14 @@ public abstract class AbstractSVGProcessor implements SVGProcessor{
         }
     }
 
+    @Override
+    public void defaultCompletedTransformation(String nodeId) {
+        defaultCompletedTransformation(nodeId, COMPLETED_COLOR, COMPLETED_BORDER_COLOR);
+    }
+
+    @Override
+    public void defaultActiveTransformation(String nodeId){
+        defaultActiveTransformation(nodeId, ACTIVE_BORDER_COLOR);
+    }
+
 }

@@ -59,6 +59,15 @@
           "methodName": "updateReleaseId",
           "elementKind": "method",
           "justification": "AF-1685: Development Lifecycle Streamline"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessInstanceImageCustomColor(java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "UIServicesClient",
+          "methodName": "getProcessInstanceImageCustomColor",
+          "elementKind": "method",
+          "justification": "JBPM-8257: Configurable Color coding for executed flows in Process model "
         }
       ]
     }

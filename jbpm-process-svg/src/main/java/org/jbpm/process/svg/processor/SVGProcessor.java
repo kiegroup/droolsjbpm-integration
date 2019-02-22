@@ -7,9 +7,13 @@ public interface SVGProcessor {
 
     String COMPLETED_COLOR = "#C0C0C0";
     String COMPLETED_BORDER_COLOR = "#030303";
-    String ACTIVE_COLOR = "#FF0000";
+    String ACTIVE_BORDER_COLOR = "#FF0000";
 
     void transform(Transformation t);
+
+    void defaultCompletedTransformation(String nodeId, String completedNodeColor, String completedNodeBorderColor);
+
+    void defaultActiveTransformation(String nodeId, String activeNodeBorderColor);
 
     void defaultCompletedTransformation(String nodeId);
 
