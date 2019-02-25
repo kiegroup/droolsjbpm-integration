@@ -114,15 +114,14 @@
           <artifactId>cargo-maven2-plugin</artifactId>
           <configuration>
             <container>
-              <containerId>tomcat9x</containerId>
+              <containerId>wildfly14x</containerId>
               <type>installed</type>
               <artifactInstaller>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat</artifactId>
-                <version>${version.tomcat9}</version>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-dist</artifactId>
+                <version>${version.org.wildfly}</version>
               </artifactInstaller>
               <systemProperties>
-                <tomcat.home>${project.build.directory}/cargo/configurations/tomcat9x</tomcat.home>
                 <conf.directory>${project.build.testOutputDirectory}</conf.directory>
                 <tmp.directory>${project.build.directory}</tmp.directory>
                 <!--<org.kie.server.controller.swagger.disabled>true</org.kie.server.controller.swagger.disabled>-->
@@ -134,7 +133,7 @@
                 <artifactId>kie-server-controller-standalone</artifactId>
                 <classifier>webc</classifier>
                 <type>war</type>
-                <location>${project.build.directory}/${project.build.finalName}-webc.war</location>
+                <location>${project.build.directory}/${project.build.finalName}-ee7.war</location>
                 <properties>
                   <context>/controller</context>
                 </properties>
