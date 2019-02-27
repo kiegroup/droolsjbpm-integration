@@ -88,7 +88,7 @@ public class KieServerTest {
     
     @BeforeClass
     public static void generalSetup() {
-        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.name());
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.PRODUCTION.name());
         KieServices ks = KieServices.Factory.get();
         org.kie.api.builder.ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
         File kjar = new File("../kjars/evaluation/jbpm-module.jar");

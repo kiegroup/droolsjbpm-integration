@@ -26,6 +26,7 @@
     <container.port>8080</container.port>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
     <kie.maven.settings.custom>${user.home}/.m2/settings.xml</kie.maven.settings.custom>
+    <org.kie.server.mode.production>PRODUCTION</org.kie.server.mode.production>
   </properties>
 
   <dependencies>
@@ -177,7 +178,7 @@
                 <type>installed</type>
                 <systemProperties>
                   <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
-                  <org.kie.server.mode>regular</org.kie.server.mode>
+                  <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
                 </systemProperties>
               </container>
               <deployables>
@@ -284,7 +285,7 @@
                 <type>installed</type>
                 <systemProperties>
                   <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
-                  <org.kie.server.mode>regular</org.kie.server.mode>
+                  <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
                 </systemProperties>
               </container>
               <deployables>

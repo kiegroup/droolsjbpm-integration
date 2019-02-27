@@ -121,7 +121,7 @@ public class KieServerImpl implements KieServer {
             logger.info("Starting server in '" + mode.name() + "' mode.");
         } catch (Exception ex) {
             mode = KieServerMode.DEVELOPMENT;
-            logger.warn("Unable to parse value of " + KieServerConstants.KIE_SERVER_MODE + " = " + modeParam + "; supported values are 'REGULAR' or 'DEVELOPMENT'. Falling back to 'DEVELOPMENT' mode.");
+            logger.warn("Unable to parse value of " + KieServerConstants.KIE_SERVER_MODE + " = " + modeParam + "; supported values are 'DEVELOPMENT' or 'PRODUCTION'. Falling back to 'DEVELOPMENT' mode.");
         }
     }
     
@@ -362,14 +362,8 @@ public class KieServerImpl implements KieServer {
 
         boolean isSnapshot = KieServerUtils.isSnapshot(releaseId);
 
-        if (isSnapshot) {
-            if (mode.equals(KieServerMode.REGULAR)) {
-                return new ServiceResponse<>(ResponseType.FAILURE, preffix + " KieServer running on REGULAR mode doesn't support deploying SNAPSHOT modules.");
-            }
-        } else {
-            if (mode.equals(KieServerMode.DEVELOPMENT)) {
-                return new ServiceResponse<>(ResponseType.FAILURE, preffix + " KieServer running on DEVELOPMENT mode only support deploying SNAPSHOT modules.");
-            }
+        if (isSnapshot && mode.equals(KieServerMode.PRODUCTION)) {
+            return new ServiceResponse<>(ResponseType.FAILURE, preffix + " Kie Server running on PRODUCTION mode doesn't allow deploying SNAPSHOT modules.");
         }
 
         return null;
