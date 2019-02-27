@@ -89,9 +89,9 @@
     <feature>camel-core</feature>
     <feature>camel-spring</feature>
     <feature>camel-cxf</feature>
-    <feature>cxf-specs</feature>
-    <feature>cxf-core</feature>
-    <feature>cxf-jaxrs</feature>
+    <feature version="[3.2,3.3)">cxf-specs</feature>
+    <feature version="[3.2,3.3)">cxf-core</feature>
+    <feature version="[3.2,3.3)">cxf-jaxrs</feature>
     <bundle>mvn:org.kie/kie-camel/${project.version}</bundle>
   </feature>
 
