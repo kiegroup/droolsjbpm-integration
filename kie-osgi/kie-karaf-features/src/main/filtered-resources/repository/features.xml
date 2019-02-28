@@ -5,7 +5,7 @@
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
   <repository>mvn:org.kie/kie-karaf-features/${project.version}/xml/features-core</repository>
-  <repository>mvn:org.apache.camel.karaf/apache-camel/RELEASE/xml/features</repository>
+  <repository>mvn:org.apache.camel.karaf/apache-camel/${karaf.version.org.apache.camel}/xml/features</repository>
 
   <feature name="drools-common" version="${project.version}" description="Drools Commons">
     <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>

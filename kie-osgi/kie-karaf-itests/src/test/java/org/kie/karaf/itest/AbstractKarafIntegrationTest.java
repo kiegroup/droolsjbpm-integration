@@ -62,6 +62,18 @@ abstract public class AbstractKarafIntegrationTest {
     public static final String PROP_KARAF_VERSION = "karaf.version";
 
     /**
+     * Defines version of CXF. In order not to rely on automatic resolution of {@code RELEASE} version in
+     * {@code etc/org.apache.karaf.features.repos.cfg}, we should provide concrete version.
+     */
+    public static final String PROP_CXF_VERSION = "cxf.version";
+
+    /**
+     * Defines version of Camel. In order not to rely on automatic resolution of {@code RELEASE} version in
+     * {@code etc/org.apache.karaf.features.repos.cfg}, we should provide concrete version.
+     */
+    public static final String PROP_CAMEL_VERSION = "camel.version";
+
+    /**
      * Maximal size of perm gen memory. For example "512M". This property
      * is useful only in Java 7.
      */
@@ -148,12 +160,24 @@ abstract public class AbstractKarafIntegrationTest {
         return karafVersion;
     }
 
+    protected static String getCxfVersion() {
+        return System.getProperty(PROP_CXF_VERSION);
+    }
+
+    protected static String getCamelVersion() {
+        return System.getProperty(PROP_CAMEL_VERSION);
+    }
+
     public static Option getKarafDistributionOption() {
         
         List<Option> options = new ArrayList<Option>();
         
         String karafVersion = getKarafVersion();
+        String cxfVersion = getCxfVersion();
+        String camelVersion = getCamelVersion();
         logger.info("*** The karaf version is " + karafVersion + " ***");
+        logger.info("*** The cxf version is " + cxfVersion + " ***");
+        logger.info("*** The camel version is " + camelVersion + " ***");
 
         KarafDistributionBaseConfigurationOption karafConfiguration = karafDistributionConfiguration();
         
@@ -189,6 +213,8 @@ abstract public class AbstractKarafIntegrationTest {
         
         options.add(localMavenRepoOption());
 
+        options.add(vmOption("-Dkaraf.log=${karaf.data}/log"));
+
         /* Add additional Maven repositories */
         String additionalMavenRepositories = "";
         if (System.getProperty(PROP_ADDITIONAL_MAVEN_REPOS) != null) {
@@ -202,16 +228,27 @@ abstract public class AbstractKarafIntegrationTest {
         options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
         if (!"features-fuse".equals(System.getProperty("kie.features.classifier"))) {
             // when not running on Fuse, we have to configure overrides and add some missing features
-            options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.5.4/jar/uber", "5"));
+            options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.6.1/jar/uber", "5"));
             options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
                     "featuresRepositories", "mvn:org.apache.karaf.features/spring-legacy/" + karafVersion + "/xml/features"));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
+                    "featuresRepositories", "mvn:org.apache.cxf.karaf/apache-cxf/" + cxfVersion + "/xml/features"));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
+                    "featuresRepositories", "mvn:org.apache.camel.karaf/apache-camel/" + camelVersion + "/xml/features"));
             options.add(replaceConfigurationFile("etc/org.apache.karaf.features.xml", new File("target/test-classes/org.apache.karaf.features.xml")));
-            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "aries-blueprint"));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "aries-blueprint/" + karafVersion));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "pax-http-jetty"));
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "cxf-http"));
+            options.add(editConfigurationFilePut("etc/org.apache.karaf.features.repos.cfg", "cxf", "mvn:org.apache.cxf.karaf/apache-cxf/" + cxfVersion + "/xml/features"));
+            options.add(editConfigurationFilePut("etc/org.apache.karaf.features.repos.cfg", "camel", "mvn:org.apache.camel.karaf/apache-camel/" + camelVersion + "/xml/features"));
         }
 
         if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
             options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));
         }
+
+        options.add(keepRuntimeFolder());
+
         return new DefaultCompositeOption(options.toArray(new Option[1]));
     }
 
