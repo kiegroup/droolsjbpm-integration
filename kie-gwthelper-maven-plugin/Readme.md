@@ -11,7 +11,7 @@ GWT modules are individuated if the directory contains a **src/main/resources/()
 
 **includes/excludes** patterns are simple **contains** evaluation on the (full) **gwt.xml** file name; i.e. they are matched if that name **contains** those pattern, **case-sensitive**.
 
-**includes/excludes are mutually exclusive!** If provide both, the plugin will throw an exception.
+**includes/excludes are mutually exclusive!** If both are provided, the plugin will throw an exception.
 
 Moreover, it requires a single parameter to define the folder to scan, so that these parameter may be included as **property** in private user settings,
 to allow different configuration on different machine.
