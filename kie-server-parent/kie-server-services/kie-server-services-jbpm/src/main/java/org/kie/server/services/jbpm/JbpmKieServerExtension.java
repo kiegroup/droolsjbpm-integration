@@ -118,7 +118,6 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.util.KieServerUtils;
 import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
@@ -137,7 +136,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
     protected static final Pattern PARAMETER_MATCHER = Pattern.compile("\\$\\{([\\S&&[^\\}]]+)\\}", Pattern.DOTALL);
-   
+
     protected boolean isExecutorAvailable = false;
 
     protected String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
@@ -187,7 +186,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         this.kieServer = kieServer;
         this.context = registry;
         configureServices(kieServer, registry);
-        
+
 
         if (registry.getKieSessionLookupManager() != null) {
             registry.getKieSessionLookupManager().addHandler(new JBPMKieSessionLookupHandler());
@@ -204,7 +203,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         services.add(processInstanceMigrationService);
         services.add(processInstanceAdminService);
         services.add(userTaskAdminService);
-        
+
         registerDefaultQueryDefinitions();
         initialized = true;
     }
@@ -222,7 +221,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
 
         this.isExecutorAvailable = isExecutorOnClasspath();
-
 
         EntityManagerFactory emf = build(getPersistenceProperties(config));
         EntityManagerFactoryManager.get().addEntityManagerFactory(persistenceUnitName, emf);
@@ -284,11 +282,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 dataSource = configuration.getConfigItemValue(paramName, "java:jboss/datasources/ExampleDS");
                 logger.info("Data source expression {} resolved to {}", input, dataSource);
             }
-            
+
             return dataSource;
-        };        
-        ((QueryServiceImpl) queryService).setDataSourceResolver(kieServerDataSourceResolver);        
-        ((QueryServiceImpl)queryService).init();
+        };
+        ((QueryServiceImpl) queryService).setDataSourceResolver(kieServerDataSourceResolver);
+        ((QueryServiceImpl) queryService).init();
 
         // set runtime data service as listener on deployment service
         ((KModuleDeploymentService) deploymentService).addListener(((RuntimeDataServiceImpl) runtimeDataService));
@@ -457,7 +455,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
                 URL definitionsURL = queryDefinitionsFiles.nextElement();
                 InputStream qdStream = definitionsURL.openStream();
-                
+
                 loadAndRegisterQueryDefinitions(qdStream, kieContainerInstance.getMarshaller(MarshallingFormat.JSON), id);
             }
 
@@ -475,8 +473,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
 
-        // Allowing container updates for SNAPSHOTS
-        if(KieServerUtils.isSnapshot(kieContainerInstance.getKieContainer().getReleaseId())) {
+        // Allowing container updates when Kie Server runs in DEVELOPMENT mode.
+        if (kieServer.getInfo().getResult().getMode().equals(KieServerMode.DEVELOPMENT)) {
             return true;
         }
 
@@ -525,10 +523,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
 
-        if(kieServer.getInfo().getResult().getMode().equals(KieServerMode.REGULAR)) {
+        if (kieServer.getInfo().getResult().getMode().equals(KieServerMode.PRODUCTION)) {
             deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
         } else {
-            if(abortInstances) {
+            if (abortInstances) {
                 deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
             } else {
                 deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.doNothing());
@@ -770,7 +768,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
             throw new RuntimeException("Unable to create EntityManagerFactory due to " + e.getMessage(), e);
         }
     }
-    
+
     protected void loadAndRegisterQueryDefinitions(InputStream qdStream, org.kie.server.api.marshalling.Marshaller marshaller, String containerId) throws IOException {
         if (qdStream != null) {
             String qdString = IOUtils.toString(qdStream, Charset.forName("UTF-8"));
@@ -784,7 +782,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                     queries.add(qd.getName());
                     logger.debug("Registered '{}' query from container '{}' successfully", qd.getName(), containerId);
                 });
-                
+
                 if (containerId != null) {
                     containerQueries.put(containerId, queries);
                 }
@@ -793,20 +791,20 @@ public class JbpmKieServerExtension implements KieServerExtension {
             }
         }
     }
-    
+
     protected void registerDefaultQueryDefinitions() {
         try {
             // load any default query definitions
-            InputStream qdStream = this.getClass().getResourceAsStream("/default-query-definitions.json"); 
+            InputStream qdStream = this.getClass().getResourceAsStream("/default-query-definitions.json");
             if (qdStream == null) {
                 String externalLocationQueryDefinitions = System.getProperty(KieServerConstants.CFG_DEFAULT_QUERY_DEFS_LOCATION);
                 if (externalLocationQueryDefinitions != null) {
                     qdStream = new FileInputStream(externalLocationQueryDefinitions);
                 }
             }
-            
+
             loadAndRegisterQueryDefinitions(qdStream, MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader()), null);
-            
+
             if (qdStream != null) {
                 qdStream.close();
             }
@@ -820,7 +818,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         this.queryService = queryService;
     }
 
-    
+
     void setContext(KieServerRegistry context) {
         this.context = context;
     }
@@ -828,7 +826,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public List<Message> healthCheck(boolean report) {
         List<Message> messages = KieServerExtension.super.healthCheck(report);
-        
+
         try {
             // run base query to make sure data access layer is available
             runtimeDataService.getProcessInstanceById(-99999);
@@ -838,9 +836,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
         } catch (Exception e) {
             messages.add(new Message(Severity.ERROR, getExtensionName() + " failed due to " + e.getMessage()));
         }
-        
+
         return messages;
     }
 
-    
+
 }

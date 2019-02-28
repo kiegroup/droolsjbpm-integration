@@ -80,7 +80,7 @@ public class KieCamelBlueprintDTIntegrationTest extends AbstractKarafIntegration
 
     @BeforeClass
     public static void generalSetup() {
-        System.setProperty(KieServerConstants.KIE_SERVER_MODE, "regular");
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, "production");
     }
 
     @AfterClass

@@ -73,7 +73,7 @@ public class KieServerExecutor {
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getEmbeddedKieServerHttpUrl());
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
         System.setProperty(KieServerConstants.CFG_SYNC_DEPLOYMENT, Boolean.toString(syncWithController));
-        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.REGULAR.name());
+        System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.PRODUCTION.name());
 
         // kie server policy settings
         System.setProperty(KieServerConstants.KIE_SERVER_ACTIVATE_POLICIES, "KeepLatestOnly");
