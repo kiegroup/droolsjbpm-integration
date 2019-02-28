@@ -16,16 +16,15 @@
   <name>KIE :: Gwt Helper Maven Plugin</name>
 
   <prerequisites>
-    <maven>${maven.required.version}</maven>
+    <maven>${version.maven.required}</maven>
   </prerequisites>
 
   <properties>
-    <maven.required.version>3.0</maven.required.version>
-    <plexus.component.annotations>1.7.1</plexus.component.annotations>
-    <plexus.utils.version>3.1.0</plexus.utils.version>
-    <maven.artifact.version>3.6.0</maven.artifact.version>
-    <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
-    <maven.javadoc.plugin.version>3.0.1</maven.javadoc.plugin.version>
+    <version.maven.required>3.0</version.maven.required>
+    <version.plexus.component.annotations>1.7.1</version.plexus.component.annotations>
+    <version.maven.artifact>3.6.0</version.maven.artifact>
+    <version.maven.source.plugin>3.0.1</version.maven.source.plugin>
+    <version.maven.javadoc.plugin>3.0.1</version.maven.javadoc.plugin>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -54,16 +53,12 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-annotations</artifactId>
-        <version>${plexus.component.annotations}</version>
+        <version>${version.plexus.component.annotations}</version>
       </dependency>
-      <!--<dependency>-->
-        <!--<groupId>org.codehaus.plexus</groupId>-->
-        <!--<artifactId>plexus-utils</artifactId>-->
-      <!--</dependency>-->
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
-        <version>${maven.artifact.version}</version>
+        <version>${version.maven.artifact}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -87,7 +82,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>${maven.source.plugin.version}</version>
+            <version>${version.maven.source.plugin}</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -100,7 +95,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>${maven.javadoc.plugin.version}</version>
+            <version>${version.maven.javadoc.plugin}</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
