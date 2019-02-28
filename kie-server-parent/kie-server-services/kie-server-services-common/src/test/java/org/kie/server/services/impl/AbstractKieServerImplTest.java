@@ -69,8 +69,6 @@ import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -79,9 +77,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -92,7 +88,7 @@ public abstract class AbstractKieServerImplTest {
     static final File REPOSITORY_DIR = new File("target/repository-dir");
     static final String KIE_SERVER_ID = "kie-server-impl-test";
     static final String GROUP_ID = "org.kie.server.test";
-    static final String REGULAR_MODE_VERSION = "1.0.0.Final";
+    static final String PRODUCTION_MODE_VERSION = "1.0.0.Final";
     static final String DEVELOPMENT_MODE_VERSION = "1.0.0-SNAPSHOT";
 
     protected KieServerMode mode;
@@ -130,8 +126,8 @@ public abstract class AbstractKieServerImplTest {
         kieServer.init();
     }
 
-    private String getVersion(KieServerMode mode) {
-        return mode.equals(KieServerMode.DEVELOPMENT) ? DEVELOPMENT_MODE_VERSION : REGULAR_MODE_VERSION;
+    protected String getVersion(KieServerMode mode) {
+        return mode.equals(KieServerMode.DEVELOPMENT) ? DEVELOPMENT_MODE_VERSION : PRODUCTION_MODE_VERSION;
     }
 
     @After
@@ -455,22 +451,6 @@ public abstract class AbstractKieServerImplTest {
     }
 
     @Test
-    public void testCreateContainerValidationModeConflict() {
-        String containerId = "container-to-create";
-
-        createEmptyKjar(containerId);
-
-        ReleaseId testReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(mode.equals(KieServerMode.DEVELOPMENT) ? KieServerMode.REGULAR : KieServerMode.DEVELOPMENT));
-
-        // create the container (provide scanner info as well)
-        KieContainerResource kieContainerResource = new KieContainerResource(containerId, testReleaseId);
-        KieScannerResource kieScannerResource = new KieScannerResource(KieScannerStatus.STARTED, 20000L);
-        kieContainerResource.setScanner(kieScannerResource);
-        ServiceResponse<KieContainerResource> createResponse = kieServer.createContainer(containerId, kieContainerResource);
-        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
-    }
-
-    @Test
     public void testUpdateContainer() {
         KieServerExtension extension = mock(KieServerExtension.class);
         when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(true);
@@ -478,7 +458,7 @@ public abstract class AbstractKieServerImplTest {
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
+        startContainerToUpdate(containerId, getVersion(mode));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, new ReleaseId(releaseId), true);
         Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
@@ -497,33 +477,12 @@ public abstract class AbstractKieServerImplTest {
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
+        startContainerToUpdate(containerId, getVersion(mode));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, new ReleaseId(this.releaseId), true);
         Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
 
         verify(extension).isUpdateContainerAllowed(anyString(), any(), any());
-        verify(extension, never()).updateContainer(any(), any(), any());
-
-        kieServer.disposeContainer(containerId);
-    }
-
-    @Test
-    public void testUpdateContainerWithModeConflict() {
-        KieServerExtension extension = mock(KieServerExtension.class);
-        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(false);
-        extensions.add(extension);
-
-        String containerId = "container-to-update";
-
-        startContainerToUpdate(containerId);
-
-        ReleaseId updateReleaseId = new ReleaseId(GROUP_ID, containerId, getVersion(mode.equals(KieServerMode.DEVELOPMENT) ? KieServerMode.REGULAR : KieServerMode.DEVELOPMENT));
-
-        ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, updateReleaseId, true);
-        Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
-
-        verify(extension, never()).isUpdateContainerAllowed(anyString(), any(), any());
         verify(extension, never()).updateContainer(any(), any(), any());
 
         kieServer.disposeContainer(containerId);
@@ -537,7 +496,7 @@ public abstract class AbstractKieServerImplTest {
 
         String containerId = "container-to-update";
 
-        startContainerToUpdate(containerId);
+        startContainerToUpdate(containerId, getVersion(mode));
 
         ServiceResponse<ReleaseId> updateResponse = kieServer.updateContainerReleaseId(containerId, null, true);
         Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.FAILURE);
@@ -548,8 +507,8 @@ public abstract class AbstractKieServerImplTest {
         kieServer.disposeContainer(containerId);
     }
 
-    private void startContainerToUpdate(String containerId) {
-        createEmptyKjar(containerId);
+    protected void startContainerToUpdate(String containerId, String version) {
+        createEmptyKjar(containerId, version);
 
         ReleaseId releaseId = new ReleaseId(this.releaseId);
 
