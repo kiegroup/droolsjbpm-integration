@@ -27,6 +27,10 @@ import org.jbpm.process.svg.processor.SVGProcessor;
 import org.jbpm.process.svg.processor.SVGProcessorFactory;
 import org.w3c.dom.Document;
 
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
+
 public class SVGImageProcessor {
 
     private SVGProcessor svgProcessor;
@@ -58,19 +62,25 @@ public class SVGImageProcessor {
     //Static methods to keep backward compatibility
 
     public static String transform(InputStream svg, List<String> completed, List<String> active) {
-        return transform(svg, completed, active, null);
+        return transform(svg, completed, active, null, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
     }
 
-    public static String transform(InputStream svg, List<String> completed, List<String> active, Map<String, String> subProcessLinks) {
+    public static String transform(InputStream svg, List<String> completed, List<String> active, Map<String, String> subProcessLinks){
+        return transform(svg, completed, active, subProcessLinks, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
+    }
+
+    public static String transform(InputStream svg, List<String> completed, List<String> active,
+                                   Map<String, String> subProcessLinks, String completedNodeColor,
+                                   String completedNodeBorderColor, String activeNodeBorderColor) {
         SVGProcessor processor = new SVGImageProcessor(svg).getProcessor();
 
         for (String nodeId : completed) {
             if (!active.contains(nodeId)) {
-                processor.defaultCompletedTransformation(nodeId);
+                processor.defaultCompletedTransformation(nodeId, completedNodeColor, completedNodeBorderColor);
             }
         }
         for (String nodeId : active) {
-            processor.defaultActiveTransformation(nodeId);
+            processor.defaultActiveTransformation(nodeId, activeNodeBorderColor);
         }
 
         if (subProcessLinks != null) {
