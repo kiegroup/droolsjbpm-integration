@@ -33,11 +33,14 @@ import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.jbpm.ui.img.ImageReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
 
 public class ImageServiceBase {
 
@@ -105,6 +108,11 @@ public class ImageServiceBase {
     }
 
     public String getActiveProcessImage(String containerId, long procInstId) {
+        return getActiveProcessImage(containerId, procInstId, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
+    }
+
+    public String getActiveProcessImage(String containerId, long procInstId, String completedNodeColor,
+                                        String completedNodeBorderColor, String activeNodeBorderColor) {
         ProcessInstanceDesc instance = dataService.getProcessInstanceById(procInstId);
         if (instance == null) {
             throw new ProcessInstanceNotFoundException("No instance found for process instance id " + procInstId);
@@ -136,7 +144,9 @@ public class ImageServiceBase {
 
             ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
 
-            imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()), subProcessLinks);
+            imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()),
+                                                         subProcessLinks, completedNodeColor, completedNodeBorderColor,
+                                                         activeNodeBorderColor);
 
             return imageSVGString;
         }

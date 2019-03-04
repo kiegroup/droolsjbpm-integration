@@ -57,6 +57,9 @@ public class RestURI {
     public static final String NOTIFICATION_ID = "notificationId";
     public static final String ERROR_ID = "errorId";
     public static final String RENDERER_ID = "provider";
+    public static final String SVG_NODE_COMPLETED_COLOR = "svgCompletedColor";
+    public static final String SVG_NODE_COMPLETED_BORDER_COLOR = "svgCompletedBorderColor";
+    public static final String SVG_NODE_ACTIVE_COLOR = "svgActiveBorderColor";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";

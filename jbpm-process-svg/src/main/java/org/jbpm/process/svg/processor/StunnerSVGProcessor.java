@@ -24,23 +24,23 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
     }
 
     @Override
-    public void defaultCompletedTransformation(String nodeId) {
+    public void defaultCompletedTransformation(String nodeId ,String completedNodeColor, String completeBorderColor) {
         transform((summary) -> {
             Optional.ofNullable(summary.getNode(nodeId)).ifPresent(node -> {
                 Optional.ofNullable(node.getBackground()).ifPresent(background -> {
-                    background.setAttribute("fill", COMPLETED_COLOR);
-                    setNodeBorderColor(node.getRenderType(), node.getBorder(), COMPLETED_BORDER_COLOR);
+                    background.setAttribute("fill", completedNodeColor);
+                    setNodeBorderColor(node.getRenderType(), node.getBorder(), completeBorderColor);
                 });
             });
         });
     }
 
     @Override
-    public void defaultActiveTransformation(String nodeId) {
+    public void defaultActiveTransformation(String nodeId, String activeNodeBorderColor) {
         transform((summary) -> {
             Optional.ofNullable(summary.getNode(nodeId)).ifPresent(node -> {
                 Optional.ofNullable(node.getBorder()).ifPresent(border -> {
-                    setNodeBorderColor(node.getRenderType(), border, ACTIVE_COLOR);
+                    setNodeBorderColor(node.getRenderType(), border, activeNodeBorderColor);
                 });
             });
         });
