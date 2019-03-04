@@ -29,6 +29,8 @@ import org.kie.server.client.KieServicesConfiguration;
 
 public class CamelKieServiceConfigurationCustomizer implements KieServicesConfigurationCustomizer {
 
+    private static final long KIE_SERVER_CLIENT_TIMEOUT = 60000L;
+
     @Override
     public KieServicesConfiguration apply(KieServicesConfiguration configuration) {
         final Set<Class<?>> additionalClasses = new HashSet<>();
@@ -39,6 +41,7 @@ public class CamelKieServiceConfigurationCustomizer implements KieServicesConfig
 
         final KieServicesConfiguration conf = configuration.clone();
         conf.addExtraClasses(additionalClasses);
+        conf.setTimeout(KIE_SERVER_CLIENT_TIMEOUT);
         return conf;
     }
 
