@@ -52,7 +52,7 @@ public class MvelValidatorMojo extends AbstractKieMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (ExecModelMode.shouldValidateMVEL(generateModel)) {
-            getLog().info("Starting MVEL Validation " + 4);
+            getLog().info("Starting MVEL Validation");
             validateMVEL();
         }
     }
