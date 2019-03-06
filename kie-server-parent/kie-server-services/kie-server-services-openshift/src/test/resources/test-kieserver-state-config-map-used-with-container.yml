@@ -26,6 +26,7 @@ metadata:
   name: myapp2-kieserver-container
   labels:
     services.server.kie.org/kie-server-state: USED
+    application: myapp2
   annotations:
     test.annotation: must_be_kept
 data:

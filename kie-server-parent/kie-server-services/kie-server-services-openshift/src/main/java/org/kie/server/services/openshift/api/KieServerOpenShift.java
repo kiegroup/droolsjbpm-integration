@@ -15,20 +15,29 @@
 
 package org.kie.server.services.openshift.api;
 
+import java.util.Optional;
+
+import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.server.services.impl.KieServerLocator;
 
-public interface KieServerReadinessProbe {
+public interface KieServerOpenShift {
 
     default boolean isKieServerReady() {
         return KieServerLocator.getInstance().isKieServerReady();
     }
 
-    /**
-     * @param dc
-     * @return true if there are no ongoing DeploymentConfig activities, such as rollout and scale etc.
-     */
     default boolean isDCStable(DeploymentConfig dc) {
         return "True".equals(dc.getStatus().getConditions().get(0).getStatus()) && dc.getStatus().getUnavailableReplicas() == 0;
     }
+
+    default Optional<DeploymentConfig> getKieServerDC(OpenShiftClient client, String serverId) {
+        return Optional.ofNullable(client.deploymentConfigs().withName(serverId).get());
+    }
+    
+    default Optional<ConfigMap> getKieServerCM(OpenShiftClient client, String serverId) {
+        return Optional.ofNullable(client.configMaps().withName(serverId).get());
+    }
+
 }

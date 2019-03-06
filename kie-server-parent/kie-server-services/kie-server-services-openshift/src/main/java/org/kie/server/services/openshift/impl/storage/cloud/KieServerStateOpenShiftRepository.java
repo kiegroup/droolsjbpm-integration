@@ -17,9 +17,12 @@ package org.kie.server.services.openshift.impl.storage.cloud;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,44 +31,49 @@ import javax.validation.constraints.NotNull;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
+import io.fabric8.kubernetes.api.model.LabelSelector;
+import io.fabric8.kubernetes.api.model.LabelSelectorBuilder;
+import io.fabric8.kubernetes.api.model.LabelSelectorRequirement;
+import io.fabric8.kubernetes.api.model.LabelSelectorRequirementBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepositoryUtils;
+import org.kie.server.services.openshift.api.KieServerOpenShift;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_STATE_IMMUTABLE;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_STATE_IMMUTABLE_INIT;
 
-public class KieServerStateOpenShiftRepository extends KieServerStateCloudRepository {
+public class KieServerStateOpenShiftRepository extends KieServerStateCloudRepository implements KieServerOpenShift {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerStateOpenShiftRepository.class);
 
     public synchronized void create(@NotNull KieServerState kieServerState) {
         String serverId = retrieveKieServerId(kieServerState);
         processKieServerStateByOpenShift(client -> {
-            ConfigMap cm = client.configMaps().withName(serverId).get();
-            if (cm != null) {
+            if (getKieServerCM(client, serverId).isPresent()) {
                 logger.info("Create new ConfigMap action ignored. ConfigMap for KieServer [{}] exists.", serverId);
-                return null;
+            } else {
+                createNewKieServerStateCM(client, serverId, kieServerState);
             }
-            createNewKieServerStateCM(kieServerState, serverId, client);
             return null;
         });
     }
 
     public List<String> retrieveAllKieServerIds() {
         return processKieServerStateByOpenShift(client ->
-            client.configMaps().withLabelIn(KieServerStateCloudRepository.CFG_MAP_LABEL_NAME,
-                                                   KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_IMMUTABLE,
-                                                   KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_USED)
+            client.configMaps().withLabelSelector(getKieServerCMLabelSelector(client))
                          .list()
                          .getItems()
                          .stream()
@@ -76,9 +84,7 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
 
     public List<KieServerState> retrieveAllKieServerStates() {
         return processKieServerStateByOpenShift(client ->
-            client.configMaps().withLabelIn(KieServerStateCloudRepository.CFG_MAP_LABEL_NAME,
-                                                   KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_IMMUTABLE,
-                                                   KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_USED)
+            client.configMaps().withLabelSelector(getKieServerCMLabelSelector(client))
                          .list()
                          .getItems()
                          .stream()
@@ -88,18 +94,18 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
     }
 
     public boolean exists(String id) {
-        return processKieServerStateByOpenShift(client -> client.configMaps().withName(id).get() != null);
+        return processKieServerStateByOpenShift(client -> getKieServerCM(client, id).isPresent());
     }
 
     public KieServerState delete(String id) {
         KieServerState state = load(id);
         boolean isUnsupported = processKieServerStateByOpenShift(client -> {
-            if (client.deploymentConfigs().withName(id).get() == null) {
-                client.configMaps().withName(id).delete();
-            } else {
+            if (getKieServerDC(client, id).isPresent()) {
                 return true;
+            } else {
+                client.configMaps().withName(id).delete();
+                return false;
             }
-            return false;
         });
 
         if (isUnsupported) {
@@ -116,26 +122,29 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
         }
 
         processKieServerStateByOpenShift(client -> {
-            DeploymentConfig dc = client.deploymentConfigs().withName(serverId).get();
-            ConfigMap cm = client.configMaps().withName(serverId).get();
+            Optional<ConfigMap> cmOpt = getKieServerCM(client, serverId);
 
             if (Boolean.parseBoolean(kieServerState.getConfiguration()
                                                    .getConfigItemValue(KIE_SERVER_STATE_IMMUTABLE, Boolean.FALSE.toString()))) {
                 if (Boolean.parseBoolean(System.getProperty(KIE_SERVER_STATE_IMMUTABLE_INIT, Boolean.FALSE.toString()))) {
                     // Provide compatibility to KieServerStateFileInit
-                    createNewKieServerStateCM(kieServerState, serverId, client);
+                    createNewKieServerStateCM(client, serverId, kieServerState);
                 } else {
-                    logger.debug("Overwrite immutable KieServer, id:{}, state is not allow.", serverId);
+                    logger.debug("Overwrite immutable KieServer[id:{}] state is not allowed.", serverId);
                 }
-            } else if (isServerStateUpdateAllowed(dc, cm, kieServerState)) {
-                ObjectMeta md = cm.getMetadata();
-                Map<String, String> ann = md.getAnnotations() == null ? new ConcurrentHashMap<>() : md.getAnnotations();
-                md.setAnnotations(ann);
-                ann.put(STATE_CHANGE_TIMESTAMP,
-                        ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-                ann.put(ROLLOUT_REQUIRED, "true");
-                cm.setData(Collections.singletonMap(CFG_MAP_DATA_KEY, xs.toXML(kieServerState)));
-                client.configMaps().createOrReplace(cm);
+            } else {
+                ConfigMap cm = cmOpt.orElseThrow(() -> 
+                    new IllegalStateException("KieServerState ConfigMap must exist before update."));
+                if (isServerStateUpdateAllowed(client, serverId, cm, kieServerState)) {
+                    ObjectMeta md = cm.getMetadata();
+                    Map<String, String> ann = md.getAnnotations() == null ? new ConcurrentHashMap<>() : md.getAnnotations();
+                    md.setAnnotations(ann);
+                    ann.put(STATE_CHANGE_TIMESTAMP,
+                            ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+                    ann.put(ROLLOUT_REQUIRED, "true");
+                    cm.setData(Collections.singletonMap(CFG_MAP_DATA_KEY, xs.toXML(kieServerState)));
+                    client.configMaps().createOrReplace(cm);
+                }
             }
             return null;
         });
@@ -144,9 +153,12 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
     @Override
     public KieServerState load(@NotNull String serverId) {
         KieServerState kieServerState = processKieServerStateByOpenShift(client -> {
-            ConfigMap cm = client.configMaps().withName(serverId).get();
-            if (cm == null) {
-                if (isKieServerRuntime()) {
+            Optional<ConfigMap> cmOpt = getKieServerCM(client, serverId);
+            if (!cmOpt.isPresent() && !isKieServerRuntime()) {
+                return null;
+            }
+            
+            ConfigMap cm = cmOpt.orElseGet(() -> {
                     // Create KieServer ConfigMap with values from System properties
                     KieServerState initkieServerState = new KieServerState();
                     KieServerConfig config = new KieServerConfig();
@@ -158,11 +170,8 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
                         throw new IllegalStateException(("KieServerId: [" + serverId +
                                                          "], must NOT be null and be set by system property or environment varible."));
                     }
-                    cm = createNewKieServerStateCM(initkieServerState, serverId, client);
-                } else {
-                    return null;
-                }
-            }
+                    return createNewKieServerStateCM(client, serverId, initkieServerState);
+                });
             return (KieServerState) xs.fromXML(cm.getData().get(CFG_MAP_DATA_KEY));
         });
     
@@ -170,8 +179,6 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
             if (isKieServerRuntime()) {
                 throw new IllegalStateException("Invalid KieServerId: [" + serverId +
                                                 "], load kie server state failed.");
-            } else {
-                return null;
             }
         } else if (!retrieveKieServerId(kieServerState).equals(serverId)) {
             throw new IllegalStateException("Inconsistent kie server state data, " +
@@ -180,10 +187,38 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
                                             retrieveKieServerId(kieServerState) + "]," +
                                             "from kie server state.");
         }
-
         return kieServerState;
     }
     
+    public Optional<String> getAppName(OpenShiftClient client, String serverId) {
+        Optional<String> appNameFromDC = getKieServerDC(client, serverId)
+                .map(dc -> dc.getMetadata().getLabels().get(CFG_MAP_LABEL_APP_NAME));
+        return appNameFromDC.isPresent() ? appNameFromDC : getAppNameFromPod(client);
+    }
+    
+    public Optional<String> getAppNameFromPod(OpenShiftClient client) {
+        Optional<Pod> pod = Optional.ofNullable(client.pods().withName(System.getenv(ENV_HOSTNAME)).get());
+        return pod.map(p -> p.getMetadata().getLabels().get(CFG_MAP_LABEL_APP_NAME));
+    }
+
+    public LabelSelector getKieServerCMLabelSelector(OpenShiftClient client) {
+        List<LabelSelectorRequirement> selectorReqs = new ArrayList<>();
+        Optional<String> appName = getAppNameFromPod(client);
+        selectorReqs.add(new LabelSelectorRequirementBuilder()
+                         .withKey(CFG_MAP_LABEL_NAME)
+                         .withOperator("In")
+                         .withValues(CFG_MAP_LABEL_VALUE_IMMUTABLE, CFG_MAP_LABEL_VALUE_USED)
+                         .build());
+        if (!isKieServerGlobalDiscoveryEnabled() && appName.isPresent()) {
+            selectorReqs.add(new LabelSelectorRequirementBuilder()
+                             .withKey(KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME)
+                             .withOperator("In")
+                             .withValues(appName.get())
+                             .build());
+        }
+        return new LabelSelectorBuilder().withMatchExpressions(selectorReqs).build();
+    }
+
     @Override
     public boolean isKieServerReady() {
         return KieServerLocator.getInstance().isKieServerReady();
@@ -233,36 +268,52 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
         return false;
     }
 
-    protected ConfigMap createNewKieServerStateCM(KieServerState kieServerState, String serverId, OpenShiftClient client) {
+    public ConfigMap createNewKieServerStateCM(OpenShiftClient client, String serverId, KieServerState kieServerState) {
         String stateXML = xs.toXML(kieServerState);
-        Map<String, String> labels = null;
+        Map<String, String> labels = new HashMap<>();
+        Optional<String> appName = getAppName(client, serverId);
+        Optional<DeploymentConfig> dcOpt = getKieServerDC(client, serverId);
+        
+        appName.ifPresent(aName -> labels.put(CFG_MAP_LABEL_APP_NAME, aName));
+ 
         if (Boolean.parseBoolean(kieServerState.getConfiguration()
                                  .getConfigItemValue(KieServerConstants.KIE_SERVER_STATE_IMMUTABLE, "false"))) {
-            labels = Collections.singletonMap(CFG_MAP_LABEL_NAME, CFG_MAP_LABEL_VALUE_IMMUTABLE);
+            labels.put(CFG_MAP_LABEL_NAME, CFG_MAP_LABEL_VALUE_IMMUTABLE);
         } else {    
-            labels = Collections.singletonMap(CFG_MAP_LABEL_NAME, CFG_MAP_LABEL_VALUE_USED);
+            labels.put(CFG_MAP_LABEL_NAME, CFG_MAP_LABEL_VALUE_USED);
         }
-        return client.configMaps().createOrReplace(new ConfigMapBuilder()
-                                   .withNewMetadata()
-                                     .withName(serverId)
-                                     .withLabels(labels)
-                                   .endMetadata()
-                                   .withData(Collections.singletonMap(CFG_MAP_DATA_KEY, stateXML))
-                                   .build());
+        
+        return dcOpt.map(dc -> client.configMaps().createOrReplace(new ConfigMapBuilder()
+                                                   .withNewMetadata()
+                                                     .withName(serverId)
+                                                     .withLabels(labels)
+                                                     .withOwnerReferences(new OwnerReferenceBuilder()
+                                                                          .withApiVersion(dc.getApiVersion())
+                                                                          .withKind(dc.getKind())                     
+                                                                          .withName(dc.getMetadata().getName())
+                                                                          .withUid(dc.getMetadata().getUid())
+                                                                          .build())     
+                                                   .endMetadata()
+                                                   .withData(Collections.singletonMap(CFG_MAP_DATA_KEY, stateXML))
+                                                   .build()))
+                    .orElseGet(() -> client.configMaps().createOrReplace(new ConfigMapBuilder()
+                                       .withNewMetadata()
+                                         .withName(serverId)
+                                         .withLabels(labels)
+                                       .endMetadata()
+                                       .withData(Collections.singletonMap(CFG_MAP_DATA_KEY, stateXML))
+                                       .build()));
     }
 
-    protected boolean isServerStateUpdateAllowed(DeploymentConfig dc, ConfigMap cm, KieServerState newState) {
-        if (cm == null) {
-            throw new IllegalStateException("KieServerState ConfigMap must exist before update.");
-        }
+    private boolean isServerStateUpdateAllowed(OpenShiftClient client, String serverId, ConfigMap cm, KieServerState newState) {
         if (cm.getMetadata().getLabels() == null) {
             return false;
         }
         if (cm.getMetadata().getLabels().containsValue(CFG_MAP_LABEL_VALUE_USED)) {
             if (isKieServerRuntime()) {
-                return isUpdateByKieServerProcessAllowed(dc, cm, newState);
+                return isUpdateByKieServerProcessAllowed(client, serverId, cm, newState);
             } else {
-                return isUpdateByNonKieServerProcessAllowed(dc, cm, newState);
+                return isUpdateByNonKieServerProcessAllowed(client, serverId, cm, newState);
             }
         }
         if (cm.getMetadata().getLabels().containsValue(CFG_MAP_LABEL_VALUE_IMMUTABLE)) {
@@ -272,16 +323,22 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
         return false;
     }
     
-    protected boolean isUpdateByNonKieServerProcessAllowed(DeploymentConfig dc, ConfigMap cm, KieServerState newState) {
-        if (isDCStable(dc)) {
-            logger.debug("Non KieServer process updated KieServerState.");
-            return true;
+    private boolean isUpdateByNonKieServerProcessAllowed(OpenShiftClient client, String serverId, ConfigMap cm, KieServerState newState) {
+        Optional<DeploymentConfig> dcOpt = getKieServerDC(client, serverId);
+        if (dcOpt.isPresent()) {
+            if (isDCStable(dcOpt.get())) {
+                logger.debug("Non KieServer process updated KieServerState.");
+                return true;
+            } else {
+                return isKieContainerUpdateDuringRolloutAllowed(cm, newState);
+            }
         } else {
-            return isKieContainerUpdateDuringRolloutAllowed(cm, newState);
+            return true;
         }
     }
 
-    protected boolean isUpdateByKieServerProcessAllowed(DeploymentConfig dc, ConfigMap cm, KieServerState newState) {
+    private boolean isUpdateByKieServerProcessAllowed(OpenShiftClient client, String serverId, ConfigMap cm, KieServerState newState) {
+        DeploymentConfig dc = getKieServerDC(client, serverId).orElseThrow(IllegalStateException::new);
         if (!isKieContainerRemovalAllowed(cm, newState)) {
             return false;
         }
@@ -306,6 +363,16 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
      */
     private boolean isKieServerRuntime() {
         return System.getProperty(KieServerConstants.KIE_SERVER_ID) != null;
+    }
+    
+    /**
+     * 
+     * @return false as default value if neither environment variable nor system property found.
+     */
+    private boolean isKieServerGlobalDiscoveryEnabled() {
+        return Boolean.parseBoolean(System.getProperty(
+            KieServerControllerConstants.KIE_CONTROLLER_OCP_GLOBAL_DISCOVERY_ENABLED,
+            System.getenv("KIE_CONTROLLER_OCP_GLOBAL_DISCOVERY_ENABLED")));
     }
 
     private <R> R processKieServerStateByOpenShift(Function<OpenShiftClient, R> func) {
