@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
 import javax.naming.Context;
 import javax.ws.rs.core.Configuration;
 
@@ -247,6 +248,14 @@ public abstract class KieServerBaseIntegrationTest {
         configuration.setMarshallingFormat(MarshallingFormat.JAXB);
 
         KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
+        return kieServicesClient;
+    }
+
+    protected static KieServicesClient createDefaultStaticClient(long timeout, ClassLoader classLoader) {
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword(), timeout);
+        configuration.setMarshallingFormat(MarshallingFormat.JAXB);
+
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(configuration, classLoader);
         return kieServicesClient;
     }
 
