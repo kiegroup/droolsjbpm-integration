@@ -44,6 +44,8 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 import static org.drools.modelcompiler.builder.JavaParserCompiler.getCompiler;
@@ -170,11 +172,17 @@ public class MvelValidatorMojo extends AbstractKieMojo {
                 super(true, kieModule, classLoader);
             }
 
+            Logger logger = LoggerFactory.getLogger(ExecutableModelMavenPluginKieProject.class);
+
+
             @Override
             public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
 
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
                 ModelWriter modelWriter = new ModelWriter();
+
+
+                modelBuilders.forEach(m -> logger.info(m.toString()));
 
                 for (ModelBuilderImpl modelBuilder : modelBuilders) {
                     final ModelWriter.Result result = modelWriter.writeModel( srcMfs, modelBuilder.getPackageModels() );
