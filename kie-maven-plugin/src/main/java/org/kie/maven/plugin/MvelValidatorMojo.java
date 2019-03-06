@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -42,6 +43,7 @@ import org.drools.modelcompiler.builder.ModelWriter;
 import org.drools.modelcompiler.builder.PackageModel;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.Message;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.slf4j.Logger;
@@ -192,6 +194,14 @@ public class MvelValidatorMojo extends AbstractKieMojo {
 
                         for (PackageModel pm : modelBuilder.getPackageModels()) {
                             pm.validateConsequence(getClassLoader(), trgMfs, messages);
+                        }
+
+                        List<Message> errorMessages = messages.getMessages(Message.Level.ERROR);
+                        if(!errorMessages.isEmpty()) {
+                            String errorMessagesString = errorMessages.stream()
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining("\n"));
+                            throw new RuntimeException(new MojoExecutionException(errorMessagesString));
                         }
                     }
                 }
