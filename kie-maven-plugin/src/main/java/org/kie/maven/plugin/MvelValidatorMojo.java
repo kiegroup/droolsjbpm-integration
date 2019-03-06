@@ -3,7 +3,6 @@ package org.kie.maven.plugin;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -16,17 +15,13 @@ import org.apache.maven.project.MavenProject;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
-import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
 import org.drools.modelcompiler.builder.ModelBuilderImpl;
 import org.drools.modelcompiler.builder.ModelWriter;
 import org.drools.modelcompiler.builder.PackageModel;
 import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.drools.modelcompiler.builder.JavaParserCompiler.getCompiler;
 
@@ -68,10 +63,8 @@ public class MvelValidatorMojo extends AbstractKieMojo {
         KieServices ks = KieServices.Factory.get();
 
         try {
-            setSystemProperties(properties);
-
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll((k, c) -> new ExecutableModelMavenPluginKieProject(outputDirectory, k, c), s -> {
+            kieBuilder.buildAll(ExecutableModelMavenPluginKieProject::new, s -> {
                 return !s.contains("src/test/java");
             });
         } finally {
@@ -81,14 +74,9 @@ public class MvelValidatorMojo extends AbstractKieMojo {
 
     public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
 
-        private File outputDirectory;
-
-        public ExecutableModelMavenPluginKieProject(File outputDirectory, InternalKieModule kieModule, ClassLoader classLoader) {
+        public ExecutableModelMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
             super(true, kieModule, classLoader);
-            this.outputDirectory = outputDirectory;
         }
-
-        Logger logger = LoggerFactory.getLogger(ExecutableModelMavenPluginKieProject.class);
 
         @Override
         public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
