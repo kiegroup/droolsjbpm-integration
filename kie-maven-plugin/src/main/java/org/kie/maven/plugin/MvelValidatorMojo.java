@@ -79,12 +79,13 @@ public class MvelValidatorMojo extends AbstractKieMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (ExecModelMode.shouldGenerateModel(generateModel)) {
-            generateModel();
+        if (ExecModelMode.shouldValidateMVEL(generateModel)) {
+            getLog().info("Starting MVEL Validation");
+            validateMVEL();
         }
     }
 
-    private void generateModel() throws MojoExecutionException {
+    private void validateMVEL() throws MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
         List<InternalKieModule> kmoduleDeps = new ArrayList<>();
@@ -135,8 +136,6 @@ public class MvelValidatorMojo extends AbstractKieMojo {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-
-        getLog().info("DSL successfully generated");
     }
 
     private KieModuleModel getDependencyKieModel(File jar) {
