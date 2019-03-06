@@ -29,12 +29,15 @@ import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.ConfigMapList;
 import io.fabric8.kubernetes.api.model.DoneableConfigMap;
+import io.fabric8.kubernetes.api.model.LabelSelector;
+import io.fabric8.kubernetes.api.model.LabelSelectorRequirement;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.services.impl.StartupStrategyProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -271,17 +274,26 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         String srvStateInXML = client.configMaps().inNamespace(testNamespace)
                                      .withName(TEST_KIE_SERVER_ID).get().getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY);
         KieServerState kieServerState = (KieServerState) xs.fromXML(srvStateInXML);
+        String newKieServerID = TEST_KIE_SERVER_ID + "_NEW";
+        String kieServerDCUID = UUID.randomUUID().toString();
     
         assertNotNull(kieServerState);
     
         kieServerState.getConfiguration()
-                      .getConfigItem(KieServerConstants.KIE_SERVER_ID).setValue(TEST_KIE_SERVER_ID + "_NEW");
-    
+                      .getConfigItem(KieServerConstants.KIE_SERVER_ID).setValue(newKieServerID);
+        // Create a dummy KIE server DC
+        createDummyDC(newKieServerID, kieServerDCUID);
+
         repo.create(kieServerState);
         assertNotNull(client.configMaps().inNamespace(testNamespace)
-                            .withName(TEST_KIE_SERVER_ID + "_NEW").get());
-    
-        assertNotNull(repo.load(TEST_KIE_SERVER_ID + "_NEW"));
+                            .withName(newKieServerID).get());
+        assertNotNull(repo.load(newKieServerID));
+        
+        ConfigMap newKieSeverCM = client.configMaps().inNamespace(testNamespace).withName(newKieServerID).get();
+        
+        assertEquals(TEST_APP_NAME, newKieSeverCM.getMetadata().getLabels().get(
+            KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME));
+        assertEquals(kieServerDCUID, newKieSeverCM.getMetadata().getOwnerReferences().get(0).getUid());
     }
 
     @Test
@@ -330,7 +342,7 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
     }
 
     @Test
-    @Ignore ("Ignored due to unsupport API method, withLabelIn, by Mock OpenShiftServer.")
+    @Ignore ("Ignored due to unsupport API method, withLabelSelector, by Mock OpenShiftServer.")
     public void testRetrieveAllKieServerIdsAndStatesWithContaminatedCF() {
         // Adding a contaminated configmap which does not include required label
         ConfigMap cfm = client.configMaps()
@@ -392,7 +404,32 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         
         // Only allow state transition from STARTED to STOPPED
         assertTrue(repo.isKieContainerUpdateDuringRolloutAllowed(cfmContainer, stateWithStopped));
-        // Does not allow state transition from STOPPED to STARTED as it is not necesscary
+        // Does not allow state transition from STOPPED to STARTED as it is not necessary.
         assertFalse(repo.isKieContainerUpdateDuringRolloutAllowed(cfmStopped, state));
-}
+    }
+
+    @Test
+    public void testLabelSelector() {
+        LabelSelector selector = repo.getKieServerCMLabelSelector(client);
+        assertNotNull(selector);
+        // By default, global discovery is disabled, meaning that it must have an 'application' label in the selector
+        boolean foundAppNameLabel = false;
+        for (LabelSelectorRequirement selReq : selector.getMatchExpressions()) {
+            if (selReq.getKey() == KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME) {
+                foundAppNameLabel = true;
+                assertEquals("In", selReq.getOperator());
+                assertTrue(selReq.getValues().contains(TEST_APP_NAME));
+            }
+            if (selReq.getKey() == KieServerStateCloudRepository.CFG_MAP_LABEL_NAME) {
+                assertEquals("In", selReq.getOperator());
+                assertTrue(selReq.getValues().contains(KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_USED));
+                assertTrue(selReq.getValues().contains(KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_IMMUTABLE));
+            }
+        }
+        assertTrue(foundAppNameLabel);
+                
+        System.setProperty(KieServerControllerConstants.KIE_CONTROLLER_OCP_GLOBAL_DISCOVERY_ENABLED, "true");
+        assertTrue(repo.getKieServerCMLabelSelector(client).getMatchExpressions().stream().noneMatch(
+            selReq -> selReq.getKey() == KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME));
+    }
 }

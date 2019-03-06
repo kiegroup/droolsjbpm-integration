@@ -22,20 +22,20 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
-import org.kie.server.services.openshift.api.KieServerReadinessProbe;
 import org.kie.soup.commons.xstream.XStreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class KieServerStateCloudRepository implements KieServerStateRepository,
-                                                    KieServerReadinessProbe, CloudClientFactory {
+public abstract class KieServerStateCloudRepository implements KieServerStateRepository, CloudClientFactory {
 
     public static final String ROLLOUT_REQUIRED = "services.server.kie.org/openshift-startup-strategy.rolloutRequired";
     public static final String CFG_MAP_DATA_KEY = "kie-server-state";
     public static final String CFG_MAP_LABEL_NAME = "services.server.kie.org/kie-server-state";
     public static final String CFG_MAP_LABEL_VALUE_USED = "USED";
     public static final String CFG_MAP_LABEL_VALUE_IMMUTABLE = "IMMUTABLE";
-
+    public static final String CFG_MAP_LABEL_APP_NAME = "application";
+    public static final String ENV_HOSTNAME = "HOSTNAME";
+    
     protected static final String STATE_CHANGE_TIMESTAMP = "services.server.kie.org/kie-server-state.changeTimestamp";
     private static final Logger logger = LoggerFactory.getLogger(KieServerStateCloudRepository.class);
 

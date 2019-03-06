@@ -16,6 +16,9 @@
 
 package org.kie.server.services.openshift.impl.storage.cloud;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import com.thoughtworks.xstream.XStream;
@@ -28,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.controller.api.KieServerControllerConstants;
 
 import static org.kie.server.services.openshift.impl.storage.cloud.KieServerStateCloudRepository.initializeXStream;
 
@@ -38,6 +42,7 @@ public class KieServerStateOpenShiftRepositoryTest {
 
     // Must match the the kie server id specified at test file
     protected static final String TEST_KIE_SERVER_ID = "myapp2-kieserver";
+    protected static final String TEST_APP_NAME = "myapp2";
     protected static XStream xs = initializeXStream();
     protected static Supplier<OpenShiftClient> clouldClientHelper = () -> (new CloudClientFactory() {
     }).createOpenShiftClient();
@@ -104,6 +109,11 @@ public class KieServerStateOpenShiftRepositoryTest {
             public boolean isDCStable(DeploymentConfig dc) {
                 return true;
             }
+            
+            @Override
+            public Optional<String> getAppNameFromPod(OpenShiftClient client) {
+                return Optional.of(TEST_APP_NAME);
+            }
         };
 
         repo.load(TEST_KIE_SERVER_ID);
@@ -112,35 +122,44 @@ public class KieServerStateOpenShiftRepositoryTest {
     @After
     public void tearDown() {
         System.clearProperty(KieServerConstants.KIE_SERVER_ID);
+        System.clearProperty(KieServerControllerConstants.KIE_CONTROLLER_OCP_GLOBAL_DISCOVERY_ENABLED);
         client.configMaps().inNamespace(testNamespace).delete();
+        client.deploymentConfigs().inNamespace(testNamespace).delete();
         client.close();
     }
 
     protected void createDummyDC() {
+        createDummyDC(TEST_KIE_SERVER_ID, UUID.randomUUID().toString());
+    }
+
+    protected void createDummyDC(String kieServerID, String kieServerDCUID) {
         client.deploymentConfigs().inNamespace(testNamespace).createOrReplaceWithNew()
-              .withNewMetadata()
-                .withName(TEST_KIE_SERVER_ID)
-              .endMetadata()
-              .withNewSpec()
-                .withReplicas(0)
-                  .addNewTrigger()
-                    .withType("ConfigChange")
-                  .endTrigger()
-                .withNewTemplate()
-                  .withNewMetadata()
-                    .addToLabels("app", "kieserver")
-                  .endMetadata()
-                  .withNewSpec()
-                    .addNewContainer()
-                      .withName("kieserver")
-                      .withImage("kiserver")
-                      .addNewPort()
-                        .withContainerPort(80)
-                      .endPort()
-                    .endContainer()
-                  .endSpec()
-                .endTemplate()
-              .endSpec()
-              .done();
+            .withNewMetadata()
+              .withName(kieServerID)
+              .withLabels(Collections.singletonMap(KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME, TEST_APP_NAME))
+              .withUid(kieServerDCUID)
+            .endMetadata()
+            .withNewSpec()
+              .withReplicas(0)
+              .addNewTrigger()
+                .withType("ConfigChange")
+              .endTrigger()
+              .addToSelector("app", "kieserver")
+              .withNewTemplate()
+                .withNewMetadata()
+                  .addToLabels("app", "kieserver")
+                .endMetadata()
+                .withNewSpec()
+                  .addNewContainer()
+                    .withName("kieserver")
+                    .withImage("kieserver")
+                    .addNewPort()
+                      .withContainerPort(80)
+                    .endPort()
+                  .endContainer()
+                .endSpec()
+              .endTemplate()
+            .endSpec()
+            .done();
     }
 }
