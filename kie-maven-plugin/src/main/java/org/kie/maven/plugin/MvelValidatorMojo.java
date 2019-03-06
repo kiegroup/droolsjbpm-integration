@@ -95,8 +95,6 @@ public class MvelValidatorMojo extends AbstractKieMojo {
             MemoryFileSystem srcMfs = new MemoryFileSystem();
             ModelWriter modelWriter = new ModelWriter();
 
-            modelBuilders.forEach(m -> logger.info(m.toString()));
-
             for (ModelBuilderImpl modelBuilder : modelBuilders) {
                 final ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageModels());
                 final String[] sources = result.getSources();
