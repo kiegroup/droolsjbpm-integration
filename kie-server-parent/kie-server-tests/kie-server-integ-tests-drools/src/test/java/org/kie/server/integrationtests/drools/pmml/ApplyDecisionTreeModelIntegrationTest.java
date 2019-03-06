@@ -15,15 +15,19 @@
 
 package org.kie.server.integrationtests.drools.pmml;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.drools.core.command.impl.CommandFactoryServiceImpl;
 import org.drools.core.command.runtime.pmml.ApplyPmmlModelCommand;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.pmml.PMML4Result;
 import org.kie.api.pmml.PMMLRequestData;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.scanner.KieMavenRepository;
+import org.kie.scanner.KieURLClassLoader;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -48,11 +52,25 @@ public class ApplyDecisionTreeModelIntegrationTest extends PMMLApplyModelBaseTes
     private static final String CONTAINER_ID = "decision-tree";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
+    private static ClassLoader classLoader;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/decision-tree");
+        KieMavenRepository kmp = KieMavenRepository.getKieMavenRepository();
+        File artifact = kmp.resolveArtifact(releaseId).getFile();
+        if (artifact != null) {
+            URL urls[] = new URL[1];
+            try {
+                urls[0] = artifact.toURI().toURL();
+                classLoader = new KieURLClassLoader(urls, PMML4Result.class.getClassLoader());
+            } catch (MalformedURLException e) {
+                logger.error("FAILED TO GET CLASSLOADER !!!");
+            }
+        } else {
+            logger.error("Could not find artifact file and no class loader created");
+        }
 
         // Having timeout issues due to pmml -> raised timeout.
         KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
@@ -62,8 +80,9 @@ public class ApplyDecisionTreeModelIntegrationTest extends PMMLApplyModelBaseTes
 
     @Test
     public void testApplyPmmlDecisionTree() {
-        Assume.assumeTrue((marshallingFormat == MarshallingFormat.JSON) || (marshallingFormat == MarshallingFormat.JAXB)); // RHPAM-1875
 
+        ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(classLoader);
         PMMLRequestData request = new PMMLRequestData("123", "TreeTest");
         request.addRequestParam("fld1", 30.0);
         request.addRequestParam("fld2", 60.0);

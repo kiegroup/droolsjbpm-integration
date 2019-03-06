@@ -150,6 +150,8 @@ public class XStreamMarshaller
         this.xstream.denyTypes(voidDeny);
 
         this.xstream.addPermission(new KieServerTypePermission(classes));
+        String classWildcards[] = {"org.kie.api.pmml.*", "org.kie.pmml.pmml_4_2.model.*"};
+        this.xstream.allowTypesByWildcard(classWildcards);
 
         AbstractScoreXStreamConverter.registerScoreConverters(xstream);
 
