@@ -57,7 +57,7 @@ public class MvelValidatorMojo extends AbstractKieMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (ExecModelMode.shouldValidateMVEL(generateModel)) {
-            getLog().info("Starting MVEL Validation " + 3);
+            getLog().info("Starting MVEL Validation " + 4);
             validateMVEL();
         }
     }
@@ -67,60 +67,54 @@ public class MvelValidatorMojo extends AbstractKieMojo {
 
         KieServices ks = KieServices.Factory.get();
 
-
         try {
             setSystemProperties(properties);
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(MvelValidatorBuilder.SUPPLIER, s -> {
+            kieBuilder.buildAll((k, c) -> new ExecutableModelMavenPluginKieProject(outputDirectory, k, c), s -> {
                 return !s.contains("src/test/java");
             });
-
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 
-    public static class MvelValidatorBuilder implements KieBuilder.ProjectType {
+    public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
 
-        public static final BiFunction<InternalKieModule, ClassLoader, KieModuleKieProject> SUPPLIER = ExecutableModelMavenPluginKieProject::new;
+        private File outputDirectory;
 
-        public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
+        public ExecutableModelMavenPluginKieProject(File outputDirectory, InternalKieModule kieModule, ClassLoader classLoader) {
+            super(true, kieModule, classLoader);
+            this.outputDirectory = outputDirectory;
+        }
 
-            public ExecutableModelMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
-                super(true, kieModule, classLoader);
-            }
+        Logger logger = LoggerFactory.getLogger(ExecutableModelMavenPluginKieProject.class);
 
-            Logger logger = LoggerFactory.getLogger(ExecutableModelMavenPluginKieProject.class);
+        @Override
+        public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
+            MemoryFileSystem srcMfs = new MemoryFileSystem();
+            ModelWriter modelWriter = new ModelWriter();
 
+            modelBuilders.forEach(m -> logger.info(m.toString()));
 
-            @Override
-            public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
-                MemoryFileSystem srcMfs = new MemoryFileSystem();
-                ModelWriter modelWriter = new ModelWriter();
+            for (ModelBuilderImpl modelBuilder : modelBuilders) {
+                final ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageModels());
+                final String[] sources = result.getSources();
+                if (sources.length != 0) {
+                    getCompiler().compile(sources, srcMfs, trgMfs, getClassLoader());
 
-                modelBuilders.forEach(m -> logger.info(m.toString()));
+                    for (PackageModel pm : modelBuilder.getPackageModels()) {
+                        pm.validateConsequence(getClassLoader(), trgMfs, messages);
+                    }
 
-                for (ModelBuilderImpl modelBuilder : modelBuilders) {
-                    final ModelWriter.Result result = modelWriter.writeModel( srcMfs, modelBuilder.getPackageModels() );
-                    final String[] sources = result.getSources();
-                    if(sources.length != 0) {
-                        getCompiler().compile(sources, srcMfs, trgMfs, getClassLoader());
-
-                        for (PackageModel pm : modelBuilder.getPackageModels()) {
-                            pm.validateConsequence(getClassLoader(), trgMfs, messages);
-                        }
-
-                        List<Message> errorMessages = messages.getMessages(Message.Level.ERROR);
-                        if(!errorMessages.isEmpty()) {
-                            String errorMessagesString = errorMessages.stream()
-                                    .map(Object::toString)
-                                    .collect(Collectors.joining("\n"));
-                            throw new RuntimeException(new MojoExecutionException(errorMessagesString));
-                        }
+                    List<Message> errorMessages = messages.getMessages(Message.Level.ERROR);
+                    if (!errorMessages.isEmpty()) {
+                        String errorMessagesString = errorMessages.stream()
+                                .map(Object::toString)
+                                .collect(Collectors.joining("\n"));
+                        throw new RuntimeException(new MojoExecutionException(errorMessagesString));
                     }
                 }
-
             }
         }
     }
