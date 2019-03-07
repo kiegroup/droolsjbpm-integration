@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.services.jbpm.ui;
 
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jbpm.process.svg.SVGImageProcessor;
+import org.jbpm.process.svg.processor.SVGProcessor;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.NodeInstanceDesc;
@@ -53,7 +54,7 @@ public class ImageServiceBase {
     private String processInstanceImageLink = "containers/{0}/images/processes/instances/{1}";
 
     private KieServerRegistry registry;
-    
+
     public ImageServiceBase() {
         // for tests only
         this.kieServerLocation = "";
@@ -73,7 +74,7 @@ public class ImageServiceBase {
     private byte[] getProcessImageAsBytes(String containerId, String processId) {
 
         ProcessDefinition procDef = dataService.getProcessesByDeploymentIdProcessId(containerId, processId);
-        if( procDef == null ) {
+        if (procDef == null) {
             throw new IllegalArgumentException("No process found for " + processId + " within container " + containerId);
         }
 
@@ -83,7 +84,7 @@ public class ImageServiceBase {
         }
         // get SVG String
         byte[] imageSVG = imageReferenceMap.get(containerId).getImageContent(location, processId);
-        if( imageSVG == null ) {
+        if (imageSVG == null) {
             logger.warn("Could not find SVG image file for process '" + processId + "' within container " + containerId);
             return null;
         }
@@ -92,15 +93,26 @@ public class ImageServiceBase {
     }
 
     public String getProcessImage(String containerId, String processId) {
+        return getProcessImage(containerId, processId, null, null);
+    }
+
+    public String getProcessImage(String containerId, String processId, String svgWidth, String svgHeight) {
         containerId = registry.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
 
         String imageSVGString = null;
         byte[] imageSVG = getProcessImageAsBytes(containerId, processId);
         if (imageSVG != null) {
-            try {
-                imageSVGString = new String(imageSVG, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                logger.debug("UnsupportedEncodingException while building process image due to {}", e.getMessage());
+            if (svgWidth != null && !svgWidth.isEmpty() ||
+                    (svgHeight != null && !svgHeight.isEmpty())) {
+                ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
+                SVGProcessor processor = new SVGImageProcessor(svgStream).getProcessor();
+                imageSVGString = processor.getSVG(svgWidth, svgHeight);
+            } else {
+                try {
+                    imageSVGString = new String(imageSVG, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    logger.debug("UnsupportedEncodingException while building process image due to {}", e.getMessage());
+                }
             }
         }
 
@@ -108,11 +120,13 @@ public class ImageServiceBase {
     }
 
     public String getActiveProcessImage(String containerId, long procInstId) {
-        return getActiveProcessImage(containerId, procInstId, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
+        return getActiveProcessImage(containerId, procInstId, COMPLETED_COLOR, COMPLETED_BORDER_COLOR,
+                                     ACTIVE_BORDER_COLOR, null, null);
     }
 
     public String getActiveProcessImage(String containerId, long procInstId, String completedNodeColor,
-                                        String completedNodeBorderColor, String activeNodeBorderColor) {
+                                        String completedNodeBorderColor, String activeNodeBorderColor,
+                                        String svgWidth, String svgHeight) {
         ProcessInstanceDesc instance = dataService.getProcessInstanceById(procInstId);
         if (instance == null) {
             throw new ProcessInstanceNotFoundException("No instance found for process instance id " + procInstId);
@@ -146,7 +160,7 @@ public class ImageServiceBase {
 
             imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()),
                                                          subProcessLinks, completedNodeColor, completedNodeBorderColor,
-                                                         activeNodeBorderColor);
+                                                         activeNodeBorderColor, svgWidth, svgHeight);
 
             return imageSVGString;
         }

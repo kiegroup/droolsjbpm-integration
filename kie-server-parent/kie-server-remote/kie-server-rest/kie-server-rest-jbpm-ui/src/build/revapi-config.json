@@ -48,6 +48,26 @@
           "methodName": "getProcessInstanceImage",
           "elementKind": "method",
           "justification": "JBPM-8257: Configurable Color coding for executed flows in Process model "
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+          "package": "org.kie.server.remote.rest.jbpm.ui",
+          "classSimpleName": "ImageResource",
+          "methodName": "getProcessImage",
+          "elementKind": "method",
+          "justification": "JBPM-8306:Process diagram images are hardcoded to large sizes"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+          "package": "org.kie.server.remote.rest.jbpm.ui",
+          "classSimpleName": "ImageResource",
+          "methodName": "getProcessInstanceImage",
+          "elementKind": "method",
+          "justification": "JBPM-8306:Process diagram images are hardcoded to large sizes"
         }
       ]
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,11 +74,13 @@ public class ImageResource {
     @Produces({MediaType.APPLICATION_SVG_XML})
     public Response getProcessImage(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-            @ApiParam(value = "identifier of the process definition that image should be loaded for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @ApiParam(value = "identifier of the process definition that image should be loaded for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
+            @ApiParam(value = "svg width", required = false, example = "1000") @QueryParam(SVG_WIDTH) String svgWidth,
+            @ApiParam(value = "svg height", required = false, example = "500") @QueryParam(SVG_HEIGHT) String svgHeight) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            String svgString = imageServiceBase.getProcessImage(containerId, processId);
+            String svgString = imageServiceBase.getProcessImage(containerId, processId, svgWidth, svgHeight);
 
             logger.debug("Returning OK response with content '{}'", svgString);
             return createResponse(svgString, v, Response.Status.OK, conversationIdHeader);
@@ -102,14 +104,17 @@ public class ImageResource {
             @ApiParam(value = "identifier of the process instance that image should be loaded for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long procInstId,
             @ApiParam(value = "svg completed node color", required = false, example = COMPLETED_COLOR) @QueryParam(SVG_NODE_COMPLETED_COLOR) @DefaultValue(COMPLETED_COLOR) String svgNodeCompletedColor,
             @ApiParam(value = "svg completed node border color", required = false, example = COMPLETED_BORDER_COLOR) @QueryParam(SVG_NODE_COMPLETED_BORDER_COLOR) @DefaultValue(COMPLETED_BORDER_COLOR) String svgNodeCompletedBorderColor,
-            @ApiParam(value = "svg active node border color", required = false, example = ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_COLOR) @DefaultValue(ACTIVE_BORDER_COLOR) String svgActiveNodeBorderColor) {
+            @ApiParam(value = "svg active node border color", required = false, example = ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_COLOR) @DefaultValue(ACTIVE_BORDER_COLOR) String svgActiveNodeBorderColor,
+            @ApiParam(value = "svg width attribute value", required = false, example = "1000") @QueryParam(SVG_WIDTH) String svgWidth,
+            @ApiParam(value = "svg height attribute value", required = false, example = "500") @QueryParam(SVG_HEIGHT) String svgHeight) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String svgString = imageServiceBase.getActiveProcessImage(containerId, procInstId,
                                                                       (COMPLETED_COLOR.equals(svgNodeCompletedColor) ? COMPLETED_COLOR : URLDecoder.decode(svgNodeCompletedColor, "UTF-8")),
                                                                       (COMPLETED_BORDER_COLOR.equals(svgNodeCompletedBorderColor) ? COMPLETED_BORDER_COLOR : URLDecoder.decode(svgNodeCompletedBorderColor, "UTF-8")),
-                                                                      (ACTIVE_BORDER_COLOR.equals(svgActiveNodeBorderColor) ? ACTIVE_BORDER_COLOR : URLDecoder.decode(svgActiveNodeBorderColor, "UTF-8")));
+                                                                      (ACTIVE_BORDER_COLOR.equals(svgActiveNodeBorderColor) ? ACTIVE_BORDER_COLOR : URLDecoder.decode(svgActiveNodeBorderColor, "UTF-8")),
+                                                                      svgWidth, svgHeight);
 
             logger.debug("Returning OK response with content '{}'", svgString);
             return createResponse(svgString, v, Response.Status.OK, conversationIdHeader);

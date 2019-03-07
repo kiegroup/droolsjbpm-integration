@@ -1,9 +1,9 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.jbpm.process.svg;
 
@@ -38,7 +38,7 @@ public class SVGImageProcessor {
     public SVGImageProcessor(InputStream svg) {
         this(svg, true);
     }
-    
+
     public SVGImageProcessor(InputStream svg, boolean mapById) {
 
         try {
@@ -49,7 +49,6 @@ public class SVGImageProcessor {
 
             svgProcessor = new SVGProcessorFactory().create(svgDocument, mapById);
             svgProcessor.processNodes(svgDocument.getChildNodes());
-
         } catch (IOException e) {
             throw new RuntimeException("Could not parse svg", e);
         }
@@ -65,13 +64,21 @@ public class SVGImageProcessor {
         return transform(svg, completed, active, null, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
     }
 
-    public static String transform(InputStream svg, List<String> completed, List<String> active, Map<String, String> subProcessLinks){
+    public static String transform(InputStream svg, List<String> completed, List<String> active, Map<String, String> subProcessLinks) {
         return transform(svg, completed, active, subProcessLinks, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
     }
 
     public static String transform(InputStream svg, List<String> completed, List<String> active,
                                    Map<String, String> subProcessLinks, String completedNodeColor,
                                    String completedNodeBorderColor, String activeNodeBorderColor) {
+        return transform(svg, completed, active, subProcessLinks, completedNodeColor, completedNodeBorderColor,
+                         activeNodeBorderColor, null, null);
+    }
+
+    public static String transform(InputStream svg, List<String> completed, List<String> active,
+                                   Map<String, String> subProcessLinks, String completedNodeColor,
+                                   String completedNodeBorderColor, String activeNodeBorderColor,
+                                   String svgWidth, String svgHeight) {
         SVGProcessor processor = new SVGImageProcessor(svg).getProcessor();
 
         for (String nodeId : completed) {
@@ -89,7 +96,7 @@ public class SVGImageProcessor {
                 processor.defaultSubProcessLinkTransformation(subProcessLink.getKey(), subProcessLink.getValue());
             }
         }
-        return processor.getSVG();
+        return processor.getSVG(svgWidth, svgHeight);
     }
 
     public static String transformByName(InputStream svg, List<String> completed, List<String> active) {
@@ -101,7 +108,6 @@ public class SVGImageProcessor {
         }
         for (String nodeId : active) {
             processor.defaultActiveTransformation(nodeId);
-
         }
         return processor.getSVG();
     }

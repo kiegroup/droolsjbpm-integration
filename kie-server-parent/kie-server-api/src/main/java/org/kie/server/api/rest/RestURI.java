@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.rest;
 
@@ -60,13 +60,15 @@ public class RestURI {
     public static final String SVG_NODE_COMPLETED_COLOR = "svgCompletedColor";
     public static final String SVG_NODE_COMPLETED_BORDER_COLOR = "svgCompletedBorderColor";
     public static final String SVG_NODE_ACTIVE_COLOR = "svgActiveBorderColor";
+    public static final String SVG_WIDTH = "svgWidth";
+    public static final String SVG_HEIGHT = "svgHeight";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";
     public static final String JOB_URI = "jobs";
     public static final String TASK_URI = "containers/{" + CONTAINER_ID + "}/tasks";
     public static final String QUERY_URI = "queries";
-    public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";    
+    public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";
     public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
     public static final String QUERY_DEF_URI = "queries/definitions";
     public static final String DOCUMENT_URI = "documents";
@@ -230,7 +232,7 @@ public class RestURI {
 
     // DMN URI
     public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";
-    
+
     // document related
     public static final String DOCUMENT_INSTANCE_GET_URI = "{" + DOCUMENT_ID + "}";
     public static final String DOCUMENT_INSTANCE_CONTENT_GET_URI = "{" + DOCUMENT_ID + "}/content";
@@ -306,7 +308,7 @@ public class RestURI {
     public static final String CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/processes/{" + PROCESS_ID + "}";
     public static final String CASE_DYNAMIC_TASK_PUT_URI = "instances/{" + CASE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
     public static final String CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
-    
+
     public static final String MIGRATE_CASE_INST_PUT_URI = "containers/{" + CONTAINER_ID + "}/cases/instances/{" + CASE_ID + "}";
 
     // case queries
@@ -320,7 +322,7 @@ public class RestURI {
     public static final String CASE_ALL_PROCESSES_INSTANCES_GET_URI = "processes";
     public static final String CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI = "{" + CONTAINER_ID + "}/processes";
     public static final String ADMIN_CASE_ALL_INSTANCES_GET_URI = "cases/instances";
-    
+
     // static files 
     public static final String STATIC_BY_TYPE_GET_URI = "{type}/{file}";
     public static final String STATIC_RENDERER_BY_TYPE_GET_URI = "{provider}/{type}/{file}";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.jbpm.process.svg.model.SVGSummary;
 import org.jbpm.process.svg.model.Transformation;
 import org.w3c.dom.Document;
 
-public abstract class AbstractSVGProcessor implements SVGProcessor{
+public abstract class AbstractSVGProcessor implements SVGProcessor {
 
     protected Document svgDocument;
     protected SVGSummary summary = new SVGSummary();
@@ -46,12 +46,23 @@ public abstract class AbstractSVGProcessor implements SVGProcessor{
 
     @Override
     public String getSVG() {
+        return getSVG(null, null);
+    }
+
+    @Override
+    public String getSVG(String svgWidth, String svgHeight) {
         try {
             DOMSource domSource = new DOMSource(svgDocument.getFirstChild());
             StringWriter writer = new StringWriter();
             StreamResult result = new StreamResult(writer);
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
+            if (svgWidth != null && !svgWidth.isEmpty()) {
+                svgDocument.getFirstChild().getAttributes().getNamedItem("width").setTextContent(svgWidth);
+            }
+            if (svgHeight != null && !svgHeight.isEmpty()) {
+                svgDocument.getFirstChild().getAttributes().getNamedItem("height").setTextContent(svgHeight);
+            }
             transformer.transform(domSource, result);
             return writer.toString();
         } catch (TransformerException e) {
@@ -65,8 +76,7 @@ public abstract class AbstractSVGProcessor implements SVGProcessor{
     }
 
     @Override
-    public void defaultActiveTransformation(String nodeId){
+    public void defaultActiveTransformation(String nodeId) {
         defaultActiveTransformation(nodeId, ACTIVE_BORDER_COLOR);
     }
-
 }
