@@ -16,12 +16,18 @@
 
 package org.kie.karaf.itest.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -74,6 +80,20 @@ public class KieScannerTestUtils {
         }
     }
 
+    public void createAndInstallKJarWithDependencies(final ReleaseId releaseId, final String rule, ReleaseId... dependencies) {
+        KieServices ks = KieServices.Factory.get();
+
+        try {
+            InternalKieModule kJar1 = createKieJarWithDependencies(ks, releaseId, true, rule, dependencies);
+            ks.newKieContainer(releaseId);
+
+            KieMavenRepository repository = KieMavenRepository.getKieMavenRepository();
+            repository.installArtifact(releaseId, kJar1, createKPom(fileManager, releaseId));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to install artifact " + releaseId, e);
+        }
+    }
+
     protected InternalKieModule createKieJar(KieServices ks, ReleaseId releaseId, boolean isdefault, String... rules) throws IOException {
         KieFileSystem kfs = createKieFileSystemWithKProject(ks, isdefault);
         kfs.writePomXML(getPom(releaseId));
@@ -88,12 +108,17 @@ public class KieScannerTestUtils {
         return (InternalKieModule) kieBuilder.getKieModule();
     }
 
-    protected InternalKieModule createKieJarWithDependencies(KieServices ks, ReleaseId releaseId, boolean isdefault, String rule, ReleaseId... dependencies) throws IOException {
+    protected InternalKieModule createKieJarWithDependencies(KieServices ks, ReleaseId releaseId, boolean isdefault,
+                                                             String rule, ReleaseId... dependencies) throws IOException {
         KieFileSystem kfs = createKieFileSystemWithKProject(ks, isdefault);
         kfs.writePomXML(getPom(releaseId, dependencies));
 
-        String file = "org/test/" + rule + ".drl";
-        kfs.write("src/main/resources/KBase1/" + file, createDRL(rule));
+        String file = "org/test/rules.drl";
+
+        final InputStream ruleStream = KieScannerTestUtils.class.getResourceAsStream(rule);
+        final String ruleContent = new BufferedReader(new InputStreamReader(ruleStream))
+                .lines().collect(Collectors.joining("\n"));;
+        kfs.write("src/main/resources/KBase1/" + file, ruleContent);
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs);
         assertTrue(kieBuilder.buildAll().getResults().getMessages().isEmpty());
