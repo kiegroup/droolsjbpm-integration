@@ -23,6 +23,8 @@ import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 

@@ -16,29 +16,42 @@ package org.kie.karaf.itest.blueprint;
  * limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.builder.KieScanner;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
 import org.kie.karaf.itest.blueprint.domain.Customer;
 import org.kie.karaf.itest.blueprint.domain.Drink;
 import org.kie.karaf.itest.blueprint.domain.Order;
+import org.kie.karaf.itest.util.KieScannerTestUtils;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.osgi.framework.Constants;
 
+import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
@@ -48,6 +61,8 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
 
     private static final String BLUEPRINT_XML_LOCATION = "/org/kie/karaf/itest/blueprint/kie-scanner-import-blueprint.xml";
 
+    private static final ReleaseId RELEASE_ID = KieServices.Factory.get().newReleaseId("org.kie", "kie-karaf-itests-kjar", "1.0.0");
+
     @Inject
     KieSession kieSession;
 
@@ -56,6 +71,27 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
 
     @Inject
     KieScanner kieScanner;
+
+    public static void setup(final String modelVersion) {
+        final ReleaseId modelReleaseId = KieServices.Factory.get().newReleaseId("org.kie", "kie-karaf-itests-domain-model", modelVersion);
+
+        if(System.getProperty("maven.repo.local") != null) {
+            InputStream testPropertiesStream = AbstractKarafIntegrationTest.class.getClassLoader().getResourceAsStream(TEST_PROPERTIES_FILE);
+            Properties testProperties = new Properties();
+            try {
+                testProperties.load(testPropertiesStream);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to read test.properties file", e);
+            }
+
+            System.setProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY, testProperties.getProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY));
+        }
+
+        KieScannerTestUtils kieScannerTestUtils = new KieScannerTestUtils();
+        kieScannerTestUtils.setUp();
+        kieScannerTestUtils.createAndInstallKJarWithDependencies(RELEASE_ID, "/drl_blueprint_import_test/rules.drl", modelReleaseId);
+        kieScannerTestUtils.tearDown();
+    }
 
     @Test
     public void kieElementsExistTest() {
@@ -94,6 +130,16 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
 
     @Configuration
     public static Option[] configure() {
+        final String modelMvnString = maven().groupId("org.kie").artifactId("kie-karaf-itests-domain-model")
+                .versionAsInProject().versionAsInProject().toString();
+        Pattern pattern = Pattern.compile(".*version='(.*)',");
+        Matcher matcher = pattern.matcher(modelMvnString);
+        if (matcher.find()) {
+            setup(matcher.group(1));
+        } else {
+            throw new RuntimeException("Unable to detect domain model version");
+        }
+
         return new Option[]{
                 // Install Karaf Container
                 getKarafDistributionOption(),
