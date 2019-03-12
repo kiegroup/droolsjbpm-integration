@@ -15,13 +15,17 @@
 package org.kie.server.controller.common;
 
 import java.util.ServiceLoader;
+import java.util.concurrent.Executors;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.kie.server.controller.api.service.NotificationService;
+import org.kie.server.controller.api.service.NotificationServiceFactory;
 import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
+import org.kie.server.controller.impl.KieServerHealthCheckControllerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +34,12 @@ public class KieControllerServletListener implements ServletContextListener {
 
     private static final Logger logger = LoggerFactory.getLogger(KieControllerServletListener.class);
     private KieServerTemplateStorage storage;
+    private NotificationService notificationService;
+    private KieServerHealthCheckControllerImpl healthCheck;
+    
+    public KieControllerServletListener() {
+        healthCheck = new KieServerHealthCheckControllerImpl();
+    }
     
     @Override
     public void contextDestroyed(ServletContextEvent event) {
@@ -38,6 +48,7 @@ public class KieControllerServletListener implements ServletContextListener {
             
             logger.debug("Template storage {} closed successfully", storage);
         }
+        healthCheck.stop();
     }
 
     @Override
@@ -50,6 +61,17 @@ public class KieControllerServletListener implements ServletContextListener {
             
             logger.debug("Template storage {} initialized successfully", storage);
         }
+
+        ServiceLoader<NotificationServiceFactory> notificationServiceLoader = ServiceLoader.load(NotificationServiceFactory.class);
+        if (notificationServiceLoader != null && notificationServiceLoader.iterator().hasNext()) {
+            notificationService = notificationServiceLoader.iterator().next().getNotificationService();
+
+            logger.debug("Notification service {} initialized successfully", notificationService.toString());
+        } 
+        healthCheck.setExecutorService(Executors.newSingleThreadExecutor());
+        healthCheck.setNotificationService(notificationService);
+        healthCheck.setTemplateStorage(storage);
+        healthCheck.start();
     }
 
 }

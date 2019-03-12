@@ -22,9 +22,6 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import io.swagger.jaxrs.listing.SwaggerSerializers;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.controller.api.KieServerController;
-import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
 import org.kie.server.controller.service.StandaloneRuntimeManagementServiceImpl;
 import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
