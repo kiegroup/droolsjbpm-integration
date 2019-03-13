@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 @Path("metrics")
 public class MetricsResource {
 
-    Logger logger = LoggerFactory.getLogger(MetricsResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(MetricsResource.class);
     public static CollectorRegistry prometheusRegistry = CollectorRegistry.defaultRegistry;
 
     @GET

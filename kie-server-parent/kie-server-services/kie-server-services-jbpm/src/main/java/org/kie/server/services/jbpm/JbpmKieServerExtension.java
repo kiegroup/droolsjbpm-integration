@@ -329,7 +329,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context),
                 new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
                 new UserTaskAdminServiceBase(userTaskAdminService, context));
-
     }
 
 
@@ -350,7 +349,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public void serverStarted() {
         if (executorService != null) {
-
             executorService.init();
         }
     }

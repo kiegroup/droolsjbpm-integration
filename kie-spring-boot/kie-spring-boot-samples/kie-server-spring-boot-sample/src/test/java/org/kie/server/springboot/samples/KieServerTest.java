@@ -16,10 +16,6 @@
 
 package org.kie.server.springboot.samples;
 
-import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -51,41 +47,53 @@ import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.prometheus.PrometheusKieServerExtension;
 import org.kie.server.springboot.jbpm.ContainerAliasResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations="classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class KieServerTest {
 
     static final String ARTIFACT_ID = "evaluation";
     static final String GROUP_ID = "org.jbpm.test";
     static final String VERSION = "1.0.0";
-    
+
     @LocalServerPort
-    private int port;    
-   
+    private int port;
+
     private String user = "john";
     private String password = "john@pwd1";
 
     private String containerAlias = "eval";
     private String containerId = "evaluation";
     private String processId = "evaluation";
-    
+
     private KieServicesClient kieServicesClient;
-    
+
     @Autowired
     private KieServer kieServer;
-    
+
     @Autowired
     private ContainerAliasResolver aliasResolver;
-    
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
     @BeforeClass
     public static void generalSetup() {
         System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.PRODUCTION.name());
@@ -101,7 +109,7 @@ public class KieServerTest {
     public static void generalCleanup() {
         System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
-    
+
     @Before
     public void setup() {
         ReleaseId releaseId = new ReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
@@ -109,20 +117,20 @@ public class KieServerTest {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl, user, password);
         configuration.setTimeout(60000);
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
-        this.kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
-        
+        this.kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
+
         KieContainerResource resource = new KieContainerResource(containerId, releaseId);
         resource.setContainerAlias(containerAlias);
         kieServicesClient.createContainer(containerId, resource);
     }
-    
+
     @After
     public void cleanup() {
         if (kieServicesClient != null) {
             kieServicesClient.disposeContainer(containerId);
         }
     }
-    
+
     @Test
     public void testProcessStartAndAbort() {
 
@@ -143,7 +151,7 @@ public class KieServerTest {
         params.put("reason", "test on spring boot");
         Long processInstanceId = processClient.startProcess(containerId, processId, params);
         assertNotNull(processInstanceId);
-       
+
         // find active process instances
         List<ProcessInstance> instances = queryClient.findProcessInstances(0, 10);
         assertEquals(1, instances.size());
@@ -153,7 +161,7 @@ public class KieServerTest {
 
         ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
         assertNotNull(processInstance);
-        assertEquals(3, processInstance.getState().intValue());        
+        assertEquals(3, processInstance.getState().intValue());
     }
 
     @Test
@@ -176,7 +184,7 @@ public class KieServerTest {
         params.put("reason", "test on spring boot");
         Long processInstanceId = processClient.startProcess(containerId, processId, params);
         assertNotNull(processInstanceId);
-       
+
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
         // find available tasks
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(user, 0, 10);
@@ -197,9 +205,9 @@ public class KieServerTest {
 
         ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
         assertNotNull(processInstance);
-        assertEquals(3, processInstance.getState().intValue());        
+        assertEquals(3, processInstance.getState().intValue());
     }
-    
+
     @Test
     public void testProcessStartAndAbortUsingAlias() {
 
@@ -215,16 +223,16 @@ public class KieServerTest {
         assertEquals(processId, definition.getId());
 
         String resolvedContainerId = aliasResolver.latest(containerAlias);
-        
+
         // start process instance
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("employee", "john");
         params.put("reason", "test on spring boot");
         Long processInstanceId = processClient.startProcess(resolvedContainerId, processId, params);
         assertNotNull(processInstanceId);
-        
+
         resolvedContainerId = aliasResolver.forProcessInstance(containerAlias, processInstanceId);
-       
+
         // find active process instances
         List<ProcessInstance> instances = queryClient.findProcessInstances(0, 10);
         assertEquals(1, instances.size());
@@ -234,15 +242,26 @@ public class KieServerTest {
 
         ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
         assertNotNull(processInstance);
-        assertEquals(3, processInstance.getState().intValue());        
+        assertEquals(3, processInstance.getState().intValue());
     }
-    
+
+    @Test
+    public void testPrometheusEndpoint() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/rest/metrics", String.class);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getBody()).contains("# TYPE kie_server_start_time gauge");
+    }
+
     @Test
     public void testCommandServiceSetup() {
-        for (KieServerExtension extension : ((KieServerImpl)kieServer).getServerExtensions()) {
+        for (KieServerExtension extension : ((KieServerImpl) kieServer).getServerExtensions()) {
             KieContainerCommandService<?> tmp = extension.getAppComponents(KieContainerCommandService.class);
-
-            assertNotNull(tmp);
+            if (PrometheusKieServerExtension.EXTENSION_NAME.equals(extension.getExtensionName())) {
+                assertNull(tmp);
+            } else {
+                assertNotNull(tmp);
+            }
         }
     }
 }

@@ -18,6 +18,7 @@ kieserver.jbpm.enabled=true
 kieserver.jbpmui.enabled=true
 kieserver.casemgmt.enabled=true
 kieserver.optaplanner.enabled=true
+kieserver.prometheus.enabled=true
 ```
 
 How to run it

@@ -45,8 +45,6 @@ public class JBPMUIKieServerAutoConfiguration {
     @ConditionalOnMissingBean(name = "jBPMUIServerExtension")
     @ConditionalOnProperty(name = "kieserver.jbpmui.enabled")
     public KieServerExtension jbpmUIServerExtension() {
-
         return new JBPMUIKieServerExtension();
-
     }
 }
