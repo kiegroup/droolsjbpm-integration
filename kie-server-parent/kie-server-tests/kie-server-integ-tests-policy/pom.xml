@@ -397,6 +397,12 @@
             </plugin>
           </plugins>
         </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>com.bazaarvoice.maven.plugins</groupId>
+            <artifactId>process-exec-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>

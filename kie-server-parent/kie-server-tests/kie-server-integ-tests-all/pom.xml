@@ -419,6 +419,14 @@
         <kieserver.casemgmt.enabled>true</kieserver.casemgmt.enabled>
         <jbpm.executor.disabled>true</jbpm.executor.disabled>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.bazaarvoice.maven.plugins</groupId>
+            <artifactId>process-exec-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

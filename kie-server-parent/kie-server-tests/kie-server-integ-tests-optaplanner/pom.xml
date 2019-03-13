@@ -293,6 +293,14 @@
         <kieserver.drools.enabled>true</kieserver.drools.enabled>
         <kieserver.optaplanner.enabled>true</kieserver.optaplanner.enabled>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.bazaarvoice.maven.plugins</groupId>
+            <artifactId>process-exec-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
