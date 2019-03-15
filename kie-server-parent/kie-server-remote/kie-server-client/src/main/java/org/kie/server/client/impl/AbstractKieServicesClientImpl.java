@@ -505,11 +505,9 @@ public abstract class AbstractKieServicesClientImpl {
 
             // Create msg
             TextMessage textMsg;
-            Marshaller marshaller;
             try {
 
                 // serialize request
-                marshaller = MarshallerFactory.getMarshaller( config.getExtraClasses(), config.getMarshallingFormat(), classLoader );
                 String xmlStr = marshaller.marshall( command );
                 logger.debug("Message content to be sent '{}'", xmlStr);
                 textMsg = session.createTextMessage(xmlStr);
