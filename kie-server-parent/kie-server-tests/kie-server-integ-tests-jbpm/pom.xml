@@ -567,6 +567,14 @@
         <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
         <jbpm.executor.enabled>true</jbpm.executor.enabled>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.bazaarvoice.maven.plugins</groupId>
+            <artifactId>process-exec-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
