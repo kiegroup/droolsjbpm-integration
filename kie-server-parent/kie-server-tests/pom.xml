@@ -1256,12 +1256,6 @@
             </plugin>
           </plugins>
         </pluginManagement>
-        <plugins>
-          <plugin>
-            <groupId>com.bazaarvoice.maven.plugins</groupId>
-            <artifactId>process-exec-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
       </build>
     </profile>
     <!-- This profile basically disables any cargo related execution. It can be used when the tests should run on
