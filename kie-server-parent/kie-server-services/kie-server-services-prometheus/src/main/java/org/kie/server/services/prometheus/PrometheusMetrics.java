@@ -17,7 +17,9 @@ package org.kie.server.services.prometheus;
 import java.util.stream.IntStream;
 
 import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class PrometheusMetrics {
@@ -91,4 +93,33 @@ public class PrometheusMetrics {
     Histogram getDroolsEvaluationTimeHistogram() {
         return droolsEvaluationTimeHistogram;
     }
+
+
+    private static final Summary optaPlannerSolverDuration = Summary.build()
+            .name("solver_duration_seconds")
+            .help("Time in seconds it took solver to solve the constraint problem")
+            .labelNames("solver_id").register();
+
+    Summary getOptaPlannerSolverDuration() {
+        return optaPlannerSolverDuration;
+    }
+
+    private static final Summary optaPlannerSolverScoreCalculationSpeed = Summary.build()
+            .name("solver_score_calculation_speed")
+            .help("Number of moves per second for a particular solver solving the constraint problem")
+            .labelNames("solver_id").register();
+
+    Summary getOptaPlannerSolverScoreCalculationSpeed() {
+        return optaPlannerSolverScoreCalculationSpeed;
+    }
+
+    private static final Gauge optaPlannerSolverCount = Gauge.build()
+            .name("solvers_running")
+            .help("Number of solvers currently running")
+            .register();
+
+    Gauge getOptaPlannerSolverCount() {
+        return optaPlannerSolverCount;
+    }
+
 }
