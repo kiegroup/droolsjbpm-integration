@@ -16,6 +16,7 @@ package org.kie.server.controller.common;
 
 import java.util.ServiceLoader;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -36,7 +37,8 @@ public class KieControllerServletListener implements ServletContextListener {
     private KieServerTemplateStorage storage;
     private NotificationService notificationService;
     private KieServerHealthCheckControllerImpl healthCheck;
-    
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     public KieControllerServletListener() {
         healthCheck = new KieServerHealthCheckControllerImpl();
     }
@@ -49,6 +51,7 @@ public class KieControllerServletListener implements ServletContextListener {
             logger.debug("Template storage {} closed successfully", storage);
         }
         healthCheck.stop();
+        executorService.shutdownNow();
     }
 
     @Override
@@ -68,7 +71,7 @@ public class KieControllerServletListener implements ServletContextListener {
 
             logger.debug("Notification service {} initialized successfully", notificationService.toString());
         } 
-        healthCheck.setExecutorService(Executors.newSingleThreadExecutor());
+        healthCheck.setExecutorService(executorService);
         healthCheck.setNotificationService(notificationService);
         healthCheck.setTemplateStorage(storage);
         healthCheck.start();
