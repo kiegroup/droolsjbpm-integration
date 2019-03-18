@@ -28,11 +28,15 @@ import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.services.api.KieContainerInstance;
+import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.prometheus.PrometheusKieServerExtension;
+import org.kie.server.services.prometheus.PrometheusMetricsSolverListener;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.impl.solver.AbstractSolver;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +99,8 @@ public class SolverServiceBase {
                     Solver<Object> solver = solverFactory.buildSolver();
 
                     sic.setSolver(solver);
+                    registerListener(solver, solverId);
+
                     updateSolverInstance(sic);
 
                     solvers.put(instance.getSolverInstanceKey(),
@@ -502,6 +508,13 @@ public class SolverServiceBase {
                 }
             }
         });
+    }
+
+    private void registerListener(Solver solver, String solverId) {
+        KieServerExtension extension = context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
+        if (extension != null) {
+            ((AbstractSolver) solver).addPhaseLifecycleListener(new PrometheusMetricsSolverListener(solverId));
+        }
     }
 
     private void terminateSolverEarly(SolverInstanceContext sic) {
