@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,16 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.ConfigMapList;
-import io.fabric8.kubernetes.api.model.DoneableConfigMap;
 import io.fabric8.kubernetes.api.model.LabelSelector;
 import io.fabric8.kubernetes.api.model.LabelSelectorRequirement;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.client.dsl.Resource;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.services.impl.StartupStrategyProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -48,6 +45,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_ID;
+import static org.kie.server.controller.api.KieServerControllerConstants.KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_DATA_KEY;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_APP_NAME_KEY;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_ID_KEY;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_STATE_KEY;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_STATE_VALUE_IMMUTABLE;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_STATE_VALUE_USED;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.ROLLOUT_REQUIRED;
 
 public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerStateOpenShiftRepositoryTest {
 
@@ -118,29 +124,28 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
 
     @Test
     public void testKieServerStateConfigMap() throws InterruptedException {
-        Resource<ConfigMap, DoneableConfigMap> configMapResource = client.configMaps().inNamespace(testNamespace)
-                                                                         .withName(TEST_KIE_SERVER_ID);
+        Optional<ConfigMap> cmOpt = repo.getKieServerCM(client, TEST_KIE_SERVER_ID);
+        
+        assertTrue(cmOpt.isPresent());
+        cmOpt.ifPresent(configMap -> assertTrue(configMap.getMetadata().getLabels().containsValue(TEST_KIE_SERVER_ID)));
     
-        ConfigMap configMap = configMapResource.get();
-        assertEquals(TEST_KIE_SERVER_ID, configMap.getMetadata().getName());
-    
-        Map<String, String> data = configMap.getData();
+        Map<String, String> data = cmOpt.get().getData();
     
         // Avoid attribute name having '.' as it confuses jsonpath
-        String srvStateInXML = data.get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY);
+        String srvStateInXML = data.get(CFG_MAP_DATA_KEY);
         KieServerState kieServerState = (KieServerState) xs.fromXML(srvStateInXML);
     
         assertNotNull(kieServerState);
         assertEquals(TEST_KIE_SERVER_ID,
-                     kieServerState.getConfiguration().getConfigItem(KieServerConstants.KIE_SERVER_ID).getValue());
+                     kieServerState.getConfiguration().getConfigItem(KIE_SERVER_ID).getValue());
     
     }
 
     @Test
     public void testStoreAndLoad() throws InterruptedException {
         // Retrieve the seeded KSSConfigMap and Store it under new name
-        String srvStateInXML = client.configMaps().inNamespace(testNamespace)
-                                     .withName(TEST_KIE_SERVER_ID).get().getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY);
+        String srvStateInXML = repo.getKieServerCM(client, TEST_KIE_SERVER_ID)
+                                   .get().getData().get(CFG_MAP_DATA_KEY);
         KieServerState kieServerState = (KieServerState) xs.fromXML(srvStateInXML);
     
         assertNotNull(kieServerState);
@@ -148,15 +153,14 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         /**
          * At normal situation, DC will not be null otherwise there will no KieServer Pod running
          */
-        createDummyDC();
+        createDummyDCandRC();
         repo.store(TEST_KIE_SERVER_ID, kieServerState);
-        assertNotNull(client.configMaps().inNamespace(testNamespace)
-                            .withName(TEST_KIE_SERVER_ID).get());
+        assertNotNull(repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get());
     
         KieServerState kssLoaded = repo.load(TEST_KIE_SERVER_ID);
         assertNotNull(kssLoaded);
         assertEquals(TEST_KIE_SERVER_ID,
-                     kssLoaded.getConfiguration().getConfigItem(KieServerConstants.KIE_SERVER_ID).getValue());
+                     kssLoaded.getConfiguration().getConfigItem(KIE_SERVER_ID).getValue());
     
         KieContainerResource[] kcr = kssLoaded.getContainers()
                                               .<KieContainerResource> toArray(new KieContainerResource[]{});
@@ -169,17 +173,16 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
     @Test
     public void testStoreAndLoadWithRolloutTrigger() throws InterruptedException {
         // Retrieve the seeded KSSConfigMap and Store it under new name
-        String srvStateInXML = client.configMaps().inNamespace(testNamespace)
-                                     .withName(TEST_KIE_SERVER_ID).get().getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY);
+        String srvStateInXML = repo.getKieServerCM(client, TEST_KIE_SERVER_ID)
+                                   .get().getData().get(CFG_MAP_DATA_KEY);
         KieServerState kieServerState = (KieServerState) xs.fromXML(srvStateInXML);
     
         repo.store(TEST_KIE_SERVER_ID, kieServerState);
-        assertTrue(client.configMaps().inNamespace(testNamespace)
-                            .withName(TEST_KIE_SERVER_ID)
+        assertTrue(repo.getKieServerCM(client, TEST_KIE_SERVER_ID)
                             .get()
                             .getMetadata()
                             .getAnnotations()
-                            .containsKey(KieServerStateCloudRepository.ROLLOUT_REQUIRED));
+                            .containsKey(ROLLOUT_REQUIRED));
     
     }
 
@@ -209,48 +212,39 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         KieServerState kss = repo.load(TEST_KIE_SERVER_ID);
     
         // Remove the configmap created at Setup to set a no pre-seeded scenario
-        client.configMaps().inNamespace(testNamespace).withName(TEST_KIE_SERVER_ID).delete();
+        client.configMaps().withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, TEST_KIE_SERVER_ID).delete();
     
         repo.store(TEST_KIE_SERVER_ID, kss);
     }
 
     @Test
     public void testAnnotation() {
-    
         String kieServer1 = KIE_SERVER_STARTUP_IN_PROGRESS_KEY_PREFIX + UUID.randomUUID().toString();
         String kieServer2 = KIE_SERVER_STARTUP_IN_PROGRESS_KEY_PREFIX + UUID.randomUUID().toString();
     
-        ConfigMap cm = client.configMaps().withName(TEST_KIE_SERVER_ID).get();
+        ConfigMap cm = repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get();
         ObjectMeta md = cm.getMetadata();
         Map<String, String> ann = md.getAnnotations() == null ? new HashMap<>() : md.getAnnotations();
         md.setAnnotations(ann);
         ann.put(kieServer1, KIE_SERVER_STARTUP_IN_PROGRESS_VALUE);
         ann.put(kieServer2, KIE_SERVER_STARTUP_IN_PROGRESS_VALUE);
-        client.configMaps().createOrReplace(cm);
-    
-        assertNotNull(client.configMaps().withName(TEST_KIE_SERVER_ID).get().getMetadata().getAnnotations());
-        assertTrue(client.configMaps().withName(TEST_KIE_SERVER_ID).get().getMetadata()
-                         .getAnnotations().containsKey(kieServer1));
-        assertTrue(client.configMaps().withName(TEST_KIE_SERVER_ID).get().getMetadata()
-                         .getAnnotations().containsKey(kieServer2));
-        assertTrue(
-                   client.configMaps().withName(TEST_KIE_SERVER_ID).get().getMetadata()
-                         .getAnnotations().containsValue(KIE_SERVER_STARTUP_IN_PROGRESS_VALUE));
+        repo.createOrReplaceCM(client, cm);
+        
+        assertNotNull(repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get().getMetadata().getAnnotations());
+        assertTrue(repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get().getMetadata().getAnnotations().containsKey(kieServer1));
+        assertTrue(repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get().getMetadata().getAnnotations().containsKey(kieServer2));
+        assertTrue(repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get().getMetadata().getAnnotations().containsValue(KIE_SERVER_STARTUP_IN_PROGRESS_VALUE));
     
         ann.remove(kieServer1);
-        client.configMaps().createOrReplace(cm);
+        repo.createOrReplaceCM(client, cm);
     
-        assertTrue(
-                   client.configMaps().withName(TEST_KIE_SERVER_ID).get().getMetadata()
-                         .getAnnotations().containsValue(KIE_SERVER_STARTUP_IN_PROGRESS_VALUE));
+        // Reload CM
+        assertTrue(repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get().getMetadata().getAnnotations().containsValue(KIE_SERVER_STARTUP_IN_PROGRESS_VALUE));
     
         ann.remove(kieServer2);
-        client.configMaps().createOrReplace(cm);
+        repo.createOrReplaceCM(client, cm);
     
-        assertFalse(
-                    client.configMaps().withName(TEST_KIE_SERVER_ID).get().getMetadata()
-                          .getAnnotations().containsValue(KIE_SERVER_STARTUP_IN_PROGRESS_VALUE));
-    
+        assertFalse(repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get().getMetadata().getAnnotations().containsValue(KIE_SERVER_STARTUP_IN_PROGRESS_VALUE));
     }
 
     @Test
@@ -271,28 +265,24 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
     @Test
     public void testCreateAndLoad() {
         // Retrieve the seeded KSSConfigMap and Store it under new name
-        String srvStateInXML = client.configMaps().inNamespace(testNamespace)
-                                     .withName(TEST_KIE_SERVER_ID).get().getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY);
+        String srvStateInXML = repo.getKieServerCM(client, TEST_KIE_SERVER_ID).get().getData().get(CFG_MAP_DATA_KEY);
         KieServerState kieServerState = (KieServerState) xs.fromXML(srvStateInXML);
         String newKieServerID = TEST_KIE_SERVER_ID + "_NEW";
         String kieServerDCUID = UUID.randomUUID().toString();
     
         assertNotNull(kieServerState);
     
-        kieServerState.getConfiguration()
-                      .getConfigItem(KieServerConstants.KIE_SERVER_ID).setValue(newKieServerID);
+        kieServerState.getConfiguration().getConfigItem(KIE_SERVER_ID).setValue(newKieServerID);
         // Create a dummy KIE server DC
-        createDummyDC(newKieServerID, kieServerDCUID);
+        createDummyDCandRC(newKieServerID, kieServerDCUID);
 
         repo.create(kieServerState);
-        assertNotNull(client.configMaps().inNamespace(testNamespace)
-                            .withName(newKieServerID).get());
+        assertTrue(repo.getKieServerCM(client, newKieServerID).isPresent());
         assertNotNull(repo.load(newKieServerID));
         
-        ConfigMap newKieSeverCM = client.configMaps().inNamespace(testNamespace).withName(newKieServerID).get();
+        ConfigMap newKieSeverCM = repo.getKieServerCM(client, newKieServerID).get();
         
-        assertEquals(TEST_APP_NAME, newKieSeverCM.getMetadata().getLabels().get(
-            KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME));
+        assertEquals(TEST_APP_NAME, newKieSeverCM.getMetadata().getLabels().get(CFG_MAP_LABEL_APP_NAME_KEY));
         assertEquals(kieServerDCUID, newKieSeverCM.getMetadata().getOwnerReferences().get(0).getUid());
     }
 
@@ -307,7 +297,7 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
     public void testDeleteAttachedKieServerStateIsNotAllowed() {
         assertTrue(repo.exists(TEST_KIE_SERVER_ID));
         // Create a dummy DeploymentConfig to simulate attached KieServeState scenario
-        createDummyDC();
+        createDummyDCandRC();
         repo.delete(TEST_KIE_SERVER_ID);
     }
 
@@ -315,12 +305,12 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
     public void testRetrieveAllKieServerIdsAndStates() {
         KieServerState state = repo.load(TEST_KIE_SERVER_ID);
         state.getConfiguration()
-             .getConfigItem(KieServerConstants.KIE_SERVER_ID).setValue(TEST_KIE_SERVER_ID + "_1");
+             .getConfigItem(KIE_SERVER_ID).setValue(TEST_KIE_SERVER_ID + "_1");
         // Create new KieServer    
         repo.create(state);
     
         state.getConfiguration()
-             .getConfigItem(KieServerConstants.KIE_SERVER_ID).setValue(TEST_KIE_SERVER_ID + "_2");
+             .getConfigItem(KIE_SERVER_ID).setValue(TEST_KIE_SERVER_ID + "_2");
         // Create new KieServer    
         repo.create(state);
     
@@ -342,14 +332,14 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
     }
 
     @Test
-    @Ignore ("Ignored due to unsupport API method, withLabelSelector, by Mock OpenShiftServer.")
+    @Ignore ("Ignored due to unsupported API method, withLabelSelector, by Mock OpenShiftServer.")
     public void testRetrieveAllKieServerIdsAndStatesWithContaminatedCF() {
         // Adding a contaminated configmap which does not include required label
         ConfigMap cfm = client.configMaps()
                 .load(KieServerStateOpenShiftRepositoryTest.class
                 .getResourceAsStream("/test-kieserver-state-config-map-without-label.yml")).get();
     
-        client.configMaps().inNamespace(testNamespace).createOrReplace(cfm);
+        repo.createOrReplaceCM(client, cfm);
         
         // Now there are two configmaps in the test namespace
         assertEquals(2, client.configMaps().list().getItems().size());
@@ -375,9 +365,9 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         client.configMaps().inNamespace(testNamespace).createOrReplace(cfmStopped);
 
         KieServerState stateWithoutContainer = (KieServerState) xs.fromXML(
-            cfmContainer.getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY));
+            cfmContainer.getData().get(CFG_MAP_DATA_KEY));
         KieServerState stateWithStopped = (KieServerState) xs.fromXML(
-            cfmStopped.getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY));
+            cfmStopped.getData().get(CFG_MAP_DATA_KEY));
         
         // Removing STOPPED container is not allowed
         assertFalse(repo.isKieContainerRemovalAllowed(cfmStopped, stateWithoutContainer));
@@ -398,9 +388,9 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         client.configMaps().inNamespace(testNamespace).createOrReplace(cfmStopped);
 
         KieServerState state = (KieServerState) xs.fromXML(
-            cfmContainer.getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY));
+            cfmContainer.getData().get(CFG_MAP_DATA_KEY));
         KieServerState stateWithStopped = (KieServerState) xs.fromXML(
-            cfmStopped.getData().get(KieServerStateCloudRepository.CFG_MAP_DATA_KEY));
+            cfmStopped.getData().get(CFG_MAP_DATA_KEY));
         
         // Only allow state transition from STARTED to STOPPED
         assertTrue(repo.isKieContainerUpdateDuringRolloutAllowed(cfmContainer, stateWithStopped));
@@ -415,21 +405,23 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         // By default, global discovery is disabled, meaning that it must have an 'application' label in the selector
         boolean foundAppNameLabel = false;
         for (LabelSelectorRequirement selReq : selector.getMatchExpressions()) {
-            if (selReq.getKey() == KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME) {
+            if (selReq.getKey() == CFG_MAP_LABEL_APP_NAME_KEY) {
                 foundAppNameLabel = true;
                 assertEquals("In", selReq.getOperator());
                 assertTrue(selReq.getValues().contains(TEST_APP_NAME));
             }
-            if (selReq.getKey() == KieServerStateCloudRepository.CFG_MAP_LABEL_NAME) {
+            if (selReq.getKey() == CFG_MAP_LABEL_SERVER_STATE_KEY) {
                 assertEquals("In", selReq.getOperator());
-                assertTrue(selReq.getValues().contains(KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_USED));
-                assertTrue(selReq.getValues().contains(KieServerStateCloudRepository.CFG_MAP_LABEL_VALUE_IMMUTABLE));
+                assertTrue(selReq.getValues().contains(CFG_MAP_LABEL_SERVER_STATE_VALUE_USED));
+                assertTrue(selReq.getValues().contains(CFG_MAP_LABEL_SERVER_STATE_VALUE_IMMUTABLE));
             }
         }
         assertTrue(foundAppNameLabel);
                 
-        System.setProperty(KieServerControllerConstants.KIE_CONTROLLER_OCP_GLOBAL_DISCOVERY_ENABLED, "true");
+        System.setProperty(KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED, "true");
         assertTrue(repo.getKieServerCMLabelSelector(client).getMatchExpressions().stream().noneMatch(
-            selReq -> selReq.getKey() == KieServerStateCloudRepository.CFG_MAP_LABEL_APP_NAME));
+            selReq -> selReq.getKey() == CFG_MAP_LABEL_APP_NAME_KEY));
+        System.clearProperty(KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED);
     }
+    
 }

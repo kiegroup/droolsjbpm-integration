@@ -23,8 +23,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: myapp2-kieserver-container
+  name: myapp2-kieserver-2
   labels:
+    services.server.kie.org/kie-server-id: myapp2-kieserver-container
     services.server.kie.org/kie-server-state: USED
     application: myapp2
   annotations:

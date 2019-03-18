@@ -121,13 +121,10 @@
           <forkCount>1</forkCount>
           <reuseForks>false</reuseForks>
           <systemPropertyVariables>
-            <org.kie.server.controller.openshift.prefer.kieserver.service>true</org.kie.server.controller.openshift.prefer.kieserver.service>
+            <org.kie.server.controller.openshift.prefer.kieserver.service>false</org.kie.server.controller.openshift.prefer.kieserver.service>
+            <org.kie.server.location>http://myapp2-kieserver-myproject.127.0.0.1.nip.io:80/services/rest/server</org.kie.server.location>
           </systemPropertyVariables>
           <environmentVariables>
-            <MYAPP2_KIESERVER_SERVICE_HOST>172.30.99.129</MYAPP2_KIESERVER_SERVICE_HOST>
-            <MYAPP2_KIESERVER_SERVICE_PORT>8080</MYAPP2_KIESERVER_SERVICE_PORT>
-            <MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_HOST>172.30.99.129</MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_HOST>
-            <MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_PORT>8080</MYAPP2_KIESERVER_FROM_TEMPLATE_SERVICE_PORT>
             <KUBERNETES_MASTER />
             <KUBERNETES_API_VERSION />
             <KUBERNETES_TRUST_CERTIFICATES />
