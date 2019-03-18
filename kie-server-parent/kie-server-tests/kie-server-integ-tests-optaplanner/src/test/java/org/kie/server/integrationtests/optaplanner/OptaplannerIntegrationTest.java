@@ -15,13 +15,21 @@
  */
 package org.kie.server.integrationtests.optaplanner;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 
+import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -32,13 +40,19 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import static org.junit.Assert.*;
+import org.assertj.core.api.Assertions;
 
 public class OptaplannerIntegrationTest
         extends OptaplannerKieServerBaseIntegrationTest {
@@ -51,6 +65,7 @@ public class OptaplannerIntegrationTest
     private static final String NOT_EXISTING_CONTAINER_ID = "no_container";
     private static final String CONTAINER_1_ID = "cloudbalance";
     private static final String SOLVER_1_ID = "cloudsolver";
+    private static final String SOLVER_PROMETHEUS_ID = "cloudsolver-prometheus";
     private static final String SOLVER_1_CONFIG = "cloudbalance-solver.xml";
     private static final String SOLVER_1_REALTIME_CONFIG = "cloudbalance-realtime-planning-solver.xml";
     private static final String SOLVER_1_REALTIME_DAEMON_CONFIG = "cloudbalance-realtime-planning-daemon-solver.xml";
@@ -251,10 +266,20 @@ public class OptaplannerIntegrationTest
         assertNull(returnedInstance.getScoreWrapper().toScore());
     }
 
-    @Test
+    @Test(timeout = 15_000)
     public void testExecuteSolver() throws Exception {
+        testExecuteSolverHelper(SOLVER_1_ID);
+    }
+
+    @Test(timeout = 15_000)
+    public void testPrometheusMetrics() throws Exception {
+        testExecuteSolverHelper(SOLVER_PROMETHEUS_ID);
+        checkPrometheusMetrics();
+    }
+
+    private void testExecuteSolverHelper(String solverID) throws Exception {
         SolverInstance solverInstance = solverClient.createSolver(CONTAINER_1_ID,
-                                                                  SOLVER_1_ID,
+                                                                  solverID,
                                                                   SOLVER_1_CONFIG);
         assertNotNull(solverInstance);
         assertEquals(SolverInstance.SolverStatus.NOT_SOLVING,
@@ -264,25 +289,26 @@ public class OptaplannerIntegrationTest
         Object planningProblem = loadPlanningProblem(5,
                                                      15);
         solverClient.solvePlanningProblem(CONTAINER_1_ID,
-                                          SOLVER_1_ID,
+                                          solverID,
                                           planningProblem);
 
         solverInstance = solverClient.getSolver(CONTAINER_1_ID,
-                                                SOLVER_1_ID);
+                                                solverID);
 
         // solver should finish in 5 seconds, but we wait up to 15s before timing out
-        for (int i = 0; i < 5 && solverInstance.getStatus() == SolverInstance.SolverStatus.SOLVING; i++) {
-            Thread.sleep(3000);
+        final long SOLVER_STATUS_CHECK_PERIOD = 1000L;
+        while (solverInstance.getStatus() == SolverInstance.SolverStatus.SOLVING) {
             solverInstance = solverClient.getSolver(CONTAINER_1_ID,
-                                                    SOLVER_1_ID);
+                                                    solverID);
             assertNotNull(solverInstance);
+            Thread.sleep(SOLVER_STATUS_CHECK_PERIOD);
         }
 
         assertEquals(SolverInstance.SolverStatus.NOT_SOLVING,
                      solverInstance.getStatus());
 
         solverClient.disposeSolver(CONTAINER_1_ID,
-                                   SOLVER_1_ID);
+                                   solverID);
     }
 
     @Test(timeout = 60_000)
@@ -613,6 +639,74 @@ public class OptaplannerIntegrationTest
 
         solverClient.disposeSolver(CONTAINER_1_ID,
                                    SOLVER_1_ID);
+    }
+
+    protected WebTarget newRequest(String uriString) {
+
+        ResteasyClient httpClient = new ResteasyClientBuilder()
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
+                    .build();
+
+        WebTarget webTarget = httpClient.target(uriString);
+        webTarget.register(new BasicAuthentication(TestConfig.getUsername(), TestConfig.getPassword()));
+        return webTarget;
+    }
+
+    private void checkPrometheusMetrics() {
+        Response response = null;
+        try {
+            String uriString = TestConfig.getKieServerHttpUrl().replaceAll("/server", "") + "/metrics";
+            WebTarget clientRequest = newRequest(uriString);
+            response = clientRequest.request(MediaType.TEXT_PLAIN_TYPE).get();
+
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            String res = response.readEntity(String.class);
+
+            //These are Prometheus metrics attributes we defined in Optaplanner
+            Assertions.assertThat(res).contains("solvers_running");
+            Assertions.assertThat(res).contains("solver_duration_seconds_count{solver_id=\"cloudsolver-prometheus\"");
+            Assertions.assertThat(res).contains("solver_duration_seconds_sum{solver_id=\"cloudsolver-prometheus\"");
+            Assertions.assertThat(res).contains("solver_score_calculation_speed_count{solver_id=\"cloudsolver-prometheus\"");
+            Assertions.assertThat(res).contains("solver_score_calculation_speed_sum{solver_id=\"cloudsolver-prometheus\"");
+            //verify metric values
+            try (BufferedReader br = new BufferedReader(new StringReader(res))) {
+                String line = br.readLine();
+                while (line != null) {
+                    checkPrometheusMetricsLine(line);
+                    line = br.readLine();
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    private void checkPrometheusMetricsLine(String line) {
+        if (line.startsWith("solver_duration_seconds_count")
+                || line.startsWith("solver_duration_seconds_sum")
+                || line.startsWith("solver_score_calculation_speed_count")
+                || line.startsWith("solver_score_calculation_speed_sum")
+        ) {
+            // all metric values should be a positive double
+            Assertions.assertThat(Double.parseDouble(getMetricToken(line))).isGreaterThan(0d);
+        } else if (line.startsWith("solvers_running")) {
+            //when test is done we should have zero solvers running
+            Assertions.assertThat(Double.parseDouble(getMetricToken(line))).isEqualTo(0d);
+        }
+    }
+
+    private String getMetricToken(String line) {
+        StringTokenizer st = new StringTokenizer(line, " ");
+        Assert.assertEquals(2, st.countTokens());
+        st.nextToken();
+        return st.nextToken();
     }
 
     private Object loadPlanningProblem(int computerListSize,
