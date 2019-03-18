@@ -89,7 +89,7 @@ public class ModelEvaluatorResource {
         }
     }
 
-    @ApiOperation(value="Evaluates decisions for given imput",
+    @ApiOperation(value="Evaluates decisions for given input",
             response=ServiceResponse.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Container not found") })
     @POST
