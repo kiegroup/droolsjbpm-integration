@@ -70,7 +70,7 @@
         <include>org.hibernate:hibernate-entitymanager</include>
         <include>org.hibernate:hibernate-core</include>
         <include>org.hibernate:hibernate-validator</include>
-        <include>dom4j:dom4j</include>
+        <include>org.dom4j:dom4j</include>
         <include>xerces:xercesImpl</include>
 
         <include>org.jboss.spec.javax.jms:jboss-jms-api_2.0_spec</include>

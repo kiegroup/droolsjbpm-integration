@@ -201,16 +201,9 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
 
             WebTarget clientRequest = newRequest(serverUrl + "/containers/container3/instances");
             logger.debug("[GET] " + clientRequest.getUri());
-            try {
-                response = clientRequest.request(getMediaType()).get();
-                fail("Should fail as this is an invalid host");
-            } catch (Exception e) {
-                // expected
-            } finally {
-                if(response != null) {
-                    response.close();
-                }
-            }
+            response = clientRequest.request(getMediaType()).get();
+            Assert.assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
+            response.close();
 
             Configuration config = routerClient.getRouterConfig();
 

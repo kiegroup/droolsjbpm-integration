@@ -73,7 +73,7 @@
         <include>org.hibernate.common:hibernate-commons-annotations</include>
         <include>org.hibernate:hibernate-validator</include>
         
-        <include>dom4j:dom4j</include>
+        <include>org.dom4j:dom4j</include>
 
         <include>org.quartz-scheduler:quartz</include>
 
