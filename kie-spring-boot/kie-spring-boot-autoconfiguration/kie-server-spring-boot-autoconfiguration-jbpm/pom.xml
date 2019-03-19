@@ -86,7 +86,7 @@
       <exclusions>
         <exclusion>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
@@ -147,7 +147,7 @@
           <artifactId>jboss-transaction-api_1.1_spec</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
@@ -173,7 +173,7 @@
           <artifactId>jboss-transaction-api_1.1_spec</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
@@ -200,7 +200,7 @@
           <artifactId>jboss-transaction-api_1.1_spec</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
