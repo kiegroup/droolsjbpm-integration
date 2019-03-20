@@ -317,7 +317,7 @@ public class KieServerRestImpl {
             @ApiParam(value = "Release Id to be upgraded to as ReleaseId type", required = true, examples=@Example(value= {
                                    @ExampleProperty(mediaType=JSON, value=UPDATE_RELEASE_ID_JSON),
                                    @ExampleProperty(mediaType=XML, value=UPDATE_RELEASE_ID_XML)})) String releaseIdPayload,
-            @ApiParam(value = "Allows to reset the current environment aborting active process instances before updating when the server runs on development mode. Optional, defaults to false") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
+            @ApiParam(value = "Determines whether active processes are aborted (reset) before updating when the server runs in development mode") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
