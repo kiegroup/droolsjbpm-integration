@@ -101,7 +101,7 @@ public class RestSpecManagementServiceImpl {
                                                 @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
                                                 @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
                                         })) String containerSpecPayload,
-                                        @ApiParam(value = "Allows to reset the current environment aborting active process instances before updating when the server runs on development mode. Optional, defaults to false") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
+                                        @ApiParam(value = "Determines whether active processes are aborted (reset) before updating when the server runs in development mode") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
 
         String contentType = getContentType(headers);
         try {
