@@ -130,6 +130,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     public static final String EXTENSION_NAME = "jBPM";
     private static final String PERSISTENCE_XML_LOCATION = "/jpa/META-INF/persistence.xml";
+    private static final String UPDATING_CONTAINER_PARAM = "jBPMExtensionUpdateContainer";
 
     private static final Logger logger = LoggerFactory.getLogger(JbpmKieServerExtension.class);
 
@@ -496,6 +497,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
     public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         // essentially it's a redeploy to make sure all components are up to date,
         // though update of kie base is done only once on kie server level and KieContainer is reused across all extensions
+        // we add this UPDATING_CONTAINER_PARAM
+        parameters.put(UPDATING_CONTAINER_PARAM, Boolean.TRUE);
+
         disposeContainer(id, kieContainerInstance, parameters);
 
         createContainer(id, kieContainerInstance, parameters);
@@ -526,7 +530,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
         if (kieServer.getInfo().getResult().getMode().equals(KieServerMode.PRODUCTION)) {
             deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
         } else {
-            if (abortInstances) {
+            // Checking if we are updating or disposing the container. We must only keep process instances only when updating.
+            Boolean isUpdate = (Boolean) parameters.getOrDefault(UPDATING_CONTAINER_PARAM, Boolean.FALSE);
+
+            if (abortInstances || !isUpdate) {
                 deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
             } else {
                 deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.doNothing());
