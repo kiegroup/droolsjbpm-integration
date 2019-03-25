@@ -120,8 +120,9 @@ public class ServerTemplateConverter {
         }
 
         template.setCapabilities(capabilities);
-        template.setMode(KieServerMode.valueOf(mode));
-
+        //https://issues.jboss.org/projects/RHPAM/issues/RHPAM-1975
+        template.setMode(KieServerMode.valueOf(mode.toUpperCase()));
+        
         return template;
     }
 
