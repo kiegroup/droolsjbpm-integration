@@ -203,6 +203,56 @@ public class JbpmKieServerExtensionTest {
     }
 
     @Test
+    public void testDisposePRODUCTIONContainer() throws IOException {
+        testDispose(KieServerMode.PRODUCTION);
+    }
+
+    @Test
+    public void testDisposeSNAPSHOTContainer() throws IOException {
+        testDispose(KieServerMode.DEVELOPMENT);
+    }
+
+    private void testDispose(KieServerMode mode) throws IOException {
+        this.mode = mode;
+
+        String version;
+
+        if(mode.equals(KieServerMode.DEVELOPMENT)) {
+            version = VERSION_SNAPSHOT;
+        } else {
+            version = VERSION;
+        }
+
+        testDeployContainer(version);
+
+        KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(new ReleaseId(GROUP_ID, ARTIFACT_ID, version), DependencyFilter.COMPILE_FILTER);
+        List<Message> messages = new ArrayList<>();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
+        params.put(KieServerConstants.KIE_SERVER_PARAM_MESSAGES, messages);
+        params.put(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, Boolean.FALSE);
+
+        extension.disposeContainer(CONTAINER_ID, new KieContainerInstanceImpl(CONTAINER_ID, KieContainerStatus.STARTED, kieContainer), params);
+
+        if(mode.equals(KieServerMode.DEVELOPMENT)) {
+            verify(deploymentService).undeploy(any(), beforeUndeployCaptor.capture());
+
+            Function<DeploymentUnit, Boolean> function = beforeUndeployCaptor.getValue();
+
+            function.apply(deploymentUnit);
+
+            verify(runtimeDataService).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
+            verify(runimeManager, times(activeProcessInstances.size())).getRuntimeEngine(any());
+            verify(engine, times(activeProcessInstances.size())).getKieSession();
+            verify(session, times(activeProcessInstances.size())).abortProcessInstance(eq(new Long(1)));
+            verify(runimeManager, times(activeProcessInstances.size())).disposeRuntimeEngine(any());
+        } else {
+            verify(deploymentService).undeploy(any());
+        }
+    }
+
+    @Test
     public void testIsUpdateAllowedDevModeSNAPSHOT() throws IOException {
         testDeployContainer(VERSION_SNAPSHOT);
 
