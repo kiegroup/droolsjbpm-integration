@@ -1,9 +1,9 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.jbpm.process.svg;
 
@@ -52,7 +52,7 @@ public class TestEvalutionSVG {
         // verify transformation
         Document svgDocument = readSVG(svg);
         validateNodesMarkedAsActive(svgDocument, active, SVGProcessor.ACTIVE_BORDER_COLOR);
-        validateNodesMarkedAsCompleted(svgDocument, completed, SVGProcessor.COMPLETED_COLOR );
+        validateNodesMarkedAsCompleted(svgDocument, completed, SVGProcessor.COMPLETED_COLOR);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class TestEvalutionSVG {
         // verify transformation
         Document svgDocument = readSVG(svg);
         validateNodesMarkedAsActive(svgDocument, activeID, SVGProcessor.ACTIVE_BORDER_COLOR);
-        validateNodesMarkedAsCompleted(svgDocument, completedID, SVGProcessor.COMPLETED_COLOR );
+        validateNodesMarkedAsCompleted(svgDocument, completedID, SVGProcessor.COMPLETED_COLOR);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class TestEvalutionSVG {
         validateNodesMarkedAsActive(svgDocument, active, SVGProcessor.ACTIVE_BORDER_COLOR);
         // remove it as it should be not considered completed and was already asserted as active
         completed.remove("_6063D302-9D81-4C86-920B-E808A45377C2");
-        validateNodesMarkedAsCompleted(svgDocument, completed, SVGProcessor.COMPLETED_COLOR );
+        validateNodesMarkedAsCompleted(svgDocument, completed, SVGProcessor.COMPLETED_COLOR);
     }
 
     @Test
@@ -117,13 +117,29 @@ public class TestEvalutionSVG {
         List<String> active = new ArrayList<String>();
         active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
         String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"),
-                                                 completed , active, null, completedNodeColor,
+                                                 completed, active, null, completedNodeColor,
                                                  completedNodeBorderColor, activeNodeBorderColor);
 
         // verify transformation
         Document svgDocument = readSVG(svg);
         validateNodesMarkedAsActive(svgDocument, active, activeNodeBorderColor);
         validateNodesMarkedAsCompleted(svgDocument, completed, completedNodeColor);
+    }
+
+    @Test
+    public void testViewBoxAttributeAddition() throws Exception {
+        List<String> completed = new ArrayList<String>();
+        completed.add("_343B16DA-961A-49BF-8697-9A86DEAFBAF4");
+        List<String> active = new ArrayList<String>();
+        active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
+        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"),
+                                                 completed, active, null, "#888888",
+                                                 "#888887", "#888886");
+
+        Document svgDocument = readSVG(svg);
+        assertEquals("", ((Element) svgDocument.getFirstChild()).getAttribute("width"));
+        assertEquals("", ((Element) svgDocument.getFirstChild()).getAttribute("height"));
+        assertEquals("0 0 3000 2000", svgDocument.getFirstChild().getAttributes().getNamedItem("viewBox").getNodeValue());
     }
 
     // helper methods for verifying svg transformation
@@ -147,7 +163,6 @@ public class TestEvalutionSVG {
             String markerWidth = border.getAttribute("stroke-width");
             assertNotNull(markerWidth);
             assertEquals("2", markerWidth);
-
         }
     }
 
@@ -166,7 +181,6 @@ public class TestEvalutionSVG {
             String marker = background.getAttribute("stop-color");
             assertNotNull(marker);
             assertEquals(completedNodeColor, marker);
-
         }
     }
 
@@ -192,7 +206,6 @@ public class TestEvalutionSVG {
             String target = border.getAttribute("target");
             assertNotNull(target);
             assertEquals("_blank", target);
-
         }
     }
 
