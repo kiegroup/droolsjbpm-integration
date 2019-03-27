@@ -19,8 +19,10 @@ package org.kie.karaf.itest;
 import org.apache.commons.io.FileUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.configs.CustomProperties;
+import org.ops4j.pax.exam.options.CompositeOption;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
+import org.ops4j.pax.exam.options.OptionalCompositeOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -112,6 +114,8 @@ abstract public class AbstractKarafIntegrationTest {
     public static final String SYSTEM_PROP_MAVEN_CUSTOM_SETTINGS = "kie.maven.settings.custom";
 
     public static final String TEST_PROPERTIES_FILE = "test.properties";
+
+    public static final String MAVEN_REPO_LOCAL_PROPERTY = "maven.repo.local";
 
     public static final String KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY = "kie.maven.settings.custom";
 
@@ -253,16 +257,25 @@ abstract public class AbstractKarafIntegrationTest {
     }
 
     public static Option localMavenRepoOption() {
-        String localRepo = System.getProperty("maven.repo.local", "");
-        if (localRepo.length() > 0) {
+        final DefaultCompositeOption compositeOption = new DefaultCompositeOption();
+
+        if (System.getProperties().containsKey(MAVEN_REPO_LOCAL_PROPERTY)) {
+            final String localRepo = System.getProperty(MAVEN_REPO_LOCAL_PROPERTY);
+            compositeOption.add(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                         "org.ops4j.pax.url.mvn.localRepository",
+                                                         new File(localRepo).getAbsolutePath()));
+            System.out.println("Using alternative local Maven repository in " + localRepo);
             logger.info("Using alternative local Maven repository in {}.", new File(localRepo).getAbsolutePath());
         }
-        return when(localRepo.length() > 0).useOptions(
-                //                systemProperty("org.ops4j.pax.url.mvn.localRepository").value(new File(localRepo).getAbsolutePath()));
-                editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                        "org.ops4j.pax.url.mvn.localRepository",
-                        new File(localRepo).getAbsolutePath()),
-                systemProperty(SYSTEM_PROP_MAVEN_CUSTOM_SETTINGS).value(kieCustomMavenSettingsXML()));
+
+        if (System.getProperties().containsKey(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY)) {
+            final String kieMavenSettingsCustom = System.getProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY);
+            compositeOption.add(systemProperty(SYSTEM_PROP_MAVEN_CUSTOM_SETTINGS).value(kieMavenSettingsCustom));
+            System.out.println("Using custom Maven settings file " + kieMavenSettingsCustom);
+            logger.info("Using custom Maven settings file {}.", kieMavenSettingsCustom);
+        }
+
+        return compositeOption;
     }
 
     public static MavenArtifactProvisionOption getFeaturesUrl(String groupId, String artifactId, String version) {
@@ -304,16 +317,5 @@ abstract public class AbstractKarafIntegrationTest {
 
     public static Option loadKieFeatures(List<String> features) {
         return loadKieFeatures(features.toArray(new String[features.size()]));
-    }
-
-    private static String kieCustomMavenSettingsXML() {
-        InputStream testPropertiesStream = AbstractKarafIntegrationTest.class.getClassLoader().getResourceAsStream(TEST_PROPERTIES_FILE);
-        Properties testProperties = new Properties();
-        try {
-            testProperties.load(testPropertiesStream);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to read test.properties file", e);
-        }
-        return testProperties.getProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY);
     }
 }
