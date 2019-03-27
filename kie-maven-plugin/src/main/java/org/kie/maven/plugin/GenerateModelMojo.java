@@ -136,7 +136,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
             kieBuilder.buildAll(ExecutableModelMavenProject.SUPPLIER, s -> {
-                return !s.contains("src/test/java");
+                return !s.contains("src/test/java") && !s.contains("src\\test\\java");
             });
 
             InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
