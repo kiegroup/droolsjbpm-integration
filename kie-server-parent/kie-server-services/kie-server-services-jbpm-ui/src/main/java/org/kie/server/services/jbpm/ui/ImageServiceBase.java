@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,12 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.services.jbpm.ui;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jbpm.process.svg.SVGImageProcessor;
+import org.jbpm.process.svg.processor.SVGProcessor;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.NodeInstanceDesc;
@@ -53,7 +53,7 @@ public class ImageServiceBase {
     private String processInstanceImageLink = "containers/{0}/images/processes/instances/{1}";
 
     private KieServerRegistry registry;
-    
+
     public ImageServiceBase() {
         // for tests only
         this.kieServerLocation = "";
@@ -73,7 +73,7 @@ public class ImageServiceBase {
     private byte[] getProcessImageAsBytes(String containerId, String processId) {
 
         ProcessDefinition procDef = dataService.getProcessesByDeploymentIdProcessId(containerId, processId);
-        if( procDef == null ) {
+        if (procDef == null) {
             throw new IllegalArgumentException("No process found for " + processId + " within container " + containerId);
         }
 
@@ -83,7 +83,7 @@ public class ImageServiceBase {
         }
         // get SVG String
         byte[] imageSVG = imageReferenceMap.get(containerId).getImageContent(location, processId);
-        if( imageSVG == null ) {
+        if (imageSVG == null) {
             logger.warn("Could not find SVG image file for process '" + processId + "' within container " + containerId);
             return null;
         }
@@ -97,11 +97,9 @@ public class ImageServiceBase {
         String imageSVGString = null;
         byte[] imageSVG = getProcessImageAsBytes(containerId, processId);
         if (imageSVG != null) {
-            try {
-                imageSVGString = new String(imageSVG, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                logger.debug("UnsupportedEncodingException while building process image due to {}", e.getMessage());
-            }
+            ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
+            SVGProcessor processor = new SVGImageProcessor(svgStream).getProcessor();
+            imageSVGString = processor.getSVG();
         }
 
         return imageSVGString;

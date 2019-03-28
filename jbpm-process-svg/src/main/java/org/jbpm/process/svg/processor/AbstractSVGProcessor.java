@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.jbpm.process.svg.model.SVGSummary;
 import org.jbpm.process.svg.model.Transformation;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-public abstract class AbstractSVGProcessor implements SVGProcessor{
+public abstract class AbstractSVGProcessor implements SVGProcessor {
 
     protected Document svgDocument;
     protected SVGSummary summary = new SVGSummary();
@@ -52,6 +53,11 @@ public abstract class AbstractSVGProcessor implements SVGProcessor{
             StreamResult result = new StreamResult(writer);
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
+            ((Element) svgDocument.getFirstChild()).setAttribute("viewBox", "0 0 " +
+                    ((Element) svgDocument.getFirstChild()).getAttribute("width") + " " +
+                    ((Element) svgDocument.getFirstChild()).getAttribute("height"));
+            ((Element) svgDocument.getFirstChild()).removeAttribute("width");
+            ((Element) svgDocument.getFirstChild()).removeAttribute("height");
             transformer.transform(domSource, result);
             return writer.toString();
         } catch (TransformerException e) {
@@ -65,8 +71,7 @@ public abstract class AbstractSVGProcessor implements SVGProcessor{
     }
 
     @Override
-    public void defaultActiveTransformation(String nodeId){
+    public void defaultActiveTransformation(String nodeId) {
         defaultActiveTransformation(nodeId, ACTIVE_BORDER_COLOR);
     }
-
 }
