@@ -16,6 +16,7 @@ package org.kie.karaf.itest.blueprint;
  * limitations under the License.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -49,9 +50,11 @@ import org.osgi.framework.Constants;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
@@ -74,18 +77,6 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
 
     public static void setup(final String modelVersion) {
         final ReleaseId modelReleaseId = KieServices.Factory.get().newReleaseId("org.kie", "kie-karaf-itests-domain-model", modelVersion);
-
-        if(System.getProperty("maven.repo.local") != null) {
-            InputStream testPropertiesStream = AbstractKarafIntegrationTest.class.getClassLoader().getResourceAsStream(TEST_PROPERTIES_FILE);
-            Properties testProperties = new Properties();
-            try {
-                testProperties.load(testPropertiesStream);
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to read test.properties file", e);
-            }
-
-            System.setProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY, testProperties.getProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY));
-        }
 
         KieScannerTestUtils kieScannerTestUtils = new KieScannerTestUtils();
         kieScannerTestUtils.setUp();
