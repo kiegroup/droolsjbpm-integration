@@ -67,18 +67,6 @@ public class KieBlueprintScannerReimportIntegrationTest extends AbstractKarafInt
     KieScanner kieScanner;
 
     private static void setup() {
-        if(System.getProperty("maven.repo.local") != null) {
-            InputStream testPropertiesStream = AbstractKarafIntegrationTest.class.getClassLoader().getResourceAsStream(TEST_PROPERTIES_FILE);
-            Properties testProperties = new Properties();
-            try {
-                testProperties.load(testPropertiesStream);
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to read test.properties file", e);
-            }
-
-            System.setProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY, testProperties.getProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY));
-        }
-
         KieScannerTestUtils kieScannerTestUtils = new KieScannerTestUtils();
         kieScannerTestUtils.setUp();
         kieScannerTestUtils.createAndInstallKJar(RELEASE_ID, "rule_0");
