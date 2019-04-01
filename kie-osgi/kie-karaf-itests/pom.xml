@@ -332,44 +332,6 @@
 
   <profiles>
     <profile>
-      <id>fuse63</id>
-      <properties>
-        <version.org.apache.karaf>2.4.0.redhat-630260</version.org.apache.karaf>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <kie.features.classifier>features-fuse</kie.features.classifier>
-                <additional.features.url>mvn:org.apache.karaf.assemblies.features/brms-features/${version.org.apache.karaf}/xml/features</additional.features.url>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>fuse621</id>
-      <properties>
-        <version.org.apache.karaf>2.4.0.redhat-621187</version.org.apache.karaf>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <kie.features.classifier>features-fuse</kie.features.classifier>
-                <additional.features.url>mvn:org.apache.karaf.assemblies.features/brms-features/${version.org.apache.karaf}/xml/features</additional.features.url>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>fuse7</id>
       <properties>
         <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
