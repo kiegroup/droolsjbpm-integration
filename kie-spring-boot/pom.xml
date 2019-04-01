@@ -51,6 +51,17 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter</artifactId>
+	<version>${version.org.spring-boot}</version>
+	<exclusions>
+	    <exclusion>
+	      <groupId>org.apache.logging.log4j</groupId>
+              <artifactId>log4j-api</artifactId>
+            </exclusion>
+	  </exclusions>
+      </dependency>
       <!-- overrides of narayana version -->
       <dependency>
         <groupId>org.jboss.narayana.jta</groupId>
