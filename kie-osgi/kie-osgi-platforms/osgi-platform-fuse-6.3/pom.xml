@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-osgi-platforms</artifactId>
-    <version>7.20.0-SNAPSHOT</version>
+    <version>7.20.0.Final</version>
   </parent>
 
   <artifactId>kie-platform-fuse-6.3</artifactId>
