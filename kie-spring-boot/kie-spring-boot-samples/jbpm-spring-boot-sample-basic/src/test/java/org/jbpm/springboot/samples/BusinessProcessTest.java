@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.springboot.samples.entities.Person;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -147,5 +149,32 @@ public class BusinessProcessTest {
         ProcessInstance pi = processService.getProcessInstance(processInstanceId);
         assertNull(pi);
     }   
+    
+    @Test
+    public void testProcessStartAndAbortWithNotSerializableVar() {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("employee", "john");
+        parameters.put("reason", "SpringBoot jBPM evaluation");
+        
+        long processInstanceId = processService.startProcess(unit.getIdentifier(), "evaluation", parameters);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+        
+        try {
+            processService.setProcessVariable(processInstanceId, "test", new Person());
+            fail("Should fail on commit");
+        } catch (Exception e) {
+            // expected as using not serializable object
+            assertEquals("Unable to commit transaction", e.getMessage());
+        }
+        
+        Object testVar = processService.getProcessInstanceVariable(processInstanceId, "test");
+        assertNull(testVar);
+        
+        processService.abortProcessInstance(processInstanceId);
+        
+        ProcessInstance pi = processService.getProcessInstance(processInstanceId);
+        assertNull(pi);
+    }
 }
 

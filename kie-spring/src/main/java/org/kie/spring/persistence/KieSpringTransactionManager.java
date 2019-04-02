@@ -83,7 +83,7 @@ public class KieSpringTransactionManager
 
     public void rollback(boolean transactionOwner) {
         try {
-            if (transactionOwner) {
+            if (transactionOwner && currentTransaction != null) {
                 this.ptm.rollback(currentTransaction);
                 currentTransaction = null;
                 if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
