@@ -419,6 +419,9 @@ public class ConvertUtils {
                 .expirationTime(userTask.getDueDate())
                 .status(userTask.getStatus())
                 .priority(userTask.getPriority())
+                .workItemId(userTask.getWorkItemId())
+                .slaCompliance(userTask.getSlaCompliance())
+                .slaDueDate(userTask.getSlaDueDate())
                 .build();
 
         return instance;

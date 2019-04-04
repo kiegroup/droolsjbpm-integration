@@ -66,6 +66,10 @@ public class TaskInstance {
     private String processId;
     @XmlElement(name="task-container-id")
     private String containerId;
+    @XmlElement(name="sla-compliance")
+    private Integer slaCompliance;
+    @XmlElement(name="sla-due-date")
+    private Date slaDueDate;
 
     @XmlElementWrapper(name="potential-owners")
     @XmlElement(name="task-pot-owners")
@@ -243,6 +247,22 @@ public class TaskInstance {
     public void setContainerId(String containerId) {
         this.containerId = containerId;
     }
+
+    public Integer getSlaCompliance() {
+        return slaCompliance;
+    }
+
+    public void setSlaCompliance(Integer slaCompliance) {
+        this.slaCompliance = slaCompliance;
+    }
+
+    public Date getSlaDueDate() {
+        return slaDueDate;
+    }
+
+    public void setSlaDueDate(Date slaDueDate) {
+        this.slaDueDate = slaDueDate;
+    }
     
     public List<String> getPotentialOwners() {
         return potentialOwners;
@@ -295,6 +315,9 @@ public class TaskInstance {
                 ", processInstanceId=" + processInstanceId +
                 ", processId='" + processId + '\'' +
                 ", containerId='" + containerId + '\'' +
+                ", workItemId=" + workItemId +
+                ", slaCompliance=" + slaCompliance +
+                ", slaDueDate=" + slaDueDate  +
                 '}';
     }
 
@@ -398,6 +421,16 @@ public class TaskInstance {
         
         public Builder containerId(String containerId) {
             taskInstance.setContainerId(containerId);
+            return this;
+        }
+
+        public TaskInstance.Builder slaDueDate(Date slaDueDate) {
+            taskInstance.setSlaDueDate(slaDueDate);
+            return this;
+        }
+
+        public TaskInstance.Builder slaCompliance(Integer slaCompliance) {
+            taskInstance.setSlaCompliance(slaCompliance);
             return this;
         }
 
