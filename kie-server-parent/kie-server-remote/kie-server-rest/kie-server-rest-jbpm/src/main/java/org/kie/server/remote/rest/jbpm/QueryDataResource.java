@@ -33,6 +33,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.QUERY_DEF_JSON;
@@ -45,7 +46,6 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.BAD_REQUEST;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_ALREADY_EXISTS;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_NOT_FOUND;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.text.MessageFormat;
 
@@ -173,8 +173,7 @@ public class QueryDataResource {
             logger.error( "Unexpected error during processing {}",
                           e.getMessage(),
                           e );
-            return internalServerError( MessageFormat.format( UNEXPECTED_ERROR,
-                                                              e.getMessage() ),
+            return internalServerError( errorMessage(e),
                                         v,
                                         conversationIdHeader );
         }
@@ -215,8 +214,7 @@ public class QueryDataResource {
             logger.error( "Unexpected error during processing {}",
                           e.getMessage(),
                           e );
-            return internalServerError( MessageFormat.format( UNEXPECTED_ERROR,
-                                                              e.getMessage() ),
+            return internalServerError( errorMessage(e),
                                         v,
                                         conversationIdHeader );
         }
@@ -251,8 +249,7 @@ public class QueryDataResource {
             logger.error( "Unexpected error during processing {}",
                           e.getMessage(),
                           e );
-            return internalServerError( MessageFormat.format( UNEXPECTED_ERROR,
-                                                              e.getMessage() ),
+            return internalServerError( errorMessage(e),
                                         v,
                                         conversationIdHeader );
         }
@@ -291,8 +288,7 @@ public class QueryDataResource {
             logger.error( "Unexpected error during processing {}",
                           e.getMessage(),
                           e );
-            return internalServerError( MessageFormat.format( UNEXPECTED_ERROR,
-                                                              e.getMessage() ),
+            return internalServerError( errorMessage(e),
                                         v,
                                         conversationIdHeader );
         }
@@ -403,13 +399,10 @@ public class QueryDataResource {
                                    getVariant( headers ),
                                    conversationIdHeader );
             } else {
-                logger.error( "{}",
-                              MessageFormat.format( UNEXPECTED_ERROR,
-                                                    e.getMessage() ),
+                logger.error( "Unexpected error",
                               e );
 
-                return internalServerError( MessageFormat.format( UNEXPECTED_ERROR,
-                                                                  e.getMessage() ),
+                return internalServerError( errorMessage(e),
                                             getVariant( headers ),
                                             conversationIdHeader );
             }
@@ -486,13 +479,10 @@ public class QueryDataResource {
                                    getVariant( headers ),
                                    conversationIdHeader );
             } else {
-                logger.error( "{}",
-                              MessageFormat.format( UNEXPECTED_ERROR,
-                                                    e.getMessage() ),
+                logger.error( "Unexpected error",
                               e );
 
-                return internalServerError( MessageFormat.format( UNEXPECTED_ERROR,
-                                                                  e.getMessage() ),
+                return internalServerError( errorMessage(e),
                                             getVariant( headers ),
                                             conversationIdHeader );
             }

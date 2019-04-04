@@ -86,7 +86,7 @@ public class ImageResource {
             return notFound("Image for process id " + processId + " not found", v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -119,7 +119,7 @@ public class ImageResource {
             return notFound("Image for process instance id " + procInstId + " not found", v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 }
