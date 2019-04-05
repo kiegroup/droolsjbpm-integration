@@ -49,7 +49,7 @@ public class KeyStoreHelperUtil {
 
             return keyStoreHelper.getPasswordKey(pwdKeyAlias, pwdKeyPassword);
         } catch (RuntimeException re) {
-            logger.warn("Unable to load key store. Using password from configuration");
+            logger.debug("Unable to load key store. Using password from configuration");
             return defaultPassword;
         }
     }
