@@ -27,7 +27,7 @@ public final class KieServerControllerConstants {
     public static final String KIE_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE =
             "org.kie.server.controller.openshift.prefer.kieserver.service";
 
-    public static final String KIE_CONTROLLER_OCP_GLOBAL_DISCOVERY_ENABLED =
+    public static final String KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED =
             "org.kie.server.controller.openshift.global.discovery.enabled";
 
 }
