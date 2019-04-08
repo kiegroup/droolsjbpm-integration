@@ -58,8 +58,6 @@ public class ApplyPmmlMultipleTimesIntegrationTest extends PMMLApplyModelBaseTes
 
     @Test
     public void testMultipleRegressionEvaluation() {
-        Assume.assumeTrue(marshallingFormat != MarshallingFormat.XSTREAM); // RHPAM-1875
-
         double fld1 = 12.0;
         double fld2 = 25.0;
         String fld3 = "x";
