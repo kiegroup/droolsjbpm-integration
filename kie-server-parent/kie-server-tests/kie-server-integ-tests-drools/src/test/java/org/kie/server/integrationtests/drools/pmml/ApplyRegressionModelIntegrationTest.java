@@ -55,8 +55,6 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
 
     @Test
     public void testApplyPmmlRegressionModel() {
-        Assume.assumeTrue(marshallingFormat != MarshallingFormat.XSTREAM); // RHPAM-1875
-
         final PMMLRequestData request = new PMMLRequestData("123", "LinReg");
         request.addRequestParam("fld1", 12.0);
         request.addRequestParam("fld2", 25.0);
