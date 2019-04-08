@@ -17,13 +17,14 @@
 package org.kie.server.api.model;
 
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XmlRootElement(name="kie-server-info")
-@XStreamAlias( "kie-server-info" )
+@XmlRootElement(name = "kie-server-info")
+@XStreamAlias("kie-server-info")
 public class KieServerInfo {
 
     private String serverId;
@@ -37,7 +38,7 @@ public class KieServerInfo {
     private List<Message> messages;
 
     private KieServerMode mode = KieServerMode.DEVELOPMENT;
-    
+
     public KieServerInfo() {
         super();
     }
@@ -62,21 +63,21 @@ public class KieServerInfo {
         this.mode = mode;
     }
 
-    @XmlElement(name="version")
+    @XmlElement(name = "version")
     public String getVersion() {
         return version;
     }
-    
+
     public void setVersion(String version) {
         this.version = version;
     }
 
-    @XmlElement(name="id")
+    @XmlElement(name = "id")
     public String getServerId() {
         return serverId;
     }
 
-    @XmlElement(name="name")
+    @XmlElement(name = "name")
     public String getName() {
         return name;
     }
@@ -89,7 +90,7 @@ public class KieServerInfo {
         this.serverId = serverId;
     }
 
-    @XmlElement(name="capabilities")
+    @XmlElement(name = "capabilities")
     public List<String> getCapabilities() {
         return capabilities;
     }
@@ -98,7 +99,7 @@ public class KieServerInfo {
         this.capabilities = capabilities;
     }
 
-    @XmlElement(name="location")
+    @XmlElement(name = "location")
     public String getLocation() {
         return location;
     }
@@ -107,7 +108,7 @@ public class KieServerInfo {
         this.location = location;
     }
 
-    @XmlElement(name="messages")
+    @XmlElement(name = "messages")
     public List<Message> getMessages() {
         return messages;
     }
@@ -116,7 +117,7 @@ public class KieServerInfo {
         this.messages = messages;
     }
 
-    @XmlElement(name="mode")
+    @XmlElement(name = "mode")
     public KieServerMode getMode() {
         return mode;
     }

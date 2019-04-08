@@ -3,31 +3,32 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 @XmlRootElement(name = "kie-scanner")
-@XStreamAlias( "kie-scanner" )
+@XStreamAlias("kie-scanner")
 public class KieScannerResource {
 
-    @XStreamAlias( "status" )
+    @XStreamAlias("status")
     private KieScannerStatus status;
-    @XStreamAlias( "poll-interval" )
-    private Long             pollInterval;
+    @XStreamAlias("poll-interval")
+    private Long pollInterval;
 
     public KieScannerResource() {
     }
@@ -70,20 +71,26 @@ public class KieScannerResource {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         KieScannerResource other = (KieScannerResource) obj;
         if (pollInterval == null) {
-            if (other.pollInterval != null)
+            if (other.pollInterval != null) {
                 return false;
-        } else if (!pollInterval.equals(other.pollInterval))
+            }
+        } else if (!pollInterval.equals(other.pollInterval)) {
             return false;
-        if (status != other.status)
+        }
+        if (status != other.status) {
             return false;
+        }
         return true;
     }
 
@@ -91,5 +98,4 @@ public class KieScannerResource {
     public String toString() {
         return "KieScannerResource [status=" + status + ", pollInterval=" + pollInterval + "]";
     }
-
 }

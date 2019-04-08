@@ -1,17 +1,18 @@
 /*
- * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling.jaxb;
 
@@ -51,7 +52,6 @@ import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.kie.api.pmml.DoubleFieldOutput;
 import org.kie.api.pmml.IntegerFieldOutput;
-import org.kie.api.pmml.PMML4OutputField;
 import org.kie.api.pmml.PMML4Result;
 import org.kie.api.pmml.StringFieldOutput;
 import org.kie.pmml.pmml_4_2.model.ScoreCard;
@@ -401,7 +401,7 @@ public class JaxbMarshaller implements Marshaller {
         buildMarshaller(classes, classLoader);
     }
 
-    protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+    protected void buildMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
 
         try {
             logger.debug("Additional classes for JAXB context are {}", classes);
@@ -412,14 +412,14 @@ public class JaxbMarshaller implements Marshaller {
                 allClasses.addAll(classes);
             }
             logger.debug("All classes for JAXB context are {}", allClasses);
-            this.jaxbContext = JAXBContext.newInstance( allClasses.toArray(new Class[allClasses.size()]) );
-        } catch ( JAXBException e ) {
+            this.jaxbContext = JAXBContext.newInstance(allClasses.toArray(new Class[allClasses.size()]));
+        } catch (JAXBException e) {
             logger.error("Error while creating JAXB Marshaller due to {}", e.getMessage(), e);
-            throw new MarshallingException( "Error while creating JAXB context from default classes! " + e.getMessage(), e );
+            throw new MarshallingException("Error while creating JAXB context from default classes! " + e.getMessage(), e);
         }
     }
 
-    protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+    protected void configureMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
         // by default nothing to configure though it might be needed in case of extensions
     }
 
@@ -432,8 +432,8 @@ public class JaxbMarshaller implements Marshaller {
         StringWriter writer = new StringWriter();
         try {
             getMarshaller().marshal(ModelWrapper.wrap(input), writer);
-        } catch ( JAXBException e ) {
-            throw new MarshallingException( "Can't marshall input object: "+input, e );
+        } catch (JAXBException e) {
+            throw new MarshallingException("Can't marshall input object: " + input, e);
         }
         return writer.toString();
     }
@@ -442,8 +442,8 @@ public class JaxbMarshaller implements Marshaller {
     public <T> T unmarshall(String input, Class<T> type) {
         try {
             return (T) unwrap(getUnmarshaller().unmarshal(new StringReader(input)));
-        } catch ( JAXBException e ) {
-            throw new MarshallingException( "Can't unmarshall input string: "+input, e );
+        } catch (JAXBException e) {
+            throw new MarshallingException("Can't unmarshall input string: " + input, e);
         }
     }
 
@@ -455,7 +455,6 @@ public class JaxbMarshaller implements Marshaller {
         return data;
     }
 
-
     @Override
     public void dispose() {
 
@@ -465,7 +464,6 @@ public class JaxbMarshaller implements Marshaller {
     public MarshallingFormat getFormat() {
         return MarshallingFormat.JAXB;
     }
-
 
     protected javax.xml.bind.Marshaller getMarshaller() throws JAXBException {
         javax.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
