@@ -3,24 +3,25 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -28,22 +29,22 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "descriptor-command")
-@XStreamAlias( "descriptor-command" )
+@XStreamAlias("descriptor-command")
 @XmlAccessorType(XmlAccessType.NONE)
 public class DescriptorCommand implements KieServerCommand {
 
-    private static final long   serialVersionUID = -1803374525440238418L;
+    private static final long serialVersionUID = -1803374525440238418L;
 
     @XmlElement(name = "service")
-    @XStreamAlias( "service" )
+    @XStreamAlias("service")
     private String service;
 
     @XmlElement(name = "method")
-    @XStreamAlias( "method" )
+    @XStreamAlias("method")
     private String method;
 
     @XmlElement(name = "arguments")
-    @XStreamAlias( "arguments" )
+    @XStreamAlias("arguments")
     private List<Object> arguments;
 
     @XmlElement(name = "payload")

@@ -3,19 +3,21 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
 import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -25,25 +27,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "task-attachment")
 public class TaskAttachment {
 
-    @XmlElement(name="attachment-id")
+    @XmlElement(name = "attachment-id")
     private Long id;
 
-    @XmlElement(name="attachment-name")
+    @XmlElement(name = "attachment-name")
     private String name;
 
-    @XmlElement(name="attachment-added-by")
+    @XmlElement(name = "attachment-added-by")
     private String addedBy;
 
-    @XmlElement(name="attachment-added-at")
+    @XmlElement(name = "attachment-added-at")
     private Date addedAt;
 
-    @XmlElement(name="attachment-type")
+    @XmlElement(name = "attachment-type")
     private String contentType;
 
-    @XmlElement(name="attachment-size")
+    @XmlElement(name = "attachment-size")
     private Integer size;
 
-    @XmlElement(name="attachment-content-id")
+    @XmlElement(name = "attachment-content-id")
     private Long attachmentContentId;
 
     public TaskAttachment() {
@@ -109,7 +111,8 @@ public class TaskAttachment {
         this.attachmentContentId = attachmentContentId;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "TaskAttachment{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
@@ -164,5 +167,4 @@ public class TaskAttachment {
             return this;
         }
     }
-
 }

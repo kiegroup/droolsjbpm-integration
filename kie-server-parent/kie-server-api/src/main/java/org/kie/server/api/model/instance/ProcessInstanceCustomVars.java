@@ -3,15 +3,16 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 package org.kie.server.api.model.instance;
 
 import java.util.Date;
@@ -22,40 +23,39 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance-custom")
 public class ProcessInstanceCustomVars {
 
-    @XmlElement(name="process-instance-id")
+    @XmlElement(name = "process-instance-id")
     private Long id;
-    @XmlElement(name="process-id")
+    @XmlElement(name = "process-id")
     private String processId;
-    @XmlElement(name="process-name")
+    @XmlElement(name = "process-name")
     private String processName;
-    @XmlElement(name="process-version")
+    @XmlElement(name = "process-version")
     private String processVersion;
-    @XmlElement(name="process-instance-state")
+    @XmlElement(name = "process-instance-state")
     private Integer state;
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
-    @XmlElement(name="initiator")
+    @XmlElement(name = "initiator")
     private String initiator;
-    @XmlElement(name="start-date")
+    @XmlElement(name = "start-date")
     private Date date;
-    @XmlElement(name="process-instance-desc")
+    @XmlElement(name = "process-instance-desc")
     private String processInstanceDescription;
-    @XmlElement(name="correlation-key")
+    @XmlElement(name = "correlation-key")
     private String correlationKey;
-    @XmlElement(name="parent-instance-id")
+    @XmlElement(name = "parent-instance-id")
     private Long parentId;
-    @XmlElement(name="last-modification-date")
+    @XmlElement(name = "last-modification-date")
     private Date lastModificationDate;
 
-    @XmlElement(name="active-user-tasks")
+    @XmlElement(name = "active-user-tasks")
     private TaskSummaryList activeUserTasks;
 
-    @XmlElement(name="process-instance-variables")
+    @XmlElement(name = "process-instance-variables")
     private Map<String, Object> variables;
 
     public ProcessInstanceCustomVars() {
@@ -168,11 +168,11 @@ public class ProcessInstanceCustomVars {
     public void setActiveUserTasks(TaskSummaryList activeUserTasks) {
         this.activeUserTasks = activeUserTasks;
     }
-    
+
     public Date getLastModificationDate() {
         return lastModificationDate;
     }
-    
+
     public void setLastModificationDate(Date lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
     }
@@ -190,6 +190,7 @@ public class ProcessInstanceCustomVars {
     }
 
     public static class Builder {
+
         private ProcessInstanceCustomVars processInstance = new ProcessInstanceCustomVars();
 
         public ProcessInstanceCustomVars build() {
@@ -260,12 +261,11 @@ public class ProcessInstanceCustomVars {
             processInstance.setActiveUserTasks(activeUserTasks);
             return this;
         }
-        
+
         public Builder lastModificationDate(Date lastModificationDate) {
             processInstance.setLastModificationDate(lastModificationDate);
             return this;
         }
-        
     }
 }
 

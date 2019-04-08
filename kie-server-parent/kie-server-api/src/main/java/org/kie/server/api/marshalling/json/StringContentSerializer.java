@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-
 public class StringContentSerializer extends StdSerializer<StringContent> {
 
     private static final long serialVersionUID = 6139683510592452430L;
@@ -30,7 +29,7 @@ public class StringContentSerializer extends StdSerializer<StringContent> {
     public StringContentSerializer() {
         this(null);
     }
-     
+
     public StringContentSerializer(Class<StringContent> t) {
         super(t);
     }
@@ -39,7 +38,5 @@ public class StringContentSerializer extends StdSerializer<StringContent> {
     public void serialize(StringContent value, JsonGenerator gen, SerializerProvider provider) throws IOException {
 
         gen.writeRaw(value.getContent());
-        
     }
-
 }

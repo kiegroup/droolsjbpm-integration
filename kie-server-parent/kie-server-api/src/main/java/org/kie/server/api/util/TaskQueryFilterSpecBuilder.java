@@ -3,15 +3,16 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.util;
 
@@ -32,94 +33,93 @@ import org.kie.server.api.model.definition.TaskQueryFilterSpec;
  */
 public class TaskQueryFilterSpecBuilder {
 
-	private List<QueryParam> parameters = new ArrayList<QueryParam>();
-	private TaskQueryFilterSpec filterSpec = new TaskQueryFilterSpec();
-	
-	public TaskQueryFilterSpec get() {
-		if (!parameters.isEmpty()) {
-			filterSpec.setParameters(parameters.toArray(new QueryParam[parameters.size()]));
-		}
-		
-		return filterSpec;
-	}
+    private List<QueryParam> parameters = new ArrayList<QueryParam>();
+    private TaskQueryFilterSpec filterSpec = new TaskQueryFilterSpec();
 
-	public TaskQueryFilterSpecBuilder orderBy(TaskField field, boolean isAscending) {
-		filterSpec.setOrderBy(field.toString());
-		filterSpec.setAscending(isAscending);
+    public TaskQueryFilterSpec get() {
+        if (!parameters.isEmpty()) {
+            filterSpec.setParameters(parameters.toArray(new QueryParam[parameters.size()]));
+        }
 
-		return this;
-	}
+        return filterSpec;
+    }
 
-	public TaskQueryFilterSpecBuilder isNull(TaskField field) {
-		parameters.add(new QueryParam(field.toString(), "IS_NULL", null));
+    public TaskQueryFilterSpecBuilder orderBy(TaskField field, boolean isAscending) {
+        filterSpec.setOrderBy(field.toString());
+        filterSpec.setAscending(isAscending);
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder isNotNull(TaskField field) {
-		parameters.add(new QueryParam(field.toString(), "NOT_NULL", null));
+    public TaskQueryFilterSpecBuilder isNull(TaskField field) {
+        parameters.add(new QueryParam(field.toString(), "IS_NULL", null));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder equalsTo(TaskField field, Comparable<?>... values) {
-		parameters.add(new QueryParam(field.toString(), "EQUALS_TO", Arrays.asList(values)));
+    public TaskQueryFilterSpecBuilder isNotNull(TaskField field) {
+        parameters.add(new QueryParam(field.toString(), "NOT_NULL", null));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder notEqualsTo(TaskField field, Comparable<?>... values) {
-		parameters.add(new QueryParam(field.toString(), "NOT_EQUALS_TO", Arrays.asList(values)));
+    public TaskQueryFilterSpecBuilder equalsTo(TaskField field, Comparable<?>... values) {
+        parameters.add(new QueryParam(field.toString(), "EQUALS_TO", Arrays.asList(values)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder likeTo(TaskField field, boolean caseSensitive, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "LIKE_TO", Arrays.asList(value, caseSensitive)));
+    public TaskQueryFilterSpecBuilder notEqualsTo(TaskField field, Comparable<?>... values) {
+        parameters.add(new QueryParam(field.toString(), "NOT_EQUALS_TO", Arrays.asList(values)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder greaterThan(TaskField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "GREATER_THAN", Arrays.asList(value)));
+    public TaskQueryFilterSpecBuilder likeTo(TaskField field, boolean caseSensitive, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "LIKE_TO", Arrays.asList(value, caseSensitive)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder greaterOrEqualTo(TaskField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "GREATER_OR_EQUALS_TO", Arrays.asList(value)));
+    public TaskQueryFilterSpecBuilder greaterThan(TaskField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "GREATER_THAN", Arrays.asList(value)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder lowerThan(TaskField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "LOWER_THAN", Arrays.asList(value)));
+    public TaskQueryFilterSpecBuilder greaterOrEqualTo(TaskField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "GREATER_OR_EQUALS_TO", Arrays.asList(value)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder lowerOrEqualTo(TaskField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "LOWER_OR_EQUALS_TO", Arrays.asList(value)));
+    public TaskQueryFilterSpecBuilder lowerThan(TaskField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "LOWER_THAN", Arrays.asList(value)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder between(TaskField field, Comparable<?> start, Comparable<?> end) {
-		parameters.add(new QueryParam(field.toString(), "BETWEEN", Arrays.asList(start, end)));
+    public TaskQueryFilterSpecBuilder lowerOrEqualTo(TaskField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "LOWER_OR_EQUALS_TO", Arrays.asList(value)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder in(TaskField field, List<?> values) {
-		parameters.add(new QueryParam(field.toString(), "IN", values));
+    public TaskQueryFilterSpecBuilder between(TaskField field, Comparable<?> start, Comparable<?> end) {
+        parameters.add(new QueryParam(field.toString(), "BETWEEN", Arrays.asList(start, end)));
 
-		return this;
-	}
+        return this;
+    }
 
-	public TaskQueryFilterSpecBuilder notIn(TaskField field, List<?> values) {
-		parameters.add(new QueryParam(field.toString(), "NOT_IN", values));
+    public TaskQueryFilterSpecBuilder in(TaskField field, List<?> values) {
+        parameters.add(new QueryParam(field.toString(), "IN", values));
 
-		return this;
-	}
+        return this;
+    }
 
+    public TaskQueryFilterSpecBuilder notIn(TaskField field, List<?> values) {
+        parameters.add(new QueryParam(field.toString(), "NOT_IN", values));
+
+        return this;
+    }
 }

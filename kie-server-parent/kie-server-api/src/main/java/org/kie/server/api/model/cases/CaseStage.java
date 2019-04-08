@@ -3,20 +3,21 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
-import java.util.Date;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,15 +29,15 @@ import org.kie.server.api.model.instance.NodeInstance;
 @XmlRootElement(name = "case-stage")
 public class CaseStage {
 
-    @XmlElement(name="stage-name")
+    @XmlElement(name = "stage-name")
     private String name;
-    @XmlElement(name="stage-id")
+    @XmlElement(name = "stage-id")
     private String identifier;
-    @XmlElement(name="stage-status")
+    @XmlElement(name = "stage-status")
     private String status;
-    @XmlElement(name="adhoc-fragments")
+    @XmlElement(name = "adhoc-fragments")
     private List<CaseAdHocFragment> adHocFragments;
-    @XmlElement(name="active-nodes")
+    @XmlElement(name = "active-nodes")
     private List<NodeInstance> activeNodes;
 
     public CaseStage() {

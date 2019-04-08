@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.kie.server.api.marshalling.objects;
 
 import java.time.LocalDate;
@@ -25,12 +41,11 @@ import org.kie.soup.commons.xstream.OffsetDateTimeXStreamConverter;
  * TODO Remove @XStreamConverter for java.time attributes once converters are provided by XStream out of the box.
  * Maybe keep this for backward compatibility (KIE Soup converters should keep working even if they're no longer needed)
  * and use {@link DateObjectUnannotated} when testing out-of-the-box time (un)marshalling.
- *
  * @see <a href="https://github.com/x-stream/xstream/issues/75">XStream#75</a>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "date-object")
-@XStreamAlias( "date-object" )
+@XStreamAlias("date-object")
 public class DateObject {
 
     @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
@@ -53,7 +68,7 @@ public class DateObject {
         return localDate;
     }
 
-    public void setLocalDate( LocalDate localDate ) {
+    public void setLocalDate(LocalDate localDate) {
         this.localDate = localDate;
     }
 
@@ -61,7 +76,7 @@ public class DateObject {
         return localDateTime;
     }
 
-    public void setLocalDateTime( LocalDateTime localDateTime ) {
+    public void setLocalDateTime(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
     }
 
@@ -69,7 +84,7 @@ public class DateObject {
         return localTime;
     }
 
-    public void setLocalTime( LocalTime localTime ) {
+    public void setLocalTime(LocalTime localTime) {
         this.localTime = localTime;
     }
 
@@ -77,8 +92,7 @@ public class DateObject {
         return offsetDateTime;
     }
 
-    public void setOffsetDateTime( OffsetDateTime offsetDateTime ) {
+    public void setOffsetDateTime(OffsetDateTime offsetDateTime) {
         this.offsetDateTime = offsetDateTime;
     }
-
 }

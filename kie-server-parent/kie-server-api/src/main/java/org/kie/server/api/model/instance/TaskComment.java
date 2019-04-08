@@ -3,19 +3,21 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
 import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -25,16 +27,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "task-comment")
 public class TaskComment {
 
-    @XmlElement(name="comment-id")
+    @XmlElement(name = "comment-id")
     private Long id;
 
-    @XmlElement(name="comment")
+    @XmlElement(name = "comment")
     private String text;
 
-    @XmlElement(name="comment-added-by")
+    @XmlElement(name = "comment-added-by")
     private String addedBy;
 
-    @XmlElement(name="comment-added-at")
+    @XmlElement(name = "comment-added-at")
     private Date addedAt;
 
     public TaskComment() {
@@ -76,7 +78,8 @@ public class TaskComment {
         this.addedAt = addedAt;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "TaskComment{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
@@ -113,5 +116,4 @@ public class TaskComment {
             return this;
         }
     }
-
 }

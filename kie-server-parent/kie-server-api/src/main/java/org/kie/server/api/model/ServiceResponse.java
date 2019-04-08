@@ -3,42 +3,122 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
 import java.util.ArrayList;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.kie.api.pmml.PMML4Result;
-import org.kie.server.api.model.admin.*;
-import org.kie.server.api.model.cases.*;
-import org.kie.server.api.model.definition.*;
+import org.kie.server.api.model.admin.EmailNotification;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.MigrationReportInstance;
+import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.OrgEntities;
+import org.kie.server.api.model.admin.ProcessNode;
+import org.kie.server.api.model.admin.ProcessNodeList;
+import org.kie.server.api.model.admin.TaskNotification;
+import org.kie.server.api.model.admin.TaskNotificationList;
+import org.kie.server.api.model.admin.TaskReassignment;
+import org.kie.server.api.model.admin.TaskReassignmentList;
+import org.kie.server.api.model.admin.TimerInstance;
+import org.kie.server.api.model.admin.TimerInstanceList;
+import org.kie.server.api.model.cases.CaseAdHocFragment;
+import org.kie.server.api.model.cases.CaseAdHocFragmentList;
+import org.kie.server.api.model.cases.CaseComment;
+import org.kie.server.api.model.cases.CaseCommentList;
+import org.kie.server.api.model.cases.CaseDefinition;
+import org.kie.server.api.model.cases.CaseDefinitionList;
+import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseFileDataItem;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
+import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.cases.CaseMigrationReportInstance;
+import org.kie.server.api.model.cases.CaseMilestone;
+import org.kie.server.api.model.cases.CaseMilestoneDefinition;
+import org.kie.server.api.model.cases.CaseMilestoneList;
+import org.kie.server.api.model.cases.CaseRoleAssignment;
+import org.kie.server.api.model.cases.CaseRoleAssignmentList;
+import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.cases.CaseStageDefinition;
+import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryDefinitionList;
+import org.kie.server.api.model.definition.ServiceTasksDefinition;
+import org.kie.server.api.model.definition.SubProcessesDefinition;
+import org.kie.server.api.model.definition.TaskInputsDefinition;
+import org.kie.server.api.model.definition.TaskOutputsDefinition;
+import org.kie.server.api.model.definition.UserTaskDefinition;
+import org.kie.server.api.model.definition.UserTaskDefinitionList;
+import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
-import org.kie.server.api.model.instance.*;
-import org.kie.server.api.model.type.*;
+import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstanceList;
+import org.kie.server.api.model.instance.ErrorInfoInstance;
+import org.kie.server.api.model.instance.ErrorInfoInstanceList;
+import org.kie.server.api.model.instance.JobRequestInstance;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.api.model.instance.RequestInfoInstanceList;
+import org.kie.server.api.model.instance.SolverInstance;
+import org.kie.server.api.model.instance.SolverInstanceList;
+import org.kie.server.api.model.instance.TaskEventInstance;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.api.model.type.JaxbBoolean;
+import org.kie.server.api.model.type.JaxbByte;
+import org.kie.server.api.model.type.JaxbCharacter;
+import org.kie.server.api.model.type.JaxbDouble;
+import org.kie.server.api.model.type.JaxbFloat;
+import org.kie.server.api.model.type.JaxbInteger;
+import org.kie.server.api.model.type.JaxbList;
+import org.kie.server.api.model.type.JaxbLong;
+import org.kie.server.api.model.type.JaxbMap;
+import org.kie.server.api.model.type.JaxbShort;
+import org.kie.server.api.model.type.JaxbString;
 
-@XmlRootElement(name="response")
+@XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.NONE)
 @XStreamAlias("response")
 public class ServiceResponse<T> implements KieServiceResponse<T> {
@@ -160,13 +240,12 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
 
             // Kie DMN
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),
-            @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class),
-            @XmlElement(name = "dmn-model-info-list" , type = DMNModelInfoList.class),
-            
+            @XmlElement(name = "dmn-evaluation-result", type = DMNResultKS.class),
+            @XmlElement(name = "dmn-model-info-list", type = DMNModelInfoList.class),
+
             // PMML
             @XmlElement(name = "pmml-result", type = PMML4Result.class)
-
-            })
+    })
     @JsonProperty
     private T result;
 
@@ -213,6 +292,6 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
 
     @Override
     public String toString() {
-        return "ServiceResponse[" + type + ", msg='" + msg + "', result='"+ result +"']";
+        return "ServiceResponse[" + type + ", msg='" + msg + "', result='" + result + "']";
     }
 }

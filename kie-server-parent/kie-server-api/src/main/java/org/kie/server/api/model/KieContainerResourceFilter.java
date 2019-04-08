@@ -3,27 +3,28 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlRootElement(name = "kie-container-filter")
 @XStreamAlias("kie-container-filter")
@@ -88,7 +89,6 @@ public class KieContainerResourceFilter {
 
     /**
      * Creates representation of this filter which can be used as part of the URL (e.g. the "?" query part).
-     *
      * @return string representation that can be directly used in URL (as query params), without the leading '?'
      */
     public String toURLQueryString() {
@@ -133,10 +133,10 @@ public class KieContainerResourceFilter {
 
         KieContainerResourceFilter that = (KieContainerResourceFilter) o;
 
-        if (releaseIdFilter != null ? !releaseIdFilter.equals(that.releaseIdFilter) : that.releaseIdFilter != null)
+        if (releaseIdFilter != null ? !releaseIdFilter.equals(that.releaseIdFilter) : that.releaseIdFilter != null) {
             return false;
+        }
         return statusFilter != null ? statusFilter.equals(that.statusFilter) : that.statusFilter == null;
-
     }
 
     @Override
@@ -147,6 +147,7 @@ public class KieContainerResourceFilter {
     }
 
     public static class Builder {
+
         private ReleaseIdFilter releaseIdFilter = ReleaseIdFilter.ACCEPT_ALL;
         private KieContainerStatusFilter statusFilter = KieContainerStatusFilter.ACCEPT_ALL;
 
@@ -177,5 +178,4 @@ public class KieContainerResourceFilter {
             return new KieContainerResourceFilter(releaseIdFilter, statusFilter);
         }
     }
-
 }

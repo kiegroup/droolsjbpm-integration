@@ -3,15 +3,16 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.util;
 
@@ -22,7 +23,6 @@ import java.util.List;
 import org.kie.server.api.model.definition.ProcessInstanceField;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
-import org.kie.server.api.model.definition.TaskField;
 
 /**
  * QueryFilterSpecBuilder targeted at filters for Process Instances.
@@ -34,103 +34,100 @@ import org.kie.server.api.model.definition.TaskField;
 
 //TODO: Use the "Curiously Recurring Template Pattern" to create a single builder for tasks and process instances, as the code is the same. Just the method signatures are different.
 public class ProcessInstanceQueryFilterSpecBuilder {
-	
-	private List<QueryParam> parameters = new ArrayList<QueryParam>();
-	private ProcessInstanceQueryFilterSpec filterSpec = new ProcessInstanceQueryFilterSpec();
-	
-	
-	public ProcessInstanceQueryFilterSpec get() {
-		if (!parameters.isEmpty()) {
-			filterSpec.setParameters(parameters.toArray(new QueryParam[parameters.size()]));
-		}
-		
-		return filterSpec;
-	}
 
-	public ProcessInstanceQueryFilterSpecBuilder orderBy(ProcessInstanceField field, boolean isAscending) {
-		filterSpec.setOrderBy(field.toString());
-		filterSpec.setAscending(isAscending);
+    private List<QueryParam> parameters = new ArrayList<QueryParam>();
+    private ProcessInstanceQueryFilterSpec filterSpec = new ProcessInstanceQueryFilterSpec();
 
-		return this;
-	}
+    public ProcessInstanceQueryFilterSpec get() {
+        if (!parameters.isEmpty()) {
+            filterSpec.setParameters(parameters.toArray(new QueryParam[parameters.size()]));
+        }
 
-	public ProcessInstanceQueryFilterSpecBuilder isNull(ProcessInstanceField field) {
-		parameters.add(new QueryParam(field.toString(), "IS_NULL", null));
+        return filterSpec;
+    }
 
-		return this;
-	}
+    public ProcessInstanceQueryFilterSpecBuilder orderBy(ProcessInstanceField field, boolean isAscending) {
+        filterSpec.setOrderBy(field.toString());
+        filterSpec.setAscending(isAscending);
 
-	public ProcessInstanceQueryFilterSpecBuilder isNotNull(ProcessInstanceField field) {
-		parameters.add(new QueryParam(field.toString(), "NOT_NULL", null));
+        return this;
+    }
 
-		return this;
-	}
+    public ProcessInstanceQueryFilterSpecBuilder isNull(ProcessInstanceField field) {
+        parameters.add(new QueryParam(field.toString(), "IS_NULL", null));
 
-	public ProcessInstanceQueryFilterSpecBuilder equalsTo(ProcessInstanceField field, Comparable<?>... values) {
-		parameters.add(new QueryParam(field.toString(), "EQUALS_TO", Arrays.asList(values)));
+        return this;
+    }
 
-		return this;
-	}
+    public ProcessInstanceQueryFilterSpecBuilder isNotNull(ProcessInstanceField field) {
+        parameters.add(new QueryParam(field.toString(), "NOT_NULL", null));
 
-	public ProcessInstanceQueryFilterSpecBuilder notEqualsTo(ProcessInstanceField field, Comparable<?>... values) {
-		parameters.add(new QueryParam(field.toString(), "NOT_EQUALS_TO", Arrays.asList(values)));
+        return this;
+    }
 
-		return this;
-	}
+    public ProcessInstanceQueryFilterSpecBuilder equalsTo(ProcessInstanceField field, Comparable<?>... values) {
+        parameters.add(new QueryParam(field.toString(), "EQUALS_TO", Arrays.asList(values)));
 
-	@SuppressWarnings("unchecked")
-	public ProcessInstanceQueryFilterSpecBuilder likeTo(ProcessInstanceField field, boolean caseSensitive, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "LIKE_TO", Arrays.asList(value, caseSensitive)));
+        return this;
+    }
 
-		return this;
-	}
+    public ProcessInstanceQueryFilterSpecBuilder notEqualsTo(ProcessInstanceField field, Comparable<?>... values) {
+        parameters.add(new QueryParam(field.toString(), "NOT_EQUALS_TO", Arrays.asList(values)));
 
-	@SuppressWarnings("unchecked")
-	public ProcessInstanceQueryFilterSpecBuilder greaterThan(ProcessInstanceField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "GREATER_THAN", Arrays.asList(value)));
+        return this;
+    }
 
-		return this;
-	}
+    @SuppressWarnings("unchecked")
+    public ProcessInstanceQueryFilterSpecBuilder likeTo(ProcessInstanceField field, boolean caseSensitive, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "LIKE_TO", Arrays.asList(value, caseSensitive)));
 
-	@SuppressWarnings("unchecked")
-	public ProcessInstanceQueryFilterSpecBuilder greaterOrEqualTo(ProcessInstanceField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "GREATER_OR_EQUALS_TO", Arrays.asList(value)));
+        return this;
+    }
 
-		return this;
-	}
+    @SuppressWarnings("unchecked")
+    public ProcessInstanceQueryFilterSpecBuilder greaterThan(ProcessInstanceField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "GREATER_THAN", Arrays.asList(value)));
 
-	@SuppressWarnings("unchecked")
-	public ProcessInstanceQueryFilterSpecBuilder lowerThan(ProcessInstanceField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "LOWER_THAN", Arrays.asList(value)));
+        return this;
+    }
 
-		return this;
-	}
+    @SuppressWarnings("unchecked")
+    public ProcessInstanceQueryFilterSpecBuilder greaterOrEqualTo(ProcessInstanceField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "GREATER_OR_EQUALS_TO", Arrays.asList(value)));
 
-	@SuppressWarnings("unchecked")
-	public ProcessInstanceQueryFilterSpecBuilder lowerOrEqualTo(ProcessInstanceField field, Comparable<?> value) {
-		parameters.add(new QueryParam(field.toString(), "LOWER_OR_EQUALS_TO", Arrays.asList(value)));
+        return this;
+    }
 
-		return this;
-	}
+    @SuppressWarnings("unchecked")
+    public ProcessInstanceQueryFilterSpecBuilder lowerThan(ProcessInstanceField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "LOWER_THAN", Arrays.asList(value)));
 
-	@SuppressWarnings("unchecked")
-	public ProcessInstanceQueryFilterSpecBuilder between(ProcessInstanceField field, Comparable<?> start, Comparable<?> end) {
-		parameters.add(new QueryParam(field.toString(), "BETWEEN", Arrays.asList(start, end)));
+        return this;
+    }
 
-		return this;
-	}
+    @SuppressWarnings("unchecked")
+    public ProcessInstanceQueryFilterSpecBuilder lowerOrEqualTo(ProcessInstanceField field, Comparable<?> value) {
+        parameters.add(new QueryParam(field.toString(), "LOWER_OR_EQUALS_TO", Arrays.asList(value)));
 
-	public ProcessInstanceQueryFilterSpecBuilder in(ProcessInstanceField field, List<?> values) {
-		parameters.add(new QueryParam(field.toString(), "IN", values));
+        return this;
+    }
 
-		return this;
-	}
+    @SuppressWarnings("unchecked")
+    public ProcessInstanceQueryFilterSpecBuilder between(ProcessInstanceField field, Comparable<?> start, Comparable<?> end) {
+        parameters.add(new QueryParam(field.toString(), "BETWEEN", Arrays.asList(start, end)));
 
-	public ProcessInstanceQueryFilterSpecBuilder notIn(ProcessInstanceField field, List<?> values) {
-		parameters.add(new QueryParam(field.toString(), "NOT_IN", values));
+        return this;
+    }
 
-		return this;
-	}
+    public ProcessInstanceQueryFilterSpecBuilder in(ProcessInstanceField field, List<?> values) {
+        parameters.add(new QueryParam(field.toString(), "IN", values));
 
+        return this;
+    }
 
+    public ProcessInstanceQueryFilterSpecBuilder notIn(ProcessInstanceField field, List<?> values) {
+        parameters.add(new QueryParam(field.toString(), "NOT_IN", values));
+
+        return this;
+    }
 }

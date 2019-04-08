@@ -3,15 +3,16 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -26,31 +27,31 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "node-instance")
 public class NodeInstance {
 
-    @XmlElement(name="node-instance-id")
+    @XmlElement(name = "node-instance-id")
     private Long id;
-    @XmlElement(name="node-name")
+    @XmlElement(name = "node-name")
     private String name;
-    @XmlElement(name="process-instance-id")
+    @XmlElement(name = "process-instance-id")
     private Long processInstanceId;
-    @XmlElement(name="work-item-id")
+    @XmlElement(name = "work-item-id")
     private Long workItemId;
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
-    @XmlElement(name="start-date")
+    @XmlElement(name = "start-date")
     private Date date;
-    @XmlElement(name="node-id")
+    @XmlElement(name = "node-id")
     private String nodeId;
-    @XmlElement(name="node-type")
+    @XmlElement(name = "node-type")
     private String nodeType;
-    @XmlElement(name="node-connection")
+    @XmlElement(name = "node-connection")
     private String connection;
-    @XmlElement(name="node-completed")
+    @XmlElement(name = "node-completed")
     private Boolean completed;
-    @XmlElement(name="reference-id")
+    @XmlElement(name = "reference-id")
     private Long referenceId;
-    @XmlElement(name="sla-compliance")
-    private Integer slaCompliance;   
-    @XmlElement(name="sla-due-date")
+    @XmlElement(name = "sla-compliance")
+    private Integer slaCompliance;
+    @XmlElement(name = "sla-due-date")
     private Date slaDueDate;
 
     public NodeInstance() {
@@ -151,15 +152,15 @@ public class NodeInstance {
     public Integer getSlaCompliance() {
         return slaCompliance;
     }
-    
+
     public void setSlaCompliance(Integer slaCompliance) {
         this.slaCompliance = slaCompliance;
     }
-    
+
     public Date getSlaDueDate() {
         return slaDueDate;
     }
-    
+
     public void setSlaDueDate(Date slaDueDate) {
         this.slaDueDate = slaDueDate;
     }
@@ -180,6 +181,7 @@ public class NodeInstance {
     }
 
     public static class Builder {
+
         private NodeInstance nodeInstance = new NodeInstance();
 
         public NodeInstance build() {
@@ -240,15 +242,15 @@ public class NodeInstance {
             nodeInstance.setReferenceId(referenceId);
             return this;
         }
+
         public Builder slaDueDate(Date slaDueDate) {
             nodeInstance.setSlaDueDate(slaDueDate);
             return this;
         }
-        
+
         public Builder slaCompliance(Integer slaCompliance) {
             nodeInstance.setSlaCompliance(slaCompliance);
             return this;
         }
-
     }
 }

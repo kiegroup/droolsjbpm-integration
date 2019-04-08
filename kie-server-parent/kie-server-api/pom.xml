@@ -14,6 +14,26 @@
   <description>KIE Execution Server API</description>
 
   <properties>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <checkstyle.header.template><![CDATA[
+^\/\*$\n^
+\* Copyright \d\d\d\d Red Hat, Inc\. and\/or its affiliates\.$\n^
+\*$\n^
+\* Licensed under the Apache License, Version 2\.0 \(the &quot;License&quot;\);$\n^
+\* you may not use this file except in compliance with the License\.$\n^
+\* You may obtain a copy of the License at$\n^
+\*$\n^
+\*     http:\/\/www\.apache\.org\/licenses\/LICENSE-2\.0$\n^
+\*$\n^
+\* Unless required by applicable law or agreed to in writing, software$\n^
+\* distributed under the License is distributed on an &quot;AS IS&quot; BASIS,$\n^
+\* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied\.$\n^
+\* See the License for the specific language governing permissions and$\n^
+\* limitations under the License\.$\n^
+\*\/$
+]]>
+    </checkstyle.header.template>
+    <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
     <java.module.name>org.kie.server.api</java.module.name>
   </properties>
 
@@ -53,7 +73,7 @@
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-jaxb</artifactId>
     </dependency>
-    
+
     <!-- Needed only for the DMNResult, DMNContext, etc and FEELEvent so should be possible later to migrate to kie-dmn-API -->
     <dependency>
       <groupId>org.kie</groupId>
@@ -105,7 +125,7 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-core</artifactId>
@@ -123,8 +143,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.drools</groupId>
-    	<artifactId>kie-pmml</artifactId>
+      <groupId>org.drools</groupId>
+      <artifactId>kie-pmml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
