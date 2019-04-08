@@ -3,15 +3,16 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.commands;
 
@@ -25,18 +26,18 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "call-container")
-@XStreamAlias( "call-container" )
+@XStreamAlias("call-container")
 @XmlAccessorType(XmlAccessType.NONE)
 public class CallContainerCommand implements KieServerCommand {
 
-    private static final long   serialVersionUID = -1803374525440238478L;
+    private static final long serialVersionUID = -1803374525440238478L;
 
     @XmlAttribute(name = "container-id")
-    @XStreamAlias( "container-id" )
-    private String              containerId;
+    @XStreamAlias("container-id")
+    private String containerId;
 
     @XmlElement(name = "payload")
-    private String              payload;
+    private String payload;
 
     public CallContainerCommand() {
         super();
@@ -67,5 +68,4 @@ public class CallContainerCommand implements KieServerCommand {
     public String toString() {
         return "CallContainerCommand [containerId=" + containerId + ", payload=" + payload + "]";
     }
-
 }

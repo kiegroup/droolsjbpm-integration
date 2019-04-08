@@ -3,15 +3,16 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.cases;
 
@@ -27,49 +28,49 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "case-instance")
 public class CaseInstance {
 
-    @XmlElement(name="case-id")
+    @XmlElement(name = "case-id")
     private String caseId;
 
-    @XmlElement(name="case-description")
+    @XmlElement(name = "case-description")
     private String caseDescription;
 
-    @XmlElement(name="case-owner")
+    @XmlElement(name = "case-owner")
     private String caseOwner;
 
-    @XmlElement(name="case-status")
+    @XmlElement(name = "case-status")
     private Integer caseStatus;
 
-    @XmlElement(name="case-definition-id")
+    @XmlElement(name = "case-definition-id")
     private String caseDefinitionId;
 
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
 
-    @XmlElement(name="case-started-at")
+    @XmlElement(name = "case-started-at")
     private Date startedAt;
 
-    @XmlElement(name="case-completed-at")
+    @XmlElement(name = "case-completed-at")
     private Date completedAt;
 
-    @XmlElement(name="case-completion-msg")
+    @XmlElement(name = "case-completion-msg")
     private String completionMessage;
-    
-    @XmlElement(name="case-sla-compliance")
-    private Integer slaCompliance;
-    
-    @XmlElement(name="case-sla-due-date")
-    private Date slaDueDate;    
 
-    @XmlElement(name="case-file")
+    @XmlElement(name = "case-sla-compliance")
+    private Integer slaCompliance;
+
+    @XmlElement(name = "case-sla-due-date")
+    private Date slaDueDate;
+
+    @XmlElement(name = "case-file")
     private CaseFile caseFile;
 
-    @XmlElement(name="case-milestones")
+    @XmlElement(name = "case-milestones")
     private List<CaseMilestone> milestones;
 
-    @XmlElement(name="case-stages")
+    @XmlElement(name = "case-stages")
     private List<CaseStage> stages;
 
-    @XmlElement(name="case-roles")
+    @XmlElement(name = "case-roles")
     private List<CaseRoleAssignment> roleAssignments;
 
     public String getCaseId() {
@@ -179,15 +180,15 @@ public class CaseInstance {
     public Integer getSlaCompliance() {
         return slaCompliance;
     }
-    
+
     public void setSlaCompliance(Integer slaCompliance) {
         this.slaCompliance = slaCompliance;
     }
-    
+
     public Date getSlaDueDate() {
         return slaDueDate;
     }
-    
+
     public void setSlaDueDate(Date slaDueDate) {
         this.slaDueDate = slaDueDate;
     }
@@ -245,7 +246,7 @@ public class CaseInstance {
         }
 
         public Builder completionMessage(String completionMessage) {
-            caseInstance.setCompletionMessage(completionMessage==null?"":completionMessage);
+            caseInstance.setCompletionMessage(completionMessage == null ? "" : completionMessage);
             return this;
         }
 
@@ -268,12 +269,12 @@ public class CaseInstance {
             caseInstance.setRoleAssignments(roleAssignments);
             return this;
         }
-        
+
         public Builder slaDueDate(Date slaDueDate) {
             caseInstance.setSlaDueDate(slaDueDate);
             return this;
         }
-        
+
         public Builder slaCompliance(Integer slaCompliance) {
             caseInstance.setSlaCompliance(slaCompliance);
             return this;

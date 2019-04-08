@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,7 @@ public class StringContentMap implements Map<String, Object>, StringContent {
         this.content = content;
     }
 
-    @Override    
+    @Override
     public String getContent() {
         return content;
     }
@@ -50,7 +50,7 @@ public class StringContentMap implements Map<String, Object>, StringContent {
 
     @Override
     public int size() {
-       throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -107,5 +107,4 @@ public class StringContentMap implements Map<String, Object>, StringContent {
     public Set<Entry<String, Object>> entrySet() {
         throw new UnsupportedOperationException();
     }
-
 }

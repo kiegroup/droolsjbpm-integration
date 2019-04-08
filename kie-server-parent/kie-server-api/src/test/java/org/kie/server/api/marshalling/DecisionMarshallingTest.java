@@ -3,21 +3,18 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.marshalling;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,17 +34,21 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNResultKS;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+
 @RunWith(Parameterized.class)
 public class DecisionMarshallingTest {
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
-        Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(new Object[][]
-                        {
-                                {MarshallingFormat.JAXB},
-                                {MarshallingFormat.JSON},
-                                {MarshallingFormat.XSTREAM}
-                        }
+        Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(
+                new Object[][]{
+                        {MarshallingFormat.JAXB},
+                        {MarshallingFormat.JSON},
+                        {MarshallingFormat.XSTREAM}
+                }
         ));
 
         return parameterData;
@@ -70,23 +71,22 @@ public class DecisionMarshallingTest {
         DMNModel model = dmnRuntime.getModels().get(0);
 
         DMNContext realCtx = dmnRuntime.newContext();
-        realCtx.set( "a", 10 );
-        realCtx.set( "b", 5 );
-        DMNContextKS dmnClientRequest = new DMNContextKS( realCtx.getAll() );
-        
+        realCtx.set("a", 10);
+        realCtx.set("b", 5);
+        DMNContextKS dmnClientRequest = new DMNContextKS(realCtx.getAll());
+
         DMNContextKS mu_dmnClientRequest = marshallUnmarshall(dmnClientRequest);
         assertEquals(dmnClientRequest.getNamespace(), mu_dmnClientRequest.getNamespace());
         assertEquals(dmnClientRequest.getModelName(), mu_dmnClientRequest.getModelName());
         assertThat(dmnClientRequest.getDecisionNames(), is(mu_dmnClientRequest.getDecisionNames()));
         assertEquals(dmnClientRequest.getDmnContext().size(), mu_dmnClientRequest.getDmnContext().size());
         assertEquals(dmnClientRequest.getDmnContext().keySet(), mu_dmnClientRequest.getDmnContext().keySet());
-        
+
         DMNResult evaluateAll = dmnRuntime.evaluateAll(model, realCtx);
-        ServiceResponse<DMNResultKS> dmnClientResponse = 
-        new ServiceResponse<DMNResultKS>(
+        ServiceResponse<DMNResultKS> dmnClientResponse = new ServiceResponse<DMNResultKS>(
                 ServiceResponse.ResponseType.SUCCESS,
                 "Test case",
-                new DMNResultKS(model.getNamespace(), model.getName(), dmnClientRequest.getDecisionNames(), evaluateAll) );
+                new DMNResultKS(model.getNamespace(), model.getName(), dmnClientRequest.getDecisionNames(), evaluateAll));
         ServiceResponse<DMNResultKS> mu_dmnClientResponse = marshallUnmarshall(dmnClientResponse);
         assertEquals(dmnClientResponse.getResult().getNamespace(), mu_dmnClientResponse.getResult().getNamespace());
         assertEquals(dmnClientResponse.getResult().getModelName(), mu_dmnClientResponse.getResult().getModelName());
@@ -98,7 +98,7 @@ public class DecisionMarshallingTest {
     @SuppressWarnings("unchecked")
     private <V> V marshallUnmarshall(V input) {
         try {
-            String marshall = marshaller.marshall( input );
+            String marshall = marshaller.marshall(input);
             System.out.println(marshall);
             V unmarshall = (V) marshaller.unmarshall(marshall, input.getClass());
             return unmarshall;
@@ -107,5 +107,4 @@ public class DecisionMarshallingTest {
             throw e;
         }
     }
-    
 }
