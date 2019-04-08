@@ -23,8 +23,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: myapp2-kieserver-stopped
+  name: myapp2-kieserver-3
   labels:
+    services.server.kie.org/kie-server-id: myapp2-kieserver-stopped
     services.server.kie.org/kie-server-state: USED
     application: myapp2
   annotations:

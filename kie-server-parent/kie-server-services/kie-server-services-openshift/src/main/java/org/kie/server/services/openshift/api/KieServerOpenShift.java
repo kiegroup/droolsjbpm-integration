@@ -15,12 +15,15 @@
 
 package org.kie.server.services.openshift.api;
 
+import java.util.List;
 import java.util.Optional;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.server.services.impl.KieServerLocator;
+
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_ID_KEY;
 
 public interface KieServerOpenShift {
 
@@ -29,15 +32,26 @@ public interface KieServerOpenShift {
     }
 
     default boolean isDCStable(DeploymentConfig dc) {
-        return "True".equals(dc.getStatus().getConditions().get(0).getStatus()) && dc.getStatus().getUnavailableReplicas() == 0;
+        return "True".equalsIgnoreCase(dc.getStatus().getConditions().get(0).getStatus()) 
+                && dc.getStatus().getUnavailableReplicas() == 0;
     }
 
     default Optional<DeploymentConfig> getKieServerDC(OpenShiftClient client, String serverId) {
-        return Optional.ofNullable(client.deploymentConfigs().withName(serverId).get());
+        List<DeploymentConfig> deployments = client.deploymentConfigs()
+                .withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, serverId).list().getItems();
+        if (deployments.isEmpty()) { return Optional.empty();}
+        if (deployments.size() == 1) { return Optional.ofNullable(deployments.get(0)); }
+        throw new IllegalStateException("Ambiguous KIE server id: [" + serverId + 
+                                        "]; more than one KIE server DeploymentConfig exists.");
     }
     
     default Optional<ConfigMap> getKieServerCM(OpenShiftClient client, String serverId) {
-        return Optional.ofNullable(client.configMaps().withName(serverId).get());
+        List<ConfigMap> configMaps = client.configMaps()
+                .withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, serverId).list().getItems();
+        if (configMaps.isEmpty()) { return Optional.empty();}
+        if (configMaps.size() == 1) { return Optional.ofNullable(configMaps.get(0)); }
+        throw new IllegalStateException("Ambiguous KIE server id: [" + serverId + 
+                                        "]; more than one KIE server ConfigMaps exists.");
     }
 
 }

@@ -16,6 +16,7 @@
 package org.kie.server.controller.openshift.storage;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -105,6 +106,15 @@ public class ServerTemplateConverterTest {
     }
 
     @Test
+    public void testFromStateWithoutServerLocation() {
+        KieServerState state = repo.load(TEST_KIE_SERVER_ID);
+        KieServerConfigItem cfgItem = state.getConfiguration().getConfigItem(KieServerConstants.KIE_SERVER_LOCATION);
+        state.getConfiguration().removeConfigItem(cfgItem);
+        ServerTemplate template = ServerTemplateConverter.fromState(state);
+        assertTrue(isMatching(template, state));
+    }
+
+    @Test
     public void testToState() {
         String tmpId = TEST_KIE_SERVER_ID + "-from-template";
 
@@ -148,50 +158,49 @@ public class ServerTemplateConverterTest {
     private static boolean isMatching(ServerTemplate template, KieServerState state) {
         boolean result = true;
         String id = null;
-        String url = null;
         String mode = null;
+        Optional<String> urlOpt = Optional.empty();
         try {
             id = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_ID);
-            url = ServerTemplateConverter.resolveServerUrl(state);
             mode = state.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_MODE);
+            urlOpt = ServerTemplateConverter.resolveServerUrl(state);
             
             if (!template.getId().equals(id)) {
                 fail("Id doesn't match!");
             }
-
             if (!template.getName().equals(id)) {
                 fail("Name doesn't match!");
             }
+            if (urlOpt.isPresent()) {
+                if (template.getServerInstanceKeys().size() != 1) {
+                    fail("ServerTemplate can have ONLY ONE server instance, but now contains: [" +
+                         template.getServerInstanceKeys().size() + "].");
+                }
+                if (!template.hasServerInstanceId(id)) {
+                    fail("Server instance id missing.");
+                }
+                if (!template.hasServerInstance(urlOpt.get())) {
+                    fail("Server URL missing.");
+                }
+                if (!template.getServerInstance(id).getServerName().equals(id)) {
+                    fail("Server instance name doesn't match up with Id!");
+                }
 
-            if (template.getServerInstanceKeys().size() != 1) {
-                fail("ServerTemplate can have ONLY ONE server instance, but now contains: [" +
-                     template.getServerInstanceKeys().size() + "].");
+                if (!template.getServerInstance(id).getServerTemplateId().equals(id)) {
+                    fail("Server instance templateId doesn't match up with Id!");
+                }
+
+                if (!template.getServerInstance(id).getUrl().equals(urlOpt.get())) {
+                    fail("Server URL doesn't match!");
+                }
+            } else {
+                if (template.getServerInstanceKeys().size() != 0) {
+                    fail("Should not have server instance.");
+                }
             }
-
-            if (!template.hasServerInstanceId(id)) {
-                fail("Server instance id missing.");
-            }
-
-            if (!template.hasServerInstance(url)) {
-                fail("Server URL missing.");
-            }
-
-            if (!template.getServerInstance(id).getServerName().equals(id)) {
-                fail("Server instance name doesn't match up with Id!");
-            }
-
-            if (!template.getServerInstance(id).getServerTemplateId().equals(id)) {
-                fail("Server instance templateId doesn't match up with Id!");
-            }
-
-            if (!template.getServerInstance(id).getUrl().equals(url)) {
-                fail("Server URL doesn't match!");
-            }
-
             if (template.getMode() == null || !template.getMode().equals(KieServerMode.valueOf(mode))) {
                 fail("Server MODE doesn't match!");
             }
-
             // ContainerSpec and ContainerResource mapping check
             for (ContainerSpec conSpec : template.getContainersSpec()) {
                 String conId = conSpec.getId();
@@ -206,14 +215,12 @@ public class ServerTemplateConverterTest {
                 if (!conSpec.getServerTemplateKey().getName().equals(id)) {
                     fail("Server template name within container spec doesn't match!");
                 }
-
                 for (KieContainerResource conRes : state.getContainers()) {
                     if (conRes.getReleaseId().equals(relId)) {
                         conResFound = conRes;
                         break;
                     }
                 }
-
                 if (conResFound == null) {
                     fail("Container Spec/Resource doesn't match! Container Id: [" + conId + "]");
                 }
@@ -231,7 +238,6 @@ public class ServerTemplateConverterTest {
                 }
 
                 List<KieServerConfigItem> cfgItems = conResFound.getConfigItems();
-
                 // ContainerSpec.configs check
                 for (ContainerConfig conCfg : conSpec.getConfigs().values()) {
                     if (conCfg instanceof ProcessConfig) {

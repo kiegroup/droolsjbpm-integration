@@ -17,8 +17,10 @@ package org.kie.server.controller.openshift.storage;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Supplier;
 
+import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -46,8 +48,10 @@ public class OpenShiftServerTemplateStorageTest extends ServerTemplateStorageTes
      *  Must match current project name associated with OpenShift login
      *  if test against real OCP/K8S cluster
      */
-    private String testNamespace = "myproject";
+    private String testNamespace = "test";
     private OpenShiftClient client;
+    
+    protected static final String TEST_APP_NAME = "myapp2";
 
     @Rule
     public OpenShiftServer server = new OpenShiftServer(false, true);
@@ -68,9 +72,6 @@ public class OpenShiftServerTemplateStorageTest extends ServerTemplateStorageTes
         } else {
             // Get client from MockKubernetes Server
             client = server.getOpenshiftClient();
-
-            // The default namespace for MockKubernetes Server is 'test'
-            testNamespace = "test";
         }
 
         // Create cloud repository instance with mock K8S server test client
@@ -90,10 +91,22 @@ public class OpenShiftServerTemplateStorageTest extends ServerTemplateStorageTes
             public boolean isKieServerReady() {
                 return true;
             }
-
+            
             @Override
             public boolean isDCStable(DeploymentConfig dc) {
                 return true;
+            }
+            
+            @Override
+            public Optional<String> getAppNameFromPod(OpenShiftClient client) {
+                return Optional.of(TEST_APP_NAME);
+            }
+            
+            @Override
+            public ConfigMap createOrReplaceCM(OpenShiftClient client, ConfigMap cm) {
+                // Issue workaround: MockKubenetes Server ignores update 
+                client.configMaps().inNamespace(testNamespace).delete(cm);
+                return client.configMaps().inNamespace(testNamespace).createOrReplace(cm);
             }
         };
 

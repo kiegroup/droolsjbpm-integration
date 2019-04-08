@@ -31,7 +31,6 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
-import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -42,9 +41,12 @@ import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.openshift.api.KieServerOpenShift;
 import org.kie.server.services.openshift.impl.storage.cloud.CloudClientFactory;
-import org.kie.server.services.openshift.impl.storage.cloud.KieServerStateCloudRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_ID_KEY;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.ROLLOUT_REQUIRED;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.UNKNOWN;
 
 public class OpenShiftStartupStrategy implements StartupStrategy {
 
@@ -68,25 +70,28 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
         public void run() {
             try (OpenShiftClient client = clouldClientHelper.get()) {
                 logger.info("Watching ConfigMap in namespace: [{}]", client.getNamespace());
-                try (Watch watchable = client.configMaps().withName(kieServerId).watch(new Watcher<ConfigMap>() {
+                try (Watch watchable = client.configMaps().withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerId)
+                                             .watch(new Watcher<ConfigMap>() {
                     @Override
                     public void eventReceived(Action action, ConfigMap kieServerState) {
                         logger.debug("Event - Action: {}, {} on ConfigMap ",
-                                    action, kieServerState.getMetadata().getName());
-
-                        DeploymentConfig dc = getKieServerDC(client, kieServerId).orElseThrow(IllegalStateException::new);
-                        if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
-                            ObjectMeta md = dc.getSpec().getTemplate().getMetadata();
-                            Map<String, String> ann = md.getAnnotations() == null ? new HashMap<>() : md.getAnnotations();
-                            md.setAnnotations(ann);
-                            ann.put(ROLLOUT_TRIGGER_TIMESTAMP,
-                                    ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-                            client.deploymentConfigs().createOrReplace(dc);
-
-                            logger.info("Updated DeploymentConfig: {}", md.getName());
-                        } else {
-                            logger.debug("Event - Ignored");
-                        }
+                                    action, kieServerState.getMetadata().getLabels()
+                                                          .getOrDefault(CFG_MAP_LABEL_SERVER_ID_KEY, UNKNOWN));
+                        
+                        getKieServerDC(client, kieServerId).ifPresent(dc -> { 
+                            if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
+                                ObjectMeta md = dc.getSpec().getTemplate().getMetadata();
+                                Map<String, String> ann = md.getAnnotations() == null ? new HashMap<>() : md.getAnnotations();
+                                md.setAnnotations(ann);
+                                ann.put(ROLLOUT_TRIGGER_TIMESTAMP,
+                                        ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+                                client.deploymentConfigs().createOrReplace(dc);
+    
+                                logger.info("Updated DeploymentConfig: {}", md.getName());
+                            } else {
+                                logger.debug("Event - Ignored");
+                            }
+                        });
                     }
 
                     @Override
@@ -126,13 +131,13 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
             }
         }
 
-        private static boolean isRolloutRequired(OpenShiftClient client, String kieServerId, boolean isDCStable) {
+        private boolean isRolloutRequired(OpenShiftClient client, String kieServerId, boolean isDCStable) {
             boolean pullTrigger = false;
             String triggerName = KIE_SERVER_ROLLOUT_IN_PROGRESS + "-" + kieServerId;
-            ConfigMap cm = client.configMaps().withName(kieServerId).get();
+            ConfigMap cm = getKieServerCM(client, kieServerId).orElseThrow(IllegalStateException::new);
             Map<String, String> ann = cm.getMetadata().getAnnotations();
 
-            if (ann != null && ann.containsKey(KieServerStateCloudRepository.ROLLOUT_REQUIRED)) {
+            if (ann != null && ann.containsKey(ROLLOUT_REQUIRED)) {
                 try {
                     if (isDCStable) {
                         // Create temporary rollout-in-progress configmap only if there is no DC activities.
@@ -151,7 +156,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                     /**
                      * Cleanup the configmap annotation related to rollout-in-progress
                      */
-                    ann.remove(KieServerStateCloudRepository.ROLLOUT_REQUIRED);
+                    ann.remove(ROLLOUT_REQUIRED);
                     client.configMaps().createOrReplace(cm);
                 } catch (KubernetesClientException kce) {
                     logger.debug("Mark DC rollout failed", kce);
