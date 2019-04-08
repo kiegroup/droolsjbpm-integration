@@ -167,6 +167,16 @@ public class KieControllerCrashIntegrationTest extends KieControllerManagementBa
         // Check that kie server is registered.
         serverUp.await(5, TimeUnit.SECONDS);
         ServerInstanceKeyList list = controllerClient.getServerInstances(instanceList.getServerTemplates()[0].getId());
+
+        if (list.getServerInstanceKeys().length == 0) {
+            // Race condition when health check deleted server instance sooner than we were able to check. Resubmitting server instance again.
+            serverUp = new CountDownLatch(1);
+            serverDown = new CountDownLatch(1);
+            controller.connect(kieServerInfo);
+
+            serverUp.await(5, TimeUnit.SECONDS);
+            list = controllerClient.getServerInstances(instanceList.getServerTemplates()[0].getId());
+        }
         assertNotNull(list.getServerInstanceKeys());
         assertEquals(1, list.getServerInstanceKeys().length);
 
