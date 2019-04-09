@@ -53,6 +53,7 @@ public class KieSpringTransactionManager
                 currentTransaction = this.ptm.getTransaction(td);
                 return true;
             } else {
+                currentTransaction = this.ptm.getTransaction(td);
                 return false;
             }
         } catch (Exception e) {
