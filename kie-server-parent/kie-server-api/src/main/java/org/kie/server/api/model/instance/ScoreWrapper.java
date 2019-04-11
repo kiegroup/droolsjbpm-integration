@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.kie.server.api.model.instance;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -41,7 +57,6 @@ public class ScoreWrapper {
 
     /**
      * Returns score representation of the object.
-     *
      * @return Score representation of the object. Returns null if the score has not been assigned by the solver yet.
      * @throws IllegalArgumentException If <code>scoreClass</code> is not one of the out-of-box score implementations.
      * In this case clients may implement their own way to extract the score object.
@@ -61,5 +76,4 @@ public class ScoreWrapper {
                 + ", scoreString='" + scoreString + '\''
                 + '}';
     }
-
 }

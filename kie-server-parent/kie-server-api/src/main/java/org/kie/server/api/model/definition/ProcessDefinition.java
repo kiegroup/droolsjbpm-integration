@@ -3,21 +3,23 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.definition;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,35 +30,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "process-definition")
 public class ProcessDefinition {
 
-    @XmlElement(name="process-id")
+    @XmlElement(name = "process-id")
     private String id;
 
-    @XmlElement(name="process-name")
+    @XmlElement(name = "process-name")
     private String name;
 
-    @XmlElement(name="process-version")
+    @XmlElement(name = "process-version")
     private String version;
 
-    @XmlElement(name="package")
+    @XmlElement(name = "package")
     private String packageName;
 
-    @XmlElement(name="container-id")
+    @XmlElement(name = "container-id")
     private String containerId;
 
-    @XmlElementWrapper(name="associated-entities")
+    @XmlElementWrapper(name = "associated-entities")
     private Map<String, String[]> associatedEntities;
-    @XmlElementWrapper(name="service-tasks")
+    @XmlElementWrapper(name = "service-tasks")
     private Map<String, String> serviceTasks;
-    @XmlElementWrapper(name="process-variables")
+    @XmlElementWrapper(name = "process-variables")
     private Map<String, String> processVariables;
-    @XmlElementWrapper(name="process-subprocesses")
+    @XmlElementWrapper(name = "process-subprocesses")
     private Collection<String> reusableSubProcesses;
-    @XmlElementWrapper(name="nodes")
+    @XmlElementWrapper(name = "nodes")
     private Collection<NodeDefinition> nodes;
-    @XmlElementWrapper(name="timers")
+    @XmlElementWrapper(name = "timers")
     private Collection<TimerDefinition> timers;
 
-    @XmlElement(name="dynamic")
+    @XmlElement(name = "dynamic")
     private boolean dynamic;
 
     public ProcessDefinition() {

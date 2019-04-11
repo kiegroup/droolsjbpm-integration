@@ -3,15 +3,16 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.api.model.instance;
 
@@ -25,70 +26,69 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-instance-custom")
 public class TaskWithProcessDescription {
-    
-    @XmlElement(name="task-id")
+
+    @XmlElement(name = "task-id")
     private Long id;
-    @XmlElement(name="task-priority")
+    @XmlElement(name = "task-priority")
     private Integer priority;
-    @XmlElement(name="task-name")
+    @XmlElement(name = "task-name")
     private String name;
-    @XmlElement(name="task-subject")
+    @XmlElement(name = "task-subject")
     private String subject;
-    @XmlElement(name="task-description")
+    @XmlElement(name = "task-description")
     private String description;
-    @XmlElement(name="task-type")
+    @XmlElement(name = "task-type")
     private String taskType;
-    @XmlElement(name="task-form")
+    @XmlElement(name = "task-form")
     private String formName;
-    @XmlElement(name="task-status")
+    @XmlElement(name = "task-status")
     private String status;
-    @XmlElement(name="task-actual-owner")
+    @XmlElement(name = "task-actual-owner")
     private String actualOwner;
-    @XmlElement(name="task-created-by")
+    @XmlElement(name = "task-created-by")
     private String createdBy;
-    @XmlElement(name="task-created-on")
+    @XmlElement(name = "task-created-on")
     private Date createdOn;
-    @XmlElement(name="task-activation-time")
+    @XmlElement(name = "task-activation-time")
     private Date activationTime;
-    @XmlElement(name="task-expiration-time")
+    @XmlElement(name = "task-expiration-time")
     private Date expirationDate;
-    @XmlElement(name="task-process-instance-id")
+    @XmlElement(name = "task-process-instance-id")
     private Long processInstanceId;
-    @XmlElement(name="task-parent-id")
+    @XmlElement(name = "task-parent-id")
     private Long parentId;
-    @XmlElement(name="task-process-id")
+    @XmlElement(name = "task-process-id")
     private String processId;
-    @XmlElement(name="task-container-id")
+    @XmlElement(name = "task-container-id")
     private String containerId;
-    @XmlElement(name="process-instance-desc")
+    @XmlElement(name = "process-instance-desc")
     private String processInstanceDescription;
-    @XmlElement(name="task-last-modification-user")
+    @XmlElement(name = "task-last-modification-user")
     private String lastModificationUser;
-    @XmlElement(name="task-last-modificaiton-date")
+    @XmlElement(name = "task-last-modificaiton-date")
     private Date lastModificationDate;
-    @XmlElement(name="task-correlation-key")
+    @XmlElement(name = "task-correlation-key")
     private String correlationKey;
 
-    @XmlElementWrapper(name="potential-owners")
-    @XmlElement(name="task-pot-owners")
+    @XmlElementWrapper(name = "potential-owners")
+    @XmlElement(name = "task-pot-owners")
     private List<String> potentialOwners;
 
-    @XmlElementWrapper(name="excluded-owners")
-    @XmlElement(name="task-excl-owners")
+    @XmlElementWrapper(name = "excluded-owners")
+    @XmlElement(name = "task-excl-owners")
     private List<String> excludedOwners;
 
-    @XmlElementWrapper(name="business-admins")
-    @XmlElement(name="task-business-admins")
+    @XmlElementWrapper(name = "business-admins")
+    @XmlElement(name = "task-business-admins")
     private List<String> businessAdmins;
 
-    @XmlElement(name="task-input-data")
+    @XmlElement(name = "task-input-data")
     private Map<String, Object> inputData;
 
-    @XmlElement(name="task-output-data")
+    @XmlElement(name = "task-output-data")
     private Map<String, Object> outputData;
 
     public TaskWithProcessDescription() {
@@ -230,11 +230,10 @@ public class TaskWithProcessDescription {
         return processInstanceDescription;
     }
 
-    
     public void setProcessInstanceDescription(String processInstanceDescription) {
         this.processInstanceDescription = processInstanceDescription;
     }
-    
+
     public String getContainerId() {
         return containerId;
     }
@@ -242,7 +241,7 @@ public class TaskWithProcessDescription {
     public void setContainerId(String containerId) {
         this.containerId = containerId;
     }
-    
+
     public String getLastModificationUser() {
         return lastModificationUser;
     }
@@ -254,15 +253,15 @@ public class TaskWithProcessDescription {
     public Date getLastModificationDate() {
         return lastModificationDate;
     }
-    
+
     public void setLastModificationDate(Date lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
     }
-    
+
     public String getCorrelationKey() {
         return correlationKey;
     }
-    
+
     public void setCorrelationKey(String correlationKey) {
         this.correlationKey = correlationKey;
     }
@@ -411,7 +410,7 @@ public class TaskWithProcessDescription {
             taskInstance.setProcessId(processId);
             return this;
         }
-        
+
         public Builder processInstanceDescription(String processInstanceDescription) {
             taskInstance.setProcessInstanceDescription(processInstanceDescription);
             return this;
@@ -446,7 +445,7 @@ public class TaskWithProcessDescription {
             taskInstance.setOutputData(outputData);
             return this;
         }
-        
+
         public Builder lastModificationUser(String lastModificationUser) {
             taskInstance.setLastModificationUser(lastModificationUser);
             return this;
