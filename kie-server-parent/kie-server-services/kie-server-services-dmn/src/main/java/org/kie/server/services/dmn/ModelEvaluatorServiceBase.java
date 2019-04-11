@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
@@ -126,11 +127,13 @@ public class ModelEvaluatorServiceBase {
         InputData id = ((InputDataNodeImpl) inputDataNode).getInputData();
         QName typeRef = id.getVariable().getTypeRef();
         // for InputData sometimes the NS is not really valorized inside the jdk QName as internally ns are resolved by prefix directly.
-        if (typeRef != null && XMLConstants.NULL_NS_URI.equals(typeRef.getNamespaceURI())) {
-            String actualNS = id.getNamespaceURI(typeRef.getPrefix());
-            typeRef = new QName(actualNS, typeRef.getLocalPart(), typeRef.getPrefix());
+        if (typeRef != null) {
+            if (XMLConstants.NULL_NS_URI.equals(typeRef.getNamespaceURI())) {
+                String actualNS = id.getNamespaceURI(typeRef.getPrefix());
+                typeRef = new QName(actualNS, typeRef.getLocalPart(), typeRef.getPrefix());
+            }
+            res.setTypeRef(DMNQNameInfo.of(typeRef));
         }
-        res.setTypeRef(DMNQNameInfo.of(typeRef));
         return res;
     }
     
