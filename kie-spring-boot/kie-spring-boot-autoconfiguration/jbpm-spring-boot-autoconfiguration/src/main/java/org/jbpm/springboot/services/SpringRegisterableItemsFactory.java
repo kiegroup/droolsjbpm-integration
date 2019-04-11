@@ -38,12 +38,12 @@ import org.springframework.stereotype.Component;
 public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFactory {
     
     private static final Logger logger = LoggerFactory.getLogger(SpringRegisterableItemsFactory.class);
-    
-    private Map<String, WorkItemHandler> handlers;
-    private List<ProcessEventListener> processEventListeners;
-    private List<AgendaEventListener> agendaEventListeners;
-    private List<RuleRuntimeEventListener> ruleRuntimeEventListeners;
-    private List<TaskLifeCycleEventListener> taskListeners;
+       
+    private volatile Map<String, WorkItemHandler> handlers;
+    private volatile List<ProcessEventListener> processEventListeners;
+    private volatile List<AgendaEventListener> agendaEventListeners;
+    private volatile List<RuleRuntimeEventListener> ruleRuntimeEventListeners;
+    private volatile List<TaskLifeCycleEventListener> taskListeners;
     
     private ApplicationContext context;
 
@@ -112,20 +112,24 @@ public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFact
      */
     
     protected void processHandlers() {
-        // processing should only be done once
+        // processing should only be done once        
         if (handlers == null) {
-            handlers = new HashMap<>();
-            Map<String, WorkItemHandler> foundBeans = context.getBeansOfType(WorkItemHandler.class);
-            for (WorkItemHandler handler : foundBeans.values()) {
-                String name = getComponentName(handler);
-        
-                if (name != null && !name.toString().isEmpty()) {
-                    logger.debug("Registering {} work item handler under name {}", handler, name);
-                    handlers.put(name.toString(), handler);
-                } else {
-                    logger.warn("Not possible to register {} handler due to missing name - annotate your class with @Component with given name", handler);
+            synchronized (this) {
+                if (handlers == null) {                    
+                    handlers = new HashMap<>();
+                    Map<String, WorkItemHandler> foundBeans = context.getBeansOfType(WorkItemHandler.class);
+                    for (WorkItemHandler handler : foundBeans.values()) {
+                        String name = getComponentName(handler);
+                
+                        if (name != null && !name.toString().isEmpty()) {
+                            logger.debug("Registering {} work item handler under name {}", handler, name);
+                            handlers.put(name.toString(), handler);
+                        } else {
+                            logger.warn("Not possible to register {} handler due to missing name - annotate your class with @Component with given name", handler);
+                        }
+            
+                    }                    
                 }
-    
             }
         }
     }
@@ -133,13 +137,15 @@ public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFact
     protected void processAgendaEventListeners() {
         // processing should only be done once
         if (agendaEventListeners == null) {
-            agendaEventListeners = new ArrayList<>();
-            Map<String, AgendaEventListener> foundBeans = context.getBeansOfType(AgendaEventListener.class);
-            for (AgendaEventListener listener : foundBeans.values()) {
-                logger.debug("Registering {} agenda event listener", listener);
-                agendaEventListeners.add(listener);
-                
-    
+            synchronized (this) {
+                if (agendaEventListeners == null) {
+                    agendaEventListeners = new ArrayList<>();
+                    Map<String, AgendaEventListener> foundBeans = context.getBeansOfType(AgendaEventListener.class);
+                    for (AgendaEventListener listener : foundBeans.values()) {
+                        logger.debug("Registering {} agenda event listener", listener);
+                        agendaEventListeners.add(listener);            
+                    }
+                }
             }
         }
     }
@@ -147,13 +153,15 @@ public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFact
     protected void processRuleRuntimeEventListeners() {
         // processing should only be done once
         if (ruleRuntimeEventListeners == null) {
-            ruleRuntimeEventListeners = new ArrayList<>();
-            Map<String, RuleRuntimeEventListener> foundBeans = context.getBeansOfType(RuleRuntimeEventListener.class);
-            for (RuleRuntimeEventListener listener : foundBeans.values()) {
-                logger.debug("Registering {} rule runtime event listener", listener);
-                ruleRuntimeEventListeners.add(listener);
-                
-    
+            synchronized (this) {
+                if (ruleRuntimeEventListeners == null) {
+                    ruleRuntimeEventListeners = new ArrayList<>();
+                    Map<String, RuleRuntimeEventListener> foundBeans = context.getBeansOfType(RuleRuntimeEventListener.class);
+                    for (RuleRuntimeEventListener listener : foundBeans.values()) {
+                        logger.debug("Registering {} rule runtime event listener", listener);
+                        ruleRuntimeEventListeners.add(listener);
+                    }      
+                }
             }
         }
     }
@@ -161,13 +169,15 @@ public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFact
     protected void processTaskEventListeners() {
         // processing should only be done once
         if (taskListeners == null) {
-            taskListeners = new ArrayList<>();
-            Map<String, TaskLifeCycleEventListener> foundBeans = context.getBeansOfType(TaskLifeCycleEventListener.class);
-            for (TaskLifeCycleEventListener listener : foundBeans.values()) {
-                logger.debug("Registering {} task event listener", listener);
-                taskListeners.add(listener);
-                
-    
+            synchronized (this) {
+                if (taskListeners == null) {
+                    taskListeners = new ArrayList<>();
+                    Map<String, TaskLifeCycleEventListener> foundBeans = context.getBeansOfType(TaskLifeCycleEventListener.class);
+                    for (TaskLifeCycleEventListener listener : foundBeans.values()) {
+                        logger.debug("Registering {} task event listener", listener);
+                        taskListeners.add(listener);
+                    }   
+                }
             }
         }
     }
@@ -175,13 +185,15 @@ public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFact
     protected void processProcessEventListeners() {
         // processing should only be done once
         if (processEventListeners == null) {
-            processEventListeners = new ArrayList<>();
-            Map<String, ProcessEventListener> foundBeans = context.getBeansOfType(ProcessEventListener.class);
-            for (ProcessEventListener listener : foundBeans.values()) {
-                logger.debug("Registering {} process event listener", listener);
-                processEventListeners.add(listener);
-                
-    
+            synchronized (this) {
+                if (processEventListeners == null) {
+                    processEventListeners = new ArrayList<>();
+                    Map<String, ProcessEventListener> foundBeans = context.getBeansOfType(ProcessEventListener.class);
+                    for (ProcessEventListener listener : foundBeans.values()) {
+                        logger.debug("Registering {} process event listener", listener);
+                        processEventListeners.add(listener);            
+                    }
+                }
             }
         }
     }
