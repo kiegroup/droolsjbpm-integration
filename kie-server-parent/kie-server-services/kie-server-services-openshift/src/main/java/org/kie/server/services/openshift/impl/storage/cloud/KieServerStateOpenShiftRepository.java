@@ -101,7 +101,7 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
                          .list()
                          .getItems()
                          .stream()
-                         .map(cfg -> (KieServerState) xs.fromXML(cfg.getData().get(CFG_MAP_DATA_KEY)))
+                         .map(this::getKieServerState)
                          .collect(Collectors.toList())
         );
     }
