@@ -15,6 +15,9 @@
 
 package org.kie.server.remote.rest.common.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,13 +26,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.kie.server.common.rest.RestEasy960Util;
 import org.kie.server.api.ConversationId;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.common.rest.RestEasy960Util;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
@@ -39,6 +42,8 @@ public class RestUtils {
 
     private static MarshallerHelper marshallerHelper = new MarshallerHelper(null);
     private static Variant ERROR_VARIANT = new Variant(MediaType.TEXT_PLAIN_TYPE, (Locale) null, null);
+    private static final String UNEXPECTED_ERROR = "Unexpected error during processing: {0}";
+    private static final boolean INCLUDE_STACKTRACE = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_INCLUDE_STACKTRACE, "false"));
     
     public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, Header... customHeaders) {
         return createCorrectVariant(responseObj, headers, null, customHeaders);
@@ -214,5 +219,23 @@ public class RestUtils {
         }
 
         return null;
+    }
+    
+    public static String errorMessage(Throwable e, String defaultMessage) {
+        if (INCLUDE_STACKTRACE) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            
+            String message = sw.toString();
+            pw.close();
+            return message;
+        }
+        
+        return defaultMessage;
+    }
+    
+    public static String errorMessage(Throwable e) {        
+        return errorMessage(e, MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()));
     }
 }

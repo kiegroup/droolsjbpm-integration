@@ -54,6 +54,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_MGMT_API_DISABLED = "org.kie.server.mgmt.api.disabled";
     public static final String KIE_SERVER_STARTUP_STRATEGY = "org.kie.server.startup.strategy";
     public static final String KIE_SERVER_MODE = "org.kie.server.mode";
+    public static final String KIE_SERVER_INCLUDE_STACKTRACE = "org.kie.server.stacktrace.included";
 
     // configuration parameters
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";

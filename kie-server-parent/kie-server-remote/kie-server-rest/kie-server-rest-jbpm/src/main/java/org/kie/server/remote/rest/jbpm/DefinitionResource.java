@@ -31,6 +31,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVari
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEF_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_ENTITIES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_SERVICE_TASKS_RESPONSE_JSON;
@@ -41,7 +42,6 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASK_INP
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASK_OUTPUTS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.net.URLDecoder;
 import java.text.MessageFormat;
@@ -117,7 +117,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -144,7 +144,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -171,7 +171,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -198,7 +198,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -225,7 +225,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -252,7 +252,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -281,7 +281,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -309,7 +309,7 @@ public class DefinitionResource {
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch( Exception e ) {
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 

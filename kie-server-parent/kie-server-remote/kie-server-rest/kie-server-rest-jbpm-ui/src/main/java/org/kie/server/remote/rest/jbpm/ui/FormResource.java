@@ -31,6 +31,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
 import static org.kie.server.remote.rest.common.util.RestUtils.permissionDenied;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.ui.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.ui.docs.ParameterSamples.PROCESS_FORM_DEF_JSON;
 import static org.kie.server.remote.rest.jbpm.ui.docs.ParameterSamples.TASK_FORM_DEF_JSON;
@@ -135,7 +136,7 @@ public class FormResource {
             return notFound("Form for process id " + processId + " not found", variant, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+            return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
     }
 
@@ -177,7 +178,7 @@ public class FormResource {
             return notFound("Form for task id " + taskId + " not found", variant, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+            return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
     }
     
@@ -210,7 +211,7 @@ public class FormResource {
             return notFound(e.getMessage(), variant, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+            return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
         
     }
@@ -246,7 +247,7 @@ public class FormResource {
             return notFound(e.getMessage(), variant, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+            return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
         
     }
@@ -280,7 +281,7 @@ public class FormResource {
             return notFound(e.getMessage(), variant, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
+            return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
         
     }

@@ -47,6 +47,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_EXEC_ERRORS_RESPONSE_JSON;
@@ -62,7 +63,6 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -302,7 +302,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -329,7 +329,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -356,7 +356,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -407,7 +407,7 @@ public class UserTaskAdminResource {
             return badRequest(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -455,7 +455,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -482,7 +482,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -509,7 +509,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -538,7 +538,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -567,7 +567,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -593,7 +593,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -619,7 +619,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -647,7 +647,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -680,7 +680,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -714,7 +714,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -748,7 +748,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -781,7 +781,7 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 }

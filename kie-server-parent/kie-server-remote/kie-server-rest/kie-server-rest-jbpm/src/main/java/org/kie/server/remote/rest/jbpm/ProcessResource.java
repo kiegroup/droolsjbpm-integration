@@ -50,6 +50,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON;
@@ -72,7 +73,6 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_F
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CREATE_RESPONSE_ERROR;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.WORK_ITEM_NOT_FOUND;
 
 import java.text.MessageFormat;
@@ -259,7 +259,7 @@ public class ProcessResource  {
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -288,7 +288,7 @@ public class ProcessResource  {
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -323,7 +323,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -362,7 +362,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -395,7 +395,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(errorMessage(e), v);
         }
     }
 
@@ -429,7 +429,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -461,7 +461,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -496,7 +496,7 @@ public class ProcessResource  {
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -530,7 +530,7 @@ public class ProcessResource  {
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
 
     }
@@ -563,7 +563,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
 
     }
@@ -599,7 +599,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -631,7 +631,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -665,7 +665,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(WORK_ITEM_NOT_FOUND, workItemId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
 
     }
@@ -697,7 +697,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -729,7 +729,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -760,7 +760,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -793,7 +793,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -823,7 +823,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -856,7 +856,7 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 

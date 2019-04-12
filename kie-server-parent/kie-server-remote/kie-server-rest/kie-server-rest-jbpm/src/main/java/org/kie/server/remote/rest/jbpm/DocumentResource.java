@@ -27,6 +27,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.CREATE_DOC_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_XML;
@@ -34,11 +35,9 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENT
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENT_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.MessageFormat;
 
 import javax.mail.internet.MimeUtility;
 import javax.ws.rs.Consumes;
@@ -130,7 +129,7 @@ public class DocumentResource {
             return Response.ok().entity(entity).header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
         }  catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -157,7 +156,7 @@ public class DocumentResource {
             return notFound("Document with id " + documentId + " not found", v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -181,7 +180,7 @@ public class DocumentResource {
             return createCorrectVariant(documents, headers, Response.Status.OK, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -208,7 +207,7 @@ public class DocumentResource {
             return createCorrectVariant(identifier, headers, Response.Status.CREATED, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -238,7 +237,7 @@ public class DocumentResource {
             return notFound("Document with id " + documentId + " not found", v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -264,7 +263,7 @@ public class DocumentResource {
             return notFound("Document with id " + documentId + " not found", v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 }

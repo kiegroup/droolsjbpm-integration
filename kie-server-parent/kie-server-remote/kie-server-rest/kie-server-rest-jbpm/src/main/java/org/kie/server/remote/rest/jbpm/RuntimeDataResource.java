@@ -49,6 +49,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVari
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEF_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
@@ -66,7 +67,6 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINIT
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -209,7 +209,7 @@ public class RuntimeDataResource {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -515,7 +515,7 @@ public class RuntimeDataResource {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM, workItemId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -542,7 +542,7 @@ public class RuntimeDataResource {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -572,7 +572,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -606,7 +606,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
 
     }
@@ -638,7 +638,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -668,7 +668,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -698,7 +698,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -726,7 +726,7 @@ public class RuntimeDataResource {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 
@@ -760,7 +760,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
 }
