@@ -87,7 +87,7 @@ public abstract class AbstractCaseResource {
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+                    errorMessage(e), v, conversationIdHeader);
         }
     }
 
