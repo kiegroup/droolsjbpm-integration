@@ -15,25 +15,22 @@
 
 package org.kie.server.services.dmn;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.kie.api.runtime.KieSession;
-import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNModel;
-import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.ast.DecisionServiceNode;
 import org.kie.dmn.api.core.ast.InputDataNode;
-import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.core.ast.InputDataNodeImpl;
 import org.kie.dmn.core.ast.ItemDefNodeImpl;
+import org.kie.dmn.core.internal.utils.DMNEvaluationUtils;
+import org.kie.dmn.core.internal.utils.DMNEvaluationUtils.DMNEvaluationResult;
 import org.kie.dmn.model.api.InputData;
 import org.kie.dmn.model.api.ItemDefinition;
 import org.kie.server.api.model.ServiceResponse;
@@ -173,58 +170,18 @@ public class ModelEvaluatorServiceBase {
             LOG.debug("Will deserialize payload: {}", contextPayload);
             DMNContextKS evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNContextKS.class);
             
-            DMNModel model;
-            if ( evalCtx.getModelName() == null ) {
-                if ( dmnRuntime.getModels().size() > 1 ) {
-                    throw new RuntimeException("more than one (default) model");
-                }
-                
-                model = dmnRuntime.getModels().get(0);
-            } else {
-                model = dmnRuntime.getModel(evalCtx.getNamespace(), evalCtx.getModelName());
-            }
-            if ( model == null ) {
-                throw new RuntimeException("Unable to locate DMN Model to evaluate");
-            }
-            LOG.debug("Will use model: {}", model);
-            
-            DMNContext dmnContext = DMNFactory.newContext();
-            for ( Entry<String, Object> e : evalCtx.getDmnContext().entrySet() ) {
-                dmnContext.set(e.getKey(), e.getValue());
-            }
-            LOG.debug("Will use dmnContext: {}", dmnContext);
-            
-            DMNResult result = null;
+            DMNEvaluationResult evaluationResult = DMNEvaluationUtils.evaluate(dmnRuntime,
+                                                                               evalCtx.getNamespace(),
+                                                                               evalCtx.getModelName(),
+                                                                               evalCtx.getDmnContext(),
+                                                                               evalCtx.getDecisionNames(),
+                                                                               evalCtx.getDecisionIds(),
+                                                                               evalCtx.getDecisionServiceName());
 
-            final List<String> names = Optional.ofNullable(evalCtx.getDecisionNames()).orElse(Collections.emptyList());
-            final List<String> ids = Optional.ofNullable(evalCtx.getDecisionIds()).orElse(Collections.emptyList());
-            final String decisionServiceName = evalCtx.getDecisionServiceName();
-
-            if (decisionServiceName == null && names.isEmpty() && ids.isEmpty()) {
-                // then implies evaluate All decisions
-                LOG.debug("Invoking evaluateAll...");
-                result = dmnRuntime.evaluateAll(model, dmnContext);
-            } else if (decisionServiceName != null && names.isEmpty() && ids.isEmpty()) {
-                LOG.debug("Invoking evaluateDecisionService using decisionServiceName: {}", decisionServiceName);
-                result = dmnRuntime.evaluateDecisionService(model, dmnContext, decisionServiceName);
-            } else if ( !names.isEmpty()  && ids.isEmpty() ) {
-                LOG.debug("Invoking evaluateDecisionByName using {}", names);
-                result = dmnRuntime.evaluateByName( model, dmnContext, names.toArray(new String[]{}) );
-            } else if ( !ids.isEmpty() && names.isEmpty() ) {
-                LOG.debug("Invoking evaluateDecisionById using {}", ids);
-                result = dmnRuntime.evaluateById( model, dmnContext, ids.toArray(new String[]{}) );
-            } else {
-                LOG.debug("Not supported case");
-                throw new RuntimeException("Unable to locate DMN Decision to evaluate");
-            }
-            
-            LOG.debug("Result:");
-            LOG.debug("{}",result);
-            LOG.debug("{}",result.getContext());
-            LOG.debug("{}",result.getDecisionResults());
-            LOG.debug("{}",result.getMessages());
-            
-            DMNResultKS res = new DMNResultKS(model.getNamespace(), model.getName(), evalCtx.getDecisionNames(), result);
+            DMNResultKS res = new DMNResultKS(evaluationResult.model.getNamespace(),
+                                              evaluationResult.model.getName(),
+                                              evalCtx.getDecisionNames(),
+                                              evaluationResult.result);
             
             kieSession.dispose();
             return new ServiceResponse<DMNResultKS>(
