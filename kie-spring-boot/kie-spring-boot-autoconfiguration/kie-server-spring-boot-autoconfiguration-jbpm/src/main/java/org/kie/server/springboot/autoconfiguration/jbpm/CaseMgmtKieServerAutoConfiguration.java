@@ -53,8 +53,6 @@ public class CaseMgmtKieServerAutoConfiguration {
     @ConditionalOnMissingBean(name = "caseMgmtServerExtension")
     @ConditionalOnProperty(name = "kieserver.casemgmt.enabled")
     public KieServerExtension caseMgmtServerExtension() {
-
         return new SpringBootCaseKieServerExtension(caseService, caseRuntimeDataService, caseInstanceMigrationService);
-
     }
 }

@@ -1238,8 +1238,6 @@
                       <argument>-Dorg.jbpm.document.storage=${org.jbpm.document.storage}</argument>
                       <argument>-Dkie.server.base.http.url=${kie.server.base.http.url}</argument>
                       <argument>-Dorg.kie.server.mode=${org.kie.server.mode.production}</argument>
-                      <!-- Enable Prometheus extension by system property as only enabled extensions can be used and published by Kie server SpringBoot in current implementation. -->
-                      <argument>-Dorg.kie.prometheus.server.ext.disabled=false</argument>
                       <argument>org.springframework.boot.loader.JarLauncher</argument>
                     </arguments>
                   </configuration>

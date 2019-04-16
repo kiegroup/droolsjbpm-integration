@@ -44,7 +44,6 @@ public class DMNKieServerAutoConfiguration {
     @ConditionalOnMissingBean(name = "dmnServerExtension")
     @ConditionalOnProperty(name = "kieserver.dmn.enabled")
     public KieServerExtension dmnServerExtension() {
-
         return new DMNKieServerExtension();
     }
 }

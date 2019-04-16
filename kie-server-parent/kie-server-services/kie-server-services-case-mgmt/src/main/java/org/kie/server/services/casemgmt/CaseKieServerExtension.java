@@ -11,13 +11,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.services.casemgmt;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
@@ -91,9 +92,8 @@ public class CaseKieServerExtension implements KieServerExtension {
             logger.warn("jBPM extension not found, Case Management cannot work without jBPM extension, disabling itself");
             return;
         }
-        
+
         configureServices(kieServer, registry);
-        
 
         this.services.add(this.caseManagementServiceBase);
         this.services.add(this.caseManagementRuntimeDataService);
@@ -103,9 +103,9 @@ public class CaseKieServerExtension implements KieServerExtension {
 
         initialized = true;
     }
-    
+
     protected void configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
-        
+
         KieServerExtension jbpmExtension = registry.getServerExtension("jBPM");
         List<Object> jbpmServices = jbpmExtension.getServices();
         RuntimeDataService runtimeDataService = null;
@@ -113,22 +113,21 @@ public class CaseKieServerExtension implements KieServerExtension {
         DeploymentService deploymentService = null;
         ProcessInstanceMigrationService processInstanceMigrationService = null;
 
-
-        for( Object object : jbpmServices ) {
+        for (Object object : jbpmServices) {
             // in case given service is null (meaning was not configured) continue with next one
             if (object == null) {
                 continue;
             }
-            if( RuntimeDataService.class.isAssignableFrom(object.getClass()) ) {
+            if (RuntimeDataService.class.isAssignableFrom(object.getClass())) {
                 runtimeDataService = (RuntimeDataService) object;
                 continue;
-            } else if( ProcessService.class.isAssignableFrom(object.getClass()) ) {
+            } else if (ProcessService.class.isAssignableFrom(object.getClass())) {
                 processService = (ProcessService) object;
                 continue;
-            } else if( DeploymentService.class.isAssignableFrom(object.getClass()) ) {
+            } else if (DeploymentService.class.isAssignableFrom(object.getClass())) {
                 deploymentService = (DeploymentService) object;
                 continue;
-            } else if( ProcessInstanceMigrationService.class.isAssignableFrom(object.getClass()) ) {
+            } else if (ProcessInstanceMigrationService.class.isAssignableFrom(object.getClass())) {
                 processInstanceMigrationService = (ProcessInstanceMigrationService) object;
                 continue;
             }
@@ -151,16 +150,16 @@ public class CaseKieServerExtension implements KieServerExtension {
         ((CaseServiceImpl) caseService).setRuntimeDataService(runtimeDataService);
         ((CaseServiceImpl) caseService).setCommandService(new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName)));
         ((CaseServiceImpl) caseService).setAuthorizationManager(new AuthorizationManagerImpl(registry.getIdentityProvider(),
-                new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName))));
+                                                                                             new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName))));
         ((CaseServiceImpl) caseService).setIdentityProvider(registry.getIdentityProvider());
 
         // build case configuration on deployment listener
         CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(registry.getIdentityProvider());
 
         // configure case mgmt services as listeners
-        ((KModuleDeploymentService)deploymentService).addListener((CaseRuntimeDataServiceImpl) caseRuntimeDataService);
-        ((KModuleDeploymentService)deploymentService).addListener(configurationListener);
-        
+        ((KModuleDeploymentService) deploymentService).addListener((CaseRuntimeDataServiceImpl) caseRuntimeDataService);
+        ((KModuleDeploymentService) deploymentService).addListener(configurationListener);
+
         CaseInstanceMigrationService caseInstanceMigrationService = new CaseInstanceMigrationServiceImpl();
         ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setCaseRuntimeDataService(caseRuntimeDataService);
         ((CaseInstanceMigrationServiceImpl) caseInstanceMigrationService).setCommandService(new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName)));
@@ -182,7 +181,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         ServiceLoader<CaseIdGenerator> generators = ServiceLoader.load(CaseIdGenerator.class);
 
         for (CaseIdGenerator generator : generators) {
-            if (generator.getIdentifier().equals(selectedGenerator))  {
+            if (generator.getIdentifier().equals(selectedGenerator)) {
                 return generator;
             }
         }
@@ -234,13 +233,13 @@ public class CaseKieServerExtension implements KieServerExtension {
         }
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices = ServiceLoader.load(KieServerApplicationComponentsService.class);
 
-        Object [] services = {
+        Object[] services = {
                 caseManagementServiceBase,
                 caseManagementRuntimeDataService,
                 caseAdminServiceBase,
                 registry
         };
-        for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
+        for (KieServerApplicationComponentsService appComponentsService : appComponentsServices) {
             appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
         }
         return appComponentsList;
@@ -254,7 +253,9 @@ public class CaseKieServerExtension implements KieServerExtension {
         if (serviceType.isAssignableFrom(kieContainerCommandService.getClass())) {
             return (T) kieContainerCommandService;
         }
-        return null;
+
+        final Optional<Object> service = services.stream().filter(s -> serviceType.isAssignableFrom(s.getClass())).findFirst();
+        return (T) service.orElse(null);
     }
 
     @Override
@@ -281,15 +282,14 @@ public class CaseKieServerExtension implements KieServerExtension {
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
     }
-    
 
     @Override
     public List<Message> healthCheck(boolean report) {
         List<Message> messages = KieServerExtension.super.healthCheck(report);
-        
+
         if (report) {
             messages.add(new Message(Severity.INFO, getExtensionName() + " is alive"));
-        }        
+        }
         return messages;
     }
 }

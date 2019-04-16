@@ -42,6 +42,10 @@ public class PrometheusMetrics {
         return IntStream.range(start, end).mapToDouble(l -> toMicro((long) l)).toArray();
     }
 
+    protected static double millisToSeconds(long millis) {
+        return millis / 1000.0;
+    }
+
     private static double[] ONE_TO_FIVE = rangeNano(1, 5);
 
     private static final double[] DECISION_TIME_BUCKETS;
