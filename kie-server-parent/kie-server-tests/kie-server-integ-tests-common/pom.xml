@@ -304,6 +304,7 @@
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>true</org.kie.prometheus.server.ext.disabled>
               <org.kie.swagger.server.ext.disabled>true</org.kie.swagger.server.ext.disabled>
               <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
             </systemProperties>

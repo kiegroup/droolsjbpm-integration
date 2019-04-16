@@ -79,6 +79,7 @@ kieserver.dmn.enabled=true
 kieserver.jbpm.enabled=true
 kieserver.jbpmui.enabled=true
 kieserver.casemgmt.enabled=true
+kieserver.prometheus.enabled=true
 ```
 
 Additional configuration properties that might be relevant (depending on application needs) can be found at https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties

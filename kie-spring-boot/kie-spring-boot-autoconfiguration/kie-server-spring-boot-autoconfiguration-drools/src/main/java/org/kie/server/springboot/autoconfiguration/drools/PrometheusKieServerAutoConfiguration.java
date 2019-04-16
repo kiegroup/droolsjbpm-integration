@@ -16,10 +16,16 @@
 
 package org.kie.server.springboot.autoconfiguration.drools;
 
+import org.jbpm.casemgmt.api.event.CaseEventListener;
+import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.task.TaskLifeCycleEventListener;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.prometheus.PrometheusKieServerExtension;
+import org.kie.server.services.prometheus.PrometheusCaseEventListener;
+import org.kie.server.services.prometheus.PrometheusProcessEventListener;
+import org.kie.server.services.prometheus.PrometheusTaskEventListener;
 import org.kie.server.springboot.autoconfiguration.KieServerProperties;
+import org.kie.server.springboot.autoconfiguration.drools.extensions.SpringBootPrometheusKieServerExtension;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,6 +44,24 @@ public class PrometheusKieServerAutoConfiguration {
     @ConditionalOnMissingBean(name = "prometheusServerExtension")
     @ConditionalOnProperty(name = "kieserver.prometheus.enabled")
     public KieServerExtension prometheusServerExtension() {
-        return new PrometheusKieServerExtension();
+        return new SpringBootPrometheusKieServerExtension();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "kieserver.prometheus.enabled")
+    public ProcessEventListener processEventListener() {
+        return new PrometheusProcessEventListener();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "kieserver.prometheus.enabled")
+    public CaseEventListener caseEventListener() {
+        return new PrometheusCaseEventListener();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "kieserver.prometheus.enabled")
+    public TaskLifeCycleEventListener taskEventListener() {
+        return new PrometheusTaskEventListener();
     }
 }
