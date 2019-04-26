@@ -36,6 +36,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.*;
@@ -96,8 +97,13 @@ public class DMNMetricIntegrationTest
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             String res = response.readEntity(String.class);
-            logger.info("Response: " + res);
+            logger.debug("Response: " + res);
             Assert.assertThat(res, not(isEmptyOrNullString()));
+            assertThat(res).contains(
+                  "dmn_evaluate_decision_nanosecond_bucket",
+                  "dmn_evaluate_decision_nanosecond_count",
+                  "dmn_evaluate_decision_nanosecond_sum"
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
