@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.naming.InitialContext;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
@@ -356,6 +357,7 @@ public class KieServerImpl {
                 synchronized (kci) {
                     kci.setStatus(KieContainerStatus.DISPOSING); // just in case
                     if (kci.getKieContainer() != null) {
+                        org.kie.api.builder.ReleaseId releaseId = kci.getKieContainer().getReleaseId();
                         List<KieServerExtension> disposedExtensions = new ArrayList<KieServerExtension>();
                         try {
                             // first attempt to dispose container on all extensions
@@ -371,7 +373,6 @@ public class KieServerImpl {
                             logger.warn("Dispose of container {} failed, putting it back to started state by recreating container on {}", containerId, disposedExtensions);
 
                             // since the dispose fail rollback must take place to put it back to running state
-                            org.kie.api.builder.ReleaseId releaseId = kci.getKieContainer().getReleaseId();
                             Map<String, Object> parameters = getCreateContainerParameters(releaseId);
                             for (KieServerExtension extension : disposedExtensions) {
                                 extension.createContainer(containerId, kci, parameters);
@@ -391,6 +392,7 @@ public class KieServerImpl {
                         kci.setKieContainer(null); // helps reduce concurrent access issues
                         // this may fail, but we already removed the container from the registry
                         kieContainer.dispose();
+                        ks.getRepository().removeKieModule(releaseId);
                         logger.info("Container {} (for release id {}) successfully stopped", containerId, kci.getResource().getReleaseId());
 
                         // store the current state of the server
