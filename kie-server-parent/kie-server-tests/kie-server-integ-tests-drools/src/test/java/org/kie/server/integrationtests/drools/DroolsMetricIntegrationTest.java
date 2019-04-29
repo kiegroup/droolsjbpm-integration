@@ -40,6 +40,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.*;
@@ -115,8 +116,13 @@ public class DroolsMetricIntegrationTest extends DroolsKieServerBaseIntegrationT
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             String res = response.readEntity(String.class);
-            logger.info("response: " + res);
+            logger.debug("response: " + res);
             Assert.assertThat(res, not(isEmptyOrNullString()));
+            assertThat(res).contains(
+                "drl_match_fired_nanosecond_bucket",
+                "drl_match_fired_nanosecond_count",
+                "drl_match_fired_nanosecond_sum"
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
