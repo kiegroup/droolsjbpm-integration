@@ -17,8 +17,14 @@
 package org.kie.server.integrationtests.prometheus;
 
 import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -35,25 +41,40 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
+import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
 
 public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static final String CONTAINER_ID = "prometheus";
+    private static final String CONTAINER_ID_CASE = "prometheus-case";
     private static final String PROCESS_ID = "per-process-instance-project.usertask";
     private static final String USER_ID = "yoda";
+
+    private static final String CASE_DEF_ID = "UserTaskCase";
+    private static final String CASE_OWNER_ROLE = "owner";
+    private static final String CASE_CONTACT_ROLE = "contact";
+
+    protected static final String BUSINESS_KEY = "test key";
+    protected static final String PRINT_OUT_COMMAND = "org.jbpm.executor.commands.PrintOutCommand";
+
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "per-process-instance-project", "1.0.0.Final");
+    private static ReleaseId caseReleaseId = new ReleaseId("org.kie.server.testing", "case-insurance", "1.0.0.Final");
     private static Client httpClient;
 
     @AfterClass
@@ -68,8 +89,10 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/per-process-instance-project");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/case-insurance");
 
         createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID_CASE, caseReleaseId);
     }
 
     protected String getMetrics() {
@@ -135,5 +158,76 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
                 "kie_server_task_duration_seconds_sum{deployment_id=\"prometheus\",process_id=\"per-process-instance-project.usertask\",task_name=\"First task\",}",
                 format("kie_server_task_exited_total{deployment_id=\"prometheus\",process_id=\"per-process-instance-project.usertask\",task_name=\"First task\",} %d.0", exitedTasks)
         );
+    }
+
+    @Test
+    public void testPrometheusCaseMetrics() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        assertThat(caseId).isNotEmpty();
+
+        assertThat(getMetrics()).contains(
+              "kie_server_case_started_total{case_definition_id=\"" + CASE_DEF_ID + "\",",
+              "kie_server_case_running_total{case_definition_id=\"" + CASE_DEF_ID + "\","
+        );
+
+        caseClient.cancelCaseInstance(CONTAINER_ID_CASE, caseId);
+
+        assertThat(getMetrics()).contains(
+              "kie_server_case_started_total{case_definition_id=\"" + CASE_DEF_ID + "\",",
+              "kie_server_case_running_total{case_definition_id=\"" + CASE_DEF_ID + "\",",
+              "kie_server_case_duration_seconds_count{case_definition_id=\"" + CASE_DEF_ID + "\",",
+              "kie_server_case_duration_seconds_sum{case_definition_id=\"" + CASE_DEF_ID + "\","
+        );
+    }
+
+    @Test
+    public void testPrometheusJobMetrics() throws Exception {
+        int currentNumberOfCancelled = jobServicesClient.getRequestsByStatus(Collections.singletonList(STATUS.CANCELLED.toString()), 0, 1000).size();
+        int currentNumberOfDone = jobServicesClient.getRequestsByStatus(Collections.singletonList(STATUS.DONE.toString()), 0, 1000).size();
+
+        Instant tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
+
+        JobRequestInstance jobRequestInstanceTomorrow = createJobRequestInstance();
+        jobRequestInstanceTomorrow.setScheduledDate(Date.from(tomorrow));
+        Long jobIdTomorrow = jobServicesClient.scheduleRequest(jobRequestInstanceTomorrow);
+        jobServicesClient.cancelRequest(jobIdTomorrow);
+
+        JobRequestInstance jobRequestInstanceNow = createJobRequestInstance();
+        Long jobIdNow = jobServicesClient.scheduleRequest(jobRequestInstanceNow);
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobIdNow);
+
+        assertThat(getMetrics()).contains(
+              "kie_server_job_scheduled_total{container_id=\"\",command_name=\"" + PRINT_OUT_COMMAND + "\",}",
+              "kie_server_job_cancelled_total{container_id=\"\",command_name=\"" + PRINT_OUT_COMMAND + "\",} " + (currentNumberOfCancelled + 1)
+              // Uncomment when JBPM-8452 is resolved.
+//              "kie_server_job_executed_total{container_id=\"\",failed=\"false\",command_name=\"" + PRINT_OUT_COMMAND + "\",} " + (currentNumberOfDone + 1),
+//              "kie_server_job_running_total{container_id=\"\",command_name=\"" + PRINT_OUT_COMMAND + "\",}",
+//              "kie_server_job_duration_seconds_count{container_id=\"\",command_name=\"" + PRINT_OUT_COMMAND + "\",}",
+//              "kie_server_job_duration_seconds_sum{container_id=\"\",command_name=\"" + PRINT_OUT_COMMAND + "\",}"
+          );
+    }
+
+    private String startUserTaskCase(String owner, String contact) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("s", "first case started");
+        CaseFile caseFile = CaseFile.builder()
+                .addUserAssignments(CASE_OWNER_ROLE, owner)
+                .addUserAssignments(CASE_CONTACT_ROLE, contact)
+                .data(data)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID_CASE, CASE_DEF_ID, caseFile);
+        assertNotNull(caseId);
+        return caseId;
+    }
+
+    private JobRequestInstance createJobRequestInstance() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("businessKey", BUSINESS_KEY);
+
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(PRINT_OUT_COMMAND);
+        jobRequestInstance.setData(data);
+        return jobRequestInstance;
     }
 }
