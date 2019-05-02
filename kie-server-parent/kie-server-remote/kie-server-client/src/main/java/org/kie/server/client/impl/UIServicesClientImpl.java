@@ -15,8 +15,10 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -210,6 +212,21 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
         }
     }
 
+    protected String createColorURLParams(String completeNodeColor, String completeNodeBorderColor, String activeNodeBorderColor) {
+        List<String> params = new ArrayList<>();
+        if(completeNodeColor != null && !completeNodeColor.isEmpty()) {
+            params.add(RestURI.SVG_NODE_COMPLETED_COLOR + "=" + encode(completeNodeColor));
+        }
+        if(completeNodeBorderColor != null && !completeNodeBorderColor.isEmpty()) {
+            params.add(RestURI.SVG_NODE_COMPLETED_BORDER_COLOR + "=" + encode(completeNodeBorderColor));
+        }
+        if(activeNodeBorderColor != null && !activeNodeBorderColor.isEmpty()) {
+            params.add(RestURI.SVG_NODE_ACTIVE_COLOR + "=" + encode(activeNodeBorderColor));
+        }
+
+        return String.join("&", params);
+    }
+
     @Override
     public String getProcessInstanceImageCustomColor(String containerId, Long processInstanceId, String completeNodeColor,
                                                      String completeNodeBorderColor, String activeNodeBorderColor) {
@@ -218,16 +235,13 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.PROCESS_INST_ID, processInstanceId);
 
-            StringBuffer params = new StringBuffer();
-            params.append(RestURI.SVG_NODE_COMPLETED_COLOR + "=").append(encode(completeNodeColor));
-            params.append("&" + RestURI.SVG_NODE_COMPLETED_BORDER_COLOR + "=").append(encode(completeNodeBorderColor));
-            params.append("&" + RestURI.SVG_NODE_ACTIVE_COLOR + "=").append(encode(activeNodeBorderColor));
+            String colorURLParams = createColorURLParams(completeNodeColor, completeNodeBorderColor, activeNodeBorderColor);
 
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("Accept", MediaType.APPLICATION_SVG_XML);
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI + "?" + params.toString(),
+                    build(loadBalancer.getUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI + "?" + colorURLParams,
                           valuesMap), headers);
         } else {
             CommandScript script = new CommandScript(Collections.singletonList(
