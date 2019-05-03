@@ -26,15 +26,15 @@
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly14x</cargo.container.id>
         <kie.server.classifier>ee7</kie.server.classifier>
-        <!-- This property needs to be overridden when running tests against 
-            different version of the WAR (e.g. running SNAPSHOT tests against Beta3 WAR) 
+        <!-- This property needs to be overridden when running tests against
+            different version of the WAR (e.g. running SNAPSHOT tests against Beta3 WAR)
             so the tests actually know what exact version of server is being tested -->
         <kie.server.version>${project.version}</kie.server.version>
         <container.port>19090</container.port>
         <kie.server.context>kie-server</kie.server.context>
         <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
         <kie.server.classifier>ee7</kie.server.classifier>
-        <!-- Path to Kie server WAR file. Used for referencing WAR file in 
+        <!-- Path to Kie server WAR file. Used for referencing WAR file in
             on-demand deployment/undeployment. -->
         <!-- <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path> -->
         <org.kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml</org.kie.server.controller.templatefile>
@@ -234,7 +234,7 @@
                                 <version>${version.org.wildfly}</version>
                             </artifactInstaller>
                             <systemProperties>
-                                <!-- disable JMS support for executor to 
+                                <!-- disable JMS support for executor to
                                     use same tests for all containers for jbpm executor -->
                                 <org.kie.executor.jms>false</org.kie.executor.jms>
                                 <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
@@ -269,7 +269,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
-                            <!-- Reuse yoda user for deploying and undeploying 
+                            <!-- Reuse yoda user for deploying and undeploying
                                 Kie server from within the test -->
                             <kie-server.endpoint>${kie.server.base.http.url}</kie-server.endpoint>
                             <cargo.remote.username>yoda</cargo.remote.username>
@@ -326,7 +326,7 @@
                         <deployable>
                             <groupId>org.kie.server</groupId>
                             <artifactId>kie-server</artifactId>
-                            <!-- default, may be overridden in container 
+                            <!-- default, may be overridden in container
                                 specific profiles -->
                             <classifier>${kie.server.classifier}</classifier>
                             <type>war</type>
