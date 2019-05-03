@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-autoconfiguration</artifactId>
-    <version>7.21.0-SNAPSHOT</version>
+    <version>7.22.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-autoconfiguration</artifactId>
   <name>KIE :: Spring :: Boot :: KIE Server Auto Configuration</name>
