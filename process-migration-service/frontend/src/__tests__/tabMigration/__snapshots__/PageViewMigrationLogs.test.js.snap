@@ -1,0 +1,120 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PageViewMigrationLogs renders correctly using snapshot 1`] = `
+<div>
+  <div>
+    <div
+      className="form-horizontal"
+    >
+      <div
+        className="form-group required"
+      >
+        <label
+          className="col-sm-2 control-label"
+        >
+          ID
+        </label>
+        <div
+          className="col-sm-10"
+        >
+          1
+        </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-2 control-label"
+        >
+          Start Date
+        </label>
+        <div
+          className="col-sm-10"
+        >
+          2019-02-03T21:17:54.739Z
+        </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-2 control-label"
+        >
+          End Date
+        </label>
+        <div
+          className="col-sm-10"
+        >
+          2019-02-03T21:17:54.854Z
+        </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-2 control-label"
+        >
+          Successful
+        </label>
+        <div
+          className="col-sm-10"
+        >
+          true
+        </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-2 control-label"
+        >
+          Logs
+        </label>
+        <div
+          className="col-sm-10"
+        >
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Variable instances updated = 3 for process instance id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Node instances updated = 3 for process instance id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Process instances updated = 1 for process instance id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Task variables updated = 4 for process instance id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Task audit updated = 1 for process instance id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Tasks updated = 1 for process instance id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Context info updated = 0 for process instance id 1
+          </li>
+          <li>
+            WARN Sun Feb 03 16:17:54 EST 2019 Source and target process id is exactly the same (evaluation) it's recommended to use unique process ids
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Node instance logs to be updated  = [1]
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Node instance logs updated = 1 for node instance id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Task audit updated = 1 for task id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Task updated = 1 for task id 1
+          </li>
+          <li>
+            INFO Sun Feb 03 16:17:54 EST 2019 Migration of process instance (1) completed successfully to process evaluation
+          </li>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

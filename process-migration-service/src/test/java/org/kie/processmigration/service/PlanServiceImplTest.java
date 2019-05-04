@@ -16,18 +16,17 @@
 
 package org.kie.processmigration.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.kie.processmigration.model.Plan;
 import org.kie.processmigration.service.impl.PlanServiceImpl;
+
+import javax.inject.Inject;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class PlanServiceImplTest extends AbstractPersistenceTest {

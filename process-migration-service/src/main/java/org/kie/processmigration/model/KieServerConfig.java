@@ -16,9 +16,8 @@
 
 package org.kie.processmigration.model;
 
-import org.kie.server.client.CredentialsProvider;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.kie.server.client.CredentialsProvider;
 
 public class KieServerConfig {
 

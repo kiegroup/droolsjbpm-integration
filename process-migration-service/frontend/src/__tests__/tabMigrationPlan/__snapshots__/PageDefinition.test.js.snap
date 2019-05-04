@@ -1,0 +1,155 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PageDefinition renders correctly using snapshot 1`] = `
+<div
+  className="form-horizontal"
+>
+  <p />
+  <div>
+    <div
+      className="form-group required"
+    >
+      <label
+        className="col-sm-2 control-label"
+      >
+        Source 
+         ContainerID
+      </label>
+      <div
+        className="col-sm-10"
+      >
+        <input
+          className="form-control"
+          name="ContainerId"
+          onChange={[Function]}
+          type="text"
+          value=""
+        />
+      </div>
+    </div>
+    <div
+      className="form-group required"
+    >
+      <label
+        className="col-sm-2 control-label"
+      >
+        Source 
+         ProcessId
+      </label>
+      <div
+        className="col-sm-10"
+      >
+        <input
+          className="form-control"
+          name="processId"
+          onChange={[Function]}
+          type="text"
+          value=""
+        />
+      </div>
+    </div>
+  </div>
+  <button
+    className="btn btn-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+     
+    Copy Source To Target
+  </button>
+  <p />
+  <div>
+    <div
+      className="form-group required"
+    >
+      <label
+        className="col-sm-2 control-label"
+      >
+        Target 
+         ContainerID
+      </label>
+      <div
+        className="col-sm-10"
+      >
+        <input
+          className="form-control"
+          name="ContainerId"
+          onChange={[Function]}
+          type="text"
+          value=""
+        />
+      </div>
+    </div>
+    <div
+      className="form-group required"
+    >
+      <label
+        className="col-sm-2 control-label"
+      >
+        Target 
+         ProcessId
+      </label>
+      <div
+        className="col-sm-10"
+      >
+        <input
+          className="form-control"
+          name="processId"
+          onChange={[Function]}
+          type="text"
+          value=""
+        />
+      </div>
+    </div>
+  </div>
+  <button
+    className="btn btn-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Retrieve definitions from backend
+  </button>
+  <div
+    className="form-group"
+  >
+    <label
+      className="col-sm-2 control-label"
+    >
+      evaluation_2.0.0-SNAPSHOT
+    </label>
+    <label
+      className="col-sm-2 control-label"
+    >
+      mortgage-process_1.0.0-SNAPSHOT
+    </label>
+  </div>
+  <div
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    <input
+      className="form-control"
+      id="hiddenField_sourceContainerId"
+      name="sourceContainerId"
+      type="text"
+    />
+    <input
+      className="form-control"
+      id="hiddenField_targetContainerId"
+      name="targetContainerId"
+      type="text"
+    />
+    <input
+      className="form-control"
+      id="hiddenField_targetProcessId"
+      name="targetProcessId"
+      type="text"
+    />
+  </div>
+</div>
+`;
