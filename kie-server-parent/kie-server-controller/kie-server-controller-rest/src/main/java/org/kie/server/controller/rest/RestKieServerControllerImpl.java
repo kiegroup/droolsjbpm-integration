@@ -51,6 +51,10 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
         String contentType = getContentType(headers);
         logger.debug("Received connect request from server with id {}", id);
         KieServerInfo serverInfo = unmarshal(serverInfoPayload, contentType, KieServerInfo.class);
+        if (serverInfo == null) {
+            serverInfo = new KieServerInfo();
+            serverInfo.setServerId(id);
+        }
         logger.debug("Server info {}", serverInfo);
         KieServerSetup serverSetup = connect(serverInfo);
 
@@ -68,7 +72,9 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
                                         @PathParam("serverInstanceId") String id,
                                         @QueryParam("location") String serverLocation) {
         try {
-            KieServerInfo serverInfo = new KieServerInfo(id, "", "", Collections.<String>emptyList(), URLDecoder.decode(serverLocation, "UTF-8"));
+            String location = serverLocation == null || serverLocation.trim().length() == 0 
+                    ? "" : URLDecoder.decode(serverLocation, "UTF-8");
+            KieServerInfo serverInfo = new KieServerInfo(id, "", "", Collections.<String>emptyList(), location);
             disconnect(serverInfo);
             logger.info("Server with id '{}' disconnected", id);
         } catch (UnsupportedEncodingException e) {

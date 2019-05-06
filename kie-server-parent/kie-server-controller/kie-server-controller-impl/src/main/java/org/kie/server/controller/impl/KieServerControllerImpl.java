@@ -64,23 +64,34 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
     @Override
     public synchronized KieServerSetup connect(KieServerInfo serverInfo) {
-
-        ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
+        boolean isKieServerLocationAvailable = isKieServerLocationAvailable(serverInfo);
+        String serverId = serverInfo.getServerId();
+        ServerTemplate serverTemplate = templateStorage.load(serverId);
         KieServerSetup serverSetup = new KieServerSetup();
-        ServerInstanceKey serverInstanceKey = ModelFactory.newServerInstanceKey(serverInfo.getServerId(), serverInfo.getLocation());
+        ServerInstanceKey serverInstanceKey = null;
         List<Container> containerList = new ArrayList<Container>();
-
+        if (isKieServerLocationAvailable) {
+            if (serverTemplate == null || serverTemplate.getServerInstance(serverId) == null) {
+                logger.warn("Trying to connect a detached or undefined KIE server: {} is not supported.", serverId);
+                return serverSetup;
+            } else {
+                serverInstanceKey = serverTemplate.getServerInstance(serverId);
+                serverInfo.setLocation(serverInstanceKey.getUrl());
+            }
+        } else {
+            serverInstanceKey = ModelFactory.newServerInstanceKey(serverInfo.getServerId(), serverInfo.getLocation());
+        }
         if (serverTemplate != null) {
             logger.debug("Server id {} know to the controller, checking if given server exists", serverInfo.getServerId());
-
 
             if (!serverTemplate.hasServerInstance(serverInfo.getLocation())) {
                 logger.debug("Server instance '{}' not yet registered", serverInfo.getLocation());
                 serverTemplate.addServerInstance(serverInstanceKey);
             }
-            templateStorage.update(serverTemplate);
-            logger.debug("KieServerInstance updated after connect from server {}", serverInfo.getLocation());
-
+            if (!isKieServerLocationAvailable) {
+                templateStorage.update(serverTemplate);
+                logger.debug("KieServerInstance updated after connect from server {}", serverInfo.getLocation());
+            }
 
             Set<KieContainerResource> containers = new HashSet<KieContainerResource>();
             for (ContainerSpec containerSpec : serverTemplate.getContainersSpec()) {
@@ -209,20 +220,24 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
     @Override
     public synchronized void disconnect(KieServerInfo serverInfo) {
-        ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
+        String id = serverInfo.getServerId();
+        ServerTemplate serverTemplate = templateStorage.load(id);
+        ServerInstanceKey serverInstanceKey = new ServerInstanceKey(id, id, id, "");
         if (serverTemplate != null) {
             logger.debug("Server id {} known to the controller, checking if given server exists", serverInfo.getServerId());
-
-            if (serverTemplate != null) {
-                logger.info("Server {} disconnected from controller", serverInfo.getLocation());
-                ServerInstanceKey serverInstanceKey = ModelFactory.newServerInstanceKey(serverInfo.getServerId(), serverInfo.getLocation());
+            if (!isKieServerLocationAvailable(serverInfo)) {
+                serverInstanceKey = ModelFactory.newServerInstanceKey(id, serverInfo.getLocation());
                 serverTemplate.deleteServerInstance(serverInstanceKey.getServerInstanceId());
-
                 templateStorage.update(serverTemplate);
-
-                notifyOnDisconnect(serverInstanceKey, serverTemplate);
             }
+            logger.info("Server {} disconnected from controller", serverInstanceKey);
+
+            notifyOnDisconnect(serverInstanceKey, serverTemplate);
         }
+    }
+
+    private boolean isKieServerLocationAvailable(KieServerInfo serverInfo) {
+        return serverInfo.getLocation() == null || serverInfo.getLocation().trim().length() == 0;
     }
 
     protected void notifyOnConnect(ServerInstance serverInstance) {
