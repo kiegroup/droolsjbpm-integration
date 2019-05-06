@@ -6,7 +6,6 @@ import moment from "moment";
 export default class PageMigrationScheduler extends Component {
   constructor(props) {
     super(props);
-    //this.disableScheduleTime();
     this.state = {
       dateTimeInput: true,
       validationMessageUrl: "",
@@ -49,10 +48,6 @@ export default class PageMigrationScheduler extends Component {
 
   handleDateTimeInput = inputMoment => {
     if (moment(inputMoment, "YYYY-MM-DDTHH:mm:ss", true).isValid()) {
-      //        this.props.setScheduleStartTime(inputMoment.format("YYYY/MM/DD hh:mm:ss a"));
-      //2019-01-30T13:00:00-05:00        this.props.setScheduleStartTime(inputMoment.format(moment.ISO_DATE_TIME));
-      //2019-01-30T18:00:00.000Z         this.props.setScheduleStartTime(inputMoment.toISOString());
-      //2019-01-30T18:00:00.000Z            this.props.setScheduleStartTime(inputMoment.toDate());
       this.props.setScheduleStartTime(inputMoment.toDate());
       this.setState({
         validationMessageTime: ""

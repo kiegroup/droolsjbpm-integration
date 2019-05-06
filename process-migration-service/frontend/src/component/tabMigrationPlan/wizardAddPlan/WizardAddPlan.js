@@ -139,7 +139,6 @@ export default class WizardAddPlan extends WizardBase {
     } = this.state;
 
     const renderAddPlanWizardContents = (wizardSteps, state, setInfo) => {
-      //        const { activeStepIndex, activeSubStepIndex, sourceInfo, targetInfo, migrationPlanJsonStr} = this.state;
       return wizardSteps.map((step, stepIndex) =>
         step.subSteps.map((sub, subStepIndex) => {
           if (stepIndex === 0) {

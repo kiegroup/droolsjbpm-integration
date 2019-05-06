@@ -133,7 +133,6 @@ export default class WizardExecuteMigration extends WizardBase {
     const { activeStepIndex, activeSubStepIndex } = this.state;
 
     const renderExecuteMigrationWizardContents = wizardSteps => {
-      //        const { activeStepIndex, activeSubStepIndex} = state;
       return wizardSteps.map((step, stepIndex) =>
         step.subSteps.map((sub, subStepIndex) => {
           if (stepIndex === 0) {

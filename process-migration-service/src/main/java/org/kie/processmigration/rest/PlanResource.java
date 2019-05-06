@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/plans")
 @Api(value = "Plans")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
 public class PlanResource {
@@ -53,7 +54,6 @@ public class PlanResource {
 
     @POST
     @ApiOperation(value = "Create a migration plan")
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(value = "Plan") Plan plan) {
         if (plan.getId() != 0) {
             throw new IllegalArgumentException("The plan ID must not be provided when creating a new plan");
@@ -64,7 +64,6 @@ public class PlanResource {
     @PUT
     @Path("/{id}")
     @ApiOperation(value = "Save a migration plan")
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response save(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id,
                          @ApiParam(value = "Plan") Plan plan) throws PlanNotFoundException {
         return Response.ok(planService.update(id, plan)).build();

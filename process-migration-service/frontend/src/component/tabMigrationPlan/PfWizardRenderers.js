@@ -25,7 +25,6 @@ export const renderWizardSteps = (
         <Wizard.SubStep
           key={subStepIndex}
           subStep={sub.subStep}
-          //          title={sub.title}
           activeSubStep={activeSubStep && activeSubStep.subStep}
         />
       ))}

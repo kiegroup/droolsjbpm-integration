@@ -32,11 +32,6 @@ export default class PageMappingDropdownNode extends React.Component {
   }
 
   render() {
-    //const defaultOption = this.state.selected;
-    //const placeHolderValue = typeof this.state.selected === 'string' ? this.state.selected : this.state.selected.value
-
-    //const title = 'Primary';
-
     return (
       <div>
         <DropdownButton title={this.state.title} id="PageMappingDropdownButton">
