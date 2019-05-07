@@ -90,20 +90,16 @@
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>jaxrs</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>thorntail-jdk-specific</artifactId>
+                    <groupId>io.thorntail.jdk-specific</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.thorntail</groupId>
-            <artifactId>microprofile-restclient</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>
@@ -177,16 +173,38 @@
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-junit4</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hibernate-jpa-2.1-api</artifactId>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>javax.activation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>arquillian</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>thorntail-jdk-specific</artifactId>
+                    <groupId>io.thorntail.jdk-specific</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jboss-modules</artifactId>
+                    <groupId>org.jboss.modules</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.kie.soup</groupId>
