@@ -358,6 +358,7 @@
                         </users>
                         <properties>
                             <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                            <cargo.jboss.management-http.port>19991</cargo.jboss.management-http.port>
                         </properties>
                     </configuration>
                 </configuration>
