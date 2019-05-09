@@ -40,6 +40,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.task.model.Status;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.ReleaseId;
@@ -47,6 +48,7 @@ import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.integrationtests.category.JEEOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -181,6 +183,7 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     }
 
     @Test
+    @Category(JEEOnly.class) // Executor in kie-server-integ-tests-all is using JMS for execution. Skipping test for non JEE containers as they don't have JMS.
     public void testPrometheusJobMetrics() throws Exception {
         int currentNumberOfCancelled = jobServicesClient.getRequestsByStatus(Collections.singletonList(STATUS.CANCELLED.toString()), 0, 1000).size();
         int currentNumberOfDone = jobServicesClient.getRequestsByStatus(Collections.singletonList(STATUS.DONE.toString()), 0, 1000).size();
