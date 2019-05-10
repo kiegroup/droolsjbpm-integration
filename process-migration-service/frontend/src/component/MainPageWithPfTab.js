@@ -13,8 +13,6 @@ import { DropdownButton, MenuItem } from "patternfly-react";
 
 import MigrationPlans from "./tabMigrationPlan/MigrationPlans";
 import MigrationDefinitions from "./tabMigration/MigrationDefinitions";
-import { MockupData_KIE_SERVER_ID } from "./common/MockupData";
-import { USE_MOCK_DATA } from "./common/PimConstants";
 import { BACKEND_URL } from "./common/PimConstants";
 
 export default class MainPageWithPfTab extends Component {
@@ -29,14 +27,10 @@ export default class MainPageWithPfTab extends Component {
   }
 
   componentDidMount() {
-    if (USE_MOCK_DATA) {
-      this.populateKieServers(MockupData_KIE_SERVER_ID, this);
-    } else {
-      const servicesUrl = BACKEND_URL + "/kieserver";
-      axios
-        .get(servicesUrl, {})
-        .then(res => this.populateKieServers(res.data, this));
-    }
+    const servicesUrl = BACKEND_URL + "/kieserver";
+    axios
+      .get(servicesUrl, {})
+      .then(res => this.populateKieServers(res.data, this));
   }
 
   populateKieServers(kieServerIds, self) {

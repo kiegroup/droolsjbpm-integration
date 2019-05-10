@@ -9,11 +9,7 @@ import { Tooltip } from "patternfly-react";
 import { Table } from "patternfly-react";
 import { actionHeaderCellFormatter } from "patternfly-react";
 
-import {
-  MockupData_Migrations_Definitions,
-  MockupData_Migrations_Logs
-} from "../common/MockupData";
-import { BACKEND_URL, USE_MOCK_DATA } from "../common/PimConstants";
+import { BACKEND_URL } from "../common/PimConstants";
 import PageViewMigrationLogs from "./PageViewMigrationLogs";
 import PageEditMigrationDefinitionModal from "./PageEditMigrationDefinitionModal";
 
@@ -45,20 +41,13 @@ export default class MigrationDefinitions extends Component {
     this.setState({
       showLogDialog: true
     });
-    if (USE_MOCK_DATA) {
+    const servicesUrl = BACKEND_URL + "/migrations/" + rowData.id + "/results";
+    axios.get(servicesUrl, {}).then(res => {
+      const results = res.data;
       this.setState({
-        migrationLogs: MockupData_Migrations_Logs
+        migrationLogs: results
       });
-    } else {
-      const servicesUrl =
-        BACKEND_URL + "/migrations/" + rowData.id + "/results";
-      axios.get(servicesUrl, {}).then(res => {
-        const results = res.data;
-        this.setState({
-          migrationLogs: results
-        });
-      });
-    }
+    });
   };
 
   showDeleteDialog = id => {
@@ -75,19 +64,14 @@ export default class MigrationDefinitions extends Component {
   };
 
   deleteMigration = () => {
-    if (USE_MOCK_DATA) {
-      this.hideDeleteDialog();
-      this.retrieveMigrationDefinitions();
-    } else {
-      //need to create a temp variable "self" to store this, so I can invoke this inside axios call
-      const self = this;
-      const servicesUrl =
-        BACKEND_URL + "/migrations/" + this.state.deleteMigrationId;
-      axios.delete(servicesUrl, {}).then(() => {
-        self.hideDeleteDialog();
-        self.retrieveMigrationDefinitions();
-      });
-    }
+    //need to create a temp variable "self" to store this, so I can invoke this inside axios call
+    const self = this;
+    const servicesUrl =
+      BACKEND_URL + "/migrations/" + this.state.deleteMigrationId;
+    axios.delete(servicesUrl, {}).then(() => {
+      self.hideDeleteDialog();
+      self.retrieveMigrationDefinitions();
+    });
   };
 
   retrieveMigrationDefinitions = event => {
@@ -117,37 +101,30 @@ export default class MigrationDefinitions extends Component {
       this.setState({
         validationMessage: ""
       });
-      if (USE_MOCK_DATA) {
-        const migrationsDefinitions = MockupData_Migrations_Definitions;
-        this.setState({
-          migrationsDefinitions
-        });
-      } else {
-        //search the migration record
-        if (input != null) {
-          let serviceUrl = BACKEND_URL + "/migrations/" + input.value;
-          if (
-            event != null &&
-            event.currentTarget.id == "id_migrationDefinition_refresh_button"
-          ) {
-            //For refresh, just retrieve all records
-            serviceUrl = BACKEND_URL + "/migrations/";
-          }
-
-          axios.get(serviceUrl, {}).then(res => {
-            var migrationsDefinitions = res.data;
-            if (migrationsDefinitions != null) {
-              const tmpStr = JSON.stringify(migrationsDefinitions);
-              if (tmpStr != "" && tmpStr.charAt(0) != "[") {
-                //this is single element json, need to change to json array, otherwise the table won't display
-                migrationsDefinitions = [migrationsDefinitions];
-              }
-            }
-            this.setState({
-              migrationsDefinitions
-            });
-          });
+      //search the migration record
+      if (input != null) {
+        let serviceUrl = BACKEND_URL + "/migrations/" + input.value;
+        if (
+          event != null &&
+          event.currentTarget.id == "id_migrationDefinition_refresh_button"
+        ) {
+          //For refresh, just retrieve all records
+          serviceUrl = BACKEND_URL + "/migrations/";
         }
+
+        axios.get(serviceUrl, {}).then(res => {
+          var migrationsDefinitions = res.data;
+          if (migrationsDefinitions != null) {
+            const tmpStr = JSON.stringify(migrationsDefinitions);
+            if (tmpStr != "" && tmpStr.charAt(0) != "[") {
+              //this is single element json, need to change to json array, otherwise the table won't display
+              migrationsDefinitions = [migrationsDefinitions];
+            }
+          }
+          this.setState({
+            migrationsDefinitions
+          });
+        });
       }
     }
   };

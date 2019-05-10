@@ -4,8 +4,7 @@ import axios from "axios";
 import { Button } from "patternfly-react";
 
 import PageDefinitionSearchTable from "./PageDefinitionSearchTable";
-import { Mockup_processMapping_Info } from "../../common/MockupData";
-import { BACKEND_URL, USE_MOCK_DATA } from "../../common/PimConstants";
+import { BACKEND_URL } from "../../common/PimConstants";
 
 export default class PageDefinition extends Component {
   constructor(props) {
@@ -65,92 +64,53 @@ export default class PageDefinition extends Component {
   };
 
   getDefinitions = () => {
-    if (USE_MOCK_DATA) {
-      const mockData = Mockup_processMapping_Info;
-      this.props.setInfo(mockData.sourceInfo, mockData.targetInfo);
+    const servicesUrl = BACKEND_URL + "/kieserver/definitions";
+    axios
+      .get(servicesUrl, {
+        params: {
+          sourceProcessId: this.state.sourceProcessId,
+          sourceContainerId: this.state.sourceContainerId,
+          targetProcessId: this.state.targetProcessId,
+          targetContainerId: this.state.targetContainerId,
+          kieServerId: this.props.kieServerIds
+        }
+      })
+      .then(res => {
+        this.props.setInfo(res.data.sourceInfo, res.data.targetInfo);
 
-      var input = document.getElementById("hiddenField_sourceContainerId");
-      var containerId =
-        this.state.sourceProcessId + "_" + this.state.sourceVersion;
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        "value"
-      ).set;
-      nativeInputValueSetter.call(input, containerId);
-      //once fired the event, this currentInputValue will be saved in the wizard form's values
-      var ev = new Event("input", { bubbles: true });
-      input.dispatchEvent(ev);
+        var input = document.getElementById("hiddenField_sourceContainerId");
+        var containerId = this.state.sourceContainerId;
+        var nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          "value"
+        ).set;
+        nativeInputValueSetter.call(input, containerId);
+        //once fired the event, this currentInputValue will be saved in the wizard form's values
+        var ev = new Event("input", { bubbles: true });
+        input.dispatchEvent(ev);
 
-      input = document.getElementById("hiddenField_targetContainerId");
-      containerId = this.state.targetProcessId + "_" + this.state.targetVersion;
-      nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        "value"
-      ).set;
-      nativeInputValueSetter.call(input, containerId);
-      //once fired the event, this currentInputValue will be saved in the wizard form's values
-      ev = new Event("input", { bubbles: true });
-      input.dispatchEvent(ev);
+        input = document.getElementById("hiddenField_targetContainerId");
+        containerId = this.state.targetContainerId;
+        nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          "value"
+        ).set;
+        nativeInputValueSetter.call(input, containerId);
+        //once fired the event, this currentInputValue will be saved in the wizard form's values
+        ev = new Event("input", { bubbles: true });
+        input.dispatchEvent(ev);
 
-      input = document.getElementById("hiddenField_targetProcessId");
-      var processId = this.state.targetProcessId;
-      nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        "value"
-      ).set;
-      nativeInputValueSetter.call(input, processId);
-      //once fired the event, this currentInputValue will be saved in the wizard form's values
-      ev = new Event("input", { bubbles: true });
-      input.dispatchEvent(ev);
-    } else {
-      const servicesUrl = BACKEND_URL + "/kieserver/definitions";
-      axios
-        .get(servicesUrl, {
-          params: {
-            sourceProcessId: this.state.sourceProcessId,
-            sourceContainerId: this.state.sourceContainerId,
-            targetProcessId: this.state.targetProcessId,
-            targetContainerId: this.state.targetContainerId,
-            kieServerId: this.props.kieServerIds
-          }
-        })
-        .then(res => {
-          this.props.setInfo(res.data.sourceInfo, res.data.targetInfo);
-
-          var input = document.getElementById("hiddenField_sourceContainerId");
-          var containerId = this.state.sourceContainerId;
-          var nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype,
-            "value"
-          ).set;
-          nativeInputValueSetter.call(input, containerId);
-          //once fired the event, this currentInputValue will be saved in the wizard form's values
-          var ev = new Event("input", { bubbles: true });
-          input.dispatchEvent(ev);
-
-          input = document.getElementById("hiddenField_targetContainerId");
-          containerId = this.state.targetContainerId;
-          nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype,
-            "value"
-          ).set;
-          nativeInputValueSetter.call(input, containerId);
-          //once fired the event, this currentInputValue will be saved in the wizard form's values
-          ev = new Event("input", { bubbles: true });
-          input.dispatchEvent(ev);
-
-          input = document.getElementById("hiddenField_targetProcessId");
-          var processId = this.state.targetProcessId;
-          nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype,
-            "value"
-          ).set;
-          nativeInputValueSetter.call(input, processId);
-          //once fired the event, this currentInputValue will be saved in the wizard form's values
-          ev = new Event("input", { bubbles: true });
-          input.dispatchEvent(ev);
-        });
-    }
+        input = document.getElementById("hiddenField_targetProcessId");
+        var processId = this.state.targetProcessId;
+        nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          "value"
+        ).set;
+        nativeInputValueSetter.call(input, processId);
+        //once fired the event, this currentInputValue will be saved in the wizard form's values
+        ev = new Event("input", { bubbles: true });
+        input.dispatchEvent(ev);
+      });
   };
 
   render() {

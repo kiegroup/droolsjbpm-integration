@@ -7,7 +7,7 @@ import { Icon } from "patternfly-react";
 import { OverlayTrigger } from "patternfly-react";
 import { Tooltip } from "patternfly-react";
 
-import { BACKEND_URL, USE_MOCK_DATA } from "../common/PimConstants";
+import { BACKEND_URL } from "../common/PimConstants";
 import PageMigrationScheduler from "../tabMigrationPlan/wizardExecuteMigration/PageMigrationScheduler";
 
 export default class PageEditMigrationDefinitionModal extends React.Component {
@@ -83,21 +83,17 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
   };
 
   submit = () => {
-    if (USE_MOCK_DATA) {
-      this.hideEditDialog();
-    } else {
-      const serviceUrl = BACKEND_URL + "/migrations/" + this.state.id;
-      const migrationDefinitionJsonStr = this.convertFormDataToJson();
-      axios
-        .put(serviceUrl, migrationDefinitionJsonStr, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-        .then(() => {
-          this.hideEditDialog();
-        });
-    }
+    const serviceUrl = BACKEND_URL + "/migrations/" + this.state.id;
+    const migrationDefinitionJsonStr = this.convertFormDataToJson();
+    axios
+      .put(serviceUrl, migrationDefinitionJsonStr, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(() => {
+        this.hideEditDialog();
+      });
   };
 
   render() {
