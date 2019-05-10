@@ -1,10 +1,9 @@
 import renderer from "react-test-renderer";
 import React from "react";
-import { MockupData_planList } from "../../component/common/MockupData";
+import plans from "../../../mock_data/plans.json";
 import MigrationPlansTable from "../../component/tabMigrationPlan/MigrationPlansTable";
 
 test("MigrationPlansTable renders correctly using snapshot", () => {
-  const mockData = MockupData_planList;
   const myMock = jest.fn();
   const tree = renderer
     .create(
@@ -13,7 +12,7 @@ test("MigrationPlansTable renders correctly using snapshot", () => {
         openAddPlanWizard={myMock}
         openAddPlanWizardWithInitialData={myMock}
         showDeleteDialog={myMock}
-        filteredPlans={mockData}
+        filteredPlans={plans}
         updatePlan={myMock}
         retrieveAllPlans={myMock}
       />

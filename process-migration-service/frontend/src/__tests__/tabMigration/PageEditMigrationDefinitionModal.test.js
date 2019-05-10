@@ -1,12 +1,12 @@
 import renderer from "react-test-renderer";
 import React from "react";
-import { MockupData_Migrations_Definitions } from "../../component/common/MockupData";
 import PageEditMigrationDefinitionModal from "../../component/tabMigration/PageEditMigrationDefinitionModal";
+import migration from "../../../mock_data/migration.json";
+
 
 test("PageEditMigrationDefinitionModal renders correctly using snapshot", () => {
-  const mockData = MockupData_Migrations_Definitions;
   const tree = renderer
-    .create(<PageEditMigrationDefinitionModal rowData={mockData[0]} />)
+    .create(<PageEditMigrationDefinitionModal rowData={migration} />)
     .toJSON();
   expect(tree).toMatchSnapshot();
 });

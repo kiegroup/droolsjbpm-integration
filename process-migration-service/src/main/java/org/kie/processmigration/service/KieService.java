@@ -41,7 +41,7 @@ public interface KieService {
 
     Set<String> getKieServerIDs();
 
-    List<RunningInstance> getRunningInstances(String containerId, String kieServerId) throws InvalidKieServerException;
+    List<RunningInstance> getRunningInstances(String containerId, String kieServerId, Integer page, Integer pageSize) throws InvalidKieServerException;
 
     ProcessInfos getProcessDefinitions(String sourceContainerId, String sourceProcessId, String targetContainerId, String targetProcessId, String kieServerId) throws InvalidKieServerException;
 

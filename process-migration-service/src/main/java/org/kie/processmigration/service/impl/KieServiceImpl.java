@@ -96,9 +96,9 @@ public class KieServiceImpl implements KieService {
     }
 
     @Override
-    public List<RunningInstance> getRunningInstances(String containerId, String kieServerId) throws InvalidKieServerException {
+    public List<RunningInstance> getRunningInstances(String containerId, String kieServerId, Integer page, Integer pageSize) throws InvalidKieServerException {
         ProcessServicesClient processServicesClient = getProcessServicesClient(kieServerId);
-        List<ProcessInstance> instanceList = processServicesClient.findProcessInstances(containerId, 0, 1000);
+        List<ProcessInstance> instanceList = processServicesClient.findProcessInstances(containerId, page, pageSize);
 
         int i = 0;
         List<RunningInstance> result = new ArrayList<>();

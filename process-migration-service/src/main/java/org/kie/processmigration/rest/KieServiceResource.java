@@ -21,17 +21,22 @@ import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.service.KieService;
 
 import javax.inject.Inject;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.util.List;
 
 @Path("/kieserver")
 @Produces(MediaType.APPLICATION_JSON)
 public class KieServiceResource {
+
+    private static final String DEFAULT_PAGE = "0";
+    private static final String DEFAULT_PAGE_SIZE = "1000";
 
     @Inject
     KieService kieService;
@@ -45,7 +50,8 @@ public class KieServiceResource {
     @Path("/definitions")
     public Response getBothProcessInfo(
             @QueryParam("sourceProcessId") String sourceProcessId, @QueryParam("sourceContainerId") String sourceContainerId,
-            @QueryParam("targetProcessId") String targetProcessId, @QueryParam("targetContainerId") String targetContainerId, @QueryParam("kieServerId") String kieServerId
+            @QueryParam("targetProcessId") String targetProcessId, @QueryParam("targetContainerId") String targetContainerId,
+            @QueryParam("kieServerId") String kieServerId
     ) throws InvalidKieServerException {
         ProcessInfos result = kieService.getProcessDefinitions(sourceContainerId, sourceProcessId, targetContainerId, targetProcessId, kieServerId);
         return Response.ok(result).build();
@@ -53,10 +59,11 @@ public class KieServiceResource {
 
     @GET
     @Path("/instances")
-    public Response getRunningInstances(@QueryParam("containerId") String containerId, @QueryParam("kieServerId") String kieServerId
-    ) throws InvalidKieServerException {
-        List<RunningInstance> result = kieService.getRunningInstances(containerId, kieServerId);
+    public Response getRunningInstances(@QueryParam("containerId") String containerId,
+                                        @QueryParam("kieServerId") String kieServerId,
+                                        @DefaultValue (DEFAULT_PAGE) @QueryParam("page") Integer page,
+                                        @DefaultValue (DEFAULT_PAGE_SIZE) @QueryParam("pageSize") Integer pageSize) throws InvalidKieServerException {
+        List<RunningInstance> result = kieService.getRunningInstances(containerId, kieServerId, page, pageSize);
         return Response.ok(result).build();
     }
-
 }
