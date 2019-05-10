@@ -391,3 +391,9 @@ Body:
 ```
 
 The migration status can be checked using the migrations api with the id returned as done before
+
+# User Interface
+
+The Process Instance Migration User Interface can be accessed in the following URL
+
+http://localhost:8080/

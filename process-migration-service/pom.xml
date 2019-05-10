@@ -22,7 +22,7 @@
         <!-- Frontend properties -->
         <frontend-maven-plugin.version>1.7.6</frontend-maven-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
-        <node.version>v12.0.0</node.version>
+        <node.version>v11.6.0</node.version>
         <!-- Following properties are used only for testing -->
         <container.hostname>localhost</container.hostname>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
