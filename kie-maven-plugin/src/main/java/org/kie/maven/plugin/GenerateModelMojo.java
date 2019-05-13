@@ -174,7 +174,8 @@ public class GenerateModelMojo extends AbstractKieMojo {
             }
 
             // copy the META-INF packages file
-            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(CanonicalKieModule.MODEL_FILE);
+            final String path = CanonicalKieModule.getModelFileWithGAV(kieModule.getReleaseId());
+            final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(path);
             final String packagesMemoryFilePath = packagesMemoryFile.getFolder().getPath().toPortableString();
             final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
 
@@ -260,7 +261,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
                     final Folder targetFolder = trgMfs.getFolder(".");
                     srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
                 }
-                modelWriter.writeModelFile(modelFiles, trgMfs);
+                modelWriter.writeModelFile(modelFiles, trgMfs, getInternalKieModule().getReleaseId());
             }
         }
     }
