@@ -305,6 +305,7 @@
       <properties>
         <kieserver.drools.enabled>true</kieserver.drools.enabled>
         <kieserver.optaplanner.enabled>true</kieserver.optaplanner.enabled>
+        <kieserver.prometheus.enabled>true</kieserver.prometheus.enabled>
       </properties>
       <build>
         <plugins>
