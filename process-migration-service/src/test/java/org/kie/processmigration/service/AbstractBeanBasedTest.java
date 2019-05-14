@@ -16,16 +16,15 @@
 
 package org.kie.processmigration.service;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.jboss.weld.junit.MockBean;
+import org.kie.processmigration.model.KieServerConfig;
 
+import javax.enterprise.inject.spi.Bean;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.enterprise.inject.spi.Bean;
-
-import org.jboss.weld.junit.MockBean;
-import org.kie.processmigration.model.KieServerConfig;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractBeanBasedTest {
 

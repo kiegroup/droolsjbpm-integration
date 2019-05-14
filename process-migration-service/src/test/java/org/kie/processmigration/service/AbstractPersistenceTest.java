@@ -16,15 +16,14 @@
 
 package org.kie.processmigration.service;
 
-import java.util.function.Function;
+import org.kie.processmigration.persistence.TestEntityManager;
+import org.mockito.Mockito;
 
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
-import org.kie.processmigration.persistence.TestEntityManager;
-import org.mockito.Mockito;
+import java.util.function.Function;
 
 public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
 

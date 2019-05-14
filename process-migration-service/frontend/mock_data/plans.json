@@ -1,0 +1,113 @@
+[
+  {
+    "id": 1,
+    "name": "mockupTest1",
+    "description": "mockup_",
+    "mappings": {
+      "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E":
+        "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
+    },
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "targetProcessId": "evaluation"
+  },
+  {
+    "id": 2,
+    "name": "upgrade",
+    "description": "mockup_",
+    "mappings": {
+      "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E":
+        "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
+    },
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "targetProcessId": "evaluation"
+  },
+  {
+    "id": 3,
+    "name": "downgrade",
+    "description": "mockup_",
+    "mappings": {
+      "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E":
+        "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
+    },
+    "sourceContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "targetContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetProcessId": "evaluation"
+  },
+  {
+    "id": 5,
+    "name": "bbb",
+    "description": "mockup_dddd",
+    "mappings": {},
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId":
+      "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
+    "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
+  },
+  {
+    "id": 8,
+    "name": "aa",
+    "description": "mockup_bb",
+    "mappings": {},
+    "sourceContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "targetContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetProcessId": "evaluation"
+  },
+  {
+    "id": 9,
+    "name": "a",
+    "description": "mockup_bfff",
+    "mappings": {},
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId":
+      "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
+    "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
+  },
+  {
+    "id": 10,
+    "name": "sdf",
+    "description": "mockup_sdf",
+    "mappings": {},
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId":
+      "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
+    "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
+  },
+  {
+    "id": 11,
+    "name": "dfdfd",
+    "description": "mockup_dfdf",
+    "mappings": {},
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId":
+      "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
+    "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
+  },
+  {
+    "id": 12,
+    "name": "upgrade",
+    "description": "mockup_",
+    "mappings": {
+      "_D3E17247-1D94-47D8-93AD-D645E317B736":
+        "_D3E17247-1D94-47D8-93AD-D645E317B736",
+      "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E":
+        "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
+    },
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "targetProcessId": "evaluation"
+  },
+  {
+    "id": 13,
+    "name": "upgrade",
+    "description": "mockup_upgrade123",
+    "mappings": {
+      "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E":
+        "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
+    },
+    "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "targetProcessId": "evaluation"
+  }
+]

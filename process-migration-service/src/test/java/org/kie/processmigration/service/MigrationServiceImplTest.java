@@ -16,48 +16,14 @@
 
 package org.kie.processmigration.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.kie.processmigration.model.Execution;
+import org.kie.processmigration.model.*;
 import org.kie.processmigration.model.Execution.ExecutionStatus;
 import org.kie.processmigration.model.Execution.ExecutionType;
-import org.kie.processmigration.model.Migration;
-import org.kie.processmigration.model.MigrationDefinition;
-import org.kie.processmigration.model.MigrationReport;
-import org.kie.processmigration.model.Plan;
-import org.kie.processmigration.model.exceptions.InvalidKieServerException;
-import org.kie.processmigration.model.exceptions.InvalidMigrationException;
-import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
-import org.kie.processmigration.model.exceptions.ProcessNotFoundException;
-import org.kie.processmigration.model.exceptions.ReScheduleException;
+import org.kie.processmigration.model.exceptions.*;
 import org.kie.processmigration.service.impl.MigrationServiceImpl;
 import org.kie.processmigration.service.impl.PlanServiceImpl;
 import org.kie.server.api.model.admin.MigrationReportInstance;
@@ -66,6 +32,19 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class MigrationServiceImplTest extends AbstractPersistenceTest {
 

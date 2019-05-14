@@ -20,10 +20,7 @@ import java.util.Collection;
 
 public class Status {
 
-    public enum HealthStatus {
-        UP,
-        DOWN
-    }
+    public static final String UP = "UP";
 
     private final Collection<KieServerConfig> kieServers;
 
@@ -35,8 +32,8 @@ public class Status {
         return kieServers;
     }
 
-    public HealthStatus getHealth() {
-        return HealthStatus.UP;
+    public String getHealth() {
+        return UP;
     }
 
 }

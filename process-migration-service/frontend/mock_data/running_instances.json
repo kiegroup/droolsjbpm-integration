@@ -1,0 +1,50 @@
+[
+    {
+      "id": 1,
+      "processInstanceId": 2,
+      "name": "Evaluation",
+      "description": "mockup_Evaluation",
+      "state": 1,
+      "startTime": "2019-01-06 21:06:55"
+    },
+    {
+      "id": 2,
+      "processInstanceId": 3,
+      "name": "Evaluation",
+      "description": "mockup_Evaluation",
+      "state": 1,
+      "startTime": "2019-01-06 21:30:23"
+    },
+    {
+      "id": 3,
+      "processInstanceId": 4,
+      "name": "Evaluation",
+      "description": "mockup_Evaluation",
+      "state": 1,
+      "startTime": "2019-01-06 21:49:27"
+    },
+    {
+      "id": 4,
+      "processInstanceId": 5,
+      "name": "Evaluation",
+      "description": "mockup_Evaluation",
+      "state": 1,
+      "startTime": "2019-01-06 21:49:34"
+    },
+    {
+      "id": 5,
+      "processInstanceId": 6,
+      "name": "Evaluation",
+      "description": "mockup_Evaluation",
+      "state": 1,
+      "startTime": "2019-01-06 21:58:54"
+    },
+    {
+      "id": 6,
+      "processInstanceId": 7,
+      "name": "Evaluation",
+      "description": "mockup_Evaluation",
+      "state": 1,
+      "startTime": "2019-01-06 21:59:04"
+    }
+  ]

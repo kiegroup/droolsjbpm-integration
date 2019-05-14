@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PageMappingDropdownNode renders correctly using snapshot 1`] = `
+<div>
+  <div
+    className="dropdown btn-group"
+  >
+    <button
+      aria-expanded={false}
+      aria-haspopup={true}
+      className="dropdown-toggle btn btn-default"
+      disabled={false}
+      id="PageMappingDropdownButton"
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      role="button"
+      type="button"
+    >
+      Source Nodes
+       
+      <span
+        className="caret"
+      />
+    </button>
+    <ul
+      aria-labelledby="PageMappingDropdownButton"
+      className="dropdown-menu"
+      role="menu"
+    >
+      <li
+        className=""
+        role="presentation"
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          Self Evaluation:_D3E17247-1D94-47D8-93AD-D645E317B736
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          PM Evaluation:_E35438DF-03AF-4D7B-9DCB-30BC70E7E92E
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          HR Evaluation:_AB431E82-86BC-460F-9D8B-7A7617565B36
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          Input:_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+`;

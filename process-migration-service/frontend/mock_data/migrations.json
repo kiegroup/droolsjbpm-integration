@@ -1,0 +1,84 @@
+[
+    {
+      "id": 1,
+      "definition": {
+        "planId": 2,
+        "processInstanceIds": [1],
+        "kieServerId": "15ad5bfa-7532-3eea-940a-abbbbc89f1e8",
+        "requester": "kermit",
+        "execution": {
+          "type": "ASYNC"
+        }
+      },
+      "createdAt": "2019-02-03T21:17:54.558Z",
+      "startedAt": "2019-02-03T21:17:54.645Z",
+      "finishedAt": "2019-02-03T21:17:54.872Z",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 2,
+      "definition": {
+        "planId": 1,
+        "processInstanceIds": [1],
+        "kieServerId": "15ad5bfa-7532-3eea-940a-abbbbc89f1e8",
+        "requester": "kermit",
+        "execution": {
+          "type": "ASYNC"
+        }
+      },
+      "createdAt": "2019-02-04T02:23:57.124Z",
+      "startedAt": "2019-02-04T02:23:57.150Z",
+      "finishedAt": "2019-02-04T02:23:57.218Z",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 8,
+      "definition": {
+        "planId": 2,
+        "processInstanceIds": [2, 1],
+        "kieServerId": "15ad5bfa-7532-3eea-940a-abbbbc89f1e8",
+        "requester": "kermit",
+        "execution": {
+          "type": "ASYNC"
+        }
+      },
+      "createdAt": "2019-02-05T01:36:33.300Z",
+      "startedAt": "2019-02-05T01:36:33.329Z",
+      "finishedAt": "2019-02-05T01:36:33.433Z",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 4,
+      "definition": {
+        "planId": 2,
+        "processInstanceIds": [1, 2],
+        "kieServerId": "15ad5bfa-7532-3eea-940a-abbbbc89f1e8",
+        "requester": "kermit",
+        "execution": {
+          "type": "ASYNC",
+          "scheduledStartTime": "2019-02-04T03:29:00Z"
+        }
+      },
+      "createdAt": "2019-02-04T03:28:19.139Z",
+      "startedAt": "2019-02-04T03:29:00.010Z",
+      "finishedAt": "2019-02-04T03:29:00.148Z",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 11,
+      "definition": {
+        "planId": 1,
+        "processInstanceIds": [2, 1],
+        "kieServerId": "15ad5bfa-7532-3eea-940a-abbbbc89f1e8",
+        "requester": "kermit",
+        "execution": {
+          "type": "ASYNC",
+          "scheduledStartTime": "2019-02-20T05:00:00Z"
+        }
+      },
+      "createdAt": "2019-02-06T00:51:45.026Z",
+      "startedAt": null,
+      "finishedAt": null,
+      "status": "SCHEDULED"
+    }
+  ]

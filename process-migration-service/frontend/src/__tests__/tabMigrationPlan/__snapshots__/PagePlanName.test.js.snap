@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PagePlanName renders correctly using snapshot 1`] = `
+<div
+  className="form-horizontal"
+>
+  <div
+    className="form-group required"
+  >
+    <label
+      className="col-sm-2 control-label"
+    >
+      Name
+    </label>
+    <div
+      className="col-sm-10"
+    >
+      <input
+        className="form-control"
+        id="id_PagePlanName_name"
+        name="name"
+        type="text"
+      />
+    </div>
+  </div>
+  <div
+    className="form-group"
+  >
+    <label
+      className="col-sm-2 control-label"
+    >
+      Description
+    </label>
+    <div
+      className="col-sm-10"
+    >
+      <textarea
+        className="form-control"
+        id="id_PagePlanName_description"
+        name="description"
+        rows="2"
+      />
+    </div>
+  </div>
+</div>
+`;

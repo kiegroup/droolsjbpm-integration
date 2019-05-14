@@ -17,12 +17,11 @@
 package org.kie.processmigration.service;
 
 import org.kie.processmigration.model.Status;
-import org.kie.processmigration.model.Status.HealthStatus;
 
 public interface StatusService {
 
     Status getStatus();
 
-    HealthStatus getHealth();
+    String getHealth();
 
 }
