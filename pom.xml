@@ -76,6 +76,7 @@
     <!-- <module>drools-examples-android</module> -->
     <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
+    <module>kie-maven-plugin-testing-multimodule</module>
     <module>kie-spring-boot</module>
     <module>camel-container-tests</module>
     <module>process-migration-service</module>
