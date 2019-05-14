@@ -15,13 +15,11 @@
     <packaging>war</packaging>
 
     <properties>
-        <version.thorntail>2.2.1.Final</version.thorntail>
         <version.fabric8-maven>3.5.42</version.fabric8-maven>
         <version.weld-junit>1.3.1.Final</version.weld-junit>
         <version.microprofile-health>1.0</version.microprofile-health>
         <version.org.jboss.weld.weld>2.4.3.Final</version.org.jboss.weld.weld>
         <version.org.jboss.weld.weld-api>2.4.SP2</version.org.jboss.weld.weld-api>
-
         <!-- Following properties are used only for testing -->
         <container.hostname>localhost</container.hostname>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
@@ -92,30 +90,16 @@
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>jaxrs</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>thorntail-jdk-specific</artifactId>
+                    <groupId>io.thorntail.jdk-specific</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.thorntail</groupId>
-            <artifactId>microprofile</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.thorntail</groupId>
-            <artifactId>microprofile-restclient</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>
@@ -124,10 +108,6 @@
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>microprofile-config</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.thorntail</groupId>
-            <artifactId>microprofile-fault-tolerance</artifactId>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>
@@ -193,16 +173,38 @@
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-junit4</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hibernate-jpa-2.1-api</artifactId>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>javax.activation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>arquillian</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>thorntail-jdk-specific</artifactId>
+                    <groupId>io.thorntail.jdk-specific</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jboss-modules</artifactId>
+                    <groupId>org.jboss.modules</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.kie.soup</groupId>
@@ -356,6 +358,7 @@
                         </users>
                         <properties>
                             <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                            <cargo.jboss.management-http.port>19991</cargo.jboss.management-http.port>
                         </properties>
                     </configuration>
                 </configuration>
