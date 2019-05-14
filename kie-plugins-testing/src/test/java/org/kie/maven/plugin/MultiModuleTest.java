@@ -19,11 +19,9 @@ import java.io.IOException;
 
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
+import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.junit.Test;
 import org.kie.api.KieServices;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 
 import static org.junit.Assert.*;
 
@@ -41,19 +39,29 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
     @Test
     public void testMultiModule() throws Exception {
         MavenExecutionResult mavenExecutionResult = buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions());
-        final KieServices kieServices = KieServices.get();
-        final ReleaseId releaseId = kieServices.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
-        final KieContainer kieContainer = kieServices.newKieContainer(releaseId);
-        final KieSession kieSession = kieContainer.newKieSession();
         try {
-            assertNotNull(kieSession);
+            KieContainerImpl kContainer =
+                    (KieContainerImpl) KieServices.Factory.get().getKieClasspathContainer(Thread.currentThread().getContextClassLoader());
+
+            for (String b : kContainer.getKieBaseNames()) {
+                System.out.println("BASE: " + b);
+//                KieBase kieBase = kContainer.getKieBase(b);
+//                for (KiePackage kiePackage : kieBase.getKiePackages()) {
+//                    System.out.println("    PACKAGE: " + kiePackage.getName());
+//
+//                    for (FactType factType : kiePackage.getFactTypes()) {
+//                        System.out.println("        FACTTYPE: " + factType.getName());
+//                    }
+//                }
+            }
+
+            assertTrue(true);
         } finally {
-            kieSession.dispose();
         }
     }
 
     private String[] getMavenGoalsAndOptions() throws IOException {
-            return new String[]{"-e", "-X", "clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=YES"};
+        return new String[]{"clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=YES"};
     }
 }
 
