@@ -52,5 +52,6 @@
 
   <modules>
     <module>modB</module>
+    <module>modC</module>
   </modules>
 </project>
