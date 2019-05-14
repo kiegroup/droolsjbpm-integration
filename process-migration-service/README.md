@@ -39,7 +39,7 @@ $ mvn clean package
 
 # Run application
 
-It is a [Thorntail 2.x](http://docs.wildfly-swarm.io/2.2.1.Final/) application
+It is a [Thorntail 2.x](http://docs.wildfly-swarm.io/2.4.0.Final/) application
 
 ```
 $ java -jar target/process-migration-thorntail.jar
@@ -139,7 +139,7 @@ thorntail:
         password: pim
 ```
 
-_Refer to the [Thorntail Datasource](https://docs.thorntail.io/2.2.1.Final/#creating-a-datasource_thorntail) configuration for further details_
+_Refer to the [Thorntail Datasource](https://docs.thorntail.io/2.4.0.Final/#creating-a-datasource_thorntail) configuration for further details_
 
 # Usage
 
@@ -391,3 +391,9 @@ Body:
 ```
 
 The migration status can be checked using the migrations api with the id returned as done before
+
+# User Interface
+
+The Process Instance Migration User Interface can be accessed in the following URL
+
+http://localhost:8080/

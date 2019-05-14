@@ -1,0 +1,69 @@
+{
+  "name": "process-migration-gui",
+  "version": "7.22.0-SNAPSHOT",
+  "description": "Process Instances Migration GUI project",
+  "main": "src/index.js",
+  "scripts": {
+    "compile": "webpack",
+    "build": "webpack -p",
+    "start": "node server.js",
+    "test": "jest",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,json,css,md}": [
+      "eslint --fix src",
+      "git add"
+    ]
+  },
+  "keywords": [
+    "react",
+    "webpack",
+    "babel",
+    "minimal",
+    "starter"
+  ],
+  "dependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-react": "^7.0.0",
+    "axios": "^0.18.0",
+    "babel-loader": "^8.0.5",
+    "bootstrap": "^4.3.1",
+    "bootstrap-sass": "^3.4.1",
+    "express": "^4.16.4",
+    "moment": "^2.24.0",
+    "patternfly-react": "^2.33.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-datetime": "^2.16.3",
+    "react-dom": "^16.8.6",
+    "react-svg-pan-zoom": "^2.18.0",
+    "react-svgmt": "^1.1.8",
+    "styled-components": "^4.2.0",
+    "validator": "^10.11.0",
+    "webpack": "^4.31.0",
+    "webpack-dev-middleware": "^3.6.2"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.8.0",
+    "css-loader": "^2.1.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-loader": "^2.1.2",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-react": "^7.13.0",
+    "husky": "^1.3.1",
+    "jest": "^24.8.0",
+    "lint-staged": "^8.1.6",
+    "prettier": "^1.17.0",
+    "raw-loader": "^2.0.0",
+    "react-test-renderer": "^16.8.6",
+    "react-testing-library": "^6.1.2",
+    "style-loader": "^0.23.1",
+    "webpack-cli": "^3.3.2"
+  }
+}

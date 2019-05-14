@@ -16,24 +16,17 @@
 
 package org.kie.processmigration.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.Startup;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.kie.processmigration.model.KieServerConfig;
+import org.kie.processmigration.model.ProcessInfo;
+import org.kie.processmigration.model.ProcessInfos;
+import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.service.KieService;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.client.CredentialsProvider;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesFactory;
-import org.kie.server.client.QueryServicesClient;
+import org.kie.server.api.model.definition.NodeDefinition;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.client.*;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.kie.server.client.credentials.EnteredCredentialsProvider;
 import org.slf4j.Logger;
@@ -41,6 +34,12 @@ import org.slf4j.LoggerFactory;
 import org.wildfly.swarm.spi.api.config.ConfigKey;
 import org.wildfly.swarm.spi.api.config.ConfigView;
 import org.wildfly.swarm.spi.api.config.SimpleKey;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.Startup;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.*;
 
 @ApplicationScoped
 @Startup
@@ -59,7 +58,6 @@ public class KieServiceImpl implements KieService {
     @Inject
     private ConfigView configView;
 
-    @SuppressWarnings("unchecked")
     @PostConstruct
     public void loadConfigs() {
         if (configView.hasKeyOrSubkeys(kieServersKey)) {
@@ -71,27 +69,102 @@ public class KieServiceImpl implements KieService {
         }
     }
 
+    @Override
     public Map<String, KieServerConfig> getConfigs() {
         return configs;
     }
 
+    @Override
+    public Set<String> getKieServerIDs() {
+        return Collections.unmodifiableSet(configs.keySet());
+    }
+
+    @Override
     public ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws InvalidKieServerException {
         if (!kieServices.containsKey(kieServerId)) {
             throw new InvalidKieServerException(kieServerId);
         }
-        return (ProcessAdminServicesClient) kieServices.get(kieServerId).getServicesClient(ProcessAdminServicesClient.class);
+        return kieServices.get(kieServerId).getServicesClient(ProcessAdminServicesClient.class);
     }
 
+    @Override
     public QueryServicesClient getQueryServicesClient(String kieServerId) throws InvalidKieServerException {
         if (!kieServices.containsKey(kieServerId)) {
             throw new InvalidKieServerException(kieServerId);
         }
-        return (QueryServicesClient) kieServices.get(kieServerId).getServicesClient(QueryServicesClient.class);
+        return kieServices.get(kieServerId).getServicesClient(QueryServicesClient.class);
+    }
+
+    @Override
+    public List<RunningInstance> getRunningInstances(String containerId, String kieServerId, Integer page, Integer pageSize) throws InvalidKieServerException {
+        ProcessServicesClient processServicesClient = getProcessServicesClient(kieServerId);
+        List<ProcessInstance> instanceList = processServicesClient.findProcessInstances(containerId, page, pageSize);
+
+        int i = 0;
+        List<RunningInstance> result = new ArrayList<>();
+        for (ProcessInstance instance : instanceList) {
+            i++;
+            result.add(new RunningInstance(i, instance));
+        }
+
+        return result;
+    }
+
+    @Override
+    public ProcessInfos getProcessDefinitions(String sourceContainerId, String sourceProcessId, String targetContainerId, String targetProcessId, String kieServerId) throws InvalidKieServerException {
+        ProcessInfos bothInfo = new ProcessInfos();
+        ProcessInfo sourceInfo = getProcessInfo(kieServerId, sourceContainerId, sourceProcessId);
+        ProcessInfo targetInfo = getProcessInfo(kieServerId, targetContainerId, targetProcessId);
+        bothInfo.setSourceInfo(sourceInfo);
+        bothInfo.setTargetInfo(targetInfo);
+        return bothInfo;
     }
 
     public boolean existsProcessDefinition(String containerId, String processId, String kieServerId) throws InvalidKieServerException {
         QueryServicesClient queryService = getQueryServicesClient(kieServerId);
         return queryService.findProcessByContainerIdProcessId(containerId, processId) != null;
+    }
+
+    private UIServicesClient getUIServicesClient(String kieServerId) throws InvalidKieServerException {
+        if (!kieServices.containsKey(kieServerId)) {
+            throw new InvalidKieServerException(kieServerId);
+        }
+        return kieServices.get(kieServerId).getServicesClient(UIServicesClient.class);
+    }
+
+    private ProcessServicesClient getProcessServicesClient(String kieServerId) throws InvalidKieServerException {
+        if (!kieServices.containsKey(kieServerId)) {
+            throw new InvalidKieServerException(kieServerId);
+        }
+        return kieServices.get(kieServerId).getServicesClient(ProcessServicesClient.class);
+    }
+
+    private ProcessInfo getProcessInfo(String kieServerId, String containerId, String processId) throws InvalidKieServerException {
+        ProcessInfo processInfo = new ProcessInfo();
+
+        //get SVG file
+        String svgFile = getUIServicesClient(kieServerId).getProcessImage(containerId, processId);
+
+        //Add this replacement here because in react-svgmt, ? and = are not allowed.
+        svgFile = svgFile.replaceAll("\\?shapeType=BACKGROUND", "_shapeType_BACKGROUND");
+        processInfo.setSvgFile(svgFile);
+
+        ProcessDefinition pd = getProcessServicesClient(kieServerId).getProcessDefinition(containerId, processId);
+        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        if(pd.getNodes() != null) {
+            Collection<NodeDefinition> nodes = pd.getNodes();
+            for (NodeDefinition node : nodes) {
+                if (node.getType().equals("HumanTaskNode")) {
+                    values.add(node.getUniqueId());
+                    labels.add(node.getName() + ":" + node.getUniqueId());
+                }
+            }
+        }
+        processInfo.setValues(values);
+        processInfo.setLabels(labels);
+        processInfo.setContainerId(containerId);
+        return processInfo;
     }
 
     private void loadConfig(Map<String, String> config) {

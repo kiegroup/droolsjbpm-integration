@@ -1,0 +1,12 @@
+{
+  "id": 99,
+  "name": "mockupTest1",
+  "description": "mockup_",
+  "mappings": {
+    "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E":
+      "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
+  },
+  "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+  "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
+  "targetProcessId": "evaluation"
+}

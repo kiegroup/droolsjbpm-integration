@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.drools</groupId>
@@ -9,7 +9,6 @@
         <version>7.22.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.kie</groupId>
     <artifactId>process-migration-service</artifactId>
     <name>Process Instance Migration Service</name>
     <packaging>war</packaging>
@@ -20,31 +19,41 @@
         <version.microprofile-health>1.0</version.microprofile-health>
         <version.org.jboss.weld.weld>2.4.3.Final</version.org.jboss.weld.weld>
         <version.org.jboss.weld.weld-api>2.4.SP2</version.org.jboss.weld.weld-api>
+        <!-- Frontend properties -->
+        <frontend-maven-plugin.version>1.7.6</frontend-maven-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+        <node.version>v11.6.0</node.version>
         <!-- Following properties are used only for testing -->
         <container.hostname>localhost</container.hostname>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly14x</cargo.container.id>
         <kie.server.classifier>ee7</kie.server.classifier>
-        <!-- This property needs to be overridden when running tests against 
-            different version of the WAR (e.g. running SNAPSHOT tests against Beta3 WAR) 
+        <!-- This property needs to be overridden when running tests against
+            different version of the WAR (e.g. running SNAPSHOT tests against Beta3 WAR)
             so the tests actually know what exact version of server is being tested -->
         <kie.server.version>${project.version}</kie.server.version>
         <container.port>19090</container.port>
         <kie.server.context>kie-server</kie.server.context>
         <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
         <kie.server.classifier>ee7</kie.server.classifier>
-        <!-- Path to Kie server WAR file. Used for referencing WAR file in 
+        <!-- Path to Kie server WAR file. Used for referencing WAR file in
             on-demand deployment/undeployment. -->
         <!-- <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path> -->
-        <org.kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml</org.kie.server.controller.templatefile>
-        <webservice.http.url>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl</webservice.http.url>
-        <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
+        <org.kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml
+        </org.kie.server.controller.templatefile>
+        <webservice.http.url>
+            http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl
+        </webservice.http.url>
+        <kie.server.base.http.url>
+            http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server
+        </kie.server.base.http.url>
 
         <!-- Kie server datasource configuration. -->
         <!-- <org.kie.server.persistence.ds/> Defined in container profiles. -->
         <org.kie.server.persistence.dialect>org.hibernate.dialect.H2Dialect</org.kie.server.persistence.dialect>
-        <org.kie.server.datasource.connection.url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</org.kie.server.datasource.connection.url>
+        <org.kie.server.datasource.connection.url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        </org.kie.server.datasource.connection.url>
         <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
         <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
         <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
@@ -234,7 +243,7 @@
                                 <version>${version.org.wildfly}</version>
                             </artifactInstaller>
                             <systemProperties>
-                                <!-- disable JMS support for executor to 
+                                <!-- disable JMS support for executor to
                                     use same tests for all containers for jbpm executor -->
                                 <org.kie.executor.jms>false</org.kie.executor.jms>
                                 <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
@@ -269,7 +278,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
-                            <!-- Reuse yoda user for deploying and undeploying 
+                            <!-- Reuse yoda user for deploying and undeploying
                                 Kie server from within the test -->
                             <kie-server.endpoint>${kie.server.base.http.url}</kie-server.endpoint>
                             <cargo.remote.username>yoda</cargo.remote.username>
@@ -292,6 +301,15 @@
                             <exclude>**/*IT.java</exclude>
                         </excludes>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>${frontend-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -317,16 +335,18 @@
                         <systemProperties>
                             <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
                             <!-- Persistence configuration -->
-                            <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
-                            <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}</org.kie.server.persistence.dialect>
+                            <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}
+                            </org.kie.server.persistence.ds>
+                            <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}
+                            </org.kie.server.persistence.dialect>
                         </systemProperties>
                     </container>
-                    <deployer />
+                    <deployer/>
                     <deployables>
                         <deployable>
                             <groupId>org.kie.server</groupId>
                             <artifactId>kie-server</artifactId>
-                            <!-- default, may be overridden in container 
+                            <!-- default, may be overridden in container
                                 specific profiles -->
                             <classifier>${kie.server.classifier}</classifier>
                             <type>war</type>
@@ -400,6 +420,104 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <configuration>
+                    <workingDirectory>frontend</workingDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>${node.version}</nodeVersion>
+                        </configuration>
+                    </execution>
+                    <!-- Updates package.json version -->
+                    <execution>
+                        <id>npm version</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>version ${project.version} --allow-same-version</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>npm run build</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run tests</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <arguments>test</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>frontend</directory>
+                                    <includes>
+                                        <include>bundle.js</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-css</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}/css</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>frontend/src/css/</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>*.map</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

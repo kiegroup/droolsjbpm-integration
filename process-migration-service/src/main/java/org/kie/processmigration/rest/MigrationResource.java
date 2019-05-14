@@ -41,6 +41,7 @@ import org.kie.processmigration.model.exceptions.ReScheduleException;
 import org.kie.processmigration.service.MigrationService;
 
 @Path("/migrations")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
 public class MigrationResource {
@@ -54,7 +55,6 @@ public class MigrationResource {
     private MigrationService migrationService;
 
     @GET
-    @Consumes({MediaType.APPLICATION_JSON})
     public Response findAll() {
         return Response.ok(migrationService.findAll()).build();
     }
@@ -72,7 +72,6 @@ public class MigrationResource {
     }
 
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
     public Response submit(@Context HttpHeaders headers, MigrationDefinition definition) throws InvalidMigrationException {
         setRequester(definition);
         Migration result = migrationService.submit(definition);
@@ -85,7 +84,6 @@ public class MigrationResource {
 
     @PUT
     @Path("/{id}")
-    @Consumes({MediaType.APPLICATION_JSON})
     public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition definition) throws MigrationNotFoundException, InvalidMigrationException, ReScheduleException {
         setRequester(definition);
         Migration migration = migrationService.update(id, definition);
@@ -94,7 +92,6 @@ public class MigrationResource {
 
     @DELETE
     @Path("/{id}")
-    @Consumes({MediaType.APPLICATION_JSON})
     public Response delete(@PathParam("id") Long id) throws MigrationNotFoundException {
         return Response.ok(migrationService.delete(id)).build();
     }

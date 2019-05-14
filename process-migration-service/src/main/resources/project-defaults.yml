@@ -2,7 +2,7 @@ thorntail:
   deployment:
     process-migration.war:
       jaxrs:
-        application-path: /
+        application-path: /rest
       web:
         login-config:
           auth-method: BASIC
