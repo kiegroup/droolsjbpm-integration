@@ -17,6 +17,7 @@ package org.kie.maven.plugin;
 
 import java.io.IOException;
 
+import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -38,8 +39,8 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
     }
 
     @Test
-    public void testComplexDMNModelWithExecutableModel() throws Exception {
-        buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions());
+    public void testMultiModule() throws Exception {
+        MavenExecutionResult mavenExecutionResult = buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions());
         final KieServices kieServices = KieServices.get();
         final ReleaseId releaseId = kieServices.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
         final KieContainer kieContainer = kieServices.newKieContainer(releaseId);
@@ -52,7 +53,7 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
     }
 
     private String[] getMavenGoalsAndOptions() throws IOException {
-            return new String[]{"clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=YES"};
+            return new String[]{"-e", "-X", "clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=YES"};
     }
 }
 
