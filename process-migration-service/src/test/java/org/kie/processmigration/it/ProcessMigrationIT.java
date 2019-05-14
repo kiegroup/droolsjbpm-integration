@@ -43,6 +43,7 @@ import org.apache.http.HttpStatus;
 import org.appformer.maven.integration.MavenRepository;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
@@ -63,6 +64,7 @@ import org.wildfly.swarm.arquillian.DefaultDeployment.Type;
 
 @RunWith(Arquillian.class)
 @DefaultDeployment(type = Type.WAR, testable = true)
+@Ignore
 public class ProcessMigrationIT {
 
     private static final String ARTIFACT_ID = "test";

@@ -78,6 +78,7 @@
     <module>kie-plugins-testing</module>
     <module>kie-spring-boot</module>
     <module>camel-container-tests</module>
+    <module>process-migration-service</module>
   </modules>
 
   <dependencyManagement>
