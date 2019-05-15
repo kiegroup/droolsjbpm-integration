@@ -1,6 +1,6 @@
 {
   "name": "process-migration-gui",
-  "version": "7.22.0-SNAPSHOT",
+  "version": "0.0.0",
   "description": "Process Instances Migration GUI project",
   "main": "src/index.js",
   "scripts": {
