@@ -22,15 +22,19 @@ import java.net.URLClassLoader;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Test;
+import org.kie.api.KieBase;
 import org.kie.api.KieServices;
+import org.kie.api.definition.KiePackage;
+import org.kie.api.definition.type.FactType;
 
 import static org.junit.Assert.*;
 
 public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
 
     private final static String GROUP_ID = "org.kie";
-    private final static String ARTIFACT_ID = "kie-maven-plugin-test-kjar-8";
+    private final static String ARTIFACT_ID = "kie-maven-plugin-test-kjar-8-modA";
     private final static String VERSION = "1.0.0.Final";
     private final static String KJAR_NAME = "kjar-8-multimodule";
 
@@ -43,26 +47,19 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
         MavenExecutionResult mavenExecutionResult = buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions());
         try {
 
-            URL ajar = new URL("file:///home/lmolteni/git/droolsjbpm-integration/kie-plugins-testing/src/test/projects/kjar-8-multimodule/modA/target/kie-maven-plugin-test-kjar-8-modA-1.0.0.Final.jar");
-            URL bjar = new URL("file:///home/lmolteni/git/droolsjbpm-integration/kie-plugins-testing/src/test/projects/kjar-8-multimodule/modB/target/kie-maven-plugin-test-kjar-8-modB-1.0.0.Final.jar");
-            URL cjar = new URL("file:///home/lmolteni/git/droolsjbpm-integration/kie-plugins-testing/src/test/projects/kjar-8-multimodule/modB/target/kie-maven-plugin-test-kjar-8-modC-1.0.0.Final.jar");
-
-            URL[] urls = new URL[] { ajar, bjar, cjar};
-            URLClassLoader urlClassLoader = new URLClassLoader(urls);
-
             KieContainerImpl kContainer =
-                    (KieContainerImpl) KieServices.Factory.get().getKieClasspathContainer(urlClassLoader);
+                    (KieContainerImpl) KieServices.Factory.get().newKieContainer(new ReleaseIdImpl(GROUP_ID, ARTIFACT_ID, VERSION));
 
             for (String b : kContainer.getKieBaseNames()) {
                 System.out.println("BASE: " + b);
-//                KieBase kieBase = kContainer.getKieBase(b);
-//                for (KiePackage kiePackage : kieBase.getKiePackages()) {
-//                    System.out.println("    PACKAGE: " + kiePackage.getName());
-//
-//                    for (FactType factType : kiePackage.getFactTypes()) {
-//                        System.out.println("        FACTTYPE: " + factType.getName());
-//                    }
-//                }
+                KieBase kieBase = kContainer.getKieBase(b);
+                for (KiePackage kiePackage : kieBase.getKiePackages()) {
+                    System.out.println("    PACKAGE: " + kiePackage.getName());
+
+                    for (FactType factType : kiePackage.getFactTypes()) {
+                        System.out.println("        FACTTYPE: " + factType.getName());
+                    }
+                }
             }
 
             assertTrue(true);

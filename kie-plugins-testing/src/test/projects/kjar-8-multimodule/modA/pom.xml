@@ -15,6 +15,19 @@
     <version>1.0.0.Final</version>
   </parent>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-maven-plugin-test-kjar-8-modB</artifactId>
+      <version>1.0.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-maven-plugin-test-kjar-8-modC</artifactId>
+      <version>1.0.0.Final</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <resources>
       <resource>
