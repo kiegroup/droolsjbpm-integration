@@ -15,21 +15,20 @@
  */
 package org.kie.maven.plugin;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.util.Collection;
+import java.util.List;
 
-import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Test;
-import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.definition.KiePackage;
 import org.kie.api.definition.type.FactType;
 
-import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.*;
 
 public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
 
@@ -44,31 +43,32 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
 
     @Test
     public void testMultiModule() throws Exception {
-        MavenExecutionResult mavenExecutionResult = buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions());
-        try {
+        String droolsVersionParameter = String.format("-Ddrools.version=%s", TestUtil.getProjectVersion());
+        buildKJarProject(KJAR_NAME, new String[]{"clean", "install", droolsVersionParameter, "-DgenerateModel=YES"});
+        KieContainerImpl kContainer =
+                (KieContainerImpl) KieServices.Factory.get().newKieContainer(new ReleaseIdImpl(GROUP_ID, ARTIFACT_ID, VERSION));
 
-            KieContainerImpl kContainer =
-                    (KieContainerImpl) KieServices.Factory.get().newKieContainer(new ReleaseIdImpl(GROUP_ID, ARTIFACT_ID, VERSION));
+        Collection<String> kieBaseNames = kContainer.getKieBaseNames();
+        assertThat(kieBaseNames).hasSameElementsAs(asList("modC", "modB", "modA"));
 
-            for (String b : kContainer.getKieBaseNames()) {
-                System.out.println("BASE: " + b);
-                KieBase kieBase = kContainer.getKieBase(b);
-                for (KiePackage kiePackage : kieBase.getKiePackages()) {
-                    System.out.println("    PACKAGE: " + kiePackage.getName());
+        List<KiePackage> kiePackages = kieBaseNames.stream()
+                .map(kContainer::getKieBase)
+                .flatMap(kb -> kb.getKiePackages().stream())
+                .collect(toList());
 
-                    for (FactType factType : kiePackage.getFactTypes()) {
-                        System.out.println("        FACTTYPE: " + factType.getName());
-                    }
-                }
-            }
+        assertThat(kiePackages.stream()
+                           .map(KiePackage::getName)
+                           .collect(toList()))
+                .hasSameElementsAs(asList("olijohns.modC", "olijohns.modB", "olijohns.modA"));
 
-            assertTrue(true);
-        } finally {
-        }
-    }
+        List<FactType> factTypes = kiePackages.stream()
+                .flatMap(kb -> kb.getFactTypes().stream())
+                .collect(toList());
 
-    private String[] getMavenGoalsAndOptions() throws IOException {
-        return new String[]{"clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=YES"};
+        assertThat(factTypes.stream()
+                           .map(FactType::getName)
+                           .collect(toList()))
+                .hasSameElementsAs(asList("olijohns.modC.FactC", "olijohns.modB.FactB", "olijohns.modA.FactA"));
     }
 }
 
