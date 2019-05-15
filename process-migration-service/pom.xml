@@ -439,16 +439,6 @@
                             <nodeVersion>${node.version}</nodeVersion>
                         </configuration>
                     </execution>
-                    <!-- Updates package.json version -->
-                    <execution>
-                        <id>npm version</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>version ${project.version} --allow-same-version</arguments>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>npm install</id>
                         <goals>
