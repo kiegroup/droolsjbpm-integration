@@ -44,31 +44,38 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
     @Test
     public void testMultiModule() throws Exception {
         String droolsVersionParameter = String.format("-Ddrools.version=%s", TestUtil.getProjectVersion());
-        buildKJarProject(KJAR_NAME, new String[]{"clean", "install", droolsVersionParameter, "-DgenerateModel=YES"});
-        KieContainerImpl kContainer =
-                (KieContainerImpl) KieServices.Factory.get().newKieContainer(new ReleaseIdImpl(GROUP_ID, ARTIFACT_ID, VERSION));
+        buildKJarProject(KJAR_NAME, "clean", "install", droolsVersionParameter, "-DgenerateModel=YES");
 
-        Collection<String> kieBaseNames = kContainer.getKieBaseNames();
-        assertThat(kieBaseNames).hasSameElementsAs(asList("modC", "modB", "modA"));
+        KieContainerImpl kContainer = null;
+        try {
+            kContainer = (KieContainerImpl) KieServices.Factory.get().newKieContainer(new ReleaseIdImpl(GROUP_ID, ARTIFACT_ID, VERSION));
 
-        List<KiePackage> kiePackages = kieBaseNames.stream()
-                .map(kContainer::getKieBase)
-                .flatMap(kb -> kb.getKiePackages().stream())
-                .collect(toList());
+            Collection<String> kieBaseNames = kContainer.getKieBaseNames();
+            assertThat(kieBaseNames).hasSameElementsAs(asList("modC", "modB", "modA"));
 
-        assertThat(kiePackages.stream()
-                           .map(KiePackage::getName)
-                           .collect(toList()))
-                .hasSameElementsAs(asList("org.kie.modC", "org.kie.modB", "org.kie.modA"));
+            List<KiePackage> kiePackages = kieBaseNames.stream()
+                    .map(kContainer::getKieBase)
+                    .flatMap(kb -> kb.getKiePackages().stream())
+                    .collect(toList());
 
-        List<FactType> factTypes = kiePackages.stream()
-                .flatMap(kb -> kb.getFactTypes().stream())
-                .collect(toList());
+            assertThat(kiePackages.stream()
+                               .map(KiePackage::getName)
+                               .collect(toList()))
+                    .hasSameElementsAs(asList("org.kie.modC", "org.kie.modB", "org.kie.modA"));
 
-        assertThat(factTypes.stream()
-                           .map(FactType::getName)
-                           .collect(toList()))
-                .hasSameElementsAs(asList("org.kie.modC.FactC", "org.kie.modB.FactB", "org.kie.modA.FactA"));
+            List<FactType> factTypes = kiePackages.stream()
+                    .flatMap(kb -> kb.getFactTypes().stream())
+                    .collect(toList());
+
+            assertThat(factTypes.stream()
+                               .map(FactType::getName)
+                               .collect(toList()))
+                    .hasSameElementsAs(asList("org.kie.modC.FactC", "org.kie.modB.FactB", "org.kie.modA.FactA"));
+        } finally {
+            if (kContainer != null) {
+                kContainer.dispose();
+            }
+        }
     }
 }
 
