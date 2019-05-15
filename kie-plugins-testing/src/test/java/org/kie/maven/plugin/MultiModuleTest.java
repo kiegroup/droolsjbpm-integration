@@ -42,9 +42,19 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
     }
 
     @Test
+    public void testMultiModuleWithExecutableModel() throws Exception {
+        testMultiModuleExec(true);
+    }
+
+    @Test
     public void testMultiModule() throws Exception {
+        testMultiModuleExec(false);
+    }
+
+    public void testMultiModuleExec(boolean executableModel) throws Exception {
         String droolsVersionParameter = String.format("-Ddrools.version=%s", TestUtil.getProjectVersion());
-        buildKJarProject(KJAR_NAME, "clean", "install", droolsVersionParameter, "-DgenerateModel=YES");
+        String executableModelParameter = String.format("-DgenerateModel=%s", executableModel ? "YES" : "NO");
+        buildKJarProject(KJAR_NAME, "clean", "install", droolsVersionParameter, executableModelParameter);
 
         KieContainerImpl kContainer = null;
         try {
