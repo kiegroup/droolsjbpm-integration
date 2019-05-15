@@ -59,7 +59,7 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
         assertThat(kiePackages.stream()
                            .map(KiePackage::getName)
                            .collect(toList()))
-                .hasSameElementsAs(asList("olijohns.modC", "olijohns.modB", "olijohns.modA"));
+                .hasSameElementsAs(asList("org.kie.modC", "org.kie.modB", "org.kie.modA"));
 
         List<FactType> factTypes = kiePackages.stream()
                 .flatMap(kb -> kb.getFactTypes().stream())
@@ -68,7 +68,7 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
         assertThat(factTypes.stream()
                            .map(FactType::getName)
                            .collect(toList()))
-                .hasSameElementsAs(asList("olijohns.modC.FactC", "olijohns.modB.FactB", "olijohns.modA.FactA"));
+                .hasSameElementsAs(asList("org.kie.modC.FactC", "org.kie.modB.FactB", "org.kie.modA.FactA"));
     }
 }
 
