@@ -20,9 +20,9 @@ import java.util.List;
 
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.definition.KiePackage;
 import org.kie.api.definition.type.FactType;
 
@@ -57,8 +57,10 @@ public class MultiModuleTest extends KieMavenPluginBaseIntegrationTest {
         buildKJarProject(KJAR_NAME, "clean", "install", droolsVersionParameter, executableModelParameter);
 
         KieContainerImpl kContainer = null;
+        KieServices kieServices = KieServices.Factory.get();
+        ReleaseId releaseId = kieServices.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
         try {
-            kContainer = (KieContainerImpl) KieServices.Factory.get().newKieContainer(new ReleaseIdImpl(GROUP_ID, ARTIFACT_ID, VERSION));
+            kContainer = (KieContainerImpl) kieServices.newKieContainer(releaseId);
 
             Collection<String> kieBaseNames = kContainer.getKieBaseNames();
             assertThat(kieBaseNames).hasSameElementsAs(asList("modC", "modB", "modA"));

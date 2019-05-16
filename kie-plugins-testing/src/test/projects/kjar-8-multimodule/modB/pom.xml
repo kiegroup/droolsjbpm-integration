@@ -7,7 +7,6 @@
   <description>Testing drools executable model capability</description>
 
   <artifactId>kie-maven-plugin-test-kjar-8-modB</artifactId>
-  <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
   <parent>
     <artifactId>kie-maven-plugin-test-kjar-8</artifactId>
