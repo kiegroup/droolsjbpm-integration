@@ -15,7 +15,6 @@
 
 package org.kie.kproject;
 
-import org.declaredtype.FactA;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,19 +50,6 @@ public class KProjectTest {
         kSession.delete(fireFH);
         rules = kSession.fireAllRules();
         assertEquals(3, rules);
-    }
-
-    @Test
-    public void testDeclaredTypeInDRLWithSrcField() {
-        KieServices ks = KieServices.Factory.get();
-        KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession kSession = kContainer.newKieSession("DeclaredTypeKBase.session");
-
-        kSession.insert(new FactA("Luca"));
-        int rulesFired = kSession.fireAllRules();
-        kSession.dispose();
-
-        assertEquals(1, rulesFired);
     }
 
     @Before
