@@ -68,6 +68,8 @@
         <include>org.kie.server:kie-server-controller-websocket-common</include>
 
         <include>org.jbpm:jbpm-services-ejb-timer</include>
+        
+        <include>org.slf4j:slf4j-jdk14</include>
 
         <!-- hibernate core and entity manager are added via maven-dependency-pluging:copy to include JPA 2.1 versions -->
         <include>org.hibernate.common:hibernate-commons-annotations</include>
