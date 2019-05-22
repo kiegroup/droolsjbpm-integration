@@ -29,7 +29,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.junit.Assert.assertEquals;
 
-public class DMNImportItemDefinitionTest
+public class DMNImportItemDefinitionIntegrationTest
         extends DMNKieServerBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId(
             "org.kie.server.testing", "import-itemdef",
