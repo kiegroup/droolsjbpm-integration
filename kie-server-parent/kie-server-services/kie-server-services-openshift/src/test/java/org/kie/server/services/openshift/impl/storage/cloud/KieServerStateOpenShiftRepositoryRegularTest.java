@@ -274,7 +274,7 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
     
         kieServerState.getConfiguration().getConfigItem(KIE_SERVER_ID).setValue(newKieServerID);
         // Create a dummy KIE server DC
-        createDummyDCandRC(newKieServerID, kieServerDCUID);
+        createDummyDCandRC(newKieServerID, kieServerDCUID, 1);
 
         repo.create(kieServerState);
         assertTrue(repo.getKieServerCM(client, newKieServerID).isPresent());
@@ -424,4 +424,20 @@ public class KieServerStateOpenShiftRepositoryRegularTest extends KieServerState
         System.clearProperty(KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED);
     }
     
+    @Test
+    public void testCreateAndLoadWithZeroReplica() {
+        String newKieServerID = TEST_KIE_SERVER_ID + "_NEW";
+        String kieServerDCUID = UUID.randomUUID().toString();
+        createDummyDCandRC(newKieServerID, kieServerDCUID, 0);
+        assertFalse(repo.getKieServerDC(client, newKieServerID).isPresent());
+    }
+
+    @Test
+    public void testCreateAndLoadWithMoreReplicas() {
+        String newKieServerID = TEST_KIE_SERVER_ID + "_NEW";
+        String kieServerDCUID = UUID.randomUUID().toString();
+        createDummyDCandRC(newKieServerID, kieServerDCUID, 2);
+        assertTrue(repo.getKieServerDC(client, newKieServerID).isPresent());
+    }
+
 }

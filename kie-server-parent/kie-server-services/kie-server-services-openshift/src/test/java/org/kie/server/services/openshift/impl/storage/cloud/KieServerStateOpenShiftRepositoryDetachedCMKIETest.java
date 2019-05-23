@@ -35,7 +35,7 @@ public class KieServerStateOpenShiftRepositoryDetachedCMKIETest extends KieServe
         // By setting org.kie.server.id property, simulates a KIE server runtime. (isKieServerRuntime -> true)
         System.setProperty(KIE_SERVER_ID, "myapp2-kieserver-detached-kie");
         System.setProperty(KIE_SERVER_LOCATION, "http://myapp2-kieserver-5-myproject.127.0.0.1.nip.io:80/services/rest/server");
-        createDummyDCandRC("myapp2-kieserver-5", "myapp2-kieserver-detached-kie", UUID.randomUUID().toString());
+        createDummyDCandRC("myapp2-kieserver-5", "myapp2-kieserver-detached-kie", UUID.randomUUID().toString(), 1);
         ConfigMap cfm = client.configMaps()
                 .load(KieServerStateOpenShiftRepositoryTest.class
                 .getResourceAsStream("/test-kieserver-state-config-map-detached-kie.yml")).get();

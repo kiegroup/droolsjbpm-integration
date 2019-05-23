@@ -30,7 +30,7 @@ public class KieServerStateOpenShiftRepositoryDetachedCMBCTest extends KieServer
 
     @Test
     public void testDetachedKieServerCMatBCEnv() {
-        createDummyDCandRC("myapp2-kieserver-6", "myapp2-kieserver-detached-bc", UUID.randomUUID().toString());
+        createDummyDCandRC("myapp2-kieserver-6", "myapp2-kieserver-detached-bc", UUID.randomUUID().toString(),1);
         ConfigMap cfm = client.configMaps()
                 .load(KieServerStateOpenShiftRepositoryTest.class
                 .getResourceAsStream("/test-kieserver-state-config-map-detached-bc.yml")).get();
