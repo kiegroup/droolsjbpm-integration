@@ -201,17 +201,13 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.thorntail</groupId>
-            <artifactId>arquillian</artifactId>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>thorntail-jdk-specific</artifactId>
-                    <groupId>io.thorntail.jdk-specific</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jboss-modules</artifactId>
-                    <groupId>org.jboss.modules</groupId>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -286,7 +282,7 @@
                             <!-- Properties values are taken from application-users.properties and project-test.yml files -->
                             <pim.username>kermit</pim.username>
                             <pim.password>thefrog</pim.password>
-                            <pim.endpoint>http://localhost:8180</pim.endpoint>
+                            <pim.endpoint>http://localhost:8180/rest</pim.endpoint>
                         </systemPropertyVariables>
                         <includes>
                             <include>**/*IT.java</include>
@@ -395,6 +391,46 @@
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>start-process-migration-service</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-jar</argument>
+                        <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
+                        <argument>-s./src/test/resources/project-test.yml</argument>
+                    </arguments>
+                    <async>true</async>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                    <target>
+                        <sleep seconds="60" />
+                    </target>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>slee-until-pim-server-is-up</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -16,14 +16,37 @@
 
 package org.kie.processmigration.it;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.appformer.maven.integration.MavenRepository;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
+import org.kie.processmigration.model.Execution;
 import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
 import org.kie.processmigration.model.Plan;
@@ -36,47 +59,29 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
-import org.wildfly.swarm.arquillian.DefaultDeployment;
-import org.wildfly.swarm.arquillian.DefaultDeployment.Type;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import static org.junit.Assert.*;
-
-@RunWith(Arquillian.class)
-@DefaultDeployment(type = Type.WAR, testable = true)
-@Ignore
 public class ProcessMigrationIT {
 
     private static final String ARTIFACT_ID = "test";
     private static final String GROUP_ID = "com.myspace.test";
     private static final String SOURCE_CONTAINER_ID = "test_1.0.0";
     private static final String TARGET_CONTAINER_ID = "test_2.0.0";
-    private static final String BASIC_AUTH = getBasicAuth();
+    private static final CredentialsProvider BASIC_AUTH = getBasicAuth();
     private static final String PIM_ENDPOINT = System.getProperty("pim.endpoint");
 
     private static String CONTAINER_ID = "test";
     private static String PROCESS_ID = "test.myprocess";
 
+    private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+    private final HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(BASIC_AUTH).build();
+
     private String kieEndpoint;
     private String kieUsername;
     private String kiePassword;
     private String kieServerId;
-
-    @ArquillianResource
-    private InitialContext context;
 
     public ProcessMigrationIT() throws IOException {
         kieEndpoint = System.getProperty("kie-server.endpoint");
@@ -88,22 +93,12 @@ public class ProcessMigrationIT {
         deployProcesses(client);
     }
 
-    private static String getBasicAuth() {
+    private static CredentialsProvider getBasicAuth() {
         String pimUsername = System.getProperty("pim.username");
         String pimPassword = System.getProperty("pim.password");
-        String credentials = Base64.getEncoder()
-                                   .encodeToString(new StringBuilder(pimUsername)
-                                                                                 .append(":")
-                                                                                 .append(pimPassword)
-                                                                                 .toString()
-                                                                                 .getBytes());
-        return new StringBuilder("Basic ").append(credentials).toString();
-    }
-
-    @Test
-    public void testDataSource() throws NamingException {
-        DataSource ds = (DataSource) context.lookup("java:jboss/datasources/pimDS");
-        assertNotNull(ds);
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(pimUsername, pimPassword));
+        return provider;
     }
 
     @Test
@@ -115,49 +110,69 @@ public class ProcessMigrationIT {
     }
 
     @Test
-    public void testMigration() {
+    public void testMigration() throws IOException, JAXBException {
+        // Given
         List<Long> pids = startProcesses();
+
+        // When
         createMigration();
+
+        // Then
         ProcessServicesClient processClient = createClient().getServicesClient(ProcessServicesClient.class);
-        List<ProcessInstance> instances = processClient.findProcessInstances(TARGET_CONTAINER_ID, 1, 10);
-        assertEquals(pids.size(), instances.size());
-        assertTrue(instances.stream().map(pi -> pi.getId()).allMatch(id -> pids.contains(id)));
+        List<ProcessInstance> instances = processClient.findProcessInstances(SOURCE_CONTAINER_ID, 0, 10);
+        assertEquals(1, instances.size());
+        assertEquals(Long.valueOf(2L), instances.get(0).getId());
+
+        instances = processClient.findProcessInstances(TARGET_CONTAINER_ID, 0, 10);
+        assertEquals(1, instances.size());
+        assertEquals(Long.valueOf(1L), instances.get(0).getId());
     }
 
-    private Migration createMigration() {
+    private Migration createMigration() throws IOException, JAXBException {
         Plan plan = createPlan();
         MigrationDefinition def = new MigrationDefinition();
         def.setPlanId(plan.getId());
         def.setKieserverId(kieServerId);
         def.setProcessInstanceIds(Arrays.asList(1L));
-        Response response = ClientBuilder.newClient()
-                                         .target(PIM_ENDPOINT + "/migrations")
-                                         .request(MediaType.APPLICATION_JSON)
-                                         .header(HttpHeaders.AUTHORIZATION, getBasicAuth())
-                                         .buildPost(Entity.json(def))
-                                         .invoke();
-        Migration migration = (Migration) response.getEntity();
+        def.setExecution(new Execution().setType(Execution.ExecutionType.SYNC));
+
+        HttpPost post = preparePost("/migrations");
+
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(writer, def);
+        post.setEntity(new StringEntity(writer.getBuffer().toString()));
+        HttpResponse r = client.execute(post);
+        assertEquals(HttpStatus.SC_OK, r.getStatusLine().getStatusCode());
+        StringReader reader = new StringReader(EntityUtils.toString(r.getEntity()));
+        Migration migration = mapper.readValue(reader, Migration.class);
         assertNotNull(migration);
         assertEquals("kermit", migration.getDefinition().getRequester());
         return migration;
     }
 
-    private Plan createPlan() {
+    private Plan createPlan() throws IOException, JAXBException {
         Plan plan = new Plan();
         plan.setSourceContainerId(SOURCE_CONTAINER_ID);
         plan.setSourceProcessId(PROCESS_ID);
         plan.setTargetContainerId(TARGET_CONTAINER_ID);
         plan.setTargetProcessId(PROCESS_ID);
-        Response response = ClientBuilder.newClient()
-                                         .target(PIM_ENDPOINT + "/plans")
-                                         .request(MediaType.APPLICATION_JSON)
-                                         .header(HttpHeaders.AUTHORIZATION, BASIC_AUTH)
-                                         .buildPost(Entity.json(plan))
-                                         .invoke();
-        assertEquals(HttpStatus.SC_OK, response.getStatus());
-        Plan createdPlan = (Plan) response.getEntity();
-        assertEquals(1L, createdPlan.getId());
-        return createdPlan;
+
+        HttpPost post = preparePost("/plans");
+
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(writer, plan);
+        post.setEntity(new StringEntity(writer.getBuffer().toString()));
+        HttpResponse r = client.execute(post);
+        assertEquals(HttpStatus.SC_OK, r.getStatusLine().getStatusCode());
+        StringReader reader = new StringReader(EntityUtils.toString(r.getEntity()));
+        return mapper.readValue(reader, Plan.class);
+    }
+
+    private HttpPost preparePost(String path) {
+        HttpPost post = new HttpPost(PIM_ENDPOINT + path);
+        post.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
+        post.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        return post;
     }
 
     private List<Long> startProcesses() {
