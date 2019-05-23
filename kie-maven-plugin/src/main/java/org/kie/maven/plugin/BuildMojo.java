@@ -50,7 +50,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
-import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
@@ -59,9 +58,6 @@ import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
-import org.drools.core.common.ProjectClassLoader;
-import org.drools.core.rule.KieModuleMetaInfo;
-import org.drools.core.rule.TypeMetaInfo;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
@@ -70,6 +66,7 @@ import org.kie.api.builder.model.KieModuleModel;
 import org.kie.internal.io.ResourceFactory;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
+import static org.drools.compiler.kproject.models.KieModuleModelImpl.KMODULE_FILE_NAME;
 
 /**
  * This goal builds the Drools files belonging to the kproject.
@@ -160,7 +157,7 @@ public class BuildMojo extends AbstractKieMojo {
 
             KieFileSystem kfs = ks.newKieFileSystem();
             for (File file : getResourceFiles(sourceFolder)) {
-                if (!file.getPath().contains("META-INF")) {
+                if (file.getName().equals( KMODULE_FILE_NAME ) || !file.getPath().contains("META-INF")) {
                     kfs.write( ResourceFactory.newFileResource(file) );
                 }
             }
