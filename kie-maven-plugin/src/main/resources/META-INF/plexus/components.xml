@@ -34,6 +34,14 @@
                 <language>java</language>
             </configuration>
         </component>
+        
+        <component>
+            <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
+            <role-hint>include-project-dependencies</role-hint>
+            <implementation>org.kie.maven.plugin.IncludeProjectDependenciesComponentConfigurator</implementation>
+            <description></description>
+            <isolated-realm>false</isolated-realm>
+        </component>
 
     </components>
 
