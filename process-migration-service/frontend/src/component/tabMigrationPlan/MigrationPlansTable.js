@@ -71,6 +71,16 @@ export default class MigrationPlansTable extends Component {
       },
       {
         header: {
+          label: "Source Process ID",
+          formatters: [headerFormat]
+        },
+        cell: {
+          formatters: [cellFormat]
+        },
+        property: "sourceProcessId"
+      },
+      {
+        header: {
           label: "Target Container ID",
           formatters: [headerFormat]
         },

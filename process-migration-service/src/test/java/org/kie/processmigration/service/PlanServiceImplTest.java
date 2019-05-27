@@ -47,8 +47,10 @@ public class PlanServiceImplTest extends AbstractPersistenceTest {
 
         Plan plan = new Plan();
         plan.setSourceContainerId("containerId");
+        plan.setSourceProcessId("sourceProcessId");
         plan.setName("name");
         plan.setTargetContainerId("targetContainerId");
+        plan.setTargetProcessId("targetProcessId");
         plan.setDescription("description");
 
         // When

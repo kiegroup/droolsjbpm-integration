@@ -32,14 +32,14 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
           />
         </th>
         <th
-          aria-label="processInstanceId"
+          aria-label="Process instance ID"
           className="sorting sort sort-none"
           colSpan={1}
           index={1}
           onClick={[Function]}
           rowSpan={1}
         >
-          processInstanceId
+          Process instance ID
         </th>
         <th
           aria-label="Name"

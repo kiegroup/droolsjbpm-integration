@@ -13,7 +13,7 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
         className="col-sm-2 control-label"
       >
         Source 
-         ContainerID
+         Container ID
       </label>
       <div
         className="col-sm-10"
@@ -23,7 +23,6 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
           name="ContainerId"
           onChange={[Function]}
           type="text"
-          value=""
         />
       </div>
     </div>
@@ -34,7 +33,7 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
         className="col-sm-2 control-label"
       >
         Source 
-         ProcessId
+         Process ID
       </label>
       <div
         className="col-sm-10"
@@ -44,7 +43,6 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
           name="processId"
           onChange={[Function]}
           type="text"
-          value=""
         />
       </div>
     </div>
@@ -67,7 +65,7 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
         className="col-sm-2 control-label"
       >
         Target 
-         ContainerID
+         Container ID
       </label>
       <div
         className="col-sm-10"
@@ -77,7 +75,6 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
           name="ContainerId"
           onChange={[Function]}
           type="text"
-          value=""
         />
       </div>
     </div>
@@ -88,7 +85,7 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
         className="col-sm-2 control-label"
       >
         Target 
-         ProcessId
+         Process ID
       </label>
       <div
         className="col-sm-10"
@@ -98,7 +95,6 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
           name="processId"
           onChange={[Function]}
           type="text"
-          value=""
         />
       </div>
     </div>
@@ -124,32 +120,6 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
     >
       mortgage-process_1.0.0-SNAPSHOT
     </label>
-  </div>
-  <div
-    style={
-      Object {
-        "display": "none",
-      }
-    }
-  >
-    <input
-      className="form-control"
-      id="hiddenField_sourceContainerId"
-      name="sourceContainerId"
-      type="text"
-    />
-    <input
-      className="form-control"
-      id="hiddenField_targetContainerId"
-      name="targetContainerId"
-      type="text"
-    />
-    <input
-      className="form-control"
-      id="hiddenField_targetProcessId"
-      name="targetProcessId"
-      type="text"
-    />
   </div>
 </div>
 `;
