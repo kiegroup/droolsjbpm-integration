@@ -21,7 +21,9 @@ import org.kie.processmigration.model.ProcessInfo;
 import org.kie.processmigration.model.ProcessInfos;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
+import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
 import org.kie.processmigration.service.KieService;
+import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
@@ -39,6 +41,8 @@ import javax.annotation.PostConstruct;
 import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
+
 import java.util.*;
 
 @ApplicationScoped
@@ -111,7 +115,7 @@ public class KieServiceImpl implements KieService {
     }
 
     @Override
-    public ProcessInfos getProcessDefinitions(String sourceContainerId, String sourceProcessId, String targetContainerId, String targetProcessId, String kieServerId) throws InvalidKieServerException {
+    public ProcessInfos getProcessDefinitions(String sourceContainerId, String sourceProcessId, String targetContainerId, String targetProcessId, String kieServerId) throws InvalidKieServerException, ProcessDefinitionNotFoundException {
         ProcessInfos bothInfo = new ProcessInfos();
         ProcessInfo sourceInfo = getProcessInfo(kieServerId, sourceContainerId, sourceProcessId);
         ProcessInfo targetInfo = getProcessInfo(kieServerId, targetContainerId, targetProcessId);
@@ -139,17 +143,29 @@ public class KieServiceImpl implements KieService {
         return kieServices.get(kieServerId).getServicesClient(ProcessServicesClient.class);
     }
 
-    private ProcessInfo getProcessInfo(String kieServerId, String containerId, String processId) throws InvalidKieServerException {
+    private ProcessInfo getProcessInfo(String kieServerId, String containerId, String processId) throws InvalidKieServerException, ProcessDefinitionNotFoundException {
         ProcessInfo processInfo = new ProcessInfo();
 
         //get SVG file
-        String svgFile = getUIServicesClient(kieServerId).getProcessImage(containerId, processId);
+        String svgFile;
+        try {
+            svgFile = getUIServicesClient(kieServerId).getProcessImage(containerId, processId);
+        } catch (KieServicesHttpException e) {
+            if(Response.Status.NOT_FOUND.getStatusCode() == e.getHttpCode()) {
+                throw new ProcessDefinitionNotFoundException(kieServerId, containerId, processId);
+            } else {
+                throw e;
+            }
+        }
 
         //Add this replacement here because in react-svgmt, ? and = are not allowed.
         svgFile = svgFile.replaceAll("\\?shapeType=BACKGROUND", "_shapeType_BACKGROUND");
         processInfo.setSvgFile(svgFile);
 
         ProcessDefinition pd = getProcessServicesClient(kieServerId).getProcessDefinition(containerId, processId);
+        if(!pd.getContainerId().equals(containerId)) {
+            throw new ProcessDefinitionNotFoundException(kieServerId, containerId, processId);
+        }
         ArrayList<String> values = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
         if(pd.getNodes() != null) {

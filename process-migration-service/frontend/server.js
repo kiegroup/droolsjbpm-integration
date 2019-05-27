@@ -36,6 +36,9 @@ app.get('/rest/kieserver/instances', (req, res) => {
 });
 
 app.get('/rest/kieserver/definitions', (req, res) => {
+  if (req.query.sourceContainerId === "error" || req.query.sourceProcessId === "error") {
+    return res.status(404).send('Not found');
+  }
   return res.send(readFile("definitions.json"));
 });
 
