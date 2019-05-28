@@ -142,6 +142,7 @@ public class Plan implements Serializable {
         this.name = plan.getName();
         this.description = plan.getDescription();
         this.sourceContainerId = plan.getSourceContainerId();
+        this.sourceProcessId = plan.getSourceProcessId();
         this.targetContainerId = plan.getTargetContainerId();
         this.targetProcessId = plan.getTargetProcessId();
         this.mappings = plan.getMappings();
