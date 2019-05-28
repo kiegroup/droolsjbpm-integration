@@ -91,6 +91,27 @@ public class KieServerRouterRestIntegrationTest extends RestOnlyBaseIntegrationT
             }
         }
     }
+    
+    @Test
+    public void testOptionsMethodOnKieServerRouter() throws Exception {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();        
+
+        Response response = null;
+        try {
+            WebTarget clientRequest = newRequest(build(serverUrl, "/", valuesMap));
+            logger.info( "[OPTIONS] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).options();
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            
+            String responseContent = response.readEntity(String.class);
+            Assert.assertEquals("GET, OPTIONS", responseContent);
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
 
     private static int allocatePort() {
         try {
