@@ -29,13 +29,4 @@
     <module>kie-karaf-itests</module>
   </modules>
 
-  <profiles>
-    <profile>
-      <id>kie-osgi-platforms</id>
-      <modules>
-        <module>kie-osgi-platforms</module>
-      </modules>
-    </profile>
-  </profiles>
-
 </project>
