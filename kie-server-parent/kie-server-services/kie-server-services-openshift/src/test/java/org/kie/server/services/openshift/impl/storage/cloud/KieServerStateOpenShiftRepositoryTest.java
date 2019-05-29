@@ -138,13 +138,13 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
     }
     
     protected void createDummyDCandRC() {
-        createDummyDCandRC(TEST_KIE_SERVER_ID, UUID.randomUUID().toString());
+        createDummyDCandRC(TEST_KIE_SERVER_ID, UUID.randomUUID().toString(), 1);
     }
 
-    protected void createDummyDCandRC(String kieServerID, String kieServerDCUID) {
-        createDummyDCandRC(UUID.randomUUID().toString(), kieServerID, kieServerDCUID);
+    protected void createDummyDCandRC(String kieServerID, String kieServerDCUID, int replicas) {
+        createDummyDCandRC(UUID.randomUUID().toString(), kieServerID, kieServerDCUID, replicas);
     }
-    protected void createDummyDCandRC(String name, String kieServerID, String kieServerDCUID) {
+    protected void createDummyDCandRC(String name, String kieServerID, String kieServerDCUID, int replicas) {
         Map<String, String> labels = new HashMap<>();
         labels.put(CFG_MAP_LABEL_APP_NAME_KEY, TEST_APP_NAME);
         labels.put(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerID);
@@ -157,7 +157,7 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
                                   .withUid(kieServerDCUID)
                                 .endMetadata()
                                 .withNewSpec()
-                                  .withReplicas(0)
+                                  .withReplicas(replicas)
                                   .addNewTrigger()
                                     .withType("ConfigChange")
                                   .endTrigger()
