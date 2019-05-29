@@ -40,7 +40,9 @@ public interface KieServerOpenShift {
         List<DeploymentConfig> deployments = client.deploymentConfigs()
                 .withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, serverId).list().getItems();
         if (deployments.isEmpty()) { return Optional.empty();}
-        if (deployments.size() == 1) { return Optional.ofNullable(deployments.get(0)); }
+        if (deployments.size() == 1) {
+            return deployments.stream().filter(dc -> dc.getSpec().getReplicas().intValue() > 0).findFirst();
+        }
         throw new IllegalStateException("Ambiguous KIE server id: [" + serverId + 
                                         "]; more than one KIE server DeploymentConfig exists.");
     }
