@@ -37,7 +37,13 @@ module.exports = {
           }
           var result = str.join("");
           return result.replace(",");
-        }
+        },
+        outputDirectory: "../target/jest-junit-reports",
+        outputName: "TEST-org.kiegroup.processmigration.js.tests.xml",
+        suiteName: "org.kiegroup.processmigration.js.tests",
+        suiteNameTemplate: "{filename}",
+        classNameTemplate:
+          "org.kiegroup.processmigration.js.tests.{filename}.{classname}"
       }
     ]
   ],
