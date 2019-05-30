@@ -16,6 +16,15 @@
 
 package org.kie.server.router;
 
+import static org.kie.server.router.KieServerRouterConstants.KIE_CONTROLLER;
+import static org.kie.server.router.KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_HOST;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_KEYALIAS;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_PASSWORD;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT_TLS;
+
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -29,15 +38,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.SSLContext;
 
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.BlockingHandler;
-import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.ResponseCodeHandler;
-import io.undertow.server.handlers.proxy.ProxyHandler;
 import org.jboss.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +50,7 @@ import org.kie.server.router.handlers.ContainersHttpHandler;
 import org.kie.server.router.handlers.DocumentsHttpHandler;
 import org.kie.server.router.handlers.JobsHttpHandler;
 import org.kie.server.router.handlers.KieServerInfoHandler;
+import org.kie.server.router.handlers.OptionsHttpHandler;
 import org.kie.server.router.handlers.QueriesDataHttpHandler;
 import org.kie.server.router.handlers.QueriesHttpHandler;
 import org.kie.server.router.proxy.KieServerProxyClient;
@@ -55,14 +59,13 @@ import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.HttpUtils;
 import org.kie.server.router.utils.SSLContextBuilder;
 
-import static org.kie.server.router.KieServerRouterConstants.KIE_CONTROLLER;
-import static org.kie.server.router.KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_HOST;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_KEYALIAS;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_PASSWORD;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT_TLS;
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.BlockingHandler;
+import io.undertow.server.handlers.PathHandler;
+import io.undertow.server.handlers.ResponseCodeHandler;
+import io.undertow.server.handlers.proxy.ProxyHandler;
 
 public class KieServerRouter {
 
@@ -161,12 +164,15 @@ public class KieServerRouter {
         }
 
         HttpHandler notFoundHandler = ResponseCodeHandler.HANDLE_404;
-
-        ProxyHandler proxyHandler = new ProxyHandler(proxyClient,
-                                                     -1,
-                                                     notFoundHandler,
-                                                     true,
-                                                     false);
+        ProxyHandler proxyHandler = ProxyHandler
+        .builder()
+        .setProxyClient(proxyClient)
+        .setMaxRequestTime(-1)
+        .setRewriteHostHeader(true)
+        .setReuseXForwarded(false)        
+        .setNext(new OptionsHttpHandler(notFoundHandler, adminHandler))        
+        .build();
+        
         PathHandler pathHandler = Handlers.path(proxyHandler);
         pathHandler.addPrefixPath("/queries/definitions",
                                   new QueriesDataHttpHandler(notFoundHandler,
