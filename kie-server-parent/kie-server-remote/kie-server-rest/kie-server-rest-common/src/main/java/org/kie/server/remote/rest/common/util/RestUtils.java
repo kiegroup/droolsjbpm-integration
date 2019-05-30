@@ -222,17 +222,17 @@ public class RestUtils {
     }
     
     public static String errorMessage(Throwable e, String defaultMessage) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        pw.println(defaultMessage);
+
         if (INCLUDE_STACKTRACE) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            
-            String message = sw.toString();
-            pw.close();
-            return message;
         }
-        
-        return defaultMessage;
+
+        pw.close();
+        return sw.toString();
     }
     
     public static String errorMessage(Throwable e) {        

@@ -294,6 +294,8 @@
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <!-- For JMS executor tests. -->
               <org.kie.executor.jms>true</org.kie.executor.jms>
+              <!-- For including complete stack trace in the response -->
+              <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
             </systemProperties>
           </container>
         </configuration>
