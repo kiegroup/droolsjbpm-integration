@@ -29,6 +29,11 @@ public class JobsHttpHandler extends AbstractAggregateHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
+        if (exchange.getRequestMethod().equals(HttpString.tryFromString("OPTIONS"))) {
+            handleOptions(exchange);
+            return;
+        }
+        
         if (!exchange.getRequestMethod().equals(HttpString.tryFromString("GET"))) {
             exchange.setResolvedPath(PREFIX + exchange.getResolvedPath());
             

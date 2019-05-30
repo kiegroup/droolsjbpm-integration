@@ -61,7 +61,11 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(final HttpServerExchange exchange) throws Exception {
+    public void handleRequest(final HttpServerExchange exchange) throws Exception {  
+        if (exchange.getRequestMethod().equals(HttpString.tryFromString("OPTIONS"))) {
+            handleOptions(exchange);
+            return;
+        }
         if (!exchange.getRequestMethod().equals(HttpString.tryFromString("GET"))) {
             httpHandler.handleRequest(exchange);
             return;
@@ -175,6 +179,41 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
 
         return response.toString();
     }
+    
+    protected String sendOptionsRequest(String url, HttpServerExchange exchange, Map<String,List<String>> responseHeaders) throws Exception {
+
+        URL obj = new URL(url + exchange.getRequestPath() + "?" + exchange.getQueryString());
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("OPTIONS");
+
+        //add request headers
+        exchange.getRequestHeaders().forEach(h -> {
+            con.setRequestProperty(h.getHeaderName().toString(), h.getFirst());
+        });
+
+        log.debugf("Sending 'OPTIONS' request to URL : %s", obj);
+        int responseCode = con.getResponseCode();
+        log.debugf("Response Code : %s", responseCode);
+
+        Map<String, List<String>> headers = con.getHeaderFields();
+        headers.forEach((k, v) -> {
+            if (k != null) {
+                responseHeaders.put(k, v);
+            }
+        });
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+
+        }
+        in.close();
+
+        return response.toString();
+    }
 
     protected Set<String> getServerHosts() {
 
@@ -209,6 +248,37 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
 
             return availableHosts[hostIndex];
         }
+    }
+    
+    protected void handleOptions(HttpServerExchange exchange) throws Exception {
+        final Map<String,List<String>> responseHeaders = new ConcurrentHashMap<>();
+        String returnResponse = getServerHosts().stream().findFirst().map(url -> {
+            String response = null;
+            try {
+                response = sendOptionsRequest(url, exchange, responseHeaders);
+            } catch (Exception e) {
+                log.error("Error when forwarding request to server", e);
+
+                removeHostOnException(url, e);
+            }
+
+            return response;
+        })
+                .filter(msg -> msg != null && !msg.trim().isEmpty())
+                .orElse(null);
+
+        if (returnResponse == null) {
+            ResponseCodeHandler.HANDLE_404.handleRequest(exchange);
+            return;
+        }
+        responseHeaders.forEach((name, value) -> {
+            exchange.getResponseHeaders().putAll(HttpString.tryFromString(name), value);
+        });
+
+        exchange.getResponseHeaders().put(Headers.ALLOW, returnResponse);
+        exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, returnResponse.getBytes("UTF-8").length);
+        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain;charset=UTF-8");
+        exchange.getResponseSender().send(returnResponse);
     }
 }
 

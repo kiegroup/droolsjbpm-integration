@@ -17,11 +17,13 @@ package org.kie.server.router.handlers;
 
 import java.util.stream.Collectors;
 
+import org.kie.server.router.KieServerRouterConstants;
+
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
-import org.kie.server.router.KieServerRouterConstants;
+import io.undertow.util.HttpString;
 
 
 public class KieServerInfoHandler implements HttpHandler {
@@ -81,6 +83,14 @@ public class KieServerInfoHandler implements HttpHandler {
     
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
+        if (exchange.getRequestMethod().equals(HttpString.tryFromString("OPTIONS"))) {
+            String response = "GET, OPTIONS";
+            
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain;charset=UTF-8");
+            exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, response.getBytes("UTF-8").length);
+            exchange.getResponseHeaders().put(Headers.ALLOW, response);
+            exchange.getResponseSender().send(response);
+        }
         HeaderValues accept = exchange.getRequestHeaders().get(Headers.ACCEPT);
         HeaderValues kieContentType = exchange.getRequestHeaders().get("X-KIE-ContentType");
         

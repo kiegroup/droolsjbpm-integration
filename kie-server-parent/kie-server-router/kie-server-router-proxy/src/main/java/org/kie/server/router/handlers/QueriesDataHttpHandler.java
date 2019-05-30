@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
+import io.undertow.server.handlers.proxy.ProxyHandler;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
@@ -41,6 +42,11 @@ public class QueriesDataHttpHandler extends AbstractAggregateHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
+        if (exchange.getRequestMethod().equals(HttpString.tryFromString("OPTIONS"))) {
+            handleOptions(exchange);
+            return;
+        }
+        
         if (exchange.getRequestMethod().equals(HttpString.tryFromString("POST"))) {
 
             Map<String, Deque<String>> queryParams = exchange.getQueryParameters();
