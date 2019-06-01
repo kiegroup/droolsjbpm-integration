@@ -39,11 +39,20 @@ module.exports = {
           return result.replace(",");
         },
         outputDirectory: "../target/jest-junit-reports",
-        outputName: "TEST-org.kiegroup.processmigration.js.tests.xml",
-        suiteName: "org.kiegroup.processmigration.js.tests",
+        outputName: "TEST-org.kie.processmigration.js.tests.xml",
+        suiteName: "org.kie.processmigration.js.tests",
         suiteNameTemplate: "{filename}",
-        classNameTemplate:
-          "org.kiegroup.processmigration.js.tests.{filename}.{classname}"
+        /*
+         * Jenkins JUnit Plugin cares only about classname.
+         * It cuts its name into 2 parts:
+         * Part before the last period is considered as a package.
+         * Part after the last period is considered as a test class name.
+         */
+        classNameTemplate: vars => {
+          var str = vars.filename;
+          str = str.slice(0, str.length - ".test.js".length);
+          return "org.kie.processmigration.js.tests." + str;
+        }
       }
     ]
   ],
