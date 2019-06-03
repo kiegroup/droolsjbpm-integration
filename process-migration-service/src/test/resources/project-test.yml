@@ -15,7 +15,7 @@ thorntail:
         security-constraints:
           - url-pattern: /*
             roles: [ admin ]
-          - url-pattern: /health/*
+          - url-pattern: /rest/health/*
   security:
     security-domains:
       pim:
