@@ -110,6 +110,9 @@ export default class PageDefinition extends Component {
         //once fired the event, this currentInputValue will be saved in the wizard form's values
         ev = new Event("input", { bubbles: true });
         input.dispatchEvent(ev);
+      })
+      .catch(() => {
+        this.props.setInfo("", "");
       });
   };
 
