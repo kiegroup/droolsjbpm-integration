@@ -14,7 +14,7 @@ export default class PageDefinitionSearchTable extends Component {
       <div>
         <div className="form-group required">
           <label className="col-sm-2 control-label">
-            {this.props.tableHeader} ContainerID
+            {this.props.tableHeader} Container ID
           </label>
           <div className="col-sm-10">
             <input
@@ -29,7 +29,7 @@ export default class PageDefinitionSearchTable extends Component {
 
         <div className="form-group required">
           <label className="col-sm-2 control-label">
-            {this.props.tableHeader} ProcessId
+            {this.props.tableHeader} Process ID
           </label>
           <div className="col-sm-10">
             <input

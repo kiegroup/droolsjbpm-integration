@@ -258,8 +258,11 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     private void validatePlanExecution(MigrationDefinition definition, Plan plan) throws InvalidMigrationException {
-        if (!kieService.existsProcessDefinition(plan.getSourceContainerId(), plan.getTargetProcessId(), definition.getKieserverId())) {
+        if (!kieService.existsProcessDefinition(plan.getSourceContainerId(), plan.getSourceProcessId(), definition.getKieserverId())) {
             throw new ProcessNotFoundException(plan.getSourceContainerId());
+        }
+        if (!kieService.existsProcessDefinition(plan.getTargetContainerId(), plan.getTargetProcessId(), definition.getKieserverId())) {
+            throw new ProcessNotFoundException(plan.getTargetContainerId());
         }
     }
 

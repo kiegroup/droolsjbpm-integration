@@ -100,7 +100,7 @@ export default class PageMigrationRunningInstances extends React.Component {
         {
           property: "processInstanceId",
           header: {
-            label: "processInstanceId",
+            label: "Process instance ID",
             props: {
               index: 1,
               rowSpan: 1,

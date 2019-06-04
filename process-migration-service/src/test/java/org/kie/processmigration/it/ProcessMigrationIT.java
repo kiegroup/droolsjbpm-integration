@@ -145,6 +145,7 @@ public class ProcessMigrationIT {
     private Plan createPlan() {
         Plan plan = new Plan();
         plan.setSourceContainerId(SOURCE_CONTAINER_ID);
+        plan.setSourceProcessId(PROCESS_ID);
         plan.setTargetContainerId(TARGET_CONTAINER_ID);
         plan.setTargetProcessId(PROCESS_ID);
         Response response = ClientBuilder.newClient()

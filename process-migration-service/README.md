@@ -158,8 +158,9 @@ Body:
     "name": "Test plan",
     "description": "Evaluation Process Test Plan",
     "sourceContainerId": "evaluation_1.0",
-    "targetProcessId": "evaluation",
-    "targetContainerId": "evaluation_1.1"
+    "sourceProcessId": "evaluation",
+    "targetContainerId": "evaluation_1.1",
+    "targetProcessId": "evaluation"
 }
 ```
 
@@ -175,8 +176,9 @@ Body:
     "name": "Test plan",
     "description": "Evaluation Process Test Plan",
     "sourceContainerId": "evaluation_1.0",
-    "targetProcessId": "evaluation",
-    "targetContainerId": "evaluation_1.1"
+    "sourceProcessId": "evaluation",
+    "targetContainerId": "evaluation_1.1",
+    "targetProcessId": "evaluation"
 }
 ```
 
