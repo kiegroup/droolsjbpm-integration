@@ -18,6 +18,7 @@ package org.kie.processmigration.rest;
 import org.kie.processmigration.model.ProcessInfos;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
+import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
 import org.kie.processmigration.service.KieService;
 
 import javax.inject.Inject;
@@ -53,7 +54,12 @@ public class KieServiceResource {
             @QueryParam("targetProcessId") String targetProcessId, @QueryParam("targetContainerId") String targetContainerId,
             @QueryParam("kieServerId") String kieServerId
     ) throws InvalidKieServerException {
-        ProcessInfos result = kieService.getProcessDefinitions(sourceContainerId, sourceProcessId, targetContainerId, targetProcessId, kieServerId);
+        ProcessInfos result = null;
+        try {
+            result = kieService.getProcessDefinitions(sourceContainerId, sourceProcessId, targetContainerId, targetProcessId, kieServerId);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
         return Response.ok(result).build();
     }
 
