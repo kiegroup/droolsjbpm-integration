@@ -8,8 +8,9 @@
         "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
     },
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
-    "targetProcessId": "evaluation"
+    "targetProcessId": "new_evaluation"
   },
   {
     "id": 2,
@@ -20,8 +21,9 @@
         "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
     },
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
-    "targetProcessId": "evaluation"
+    "targetProcessId": "new_evaluation"
   },
   {
     "id": 3,
@@ -32,8 +34,9 @@
         "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
     },
     "sourceContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "sourceProcessId": "new_evaluation",
     "targetContainerId": "evaluation_2.0.0-SNAPSHOT",
-    "targetProcessId": "evaluation"
+    "targetProcessId": "old_evaluation"
   },
   {
     "id": 5,
@@ -41,9 +44,10 @@
     "description": "mockup_dddd",
     "mappings": {},
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "Mortgage_Process.MortgageApprovalProcess",
     "targetContainerId":
       "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
-    "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
+    "targetProcessId": "Mortgage_Process.RevisitedMortgageApprovalProcess"
   },
   {
     "id": 8,
@@ -51,8 +55,9 @@
     "description": "mockup_bb",
     "mappings": {},
     "sourceContainerId": "evaluation_3.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId": "evaluation_2.0.0-SNAPSHOT",
-    "targetProcessId": "evaluation"
+    "targetProcessId": "new_evaluation"
   },
   {
     "id": 9,
@@ -60,6 +65,7 @@
     "description": "mockup_bfff",
     "mappings": {},
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId":
       "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
     "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
@@ -70,6 +76,7 @@
     "description": "mockup_sdf",
     "mappings": {},
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId":
       "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
     "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
@@ -80,6 +87,7 @@
     "description": "mockup_dfdf",
     "mappings": {},
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId":
       "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT",
     "targetProcessId": "Mortgage_Process.MortgageApprovalProcess"
@@ -95,8 +103,9 @@
         "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
     },
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
-    "targetProcessId": "evaluation"
+    "targetProcessId": "new_evaluation"
   },
   {
     "id": 13,
@@ -107,7 +116,8 @@
         "_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E"
     },
     "sourceContainerId": "evaluation_2.0.0-SNAPSHOT",
+    "sourceProcessId": "old_evaluation",
     "targetContainerId": "evaluation_3.0.0-SNAPSHOT",
-    "targetProcessId": "evaluation"
+    "targetProcessId": "new_evaluation"
   }
 ]

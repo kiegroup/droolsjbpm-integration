@@ -56,6 +56,9 @@ public class Plan implements Serializable {
     @Column(name = "source_container_id")
     private String sourceContainerId;
 
+    @Column(name = "source_process_id")
+    private String sourceProcessId;
+
     @Column(name = "target_container_id")
     private String targetContainerId;
 
@@ -103,6 +106,14 @@ public class Plan implements Serializable {
         this.sourceContainerId = sourceContainerId;
     }
 
+    public String getSourceProcessId() {
+        return sourceProcessId;
+    }
+
+    public void setSourceProcessId(String sourceProcessId) {
+        this.sourceProcessId = sourceProcessId;
+    }
+
     public String getTargetContainerId() {
         return targetContainerId;
     }
@@ -131,6 +142,7 @@ public class Plan implements Serializable {
         this.name = plan.getName();
         this.description = plan.getDescription();
         this.sourceContainerId = plan.getSourceContainerId();
+        this.sourceProcessId = plan.getSourceProcessId();
         this.targetContainerId = plan.getTargetContainerId();
         this.targetProcessId = plan.getTargetProcessId();
         this.mappings = plan.getMappings();

@@ -25,6 +25,7 @@ export default class WizardAddPlan extends WizardBase {
       name: "",
       description: "",
       sourceContainerId: "",
+      sourceProcessId: "",
       targetContainerId: "",
       targetProcessId: "",
       mappings: "",
@@ -43,6 +44,7 @@ export default class WizardAddPlan extends WizardBase {
       name: "",
       description: "",
       sourceContainerId: "",
+      sourceProcessId: "",
       targetContainerId: "",
       targetProcessId: "",
       mappings: "",
@@ -64,6 +66,7 @@ export default class WizardAddPlan extends WizardBase {
       name: rowData.name,
       description: rowData.description,
       sourceContainerId: rowData.sourceContainerId,
+      sourceProcessId: rowData.sourceProcessId,
       targetContainerId: rowData.targetContainerId,
       targetProcessId: rowData.targetProcessId,
       mappings: rowData.mappings,
@@ -88,6 +91,8 @@ export default class WizardAddPlan extends WizardBase {
       this.setState({ description: e.target.value });
     } else if (e.target.name == "sourceContainerId") {
       this.setState({ sourceContainerId: e.target.value });
+    } else if (e.target.name == "sourceProcessId") {
+      this.setState({ sourceProcessId: e.target.value });
     } else if (e.target.name == "targetContainerId") {
       this.setState({ targetContainerId: e.target.value });
     } else if (e.target.name == "targetProcessId") {
@@ -102,6 +107,7 @@ export default class WizardAddPlan extends WizardBase {
       name: this.state.name,
       description: this.state.description,
       sourceContainerId: this.state.sourceContainerId,
+      sourceProcessId: this.state.sourceProcessId,
       targetContainerId: this.state.targetContainerId,
       targetProcessId: this.state.targetProcessId
     };
@@ -127,6 +133,22 @@ export default class WizardAddPlan extends WizardBase {
       this.props.editPlan(this.state.migrationPlanJsonStr, this.state.planId);
     }
     this.onNextButtonClick();
+  };
+
+  handleSourceProcessIdChange = value => {
+    this.setState({ sourceProcessId: value });
+  };
+
+  handleSourceContainerIdChange = value => {
+    this.setState({ sourceContainerId: value });
+  };
+
+  handleTargetProcessIdChange = value => {
+    this.setState({ targetProcessId: value });
+  };
+
+  handleTargetContainerIdChange = value => {
+    this.setState({ targetContainerId: value });
   };
 
   render() {
@@ -171,9 +193,14 @@ export default class WizardAddPlan extends WizardBase {
                   sourceInfo={sourceInfo}
                   targetInfo={targetInfo}
                   setInfo={setInfo}
-                  initSourceContainerId={this.state.sourceContainerId}
-                  initTargetContainerId={this.state.targetContainerId}
-                  initProcessId={this.state.targetProcessId}
+                  sourceContainerId={this.state.sourceContainerId}
+                  sourceProcessId={this.state.sourceProcessId}
+                  targetContainerId={this.state.targetContainerId}
+                  targetProcessId={this.state.targetProcessId}
+                  onChangeSourceContainerId={this.handleSourceContainerIdChange}
+                  onChangeSourceProcessId={this.handleSourceProcessIdChange}
+                  onChangeTargetContainerId={this.handleTargetContainerIdChange}
+                  onChangeTargetProcessId={this.handleTargetProcessIdChange}
                   kieServerIds={this.props.kieServerIds}
                 />
               </Wizard.Contents>

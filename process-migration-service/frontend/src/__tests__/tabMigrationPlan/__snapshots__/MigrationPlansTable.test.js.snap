@@ -30,6 +30,11 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <th
           className=""
         >
+          Source Process ID
+        </th>
+        <th
+          className=""
+        >
           Target Container ID
         </th>
         <th
@@ -72,12 +77,17 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          old_evaluation
+        </td>
+        <td
+          className=""
+        >
           evaluation_3.0.0-SNAPSHOT
         </td>
         <td
           className=""
         >
-          evaluation
+          new_evaluation
         </td>
         <td
           className="table-view-pf-actions"
@@ -194,12 +204,17 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          old_evaluation
+        </td>
+        <td
+          className=""
+        >
           evaluation_3.0.0-SNAPSHOT
         </td>
         <td
           className=""
         >
-          evaluation
+          new_evaluation
         </td>
         <td
           className="table-view-pf-actions"
@@ -316,12 +331,17 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          new_evaluation
+        </td>
+        <td
+          className=""
+        >
           evaluation_2.0.0-SNAPSHOT
         </td>
         <td
           className=""
         >
-          evaluation
+          old_evaluation
         </td>
         <td
           className="table-view-pf-actions"
@@ -438,12 +458,17 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          Mortgage_Process.MortgageApprovalProcess
+        </td>
+        <td
+          className=""
+        >
           Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT
         </td>
         <td
           className=""
         >
-          Mortgage_Process.MortgageApprovalProcess
+          Mortgage_Process.RevisitedMortgageApprovalProcess
         </td>
         <td
           className="table-view-pf-actions"
@@ -560,12 +585,17 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          old_evaluation
+        </td>
+        <td
+          className=""
+        >
           evaluation_2.0.0-SNAPSHOT
         </td>
         <td
           className=""
         >
-          evaluation
+          new_evaluation
         </td>
         <td
           className="table-view-pf-actions"
@@ -678,6 +708,11 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
           className=""
         >
           evaluation_2.0.0-SNAPSHOT
+        </td>
+        <td
+          className=""
+        >
+          old_evaluation
         </td>
         <td
           className=""
@@ -804,6 +839,11 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          old_evaluation
+        </td>
+        <td
+          className=""
+        >
           Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT
         </td>
         <td
@@ -922,6 +962,11 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
           className=""
         >
           evaluation_2.0.0-SNAPSHOT
+        </td>
+        <td
+          className=""
+        >
+          old_evaluation
         </td>
         <td
           className=""
@@ -1048,12 +1093,17 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          old_evaluation
+        </td>
+        <td
+          className=""
+        >
           evaluation_3.0.0-SNAPSHOT
         </td>
         <td
           className=""
         >
-          evaluation
+          new_evaluation
         </td>
         <td
           className="table-view-pf-actions"
@@ -1170,12 +1220,17 @@ exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
         <td
           className=""
         >
+          old_evaluation
+        </td>
+        <td
+          className=""
+        >
           evaluation_3.0.0-SNAPSHOT
         </td>
         <td
           className=""
         >
-          evaluation
+          new_evaluation
         </td>
         <td
           className="table-view-pf-actions"
