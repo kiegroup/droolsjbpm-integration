@@ -958,7 +958,7 @@ public class KieServerImpl implements KieServer {
     private void prepareUpdateExtensions(KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
         Map<String, Object> parameters = getReleaseUpdateParameters(releaseId, messages, resetBeforeUpdate);
 
-        // once the upgrade was successful, notify all extensions so they can be upgraded (if needed)
+        // some extensions may require to do some operations before updating the container.
         for (KieServerExtension extension : getServerExtensions()) {
             extension.prepareContainerUpdate(kci.getContainerId(), kci, parameters);
             logger.debug("Preparing update for container {} (for release id {}) on {}.", kci.getContainerId(), releaseId, extension);
