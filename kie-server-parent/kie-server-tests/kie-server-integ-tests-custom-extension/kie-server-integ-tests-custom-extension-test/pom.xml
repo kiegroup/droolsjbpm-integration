@@ -15,6 +15,7 @@
   <properties>
     <java.module.name>org.kie.server.itests.custom.extension.test</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
+    <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
   </properties>
 
   <dependencies>
@@ -31,6 +32,11 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-integ-tests-custom-extension-services</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-integ-tests-custom-extension-prometheus</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -81,6 +87,7 @@
                 <target>
                   <unzip src="${maven.dependency.org.kie.server.kie-server.ee7.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
                   <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-services.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
+                  <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-prometheus.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
                   <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-rest.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
                   <zip destfile="${project.build.directory}/kie-server.war" basedir="${project.build.directory}/unzipped-kie-server"/>
                 </target>
@@ -111,6 +118,7 @@
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
           </configuration>
@@ -141,6 +149,7 @@
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
             </systemProperties>
           </container>
           <deployables>
@@ -170,6 +179,7 @@
                     <target>
                       <unzip src="${maven.dependency.org.kie.server.kie-server.webc.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
                       <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-services.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
+                      <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-prometheus.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
                       <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-rest.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
                       <zip destfile="${project.build.directory}/kie-server.war" basedir="${project.build.directory}/unzipped-kie-server"/>
                     </target>
