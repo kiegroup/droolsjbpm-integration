@@ -45,7 +45,7 @@
     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>
     <bundle>mvn:org.kie/kie-dmn-backend/${version.org.kie}</bundle>
     <bundle>mvn:org.kie/kie-dmn-feel/${version.org.kie}</bundle>
-    <bundle>mvn:org.kie/kie-dmn-core/${version.org.kie}</bundle>
+    <bundle>mvn:org.kie/kie-dmn-core-osgi/${version.org.kie}</bundle>
   </feature>
 
   <feature name="jbpm-commons" version="${project.version}" description="jBPM Commons">
