@@ -69,7 +69,7 @@ export default class WizardAddPlan extends WizardBase {
       sourceProcessId: rowData.sourceProcessId,
       targetContainerId: rowData.targetContainerId,
       targetProcessId: rowData.targetProcessId,
-      mappings: rowData.mappings,
+      mappings: JSON.stringify(rowData.mappings),
       migrationPlanJsonStr: jsonStr,
       editPlanMode: true,
       planId: rowData.id,
@@ -216,6 +216,7 @@ export default class WizardAddPlan extends WizardBase {
                   sourceInfo={sourceInfo}
                   targetInfo={targetInfo}
                   mappings={this.state.mappings}
+                  onMappingsChange={mappings => this.setState({ mappings })}
                 />
               </Wizard.Contents>
             );
