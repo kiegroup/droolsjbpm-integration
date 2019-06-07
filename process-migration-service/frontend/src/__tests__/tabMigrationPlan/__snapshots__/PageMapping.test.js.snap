@@ -4,6 +4,7 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
 <div
   className="form-horizontal"
 >
+  
   <div
     className="form-group"
   >
@@ -26,7 +27,7 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
           role="button"
           type="button"
         >
-          Source Nodes 
+          Source Nodes
            
           <span
             className="caret"
@@ -48,7 +49,10 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              Self Evaluation:_D3E17247-1D94-47D8-93AD-D645E317B736
+              Self Evaluation
+               (
+              userTask
+              )
             </a>
           </li>
           <li
@@ -62,7 +66,10 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              PM Evaluation:_E35438DF-03AF-4D7B-9DCB-30BC70E7E92E
+              PM Evaluation
+               (
+              userTask
+              )
             </a>
           </li>
           <li
@@ -76,7 +83,10 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              HR Evaluation:_AB431E82-86BC-460F-9D8B-7A7617565B36
+              HR Evaluation
+               (
+              userTask
+              )
             </a>
           </li>
           <li
@@ -90,7 +100,10 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              Input:_B8E4DA1E-A62B-49C2-9A94-FEE5F5FD2B4E
+              Input
+               (
+              userTask
+              )
             </a>
           </li>
         </ul>
@@ -116,7 +129,7 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
           role="button"
           type="button"
         >
-          Target Nodes 
+          Target Nodes
            
           <span
             className="caret"
@@ -138,7 +151,10 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              Correct Data:_011ED858-F841-4C44-B0F1-F3BE388ADDA5
+              Validation1
+               (
+              businessRuleTask
+              )
             </a>
           </li>
           <li
@@ -152,7 +168,10 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              Qualify:_92C163CB-96A0-4E7A-B3FB-59B432503BA2
+              Retract Validation
+               (
+              businessRuleTask
+              )
             </a>
           </li>
           <li
@@ -166,7 +185,10 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              Final Approval:_9D45E383-CB1F-45A7-8EDA-E4FE1DB73F7A
+              Correct Data
+               (
+              userTask
+              )
             </a>
           </li>
           <li
@@ -180,7 +202,61 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
               role="menuitem"
               tabIndex="-1"
             >
-              Increase Down Payment:_2C42D605-BB98-465B-8814-0D4E0339D61A
+              Mortgage Calculation
+               (
+              businessRuleTask
+              )
+            </a>
+          </li>
+          <li
+            className=""
+            role="presentation"
+          >
+            <a
+              href="#"
+              onClick={[Function]}
+              onKeyDown={[Function]}
+              role="menuitem"
+              tabIndex="-1"
+            >
+              Qualify
+               (
+              userTask
+              )
+            </a>
+          </li>
+          <li
+            className=""
+            role="presentation"
+          >
+            <a
+              href="#"
+              onClick={[Function]}
+              onKeyDown={[Function]}
+              role="menuitem"
+              tabIndex="-1"
+            >
+              Final Approval
+               (
+              userTask
+              )
+            </a>
+          </li>
+          <li
+            className=""
+            role="presentation"
+          >
+            <a
+              href="#"
+              onClick={[Function]}
+              onKeyDown={[Function]}
+              role="menuitem"
+              tabIndex="-1"
+            >
+              Increase Down Payment
+               (
+              userTask
+              )
             </a>
           </li>
         </ul>
@@ -207,6 +283,7 @@ exports[`PageMapping renders correctly using snapshot 1`] = `
       id="nodeMappingField"
       name="mappings"
       rows="2"
+      value=""
     />
   </div>
   <div

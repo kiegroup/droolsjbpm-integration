@@ -174,19 +174,6 @@ public class KieServiceImpl implements KieService {
         if (!pd.getContainerId().equals(containerId)) {
             throw new ProcessDefinitionNotFoundException(kieServerId, containerId, processId);
         }
-        ArrayList<String> values = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
-        if (pd.getNodes() != null) {
-            Collection<NodeDefinition> nodes = pd.getNodes();
-            for (NodeDefinition node : nodes) {
-                if (node.getType().equals("HumanTaskNode")) {
-                    values.add(node.getUniqueId());
-                    labels.add(node.getName() + ":" + node.getUniqueId());
-                }
-            }
-        }
-        processInfo.setValues(values);
-        processInfo.setLabels(labels);
         processInfo.setContainerId(containerId);
         return processInfo;
     }

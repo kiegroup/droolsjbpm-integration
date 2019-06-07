@@ -5,28 +5,24 @@ import { DropdownButton, MenuItem } from "patternfly-react";
 export default class PageMappingDropdownNode extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      title: this.props.title
-    };
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(option) {
-    const newTitle = this.props.title + ":" + option;
-    this.setState({ title: newTitle });
-    this.props.onDropdownChange(option);
   }
 
   createMenuItems(options) {
     let menuItems = [];
     for (var i = 0; i < options.length; i++) {
-      const value = options[i].value;
-      const label = options[i].label;
-      menuItems.push(
-        <MenuItem key={i} eventKey={value} onSelect={this.handleChange}>
-          {label}
-        </MenuItem>
-      );
+      const name = options[i].name;
+      const type = options[i].type;
+      if (name !== undefined && name.trim().length > 0) {
+        menuItems.push(
+          <MenuItem
+            key={i}
+            eventKey={options[i]}
+            onSelect={this.props.onDropdownChange}
+          >
+            {name} ({type})
+          </MenuItem>
+        );
+      }
     }
     return menuItems;
   }
@@ -34,7 +30,7 @@ export default class PageMappingDropdownNode extends React.Component {
   render() {
     return (
       <div>
-        <DropdownButton title={this.state.title} id="PageMappingDropdownButton">
+        <DropdownButton title={this.props.title} id="PageMappingDropdownButton">
           {this.createMenuItems(this.props.options)}
         </DropdownButton>
       </div>

@@ -11,7 +11,7 @@ exports[`PageMappingDiagrams renders correctly using snapshot 1`] = `
       onClick={[MockFunction]}
       type="button"
     >
-      Hide Source Diagram
+      Show Source Diagram
     </button>
      
     <button
@@ -20,14 +20,14 @@ exports[`PageMappingDiagrams renders correctly using snapshot 1`] = `
       onClick={[MockFunction]}
       type="button"
     >
-      Hide Target Diagram
+      Show Target Diagram
     </button>
   </div>
   <br />
   <label
     style={
       Object {
-        "display": "block",
+        "display": "none",
       }
     }
   >
@@ -429,7 +429,7 @@ exports[`PageMappingDiagrams renders correctly using snapshot 1`] = `
   <label
     style={
       Object {
-        "display": "block",
+        "display": "none",
       }
     }
   >

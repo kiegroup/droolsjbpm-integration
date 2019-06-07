@@ -3,6 +3,8 @@ import { Button } from "patternfly-react";
 
 import PageMappingDiagrams from "./PageMappingDiagrams";
 import PageMappingDropdownNode from "./PageMappingDropdownNode";
+import Notification from "../../Notification";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
 export default class PageMapping extends Component {
   //need to provide some dummy data for the selectors which are used in svg pan, because
@@ -12,10 +14,9 @@ export default class PageMapping extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sourceNodeStr: "",
-      targetNodeStr: "",
-      sourceDiagramShown: false,
-      targetDiagramShown: false,
+      errorMsg: "",
+      showSourceDiagram: false,
+      showTargetDiagram: false,
       sourceCurrentSelector: "_Dummy123",
       sourcePreviousSelector: "_Dummy123",
       targetCurrentSelector: "_Dummy123",
@@ -23,70 +24,62 @@ export default class PageMapping extends Component {
     };
   }
 
-  componentDidUpdate() {
-    var mappingField = document.getElementById("nodeMappingField");
-    if (mappingField != null) {
-      if (this.props.mappings !== null && this.props.mappings != "") {
-        if (mappingField.value === null || mappingField.value === "") {
-          mappingField.value = JSON.stringify(this.props.mappings);
-        }
-      }
-    }
-  }
-
   handleSourceDiagramButtonClick = () => {
     this.setState({
-      sourceDiagramShown: !this.state.sourceDiagramShown
+      showSourceDiagram: !this.state.showSourceDiagram
     });
   };
 
   handleTargetDiagramButtonClick = () => {
     this.setState({
-      targetDiagramShown: !this.state.targetDiagramShown
+      showTargetDiagram: !this.state.showTargetDiagram
     });
   };
 
   handleSourceDropdownChange = option => {
-    let tmpPreviousSelector = this.state.sourceCurrentSelector;
-    let tmpCurrentSelector = "#" + option + "_shapeType_BACKGROUND";
     this.setState({
-      sourceNodeStr: option,
-      sourcePreviousSelector: tmpPreviousSelector,
-      sourceCurrentSelector: tmpCurrentSelector,
-      sourceDiagramShown: true,
-      targetDiagramShown: false
+      sourceNodeTitle: `${option.name} (${option.type})`,
+      sourceNode: option,
+      sourcePreviousSelector: this.state.sourceCurrentSelector,
+      sourceCurrentSelector: "#" + option.id + "_shapeType_BACKGROUND",
+      showSourceDiagram: true,
+      showTargetDiagram: false
     });
   };
 
   handleTargetDropdownChange = option => {
-    let tmpPreviousSelector = this.state.targetCurrentSelector;
-    let tmpCurrentSelector = "#" + option + "_shapeType_BACKGROUND";
-
     this.setState({
-      targetNodeStr: option,
-      targetPreviousSelector: tmpPreviousSelector,
-      targetCurrentSelector: tmpCurrentSelector,
-      sourceDiagramShown: false,
-      targetDiagramShown: true
+      targetNodeTitle: `${option.name} (${option.type})`,
+      targetNode: option,
+      targetPreviousSelector: this.state.targetCurrentSelector,
+      targetCurrentSelector: "#" + option.id + "_shapeType_BACKGROUND",
+      showSourceDiagram: false,
+      showTargetDiagram: true
     });
   };
 
   handleMapButtonClick = () => {
     if (
-      this.state.sourceNodeStr.length > 0 &&
-      this.state.targetNodeStr.length > 0
+      this.state.sourceNode !== undefined &&
+      this.state.targetNode !== undefined
     ) {
+      if (this.state.sourceNode.type !== this.state.targetNode.type) {
+        this.setState({
+          errorMsg: "Source and Target nodes must be of the same type"
+        });
+        return;
+      }
+
       var currentNodeMapping =
         '"' +
-        this.state.sourceNodeStr +
+        this.state.sourceNode.id +
         '"' +
         ":" +
         '"' +
-        this.state.targetNodeStr +
+        this.state.targetNode.id +
         '"';
 
-      var input = document.getElementById("nodeMappingField");
-      var currentInputValue = input.value;
+      var currentInputValue = this.props.mappings;
       //remove {} before add new node mapping values
       currentInputValue = currentInputValue.replace(/{/g, "");
       currentInputValue = currentInputValue.replace(/}/g, "");
@@ -95,68 +88,60 @@ export default class PageMapping extends Component {
       } else {
         currentInputValue = currentNodeMapping;
       }
-
       currentInputValue = "{" + currentInputValue + "}";
-
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype,
-        "value"
-      ).set;
-      nativeInputValueSetter.call(input, currentInputValue);
-
-      //once fired the event, this currentInputValue will be saved in the wizard form's values
-      var ev2 = new Event("input", { bubbles: true });
-      input.dispatchEvent(ev2);
+      this.props.onMappingsChange(currentInputValue);
     }
   };
 
-  MappingButton() {
+  mappingButton = () => {
     return (
       <Button bsStyle="primary" onClick={this.handleMapButtonClick}>
         Map these two nodes
       </Button>
     );
-  }
+  };
 
   render() {
-    const sourceValues = this.props.sourceInfo.values;
-    const sourceLabels = this.props.sourceInfo.labels;
-    const sourceNode = [];
+    const notification = (
+      <Notification
+        type={ALERT_TYPE_ERROR}
+        message={this.state.errorMsg}
+        onDismiss={() => this.setState({ errorMsg: "" })}
+      />
+    );
     if (
       this.props.sourceInfo !== null &&
       this.props.sourceInfo !== "" &&
       this.props.targetInfo !== null &&
       this.props.targetInfo !== ""
     ) {
-      for (var i = 0; i < sourceValues.length; i++) {
-        sourceNode.push({ value: sourceValues[i], label: sourceLabels[i] });
-      }
-
-      const targetValues = this.props.targetInfo.values;
-      const targetLabels = this.props.targetInfo.labels;
-      const targetNode = [];
-      for (var j = 0; j < targetValues.length; j++) {
-        targetNode.push({ value: targetValues[j], label: targetLabels[j] });
-      }
-
       return (
         <div className="form-horizontal">
+          {this.state.errorMsg && notification}
           <div className="form-group">
             <label>Source: {this.props.sourceInfo.processId}</label>
             <PageMappingDropdownNode
-              options={sourceNode}
-              title="Source Nodes "
+              options={this.props.sourceInfo.nodes}
+              title={
+                this.state.sourceNodeTitle
+                  ? this.state.sourceNodeTitle
+                  : "Source Nodes"
+              }
               onDropdownChange={this.handleSourceDropdownChange}
             />
             <br />
             <label>Target: {this.props.targetInfo.processId}</label>
             <PageMappingDropdownNode
-              options={targetNode}
-              title="Target Nodes "
+              options={this.props.targetInfo.nodes}
+              title={
+                this.state.targetNodeTitle
+                  ? this.state.targetNodeTitle
+                  : "Target Nodes"
+              }
               onDropdownChange={this.handleTargetDropdownChange}
             />
             <br />
-            {this.MappingButton()}
+            {this.mappingButton()}
           </div>
 
           <div className="form-group">
@@ -170,6 +155,8 @@ export default class PageMapping extends Component {
               name="mappings"
               id="nodeMappingField"
               rows="2"
+              value={this.props.mappings}
+              onChange={this.props.onMappingsChange}
             />
           </div>
 
@@ -180,8 +167,8 @@ export default class PageMapping extends Component {
             targetPreviousSelector={this.state.targetPreviousSelector}
             sourceDiagramButtonClick={this.handleSourceDiagramButtonClick}
             targetDiagramButtonClick={this.handleTargetDiagramButtonClick}
-            sourceDiagramShown={this.state.sourceDiagramShown}
-            targetDiagramShown={this.state.targetDiagramShown}
+            showSourceDiagram={this.state.showSourceDiagram}
+            showTargetDiagram={this.state.showTargetDiagram}
             sourceInfo={this.props.sourceInfo}
             targetInfo={this.props.targetInfo}
           />
