@@ -21,9 +21,7 @@ export default class PageDefinition extends Component {
   };
 
   getDefinition = (containerId, processId, callbackFn) => {
-    const defURL = `${BACKEND_URL}/kieserver/${
-      this.props.kieServerId
-    }/definitions/${containerId}/${processId}`;
+    const defURL = `${BACKEND_URL}/kieserver/${this.props.kieServerId}/definitions/${containerId}/${processId}`;
     fetch(defURL, {
       headers: {
         "Content-Type": "application/json"
