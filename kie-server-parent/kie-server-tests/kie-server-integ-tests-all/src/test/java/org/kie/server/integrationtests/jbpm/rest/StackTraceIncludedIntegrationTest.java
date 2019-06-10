@@ -72,8 +72,8 @@ public class StackTraceIncludedIntegrationTest extends RestOnlyBaseIntegrationTe
             String responseBody = response.readEntity(String.class);
             Assert.assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus()); 
             Assert.assertThat(responseBody, 
-            		    allOf(containsString("at org.kie.server.remote.rest.jbpm.DocumentResource.createDocument"),
-            		          containsString("at org.kie.server.services.impl.marshal.MarshallerHelper.unmarshal")));    
+            		    allOf(containsString("org.kie.server.remote.rest.jbpm.DocumentResource.createDocument"),
+            		          containsString("org.kie.server.services.impl.marshal.MarshallerHelper.unmarshal")));    
         } finally {
             if(response != null) {
                 response.close();
