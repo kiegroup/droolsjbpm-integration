@@ -33,5 +33,4 @@ public class ResourceNotFoundExceptionMapper implements ExceptionMapper<Resource
         JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
         return Response.status(Response.Status.NOT_FOUND).entity(json).type(MediaType.APPLICATION_JSON).build();
     }
-
 }

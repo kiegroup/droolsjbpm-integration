@@ -31,5 +31,4 @@ public class RuntimeExceptionExceptionMapper implements ExceptionMapper<RuntimeE
         JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(json).type(MediaType.APPLICATION_JSON).build();
     }
-
 }

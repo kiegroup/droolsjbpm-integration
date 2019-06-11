@@ -81,5 +81,4 @@ public class ProcessInfo {
                 + ", values=" + values + ", labels=" + labels
                 + "]";
     }
-
 }

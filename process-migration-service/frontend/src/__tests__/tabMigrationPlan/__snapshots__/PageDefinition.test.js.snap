@@ -4,6 +4,7 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
 <div
   className="form-horizontal"
 >
+  
   <p />
   <div>
     <div
@@ -53,7 +54,6 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
     onClick={[Function]}
     type="button"
   >
-     
     Copy Source To Target
   </button>
   <p />

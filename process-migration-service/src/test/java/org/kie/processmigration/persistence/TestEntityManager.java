@@ -37,7 +37,6 @@ import javax.persistence.metamodel.Metamodel;
 /**
  * Convenience EntityManager created to allow defining Spies for EntityManager
  * With Mockito 1.x and JUnit 4 is not possible to Spy final classes
- *
  */
 public class TestEntityManager implements EntityManager {
 
@@ -301,5 +300,4 @@ public class TestEntityManager implements EntityManager {
     public <T> List<EntityGraph<? super T>> getEntityGraphs(Class<T> entityClass) {
         return em.getEntityGraphs(entityClass);
     }
-
 }

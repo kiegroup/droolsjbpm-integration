@@ -17,44 +17,86 @@
 package org.kie.processmigration.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.CredentialsProvider;
+import org.kie.server.client.KieServicesClient;
 
 public class KieServerConfig {
 
     private String id;
+
     private String host;
+
     @JsonIgnore
     private CredentialsProvider credentialsProvider;
 
+    @JsonIgnore
+    private KieServicesClient client;
+
     public String getId() {
+        if (client == null) {
+            return null;
+        }
+        try {
+            if (this.id == null) {
+                ServiceResponse<KieServerInfo> info = client.getServerInfo();
+                this.id = info.getResult().getServerId();
+            }
+        } catch (Exception e) {
+            return null;
+        }
         return id;
     }
 
-    public void setId(String id) {
+    public KieServerConfig setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getHost() {
         return host;
     }
 
-    public void setHost(String host) {
+    public KieServerConfig setHost(String host) {
         this.host = host;
+        return this;
     }
+
 
     public CredentialsProvider getCredentialsProvider() {
         return credentialsProvider;
     }
 
-    public void setCredentialsProvider(CredentialsProvider credentialsProvider) {
+    public KieServerConfig setCredentialsProvider(CredentialsProvider credentialsProvider) {
         this.credentialsProvider = credentialsProvider;
+        return this;
+    }
+
+    public KieServicesClient getClient() {
+        return client;
+    }
+
+    public KieServerConfig setClient(KieServicesClient client) {
+        this.client = client;
+        return this;
+    }
+
+    public String getStatus() {
+        if (client == null) {
+            return Status.UNKNOWN;
+        }
+        try {
+            return client.getServerInfo().getType().name();
+        } catch (Exception e) {
+            return Status.UNKNOWN;
+        }
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("KieServerConfig [id=").append(id).append(", host=").append(host).append("]");
+        builder.append("KieServerConfig [id=").append(id).append(", host=").append(host).append(", status=").append(getStatus()).append("]");
         return builder.toString();
     }
-
 }

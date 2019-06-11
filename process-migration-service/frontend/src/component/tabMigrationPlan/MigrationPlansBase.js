@@ -111,7 +111,7 @@ export default class MigrationPlansBase extends React.Component {
       .get(servicesUrl, {
         params: {
           containerId: rowData.sourceContainerId,
-          kieServerId: this.props.kieServerIds
+          kieServerId: this.props.kieServerId
         }
       })
       .then(res => {

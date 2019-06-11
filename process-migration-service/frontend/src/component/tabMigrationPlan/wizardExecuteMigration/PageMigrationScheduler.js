@@ -7,9 +7,9 @@ export default class PageMigrationScheduler extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dateTimeInput: true,
       validationMessageUrl: "",
-      validationMessageTime: ""
+      validationMessageTime: "",
+      scheduleMigration: false
     };
   }
 
@@ -35,14 +35,14 @@ export default class PageMigrationScheduler extends Component {
 
   disableScheduleTime = () => {
     this.setState({
-      dateTimeInput: false
+      scheduleMigration: false
     });
     this.props.setScheduleStartTime("");
   };
 
   enableScheduleTime = () => {
     this.setState({
-      dateTimeInput: true
+      scheduleMigration: true
     });
   };
 
@@ -90,8 +90,8 @@ export default class PageMigrationScheduler extends Component {
                 <input
                   type="radio"
                   name="timeType"
-                  value="1"
-                  onClick={this.disableScheduleTime}
+                  checked={!this.state.scheduleMigration}
+                  onChange={this.disableScheduleTime}
                 />
                 Now
               </label>
@@ -101,15 +101,15 @@ export default class PageMigrationScheduler extends Component {
                 <input
                   type="radio"
                   name="timeType"
-                  value="2"
-                  onClick={this.enableScheduleTime}
+                  onChange={this.enableScheduleTime}
                 />
                 Schedule
                 <Datetime
                   id="PageMigrationScheduler_scheduleTime"
-                  input={this.state.dateTimeInput}
+                  input={this.state.scheduleMigration}
                   onChange={this.handleDateTimeInput}
                   isValidDate={this.validDate}
+                  open={this.state.scheduleMigration}
                 />
               </label>
             </div>

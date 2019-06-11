@@ -77,12 +77,8 @@ export default class WizardAddPlan extends WizardBase {
     });
   }
 
-  setInfo = (sourceInfo, targetInfo) => {
-    this.setState({
-      sourceInfo: sourceInfo,
-      targetInfo: targetInfo
-    });
-  };
+  setSourceDefinition = sourceInfo => this.setState({ sourceInfo });
+  setTargetDefinition = targetInfo => this.setState({ targetInfo });
 
   handleAddPlanFormChange = e => {
     if (e.target.name == "name") {
@@ -160,7 +156,7 @@ export default class WizardAddPlan extends WizardBase {
       migrationPlanJsonStr
     } = this.state;
 
-    const renderAddPlanWizardContents = (wizardSteps, state, setInfo) => {
+    const renderAddPlanWizardContents = wizardSteps => {
       return wizardSteps.map((step, stepIndex) =>
         step.subSteps.map((sub, subStepIndex) => {
           if (stepIndex === 0) {
@@ -192,7 +188,8 @@ export default class WizardAddPlan extends WizardBase {
                 <PageDefinition
                   sourceInfo={sourceInfo}
                   targetInfo={targetInfo}
-                  setInfo={setInfo}
+                  setSourceDefinition={this.setSourceDefinition}
+                  setTargetDefinition={this.setTargetDefinition}
                   sourceContainerId={this.state.sourceContainerId}
                   sourceProcessId={this.state.sourceProcessId}
                   targetContainerId={this.state.targetContainerId}
@@ -201,7 +198,7 @@ export default class WizardAddPlan extends WizardBase {
                   onChangeSourceProcessId={this.handleSourceProcessIdChange}
                   onChangeTargetContainerId={this.handleTargetContainerIdChange}
                   onChangeTargetProcessId={this.handleTargetProcessIdChange}
-                  kieServerIds={this.props.kieServerIds}
+                  kieServerId={this.props.kieServerId}
                 />
               </Wizard.Contents>
             );
@@ -281,11 +278,7 @@ export default class WizardAddPlan extends WizardBase {
               />
               <Wizard.Row>
                 <Wizard.Main>
-                  {renderAddPlanWizardContents(
-                    AddPlanItems,
-                    this.state,
-                    this.setInfo
-                  )}
+                  {renderAddPlanWizardContents(AddPlanItems)}
                 </Wizard.Main>
               </Wizard.Row>
             </Wizard.Body>

@@ -28,5 +28,4 @@ public class InvalidKieServerException extends InvalidMigrationException {
     public String getMessage() {
         return String.format("Invalid KIE Server provided: %s", super.getMessage());
     }
-
 }

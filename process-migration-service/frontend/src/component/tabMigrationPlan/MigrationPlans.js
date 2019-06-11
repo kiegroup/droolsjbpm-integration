@@ -136,7 +136,7 @@ export default class MigrationPlans extends MigrationPlansBase {
           steps={AddPlanItems}
           ref="WizardAddPlanChild"
           addPlanResponseJsonStr={this.state.addPlanResponseJsonStr}
-          kieServerIds={this.props.kieServerIds}
+          kieServerId={this.props.kieServerId}
         />
 
         {/* Execute Migration Wizard*/}
@@ -147,7 +147,7 @@ export default class MigrationPlans extends MigrationPlansBase {
           planId={this.state.planId}
           steps={ExecuteMigrationItems}
           ref="WizardExecuteMigrationChild"
-          kieServerIds={this.props.kieServerIds}
+          kieServerId={this.props.kieServerId}
         />
       </div>
     );
