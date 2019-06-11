@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -33,6 +34,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
+import org.kie.processmigration.model.BpmNode;
 import org.kie.processmigration.model.KieServerConfig;
 import org.kie.processmigration.model.ProcessInfo;
 import org.kie.processmigration.model.RunningInstance;
@@ -41,7 +43,6 @@ import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundExcept
 import org.kie.processmigration.service.KieService;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.CredentialsProvider;
@@ -152,7 +153,6 @@ public class KieServiceImpl implements KieService {
             ProcessDefinitionNotFoundException, InvalidKieServerException {
         ProcessInfo processInfo = new ProcessInfo();
 
-        //get SVG file
         String svgFile;
         try {
             svgFile = getUIServicesClient(kieServerId).getProcessImage(containerId, processId);
@@ -174,7 +174,16 @@ public class KieServiceImpl implements KieService {
         if (!pd.getContainerId().equals(containerId)) {
             throw new ProcessDefinitionNotFoundException(kieServerId, containerId, processId);
         }
+        List<BpmNode> nodes = pd.getNodes()
+                .stream()
+                .map(n -> new BpmNode()
+                        .setId(n.getUniqueId())
+                        .setName(n.getName())
+                        .setType(n.getType()))
+                .collect(Collectors.toCollection(ArrayList::new));
+        processInfo.setNodes(nodes);
         processInfo.setContainerId(containerId);
+        processInfo.setProcessId(pd.getId());
         return processInfo;
     }
 

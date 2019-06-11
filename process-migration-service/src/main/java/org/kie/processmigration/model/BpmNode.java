@@ -25,24 +25,27 @@ public class BpmNode {
         return name;
     }
 
-    public void setName(String name) {
+    public BpmNode setName(String name) {
         this.name = name;
+        return this;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public BpmNode setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public BpmNode setType(String type) {
         this.type = type;
+        return this;
     }
 
     @Override
