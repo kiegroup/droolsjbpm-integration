@@ -18,6 +18,8 @@ package org.kie.processmigration.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.kie.processmigration.model.KieServerConfig;
 import org.kie.processmigration.model.ProcessInfo;
@@ -36,6 +38,8 @@ public interface KieService {
     Collection<KieServerConfig> getConfigs();
 
     boolean hasKieServer(String kieServerId);
+
+    Map<String, Set<String>> getDefinitions(String kieServerId) throws InvalidKieServerException;;
 
     ProcessInfo getDefinition(String kieServerId, String containerId, String processId) throws ProcessDefinitionNotFoundException, InvalidKieServerException;
 

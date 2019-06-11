@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import axios from "axios";
 import validator from "validator";
 
 import {
@@ -11,9 +10,9 @@ import {
   actionHeaderCellFormatter
 } from "patternfly-react";
 
-import { BACKEND_URL } from "../common/PimConstants";
 import PageViewMigrationLogs from "./PageViewMigrationLogs";
 import PageEditMigrationDefinitionModal from "./PageEditMigrationDefinitionModal";
+import MigrationClient from "../../clients/migrationClient";
 
 export default class MigrationDefinitions extends Component {
   constructor(props) {
@@ -40,14 +39,10 @@ export default class MigrationDefinitions extends Component {
   };
 
   retrieveMigrationLogs = rowData => {
-    this.setState({
-      showLogDialog: true
-    });
-    const servicesUrl = BACKEND_URL + "/migrations/" + rowData.id + "/results";
-    axios.get(servicesUrl, {}).then(res => {
-      const results = res.data;
+    MigrationClient.getResults(rowData.id).then(migrationLogs => {
       this.setState({
-        migrationLogs: results
+        showLogDialog: true,
+        migrationLogs
       });
     });
   };
@@ -67,12 +62,9 @@ export default class MigrationDefinitions extends Component {
 
   deleteMigration = () => {
     //need to create a temp variable "self" to store this, so I can invoke this inside axios call
-    const self = this;
-    const servicesUrl =
-      BACKEND_URL + "/migrations/" + this.state.deleteMigrationId;
-    axios.delete(servicesUrl, {}).then(() => {
-      self.hideDeleteDialog();
-      self.retrieveMigrationDefinitions();
+    MigrationClient.delete(this.state.deleteMigrationId).then(() => {
+      this.hideDeleteDialog();
+      this.retrieveMigrationDefinitions();
     });
   };
 
@@ -104,18 +96,19 @@ export default class MigrationDefinitions extends Component {
         validationMessage: ""
       });
       //search the migration record
+      let migrationRequest;
       if (input != null) {
-        let serviceUrl = BACKEND_URL + "/migrations/" + input.value;
         if (
           event != null &&
           event.currentTarget.id == "id_migrationDefinition_refresh_button"
         ) {
           //For refresh, just retrieve all records
-          serviceUrl = BACKEND_URL + "/migrations/";
+          migrationRequest = MigrationClient.getAll();
+        } else {
+          migrationRequest = MigrationClient.get(input.value);
         }
 
-        axios.get(serviceUrl, {}).then(res => {
-          var migrationsDefinitions = res.data;
+        migrationRequest.then(migrationsDefinitions => {
           if (migrationsDefinitions != null) {
             const tmpStr = JSON.stringify(migrationsDefinitions);
             if (tmpStr != "" && tmpStr.charAt(0) != "[") {

@@ -1,7 +1,6 @@
 import React from "react";
-import axios from "axios";
-
-import { BACKEND_URL } from "../common/PimConstants";
+import KieServerClient from "../../clients/kieServerClient";
+import PlanClient from "../../clients/planClient";
 
 export default class MigrationPlansBase extends React.Component {
   constructor(props) {
@@ -23,18 +22,9 @@ export default class MigrationPlansBase extends React.Component {
   }
 
   retrieveAllPlans = () => {
-    const servicesUrl = BACKEND_URL + "/plans";
-    axios
-      .get(servicesUrl, {})
-      .then(res => {
-        const plans = res.data;
-        this.setState({ plans, filteredPlans: plans });
-      })
-      .catch(() => {
-        this.props.onError(
-          "Unable to retrieve the migration plans. Confirm the selected KIE Server is online"
-        );
-      });
+    PlanClient.getAll().then(plans => {
+      this.setState({ plans, filteredPlans: plans });
+    });
   };
 
   showDeleteDialog = id => {
@@ -51,24 +41,10 @@ export default class MigrationPlansBase extends React.Component {
   };
 
   deletePlan = () => {
-    //need to create a temp variable "self" to store this, so I can invoke this inside axios call
-    const self = this;
-    const serviceUrl = BACKEND_URL + "/plans/" + this.state.deletePlanId;
-    axios
-      .delete(serviceUrl, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(function() {
-        self.retrieveAllPlans();
-        self.hideDeleteDialog();
-      })
-      .catch(() => {
-        this.props.onError(
-          "Unable to delete the plan. Confirm the selected KIE Server is online"
-        );
-      });
+    PlanClient.delete(this.state.deletePlanId).then(() => {
+      this.retrieveAllPlans();
+      this.hideDeleteDialog();
+    });
   };
 
   // addPlan need to be in the parent because it's shared between WizardAddPlan and Import Plan pop-up
@@ -82,73 +58,37 @@ export default class MigrationPlansBase extends React.Component {
       plan = plan.replace('}"', "}");
     }
 
-    //need to create a temp variable "self" to store this, so I can invoke this inside axios call
-    const self = this;
-    const servicsUrl = BACKEND_URL + "/plans";
-    axios
-      .post(servicsUrl, plan, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(function(response) {
-        self.setState({
-          addPlanResponseJsonStr: JSON.stringify(response.data, null, 2)
-        });
-        self.retrieveAllPlans();
-      })
-      .catch(() => {
-        this.props.onError(
-          "Unable to create the plan. Confirm the selected KIE Server is online"
-        );
+    PlanClient.create(plan).then(response => {
+      this.setState({
+        addPlanResponseJsonStr: JSON.stringify(response, null, 2)
       });
+      this.retrieveAllPlans();
+    });
   };
 
   editPlan = (plan, planId) => {
-    //need to create a temp variable "self" to store this, so I can invoke this inside axios call
-    const self = this;
-    const serviceUrl = BACKEND_URL + "/plans/" + planId;
-    axios
-      .put(serviceUrl, plan, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(function(response) {
-        self.setState({
-          addPlanResponseJsonStr: JSON.stringify(response.data, null, 2)
-        });
-        self.retrieveAllPlans();
-      })
-      .catch(() => {
-        this.props.onError(
-          "Unable to update the plan. Confirm the selected KIE Server is online"
-        );
+    PlanClient.update(planId, plan).then(response => {
+      this.setState({
+        addPlanResponseJsonStr: JSON.stringify(response, null, 2)
       });
+      this.retrieveAllPlans();
+    });
   };
 
   openMigrationWizard = rowData => {
-    const servicesUrl = BACKEND_URL + "/kieserver/instances";
-    axios
-      .get(servicesUrl, {
-        params: {
-          containerId: rowData.sourceContainerId,
-          kieServerId: this.props.kieServerId
-        }
-      })
+    KieServerClient.getInstances(this.props.kieServerId)
       .then(res => {
         const instances = res.data;
         this.setState({
           runningInstances: instances,
           showMigrationWizard: true,
-          planId: rowData.id
+          planId: rowData.id,
+          errorMsg: ""
         });
         this.refs.WizardExecuteMigrationChild.resetWizardStates();
       })
-      .catch(() => {
-        this.props.onError(
-          "Unable to open the migration wizard. Verify the selected KIE Server is online."
-        );
+      .catch(error => {
+        this.setState({ errorMsg: error.message });
       });
   };
 }

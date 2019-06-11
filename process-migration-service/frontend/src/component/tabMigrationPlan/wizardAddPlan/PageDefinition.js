@@ -3,37 +3,41 @@ import React, { Component } from "react";
 import { Button } from "patternfly-react";
 import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
-import PageDefinitionSearchTable from "./PageDefinitionSearchTable";
-import { BACKEND_URL } from "../../common/PimConstants";
 import Notification from "../../Notification";
+import KieServerClient from "../../../clients/kieServerClient";
+import ProcessSelector from "./ProcessSelector";
 
 export default class PageDefinition extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      errorMsg: ""
+      errorMsg: "",
+      containers: {}
     };
+    this.loadProcessIds();
   }
 
-  copySourceToTarget = () => {
-    this.props.onChangeTargetContainerId(this.props.sourceContainerId);
-    this.props.onChangeTargetProcessId(this.props.sourceProcessId);
+  loadProcessIds = () => {
+    KieServerClient.getDefinitions(this.props.kieServerId).then(containers => {
+      this.setState({
+        containers
+      });
+    });
   };
 
-  getDefinition = (containerId, processId, callbackFn) => {
-    const defURL = `${BACKEND_URL}/kieserver/${this.props.kieServerId}/definitions/${containerId}/${processId}`;
-    fetch(defURL, {
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "same-origin"
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw res;
-        }
-        return res.json();
-      })
+  copySourceToTarget = () => {
+    this.props.onChangeTarget(
+      this.props.source.containerId,
+      this.props.source.processId
+    );
+  };
+
+  getDefinition = (definition, callbackFn) => {
+    KieServerClient.getDefinition(
+      this.props.kieServerId,
+      definition.containerId,
+      definition.processId
+    )
       .then(res => {
         callbackFn(res);
       })
@@ -41,8 +45,8 @@ export default class PageDefinition extends Component {
         const status = err.status;
         let errorMsg;
         if (status === 404) {
-          if (containerId !== "" || processId !== "") {
-            errorMsg = `Process not found: ${containerId}/${processId}`;
+          if (definition.containerId !== "" || definition.processId !== "") {
+            errorMsg = `Process not found: ${definition.containerId}/${definition.processId}`;
           } else {
             errorMsg = "Provide a valid containerId and processId";
           }
@@ -51,7 +55,7 @@ export default class PageDefinition extends Component {
         } else {
           err.json().then(json => {
             this.setState({
-              errorMsg: `${containerId}/${processId}: ${json.message.string}`
+              errorMsg: `${definition.containerId}/${definition.processId}: ${json.message.string}`
             });
             callbackFn("");
           });
@@ -60,16 +64,8 @@ export default class PageDefinition extends Component {
   };
 
   getDefinitions = () => {
-    this.getDefinition(
-      this.props.sourceContainerId,
-      this.props.sourceProcessId,
-      this.props.setSourceDefinition
-    );
-    this.getDefinition(
-      this.props.targetContainerId,
-      this.props.targetProcessId,
-      this.props.setTargetDefinition
-    );
+    this.getDefinition(this.props.source, this.props.setSourceDefinition);
+    this.getDefinition(this.props.target, this.props.setTargetDefinition);
   };
 
   render() {
@@ -84,26 +80,21 @@ export default class PageDefinition extends Component {
       <div className="form-horizontal">
         {this.state.errorMsg && notification}
         <p />
-        <PageDefinitionSearchTable
-          tableHeader="Source "
-          processId={this.props.sourceProcessId}
-          containerId={this.props.sourceContainerId}
-          handleProcessIdChange={this.props.onChangeSourceProcessId}
-          handleContainerIdChange={this.props.onChangeSourceContainerId}
-          initContainerId={this.props.initSourceContainerId}
-          initProcessId={this.props.initSourceProcessId}
+        <ProcessSelector
+          type="Source"
+          options={this.state.containers}
+          containerId={this.props.source.containerId}
+          processId={this.props.source.processId}
+          onChange={this.props.onChangeSource}
         />
-
         <Button onClick={this.copySourceToTarget}>Copy Source To Target</Button>
         <p />
-        <PageDefinitionSearchTable
-          tableHeader="Target "
-          processId={this.props.targetProcessId}
-          containerId={this.props.targetContainerId}
-          handleProcessIdChange={this.props.onChangeTargetProcessId}
-          handleContainerIdChange={this.props.onChangeTargetContainerId}
-          initContainerId={this.props.initTargetContainerId}
-          initProcessId={this.props.initProcessId}
+        <ProcessSelector
+          type="Target"
+          options={this.state.containers}
+          containerId={this.props.target.containerId}
+          processId={this.props.target.processId}
+          onChange={this.props.onChangeTarget}
         />
 
         <Button bsStyle="default" onClick={() => this.getDefinitions()}>

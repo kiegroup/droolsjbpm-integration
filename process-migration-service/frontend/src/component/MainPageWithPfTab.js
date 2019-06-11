@@ -15,8 +15,7 @@ import {
 
 import MigrationPlans from "./tabMigrationPlan/MigrationPlans";
 import MigrationDefinitions from "./tabMigration/MigrationDefinitions";
-import { BACKEND_URL } from "./common/PimConstants";
-import Notification from "./Notification";
+import KieServerClient from "../clients/kieServerClient";
 
 export default class MainPageWithPfTab extends Component {
   constructor(props) {
@@ -38,19 +37,7 @@ export default class MainPageWithPfTab extends Component {
   resetErrorMsg = () => this.setErrorMsg("");
 
   loadKieServers = () => {
-    this.resetErrorMsg();
-    fetch(`${BACKEND_URL}/kieserver`, {
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "same-origin"
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw res;
-        }
-        return res.json();
-      })
+    KieServerClient.getKieServers()
       .then(res => this.populateKieServers(res))
       .catch(error => {
         this.populateKieServers([]);

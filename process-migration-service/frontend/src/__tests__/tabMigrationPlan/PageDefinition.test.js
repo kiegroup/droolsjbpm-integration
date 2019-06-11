@@ -12,6 +12,8 @@ test("PageDefinition renders correctly using snapshot", () => {
         sourceInfo={evaluationDef}
         targetInfo={mortgageDef}
         setInfo={myMock}
+        source={{}}
+        target={{}}
       />
     )
     .toJSON();

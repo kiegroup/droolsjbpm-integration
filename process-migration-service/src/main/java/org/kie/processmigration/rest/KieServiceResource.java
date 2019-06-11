@@ -16,6 +16,8 @@
 package org.kie.processmigration.rest;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -33,7 +35,7 @@ import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
 import org.kie.processmigration.service.KieService;
 
-@Path("/kieserver")
+@Path("/kieservers")
 @Produces(MediaType.APPLICATION_JSON)
 public class KieServiceResource {
 
@@ -46,6 +48,13 @@ public class KieServiceResource {
     @GET
     public Response getKieServers() {
         return Response.ok(kieService.getConfigs()).build();
+    }
+
+    @GET
+    @Path("/{kieServerId}/definitions")
+    public Response getDefinitions(@PathParam("kieServerId") String kieServerId) throws InvalidKieServerException {
+        Map<String, Set<String>> definitions = kieService.getDefinitions(kieServerId);
+        return Response.ok(definitions).build();
     }
 
     @GET
@@ -64,9 +73,9 @@ public class KieServiceResource {
     }
 
     @GET
-    @Path("/instances")
-    public Response getRunningInstances(@QueryParam("containerId") String containerId,
-                                        @QueryParam("kieServerId") String kieServerId,
+    @Path("/{kieServerId}/instances/{containerId}")
+    public Response getRunningInstances(@PathParam("kieServerId") String kieServerId,
+                                        @PathParam("containerId") String containerId,
                                         @DefaultValue(DEFAULT_PAGE) @QueryParam("page") Integer page,
                                         @DefaultValue(DEFAULT_PAGE_SIZE) @QueryParam("pageSize") Integer pageSize) throws InvalidKieServerException {
         List<RunningInstance> result = kieService.getRunningInstances(containerId, kieServerId, page, pageSize);

@@ -13,18 +13,38 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
       <label
         className="col-sm-2 control-label"
       >
-        Source 
+        Source
          Container ID
       </label>
       <div
         className="col-sm-10"
       >
-        <input
-          className="form-control"
-          name="ContainerId"
-          onChange={[Function]}
-          type="text"
-        />
+        <div
+          className="dropdown btn-group"
+        >
+          <button
+            aria-expanded={false}
+            aria-haspopup={true}
+            className="dropdown-toggle btn btn-default"
+            disabled={false}
+            id="Source-ContainerDropdown"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            type="button"
+          >
+            Select a container
+             
+            <span
+              className="caret"
+            />
+          </button>
+          <ul
+            aria-labelledby="Source-ContainerDropdown"
+            className="dropdown-menu"
+            role="menu"
+          />
+        </div>
       </div>
     </div>
     <div
@@ -33,18 +53,38 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
       <label
         className="col-sm-2 control-label"
       >
-        Source 
+        Source
          Process ID
       </label>
       <div
         className="col-sm-10"
       >
-        <input
-          className="form-control"
-          name="processId"
-          onChange={[Function]}
-          type="text"
-        />
+        <div
+          className="dropdown btn-group"
+        >
+          <button
+            aria-expanded={false}
+            aria-haspopup={true}
+            className="dropdown-toggle btn btn-default"
+            disabled={false}
+            id="Source-ProcessDropdown"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            type="button"
+          >
+            Select a process
+             
+            <span
+              className="caret"
+            />
+          </button>
+          <ul
+            aria-labelledby="Source-ProcessDropdown"
+            className="dropdown-menu"
+            role="menu"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -64,18 +104,38 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
       <label
         className="col-sm-2 control-label"
       >
-        Target 
+        Target
          Container ID
       </label>
       <div
         className="col-sm-10"
       >
-        <input
-          className="form-control"
-          name="ContainerId"
-          onChange={[Function]}
-          type="text"
-        />
+        <div
+          className="dropdown btn-group"
+        >
+          <button
+            aria-expanded={false}
+            aria-haspopup={true}
+            className="dropdown-toggle btn btn-default"
+            disabled={false}
+            id="Target-ContainerDropdown"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            type="button"
+          >
+            Select a container
+             
+            <span
+              className="caret"
+            />
+          </button>
+          <ul
+            aria-labelledby="Target-ContainerDropdown"
+            className="dropdown-menu"
+            role="menu"
+          />
+        </div>
       </div>
     </div>
     <div
@@ -84,18 +144,38 @@ exports[`PageDefinition renders correctly using snapshot 1`] = `
       <label
         className="col-sm-2 control-label"
       >
-        Target 
+        Target
          Process ID
       </label>
       <div
         className="col-sm-10"
       >
-        <input
-          className="form-control"
-          name="processId"
-          onChange={[Function]}
-          type="text"
-        />
+        <div
+          className="dropdown btn-group"
+        >
+          <button
+            aria-expanded={false}
+            aria-haspopup={true}
+            className="dropdown-toggle btn btn-default"
+            disabled={false}
+            id="Target-ProcessDropdown"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            type="button"
+          >
+            Select a process
+             
+            <span
+              className="caret"
+            />
+          </button>
+          <ul
+            aria-labelledby="Target-ProcessDropdown"
+            className="dropdown-menu"
+            role="menu"
+          />
+        </div>
       </div>
     </div>
   </div>

@@ -1,19 +1,15 @@
 import React from "react";
-import axios from "axios";
 
-import { Wizard } from "patternfly-react";
-import { Button } from "patternfly-react";
-import { Icon } from "patternfly-react";
+import { Wizard, Button, Icon } from "patternfly-react";
 
+import MigrationClient from "../../../clients/migrationClient";
 import { ExecuteMigrationItems } from "../../common/WizardItems";
-import { BACKEND_URL } from "../../common/PimConstants";
-
-import WizardBase from "../WizardBase";
-import { renderWizardSteps } from "../PfWizardRenderers";
-
 import PageMigrationRunningInstances from "./PageMigrationRunningInstances";
-import PageMigrationScheduler from "./PageMigrationScheduler";
 import PageReview from "../PageReview";
+import { renderWizardSteps } from "../PfWizardRenderers";
+import WizardBase from "../WizardBase";
+
+import PageMigrationScheduler from "./PageMigrationScheduler";
 
 export default class WizardExecuteMigration extends WizardBase {
   constructor(props) {
@@ -43,24 +39,14 @@ export default class WizardExecuteMigration extends WizardBase {
   }
 
   onSubmitMigrationPlan = () => {
-    const plan = this.state.migrationDefinitionJsonStr;
-
-    //need to create a temp variable "self" to store this, so I can invoke this inside axios call
-    const self = this;
-
-    const serviceUrl = BACKEND_URL + "/migrations";
-    axios
-      .post(serviceUrl, plan, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(function(response) {
-        self.setState({
-          pimServiceResponseJsonStr: JSON.stringify(response.data, null, 2)
+    MigrationClient.create(this.state.migrationDefinitionJsonStr).then(
+      migration => {
+        this.setState({
+          pimServiceResponseJsonStr: JSON.stringify(migration, null, 2)
         });
-        self.onNextButtonClick();
-      });
+        this.onNextButtonClick();
+      }
+    );
   };
 
   convertFormDataToJson() {

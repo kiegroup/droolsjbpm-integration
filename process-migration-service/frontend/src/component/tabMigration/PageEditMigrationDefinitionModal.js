@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 
 import { Button } from "patternfly-react";
 import { Modal } from "patternfly-react";
@@ -7,8 +6,8 @@ import { Icon } from "patternfly-react";
 import { OverlayTrigger } from "patternfly-react";
 import { Tooltip } from "patternfly-react";
 
-import { BACKEND_URL } from "../common/PimConstants";
 import PageMigrationScheduler from "../tabMigrationPlan/wizardExecuteMigration/PageMigrationScheduler";
+import MigrationClient from "../../clients/migrationClient";
 
 export default class PageEditMigrationDefinitionModal extends React.Component {
   constructor(props) {
@@ -83,17 +82,10 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
   };
 
   submit = () => {
-    const serviceUrl = BACKEND_URL + "/migrations/" + this.state.id;
-    const migrationDefinitionJsonStr = this.convertFormDataToJson();
-    axios
-      .put(serviceUrl, migrationDefinitionJsonStr, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(() => {
-        this.hideEditDialog();
-      });
+    const migrationDefinition = this.convertFormDataToJson();
+    MigrationClient.save(migrationDefinition).then(() => {
+      this.hideEditDialog();
+    });
   };
 
   render() {

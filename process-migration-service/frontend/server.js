@@ -19,6 +19,7 @@ app.use(
   })
 );
 
+// eslint-disable-next-line no-undef
 app.use(express.static(__dirname));
 
 const server = app.listen(3000, function() {
@@ -27,34 +28,38 @@ const server = app.listen(3000, function() {
   console.log("PIM app listening at http://%s:%s", host, port);
 });
 
-app.get("/rest/kieserver", (req, res) => {
+app.get("/rest/kieservers", (req, res) => {
   return res.send(readFile("kieservers.json"));
 });
 
-app.get("/rest/kieserver/instances", (req, res) => {
+app.get("/rest/kieservers/instances", (req, res) => {
   return res.send(readFile("running_instances.json"));
 });
 
 app.get(
-  "/rest/kieserver/:kieServerId/definitions/:containerId/:processId",
+  "/rest/kieservers/:kieServerId/definitions/:containerId/:processId",
   (req, res) => {
-    if (req.params.containerId === "error") {
+    if (req.params.containerId === "mock_error") {
       if (req.params.processId === "notfound") {
         return res.status(404).send("Not found");
       } else {
         return res.status(500).send({
           message: {
-            string: "Invalid KIE Server provided: Invalid migration: "
+            string: "Behold the error."
           }
         });
       }
     }
-    if (req.params.containerId === "mortgage" || req.params.processId === "mortgage") {
+    if (req.params.containerId.startsWith("Mortgage")) {
       return res.send(readFile("process_definition_mortgage.json"));
     }
     return res.send(readFile("process_definition_evaluation.json"));
   }
 );
+
+app.get("/rest/kieservers/:kieServerId/definitions", (req, res) => {
+  return res.send(readFile("process_definitions.json"));
+});
 
 app.get("/rest/plans", (req, res) => {
   return res.send(readFile("plans.json"));

@@ -24,10 +24,8 @@ export default class WizardAddPlan extends WizardBase {
       targetInfo: "",
       name: "",
       description: "",
-      sourceContainerId: "",
-      sourceProcessId: "",
-      targetContainerId: "",
-      targetProcessId: "",
+      source: {},
+      target: {},
       mappings: "",
       migrationPlanJsonStr: "",
       wizardHeaderTitle: "Add Migration Plan Wizard"
@@ -43,10 +41,8 @@ export default class WizardAddPlan extends WizardBase {
       targetInfo: "",
       name: "",
       description: "",
-      sourceContainerId: "",
-      sourceProcessId: "",
-      targetContainerId: "",
-      targetProcessId: "",
+      source: {},
+      target: {},
       mappings: "",
       migrationPlanJsonStr: "",
       editPlanMode: false,
@@ -65,10 +61,14 @@ export default class WizardAddPlan extends WizardBase {
       targetInfo: "",
       name: rowData.name,
       description: rowData.description,
-      sourceContainerId: rowData.sourceContainerId,
-      sourceProcessId: rowData.sourceProcessId,
-      targetContainerId: rowData.targetContainerId,
-      targetProcessId: rowData.targetProcessId,
+      source: {
+        containerId: rowData.sourceContainerId,
+        target: rowData.sourceProcessId
+      },
+      target: {
+        containerId: rowData.targetContainerId,
+        processId: rowData.targetProcessId
+      },
       mappings: JSON.stringify(rowData.mappings),
       migrationPlanJsonStr: jsonStr,
       editPlanMode: true,
@@ -80,32 +80,15 @@ export default class WizardAddPlan extends WizardBase {
   setSourceDefinition = sourceInfo => this.setState({ sourceInfo });
   setTargetDefinition = targetInfo => this.setState({ targetInfo });
 
-  handleAddPlanFormChange = e => {
-    if (e.target.name == "name") {
-      this.setState({ name: e.target.value });
-    } else if (e.target.name == "description") {
-      this.setState({ description: e.target.value });
-    } else if (e.target.name == "sourceContainerId") {
-      this.setState({ sourceContainerId: e.target.value });
-    } else if (e.target.name == "sourceProcessId") {
-      this.setState({ sourceProcessId: e.target.value });
-    } else if (e.target.name == "targetContainerId") {
-      this.setState({ targetContainerId: e.target.value });
-    } else if (e.target.name == "targetProcessId") {
-      this.setState({ targetProcessId: e.target.value });
-    } else if (e.target.name == "mappings") {
-      this.setState({ mappings: e.target.value });
-    }
-  };
-
   convertFormDataToJson() {
     const formData = {
       name: this.state.name,
       description: this.state.description,
-      sourceContainerId: this.state.sourceContainerId,
-      sourceProcessId: this.state.sourceProcessId,
-      targetContainerId: this.state.targetContainerId,
-      targetProcessId: this.state.targetProcessId
+
+      sourceContainerId: this.state.source.containerId,
+      sourceProcessId: this.state.source.processId,
+      targetContainerId: this.state.target.containerId,
+      targetProcessId: this.state.target.processId
     };
 
     if (this.state.mappings !== null && this.state.mappings !== "") {
@@ -131,20 +114,22 @@ export default class WizardAddPlan extends WizardBase {
     this.onNextButtonClick();
   };
 
-  handleSourceProcessIdChange = value => {
-    this.setState({ sourceProcessId: value });
+  onChangeSource = (newContainerId, newProcessId) => {
+    this.setState({
+      source: {
+        containerId: newContainerId,
+        processId: newProcessId
+      }
+    });
   };
 
-  handleSourceContainerIdChange = value => {
-    this.setState({ sourceContainerId: value });
-  };
-
-  handleTargetProcessIdChange = value => {
-    this.setState({ targetProcessId: value });
-  };
-
-  handleTargetContainerIdChange = value => {
-    this.setState({ targetContainerId: value });
+  onChangeTarget = (newContainerId, newProcessId) => {
+    this.setState({
+      target: {
+        containerId: newContainerId,
+        processId: newProcessId
+      }
+    });
   };
 
   render() {
@@ -190,14 +175,10 @@ export default class WizardAddPlan extends WizardBase {
                   targetInfo={targetInfo}
                   setSourceDefinition={this.setSourceDefinition}
                   setTargetDefinition={this.setTargetDefinition}
-                  sourceContainerId={this.state.sourceContainerId}
-                  sourceProcessId={this.state.sourceProcessId}
-                  targetContainerId={this.state.targetContainerId}
-                  targetProcessId={this.state.targetProcessId}
-                  onChangeSourceContainerId={this.handleSourceContainerIdChange}
-                  onChangeSourceProcessId={this.handleSourceProcessIdChange}
-                  onChangeTargetContainerId={this.handleTargetContainerIdChange}
-                  onChangeTargetProcessId={this.handleTargetProcessIdChange}
+                  source={this.state.source}
+                  target={this.state.target}
+                  onChangeSource={this.onChangeSource}
+                  onChangeTarget={this.onChangeTarget}
                   kieServerId={this.props.kieServerId}
                 />
               </Wizard.Contents>
@@ -258,7 +239,6 @@ export default class WizardAddPlan extends WizardBase {
           className="form-horizontal"
           name="form_migration_plan"
           id="WizardAddPlan_id_form1"
-          onChange={this.handleAddPlanFormChange}
         >
           <Wizard
             show={this.props.showPlanWizard}
