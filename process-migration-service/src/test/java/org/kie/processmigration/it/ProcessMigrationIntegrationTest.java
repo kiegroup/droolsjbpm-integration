@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,6 +43,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.appformer.maven.integration.MavenRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.processmigration.model.Execution;
@@ -63,56 +63,38 @@ import org.kie.server.client.ProcessServicesClient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ProcessMigrationIT {
+public class ProcessMigrationIntegrationTest {
 
     private static final String ARTIFACT_ID = "test";
     private static final String GROUP_ID = "com.myspace.test";
     private static final String SOURCE_CONTAINER_ID = "test_1.0.0";
     private static final String TARGET_CONTAINER_ID = "test_2.0.0";
-    private static final CredentialsProvider BASIC_AUTH = getBasicAuth();
     private static final String PIM_ENDPOINT = System.getProperty("pim.endpoint");
 
     private static String CONTAINER_ID = "test";
     private static String PROCESS_ID = "test.myprocess";
 
     private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-    private final HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(BASIC_AUTH).build();
 
-    private String kieEndpoint;
-    private String kieUsername;
-    private String kiePassword;
+    private HttpClient client;
     private String kieServerId;
 
-    public ProcessMigrationIT() throws IOException {
-        kieEndpoint = System.getProperty("kie-server.endpoint");
-        kieUsername = System.getProperty("cargo.remote.username");
-        kiePassword = System.getProperty("cargo.remote.password");
-
-        KieServicesClient client = createClient();
-        kieServerId = client.getServerInfo().getResult().getServerId();
-        deployProcesses(client);
-    }
-
-    private static CredentialsProvider getBasicAuth() {
-        String pimUsername = System.getProperty("pim.username");
-        String pimPassword = System.getProperty("pim.password");
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(pimUsername, pimPassword));
-        return provider;
-    }
-
-    @Test
-    public void testContainersCreated() {
-        ProcessServicesClient processClient = createClient().getServicesClient(ProcessServicesClient.class);
+    @Before
+    public void init() throws IOException {
+        KieServicesClient kieClient = createClient();
+        kieServerId = kieClient.getServerInfo().getResult().getServerId();
+        deployProcesses(kieClient);
+        ProcessServicesClient processClient = kieClient.getServicesClient(ProcessServicesClient.class);
         ProcessDefinition definition = processClient.getProcessDefinition(CONTAINER_ID, PROCESS_ID);
         assertNotNull(definition);
         assertEquals(PROCESS_ID, definition.getId());
+        client = HttpClientBuilder.create().setDefaultCredentialsProvider(getBasicAuth()).build();
     }
 
     @Test
     public void testMigration() throws IOException, JAXBException {
         // Given
-        List<Long> pids = startProcesses();
+        startProcesses();
 
         // When
         createMigration();
@@ -140,7 +122,7 @@ public class ProcessMigrationIT {
 
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, def);
-        post.setEntity(new StringEntity(writer.getBuffer().toString()));
+        post.setEntity(new StringEntity(writer.toString()));
         HttpResponse r = client.execute(post);
         assertEquals(HttpStatus.SC_OK, r.getStatusLine().getStatusCode());
         StringReader reader = new StringReader(EntityUtils.toString(r.getEntity()));
@@ -161,7 +143,7 @@ public class ProcessMigrationIT {
 
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, plan);
-        post.setEntity(new StringEntity(writer.getBuffer().toString()));
+        post.setEntity(new StringEntity(writer.toString()));
         HttpResponse r = client.execute(post);
         assertEquals(HttpStatus.SC_OK, r.getStatusLine().getStatusCode());
         StringReader reader = new StringReader(EntityUtils.toString(r.getEntity()));
@@ -175,12 +157,10 @@ public class ProcessMigrationIT {
         return post;
     }
 
-    private List<Long> startProcesses() {
+    private void startProcesses() {
         ProcessServicesClient client = createClient().getServicesClient(ProcessServicesClient.class);
-        List<Long> pids = new ArrayList<>();
-        pids.add(client.startProcess(SOURCE_CONTAINER_ID, PROCESS_ID));
-        pids.add(client.startProcess(SOURCE_CONTAINER_ID, PROCESS_ID));
-        return pids;
+        client.startProcess(SOURCE_CONTAINER_ID, PROCESS_ID);
+        client.startProcess(SOURCE_CONTAINER_ID, PROCESS_ID);
     }
 
     private void deployProcesses(KieServicesClient kieServicesClient) throws IOException {
@@ -201,7 +181,7 @@ public class ProcessMigrationIT {
         File tmpFile = new File(resource);
         tmpFile.deleteOnExit();
         try (OutputStream os = new FileOutputStream(tmpFile)) {
-            InputStream is = ProcessMigrationIT.class.getResource("/kjars/" + resource).openStream();
+            InputStream is = ProcessMigrationIntegrationTest.class.getResource("/kjars/" + resource).openStream();
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
             os.write(buffer);
@@ -210,9 +190,20 @@ public class ProcessMigrationIT {
     }
 
     private KieServicesClient createClient() {
+        String kieEndpoint = System.getProperty("kie-server.endpoint");
+        String kieUsername = System.getProperty("kie-server.username");
+        String kiePassword = System.getProperty("kie-server.password");
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieEndpoint, kieUsername, kiePassword);
         configuration.setTimeout(60000);
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
         return KieServicesFactory.newKieServicesClient(configuration);
+    }
+
+    private CredentialsProvider getBasicAuth() {
+        String pimUsername = System.getProperty("pim.username");
+        String pimPassword = System.getProperty("pim.password");
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(pimUsername, pimPassword));
+        return provider;
     }
 }

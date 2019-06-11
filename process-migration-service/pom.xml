@@ -25,7 +25,6 @@
         <node.version>v11.6.0</node.version>
         <!-- Following properties are used only for testing -->
         <container.hostname>localhost</container.hostname>
-        <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly14x</cargo.container.id>
         <kie.server.classifier>ee7</kie.server.classifier>
@@ -35,21 +34,11 @@
         <kie.server.version>${project.version}</kie.server.version>
         <container.port>19090</container.port>
         <kie.server.context>kie-server</kie.server.context>
-        <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
         <kie.server.classifier>ee7</kie.server.classifier>
-        <!-- Path to Kie server WAR file. Used for referencing WAR file in
-            on-demand deployment/undeployment. -->
-        <!-- <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path> -->
-        <org.kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml
-        </org.kie.server.controller.templatefile>
-        <webservice.http.url>
-            http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface?wsdl
-        </webservice.http.url>
         <kie.server.base.http.url>
             http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server
         </kie.server.base.http.url>
-        <pim.server.http.url>http://localhost:8180</pim.server.http.url>
-        <pim.server.http.rest>${pim.server.http.url}/rest</pim.server.http.rest>
+        <pim.server.http.rest>http://localhost:8180/rest</pim.server.http.rest>
         <pim.server.http.health>${pim.server.http.rest}/health/readiness</pim.server.http.health>
 
         <!-- Kie server datasource configuration. -->
@@ -60,6 +49,8 @@
         <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
         <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
         <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
+        <kie.server.username>yoda</kie.server.username>
+        <kie.server.password>usetheforce123@</kie.server.password>
     </properties>
 
     <dependencyManagement>
@@ -231,15 +222,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <excludes>
-                            <exclude>**/*IT.java</exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
                     <version>${frontend-maven-plugin.version}</version>
@@ -356,9 +338,215 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <configuration>
+                    <container>
+                        <containerId>${cargo.container.id}</containerId>
+                        <type>installed</type>
+                        <systemProperties>
+                            <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
+                            <!-- Persistence configuration -->
+                            <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}
+                            </org.kie.server.persistence.ds>
+                            <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}
+                            </org.kie.server.persistence.dialect>
+                            <!-- disable JMS support for executor to
+                                use same tests for all containers for jbpm executor -->
+                            <org.kie.executor.jms>false</org.kie.executor.jms>
+                            <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                        </systemProperties>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.h2database</groupId>
+                                <artifactId>h2</artifactId>
+                            </dependency>
+                        </dependencies>
+                    </container>
+                    <deployer/>
+                    <deployables>
+                        <deployable>
+                            <groupId>org.kie.server</groupId>
+                            <artifactId>kie-server</artifactId>
+                            <!-- default, may be overridden in container
+                                specific profiles -->
+                            <classifier>${kie.server.classifier}</classifier>
+                            <type>war</type>
+                            <properties>
+                                <context>${kie.server.context}</context>
+                            </properties>
+                            <pingURL>${kie.server.base.http.url}</pingURL>
+                            <pingTimeout>60000</pingTimeout>
+                        </deployable>
+                    </deployables>
+                    <configuration>
+                        <properties>
+                            <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                        </properties>
+                        <datasources>
+                            <datasource>
+                                <jndiName>${org.kie.server.persistence.ds}</jndiName>
+                                <driverClass>${org.kie.server.datasource.driver.class}</driverClass>
+                                <url>${org.kie.server.datasource.connection.url}</url>
+                                <username>${org.kie.server.datasource.username}</username>
+                                <password>${org.kie.server.datasource.password}</password>
+                                <transactionSupport>XA_TRANSACTION</transactionSupport>
+                            </datasource>
+                        </datasources>
+                        <users>
+                            <user>
+                                <name>Administrator</name>
+                                <password>${kie.server.password}</password>
+                                <roles>
+                                    <role>kie-server</role>
+                                    <role>guest</role>
+                                    <role>Administrators</role>
+                                </roles>
+                            </user>
+                            <user>
+                                <name>${kie.server.username}</name>
+                                <password>${kie.server.password}</password>
+                                <roles>
+                                    <role>kie-server</role>
+                                </roles>
+                            </user>
+                        </users>
+                    </configuration>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start-container</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop-container</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.bazaarvoice.maven.plugins</groupId>
+                <artifactId>process-exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>start-process-migration-service</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <name>ProcessMigrationService</name>
+                            <healthcheckUrl>${pim.server.http.health}</healthcheckUrl>
+                            <waitForInterrupt>false</waitForInterrupt>
+                            <waitAfterLaunch>300</waitAfterLaunch>
+                            <processLogFile>${project.build.directory}/pim.log</processLogFile>
+                            <arguments>
+                                <argument>java</argument>
+                                <argument>-jar</argument>
+                                <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
+                                <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop-process-migration-service</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop-all</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <thorntail.project.stage>test</thorntail.project.stage>
+                        <kie-server.endpoint>${kie.server.base.http.url}</kie-server.endpoint>
+                        <kie-server.username>${kie.server.username}</kie-server.username>
+                        <kie-server.password>${kie.server.password}</kie-server.password>
+                        <!-- Properties values are taken from application-users.properties and project-test.yml files -->
+                        <pim.username>kermit</pim.username>
+                        <pim.password>thefrog</pim.password>
+                        <pim.endpoint>${pim.server.http.rest}</pim.endpoint>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>custom-container</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>custom-container</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start-container</id>
+                                <phase>none</phase>
+                                <goals/>
+                                <!-- do nothing, container is not managed by cargo -->
+                            </execution>
+                            <execution>
+                                <id>stop-container</id>
+                                <phase>none</phase>
+                                <goals/>
+                                <!-- do nothing, container is not managed by cargo -->
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Integration tests are skipped by default. They are activated when specific container profile is used. -->
+            <id>skipITs-by-default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-failsafe-plugin</artifactId>
+                            <configuration>
+                                <skipITs>true</skipITs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <profile>
             <id>wildfly</id>
             <build>
@@ -368,172 +556,20 @@
                         <artifactId>cargo-maven2-plugin</artifactId>
                         <configuration>
                             <container>
-                                <containerId>${cargo.container.id}</containerId>
-                                <type>installed</type>
-                                <systemProperties>
-                                    <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
-                                    <!-- Persistence configuration -->
-                                    <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}
-                                    </org.kie.server.persistence.ds>
-                                    <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}
-                                    </org.kie.server.persistence.dialect>
-                                    <!-- disable JMS support for executor to
-                                        use same tests for all containers for jbpm executor -->
-                                    <org.kie.executor.jms>false</org.kie.executor.jms>
-                                    <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
-                                </systemProperties>
                                 <artifactInstaller>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
                                     <version>${version.org.wildfly}</version>
                                 </artifactInstaller>
-                                <dependencies>
-                                    <dependency>
-                                        <groupId>com.h2database</groupId>
-                                        <artifactId>h2</artifactId>
-                                    </dependency>
-                                </dependencies>
                             </container>
-                            <deployer/>
-                            <deployables>
-                                <deployable>
-                                    <groupId>org.kie.server</groupId>
-                                    <artifactId>kie-server</artifactId>
-                                    <!-- default, may be overridden in container
-                                        specific profiles -->
-                                    <classifier>${kie.server.classifier}</classifier>
-                                    <type>war</type>
-                                    <properties>
-                                        <context>${kie.server.context}</context>
-                                    </properties>
-                                    <pingURL>${kie.server.base.http.url}</pingURL>
-                                    <pingTimeout>60000</pingTimeout>
-                                </deployable>
-                            </deployables>
                             <configuration>
                                 <properties>
-                                    <cargo.servlet.port>${container.port}</cargo.servlet.port>
                                     <cargo.jboss.management-http.port>19991</cargo.jboss.management-http.port>
                                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                                 </properties>
-                                <datasources>
-                                    <datasource>
-                                        <jndiName>${org.kie.server.persistence.ds}</jndiName>
-                                        <driverClass>${org.kie.server.datasource.driver.class}</driverClass>
-                                        <url>${org.kie.server.datasource.connection.url}</url>
-                                        <username>${org.kie.server.datasource.username}</username>
-                                        <password>${org.kie.server.datasource.password}</password>
-                                        <transactionSupport>XA_TRANSACTION</transactionSupport>
-                                    </datasource>
-                                </datasources>
-                                <users>
-                                    <user>
-                                        <name>Administrator</name>
-                                        <password>usetheforce123@</password>
-                                        <roles>
-                                            <role>kie-server</role>
-                                            <role>guest</role>
-                                            <role>Administrators</role>
-                                        </roles>
-                                    </user>
-                                    <user>
-                                        <name>yoda</name>
-                                        <password>usetheforce123@</password>
-                                        <roles>
-                                            <role>kie-server</role>
-                                        </roles>
-                                    </user>
-                                </users>
                             </configuration>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>start-container</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop-container</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.bazaarvoice.maven.plugins</groupId>
-                        <artifactId>process-exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>start-process-migration-service</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                                <configuration>
-                                    <name>ProcessMigrationService</name>
-                                    <healthcheckUrl>${pim.server.http.health}</healthcheckUrl>
-                                    <waitForInterrupt>false</waitForInterrupt>
-                                    <waitAfterLaunch>300</waitAfterLaunch>
-                                    <processLogFile>${project.build.directory}/pim.log</processLogFile>
-                                    <arguments>
-                                        <argument>java</argument>
-                                        <argument>-jar</argument>
-                                        <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
-                                        <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>stop-process-migration-service</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop-all</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemProperties>
-                                <!-- <thorntail.project.stage.file>${basedir}/src/test/resources/project-test.yml</thorntail.project.stage.file> -->
-                                <thorntail.project.stage>test</thorntail.project.stage>
-                            </systemProperties>
-                            <systemPropertyVariables>
-                                <!-- Reuse yoda user for deploying and undeploying
-                                    Kie server from within the test -->
-                                <kie-server.endpoint>${kie.server.base.http.url}</kie-server.endpoint>
-                                <cargo.remote.username>yoda</cargo.remote.username>
-                                <cargo.remote.password>usetheforce123@</cargo.remote.password>
-                                <!-- Properties values are taken from application-users.properties and project-test.yml files -->
-                                <pim.username>kermit</pim.username>
-                                <pim.password>thefrog</pim.password>
-                                <pim.endpoint>${pim.server.http.rest}</pim.endpoint>
-                            </systemPropertyVariables>
-                            <includes>
-                                <include>**/*IT.java</include>
-                            </includes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>integration-test</id>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>verify</id>
-                                <goals>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
