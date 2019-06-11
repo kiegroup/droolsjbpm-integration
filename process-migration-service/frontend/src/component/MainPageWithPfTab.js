@@ -5,15 +5,18 @@ import {
   Nav,
   NavItem,
   TabPane,
-  TabContent
+  TabContent,
+  DropdownButton,
+  MenuItem,
+  Button,
+  Icon,
+  ALERT_TYPE_ERROR
 } from "patternfly-react";
-import { DropdownButton, MenuItem } from "patternfly-react";
 
 import MigrationPlans from "./tabMigrationPlan/MigrationPlans";
 import MigrationDefinitions from "./tabMigration/MigrationDefinitions";
 import { BACKEND_URL } from "./common/PimConstants";
-import { Button } from "patternfly-react/dist/js/components/Button";
-import { Icon } from "patternfly-react/dist/js/components/Icon";
+import Notification from "./Notification";
 
 export default class MainPageWithPfTab extends Component {
   constructor(props) {
@@ -30,7 +33,12 @@ export default class MainPageWithPfTab extends Component {
     this.loadKieServers();
   }
 
+  setErrorMsg = errorMsg => this.setState({ errorMsg });
+
+  resetErrorMsg = () => this.setErrorMsg("");
+
   loadKieServers = () => {
+    this.resetErrorMsg();
     fetch(`${BACKEND_URL}/kieserver`, {
       headers: {
         "Content-Type": "application/json"
@@ -44,8 +52,9 @@ export default class MainPageWithPfTab extends Component {
         return res.json();
       })
       .then(res => this.populateKieServers(res))
-      .catch(() => {
+      .catch(error => {
         this.populateKieServers([]);
+        this.setErrorMsg(error);
       });
   };
 
@@ -87,9 +96,16 @@ export default class MainPageWithPfTab extends Component {
     const bsClass = classNames("nav nav-tabs nav-tabs-pf", {
       "nav-justified": false
     });
-
+    const notification = (
+      <Notification
+        type={ALERT_TYPE_ERROR}
+        message={this.state.errorMsg}
+        onDismiss={() => this.setState({ errorMsg: "" })}
+      />
+    );
     return (
       <div className="">
+        {this.state.errorMsg && notification}
         <div className="row">
           <div className="col-xs-9">
             <h1>Process Instance Migration</h1>
@@ -116,10 +132,13 @@ export default class MainPageWithPfTab extends Component {
 
             <TabContent animation>
               <TabPane eventKey="first">
-                <MigrationPlans kieServerId={this.state.kieServerId} />
+                <MigrationPlans
+                  kieServerId={this.state.kieServerId}
+                  onError={this.setErrorMsg}
+                />
               </TabPane>
               <TabPane eventKey="second">
-                <MigrationDefinitions />
+                <MigrationDefinitions onError={this.setErrorMsg} />
               </TabPane>
             </TabContent>
           </div>
