@@ -190,9 +190,9 @@ public class ProcessMigrationIntegrationTest {
     }
 
     private KieServicesClient createClient() {
-        String kieEndpoint = System.getProperty("kie-server.endpoint");
-        String kieUsername = System.getProperty("kie-server.username");
-        String kiePassword = System.getProperty("kie-server.password");
+        String kieEndpoint = System.getProperty("kie.server.endpoint");
+        String kieUsername = System.getProperty("kie.server.username");
+        String kiePassword = System.getProperty("kie.server.password");
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieEndpoint, kieUsername, kiePassword);
         configuration.setTimeout(60000);
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
