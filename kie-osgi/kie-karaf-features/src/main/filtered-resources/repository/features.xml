@@ -51,7 +51,7 @@
      <feature version="${project.version}">drools-module</feature>
      <bundle>mvn:org.antlr/antlr4-runtime/${version.org.antlr4}</bundle>
      <bundle>mvn:ch.obermuhlner/big-math/${version.ch.obermuhlner}</bundle>
-     <bundle>mvn:org.drools/drools-constraint-parser/${version.org.kie}</bundle>
+     <bundle>mvn:org.drools/drools-mvel-parser/${version.org.kie}</bundle>
      <bundle>mvn:org.kie/kie-dmn-model/${version.org.kie}</bundle>
      <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>
      <bundle>mvn:org.kie/kie-dmn-backend/${version.org.kie}</bundle>
