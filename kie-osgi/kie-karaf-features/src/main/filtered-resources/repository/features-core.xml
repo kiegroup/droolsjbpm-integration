@@ -8,7 +8,8 @@
     <feature version="${project.version}">drools-common</feature>
     <feature version="${project.version}">kie</feature>
     <bundle>mvn:com.github.javaparser/javaparser-core/${karaf.version.com.github.javaparser}</bundle>
-    <bundle>mvn:org.drools/drools-constraint-parser/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-mvel-parser/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-mvel-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-canonical-model/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-model-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
