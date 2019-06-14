@@ -1,10 +1,13 @@
 thorntail:
   port:
     offset: 100
+  logging:
+    root-logger:
+      level: DEBUG
   deployment:
     process-migration.war:
       jaxrs:
-        application-path: /
+        application-path: /rest
       web:
         login-config:
           auth-method: BASIC
@@ -12,7 +15,7 @@ thorntail:
         security-constraints:
           - url-pattern: /*
             roles: [ admin ]
-          - url-pattern: /health/*
+          - url-pattern: /rest/health/*
   security:
     security-domains:
       pim:
@@ -25,6 +28,6 @@ thorntail:
                 usersProperties: application-users.properties
                 rolesProperties: application-roles.properties
 kieservers:
-  - host: http://localhost:18080/kie-server/services/rest/server
+  - host: http://localhost:19090/kie-server/services/rest/server
     username: yoda
     password: usetheforce123@
