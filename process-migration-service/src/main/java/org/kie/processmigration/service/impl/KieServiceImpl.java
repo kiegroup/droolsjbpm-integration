@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -68,15 +68,16 @@ public class KieServiceImpl implements KieService {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final long CONFIGURATION_TIMEOUT = 60000;
+    private static final long AWAIT_EXECUTOR = 5;
     private static final long RETRY_DELAY = 2;
     private static final Logger logger = LoggerFactory.getLogger(KieServiceImpl.class);
 
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    private Map<String, KieServerConfig> configs = new HashMap<>();
-    private ConfigKey kieServersKey = new SimpleKey("kieservers");
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private final Map<String, KieServerConfig> configs = new HashMap<>();
+    private final ConfigKey kieServersKey = new SimpleKey("kieservers");
 
     @Inject
-    private ConfigView configView;
+    ConfigView configView;
 
     @PostConstruct
     public void loadConfigs() {
@@ -84,6 +85,18 @@ public class KieServiceImpl implements KieService {
             @SuppressWarnings("unchecked")
             List<Map<String, String>> value = configView.resolve(kieServersKey).as(List.class).getValue();
             value.stream().forEach(this::loadConfig);
+        }
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(AWAIT_EXECUTOR, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
         }
     }
 
@@ -127,27 +140,11 @@ public class KieServiceImpl implements KieService {
         return result;
     }
 
+    @Override
     public boolean existsProcessDefinition(String containerId, String processId, String kieServerId) throws
             InvalidKieServerException {
         QueryServicesClient queryService = getQueryServicesClient(kieServerId);
         return queryService.findProcessByContainerIdProcessId(containerId, processId) != null;
-    }
-
-    private KieServicesClient getClient(String kieServerId) throws InvalidKieServerException {
-        return configs.values()
-                .stream()
-                .filter(config -> kieServerId.equals(config.getId()))
-                .findFirst()
-                .orElseThrow(() -> new InvalidKieServerException(kieServerId))
-                .getClient();
-    }
-
-    private UIServicesClient getUIServicesClient(String kieServerId) throws InvalidKieServerException {
-        return getClient(kieServerId).getServicesClient(UIServicesClient.class);
-    }
-
-    private ProcessServicesClient getProcessServicesClient(String kieServerId) throws InvalidKieServerException {
-        return getClient(kieServerId).getServicesClient(ProcessServicesClient.class);
     }
 
     @Override
@@ -205,7 +202,7 @@ public class KieServiceImpl implements KieService {
             logger.info("Loaded kie server configuration: {}", kieConfig);
         } catch (Exception e) {
             logger.info("Unable to create kie server configuration for {}. Retry asynchronously", kieConfig);
-            setKieServicesClient(kieConfig);
+            executorService.schedule(new KieServerClientConnector(kieConfig), RETRY_DELAY, TimeUnit.SECONDS);
         }
         configs.put(kieConfig.getHost(), kieConfig);
         logger.info("Loaded kie server configuration: {}", kieConfig);
@@ -218,8 +215,21 @@ public class KieServiceImpl implements KieService {
         return KieServicesFactory.newKieServicesClient(configuration);
     }
 
-    private Future<?> setKieServicesClient(KieServerConfig config) {
-        return executorService.scheduleWithFixedDelay(new KieServerClientConnector(config), RETRY_DELAY, RETRY_DELAY, TimeUnit.SECONDS);
+    private KieServicesClient getClient(String kieServerId) throws InvalidKieServerException {
+        return configs.values()
+                .stream()
+                .filter(config -> kieServerId.equals(config.getId()))
+                .findFirst()
+                .orElseThrow(() -> new InvalidKieServerException(kieServerId))
+                .getClient();
+    }
+
+    private UIServicesClient getUIServicesClient(String kieServerId) throws InvalidKieServerException {
+        return getClient(kieServerId).getServicesClient(UIServicesClient.class);
+    }
+
+    private ProcessServicesClient getProcessServicesClient(String kieServerId) throws InvalidKieServerException {
+        return getClient(kieServerId).getServicesClient(ProcessServicesClient.class);
     }
 
     /*
@@ -239,7 +249,6 @@ public class KieServiceImpl implements KieService {
             if (config.getClient() == null) {
                 try {
                     config.setClient(createKieServicesClient(config));
-                    executorService.shutdown();
                 } catch (NoEndpointFoundException e) {
                     logger.warn("Unable to connect to KieServer: {}. The client will try to reconnect in the background", config);
                 } catch (Exception e) {
@@ -247,6 +256,13 @@ public class KieServiceImpl implements KieService {
                         logger.warn("Unable to connect to KieServer: {}. The client will try to reconnect in the background", config);
                     } else {
                         logger.warn("Unable to create KieServer client: {}", config, e);
+                    }
+                } finally {
+                    if (config.getClient() == null) {
+                        logger.debug("KieServerClient for {} could not be created. Retrying...", config);
+                        executorService.schedule(new KieServerClientConnector(config), RETRY_DELAY, TimeUnit.SECONDS);
+                    } else {
+                        logger.debug("KieServerClient for {} created.", config);
                     }
                 }
             }
