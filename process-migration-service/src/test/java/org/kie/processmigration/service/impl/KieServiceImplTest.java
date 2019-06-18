@@ -19,6 +19,8 @@ package org.kie.processmigration.service.impl;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +47,8 @@ import org.wildfly.swarm.spi.api.SwarmProperties;
 @PowerMockIgnore("javax.management.*")
 public class KieServiceImplTest extends KieServiceImpl {
 
+    private static CountDownLatch countDownLatch;
+
     public KieServiceImplTest() {
         URL projectConfig = getClass().getClassLoader().getResource("project-test.yml");
         System.setProperty(SwarmProperties.PROJECT_STAGE_FILE, projectConfig.toExternalForm());
@@ -60,37 +64,59 @@ public class KieServiceImplTest extends KieServiceImpl {
     @Before
     public void init() {
         PowerMockito.mockStatic(KieServicesFactory.class);
+        countDownLatch = null;
     }
 
     @Test
     public void testKieServerClients() throws InterruptedException {
         KieServiceImpl kieService = new KieServiceImplTest();
-        Mockito.when(KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class))).thenAnswer(new Answer<KieServicesConfiguration>() {
-            private int count = 0;
+        Mockito.when(KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class)))
+                .thenAnswer(new Answer<KieServicesConfiguration>() {
+                    private int count = 0;
 
-            @Override
-            public KieServicesConfiguration answer(InvocationOnMock invocation) {
-                if (count++ == 1) {
-                    return getKieServicesConfig();
-                }
-                throw new NoEndpointFoundException("Mock error");
-            }
-        });
+                    @Override
+                    public KieServicesConfiguration answer(InvocationOnMock invocation) {
+                        if (count++ == 1) {
+                            return getKieServicesConfig();
+                        }
+                        throw new NoEndpointFoundException("Mock error");
+                    }
+                });
         Mockito.when(KieServicesFactory.newKieServicesClient(Mockito.any(KieServicesConfiguration.class)))
                 .thenReturn(Mockito.mock(KieServicesClient.class));
+
+        countDownLatch = new CountDownLatch(1);
         kieService.loadConfigs();
+        countDownLatch.await();
+
+        PowerMockito.verifyStatic(KieServicesFactory.class, Mockito.times(2));
+        KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class));
         Collection<KieServerConfig> configs = kieService.getConfigs();
         Assert.assertNotNull(configs);
         Assert.assertEquals(1, configs.size());
-
-        Thread.sleep(3000);
-        PowerMockito.verifyStatic(KieServicesFactory.class, Mockito.times(2));
-        KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class));
         KieServerConfig config = configs.iterator().next();
         Assert.assertNotNull(config.getClient());
     }
 
     private KieServicesConfiguration getKieServicesConfig() {
         return Mockito.mock(KieServicesConfiguration.class);
+    }
+
+    @Override
+    void retryConnection(KieServerConfig kieConfig) {
+        executorService.schedule(new MockKieServerClientConnector(kieConfig), 500, TimeUnit.MILLISECONDS);
+    }
+
+    class MockKieServerClientConnector extends KieServerClientConnector {
+
+        private MockKieServerClientConnector(KieServerConfig kieConfig) {
+            super(kieConfig);
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            countDownLatch.countDown();
+        }
     }
 }

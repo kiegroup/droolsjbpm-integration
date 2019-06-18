@@ -72,9 +72,9 @@ public class KieServiceImpl implements KieService {
     private static final long RETRY_DELAY = 2;
     private static final Logger logger = LoggerFactory.getLogger(KieServiceImpl.class);
 
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    private final Map<String, KieServerConfig> configs = new HashMap<>();
-    private final ConfigKey kieServersKey = new SimpleKey("kieservers");
+    final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    final Map<String, KieServerConfig> configs = new HashMap<>();
+    final ConfigKey kieServersKey = new SimpleKey("kieservers");
 
     @Inject
     ConfigView configView;
@@ -202,7 +202,7 @@ public class KieServiceImpl implements KieService {
             logger.info("Loaded kie server configuration: {}", kieConfig);
         } catch (Exception e) {
             logger.info("Unable to create kie server configuration for {}. Retry asynchronously", kieConfig);
-            executorService.schedule(new KieServerClientConnector(kieConfig), RETRY_DELAY, TimeUnit.SECONDS);
+            retryConnection(kieConfig);
         }
         configs.put(kieConfig.getHost(), kieConfig);
         logger.info("Loaded kie server configuration: {}", kieConfig);
@@ -232,37 +232,41 @@ public class KieServiceImpl implements KieService {
         return getClient(kieServerId).getServicesClient(ProcessServicesClient.class);
     }
 
+    void retryConnection(KieServerConfig kieConfig) {
+        executorService.schedule(new KieServerClientConnector(kieConfig), RETRY_DELAY, TimeUnit.SECONDS);
+    }
+
     /*
      * Runnable for checks on failed endpoints
      */
-    private class KieServerClientConnector implements Runnable {
+    class KieServerClientConnector implements Runnable {
 
-        final KieServerConfig config;
+        final KieServerConfig kieConfig;
 
-        KieServerClientConnector(KieServerConfig config) {
-            this.config = config;
+        KieServerClientConnector(KieServerConfig kieConfig) {
+            this.kieConfig = kieConfig;
         }
 
         @Override
         public void run() {
-            logger.debug("Trying to create KieServerClient for {}", config);
-            if (config.getClient() == null) {
+            logger.debug("Trying to create KieServerClient for {}", kieConfig);
+            if (kieConfig.getClient() == null) {
                 try {
-                    config.setClient(createKieServicesClient(config));
+                    kieConfig.setClient(createKieServicesClient(kieConfig));
                 } catch (NoEndpointFoundException e) {
-                    logger.warn("Unable to connect to KieServer: {}. The client will try to reconnect in the background", config);
+                    logger.warn("Unable to connect to KieServer: {}. The client will try to reconnect in the background", kieConfig);
                 } catch (Exception e) {
                     if (e.getCause() != null && NoEndpointFoundException.class.isInstance(e.getCause())) {
-                        logger.warn("Unable to connect to KieServer: {}. The client will try to reconnect in the background", config);
+                        logger.warn("Unable to connect to KieServer: {}. The client will try to reconnect in the background", kieConfig);
                     } else {
-                        logger.warn("Unable to create KieServer client: {}", config, e);
+                        logger.warn("Unable to create KieServer client: {}", kieConfig, e);
                     }
                 } finally {
-                    if (config.getClient() == null) {
-                        logger.debug("KieServerClient for {} could not be created. Retrying...", config);
-                        executorService.schedule(new KieServerClientConnector(config), RETRY_DELAY, TimeUnit.SECONDS);
+                    if (kieConfig.getClient() == null) {
+                        logger.debug("KieServerClient for {} could not be created. Retrying...", kieConfig);
+                        retryConnection(kieConfig);
                     } else {
-                        logger.debug("KieServerClient for {} created.", config);
+                        logger.debug("KieServerClient for {} created.", kieConfig);
                     }
                 }
             }
