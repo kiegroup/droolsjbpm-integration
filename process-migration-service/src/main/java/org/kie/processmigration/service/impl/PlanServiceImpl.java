@@ -66,11 +66,9 @@ public class PlanServiceImpl implements PlanService {
         return plan;
     }
 
-
     @Override
     @Transactional
     public Plan update(Long id, Plan plan) throws PlanNotFoundException {
         return create(get(id).copy(plan));
     }
-
 }

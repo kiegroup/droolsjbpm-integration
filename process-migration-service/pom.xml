@@ -25,7 +25,6 @@
     <node.version>v11.6.0</node.version>
 
     <!-- Following properties are used only for testing -->
-
     <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running
          SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
     <kie.server.version>${project.version}</kie.server.version>
@@ -35,7 +34,6 @@
     <cargo.container.id>valid-id-needs-to-be-specified-in-appropriate-container-profile</cargo.container.id>
     <kie.server.classifier>ee8</kie.server.classifier>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
-
     <!-- Kie server datasource configuration. -->
     <!-- <org.kie.server.persistence.ds/> Defined in container profiles. -->
     <org.kie.server.persistence.dialect>org.hibernate.dialect.H2Dialect</org.kie.server.persistence.dialect>
@@ -80,6 +78,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -215,6 +217,16 @@
       <artifactId>kie-server</artifactId>
       <classifier>${kie.server.classifier}</classifier>
       <type>war</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

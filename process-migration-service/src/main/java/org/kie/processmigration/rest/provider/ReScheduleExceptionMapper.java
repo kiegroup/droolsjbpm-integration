@@ -33,5 +33,4 @@ public class ReScheduleExceptionMapper implements ExceptionMapper<ReScheduleExce
         JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
         return Response.status(Response.Status.BAD_REQUEST).entity(json).type(MediaType.APPLICATION_JSON).build();
     }
-
 }

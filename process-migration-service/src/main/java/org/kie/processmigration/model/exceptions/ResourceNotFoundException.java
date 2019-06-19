@@ -31,5 +31,4 @@ public class ResourceNotFoundException extends Exception {
     public String getMessage() {
         return String.format("%s not found with id %s", resource, id);
     }
-
 }

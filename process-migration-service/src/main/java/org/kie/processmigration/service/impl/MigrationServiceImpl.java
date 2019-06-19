@@ -160,8 +160,8 @@ public class MigrationServiceImpl implements MigrationService {
             }
             AtomicBoolean hasErrors = new AtomicBoolean(false);
             List<Long> instanceIds = getInstancesToMigrate(migration);
-            ProcessAdminServicesClient adminService = kieService.getProcessAdminServicesClient(migration.getDefinition().getKieserverId());
-            QueryServicesClient queryService = kieService.getQueryServicesClient(migration.getDefinition().getKieserverId());
+            ProcessAdminServicesClient adminService = kieService.getProcessAdminServicesClient(migration.getDefinition().getKieServerId());
+            QueryServicesClient queryService = kieService.getQueryServicesClient(migration.getDefinition().getKieServerId());
             for (Long instanceId : instanceIds) {
                 boolean successful = migrateInstance(instanceId, migration, plan, adminService, queryService);
                 if (!hasErrors.get() && !Boolean.TRUE.equals(successful)) {
@@ -181,7 +181,7 @@ public class MigrationServiceImpl implements MigrationService {
         } finally {
             txHelper.withTransaction(() -> em.merge(migration));
             if (ExecutionType.ASYNC.equals(migration.getDefinition().getExecution().getType()) &&
-                migration.getDefinition().getExecution().getCallbackUrl() != null) {
+                    migration.getDefinition().getExecution().getCallbackUrl() != null) {
                 doCallback(migration);
             }
         }
@@ -194,11 +194,11 @@ public class MigrationServiceImpl implements MigrationService {
             ProcessInstance pi = queryService.findProcessInstanceById(instanceId);
             if (pi != null && pi.getContainerId().equals(plan.getSourceContainerId())) {
                 reportInstance = adminService.migrateProcessInstance(
-                                                                     plan.getSourceContainerId(),
-                                                                     instanceId,
-                                                                     plan.getTargetContainerId(),
-                                                                     plan.getTargetProcessId(),
-                                                                     plan.getMappings());
+                        plan.getSourceContainerId(),
+                        instanceId,
+                        plan.getTargetContainerId(),
+                        plan.getTargetProcessId(),
+                        plan.getMappings());
             } else {
                 reportInstance = buildReport(instanceId);
                 reportInstance.setLogs(Arrays.asList("Instance did not exist in source container. Migration skipped"));
@@ -220,10 +220,10 @@ public class MigrationServiceImpl implements MigrationService {
         try {
             callbackURI = migration.getDefinition().getExecution().getCallbackUrl();
             Response response = ClientBuilder.newClient()
-                                             .target(callbackURI)
-                                             .request(MediaType.APPLICATION_JSON)
-                                             .buildPost(Entity.json(migration))
-                                             .invoke();
+                    .target(callbackURI)
+                    .request(MediaType.APPLICATION_JSON)
+                    .buildPost(Entity.json(migration))
+                    .invoke();
             if (Status.OK.getStatusCode() == response.getStatus()) {
                 logger.debug("Migration [{}] - Callback to {} replied successfully", migration.getId(), callbackURI);
             } else {
@@ -241,11 +241,11 @@ public class MigrationServiceImpl implements MigrationService {
         if (definition.getPlanId() == null) {
             throw new InvalidMigrationException("The Plan ID is mandatory");
         }
-        if (StringUtils.isBlank(definition.getKieserverId())) {
+        if (StringUtils.isBlank(definition.getKieServerId())) {
             throw new InvalidMigrationException("The KIE Server ID is mandatory");
         }
-        if (!kieService.getConfigs().containsKey(definition.getKieserverId())) {
-            throw new InvalidKieServerException(definition.getKieserverId());
+        if (!kieService.hasKieServer(definition.getKieServerId())) {
+            throw new InvalidKieServerException(definition.getKieServerId());
         }
     }
 
@@ -258,10 +258,10 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     private void validatePlanExecution(MigrationDefinition definition, Plan plan) throws InvalidMigrationException {
-        if (!kieService.existsProcessDefinition(plan.getSourceContainerId(), plan.getSourceProcessId(), definition.getKieserverId())) {
+        if (!kieService.existsProcessDefinition(plan.getSourceContainerId(), plan.getSourceProcessId(), definition.getKieServerId())) {
             throw new ProcessNotFoundException(plan.getSourceContainerId());
         }
-        if (!kieService.existsProcessDefinition(plan.getTargetContainerId(), plan.getTargetProcessId(), definition.getKieserverId())) {
+        if (!kieService.existsProcessDefinition(plan.getTargetContainerId(), plan.getTargetProcessId(), definition.getKieServerId())) {
             throw new ProcessNotFoundException(plan.getTargetContainerId());
         }
     }
@@ -277,8 +277,8 @@ public class MigrationServiceImpl implements MigrationService {
             boolean allFetched = false;
             int page = 0;
             while (!allFetched) {
-                List<ProcessInstance> instances = kieService.getQueryServicesClient(migration.getDefinition().getKieserverId())
-                                                            .findProcessInstancesByContainerId(plan.getSourceContainerId(), QUERY_PROCESS_INSTANCE_STATUSES, page++, QUERY_PAGE_SIZE);
+                List<ProcessInstance> instances = kieService.getQueryServicesClient(migration.getDefinition().getKieServerId())
+                        .findProcessInstancesByContainerId(plan.getSourceContainerId(), QUERY_PROCESS_INSTANCE_STATUSES, page++, QUERY_PAGE_SIZE);
 
                 instances.stream().forEach(p -> instanceIds.add(p.getId()));
                 if (instances.size() < QUERY_PAGE_SIZE) {
@@ -304,5 +304,4 @@ public class MigrationServiceImpl implements MigrationService {
         reportInstance.setLogs(Arrays.asList(e.getMessage()));
         return reportInstance;
     }
-
 }

@@ -16,13 +16,12 @@
 
 package org.kie.processmigration.service.impl;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.kie.processmigration.model.Status;
 import org.kie.processmigration.service.KieService;
 import org.kie.processmigration.service.StatusService;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.Set;
 
 @ApplicationScoped
 public class StatusServiceImpl implements StatusService {
@@ -32,12 +31,11 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public Status getStatus() {
-        return new Status(kieService.getConfigs().values());
+        return new Status(kieService.getConfigs());
     }
 
     @Override
     public String getHealth() {
         return Status.UP;
     }
-
 }

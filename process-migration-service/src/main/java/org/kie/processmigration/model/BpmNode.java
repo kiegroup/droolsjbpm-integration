@@ -50,5 +50,4 @@ public class BpmNode {
         return "BpmNode [name=" + name + ", type=" + type
                 + ", id=" + id + "]";
     }
-
 }

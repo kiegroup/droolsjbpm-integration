@@ -1,14 +1,18 @@
 import React, { Component } from "react";
-import axios from "axios";
 
 import { Button } from "patternfly-react";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
 import PageDefinitionSearchTable from "./PageDefinitionSearchTable";
 import { BACKEND_URL } from "../../common/PimConstants";
+import Notification from "../../Notification";
 
 export default class PageDefinition extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      errorMsg: ""
+    };
   }
 
   copySourceToTarget = () => {
@@ -16,26 +20,71 @@ export default class PageDefinition extends Component {
     this.props.onChangeTargetProcessId(this.props.sourceProcessId);
   };
 
-  getDefinitions = () => {
-    const servicesUrl = BACKEND_URL + "/kieserver/definitions";
-    axios
-      .get(servicesUrl, {
-        params: {
-          sourceProcessId: this.props.sourceProcessId,
-          sourceContainerId: this.props.sourceContainerId,
-          targetProcessId: this.props.targetProcessId,
-          targetContainerId: this.props.targetContainerId,
-          kieServerId: this.props.kieServerIds
+  getDefinition = (containerId, processId, callbackFn) => {
+    const defURL = `${BACKEND_URL}/kieserver/${
+      this.props.kieServerId
+    }/definitions/${containerId}/${processId}`;
+    fetch(defURL, {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "same-origin"
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw res;
         }
+        return res.json();
       })
       .then(res => {
-        this.props.setInfo(res.data.sourceInfo, res.data.targetInfo);
+        callbackFn(res);
+      })
+      .catch(err => {
+        const status = err.status;
+        let errorMsg;
+        if (status === 404) {
+          if (containerId !== "" || processId !== "") {
+            errorMsg = `Process not found: ${containerId}/${processId}`;
+          } else {
+            errorMsg = "Provide a valid containerId and processId";
+          }
+          this.setState({ errorMsg });
+          callbackFn("");
+        } else {
+          err.json().then(json => {
+            this.setState({
+              errorMsg: `${containerId}/${processId}: ${json.message.string}`
+            });
+            callbackFn("");
+          });
+        }
       });
   };
 
+  getDefinitions = () => {
+    this.getDefinition(
+      this.props.sourceContainerId,
+      this.props.sourceProcessId,
+      this.props.setSourceDefinition
+    );
+    this.getDefinition(
+      this.props.targetContainerId,
+      this.props.targetProcessId,
+      this.props.setTargetDefinition
+    );
+  };
+
   render() {
+    const notification = (
+      <Notification
+        type={ALERT_TYPE_ERROR}
+        message={this.state.errorMsg}
+        onDismiss={() => this.setState({ errorMsg: "" })}
+      />
+    );
     return (
       <div className="form-horizontal">
+        {this.state.errorMsg && notification}
         <p />
         <PageDefinitionSearchTable
           tableHeader="Source "
@@ -47,10 +96,7 @@ export default class PageDefinition extends Component {
           initProcessId={this.props.initSourceProcessId}
         />
 
-        <Button onClick={this.copySourceToTarget}>
-          {" "}
-          Copy Source To Target
-        </Button>
+        <Button onClick={this.copySourceToTarget}>Copy Source To Target</Button>
         <p />
         <PageDefinitionSearchTable
           tableHeader="Target "

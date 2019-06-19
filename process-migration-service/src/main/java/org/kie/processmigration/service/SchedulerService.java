@@ -23,5 +23,4 @@ public interface SchedulerService {
     void scheduleMigration(Migration migration);
 
     void reScheduleMigration(Migration migration);
-
 }

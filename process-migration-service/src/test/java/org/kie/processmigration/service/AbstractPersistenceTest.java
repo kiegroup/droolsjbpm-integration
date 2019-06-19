@@ -16,18 +16,20 @@
 
 package org.kie.processmigration.service;
 
-import org.kie.processmigration.persistence.TestEntityManager;
-import org.mockito.Mockito;
+import java.util.function.Function;
 
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.function.Function;
+
+import org.kie.processmigration.persistence.TestEntityManager;
+import org.mockito.Mockito;
 
 public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
 
     protected EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("migration-test");
+
     protected EntityManager entityManager = Mockito.spy(new TestEntityManager(entityManagerFactory));
 
     protected EntityManager getEntityManager() {
@@ -37,5 +39,4 @@ public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
     protected Function<InjectionPoint, Object> getPCFactory() {
         return ip -> entityManager;
     }
-
 }

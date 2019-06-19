@@ -23,5 +23,4 @@ public class PlanNotFoundException extends ResourceNotFoundException {
     public PlanNotFoundException(Long id) {
         super("Plan", id);
     }
-
 }

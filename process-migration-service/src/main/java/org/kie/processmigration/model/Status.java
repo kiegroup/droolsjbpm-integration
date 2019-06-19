@@ -21,6 +21,7 @@ import java.util.Collection;
 public class Status {
 
     public static final String UP = "UP";
+    public static final String UNKNOWN = "UNKNOWN";
 
     private final Collection<KieServerConfig> kieServers;
 
@@ -35,5 +36,4 @@ public class Status {
     public String getHealth() {
         return UP;
     }
-
 }

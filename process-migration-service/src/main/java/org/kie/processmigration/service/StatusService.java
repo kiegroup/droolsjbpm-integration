@@ -23,5 +23,4 @@ public interface StatusService {
     Status getStatus();
 
     String getHealth();
-
 }

@@ -16,18 +16,15 @@
 
 package org.kie.processmigration.service;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.kie.processmigration.model.KieServerConfig;
-import org.kie.processmigration.model.ProcessInfos;
+import org.kie.processmigration.model.ProcessInfo;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
-import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
 
 public interface KieService {
@@ -36,14 +33,13 @@ public interface KieService {
 
     QueryServicesClient getQueryServicesClient(String kieServerId) throws InvalidKieServerException;
 
-    Map<String, KieServerConfig> getConfigs();
+    Collection<KieServerConfig> getConfigs();
+
+    boolean hasKieServer(String kieServerId);
+
+    ProcessInfo getDefinition(String kieServerId, String containerId, String processId) throws ProcessDefinitionNotFoundException, InvalidKieServerException;
 
     boolean existsProcessDefinition(String containerId, String processId, String kieServerId) throws InvalidKieServerException;
 
-    Set<String> getKieServerIDs();
-
     List<RunningInstance> getRunningInstances(String containerId, String kieServerId, Integer page, Integer pageSize) throws InvalidKieServerException;
-
-    ProcessInfos getProcessDefinitions(String sourceContainerId, String sourceProcessId, String targetContainerId, String targetProcessId, String kieServerId) throws InvalidKieServerException, ProcessDefinitionNotFoundException;
-
 }

@@ -114,7 +114,7 @@ public class ProcessMigrationIntegrationTest {
         Plan plan = createPlan();
         MigrationDefinition def = new MigrationDefinition();
         def.setPlanId(plan.getId());
-        def.setKieserverId(kieServerId);
+        def.setKieServerId(kieServerId);
         def.setProcessInstanceIds(Arrays.asList(1L));
         def.setExecution(new Execution().setType(Execution.ExecutionType.SYNC));
 

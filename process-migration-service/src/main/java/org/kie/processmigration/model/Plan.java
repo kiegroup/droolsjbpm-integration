@@ -38,8 +38,8 @@ import javax.persistence.Table;
 @Table(name = "plans")
 @SequenceGenerator(name = "planIdSeq", sequenceName = "PLAN_ID_SEQ")
 @NamedQueries({
-               @NamedQuery(name = "Plan.findAll", query = "SELECT p FROM Plan p"),
-               @NamedQuery(name = "Plan.findById", query = "SELECT p FROM Plan p WHERE p.id = :id")
+        @NamedQuery(name = "Plan.findAll", query = "SELECT p FROM Plan p"),
+        @NamedQuery(name = "Plan.findById", query = "SELECT p FROM Plan p WHERE p.id = :id")
 })
 public class Plan implements Serializable {
 
@@ -69,8 +69,8 @@ public class Plan implements Serializable {
     @MapKeyColumn(name = "source")
     @Column(name = "target")
     @CollectionTable(
-                     name = "plan_mappings",
-                     joinColumns = @JoinColumn(name = "plan_id")
+            name = "plan_mappings",
+            joinColumns = @JoinColumn(name = "plan_id")
     )
     private Map<String, String> mappings;
 

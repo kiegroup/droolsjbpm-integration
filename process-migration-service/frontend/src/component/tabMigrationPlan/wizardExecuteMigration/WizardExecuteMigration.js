@@ -80,7 +80,7 @@ export default class WizardExecuteMigration extends WizardBase {
 
     const formData = {
       planId: this.props.planId,
-      kieserverId: this.props.kieServerIds,
+      kieServerId: this.props.kieServerId,
       processInstanceIds: "[" + this.state.runningInstanceIds + "]",
       execution: execution
     };

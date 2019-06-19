@@ -43,7 +43,7 @@ import org.kie.server.api.model.admin.MigrationReportInstance;
 @Table(name = "migration_reports", indexes = {@Index(columnList = "migration_id")})
 @SequenceGenerator(name = "migRepIdSeq", sequenceName = "MIG_REP_ID_SEQ")
 @NamedQueries({
-               @NamedQuery(name = "MigrationReport.findByMigrationId", query = "SELECT p FROM MigrationReport p WHERE p.migrationId = :id")
+        @NamedQuery(name = "MigrationReport.findByMigrationId", query = "SELECT p FROM MigrationReport p WHERE p.migrationId = :id")
 })
 public class MigrationReport implements Serializable {
 
@@ -71,12 +71,13 @@ public class MigrationReport implements Serializable {
     @Column(name = "log")
     @Lob
     @CollectionTable(
-                     name = "migration_report_logs",
-                     joinColumns = @JoinColumn(name = "report_id")
+            name = "migration_report_logs",
+            joinColumns = @JoinColumn(name = "report_id")
     )
     private List<String> logs;
 
-    public MigrationReport() {}
+    public MigrationReport() {
+    }
 
     public MigrationReport(Long migrationId, MigrationReportInstance reportInstance) {
         this.migrationId = migrationId;
@@ -146,5 +147,4 @@ public class MigrationReport implements Serializable {
     public void setLogs(List<String> logs) {
         this.logs = logs;
     }
-
 }

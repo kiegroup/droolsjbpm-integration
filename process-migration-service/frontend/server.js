@@ -27,68 +27,82 @@ const server = app.listen(3000, function() {
   console.log("PIM app listening at http://%s:%s", host, port);
 });
 
-app.get('/rest/kieserver', (req, res) => {
-  return res.send(readFile("kieserver_ids.json"));
+app.get("/rest/kieserver", (req, res) => {
+  return res.send(readFile("kieservers.json"));
 });
 
-app.get('/rest/kieserver/instances', (req, res) => {
+app.get("/rest/kieserver/instances", (req, res) => {
   return res.send(readFile("running_instances.json"));
 });
 
-app.get('/rest/kieserver/definitions', (req, res) => {
-  if (req.query.sourceContainerId === "error" || req.query.sourceProcessId === "error") {
-    return res.status(404).send('Not found');
+app.get(
+  "/rest/kieserver/:kieServerId/definitions/:containerId/:processId",
+  (req, res) => {
+    if (req.params.containerId === "error") {
+      if (req.params.processId === "notfound") {
+        return res.status(404).send("Not found");
+      } else {
+        return res.status(500).send({
+          message: {
+            string: "Invalid KIE Server provided: Invalid migration: "
+          }
+        });
+      }
+    }
+    if (req.params.containerId === "mortgage" || req.params.processId === "mortgage") {
+      return res.send(readFile("process_definition_mortgage.json"));
+    }
+    return res.send(readFile("process_definition_evaluation.json"));
   }
-  return res.send(readFile("definitions.json"));
-});
+);
 
-app.get('/rest/plans', (req, res) => {
+app.get("/rest/plans", (req, res) => {
   return res.send(readFile("plans.json"));
 });
 
-app.post('/rest/plans', (req, res) => {
+app.post("/rest/plans", (req, res) => {
   return res.send(readFile("plan.json"));
 });
 
-app.put('/rest/plans/:planId', (req, res) => {
+app.put("/rest/plans/:planId", (req, res) => {
   console.log(`Updated plan with ID: ${req.params.planId}`);
   return res.send(readFile("plan.json"));
 });
 
-app.get('/rest/plans/:planId', (req, res) => {
+app.get("/rest/plans/:planId", (req, res) => {
   console.log(`Retrieved plan with ID: ${req.params.planId}`);
   return res.send(readFile("plan.json"));
 });
 
-app.delete('/rest/plans/:planId', (req, res) => {
+app.delete("/rest/plans/:planId", (req, res) => {
   console.log(`Deleted plan with ID: ${req.params.planId}`);
   return res.send(readFile("plans.json"));
 });
 
-app.get('/rest/migrations', (req, res) => {
+app.get("/rest/migrations", (req, res) => {
   return res.send(readFile("migrations.json"));
 });
 
-app.post('/rest/migrations', (req, res) => {
+app.post("/rest/migrations", (req, res) => {
   return res.send(readFile("migration.json"));
 });
 
-app.get('/rest/migrations/:migrationId', (req, res) => {
+app.get("/rest/migrations/:migrationId", (req, res) => {
   console.log(`Retrieved migration with ID: ${req.params.migrationId}`);
   return res.send(readFile("migration.json"));
 });
 
-app.put('/rest/migrations/:migrationId', (req, res) => {
+app.put("/rest/migrations/:migrationId", (req, res) => {
   console.log(`Updated migration with ID: ${req.params.migrationId}`);
   return res.send(readFile("migration.json"));
 });
 
-app.delete('/rest/migrations/:migrationId', (req, res) => {
+app.delete("/rest/migrations/:migrationId", (req, res) => {
   console.log(`Deleted migration with ID: ${req.params.migrationId}`);
   return res.send(readFile("migrations.json"));
 });
 
-app.get('/rest/migrations/:migrationId/results', (req, res) => {
+app.get("/rest/migrations/:migrationId/results", (req, res) => {
   console.log(`Retrieved migration results with ID: ${req.params.migrationId}`);
   return res.send(readFile("migration_results.json"));
 });

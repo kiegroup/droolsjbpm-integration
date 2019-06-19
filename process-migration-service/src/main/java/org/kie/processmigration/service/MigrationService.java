@@ -38,7 +38,6 @@ public interface MigrationService {
     Migration update(Long id, MigrationDefinition migration) throws ReScheduleException, MigrationNotFoundException, InvalidMigrationException;
 
     Migration delete(Long id) throws MigrationNotFoundException;
-    
-    Migration migrate(Migration migration) throws InvalidMigrationException;
 
+    Migration migrate(Migration migration) throws InvalidMigrationException;
 }

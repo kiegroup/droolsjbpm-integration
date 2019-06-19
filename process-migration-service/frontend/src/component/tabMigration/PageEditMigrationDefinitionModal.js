@@ -17,7 +17,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
       id: this.props.rowData.id,
       planId: this.props.rowData.definition.planId,
       processInstanceIds: this.props.rowData.definition.processInstanceIds,
-      kieserverId: this.props.rowData.definition.kieserverId,
+      kieServerId: this.props.rowData.definition.kieServerId,
       scheduledStartTime: this.props.rowData.definition.execution
         .scheduledStartTime,
       callbackUrl: this.props.rowData.definition.execution.callbackUrl,
@@ -42,7 +42,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
 
     const formData = {
       planId: this.state.planId,
-      kieserverId: this.state.kieserverId,
+      kieServerId: this.state.kieServerId,
       processInstanceIds: "[" + this.state.processInstanceIds + "]",
       execution: execution
     };
@@ -121,7 +121,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
           </div>
           <div className="form-group">
             <label className="col-md-4 control-label"> KIE Server ID</label>
-            <div className="col-md-8">{this.state.kieserverId}</div>
+            <div className="col-md-8">{this.state.kieServerId}</div>
           </div>
         </div>
 

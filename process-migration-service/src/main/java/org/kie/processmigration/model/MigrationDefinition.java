@@ -35,12 +35,12 @@ public class MigrationDefinition {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-                     name = "process_instance_ids",
-                     joinColumns = @JoinColumn(name = "migration_definition_id")
+            name = "process_instance_ids",
+            joinColumns = @JoinColumn(name = "migration_definition_id")
     )
     private List<Long> processInstanceIds;
 
-    private String kieserverId;
+    private String kieServerId;
 
     private String requester;
 
@@ -67,12 +67,12 @@ public class MigrationDefinition {
         }
     }
 
-    public String getKieserverId() {
-        return kieserverId;
+    public String getKieServerId() {
+        return kieServerId;
     }
 
-    public void setKieserverId(String kieserverId) {
-        this.kieserverId = kieserverId;
+    public void setKieServerId(String kieServerId) {
+        this.kieServerId = kieServerId;
     }
 
     public String getRequester() {
@@ -90,5 +90,4 @@ public class MigrationDefinition {
     public void setExecution(Execution execution) {
         this.execution = execution;
     }
-
 }

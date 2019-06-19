@@ -24,10 +24,17 @@ export default class MigrationPlansBase extends React.Component {
 
   retrieveAllPlans = () => {
     const servicesUrl = BACKEND_URL + "/plans";
-    axios.get(servicesUrl, {}).then(res => {
-      const plans = res.data;
-      this.setState({ plans, filteredPlans: plans });
-    });
+    axios
+      .get(servicesUrl, {})
+      .then(res => {
+        const plans = res.data;
+        this.setState({ plans, filteredPlans: plans });
+      })
+      .catch(() => {
+        this.props.onError(
+          "Unable to retrieve the migration plans. Confirm the selected KIE Server is online"
+        );
+      });
   };
 
   showDeleteDialog = id => {
@@ -56,6 +63,11 @@ export default class MigrationPlansBase extends React.Component {
       .then(function() {
         self.retrieveAllPlans();
         self.hideDeleteDialog();
+      })
+      .catch(() => {
+        this.props.onError(
+          "Unable to delete the plan. Confirm the selected KIE Server is online"
+        );
       });
   };
 
@@ -84,6 +96,11 @@ export default class MigrationPlansBase extends React.Component {
           addPlanResponseJsonStr: JSON.stringify(response.data, null, 2)
         });
         self.retrieveAllPlans();
+      })
+      .catch(() => {
+        this.props.onError(
+          "Unable to create the plan. Confirm the selected KIE Server is online"
+        );
       });
   };
 
@@ -102,6 +119,11 @@ export default class MigrationPlansBase extends React.Component {
           addPlanResponseJsonStr: JSON.stringify(response.data, null, 2)
         });
         self.retrieveAllPlans();
+      })
+      .catch(() => {
+        this.props.onError(
+          "Unable to update the plan. Confirm the selected KIE Server is online"
+        );
       });
   };
 
@@ -111,7 +133,7 @@ export default class MigrationPlansBase extends React.Component {
       .get(servicesUrl, {
         params: {
           containerId: rowData.sourceContainerId,
-          kieServerId: this.props.kieServerIds
+          kieServerId: this.props.kieServerId
         }
       })
       .then(res => {
@@ -122,6 +144,11 @@ export default class MigrationPlansBase extends React.Component {
           planId: rowData.id
         });
         this.refs.WizardExecuteMigrationChild.resetWizardStates();
+      })
+      .catch(() => {
+        this.props.onError(
+          "Unable to open the migration wizard. Verify the selected KIE Server is online."
+        );
       });
   };
 }

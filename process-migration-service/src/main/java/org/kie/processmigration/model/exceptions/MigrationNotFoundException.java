@@ -23,5 +23,4 @@ public class MigrationNotFoundException extends ResourceNotFoundException {
     public MigrationNotFoundException(Long id) {
         super("Migration", id);
     }
-
 }

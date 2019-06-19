@@ -1,7 +1,8 @@
 import renderer from "react-test-renderer";
 import React from "react";
 import PageMappingDiagrams from "../../component/tabMigrationPlan/wizardAddPlan/PageMappingDiagrams";
-import definitions from "../../../mock_data/definitions.json";
+import evaluationDef from "../../../mock_data/process_definition_evaluation.json";
+import mortgageDef from "../../../mock_data/process_definition_mortgage.json";
 
 test("PageMappingDiagrams renders correctly using snapshot", () => {
   const myMock = jest.fn();
@@ -16,8 +17,8 @@ test("PageMappingDiagrams renders correctly using snapshot", () => {
         targetDiagramButtonClick={myMock}
         sourceDiagramShown="false"
         targetDiagramShown="false"
-        sourceInfo={definitions.sourceInfo}
-        targetInfo={definitions.targetInfo}
+        sourceInfo={evaluationDef}
+        targetInfo={mortgageDef}
       />
     )
     .toJSON();
