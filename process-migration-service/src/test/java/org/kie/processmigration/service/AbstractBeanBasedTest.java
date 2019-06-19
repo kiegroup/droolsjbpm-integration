@@ -16,12 +16,13 @@
 
 package org.kie.processmigration.service;
 
-import org.jboss.weld.junit.MockBean;
-import org.kie.processmigration.model.KieServerConfig;
-
-import javax.enterprise.inject.spi.Bean;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.enterprise.inject.spi.Bean;
+
+import org.jboss.weld.junit.MockBean;
+import org.kie.processmigration.model.KieServerConfig;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +38,6 @@ public abstract class AbstractBeanBasedTest {
     protected void addMockConfigs(KieService mock) {
         Map<String, KieServerConfig> configs = new HashMap<>();
         configs.put(MOCK_KIESERVER_ID, new KieServerConfig());
-        when(mock.getConfigs()).thenReturn(configs);
+        when(mock.hasKieServer(MOCK_KIESERVER_ID)).thenReturn(true);
     }
 }

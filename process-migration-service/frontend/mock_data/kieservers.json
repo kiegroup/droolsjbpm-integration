@@ -1,0 +1,17 @@
+[
+    {
+        "id": "mockup-111-111-111-1111111111",
+        "host":"http://mock1.example.com:8080/kie-server/services/rest/server",
+        "status":"SUCCESS"
+    },
+    {
+        "id": "mockup-222-222-222-2222222222",
+        "host":"http://mock2.example.com:8080/kie-server/services/rest/server",
+        "status":"ERROR"
+    },
+    {
+        "id": "mockup-333-333-333-3333333333",
+        "host":"http://mock3.example.com:8080/kie-server/services/rest/server",
+        "status":"UNKNOWN"
+    }
+]

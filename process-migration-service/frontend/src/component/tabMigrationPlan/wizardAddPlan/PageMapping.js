@@ -122,7 +122,12 @@ export default class PageMapping extends Component {
     const sourceValues = this.props.sourceInfo.values;
     const sourceLabels = this.props.sourceInfo.labels;
     const sourceNode = [];
-    if (this.props.sourceInfo !== null && this.props.sourceInfo !== "") {
+    if (
+      this.props.sourceInfo !== null &&
+      this.props.sourceInfo !== "" &&
+      this.props.targetInfo !== null &&
+      this.props.targetInfo !== ""
+    ) {
       for (var i = 0; i < sourceValues.length; i++) {
         sourceNode.push({ value: sourceValues[i], label: sourceLabels[i] });
       }

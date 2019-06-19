@@ -32,5 +32,4 @@ public interface PlanService {
     Plan update(Long id, Plan plan) throws PlanNotFoundException;
 
     Plan delete(Long id) throws PlanNotFoundException;
-
 }

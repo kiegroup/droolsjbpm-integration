@@ -1,20 +1,21 @@
 {
-    "id": 99,
-    "definition": {
-      "execution": {
-        "type": "ASYNC",
-        "callback_url": "This is mockup reponse",
-        "scheduled_start_time": null
-        },
-      "plan_id": 2,
-      "process_instance_ids": [
-            1
-        ]
+  "id": 99,
+  "definition": {
+    "execution": {
+      "type": "ASYNC",
+      "callback_url": "This is mockup reponse",
+      "scheduled_start_time": null
     },
-    "status": "CREATED",
-    "created_at": "2019-01-12T01:04:52.035",
-    "started_at": null,
-    "finished_at": null,
-    "cancelled_at": null,
-    "error_message": null
+    "plan_id": 2,
+    "process_instance_ids": [
+      1
+    ],
+    "kieServerId": "sample-server"
+  },
+  "status": "CREATED",
+  "created_at": "2019-01-12T01:04:52.035",
+  "started_at": null,
+  "finished_at": null,
+  "cancelled_at": null,
+  "error_message": null
 }

@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Notification tests 1`] = `
+<div
+  className="toast-notifications-list-pf"
+  onFocus={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+  onMouseOver={[Function]}
+>
+  <div
+    className="alert toast-pf alert-danger alert-dismissable"
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+  >
+    <button
+      aria-hidden="true"
+      className="close close-default"
+      disabled={false}
+      onClick={[MockFunction]}
+      type="button"
+    >
+      <span
+        aria-hidden="true"
+        className="pficon pficon-close"
+      />
+    </button>
+    <span
+      aria-hidden="true"
+      className="pficon pficon-error-circle-o"
+    />
+    Test message
+  </div>
+</div>
+`;

@@ -45,5 +45,4 @@ public class HealthStatusResource {
     public Response getStatus() {
         return Response.ok(statusService.getStatus()).build();
     }
-
 }

@@ -16,25 +16,39 @@
 
 package org.kie.processmigration.model;
 
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.kie.processmigration.model.Execution.ExecutionStatus;
 import org.kie.processmigration.model.Execution.ExecutionType;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "migrations")
 @SequenceGenerator(name = "migrationIdSeq", sequenceName = "MIGRATION_ID_SEQ")
 @NamedQueries({
-               @NamedQuery(name = "Migration.findAll", query = "SELECT m FROM Migration m"),
-               @NamedQuery(name = "Migration.findById", query = "SELECT m FROM Migration m WHERE m.id = :id"),
-               @NamedQuery(name = "Migration.findByStatus", query = "SELECT m FROM Migration m WHERE m.status IN :statuses")
+        @NamedQuery(name = "Migration.findAll", query = "SELECT m FROM Migration m"),
+        @NamedQuery(name = "Migration.findById", query = "SELECT m FROM Migration m WHERE m.id = :id"),
+        @NamedQuery(name = "Migration.findByStatus", query = "SELECT m FROM Migration m WHERE m.status IN :statuses")
 })
 public class Migration implements Serializable {
 
@@ -72,15 +86,16 @@ public class Migration implements Serializable {
     @JoinColumn(name = "migration_id")
     private List<MigrationReport> reports = new ArrayList<>();
 
-    public Migration() {}
+    public Migration() {
+    }
 
     public Migration(MigrationDefinition definition) {
         this.definition = definition;
         Instant now = Instant.now();
         createdAt = now;
         if (ExecutionType.ASYNC.equals(definition.getExecution().getType()) &&
-            definition.getExecution().getScheduledStartTime() != null &&
-            now.isBefore(definition.getExecution().getScheduledStartTime())) {
+                definition.getExecution().getScheduledStartTime() != null &&
+                now.isBefore(definition.getExecution().getScheduledStartTime())) {
             status = Execution.ExecutionStatus.SCHEDULED;
         } else {
             status = Execution.ExecutionStatus.CREATED;
@@ -187,5 +202,4 @@ public class Migration implements Serializable {
         errorMessage = e.toString();
         return this;
     }
-
 }

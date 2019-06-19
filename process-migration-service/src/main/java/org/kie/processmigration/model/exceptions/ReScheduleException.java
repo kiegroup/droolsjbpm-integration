@@ -16,7 +16,6 @@
 
 package org.kie.processmigration.model.exceptions;
 
-
 public class ReScheduleException extends Exception {
 
     private static final long serialVersionUID = -1218105546946698252L;
@@ -24,5 +23,4 @@ public class ReScheduleException extends Exception {
     public ReScheduleException(String message) {
         super(message);
     }
-
 }

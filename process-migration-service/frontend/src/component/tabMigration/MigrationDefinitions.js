@@ -2,12 +2,14 @@ import React, { Component } from "react";
 import axios from "axios";
 import validator from "validator";
 
-import { Icon } from "patternfly-react";
-import { MessageDialog } from "patternfly-react";
-import { OverlayTrigger } from "patternfly-react";
-import { Tooltip } from "patternfly-react";
-import { Table } from "patternfly-react";
-import { actionHeaderCellFormatter } from "patternfly-react";
+import {
+  Icon,
+  MessageDialog,
+  OverlayTrigger,
+  Tooltip,
+  Table,
+  actionHeaderCellFormatter
+} from "patternfly-react";
 
 import { BACKEND_URL } from "../common/PimConstants";
 import PageViewMigrationLogs from "./PageViewMigrationLogs";
