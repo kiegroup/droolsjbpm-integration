@@ -9,9 +9,9 @@ import {
   DropdownButton,
   MenuItem,
   Button,
-  Icon,
-  ALERT_TYPE_ERROR
+  Icon
 } from "patternfly-react";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
 import MigrationPlans from "./tabMigrationPlan/MigrationPlans";
 import MigrationDefinitions from "./tabMigration/MigrationDefinitions";
@@ -25,7 +25,8 @@ export default class MainPageWithPfTab extends Component {
     this.state = {
       kieServerId: "",
       title: "KIE Server Name",
-      menuItems: []
+      menuItems: [],
+      errorMsg: ""
     };
   }
 
@@ -54,7 +55,7 @@ export default class MainPageWithPfTab extends Component {
       .then(res => this.populateKieServers(res))
       .catch(error => {
         this.populateKieServers([]);
-        this.setErrorMsg(error);
+        this.setErrorMsg(error.message);
       });
   };
 

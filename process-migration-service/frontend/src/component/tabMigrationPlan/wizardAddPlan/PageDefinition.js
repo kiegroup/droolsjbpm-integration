@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { Button } from "patternfly-react";
 import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
@@ -7,7 +7,7 @@ import PageDefinitionSearchTable from "./PageDefinitionSearchTable";
 import { BACKEND_URL } from "../../common/PimConstants";
 import Notification from "../../Notification";
 
-export default class PageDefinition extends Component {
+export default class PageDefinition extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
