@@ -307,6 +307,7 @@
               <configuration>
                 <properties>
                   <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                  <cargo.jvmargs>-Djava.net.preferIPv4Stack=true</cargo.jvmargs>
                 </properties>
                 <users>
                   <user>
