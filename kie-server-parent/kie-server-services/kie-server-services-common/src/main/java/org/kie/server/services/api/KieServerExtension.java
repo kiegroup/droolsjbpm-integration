@@ -58,7 +58,11 @@ public interface KieServerExtension {
     String getExtensionName();
 
     Integer getStartOrder();
-    
+
+    default void prepareContainerUpdate(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+
+    }
+
     default List<Message> healthCheck(boolean report) {
         List<Message> messages = new ArrayList<>();
         if (!isInitialized()) {

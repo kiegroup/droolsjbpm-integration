@@ -877,6 +877,8 @@ public class KieServerImpl implements KieServer {
                     logger.debug("Container {} (for release id {}) on {} ready to be updated", containerId, releaseId, extension);
                 }
 
+                prepareUpdateExtensions(kci, releaseId, messages, resetBeforeUpdate);
+
                 ReleaseId originalReleaseId = kci.getResource().getReleaseId();
                 Message updateMessage = updateKieContainerToVersion(kci, releaseId);
                 if (updateMessage.getSeverity().equals(Severity.WARN)) {
@@ -953,7 +955,17 @@ public class KieServerImpl implements KieServer {
         return response;
     }
 
-    private List<Message> updateExtensions(KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
+    private void prepareUpdateExtensions(KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
+        Map<String, Object> parameters = getReleaseUpdateParameters(releaseId, messages, resetBeforeUpdate);
+
+        // some extensions may require to do some operations before updating the container.
+        for (KieServerExtension extension : getServerExtensions()) {
+            extension.prepareContainerUpdate(kci.getContainerId(), kci, parameters);
+            logger.debug("Preparing update for container {} (for release id {}) on {}.", kci.getContainerId(), releaseId, extension);
+        }
+    }
+
+    private void updateExtensions(KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
         String containerId = kci.getContainerId();
         List<KieServerExtension> extensions = getServerExtensions();
         Map<String, Object> parameters = getReleaseUpdateParameters(releaseId, messages, resetBeforeUpdate);
@@ -963,8 +975,6 @@ public class KieServerImpl implements KieServer {
             extension.updateContainer(containerId, kci, parameters);
             logger.debug("Container {} (for release id {}) on {} updated successfully", containerId, releaseId, extension);
         }
-
-        return messages;
     }
 
     public ServiceResponse<KieServerStateInfo> getServerState() {
