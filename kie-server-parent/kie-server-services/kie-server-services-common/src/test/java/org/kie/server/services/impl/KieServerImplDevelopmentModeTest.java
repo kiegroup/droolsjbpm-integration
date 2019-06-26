@@ -94,6 +94,7 @@ public class KieServerImplDevelopmentModeTest extends AbstractKieServerImplTest 
         Assertions.assertThat(updateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
 
         verify(extension).isUpdateContainerAllowed(anyString(), any(), any());
+        verify(extension).prepareContainerUpdate(anyString(), any(), any());
         verify(extension).updateContainer(any(), any(), any());
 
         kieServer.disposeContainer(containerId);

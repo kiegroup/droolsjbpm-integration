@@ -289,17 +289,17 @@ public class JbpmKieServerExtensionTest {
 
     @Test
     public void testUpdateContainerProductionMode() throws IOException {
-        testUpdateContainer(KieServerMode.PRODUCTION, VERSION, false, false);
+        testUpdateContainer(KieServerMode.PRODUCTION, VERSION, false);
     }
 
     @Test
     public void testUpdateContainerProductionModeWithForcedCleanup() throws IOException {
-        testUpdateContainer(KieServerMode.PRODUCTION, VERSION, true, false);
+        testUpdateContainer(KieServerMode.PRODUCTION, VERSION, true);
     }
 
     @Test
     public void testUpdateDevModeSNAPSHOTContainer() throws IOException {
-        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, false, false);
+        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, false);
     }
 
     @Test
@@ -308,12 +308,12 @@ public class JbpmKieServerExtensionTest {
         activeProcessInstances.add(mockProcessInstance());
         activeProcessInstances.add(mockProcessInstance());
 
-        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, true, true);
+        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, true);
     }
 
     @Test
     public void testUpdateDevModeNonSNAPSHOTContainer() throws IOException {
-        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION, false, false);
+        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION, false);
     }
 
     @Test
@@ -322,7 +322,63 @@ public class JbpmKieServerExtensionTest {
         activeProcessInstances.add(mockProcessInstance());
         activeProcessInstances.add(mockProcessInstance());
 
-        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION, true, true);
+        testUpdateContainer(KieServerMode.DEVELOPMENT, VERSION, true);
+    }
+
+    @Test
+    public void testPrepareContainerUpdateDevModeSNAPSHOTWithForcedCleanup() throws IOException {
+        testPrepareContainerUpdate(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, true);
+    }
+
+    @Test
+    public void testPrepareContainerUpdateDevModeSNAPSHOT() throws IOException {
+        testPrepareContainerUpdate(KieServerMode.DEVELOPMENT, VERSION_SNAPSHOT, false);
+    }
+
+    @Test
+    public void testPrepareContainerUpdateDevModeNonSNAPSHOTWithForcedCleanup() throws IOException {
+        testPrepareContainerUpdate(KieServerMode.DEVELOPMENT, VERSION, true);
+    }
+
+    @Test
+    public void testPrepareContainerUpdateDevModeNonSNAPSHOT() throws IOException {
+        testPrepareContainerUpdate(KieServerMode.DEVELOPMENT, VERSION, false);
+    }
+
+
+
+    private void testPrepareContainerUpdate(KieServerMode mode, String version, boolean cleanup) throws IOException {
+        this.mode = mode;
+
+        activeProcessInstances.add(mockProcessInstance());
+        activeProcessInstances.add(mockProcessInstance());
+        activeProcessInstances.add(mockProcessInstance());
+
+        testDeployContainer(version);
+
+        KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(new ReleaseId(GROUP_ID, ARTIFACT_ID, version), DependencyFilter.COMPILE_FILTER);
+        List<Message> messages = new ArrayList<>();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
+        params.put(KieServerConstants.KIE_SERVER_PARAM_MESSAGES, messages);
+        params.put(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, cleanup);
+
+        extension.prepareContainerUpdate(CONTAINER_ID, new KieContainerInstanceImpl(CONTAINER_ID, KieContainerStatus.STARTED, kieContainer), params);
+
+        if(mode.equals(KieServerMode.PRODUCTION) || !cleanup) {
+            verify(runtimeDataService, never()).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
+            verify(runimeManager, never()).getRuntimeEngine(any());
+            verify(engine, never()).getKieSession();
+            verify(session, never()).abortProcessInstance(eq(new Long(1)));
+            verify(runimeManager, never()).disposeRuntimeEngine(any());
+        } else {
+            verify(runtimeDataService).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
+            verify(runimeManager, times(activeProcessInstances.size())).getRuntimeEngine(any());
+            verify(engine, times(activeProcessInstances.size())).getKieSession();
+            verify(session, times(activeProcessInstances.size())).abortProcessInstance(eq(new Long(1)));
+            verify(runimeManager, times(activeProcessInstances.size())).disposeRuntimeEngine(any());
+        }
     }
 
     private ProcessInstanceDesc mockProcessInstance() {
@@ -331,7 +387,7 @@ public class JbpmKieServerExtensionTest {
         return instance;
     }
 
-    private void testUpdateContainer(KieServerMode mode, String version, boolean cleanup, boolean expectedCleanup) throws IOException {
+    private void testUpdateContainer(KieServerMode mode, String version, boolean cleanup) throws IOException {
         this.mode = mode;
 
         testDeployContainer(version);
@@ -357,19 +413,11 @@ public class JbpmKieServerExtensionTest {
 
             assertTrue(function.apply(deploymentUnit));
 
-            if (expectedCleanup) {
-                verify(runtimeDataService).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
-                verify(runimeManager, times(activeProcessInstances.size())).getRuntimeEngine(any());
-                verify(engine, times(activeProcessInstances.size())).getKieSession();
-                verify(session, times(activeProcessInstances.size())).abortProcessInstance(eq(new Long(1)));
-                verify(runimeManager, times(activeProcessInstances.size())).disposeRuntimeEngine(any());
-            } else {
-                verify(runtimeDataService, never()).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
-                verify(runimeManager, never()).getRuntimeEngine(any());
-                verify(engine, never()).getKieSession();
-                verify(session, never()).abortProcessInstance(eq(new Long(1)));
-                verify(runimeManager, never()).disposeRuntimeEngine(any());
-            }
+            verify(runtimeDataService, never()).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
+            verify(runimeManager, never()).getRuntimeEngine(any());
+            verify(engine, never()).getKieSession();
+            verify(session, never()).abortProcessInstance(eq(new Long(1)));
+            verify(runimeManager, never()).disposeRuntimeEngine(any());
         }
 
         verify(deploymentService, times(2)).deploy(any());
