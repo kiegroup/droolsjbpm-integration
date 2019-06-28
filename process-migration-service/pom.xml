@@ -314,10 +314,7 @@
               <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
               <resources>
                 <resource>
-                  <directory>frontend</directory>
-                  <includes>
-                    <include>bundle.js</include>
-                  </includes>
+                  <directory>frontend/dist</directory>
                 </resource>
               </resources>
             </configuration>
@@ -337,9 +334,6 @@
                   <includes>
                     <include>**/*</include>
                   </includes>
-                  <excludes>
-                    <exclude>*.map</exclude>
-                  </excludes>
                 </resource>
               </resources>
             </configuration>

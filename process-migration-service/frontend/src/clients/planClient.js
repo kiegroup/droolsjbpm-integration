@@ -10,7 +10,7 @@ class PlanClient extends BaseClient {
   }
 
   get(id) {
-    return this.instance.get(id).then(response => response.data);
+    return this.instance.get("" + id).then(response => response.data);
   }
 
   create(plan) {
@@ -18,11 +18,11 @@ class PlanClient extends BaseClient {
   }
 
   update(id, plan) {
-    return this.instance.put(id, plan).then(response => response.data);
+    return this.instance.put("" + id, plan).then(response => response.data);
   }
 
   delete(id) {
-    return this.instance.delete(id);
+    return this.instance.delete("" + id);
   }
 }
 

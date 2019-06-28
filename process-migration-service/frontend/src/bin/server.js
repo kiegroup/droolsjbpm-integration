@@ -1,38 +1,27 @@
 const express = require("express");
-const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpack = require("webpack");
-const webpackConfig = require("./webpack.config.js");
-const app = express();
+const webpackDevMiddleware = require("webpack-dev-middleware");
+const webpackConfiguration = require("../../webpack.config");
 const fs = require("fs");
 
-const compiler = webpack(webpackConfig);
+const compiler = webpack(webpackConfiguration);
+
+const app = express();
 
 app.use(
   webpackDevMiddleware(compiler, {
-    hot: true,
-    filename: "bundle.js",
+    noInfo: false,
     publicPath: "/",
-    stats: {
-      colors: true
-    },
-    historyApiFallback: true
+    quiet: false,
+    stats: "minimal"
   })
 );
-
-// eslint-disable-next-line no-undef
-app.use(express.static(__dirname));
-
-const server = app.listen(3000, function() {
-  const host = server.address().address;
-  const port = server.address().port;
-  console.log("PIM app listening at http://%s:%s", host, port);
-});
 
 app.get("/rest/kieservers", (req, res) => {
   return res.send(readFile("kieservers.json"));
 });
 
-app.get("/rest/kieservers/instances", (req, res) => {
+app.get("/rest/kieservers/:kieServerId/instances/:containerId", (req, res) => {
   return res.send(readFile("running_instances.json"));
 });
 
@@ -115,3 +104,7 @@ app.get("/rest/migrations/:migrationId/results", (req, res) => {
 function readFile(fileName) {
   return JSON.parse(fs.readFileSync("./mock_data/" + fileName));
 }
+
+app.listen(3000, "localhost", () => {
+  console.log("Starting server on http://localhost:3000");
+});

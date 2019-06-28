@@ -1,13 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 
-import { Button } from "patternfly-react";
 import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
 import Notification from "../../Notification";
 import KieServerClient from "../../../clients/kieServerClient";
 import ProcessSelector from "./ProcessSelector";
+import { Form } from "patternfly-react/dist/js/components/Form";
 
-export default class PageDefinition extends Component {
+export default class PageDefinition extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,6 +16,9 @@ export default class PageDefinition extends Component {
       containers: {}
     };
     this.loadProcessIds();
+    this.props.onIsValid(
+      this.validate(this.props.plan.source, this.props.plan.target) === ""
+    );
   }
 
   loadProcessIds = () => {
@@ -23,13 +27,6 @@ export default class PageDefinition extends Component {
         containers
       });
     });
-  };
-
-  copySourceToTarget = () => {
-    this.props.onChangeTarget(
-      this.props.source.containerId,
-      this.props.source.processId
-    );
   };
 
   getDefinition = (definition, callbackFn) => {
@@ -42,7 +39,7 @@ export default class PageDefinition extends Component {
         callbackFn(res);
       })
       .catch(err => {
-        const status = err.status;
+        const status = err.response.status;
         let errorMsg;
         if (status === 404) {
           if (definition.containerId !== "" || definition.processId !== "") {
@@ -63,9 +60,55 @@ export default class PageDefinition extends Component {
       });
   };
 
-  getDefinitions = () => {
-    this.getDefinition(this.props.source, this.props.setSourceDefinition);
-    this.getDefinition(this.props.target, this.props.setTargetDefinition);
+  validateItem = item => {
+    const isFieldValid = field => {
+      return field !== undefined && field !== "";
+    };
+    return (
+      item !== undefined &&
+      isFieldValid(item.containerId) &&
+      isFieldValid(item.processId)
+    );
+  };
+
+  validate = (source, target) => {
+    const validSrc = this.validateItem(source);
+    const validTgt = this.validateItem(target);
+    if (!validSrc) {
+      return "Provide a valid source";
+    }
+    if (!validTgt) {
+      return "Provide a valid target";
+    }
+    if (
+      source.containerId === target.containerId &&
+      source.processId === target.processId
+    ) {
+      return "Source and target must be different";
+    }
+    return "";
+  };
+
+  onChangeSource = item => {
+    const validationError = this.validate(item, this.props.plan.target);
+    const isValidUpdate = validationError === "";
+    this.props.onIsValid(isValidUpdate);
+    this.props.onChangeSource(item.containerId, item.processId);
+    if (this.validateItem(item)) {
+      this.getDefinition(item, this.props.setSourceDefinition);
+    }
+    this.setState({ validationError });
+  };
+
+  onChangeTarget = item => {
+    const validationError = this.validate(this.props.plan.source, item);
+    const isValidUpdate = validationError === "";
+    this.props.onIsValid(isValidUpdate);
+    this.props.onChangeTarget(item.containerId, item.processId);
+    if (this.validateItem(item)) {
+      this.getDefinition(item, this.props.setTargetDefinition);
+    }
+    this.setState({ validationError });
   };
 
   render() {
@@ -77,39 +120,34 @@ export default class PageDefinition extends Component {
       />
     );
     return (
-      <div className="form-horizontal">
+      <Form horizontal>
         {this.state.errorMsg && notification}
-        <p />
         <ProcessSelector
           type="Source"
           options={this.state.containers}
-          containerId={this.props.source.containerId}
-          processId={this.props.source.processId}
-          onChange={this.props.onChangeSource}
+          containerId={this.props.plan.source.containerId}
+          processId={this.props.plan.source.processId}
+          onChange={this.onChangeSource}
         />
-        <Button onClick={this.copySourceToTarget}>Copy Source To Target</Button>
-        <p />
         <ProcessSelector
           type="Target"
           options={this.state.containers}
-          containerId={this.props.target.containerId}
-          processId={this.props.target.processId}
-          onChange={this.props.onChangeTarget}
+          containerId={this.props.plan.target.containerId}
+          processId={this.props.plan.target.processId}
+          onChange={this.onChangeTarget}
+          validationError={this.state.validationError}
         />
-
-        <Button bsStyle="default" onClick={() => this.getDefinitions()}>
-          Retrieve definitions from backend
-        </Button>
-
-        <div className="form-group">
-          <label className="col-sm-2 control-label">
-            {this.props.sourceInfo.containerId}
-          </label>
-          <label className="col-sm-2 control-label">
-            {this.props.targetInfo.containerId}
-          </label>
-        </div>
-      </div>
+      </Form>
     );
   }
 }
+
+PageDefinition.propTypes = {
+  kieServerId: PropTypes.string.isRequired,
+  plan: PropTypes.object.isRequired,
+  onIsValid: PropTypes.func.isRequired,
+  onChangeSource: PropTypes.func.isRequired,
+  onChangeTarget: PropTypes.func.isRequired,
+  setSourceDefinition: PropTypes.func.isRequired,
+  setTargetDefinition: PropTypes.func.isRequired
+};

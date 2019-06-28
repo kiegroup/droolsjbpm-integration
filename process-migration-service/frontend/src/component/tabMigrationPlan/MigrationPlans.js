@@ -10,50 +10,57 @@ import MigrationPlanListFilter from "./MigrationPlanListFilter";
 import MigrationPlansEditPopup from "./MigrationPlansEditPopup";
 
 import WizardAddPlan from "./wizardAddPlan/WizardAddPlan";
-import WizardExecuteMigration from "./wizardExecuteMigration/WizardExecuteMigration";
-
-import { AddPlanItems } from "../common/WizardItems";
-import { ExecuteMigrationItems } from "../common/WizardItems";
+import planClient from "../../clients/planClient";
 
 export default class MigrationPlans extends MigrationPlansBase {
-  resetAllStates = () => {
-    //clean all states before open add plan wizard, otherwise the wizard-form might have last add-plan's values and steps
-    this.setState({
+  constructor(props) {
+    super(props);
+    this.state = {
+      filteredPlans: [],
+      selectedPlan: this.getDefaultPlan(),
       showDeleteConfirmation: false,
       showMigrationWizard: false,
       showPlanWizard: false,
       deletePlanId: "",
       runningInstances: [],
-      planId: "",
       addPlanResponseJsonStr: ""
-    });
+    };
+  }
+
+  getDefaultPlan = () => {
+    return {
+      source: {},
+      target: {},
+      mappings: {}
+    };
   };
 
   closeMigrationWizard = () => {
     this.setState({ showMigrationWizard: false });
   };
 
-  openAddPlanWizard = () => {
-    this.resetAllStates();
-    this.setState({ showPlanWizard: true });
-    this.refs.WizardAddPlanChild.resetWizardStates();
-  };
-
-  openAddPlanWizardWithInitialData = rowData => {
-    this.resetAllStates();
-    this.setState({ showPlanWizard: true });
-    this.refs.WizardAddPlanChild.initialWizardStates(rowData);
+  openAddPlanWizard = id => {
+    if (id) {
+      planClient.get(id).then(selectedPlan => {
+        this.setState({ selectedPlan, showPlanWizard: true });
+      });
+    } else {
+      this.setState({ showPlanWizard: true });
+    }
   };
 
   closeAddPlanWizard = () => {
-    this.setState({ showPlanWizard: false });
+    this.setState({
+      showPlanWizard: false,
+      selectedPlan: this.getDefaultPlan()
+    });
     this.retrieveAllPlans();
   };
 
   onFilterChange = planFilter => {
     let filteredPlans = this.state.plans;
     filteredPlans = filteredPlans.filter(plan => {
-      let sourceContainterId = plan.sourceContainerId.toLowerCase();
+      let sourceContainterId = plan.source.containerId.toLowerCase();
       return sourceContainterId.indexOf(planFilter.toLowerCase()) !== -1;
     });
     this.setState({
@@ -62,7 +69,7 @@ export default class MigrationPlans extends MigrationPlansBase {
   };
 
   render() {
-    const { showPlanWizard, showMigrationWizard } = this.state;
+    const { showPlanWizard } = this.state;
 
     //for MessageDialogDeleteConfirmation
     const primaryContent = (
@@ -104,10 +111,13 @@ export default class MigrationPlans extends MigrationPlansBase {
                 title="Import Migration Plan"
                 actionName="Import Plan"
                 retrieveAllPlans={this.retrieveAllPlans}
-                addPlan={this.addPlan}
+                onSavePlan={this.savePlan}
               />
               &nbsp;
-              <Button bsStyle="primary" onClick={this.openAddPlanWizard}>
+              <Button
+                bsStyle="primary"
+                onClick={() => this.openAddPlanWizard()}
+              >
                 Add Plan
               </Button>
             </div>
@@ -116,39 +126,21 @@ export default class MigrationPlans extends MigrationPlansBase {
         <br />
         {/* Table lists all the migration plans */}
         <MigrationPlansTable
-          openMigrationWizard={this.openMigrationWizard}
-          openAddPlanWizard={this.openAddPlanWizard}
-          openAddPlanWizardWithInitialData={
-            this.openAddPlanWizardWithInitialData
-          }
-          showDeleteDialog={this.showDeleteDialog}
-          filteredPlans={this.state.filteredPlans}
-          updatePlan={this.editPlan}
-          retrieveAllPlans={this.retrieveAllPlans}
+          plans={this.state.filteredPlans}
+          kieServerId={this.props.kieServerId}
+          onEditPlan={id => this.openAddPlanWizard(id)}
         />
 
         {/* Add Plan Wizard */}
-        <WizardAddPlan
-          showPlanWizard={showPlanWizard}
-          closeAddPlanWizard={this.closeAddPlanWizard}
-          addPlan={this.addPlan}
-          editPlan={this.editPlan}
-          steps={AddPlanItems}
-          ref="WizardAddPlanChild"
-          addPlanResponseJsonStr={this.state.addPlanResponseJsonStr}
-          kieServerId={this.props.kieServerId}
-        />
-
-        {/* Execute Migration Wizard*/}
-        <WizardExecuteMigration
-          showMigrationWizard={showMigrationWizard}
-          closeMigrationWizard={this.closeMigrationWizard}
-          runningInstances={this.state.runningInstances}
-          planId={this.state.planId}
-          steps={ExecuteMigrationItems}
-          ref="WizardExecuteMigrationChild"
-          kieServerId={this.props.kieServerId}
-        />
+        {showPlanWizard && (
+          <WizardAddPlan
+            closeAddPlanWizard={this.closeAddPlanWizard}
+            onSavePlan={this.savePlan}
+            onPlanChanged={plan => this.setState({ plan })}
+            kieServerId={this.props.kieServerId}
+            plan={this.state.selectedPlan}
+          />
+        )}
       </div>
     );
   }

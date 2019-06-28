@@ -10,12 +10,12 @@ class MigrationClient extends BaseClient {
   }
 
   get(id) {
-    return this.instance.get(id).then(res => res.data);
+    return this.instance.get("" + id).then(res => res.data);
   }
 
   getResults(id) {
     return this.instance
-      .get(this.buildUrl(id, "results"))
+      .get(this.buildUrl("" + id, "results"))
       .then(res => res.data);
   }
 
@@ -24,11 +24,11 @@ class MigrationClient extends BaseClient {
   }
 
   update(id, migration) {
-    return this.instance.put(id, migration).then(res => res.data);
+    return this.instance.put("" + id, migration).then(res => res.data);
   }
 
   delete(id) {
-    return this.instance.delete(id);
+    return this.instance.delete("" + id);
   }
 }
 

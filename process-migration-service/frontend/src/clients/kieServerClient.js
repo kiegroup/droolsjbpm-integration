@@ -21,9 +21,9 @@ class KieServerClient extends BaseClient {
       .then(res => res.data);
   }
 
-  getInstances(kieServerId, page, pageSize) {
+  getInstances(kieServerId, containerId, page, pageSize) {
     return this.instance
-      .get(this.buildUrl(kieServerId, "instances"), {
+      .get(this.buildUrl(kieServerId, "instances", containerId), {
         params: {
           page,
           pageSize

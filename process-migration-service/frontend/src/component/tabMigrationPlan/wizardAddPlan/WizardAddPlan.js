@@ -1,8 +1,7 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-import { Wizard } from "patternfly-react";
-import { Button } from "patternfly-react";
-import { Icon } from "patternfly-react";
+import { Wizard, Button, Icon } from "patternfly-react";
 
 import WizardBase from "../WizardBase";
 import PageReview from "../PageReview";
@@ -16,120 +15,59 @@ import { AddPlanItems } from "../../common/WizardItems";
 
 export default class WizardAddPlan extends WizardBase {
   constructor(props) {
-    super(props);
+    super(props, AddPlanItems);
     this.state = {
       activeStepIndex: 0,
       activeSubStepIndex: 0,
-      sourceInfo: "",
-      targetInfo: "",
-      name: "",
-      description: "",
-      source: {},
-      target: {},
-      mappings: "",
-      migrationPlanJsonStr: "",
-      wizardHeaderTitle: "Add Migration Plan Wizard"
+      sourceInfo: {},
+      targetInfo: {},
+      wizardHeaderTitle: this.props.plan.id
+        ? "Edit migration plan"
+        : "Add migration plan",
+      stepValidation: {}
     };
-  }
-
-  //using Ref, this is called from parent before open the wizard to reset all the states.
-  resetWizardStates() {
-    this.setState({
-      activeStepIndex: 0,
-      activeSubStepIndex: 0,
-      sourceInfo: "",
-      targetInfo: "",
-      name: "",
-      description: "",
-      source: {},
-      target: {},
-      mappings: "",
-      migrationPlanJsonStr: "",
-      editPlanMode: false,
-      planId: "",
-      wizardHeaderTitle: "Add Migration Plan Wizard"
-    });
-  }
-
-  //using Ref, this is called from parent before open the wizard for edit existing migration plan
-  initialWizardStates(rowData) {
-    const jsonStr = JSON.stringify(rowData);
-    this.setState({
-      activeStepIndex: 0,
-      activeSubStepIndex: 0,
-      sourceInfo: "",
-      targetInfo: "",
-      name: rowData.name,
-      description: rowData.description,
-      source: {
-        containerId: rowData.sourceContainerId,
-        target: rowData.sourceProcessId
-      },
-      target: {
-        containerId: rowData.targetContainerId,
-        processId: rowData.targetProcessId
-      },
-      mappings: JSON.stringify(rowData.mappings),
-      migrationPlanJsonStr: jsonStr,
-      editPlanMode: true,
-      planId: rowData.id,
-      wizardHeaderTitle: "Edit Migration Plan Wizard"
-    });
   }
 
   setSourceDefinition = sourceInfo => this.setState({ sourceInfo });
   setTargetDefinition = targetInfo => this.setState({ targetInfo });
 
-  convertFormDataToJson() {
-    const formData = {
-      name: this.state.name,
-      description: this.state.description,
-
-      sourceContainerId: this.state.source.containerId,
-      sourceProcessId: this.state.source.processId,
-      targetContainerId: this.state.target.containerId,
-      targetProcessId: this.state.target.processId
-    };
-
-    if (this.state.mappings !== null && this.state.mappings !== "") {
-      formData.mappings = this.state.mappings;
-    }
-
-    if (this.state.editPlanMode) {
-      formData.id = this.state.planId;
-    }
-
-    const jsonStr = JSON.stringify(formData, null, 2);
-
-    this.setState({ migrationPlanJsonStr: jsonStr });
-  }
-
-  onSubmitMigrationPlan = () => {
-    //call the addPlan. addPlan need to be in the parent because it's shared between WizardAddPlan and Import Plan pop-up
-    if (!this.state.editPlanMode) {
-      this.props.addPlan(this.state.migrationPlanJsonStr);
-    } else {
-      this.props.editPlan(this.state.migrationPlanJsonStr, this.state.planId);
-    }
-    this.onNextButtonClick();
-  };
-
   onChangeSource = (newContainerId, newProcessId) => {
-    this.setState({
-      source: {
-        containerId: newContainerId,
-        processId: newProcessId
-      }
-    });
+    const source = {
+      containerId: newContainerId,
+      processId: newProcessId
+    };
+    this.onPlanFieldChange("source", source);
+    this.onPlanFieldChange("mappings", {});
   };
 
   onChangeTarget = (newContainerId, newProcessId) => {
-    this.setState({
-      target: {
-        containerId: newContainerId,
-        processId: newProcessId
-      }
-    });
+    const target = {
+      containerId: newContainerId,
+      processId: newProcessId
+    };
+    this.onPlanFieldChange("target", target);
+    this.onPlanFieldChange("mappings", {});
+  };
+
+  onPlanFieldChange = (field, newValue) => {
+    const plan = this.props.plan;
+    plan[field] = newValue;
+    this.props.onPlanChanged(plan);
+  };
+
+  setStepIsValid = (step, isValid) => {
+    const { stepValidation } = this.state;
+    stepValidation[step] = isValid;
+    this.setState({ stepValidation });
+  };
+
+  isStepValid = step => {
+    return this.state.stepValidation[step];
+  };
+
+  submitPlan = () => {
+    this.onNextButtonClick();
+    this.props.onSavePlan();
   };
 
   render() {
@@ -137,15 +75,14 @@ export default class WizardAddPlan extends WizardBase {
       activeStepIndex,
       activeSubStepIndex,
       sourceInfo,
-      targetInfo,
-      migrationPlanJsonStr
+      targetInfo
     } = this.state;
 
     const renderAddPlanWizardContents = wizardSteps => {
       return wizardSteps.map((step, stepIndex) =>
         step.subSteps.map((sub, subStepIndex) => {
           if (stepIndex === 0) {
-            // render steps 1
+            // render steps 0
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -155,13 +92,14 @@ export default class WizardAddPlan extends WizardBase {
                 activeSubStepIndex={activeSubStepIndex}
               >
                 <PagePlanName
-                  name={this.state.name}
-                  description={this.state.description}
+                  plan={this.props.plan}
+                  onFieldChanged={this.onPlanFieldChange}
+                  onIsValid={isValid => this.setStepIsValid(0, isValid)}
                 />
               </Wizard.Contents>
             );
           } else if (stepIndex === 1) {
-            // render steps 2
+            // render steps 1
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -175,16 +113,16 @@ export default class WizardAddPlan extends WizardBase {
                   targetInfo={targetInfo}
                   setSourceDefinition={this.setSourceDefinition}
                   setTargetDefinition={this.setTargetDefinition}
-                  source={this.state.source}
-                  target={this.state.target}
+                  plan={this.props.plan}
                   onChangeSource={this.onChangeSource}
                   onChangeTarget={this.onChangeTarget}
                   kieServerId={this.props.kieServerId}
+                  onIsValid={isValid => this.setStepIsValid(1, isValid)}
                 />
               </Wizard.Contents>
             );
           } else if (stepIndex === 2) {
-            // render steps 3
+            // render steps 2
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -194,10 +132,13 @@ export default class WizardAddPlan extends WizardBase {
                 activeSubStepIndex={activeSubStepIndex}
               >
                 <PageMapping
-                  sourceInfo={sourceInfo}
-                  targetInfo={targetInfo}
-                  mappings={this.state.mappings}
-                  onMappingsChange={mappings => this.setState({ mappings })}
+                  plan={this.props.plan}
+                  sourceProcess={this.state.sourceInfo}
+                  targetProcess={this.state.targetInfo}
+                  onMappingsChange={mappings =>
+                    this.onPlanFieldChange("mappings", mappings)
+                  }
+                  onIsValid={isValid => this.setStepIsValid(2, isValid)}
                 />
               </Wizard.Contents>
             );
@@ -211,11 +152,13 @@ export default class WizardAddPlan extends WizardBase {
                 activeStepIndex={activeStepIndex}
                 activeSubStepIndex={activeSubStepIndex}
               >
-                <PageReview inputJsonStr={migrationPlanJsonStr} />
+                <PageReview
+                  object={this.props.plan}
+                  exportedFileName={this.props.plan.name}
+                />
               </Wizard.Contents>
             );
           } else if (stepIndex === 4) {
-            // render mock progress
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -224,7 +167,10 @@ export default class WizardAddPlan extends WizardBase {
                 activeStepIndex={activeStepIndex}
                 activeSubStepIndex={activeSubStepIndex}
               >
-                <PageReview inputJsonStr={this.props.addPlanResponseJsonStr} />
+                <PageReview
+                  object={this.props.plan}
+                  exportedFileName={this.props.plan.name}
+                />
               </Wizard.Contents>
             );
           }
@@ -240,10 +186,7 @@ export default class WizardAddPlan extends WizardBase {
           name="form_migration_plan"
           id="WizardAddPlan_id_form1"
         >
-          <Wizard
-            show={this.props.showPlanWizard}
-            onHide={this.props.closeAddPlanWizard}
-          >
+          <Wizard show={true} onHide={this.props.closeAddPlanWizard}>
             <Wizard.Header
               onClose={this.props.closeAddPlanWizard}
               title={this.state.wizardHeaderTitle}
@@ -251,7 +194,7 @@ export default class WizardAddPlan extends WizardBase {
             <Wizard.Body>
               <Wizard.Steps
                 steps={renderWizardSteps(
-                  AddPlanItems,
+                  this.steps,
                   activeStepIndex,
                   activeSubStepIndex,
                   this.onStepClick
@@ -259,7 +202,7 @@ export default class WizardAddPlan extends WizardBase {
               />
               <Wizard.Row>
                 <Wizard.Main>
-                  {renderAddPlanWizardContents(AddPlanItems)}
+                  {renderAddPlanWizardContents(this.steps)}
                 </Wizard.Main>
               </Wizard.Row>
             </Wizard.Body>
@@ -279,29 +222,20 @@ export default class WizardAddPlan extends WizardBase {
                 <Icon type="fa" name="angle-left" />
                 Back
               </Button>
-              {(activeStepIndex === 0 || activeStepIndex === 2) && (
-                <Button bsStyle="primary" onClick={this.onNextButtonClick}>
-                  Next
-                  <Icon type="fa" name="angle-right" />
-                </Button>
-              )}
-
-              {activeStepIndex === 1 && (
+              {activeStepIndex < 3 && (
                 <Button
                   bsStyle="primary"
-                  disabled={
-                    this.state.sourceInfo == "" || this.state.targetInfo == ""
-                  }
                   onClick={this.onNextButtonClick}
+                  disabled={!this.isStepValid(activeStepIndex)}
                 >
                   Next
                   <Icon type="fa" name="angle-right" />
                 </Button>
               )}
+
               {activeStepIndex === 3 && (
-                <Button bsStyle="primary" onClick={this.onSubmitMigrationPlan}>
+                <Button bsStyle="primary" onClick={this.submitPlan}>
                   Submit Plan
-                  <Icon type="fa" name="angle-right" />
                 </Button>
               )}
               {activeStepIndex === 4 && (
@@ -310,7 +244,6 @@ export default class WizardAddPlan extends WizardBase {
                   onClick={this.props.closeAddPlanWizard}
                 >
                   Close
-                  <Icon type="fa" name="angle-right" />
                 </Button>
               )}
             </Wizard.Footer>
@@ -320,3 +253,11 @@ export default class WizardAddPlan extends WizardBase {
     );
   }
 }
+
+WizardAddPlan.propTypes = {
+  kieServerId: PropTypes.string.isRequired,
+  plan: PropTypes.object.isRequired,
+  onPlanChanged: PropTypes.func.isRequired,
+  onSavePlan: PropTypes.func.isRequired,
+  closeAddPlanWizard: PropTypes.func.isRequired
+};

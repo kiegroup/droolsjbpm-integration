@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { DropdownButton, MenuItem } from "patternfly-react";
 
@@ -29,11 +30,15 @@ export default class PageMappingDropdownNode extends React.Component {
 
   render() {
     return (
-      <div>
-        <DropdownButton title={this.props.title} id="PageMappingDropdownButton">
-          {this.createMenuItems(this.props.options)}
-        </DropdownButton>
-      </div>
+      <DropdownButton title={this.props.title} id="nodeMappingDropdown">
+        {this.createMenuItems(this.props.options)}
+      </DropdownButton>
     );
   }
 }
+
+PageMappingDropdownNode.propTypes = {
+  title: PropTypes.string.isRequired,
+  options: PropTypes.array.isRequired,
+  onDropdownChange: PropTypes.func.isRequired
+};

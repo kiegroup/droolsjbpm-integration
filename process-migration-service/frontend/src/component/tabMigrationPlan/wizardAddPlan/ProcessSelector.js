@@ -1,6 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { DropdownButton, MenuItem } from "patternfly-react";
+import { FormGroup } from "patternfly-react/dist/js/components/Form";
+import ControlLabel from "patternfly-react/dist/js/components/Form/ControlLabel";
+import { Col } from "patternfly-react/dist/js/components/Grid";
+import HelpBlock from "patternfly-react/dist/js/components/Form/HelpBlock";
 
 export default class ProcessSelector extends React.Component {
   constructor(props) {
@@ -9,9 +13,9 @@ export default class ProcessSelector extends React.Component {
 
   onChange = (containerId, processId) => {
     if (this.props.containerId != containerId) {
-      this.props.onChange(containerId, "");
+      this.props.onChange({ containerId });
     } else {
-      this.props.onChange(containerId, processId);
+      this.props.onChange({ containerId, processId });
     }
   };
 
@@ -62,42 +66,55 @@ export default class ProcessSelector extends React.Component {
       ? this.props.processId
       : "Select a process";
     return (
-      <div>
-        <div className="form-group required">
-          <label className="col-sm-2 control-label">
-            {this.props.type} Container ID
-          </label>
-          <div className="col-sm-10">
+      <React.Fragment>
+        <Col sm={12}>
+          <h3>{this.props.type}</h3>
+        </Col>
+        <FormGroup
+          controlId={this.props.type + "dropdown_containerid"}
+          className="required"
+        >
+          <Col componentClass={ControlLabel} sm={3}>
+            Container:
+          </Col>
+          <Col sm={9}>
             <DropdownButton
               title={containerIdTitle}
               id={this.props.type + "-ContainerDropdown"}
             >
               {containerOptions}
             </DropdownButton>
-          </div>
-        </div>
-
-        <div className="form-group required">
-          <label className="col-sm-2 control-label">
-            {this.props.type} Process ID
-          </label>
-          <div className="col-sm-10">
+          </Col>
+        </FormGroup>
+        <FormGroup
+          controlId={this.props.type + "dropdown_processid"}
+          className="required"
+          validationState={this.props.validationError === "" ? null : "error"}
+        >
+          <Col componentClass={ControlLabel} sm={3}>
+            Process:
+          </Col>
+          <Col sm={9}>
             <DropdownButton
               title={processIdTitle}
               id={this.props.type + "-ProcessDropdown"}
             >
               {processOptions}
             </DropdownButton>
-          </div>
-        </div>
-      </div>
+            {this.props.validationError && (
+              <HelpBlock>{this.props.validationError}</HelpBlock>
+            )}
+          </Col>
+        </FormGroup>
+      </React.Fragment>
     );
   }
 }
 
 ProcessSelector.defaultProps = {
   containerId: "",
-  processId: ""
+  processId: "",
+  validationError: ""
 };
 
 ProcessSelector.propTypes = {
@@ -105,5 +122,6 @@ ProcessSelector.propTypes = {
   options: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   containerId: PropTypes.string,
-  processId: PropTypes.string
+  processId: PropTypes.string,
+  validationError: PropTypes.string
 };

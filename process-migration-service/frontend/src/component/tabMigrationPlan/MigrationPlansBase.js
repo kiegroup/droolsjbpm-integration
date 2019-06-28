@@ -47,29 +47,16 @@ export default class MigrationPlansBase extends React.Component {
     });
   };
 
-  // addPlan need to be in the parent because it's shared between WizardAddPlan and Import Plan pop-up
-  addPlan = plan => {
-    if (plan !== null && plan !== "") {
-      //step 1, replace all \" to "
-      plan = plan.replace(/\\"/g, '"');
-      //step 2, replace "{ to {
-      plan = plan.replace('"{', "{");
-      //step3, replace }" to }
-      plan = plan.replace('}"', "}");
+  savePlan = () => {
+    let promise;
+    if (this.state.plan.id === undefined) {
+      promise = PlanClient.create(this.state.plan);
+    } else {
+      promise = PlanClient.update(this.state.plan.id, this.state.plan);
     }
-
-    PlanClient.create(plan).then(response => {
+    promise.then(response => {
       this.setState({
-        addPlanResponseJsonStr: JSON.stringify(response, null, 2)
-      });
-      this.retrieveAllPlans();
-    });
-  };
-
-  editPlan = (plan, planId) => {
-    PlanClient.update(planId, plan).then(response => {
-      this.setState({
-        addPlanResponseJsonStr: JSON.stringify(response, null, 2)
+        plan: response
       });
       this.retrieveAllPlans();
     });
@@ -82,7 +69,7 @@ export default class MigrationPlansBase extends React.Component {
         this.setState({
           runningInstances: instances,
           showMigrationWizard: true,
-          planId: rowData.id,
+          plan: rowData,
           errorMsg: ""
         });
         this.refs.WizardExecuteMigrationChild.resetWizardStates();

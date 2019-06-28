@@ -8,84 +8,40 @@ import { Tooltip } from "patternfly-react";
 
 import PageMigrationScheduler from "../tabMigrationPlan/wizardExecuteMigration/PageMigrationScheduler";
 import MigrationClient from "../../clients/migrationClient";
+import FormGroup from "patternfly-react/dist/js/components/Form/FormGroup";
+import ControlLabel from "patternfly-react/dist/js/components/Form/ControlLabel";
+import FormControl from "patternfly-react/dist/js/components/Form/FormControl";
+import { Form } from "patternfly-react/dist/js/components/Form";
 
 export default class PageEditMigrationDefinitionModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       id: this.props.rowData.id,
-      planId: this.props.rowData.definition.planId,
-      processInstanceIds: this.props.rowData.definition.processInstanceIds,
-      kieServerId: this.props.rowData.definition.kieServerId,
-      scheduledStartTime: this.props.rowData.definition.execution
-        .scheduledStartTime,
-      callbackUrl: this.props.rowData.definition.execution.callbackUrl,
-      showEditDialog: false
+      showEditDialog: false,
+      definition: this.props.rowData.definition,
+      isValid: true
     };
   }
-
-  convertFormDataToJson() {
-    const execution = {
-      type: "ASYNC"
-    };
-
-    if (
-      this.state.scheduledStartTime !== null &&
-      this.state.scheduledStartTime !== ""
-    ) {
-      execution.scheduledStartTime = this.state.scheduledStartTime;
-    }
-    if (this.state.callbackUrl !== null && this.state.callbackUrl !== "") {
-      execution.callbackUrl = this.state.callbackUrl;
-    }
-
-    const formData = {
-      planId: this.state.planId,
-      kieServerId: this.state.kieServerId,
-      processInstanceIds: "[" + this.state.processInstanceIds + "]",
-      execution: execution
-    };
-
-    var jsonStr = JSON.stringify(formData, null, 2);
-
-    if (jsonStr !== null && jsonStr !== "") {
-      //replace "[ to [
-      jsonStr = jsonStr.replace('"[', "[");
-
-      //replace ]" to ]
-      jsonStr = jsonStr.replace(']"', "]");
-    }
-
-    return jsonStr;
-  }
-
-  setCallbackUrl = url => {
-    this.setState({
-      callbackUrl: url
-    });
-  };
-
-  setScheduleStartTime = startTime => {
-    this.setState({
-      scheduledStartTime: startTime
-    });
-  };
 
   hideEditDialog = () => {
     this.setState({ showEditDialog: false });
   };
 
-  openEditMigration = () => {
-    this.setState({
-      showEditDialog: true
+  submit = () => {
+    MigrationClient.update(this.state.id, this.state.definition).then(() => {
+      this.hideEditDialog();
     });
   };
 
-  submit = () => {
-    const migrationDefinition = this.convertFormDataToJson();
-    MigrationClient.save(migrationDefinition).then(() => {
-      this.hideEditDialog();
-    });
+  onExecutionFieldChange = (field, value) => {
+    const { definition } = this.state;
+    definition.execution[field] = value;
+    this.setState({ definition });
+  };
+
+  onFormIsValid = isValid => {
+    this.setState({ isValid });
   };
 
   render() {
@@ -96,38 +52,49 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
     );
 
     const defaultBody = (
-      <div>
-        <div className="form-horizontal">
-          <div className="form-group">
-            <label className="col-md-4 control-label"> Plan ID</label>
-            <div className="col-md-8">{this.state.planId}</div>
-          </div>
-          <div className="form-group">
-            <label className="col-md-4 control-label">
-              {" "}
-              Process Instances ID
-            </label>
-            <div className="col-md-8">
-              {JSON.stringify(this.state.processInstanceIds)}
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="col-md-4 control-label"> KIE Server ID</label>
-            <div className="col-md-8">{this.state.kieServerId}</div>
-          </div>
-        </div>
-
+      <Form>
+        <FormGroup controlId="EditMigration_PlanId">
+          <ControlLabel>Plan ID:</ControlLabel>
+          <FormControl
+            type="text"
+            readOnly
+            value={this.props.rowData.definition.planId}
+          />
+        </FormGroup>
+        <FormGroup controlId="EditMigration_Pids">
+          <ControlLabel>Process instances ID: </ControlLabel>
+          <FormControl
+            type="text"
+            readOnly
+            value={this.props.rowData.definition.processInstanceIds.sort()}
+          />
+        </FormGroup>
+        <FormGroup controlId="EditMigration_kieId">
+          <ControlLabel>KIE Server ID: </ControlLabel>
+          <FormControl
+            type="text"
+            readOnly
+            value={this.props.rowData.definition.kieServerId}
+          />
+        </FormGroup>
         <PageMigrationScheduler
-          setCallbackUrl={this.setCallbackUrl}
-          setScheduleStartTime={this.setScheduleStartTime}
+          callbackUrl={this.state.definition.execution.callbackUrl}
+          scheduledStartTime={
+            this.state.definition.execution.scheduledStartTime
+          }
+          onFieldChange={this.onExecutionFieldChange}
+          onIsValid={this.onFormIsValid}
         />
-      </div>
+      </Form>
     );
 
     return (
       <div>
         <OverlayTrigger overlay={tooltipEdit} placement={"bottom"}>
-          <Button bsStyle="link" onClick={this.openEditMigration}>
+          <Button
+            bsStyle="link"
+            onClick={() => this.setState({ showEditDialog: true })}
+          >
             <Icon type="fa" name="edit" />
           </Button>
         </OverlayTrigger>
@@ -149,7 +116,11 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
             >
               Cancel
             </Button>
-            <Button bsStyle="primary" onClick={this.submit}>
+            <Button
+              bsStyle="primary"
+              onClick={this.submit}
+              disabled={!this.state.isValid}
+            >
               Submit
             </Button>
           </Modal.Footer>
