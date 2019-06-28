@@ -15,6 +15,8 @@
 
 package org.kie.integration.testcoverage.instrumentation;
 
+import org.drools.compiler.kie.builder.impl.ZipKieModule;
+import org.drools.core.impl.InternalKieContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,6 +31,7 @@ import org.kie.integration.testcoverage.instrumentation.model.Person;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,4 +92,12 @@ public class InstrumentationTest {
         assertThat(results).containsExactlyInAnyOrder("Lassie", "The Cat");
     }
 
+    @Test
+    public void testMetaInfoExists() {
+        ZipKieModule zipKieModule = (ZipKieModule)((InternalKieContainer)kieContainer).getMainKieModule();
+        Collection<String> fileNames = zipKieModule.getFileNames();
+
+        assertThat(fileNames).contains("META-INF/kmodule.info");
+        assertThat(fileNames).contains("META-INF/instrumentationKBase/kbase.cache");
+    }
 }
