@@ -23,7 +23,6 @@
     <frontend-maven-plugin.version>1.7.6</frontend-maven-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <node.version>v11.6.0</node.version>
-
     <!-- Following properties are used only for testing -->
     <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running
          SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->

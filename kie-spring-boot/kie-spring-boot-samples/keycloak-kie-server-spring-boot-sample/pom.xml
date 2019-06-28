@@ -47,6 +47,14 @@
           <groupId>net.minidev</groupId>
           <artifactId>accessors-smart</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>com.vaadin.external.google</groupId>
+          <artifactId>android-json</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.skyscreamer</groupId>
+          <artifactId>jsonassert</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
