@@ -1,3 +1,8 @@
+package org.kie.processmigration.model;
+
+import javax.persistence.Embeddable;
+
+@Embeddable
 /*
  * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
@@ -13,41 +18,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.processmigration.model;
+public class ProcessRef {
 
-public class BpmNode {
+  private String containerId;
+  private String processId;
 
-  private String name;
-  private String id;
-  private String type;
-
-  public String getName() {
-    return name;
+  public String getContainerId() {
+    return containerId;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public ProcessRef setContainerId(String containerId) {
+    this.containerId = containerId;
+    return this;
   }
 
-  public String getId() {
-    return id;
+  public String getProcessId() {
+    return processId;
   }
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
+  public ProcessRef setProcessId(String processId) {
+    this.processId = processId;
+    return this;
   }
 
   @Override
   public String toString() {
-    return "BpmNode [name=" + name + ", type=" + type
-        + ", id=" + id + "]";
+    return "ProcessRef{" +
+        "containerId='" + containerId + '\'' +
+        ", processId='" + processId + '\'' +
+        '}';
   }
 }

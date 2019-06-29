@@ -19,67 +19,67 @@ import org.kie.server.api.model.instance.ProcessInstance;
 
 public class RunningInstance {
 
-    private int id;
-    private Long processInstanceId;
-    private String name;
-    private String description;
-    private Integer state;
-    private String startTime;
+  private int id;
+  private Long processInstanceId;
+  private String name;
+  private String description;
+  private Integer state;
+  private String startTime;
 
-    public RunningInstance(int i, ProcessInstance p) {
-        id = i;
-        processInstanceId = p.getId();
-        name = p.getProcessName();
-        description = p.getProcessInstanceDescription();
-        state = p.getState();
-        startTime = p.getDate().toString();
-    }
+  public RunningInstance(int i, ProcessInstance p) {
+    id = i;
+    processInstanceId = p.getId();
+    name = p.getProcessName();
+    description = p.getProcessInstanceDescription();
+    state = p.getState();
+    startTime = p.getDate().toString();
+  }
 
-    public int getId() {
-        return id;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    public Long getProcessInstanceId() {
-        return processInstanceId;
-    }
+  public Long getProcessInstanceId() {
+    return processInstanceId;
+  }
 
-    public void setProcessInstanceId(Long processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
+  public void setProcessInstanceId(Long processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public Integer getState() {
-        return state;
-    }
+  public Integer getState() {
+    return state;
+  }
 
-    public void setState(Integer state) {
-        this.state = state;
-    }
+  public void setState(Integer state) {
+    this.state = state;
+  }
 
-    public String getStartTime() {
-        return startTime;
-    }
+  public String getStartTime() {
+    return startTime;
+  }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
+  public void setStartTime(String startTime) {
+    this.startTime = startTime;
+  }
 }

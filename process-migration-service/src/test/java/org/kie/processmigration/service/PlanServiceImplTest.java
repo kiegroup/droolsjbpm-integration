@@ -24,6 +24,7 @@ import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.service.impl.PlanServiceImpl;
 
 import static org.junit.Assert.assertEquals;
@@ -31,37 +32,35 @@ import static org.junit.Assert.assertNotNull;
 
 public class PlanServiceImplTest extends AbstractPersistenceTest {
 
-    @Rule
-    public WeldInitiator weld = WeldInitiator
-            .from(PlanServiceImpl.class)
-            .setPersistenceContextFactory(getPCFactory())
-            .inject(this)
-            .build();
-    @Inject
-    private PlanService planService;
+  @Rule
+  public WeldInitiator weld = WeldInitiator
+      .from(PlanServiceImpl.class)
+      .setPersistenceContextFactory(getPCFactory())
+      .inject(this)
+      .build();
+  @Inject
+  private PlanService planService;
 
-    @Test
-    public void testSaveAndFindAll() {
-        // Given
-        assertNotNull(planService);
+  @Test
+  public void testSaveAndFindAll() {
+    // Given
+    assertNotNull(planService);
 
-        Plan plan = new Plan();
-        plan.setSourceContainerId("containerId");
-        plan.setSourceProcessId("sourceProcessId");
-        plan.setName("name");
-        plan.setTargetContainerId("targetContainerId");
-        plan.setTargetProcessId("targetProcessId");
-        plan.setDescription("description");
+    Plan plan = new Plan();
+    plan.setName("name");
+    plan.setSource(new ProcessRef().setContainerId("containerId").setProcessId("sourceProcessId"));
+    plan.setTarget(new ProcessRef().setContainerId("targetContainerId").setProcessId("targetProcessId"));
+    plan.setDescription("description");
 
-        // When
-        getEntityManager().getTransaction().begin();
-        planService.create(plan);
-        getEntityManager().getTransaction().commit();
+    // When
+    getEntityManager().getTransaction().begin();
+    planService.create(plan);
+    getEntityManager().getTransaction().commit();
 
-        // Then
-        List<Plan> plans = planService.findAll();
+    // Then
+    List<Plan> plans = planService.findAll();
 
-        assertNotNull(plans);
-        assertEquals(1, plans.size());
-    }
+    assertNotNull(plans);
+    assertEquals(1, plans.size());
+  }
 }

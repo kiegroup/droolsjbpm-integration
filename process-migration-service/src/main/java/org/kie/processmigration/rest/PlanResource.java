@@ -43,43 +43,43 @@ import org.kie.processmigration.service.PlanService;
 @ApplicationScoped
 public class PlanResource {
 
-    @Inject
-    private PlanService planService;
+  @Inject
+  private PlanService planService;
 
-    @GET
-    @ApiOperation(value = "Get all existing Migration plans")
-    public Response findAll() {
-        return Response.ok(planService.findAll()).build();
-    }
+  @GET
+  @ApiOperation(value = "Get all existing Migration plans")
+  public Response findAll() {
+    return Response.ok(planService.findAll()).build();
+  }
 
-    @GET
-    @Path("/{id}")
-    @ApiOperation(value = "Finds a migration plan by the given plan Id")
-    public Response get(@ApiParam(value = "Plan Id") @PathParam("id") Long id) throws PlanNotFoundException {
-        return Response.ok(planService.get(id)).build();
-    }
+  @GET
+  @Path("/{id}")
+  @ApiOperation(value = "Finds a migration plan by the given plan Id")
+  public Response get(@ApiParam(value = "Plan Id") @PathParam("id") Long id) throws PlanNotFoundException {
+    return Response.ok(planService.get(id)).build();
+  }
 
-    @POST
-    @ApiOperation(value = "Create a migration plan")
-    public Response create(@ApiParam(value = "Plan") Plan plan) {
-        if (plan.getId() != 0) {
-            throw new IllegalArgumentException("The plan ID must not be provided when creating a new plan");
-        }
-        return Response.ok(planService.create(plan)).build();
+  @POST
+  @ApiOperation(value = "Create a migration plan")
+  public Response create(@ApiParam(value = "Plan") Plan plan) {
+    if (plan.getId() != 0) {
+      throw new IllegalArgumentException("The plan ID must not be provided when creating a new plan");
     }
+    return Response.ok(planService.create(plan)).build();
+  }
 
-    @PUT
-    @Path("/{id}")
-    @ApiOperation(value = "Save a migration plan")
-    public Response save(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id,
-                         @ApiParam(value = "Plan") Plan plan) throws PlanNotFoundException {
-        return Response.ok(planService.update(id, plan)).build();
-    }
+  @PUT
+  @Path("/{id}")
+  @ApiOperation(value = "Save a migration plan")
+  public Response save(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id,
+                       @ApiParam(value = "Plan") Plan plan) throws PlanNotFoundException {
+    return Response.ok(planService.update(id, plan)).build();
+  }
 
-    @DELETE
-    @Path("/{id}")
-    @ApiOperation(value = "Delete an existing migration plan")
-    public Response delete(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id) throws PlanNotFoundException {
-        return Response.ok(planService.delete(id)).build();
-    }
+  @DELETE
+  @Path("/{id}")
+  @ApiOperation(value = "Delete an existing migration plan")
+  public Response delete(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id) throws PlanNotFoundException {
+    return Response.ok(planService.delete(id)).build();
+  }
 }

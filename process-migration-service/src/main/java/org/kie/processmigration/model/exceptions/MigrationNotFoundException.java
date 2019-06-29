@@ -18,9 +18,9 @@ package org.kie.processmigration.model.exceptions;
 
 public class MigrationNotFoundException extends ResourceNotFoundException {
 
-    private static final long serialVersionUID = -7698220355906029892L;
+  private static final long serialVersionUID = -7698220355906029892L;
 
-    public MigrationNotFoundException(Long id) {
-        super("Migration", id);
-    }
+  public MigrationNotFoundException(Long id) {
+    super("Migration", id);
+  }
 }

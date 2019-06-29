@@ -24,13 +24,13 @@ import javax.transaction.Transactional;
 @ApplicationScoped
 public class TransactionHelper {
 
-    @Transactional
-    public <T> T withTransaction(Supplier<T> supplier) {
-        return supplier.get();
-    }
+  @Transactional
+  public <T> T withTransaction(Supplier<T> supplier) {
+    return supplier.get();
+  }
 
-    @Transactional
-    public void withTransaction(Runnable runnable) {
-        runnable.run();
-    }
+  @Transactional
+  public void withTransaction(Runnable runnable) {
+    runnable.run();
+  }
 }

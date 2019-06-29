@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.kie.processmigration.model.ProcessInfo;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
@@ -39,46 +40,46 @@ import org.kie.processmigration.service.KieService;
 @Produces(MediaType.APPLICATION_JSON)
 public class KieServiceResource {
 
-    private static final String DEFAULT_PAGE = "0";
-    private static final String DEFAULT_PAGE_SIZE = "1000";
+  private static final String DEFAULT_PAGE = "0";
+  private static final String DEFAULT_PAGE_SIZE = "1000";
 
-    @Inject
-    KieService kieService;
+  @Inject
+  KieService kieService;
 
-    @GET
-    public Response getKieServers() {
-        return Response.ok(kieService.getConfigs()).build();
+  @GET
+  public Response getKieServers() {
+    return Response.ok(kieService.getConfigs()).build();
+  }
+
+  @GET
+  @Path("/{kieServerId}/definitions")
+  public Response getDefinitions(@PathParam("kieServerId") String kieServerId) throws InvalidKieServerException {
+    Map<String, Set<String>> definitions = kieService.getDefinitions(kieServerId);
+    return Response.ok(definitions).build();
+  }
+
+  @GET
+  @Path("/{kieServerId}/definitions/{containerId}/{processId}")
+  public Response getDefinition(
+      @PathParam("kieServerId") String kieServerId,
+      @PathParam("containerId") String containerId,
+      @PathParam("processId") String processId
+  ) throws InvalidKieServerException {
+    try {
+      ProcessInfo definition = kieService.getDefinition(kieServerId, new ProcessRef().setContainerId(containerId).setProcessId(processId));
+      return Response.ok(definition).build();
+    } catch (ProcessDefinitionNotFoundException e) {
+      return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
     }
+  }
 
-    @GET
-    @Path("/{kieServerId}/definitions")
-    public Response getDefinitions(@PathParam("kieServerId") String kieServerId) throws InvalidKieServerException {
-        Map<String, Set<String>> definitions = kieService.getDefinitions(kieServerId);
-        return Response.ok(definitions).build();
-    }
-
-    @GET
-    @Path("/{kieServerId}/definitions/{containerId}/{processId}")
-    public Response getDefinition(
-            @PathParam("kieServerId") String kieServerId,
-            @PathParam("containerId") String containerId,
-            @PathParam("processId") String processId
-    ) throws InvalidKieServerException {
-        try {
-            ProcessInfo definition = kieService.getDefinition(kieServerId, containerId, processId);
-            return Response.ok(definition).build();
-        } catch (ProcessDefinitionNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        }
-    }
-
-    @GET
-    @Path("/{kieServerId}/instances/{containerId}")
-    public Response getRunningInstances(@PathParam("kieServerId") String kieServerId,
-                                        @PathParam("containerId") String containerId,
-                                        @DefaultValue(DEFAULT_PAGE) @QueryParam("page") Integer page,
-                                        @DefaultValue(DEFAULT_PAGE_SIZE) @QueryParam("pageSize") Integer pageSize) throws InvalidKieServerException {
-        List<RunningInstance> result = kieService.getRunningInstances(containerId, kieServerId, page, pageSize);
-        return Response.ok(result).build();
-    }
+  @GET
+  @Path("/{kieServerId}/instances/{containerId}")
+  public Response getRunningInstances(@PathParam("kieServerId") String kieServerId,
+                                      @PathParam("containerId") String containerId,
+                                      @DefaultValue(DEFAULT_PAGE) @QueryParam("page") Integer page,
+                                      @DefaultValue(DEFAULT_PAGE_SIZE) @QueryParam("pageSize") Integer pageSize) throws InvalidKieServerException {
+    List<RunningInstance> result = kieService.getRunningInstances(kieServerId, containerId, page, pageSize);
+    return Response.ok(result).build();
+  }
 }

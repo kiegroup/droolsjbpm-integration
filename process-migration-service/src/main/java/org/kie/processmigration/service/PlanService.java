@@ -23,13 +23,13 @@ import org.kie.processmigration.model.exceptions.PlanNotFoundException;
 
 public interface PlanService {
 
-    List<Plan> findAll();
+  List<Plan> findAll();
 
-    Plan get(Long id) throws PlanNotFoundException;
+  Plan get(Long id) throws PlanNotFoundException;
 
-    Plan create(Plan plan);
+  Plan create(Plan plan);
 
-    Plan update(Long id, Plan plan) throws PlanNotFoundException;
+  Plan update(Long id, Plan plan) throws PlanNotFoundException;
 
-    Plan delete(Long id) throws PlanNotFoundException;
+  Plan delete(Long id) throws PlanNotFoundException;
 }

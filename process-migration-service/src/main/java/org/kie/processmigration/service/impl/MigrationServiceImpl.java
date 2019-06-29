@@ -65,243 +65,243 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class MigrationServiceImpl implements MigrationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MigrationServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(MigrationServiceImpl.class);
 
-    private static final List<Integer> QUERY_PROCESS_INSTANCE_STATUSES = Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-    public static final Integer QUERY_PAGE_SIZE = 100;
+  private static final List<Integer> QUERY_PROCESS_INSTANCE_STATUSES = Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+  public static final Integer QUERY_PAGE_SIZE = 100;
 
-    @PersistenceContext
-    private EntityManager em;
+  @PersistenceContext
+  private EntityManager em;
 
-    @Inject
-    private PlanService planService;
+  @Inject
+  private PlanService planService;
 
-    @Inject
-    private KieService kieService;
+  @Inject
+  private KieService kieService;
 
-    @Inject
-    private SchedulerService schedulerService;
+  @Inject
+  private SchedulerService schedulerService;
 
-    @Inject
-    private TransactionHelper txHelper;
+  @Inject
+  private TransactionHelper txHelper;
 
-    @Override
-    public Migration get(Long id) throws MigrationNotFoundException {
-        TypedQuery<Migration> query = em.createNamedQuery("Migration.findById", Migration.class);
-        query.setParameter("id", id);
-        try {
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            throw new MigrationNotFoundException(id);
-        }
+  @Override
+  public Migration get(Long id) throws MigrationNotFoundException {
+    TypedQuery<Migration> query = em.createNamedQuery("Migration.findById", Migration.class);
+    query.setParameter("id", id);
+    try {
+      return query.getSingleResult();
+    } catch (NoResultException e) {
+      throw new MigrationNotFoundException(id);
     }
+  }
 
-    @Override
-    public List<MigrationReport> getResults(Long id) throws MigrationNotFoundException {
-        Migration m = get(id);
-        TypedQuery<MigrationReport> query = em.createNamedQuery("MigrationReport.findByMigrationId", MigrationReport.class);
-        query.setParameter("id", m.getId());
-        return query.getResultList();
+  @Override
+  public List<MigrationReport> getResults(Long id) throws MigrationNotFoundException {
+    Migration m = get(id);
+    TypedQuery<MigrationReport> query = em.createNamedQuery("MigrationReport.findByMigrationId", MigrationReport.class);
+    query.setParameter("id", m.getId());
+    return query.getResultList();
+  }
+
+  @Override
+  public List<Migration> findAll() {
+    return em.createNamedQuery("Migration.findAll", Migration.class).getResultList();
+  }
+
+  @Override
+  public Migration submit(MigrationDefinition definition) throws InvalidMigrationException {
+    validateDefinition(definition);
+    Migration migration = txHelper.withTransaction(() -> {
+      Migration m = new Migration(definition);
+      em.persist(m);
+      return m;
+    });
+    if (ExecutionType.SYNC.equals(definition.getExecution().getType())) {
+      migrate(migration);
+    } else {
+      validatePlanExecution(definition);
+      schedulerService.scheduleMigration(migration);
     }
+    return migration;
+  }
 
-    @Override
-    public List<Migration> findAll() {
-        return em.createNamedQuery("Migration.findAll", Migration.class).getResultList();
+  @Override
+  @Transactional
+  public Migration delete(Long id) throws MigrationNotFoundException {
+    Migration migration = get(id);
+    em.remove(migration);
+    return migration;
+  }
+
+  @Override
+  public Migration update(Long id, MigrationDefinition definition) throws MigrationNotFoundException, ReScheduleException, InvalidMigrationException {
+    validateDefinition(definition);
+    Migration migration = get(id);
+    if (!ExecutionStatus.SCHEDULED.equals(migration.getStatus())) {
+      throw new ReScheduleException("The migration is not scheduled and cannot be re-scheduled");
     }
-
-    @Override
-    public Migration submit(MigrationDefinition definition) throws InvalidMigrationException {
-        validateDefinition(definition);
-        Migration migration = txHelper.withTransaction(() -> {
-            Migration m = new Migration(definition);
-            em.persist(m);
-            return m;
-        });
-        if (ExecutionType.SYNC.equals(definition.getExecution().getType())) {
-            migrate(migration);
-        } else {
-            validatePlanExecution(definition);
-            schedulerService.scheduleMigration(migration);
-        }
-        return migration;
+    if (ExecutionType.SYNC.equals(definition.getExecution().getType())) {
+      throw new ReScheduleException("The migration execution type MUST be ASYNC");
     }
+    migration.setDefinition(definition);
+    txHelper.withTransaction(() -> em.merge(migration));
+    schedulerService.reScheduleMigration(migration);
+    return migration;
+  }
 
-    @Override
-    @Transactional
-    public Migration delete(Long id) throws MigrationNotFoundException {
-        Migration migration = get(id);
-        em.remove(migration);
-        return migration;
+  @Override
+  public Migration migrate(Migration migration) throws InvalidMigrationException {
+    try {
+      Plan plan = planService.get(migration.getDefinition().getPlanId());
+      validatePlanExecution(migration.getDefinition(), plan);
+      if (ExecutionStatus.CREATED.equals(migration.getStatus()) || ExecutionStatus.SCHEDULED.equals(migration.getStatus())) {
+        migration.start();
+      }
+      AtomicBoolean hasErrors = new AtomicBoolean(false);
+      List<Long> instanceIds = getInstancesToMigrate(migration);
+      ProcessAdminServicesClient adminService = kieService.getProcessAdminServicesClient(migration.getDefinition().getKieServerId());
+      QueryServicesClient queryService = kieService.getQueryServicesClient(migration.getDefinition().getKieServerId());
+      for (Long instanceId : instanceIds) {
+        boolean successful = migrateInstance(instanceId, migration, plan, adminService, queryService);
+        if (!hasErrors.get() && !Boolean.TRUE.equals(successful)) {
+          hasErrors.set(Boolean.TRUE);
+        }
+      }
+      migration.complete(hasErrors.get());
+    } catch (ProcessNotFoundException e) {
+      migration.fail(e);
+      throw e;
+    } catch (PlanNotFoundException e) {
+      migration.fail(e);
+      throw new InvalidMigrationException("The provided plan id does not exist: " + migration.getDefinition().getPlanId());
+    } catch (Exception e) {
+      logger.warn("Migration failed", e);
+      migration.fail(e);
+    } finally {
+      txHelper.withTransaction(() -> em.merge(migration));
+      if (ExecutionType.ASYNC.equals(migration.getDefinition().getExecution().getType()) &&
+          migration.getDefinition().getExecution().getCallbackUrl() != null) {
+        doCallback(migration);
+      }
     }
+    return migration;
+  }
 
-    @Override
-    public Migration update(Long id, MigrationDefinition definition) throws MigrationNotFoundException, ReScheduleException, InvalidMigrationException {
-        validateDefinition(definition);
-        Migration migration = get(id);
-        if (!ExecutionStatus.SCHEDULED.equals(migration.getStatus())) {
-            throw new ReScheduleException("The migration is not scheduled and cannot be re-scheduled");
-        }
-        if (ExecutionType.SYNC.equals(definition.getExecution().getType())) {
-            throw new ReScheduleException("The migration execution type MUST be ASYNC");
-        }
-        migration.setDefinition(definition);
-        txHelper.withTransaction(() -> em.merge(migration));
-        schedulerService.reScheduleMigration(migration);
-        return migration;
+  private boolean migrateInstance(Long instanceId, Migration migration, Plan plan, ProcessAdminServicesClient adminService, QueryServicesClient queryService) {
+    MigrationReportInstance reportInstance = null;
+    try {
+      ProcessInstance pi = queryService.findProcessInstanceById(instanceId);
+      if (pi != null && pi.getContainerId().equals(plan.getSource().getContainerId())) {
+        reportInstance = adminService.migrateProcessInstance(
+            plan.getSource().getContainerId(),
+            instanceId,
+            plan.getTarget().getContainerId(),
+            plan.getTarget().getProcessId(),
+            plan.getMappings());
+      } else {
+        reportInstance = buildReport(instanceId);
+        reportInstance.setLogs(Arrays.asList("Instance did not exist in source container. Migration skipped"));
+        logger.debug("Process Instance {} did not exist in source container with id {}", instanceId, plan.getSource().getContainerId());
+      }
+    } catch (Exception e) {
+      logger.warn("Unable to migrate instanceID: " + instanceId, e);
+      reportInstance = buildReportFromError(instanceId, e);
     }
+    final MigrationReport report = new MigrationReport(migration.getId(), reportInstance);
+    return txHelper.withTransaction(() -> {
+      em.persist(report);
+      return report;
+    }).getSuccessful();
+  }
 
-    @Override
-    public Migration migrate(Migration migration) throws InvalidMigrationException {
-        try {
-            Plan plan = planService.get(migration.getDefinition().getPlanId());
-            validatePlanExecution(migration.getDefinition(), plan);
-            if (ExecutionStatus.CREATED.equals(migration.getStatus()) || ExecutionStatus.SCHEDULED.equals(migration.getStatus())) {
-                migration.start();
-            }
-            AtomicBoolean hasErrors = new AtomicBoolean(false);
-            List<Long> instanceIds = getInstancesToMigrate(migration);
-            ProcessAdminServicesClient adminService = kieService.getProcessAdminServicesClient(migration.getDefinition().getKieServerId());
-            QueryServicesClient queryService = kieService.getQueryServicesClient(migration.getDefinition().getKieServerId());
-            for (Long instanceId : instanceIds) {
-                boolean successful = migrateInstance(instanceId, migration, plan, adminService, queryService);
-                if (!hasErrors.get() && !Boolean.TRUE.equals(successful)) {
-                    hasErrors.set(Boolean.TRUE);
-                }
-            }
-            migration.complete(hasErrors.get());
-        } catch (ProcessNotFoundException e) {
-            migration.fail(e);
-            throw e;
-        } catch (PlanNotFoundException e) {
-            migration.fail(e);
-            throw new InvalidMigrationException("The provided plan id does not exist: " + migration.getDefinition().getPlanId());
-        } catch (Exception e) {
-            logger.warn("Migration failed", e);
-            migration.fail(e);
-        } finally {
-            txHelper.withTransaction(() -> em.merge(migration));
-            if (ExecutionType.ASYNC.equals(migration.getDefinition().getExecution().getType()) &&
-                    migration.getDefinition().getExecution().getCallbackUrl() != null) {
-                doCallback(migration);
-            }
-        }
-        return migration;
+  private void doCallback(Migration migration) {
+    URI callbackURI = null;
+    try {
+      callbackURI = migration.getDefinition().getExecution().getCallbackUrl();
+      Response response = ClientBuilder.newClient()
+          .target(callbackURI)
+          .request(MediaType.APPLICATION_JSON)
+          .buildPost(Entity.json(migration))
+          .invoke();
+      if (Status.OK.getStatusCode() == response.getStatus()) {
+        logger.debug("Migration [{}] - Callback to {} replied successfully", migration.getId(), callbackURI);
+      } else {
+        logger.warn("Migration [{}] - Callback to {} replied with {}", migration.getId(), callbackURI, response.getStatus());
+      }
+    } catch (Exception e) {
+      logger.error("Migration [{}] - Callback to {} failed.", migration.getId(), callbackURI, e);
     }
+  }
 
-    private boolean migrateInstance(Long instanceId, Migration migration, Plan plan, ProcessAdminServicesClient adminService, QueryServicesClient queryService) {
-        MigrationReportInstance reportInstance = null;
-        try {
-            ProcessInstance pi = queryService.findProcessInstanceById(instanceId);
-            if (pi != null && pi.getContainerId().equals(plan.getSourceContainerId())) {
-                reportInstance = adminService.migrateProcessInstance(
-                        plan.getSourceContainerId(),
-                        instanceId,
-                        plan.getTargetContainerId(),
-                        plan.getTargetProcessId(),
-                        plan.getMappings());
-            } else {
-                reportInstance = buildReport(instanceId);
-                reportInstance.setLogs(Arrays.asList("Instance did not exist in source container. Migration skipped"));
-                logger.debug("Process Instance {} did not exist in source container with id {}", instanceId, plan.getSourceContainerId());
-            }
-        } catch (Exception e) {
-            logger.warn("Unable to migrate instanceID: " + instanceId, e);
-            reportInstance = buildReportFromError(instanceId, e);
-        }
-        final MigrationReport report = new MigrationReport(migration.getId(), reportInstance);
-        return txHelper.withTransaction(() -> {
-            em.persist(report);
-            return report;
-        }).getSuccessful();
+  public void validateDefinition(MigrationDefinition definition) throws InvalidMigrationException {
+    if (definition == null) {
+      throw new InvalidMigrationException("The Migration Definition must not be null");
     }
-
-    private void doCallback(Migration migration) {
-        URI callbackURI = null;
-        try {
-            callbackURI = migration.getDefinition().getExecution().getCallbackUrl();
-            Response response = ClientBuilder.newClient()
-                    .target(callbackURI)
-                    .request(MediaType.APPLICATION_JSON)
-                    .buildPost(Entity.json(migration))
-                    .invoke();
-            if (Status.OK.getStatusCode() == response.getStatus()) {
-                logger.debug("Migration [{}] - Callback to {} replied successfully", migration.getId(), callbackURI);
-            } else {
-                logger.warn("Migration [{}] - Callback to {} replied with {}", migration.getId(), callbackURI, response.getStatus());
-            }
-        } catch (Exception e) {
-            logger.error("Migration [{}] - Callback to {} failed.", migration.getId(), callbackURI, e);
-        }
+    if (definition.getPlanId() == null) {
+      throw new InvalidMigrationException("The Plan ID is mandatory");
     }
-
-    public void validateDefinition(MigrationDefinition definition) throws InvalidMigrationException {
-        if (definition == null) {
-            throw new InvalidMigrationException("The Migration Definition must not be null");
-        }
-        if (definition.getPlanId() == null) {
-            throw new InvalidMigrationException("The Plan ID is mandatory");
-        }
-        if (StringUtils.isBlank(definition.getKieServerId())) {
-            throw new InvalidMigrationException("The KIE Server ID is mandatory");
-        }
-        if (!kieService.hasKieServer(definition.getKieServerId())) {
-            throw new InvalidKieServerException(definition.getKieServerId());
-        }
+    if (StringUtils.isBlank(definition.getKieServerId())) {
+      throw new InvalidMigrationException("The KIE Server ID is mandatory");
     }
-
-    private void validatePlanExecution(MigrationDefinition definition) throws InvalidMigrationException {
-        try {
-            validatePlanExecution(definition, planService.get(definition.getPlanId()));
-        } catch (PlanNotFoundException e) {
-            throw new InvalidMigrationException("Plan not found with ID: " + definition.getPlanId());
-        }
+    if (!kieService.hasKieServer(definition.getKieServerId())) {
+      throw new InvalidKieServerException(definition.getKieServerId());
     }
+  }
 
-    private void validatePlanExecution(MigrationDefinition definition, Plan plan) throws InvalidMigrationException {
-        if (!kieService.existsProcessDefinition(plan.getSourceContainerId(), plan.getSourceProcessId(), definition.getKieServerId())) {
-            throw new ProcessNotFoundException(plan.getSourceContainerId());
-        }
-        if (!kieService.existsProcessDefinition(plan.getTargetContainerId(), plan.getTargetProcessId(), definition.getKieServerId())) {
-            throw new ProcessNotFoundException(plan.getTargetContainerId());
-        }
+  private void validatePlanExecution(MigrationDefinition definition) throws InvalidMigrationException {
+    try {
+      validatePlanExecution(definition, planService.get(definition.getPlanId()));
+    } catch (PlanNotFoundException e) {
+      throw new InvalidMigrationException("Plan not found with ID: " + definition.getPlanId());
     }
+  }
 
-    private List<Long> getInstancesToMigrate(Migration migration) throws InvalidKieServerException, PlanNotFoundException {
-        List<Long> instanceIds = migration.getDefinition().getProcessInstanceIds();
-        List<Long> migratedInstances = new ArrayList<>();
-        if (migration.getReports() != null && !migration.getReports().isEmpty()) {
-            migration.getReports().stream().map(r -> r.getProcessInstanceId()).forEach(id -> migratedInstances.add(id));
+  private void validatePlanExecution(MigrationDefinition definition, Plan plan) throws InvalidMigrationException {
+    if (!kieService.existsProcessDefinition(definition.getKieServerId(), plan.getSource())) {
+      throw new ProcessNotFoundException(plan.getSource().getContainerId());
+    }
+    if (!kieService.existsProcessDefinition(definition.getKieServerId(), plan.getTarget())) {
+      throw new ProcessNotFoundException(plan.getTarget().getContainerId());
+    }
+  }
+
+  private List<Long> getInstancesToMigrate(Migration migration) throws InvalidKieServerException, PlanNotFoundException {
+    List<Long> instanceIds = migration.getDefinition().getProcessInstanceIds();
+    List<Long> migratedInstances = new ArrayList<>();
+    if (migration.getReports() != null && !migration.getReports().isEmpty()) {
+      migration.getReports().stream().map(r -> r.getProcessInstanceId()).forEach(id -> migratedInstances.add(id));
+    }
+    Plan plan = planService.get(migration.getDefinition().getPlanId());
+    if (instanceIds == null || instanceIds.isEmpty()) {
+      boolean allFetched = false;
+      int page = 0;
+      while (!allFetched) {
+        List<ProcessInstance> instances = kieService.getQueryServicesClient(migration.getDefinition().getKieServerId())
+            .findProcessInstancesByContainerId(plan.getSource().getContainerId(), QUERY_PROCESS_INSTANCE_STATUSES, page++, QUERY_PAGE_SIZE);
+
+        instances.stream().forEach(p -> instanceIds.add(p.getId()));
+        if (instances.size() < QUERY_PAGE_SIZE) {
+          allFetched = true;
         }
-        Plan plan = planService.get(migration.getDefinition().getPlanId());
-        if (instanceIds == null || instanceIds.isEmpty()) {
-            boolean allFetched = false;
-            int page = 0;
-            while (!allFetched) {
-                List<ProcessInstance> instances = kieService.getQueryServicesClient(migration.getDefinition().getKieServerId())
-                        .findProcessInstancesByContainerId(plan.getSourceContainerId(), QUERY_PROCESS_INSTANCE_STATUSES, page++, QUERY_PAGE_SIZE);
-
-                instances.stream().forEach(p -> instanceIds.add(p.getId()));
-                if (instances.size() < QUERY_PAGE_SIZE) {
-                    allFetched = true;
-                }
-            }
-        }
-        return instanceIds.stream().filter(id -> !migratedInstances.contains(id)).collect(Collectors.toList());
+      }
     }
+    return instanceIds.stream().filter(id -> !migratedInstances.contains(id)).collect(Collectors.toList());
+  }
 
-    private MigrationReportInstance buildReport(Long instanceId) {
-        MigrationReportInstance reportInstance = new MigrationReportInstance();
-        reportInstance.setSuccessful(true);
-        reportInstance.setProcessInstanceId(instanceId);
-        reportInstance.setStartDate(new Date());
-        reportInstance.setEndDate(new Date());
-        return reportInstance;
-    }
+  private MigrationReportInstance buildReport(Long instanceId) {
+    MigrationReportInstance reportInstance = new MigrationReportInstance();
+    reportInstance.setSuccessful(true);
+    reportInstance.setProcessInstanceId(instanceId);
+    reportInstance.setStartDate(new Date());
+    reportInstance.setEndDate(new Date());
+    return reportInstance;
+  }
 
-    private MigrationReportInstance buildReportFromError(Long instanceId, Exception e) {
-        MigrationReportInstance reportInstance = buildReport(instanceId);
-        reportInstance.setSuccessful(false);
-        reportInstance.setLogs(Arrays.asList(e.getMessage()));
-        return reportInstance;
-    }
+  private MigrationReportInstance buildReportFromError(Long instanceId, Exception e) {
+    MigrationReportInstance reportInstance = buildReport(instanceId);
+    reportInstance.setSuccessful(false);
+    reportInstance.setLogs(Arrays.asList(e.getMessage()));
+    return reportInstance;
+  }
 }

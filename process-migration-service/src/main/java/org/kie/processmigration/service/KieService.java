@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.kie.processmigration.model.KieServerConfig;
 import org.kie.processmigration.model.ProcessInfo;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
@@ -31,19 +32,19 @@ import org.kie.server.client.admin.ProcessAdminServicesClient;
 
 public interface KieService {
 
-    ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws InvalidKieServerException;
+  ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws InvalidKieServerException;
 
-    QueryServicesClient getQueryServicesClient(String kieServerId) throws InvalidKieServerException;
+  QueryServicesClient getQueryServicesClient(String kieServerId) throws InvalidKieServerException;
 
-    Collection<KieServerConfig> getConfigs();
+  Collection<KieServerConfig> getConfigs();
 
-    boolean hasKieServer(String kieServerId);
+  boolean hasKieServer(String kieServerId);
 
-    Map<String, Set<String>> getDefinitions(String kieServerId) throws InvalidKieServerException;;
+  Map<String, Set<String>> getDefinitions(String kieServerId) throws InvalidKieServerException;
 
-    ProcessInfo getDefinition(String kieServerId, String containerId, String processId) throws ProcessDefinitionNotFoundException, InvalidKieServerException;
+  ProcessInfo getDefinition(String kieServerId, ProcessRef processRef) throws ProcessDefinitionNotFoundException, InvalidKieServerException;
 
-    boolean existsProcessDefinition(String containerId, String processId, String kieServerId) throws InvalidKieServerException;
+  boolean existsProcessDefinition(String kieServerId, ProcessRef processRef) throws InvalidKieServerException;
 
-    List<RunningInstance> getRunningInstances(String containerId, String kieServerId, Integer page, Integer pageSize) throws InvalidKieServerException;
+  List<RunningInstance> getRunningInstances(String kieServerId, String containerId, Integer page, Integer pageSize) throws InvalidKieServerException;
 }

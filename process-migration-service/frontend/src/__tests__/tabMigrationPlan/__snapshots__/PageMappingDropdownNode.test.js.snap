@@ -1,32 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PageMappingDropdownNode renders correctly using snapshot 1`] = `
-<div>
-  <div
-    className="dropdown btn-group"
+<div
+  className="dropdown btn-group"
+>
+  <button
+    aria-expanded={false}
+    aria-haspopup={true}
+    className="dropdown-toggle btn btn-default"
+    disabled={false}
+    id="nodeMappingDropdown"
+    onClick={[Function]}
+    onKeyDown={[Function]}
+    role="button"
+    type="button"
   >
-    <button
-      aria-expanded={false}
-      aria-haspopup={true}
-      className="dropdown-toggle btn btn-default"
-      disabled={false}
-      id="PageMappingDropdownButton"
-      onClick={[Function]}
-      onKeyDown={[Function]}
-      role="button"
-      type="button"
-    >
-      Source Nodes
-       
-      <span
-        className="caret"
-      />
-    </button>
-    <ul
-      aria-labelledby="PageMappingDropdownButton"
-      className="dropdown-menu"
-      role="menu"
+    Source Nodes
+     
+    <span
+      className="caret"
     />
-  </div>
+  </button>
+  <ul
+    aria-labelledby="nodeMappingDropdown"
+    className="dropdown-menu"
+    role="menu"
+  />
 </div>
 `;

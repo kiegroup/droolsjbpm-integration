@@ -28,55 +28,55 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @Embeddable
 public class Execution {
 
-    public enum ExecutionType {
-        ASYNC,
-        SYNC
-    }
+  public enum ExecutionType {
+    ASYNC,
+    SYNC
+  }
 
-    public enum ExecutionStatus {
-        SCHEDULED,
-        STARTED,
-        COMPLETED,
-        FAILED,
-        CANCELLED,
-        CREATED
-    }
+  public enum ExecutionStatus {
+    SCHEDULED,
+    STARTED,
+    COMPLETED,
+    FAILED,
+    CANCELLED,
+    CREATED
+  }
 
-    @Column(name = "execution_type")
-    private ExecutionType type;
+  @Column(name = "execution_type")
+  private ExecutionType type;
 
-    @JsonInclude(Include.NON_NULL)
-    @Column(name = "callback_url")
-    private URI callbackUrl;
+  @JsonInclude(Include.NON_NULL)
+  @Column(name = "callback_url")
+  private URI callbackUrl;
 
-    @JsonInclude(Include.NON_NULL)
-    @Column(name = "scheduled_start_time")
-    private Instant scheduledStartTime;
+  @JsonInclude(Include.NON_NULL)
+  @Column(name = "scheduled_start_time")
+  private Instant scheduledStartTime;
 
-    public Instant getScheduledStartTime() {
-        return scheduledStartTime;
-    }
+  public Instant getScheduledStartTime() {
+    return scheduledStartTime;
+  }
 
-    public Execution setScheduledStartTime(Instant scheduledStartTime) {
-        this.scheduledStartTime = scheduledStartTime;
-        return this;
-    }
+  public Execution setScheduledStartTime(Instant scheduledStartTime) {
+    this.scheduledStartTime = scheduledStartTime;
+    return this;
+  }
 
-    public ExecutionType getType() {
-        return type;
-    }
+  public ExecutionType getType() {
+    return type;
+  }
 
-    public Execution setType(ExecutionType type) {
-        this.type = type;
-        return this;
-    }
+  public Execution setType(ExecutionType type) {
+    this.type = type;
+    return this;
+  }
 
-    public URI getCallbackUrl() {
-        return callbackUrl;
-    }
+  public URI getCallbackUrl() {
+    return callbackUrl;
+  }
 
-    public Execution setCallbackUrl(URI callbackUrl) {
-        this.callbackUrl = callbackUrl;
-        return this;
-    }
+  public Execution setCallbackUrl(URI callbackUrl) {
+    this.callbackUrl = callbackUrl;
+    return this;
+  }
 }

@@ -19,9 +19,12 @@ package org.kie.processmigration.model;
 import java.io.Serializable;
 import java.util.Map;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,114 +41,98 @@ import javax.persistence.Table;
 @Table(name = "plans")
 @SequenceGenerator(name = "planIdSeq", sequenceName = "PLAN_ID_SEQ")
 @NamedQueries({
-        @NamedQuery(name = "Plan.findAll", query = "SELECT p FROM Plan p"),
-        @NamedQuery(name = "Plan.findById", query = "SELECT p FROM Plan p WHERE p.id = :id")
+    @NamedQuery(name = "Plan.findAll", query = "SELECT p FROM Plan p"),
+    @NamedQuery(name = "Plan.findById", query = "SELECT p FROM Plan p WHERE p.id = :id")
 })
 public class Plan implements Serializable {
 
-    private static final long serialVersionUID = 1244535648642365858L;
+  private static final long serialVersionUID = 1244535648642365858L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "planIdSeq")
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "planIdSeq")
+  private long id;
 
-    private String name;
+  private String name;
 
-    private String description;
+  private String description;
 
-    @Column(name = "source_container_id")
-    private String sourceContainerId;
+  @Embedded
+  @AttributeOverrides({
+      @AttributeOverride(name = "containerId", column = @Column(name = "source_container_id")),
+      @AttributeOverride(name = "processId", column = @Column(name = "source_process_id")),
+  })
+  private ProcessRef source;
 
-    @Column(name = "source_process_id")
-    private String sourceProcessId;
+  @Embedded
+  @AttributeOverrides({
+      @AttributeOverride(name = "containerId", column = @Column(name = "target_container_id")),
+      @AttributeOverride(name = "processId", column = @Column(name = "target_process_id")),
+  })
+  private ProcessRef target;
 
-    @Column(name = "target_container_id")
-    private String targetContainerId;
+  @ElementCollection(fetch = FetchType.EAGER)
+  @MapKeyColumn(name = "source")
+  @Column(name = "target")
+  @CollectionTable(
+      name = "plan_mappings",
+      joinColumns = @JoinColumn(name = "plan_id")
+  )
+  private Map<String, String> mappings;
 
-    @Column(name = "target_process_id")
-    private String targetProcessId;
+  public long getId() {
+    return id;
+  }
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @MapKeyColumn(name = "source")
-    @Column(name = "target")
-    @CollectionTable(
-            name = "plan_mappings",
-            joinColumns = @JoinColumn(name = "plan_id")
-    )
-    private Map<String, String> mappings;
+  public void setId(long id) {
+    this.id = id;
+  }
 
-    public long getId() {
-        return id;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setId(long id) {
-        this.id = id;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public ProcessRef getSource() {
+    return source;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setSource(ProcessRef source) {
+    this.source = source;
+  }
 
-    public String getSourceContainerId() {
-        return sourceContainerId;
-    }
+  public ProcessRef getTarget() {
+    return target;
+  }
 
-    public void setSourceContainerId(String sourceContainerId) {
-        this.sourceContainerId = sourceContainerId;
-    }
+  public void setTarget(ProcessRef target) {
+    this.target = target;
+  }
 
-    public String getSourceProcessId() {
-        return sourceProcessId;
-    }
+  public Map<String, String> getMappings() {
+    return mappings;
+  }
 
-    public void setSourceProcessId(String sourceProcessId) {
-        this.sourceProcessId = sourceProcessId;
-    }
+  public void setMappings(Map<String, String> mappings) {
+    this.mappings = mappings;
+  }
 
-    public String getTargetContainerId() {
-        return targetContainerId;
-    }
-
-    public void setTargetContainerId(String targetContainerId) {
-        this.targetContainerId = targetContainerId;
-    }
-
-    public String getTargetProcessId() {
-        return targetProcessId;
-    }
-
-    public void setTargetProcessId(String targetProcessId) {
-        this.targetProcessId = targetProcessId;
-    }
-
-    public Map<String, String> getMappings() {
-        return mappings;
-    }
-
-    public void setMappings(Map<String, String> mappings) {
-        this.mappings = mappings;
-    }
-
-    public Plan copy(Plan plan) {
-        this.name = plan.getName();
-        this.description = plan.getDescription();
-        this.sourceContainerId = plan.getSourceContainerId();
-        this.sourceProcessId = plan.getSourceProcessId();
-        this.targetContainerId = plan.getTargetContainerId();
-        this.targetProcessId = plan.getTargetProcessId();
-        this.mappings = plan.getMappings();
-        return this;
-    }
+  public Plan copy(Plan plan) {
+    this.name = plan.getName();
+    this.description = plan.getDescription();
+    this.source = plan.getSource();
+    this.target = plan.getTarget();
+    this.mappings = plan.getMappings();
+    return this;
+  }
 }

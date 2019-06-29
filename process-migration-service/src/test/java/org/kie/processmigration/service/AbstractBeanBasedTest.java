@@ -29,15 +29,15 @@ import static org.mockito.Mockito.when;
 
 public abstract class AbstractBeanBasedTest {
 
-    public static final String MOCK_KIESERVER_ID = "mock-kieserver";
+  public static final String MOCK_KIESERVER_ID = "mock-kieserver";
 
-    protected static Bean<?> createMockBean(Class<?> clazz) {
-        return MockBean.of(mock(clazz), clazz);
-    }
+  protected static Bean<?> createMockBean(Class<?> clazz) {
+    return MockBean.of(mock(clazz), clazz);
+  }
 
-    protected void addMockConfigs(KieService mock) {
-        Map<String, KieServerConfig> configs = new HashMap<>();
-        configs.put(MOCK_KIESERVER_ID, new KieServerConfig());
-        when(mock.hasKieServer(MOCK_KIESERVER_ID)).thenReturn(true);
-    }
+  protected void addMockConfigs(KieService mock) {
+    Map<String, KieServerConfig> configs = new HashMap<>();
+    configs.put(MOCK_KIESERVER_ID, new KieServerConfig());
+    when(mock.hasKieServer(MOCK_KIESERVER_ID)).thenReturn(true);
+  }
 }

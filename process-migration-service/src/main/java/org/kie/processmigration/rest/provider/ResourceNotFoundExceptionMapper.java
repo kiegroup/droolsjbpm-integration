@@ -28,9 +28,9 @@ import org.kie.processmigration.model.exceptions.ResourceNotFoundException;
 @Provider
 public class ResourceNotFoundExceptionMapper implements ExceptionMapper<ResourceNotFoundException> {
 
-    @Override
-    public Response toResponse(ResourceNotFoundException exception) {
-        JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
-        return Response.status(Response.Status.NOT_FOUND).entity(json).type(MediaType.APPLICATION_JSON).build();
-    }
+  @Override
+  public Response toResponse(ResourceNotFoundException exception) {
+    JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
+    return Response.status(Response.Status.NOT_FOUND).entity(json).type(MediaType.APPLICATION_JSON).build();
+  }
 }
