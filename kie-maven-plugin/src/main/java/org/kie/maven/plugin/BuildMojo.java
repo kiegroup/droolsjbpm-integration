@@ -173,14 +173,10 @@ public class BuildMojo extends AbstractKieMojo {
 
             List<Message> errors = messages != null ? messages.filterMessages( Message.Level.ERROR): Collections.emptyList();
 
-            if (container != null) {
-                Map<String, Object> kieMap = getKieMap();
-                if (!kieMap.isEmpty()) {
-                    CompilerHelper helper = new CompilerHelper();
-                    helper.share(kieMap, kModule, getLog());
-                }else{
-                    getLog().info("Kie Map empty");
-                }
+            Map<String, Object> kieMap = getKieMap();
+            if (container != null && !kieMap.isEmpty()) {
+                CompilerHelper helper = new CompilerHelper();
+                helper.share(kieMap, kModule, getLog());
             } else {
                 new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
             }
