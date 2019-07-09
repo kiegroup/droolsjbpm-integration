@@ -9,8 +9,8 @@
   language governing permissions and ~ limitations under the License. -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -38,7 +38,7 @@
     <version.org.apache.cxf>3.2.6</version.org.apache.cxf>
     <version.me.snowdrop.narayana>2.1.0</version.me.snowdrop.narayana>
     <version.org.apache.commons-dbcp2>2.4.0</version.org.apache.commons-dbcp2>
-    
+
     <version.javax.validation>2.0.1.Final</version.javax.validation>
   </properties>
 
@@ -52,15 +52,15 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter</artifactId>
-	<version>${version.org.spring-boot}</version>
-	<exclusions>
-	    <exclusion>
-	      <groupId>org.apache.logging.log4j</groupId>
-              <artifactId>log4j-api</artifactId>
-            </exclusion>
-	  </exclusions>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <version>${version.org.spring-boot}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- overrides of narayana version -->
       <dependency>
