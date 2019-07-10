@@ -88,12 +88,16 @@ public class OptaplannerKieServerExtension
         // If new jobs are submitted and all threads are busy, the default reject policy will kick in.
         int availableProcessorCount = Runtime.getRuntime().availableProcessors();
         int resolvedActiveThreadCount = Math.max(1, availableProcessorCount - 2);
+        int queueSize = Integer.parseInt(System.getProperty(
+                KieServerConstants.KIE_OPTAPLANNER_THREAD_POOL_QUEUE_SIZE, String.valueOf(resolvedActiveThreadCount)));
+        logger.info("Creating a ThreadPoolExecutor with corePoolSize = " + resolvedActiveThreadCount + ","
+                + " maximumPoolSize = " + resolvedActiveThreadCount + ", queueSize = " + queueSize);
         this.threadPool = new ThreadPoolExecutor(
                 resolvedActiveThreadCount,
                 resolvedActiveThreadCount,
                 10, // thread keep alive time
                 TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(resolvedActiveThreadCount)); // queue with a size
+                new ArrayBlockingQueue<>(queueSize)); // queue with a size
         this.solverServiceBase = new SolverServiceBase(registry, threadPool);
 
         this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);

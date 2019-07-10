@@ -112,6 +112,8 @@ public class KieServerConstants {
     public static final String KIE_SERVER_ROUTER = "org.kie.server.router";
     public static final String KIE_SERVER_ROUTER_ATTEMPT_INTERVAL = "org.kie.server.router.connect";
 
+    public static final String KIE_OPTAPLANNER_THREAD_POOL_QUEUE_SIZE = "org.optaplanner.server.ext.thread.pool.queue.size";
+
     // ProcessConfig configuration item constants
     public static final String PCFG_RUNTIME_STRATEGY = "RuntimeStrategy";
     public static final String PCFG_KIE_BASE = "KBase";
