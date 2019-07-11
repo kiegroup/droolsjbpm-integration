@@ -1,3 +1,0 @@
-org.kie.server.services.jbpm.ui.form.RemoteFormModellerFormProvider
-org.kie.server.services.jbpm.ui.form.RemoteKieFormsProvider
-org.kie.server.services.jbpm.ui.form.RemoteInMemoryFormProvider

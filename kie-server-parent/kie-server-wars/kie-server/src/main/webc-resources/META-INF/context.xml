@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Context>
-  <!-- Narayana resources -->
-  <Transaction factory="org.jboss.narayana.tomcat.jta.UserTransactionFactory"/>
-  <Resource name="TransactionManager" type="javax.transaction.TransactionManager"
-            factory="org.jboss.narayana.tomcat.jta.TransactionManagerFactory"/>
-  <Resource name="TransactionSynchronizationRegistry" type="javax.transaction.TransactionSynchronizationRegistry"
-            factory="org.jboss.narayana.tomcat.jta.TransactionSynchronizationRegistryFactory"/>
-</Context>

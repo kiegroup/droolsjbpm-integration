@@ -1,3 +1,0 @@
-import org.jbpm.data.Person;
-
-global org.jbpm.data.Person person;

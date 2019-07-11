@@ -1,4 +1,0 @@
-org.kie.server.services.impl.security.adapters.TomcatSecurityAdapter
-org.kie.server.services.impl.security.adapters.JMSSecurityAdapter
-org.kie.server.services.impl.security.adapters.WeblogicSecurityAdapter
-org.kie.server.services.impl.security.adapters.WebSphereSecurityAdapter

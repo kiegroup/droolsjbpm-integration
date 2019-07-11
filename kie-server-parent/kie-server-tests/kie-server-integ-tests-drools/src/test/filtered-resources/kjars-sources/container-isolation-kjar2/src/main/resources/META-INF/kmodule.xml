@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<kmodule xmlns="http://www.drools.org/xsd/kmodule">
-  <kbase name="kbase.kjar2" packages="kjar2">
-    <ksession name="kjar2.session" type="stateless"/>
-  </kbase>
-</kmodule>
