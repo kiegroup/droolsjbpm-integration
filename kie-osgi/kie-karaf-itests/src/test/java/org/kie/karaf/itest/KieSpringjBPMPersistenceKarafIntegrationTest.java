@@ -16,6 +16,8 @@
 
 package org.kie.karaf.itest;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,7 +209,11 @@ public class KieSpringjBPMPersistenceKarafIntegrationTest extends AbstractKieSpr
         final String jdbcDriverPath = System.getProperty("jdbc.driver.path");
         final List<Option> configurationOptions = getDefaultOptions();
         if (jdbcDriverPath != null && !"".equals(jdbcDriverPath)) {
-            configurationOptions.add(wrappedBundle("file://" + jdbcDriverPath));
+            try {
+                configurationOptions.add(wrappedBundle(new File(jdbcDriverPath).toURI().toURL().toString()));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("Error parsing jdbc driver path", e);
+            }
         }
         return configurationOptions.toArray(new Option[]{});
     }
