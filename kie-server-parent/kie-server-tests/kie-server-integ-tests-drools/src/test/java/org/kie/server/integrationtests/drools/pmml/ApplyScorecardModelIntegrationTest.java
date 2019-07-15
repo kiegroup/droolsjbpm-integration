@@ -18,6 +18,8 @@ package org.kie.server.integrationtests.drools.pmml;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
@@ -25,6 +27,9 @@ import org.drools.core.command.impl.CommandFactoryServiceImpl;
 import org.drools.core.command.runtime.pmml.ApplyPmmlModelCommand;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.api.KieServices;
+import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.command.Command;
 import org.kie.api.pmml.PMML4Result;
 import org.kie.api.pmml.PMMLRequestData;
 import org.kie.api.runtime.ExecutionResults;
@@ -82,8 +87,6 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
 
     @Test
     public void testApplyPmmlScorecard() {
-
-        ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(classLoader);
         PMMLRequestData request = new PMMLRequestData("123", "SimpleScorecard");
         request.addRequestParam("param1", 10.0);
@@ -104,5 +107,31 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
         Assertions.assertThat(rankingMap.get("reasonCh1")).isEqualTo(5);
         Assertions.assertThat(rankingMap.get("reasonCh2")).isEqualTo(-6);
         logger.info("ApplyScorecardModelIntegrationTest#testApplyPmmlScorecard completed successfully");
+    }
+
+    @Test
+    public void testApplyPmmlScorecardInBatch() {
+        Thread.currentThread().setContextClassLoader(classLoader);
+        PMMLRequestData request = new PMMLRequestData("123", "SimpleScorecard");
+        request.addRequestParam("param1", 10.0);
+        request.addRequestParam("param2", 15.0);
+
+        List<Command<?>> cmds = new ArrayList<>();
+        ApplyPmmlModelCommand command = (ApplyPmmlModelCommand) ((CommandFactoryServiceImpl) commandsFactory).newApplyPmmlModel(request);
+        cmds.add(command);
+
+        BatchExecutionCommand bec = KieServices.Factory.get().getCommands().newBatchExecution(cmds, "defaultKieSession");
+        ServiceResponse<ExecutionResults> results = ruleClient.executeCommandsWithResults(CONTAINER_ID, bec);
+        assertNotNull(results);
+        PMML4Result resultHolder = (PMML4Result) results.getResult().getValue("results");
+        assertNotNull(resultHolder);
+        assertEquals("OK", resultHolder.getResultCode());
+
+        double score = resultHolder.getResultValue("ScoreCard", "score", Double.class).get();
+        Assertions.assertThat(score).isEqualTo(40.8);
+        Map<String, Double> rankingMap = (Map<String, Double>) resultHolder.getResultValue("ScoreCard", "ranking");
+        Assertions.assertThat(rankingMap.get("reasonCh1")).isEqualTo(5);
+        Assertions.assertThat(rankingMap.get("reasonCh2")).isEqualTo(-6);
+        logger.info("ApplyScorecardModelIntegrationTest#testApplyPmmlScorecardInBatch completed successfully");
     }
 }
