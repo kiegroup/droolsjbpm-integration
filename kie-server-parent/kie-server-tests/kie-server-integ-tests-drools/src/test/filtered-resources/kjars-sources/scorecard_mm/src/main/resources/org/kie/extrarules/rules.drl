@@ -1,0 +1,18 @@
+//created on: Jul 3, 2019
+package org.kie.extrarules
+
+import org.kie.model.Applicant;
+
+//declare any global variables here
+
+
+
+
+rule "SimpleRule"
+
+    when
+        Applicant(totalScore > 10.0)
+    then
+        System.out.println("Applicant scored > 10.0");
+
+end
