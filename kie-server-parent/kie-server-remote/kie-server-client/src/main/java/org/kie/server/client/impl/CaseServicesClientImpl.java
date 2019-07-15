@@ -15,6 +15,47 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.model.cases.CaseAdHocFragment;
+import org.kie.server.api.model.cases.CaseAdHocFragmentList;
+import org.kie.server.api.model.cases.CaseComment;
+import org.kie.server.api.model.cases.CaseCommentList;
+import org.kie.server.api.model.cases.CaseDefinition;
+import org.kie.server.api.model.cases.CaseDefinitionList;
+import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseFileDataItem;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
+import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.cases.CaseMilestone;
+import org.kie.server.api.model.cases.CaseMilestoneList;
+import org.kie.server.api.model.cases.CaseRoleAssignment;
+import org.kie.server.api.model.cases.CaseRoleAssignmentList;
+import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.client.CaseServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
+
 import static org.kie.server.api.rest.RestURI.CASE_AD_HOC_FRAGMENTS_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_ALL_DEFINITIONS_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_ALL_INSTANCES_GET_URI;
@@ -65,47 +106,6 @@ import static org.kie.server.api.rest.RestURI.PROCESS_ID;
 import static org.kie.server.api.rest.RestURI.REOPEN_CASE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.START_CASE_POST_URI;
 import static org.kie.server.api.rest.RestURI.build;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.DescriptorCommand;
-import org.kie.server.api.model.KieServerCommand;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.Wrapped;
-import org.kie.server.api.model.cases.CaseAdHocFragment;
-import org.kie.server.api.model.cases.CaseAdHocFragmentList;
-import org.kie.server.api.model.cases.CaseComment;
-import org.kie.server.api.model.cases.CaseCommentList;
-import org.kie.server.api.model.cases.CaseDefinition;
-import org.kie.server.api.model.cases.CaseDefinitionList;
-import org.kie.server.api.model.cases.CaseFile;
-import org.kie.server.api.model.cases.CaseFileDataItem;
-import org.kie.server.api.model.cases.CaseFileDataItemList;
-import org.kie.server.api.model.cases.CaseInstance;
-import org.kie.server.api.model.cases.CaseInstanceList;
-import org.kie.server.api.model.cases.CaseMilestone;
-import org.kie.server.api.model.cases.CaseMilestoneList;
-import org.kie.server.api.model.cases.CaseRoleAssignment;
-import org.kie.server.api.model.cases.CaseRoleAssignmentList;
-import org.kie.server.api.model.cases.CaseStage;
-import org.kie.server.api.model.cases.CaseStageList;
-import org.kie.server.api.model.definition.ProcessDefinition;
-import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.instance.NodeInstance;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.client.CaseServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implements CaseServicesClient {
@@ -405,10 +405,10 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public void addDynamicUserTask(String containerId, String caseId, String name, String description, String actors, String groups, Map<String, Object> data) {
+    public void addDynamicUserTask(String containerId, String caseId, String name, String subject, String actors, String groups, Map<String, Object> data) {
         Map<String, Object> taskSpecMap = new HashMap<String, Object>();
         taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_NAME_PROP, name);
-        taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_DESC_PROP, description);
+        taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_DESC_PROP, subject);
         taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_ACTORS_PROP, actors);
         taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_GROUPS_PROP, groups);
         taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_DATA_PROP, data);

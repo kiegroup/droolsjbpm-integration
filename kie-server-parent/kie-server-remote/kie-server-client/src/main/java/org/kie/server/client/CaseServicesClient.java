@@ -85,7 +85,7 @@ public interface CaseServicesClient {
 
     void removeCaseInstanceData(String containerId, String caseId, String... names);
 
-    void addDynamicUserTask(String containerId, String caseId, String name, String description, String actors, String groups, Map<String, Object> data);
+    void addDynamicUserTask(String containerId, String caseId, String name, String subject, String actors, String groups, Map<String, Object> data);
 
     void addDynamicTask(String containerId, String caseId, String nodeType, String name, Map<String, Object> data);
 
