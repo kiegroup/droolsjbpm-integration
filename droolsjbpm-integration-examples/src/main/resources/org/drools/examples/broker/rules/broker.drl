@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.examples.broker
+package org.drools.examples.broker.rules
 
 // importing classes
 import org.drools.examples.broker.model.Company
