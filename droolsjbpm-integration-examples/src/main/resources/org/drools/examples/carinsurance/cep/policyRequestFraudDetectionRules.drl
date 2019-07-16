@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.examples.carinsurance.rule;
+package org.drools.examples.carinsurance.cep;
     dialect "java"
 
 import org.drools.examples.carinsurance.domain.Car;
