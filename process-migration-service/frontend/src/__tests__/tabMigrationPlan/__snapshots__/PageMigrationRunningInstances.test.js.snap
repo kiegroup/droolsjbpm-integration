@@ -32,14 +32,14 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
           />
         </th>
         <th
-          aria-label="Process instance ID"
+          aria-label="ID"
           className="sorting sort sort-none"
           colSpan={1}
           index={1}
           onClick={[Function]}
           rowSpan={1}
         >
-          Process instance ID
+          ID
         </th>
         <th
           aria-label="Name"
@@ -122,12 +122,12 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
         <td
           className=""
         >
-          2019-01-06 21:06:55
+          2019-01-06T21:06:55:123Z
         </td>
         <td
           className=""
         >
-          1
+          Active
         </td>
       </tr>
       <tr
@@ -168,12 +168,12 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
         <td
           className=""
         >
-          2019-01-06 21:30:23
+          2019-01-06T21:30:23:123Z
         </td>
         <td
           className=""
         >
-          1
+          Active
         </td>
       </tr>
       <tr
@@ -214,12 +214,12 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
         <td
           className=""
         >
-          2019-01-06 21:49:27
+          2019-01-06T21:49:27:123Z
         </td>
         <td
           className=""
         >
-          1
+          Active
         </td>
       </tr>
       <tr
@@ -260,12 +260,12 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
         <td
           className=""
         >
-          2019-01-06 21:49:34
+          2019-01-06T21:49:34:123Z
         </td>
         <td
           className=""
         >
-          1
+          Active
         </td>
       </tr>
       <tr
@@ -306,12 +306,12 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
         <td
           className=""
         >
-          2019-01-06 21:58:54
+          2019-01-06T21:58:54:123Z
         </td>
         <td
           className=""
         >
-          1
+          Active
         </td>
       </tr>
       <tr
@@ -352,12 +352,12 @@ exports[`PageMigrationRunningInstances renders correctly using snapshot 1`] = `
         <td
           className=""
         >
-          2019-01-06 21:59:04
+          2019-01-06T21:59:04:123Z
         </td>
         <td
           className=""
         >
-          1
+          Active
         </td>
       </tr>
     </tbody>

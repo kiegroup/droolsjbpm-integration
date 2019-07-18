@@ -14,8 +14,13 @@ export default class PageMappingDiagramSvgPan extends React.Component {
     const svgDoc = new DOMParser()
       .parseFromString(this.props.svg, "text/xml")
       .getElementsByTagName("svg")[0];
-    const width = parseInt(svgDoc.getAttribute("width"));
-    const height = parseInt(svgDoc.getAttribute("height"));
+    const width = svgDoc.hasAttribute("width")
+      ? parseInt(svgDoc.getAttribute("width"))
+      : 2000;
+    const height = svgDoc.hasAttribute("height")
+      ? parseInt(svgDoc.getAttribute("height"))
+      : 1400;
+
     return { width, height };
   };
 
@@ -36,7 +41,7 @@ export default class PageMappingDiagramSvgPan extends React.Component {
           width={800}
           height={400}
           ref={Viewer => (this.Viewer = Viewer)}
-          detectAutoPan={false}
+          detectWheel={false}
         >
           <svg width={width} height={height}>
             <SvgLoader svgXML={this.props.svg}>

@@ -1,20 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PageReview renders correctly using snapshot 1`] = `
-<div>
-  <div
-    className="form-group"
+Array [
+  <button
+    className="btn btn-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
   >
-    <button
-      className="btn btn-default"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      Export
-    </button>
-    <pre>
-      {
+    Export
+  </button>,
+  <pre>
+    {
   "id": 99,
   "definition": {
     "execution": {
@@ -29,13 +26,8 @@ exports[`PageReview renders correctly using snapshot 1`] = `
     "kieServerId": "sample-server"
   },
   "status": "CREATED",
-  "createdAt": "2019-01-12T01:04:52.035",
-  "startedAt": null,
-  "finishedAt": null,
-  "cancelledAt": null,
-  "errorMessage": null
+  "createdAt": "2019-07-17T20:59:22.128Z"
 }
-    </pre>
-  </div>
-</div>
+  </pre>,
+]
 `;

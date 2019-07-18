@@ -8,9 +8,9 @@ import {
   actionHeaderCellFormatter
 } from "patternfly-react";
 
-import MigrationPlansEditPopup from "./MigrationPlansEditPopup";
 import WizardExecuteMigration from "./wizardExecuteMigration/WizardExecuteMigration";
 import planClient from "../../clients/planClient";
+import ExportPlanModal from "./ExportPlanModal";
 
 export default class MigrationPlansTable extends React.Component {
   constructor(props) {
@@ -25,7 +25,8 @@ export default class MigrationPlansTable extends React.Component {
     planClient.get(id).then(plan => {
       this.setState({
         showMigrationWizard: true,
-        containerId: plan.source.containerId
+        containerId: plan.source.containerId,
+        planId: id
       });
     });
   };
@@ -43,7 +44,7 @@ export default class MigrationPlansTable extends React.Component {
 
     const tooltipExecute = (
       <Tooltip id="tooltip">
-        <div>Execute Migration Plan</div>
+        <div>Execute migration</div>
       </Tooltip>
     );
 
@@ -152,15 +153,7 @@ export default class MigrationPlansTable extends React.Component {
                 </OverlayTrigger>
               </Table.Actions>,
               <Table.Actions key="Actions_Export">
-                <MigrationPlansEditPopup
-                  title="Export Migration Plan"
-                  actionName="Export"
-                  buttonLabel="Copy To Clipboard"
-                  content={JSON.stringify(rowData)}
-                  retrieveAllPlans={this.props.retrieveAllPlans}
-                  updatePlan={this.props.updatePlan}
-                  planId={rowData.id}
-                />
+                <ExportPlanModal plan={rowData} />
               </Table.Actions>,
               <Table.Actions key="Actions_Delete">
                 <OverlayTrigger overlay={tooltipDelete} placement={"bottom"}>
@@ -197,12 +190,11 @@ export default class MigrationPlansTable extends React.Component {
         </Table.PfProvider>
         {this.state.showMigrationWizard && (
           <WizardExecuteMigration
-            showMigrationWizard={this.state.showMigrationWizard}
-            closeMigrationWizard={() =>
-              this.setState({ showMigrationWizard: false })
-            }
+            isOpen={this.state.showMigrationWizard}
+            onClose={() => this.setState({ showMigrationWizard: false })}
             containerId={this.state.containerId}
             kieServerId={this.props.kieServerId}
+            planId={this.state.planId}
           />
         )}
       </React.Fragment>

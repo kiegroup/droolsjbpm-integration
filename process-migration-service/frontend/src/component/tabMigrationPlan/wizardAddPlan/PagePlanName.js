@@ -18,7 +18,10 @@ export default class PagePlanName extends React.Component {
     this.props.onIsValid(this.isFormValid());
   }
   onDescriptionChange = event => {
-    this.props.onFieldChanged("description", event.target.value);
+    this.props.onFieldChanged(
+      "description",
+      event.target.value === "" ? null : event.target.value
+    );
   };
 
   onNameChange = event => {

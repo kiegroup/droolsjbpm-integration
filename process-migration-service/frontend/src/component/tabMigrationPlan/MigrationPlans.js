@@ -1,23 +1,22 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-import { Button } from "patternfly-react";
-import { Icon } from "patternfly-react";
-import { MessageDialog } from "patternfly-react";
+import { Button, Icon, MessageDialog } from "patternfly-react";
 
 import MigrationPlansBase from "./MigrationPlansBase";
 import MigrationPlansTable from "./MigrationPlansTable";
 import MigrationPlanListFilter from "./MigrationPlanListFilter";
-import MigrationPlansEditPopup from "./MigrationPlansEditPopup";
 
 import WizardAddPlan from "./wizardAddPlan/WizardAddPlan";
 import planClient from "../../clients/planClient";
+import ImportPlanModal from "./ImportPlanModal";
 
 export default class MigrationPlans extends MigrationPlansBase {
   constructor(props) {
     super(props);
     this.state = {
       filteredPlans: [],
-      selectedPlan: this.getDefaultPlan(),
+      plan: this.getDefaultPlan(),
       showDeleteConfirmation: false,
       showMigrationWizard: false,
       showPlanWizard: false,
@@ -41,8 +40,8 @@ export default class MigrationPlans extends MigrationPlansBase {
 
   openAddPlanWizard = id => {
     if (id) {
-      planClient.get(id).then(selectedPlan => {
-        this.setState({ selectedPlan, showPlanWizard: true });
+      planClient.get(id).then(plan => {
+        this.setState({ plan, showPlanWizard: true });
       });
     } else {
       this.setState({ showPlanWizard: true });
@@ -52,7 +51,7 @@ export default class MigrationPlans extends MigrationPlansBase {
   closeAddPlanWizard = () => {
     this.setState({
       showPlanWizard: false,
-      selectedPlan: this.getDefaultPlan()
+      plan: this.getDefaultPlan()
     });
     this.retrieveAllPlans();
   };
@@ -107,12 +106,7 @@ export default class MigrationPlans extends MigrationPlansBase {
           </div>
           <div className="col-xs-3">
             <div className="pull-right">
-              <MigrationPlansEditPopup
-                title="Import Migration Plan"
-                actionName="Import Plan"
-                retrieveAllPlans={this.retrieveAllPlans}
-                onSavePlan={this.savePlan}
-              />
+              <ImportPlanModal onImport={this.importPlan} />
               &nbsp;
               <Button
                 bsStyle="primary"
@@ -138,10 +132,14 @@ export default class MigrationPlans extends MigrationPlansBase {
             onSavePlan={this.savePlan}
             onPlanChanged={plan => this.setState({ plan })}
             kieServerId={this.props.kieServerId}
-            plan={this.state.selectedPlan}
+            plan={this.state.plan}
           />
         )}
       </div>
     );
   }
 }
+
+MigrationPlans.propTypes = {
+  kieServerId: PropTypes.string.isRequired
+};

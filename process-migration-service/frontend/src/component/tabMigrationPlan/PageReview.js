@@ -20,12 +20,10 @@ export default class PageReview extends React.Component {
 
   render() {
     return (
-      <div>
-        <div className="form-group">
-          <Button onClick={this.doExport}>Export</Button>
-          <pre>{JSON.stringify(this.props.object, null, 2)}</pre>
-        </div>
-      </div>
+      <React.Fragment>
+        <Button onClick={this.doExport}>Export</Button>
+        <pre>{JSON.stringify(this.props.object, null, 2)}</pre>
+      </React.Fragment>
     );
   }
 }

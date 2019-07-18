@@ -41,7 +41,7 @@ export default class PageMappingDiagrams extends React.Component {
           </Button>
         </Col>
         {this.state.showSourceDiagram && (
-          <div>
+          <div className="col-sm-12">
             <Col componentClass={ControlLabel}>Source diagram</Col>
             <PageMappingDiagramSvgPan
               svg={this.props.sourceProcess.svgFile}
@@ -51,7 +51,7 @@ export default class PageMappingDiagrams extends React.Component {
           </div>
         )}
         {this.state.showTargetDiagram && (
-          <div>
+          <div className="col-sm-12">
             <Col componentClass={ControlLabel}>Target diagram</Col>
             <PageMappingDiagramSvgPan
               svg={this.props.targetProcess.svgFile}

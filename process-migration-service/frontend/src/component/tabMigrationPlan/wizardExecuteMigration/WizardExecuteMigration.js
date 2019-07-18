@@ -12,6 +12,8 @@ import WizardBase from "../WizardBase";
 
 import PageMigrationScheduler from "./PageMigrationScheduler";
 import kieServerClient from "../../../clients/kieServerClient";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
+import Notification from "../../Notification";
 
 export default class WizardExecuteMigration extends WizardBase {
   constructor(props) {
@@ -22,10 +24,13 @@ export default class WizardExecuteMigration extends WizardBase {
       scheduledStartTime: "",
       callbackUrl: "",
       definition: {
+        planId: props.planId,
+        kieServerId: props.kieServerId,
         execution: {
           type: "ASYNC"
         }
       },
+      migration: {},
       stepValidation: {}
     };
     kieServerClient
@@ -33,16 +38,24 @@ export default class WizardExecuteMigration extends WizardBase {
       .then(runningInstances => this.setState({ runningInstances }))
       .catch(() => {
         this.setState({
-          runningInstances: []
+          runningInstances: [],
+          errorMsg: `Unable to retrieve running instances for " +
+            "containerID ${this.props.containerId} and KIE Server: ${this.props.kieServerId}`
         });
       });
   }
 
   onSubmitMigrationPlan = () => {
-    MigrationClient.create(this.state.migration).then(migration => {
-      this.setState({ migration });
-      this.onNextButtonClick();
-    });
+    MigrationClient.create(this.state.definition)
+      .then(migration => {
+        this.setState({ migration: migration });
+        this.onNextButtonClick();
+      })
+      .catch(() => {
+        this.setState({
+          errorMsg: `Unable to execute migration on KIE Server ${this.props.kieServerId}`
+        });
+      });
   };
 
   setRunngingInstancesIds = ids => {
@@ -53,7 +66,11 @@ export default class WizardExecuteMigration extends WizardBase {
 
   onExecutionFieldChange = (field, value) => {
     const { definition } = this.state;
-    definition.execution[field] = value;
+    if (value === null) {
+      delete definition.execution[field];
+    } else {
+      definition.execution[field] = value;
+    }
     this.setState({ definition });
   };
 
@@ -83,6 +100,13 @@ export default class WizardExecuteMigration extends WizardBase {
                 activeStepIndex={activeStepIndex}
                 activeSubStepIndex={activeSubStepIndex}
               >
+                {this.state.errorMsg && (
+                  <Notification
+                    type={ALERT_TYPE_ERROR}
+                    message={this.state.errorMsg}
+                    onDismiss={() => this.setState({ errorMsg: "" })}
+                  />
+                )}
                 {this.state.runningInstances && (
                   <PageMigrationRunningInstances
                     runningInstances={this.state.runningInstances}
@@ -122,9 +146,16 @@ export default class WizardExecuteMigration extends WizardBase {
                 activeStepIndex={activeStepIndex}
                 activeSubStepIndex={activeSubStepIndex}
               >
+                {this.state.errorMsg && (
+                  <Notification
+                    type={ALERT_TYPE_ERROR}
+                    message={this.state.errorMsg}
+                    onDismiss={() => this.setState({ errorMsg: "" })}
+                  />
+                )}
                 <PageReview
                   object={this.state.definition}
-                  exportedFileName="migration"
+                  exportedFileName="migration_definition"
                 />
               </Wizard.Contents>
             );
@@ -139,8 +170,8 @@ export default class WizardExecuteMigration extends WizardBase {
                 activeSubStepIndex={activeSubStepIndex}
               >
                 <PageReview
-                  object={this.state.definition}
-                  exportedFileName="migration"
+                  object={this.state.migration}
+                  exportedFileName="migration_execution"
                 />
               </Wizard.Contents>
             );
@@ -153,12 +184,9 @@ export default class WizardExecuteMigration extends WizardBase {
     return (
       <div>
         <form className="form-horizontal" name="form_migration">
-          <Wizard
-            show={this.props.showMigrationWizard}
-            onHide={this.props.closeMigrationWizard}
-          >
+          <Wizard show={this.props.isOpen} onHide={this.props.onClose}>
             <Wizard.Header
-              onClose={this.props.closeMigrationWizard}
+              onClose={this.props.onClose}
               title="Execute Migration Plan Wizard"
             />
             <Wizard.Body>
@@ -181,21 +209,25 @@ export default class WizardExecuteMigration extends WizardBase {
               </Wizard.Row>
             </Wizard.Body>
             <Wizard.Footer>
-              <Button
-                bsStyle="default"
-                className="btn-cancel"
-                onClick={this.props.closeMigrationWizard}
-              >
-                Cancel
-              </Button>
-              <Button
-                bsStyle="default"
-                disabled={activeStepIndex === 0 && activeSubStepIndex === 0}
-                onClick={this.onBackButtonClick}
-              >
-                <Icon type="fa" name="angle-left" />
-                Back
-              </Button>
+              {activeStepIndex !== 3 && (
+                <React.Fragment>
+                  <Button
+                    bsStyle="default"
+                    className="btn-cancel"
+                    onClick={this.props.onClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    bsStyle="default"
+                    disabled={activeStepIndex === 0 && activeSubStepIndex === 0}
+                    onClick={this.onBackButtonClick}
+                  >
+                    <Icon type="fa" name="angle-left" />
+                    Back
+                  </Button>
+                </React.Fragment>
+              )}
               {(activeStepIndex === 0 || activeStepIndex === 1) && (
                 <Button
                   bsStyle="primary"
@@ -208,14 +240,11 @@ export default class WizardExecuteMigration extends WizardBase {
               )}
               {activeStepIndex === 2 && (
                 <Button bsStyle="primary" onClick={this.onSubmitMigrationPlan}>
-                  Execute Plan
+                  Finish
                 </Button>
               )}
               {activeStepIndex === 3 && (
-                <Button
-                  bsStyle="primary"
-                  onClick={this.props.closeMigrationWizard}
-                >
+                <Button bsStyle="primary" onClick={this.props.onClose}>
                   Close
                 </Button>
               )}
@@ -228,6 +257,9 @@ export default class WizardExecuteMigration extends WizardBase {
 }
 
 WizardExecuteMigration.propTypes = {
+  planId: PropTypes.number.isRequired,
   kieServerId: PropTypes.string.isRequired,
-  containerId: PropTypes.string.isRequired
+  containerId: PropTypes.string.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired
 };

@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const webpack = require("webpack");
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpackConfiguration = require("../../webpack.config");
@@ -16,6 +17,7 @@ app.use(
     stats: "minimal"
   })
 );
+app.use(bodyParser.json());
 
 app.get("/rest/kieservers", (req, res) => {
   return res.send(readFile("kieservers.json"));
@@ -55,10 +57,27 @@ app.get("/rest/plans", (req, res) => {
 });
 
 app.post("/rest/plans", (req, res) => {
+  if (req.body.name === "error") {
+    console.log(`Fail to create plan with name: ${req.body.name}`);
+    return res.status(500).send({
+      message: {
+        string: "Behold the error."
+      }
+    });
+  }
+  console.log(`Created plan with name: ${req.body.name}`);
   return res.send(readFile("plan.json"));
 });
 
 app.put("/rest/plans/:planId", (req, res) => {
+  if (req.body.name === "error") {
+    console.log(`Failed to update plan with ID: ${req.params.planId}`);
+    return res.status(500).send({
+      message: {
+        string: "Behold the error."
+      }
+    });
+  }
   console.log(`Updated plan with ID: ${req.params.planId}`);
   return res.send(readFile("plan.json"));
 });
@@ -78,6 +97,20 @@ app.get("/rest/migrations", (req, res) => {
 });
 
 app.post("/rest/migrations", (req, res) => {
+  if (
+    req.body.execution !== undefined &&
+    req.body.execution.callbackUrl === "http://error.com"
+  ) {
+    console.log(
+      `Failed to create new migration for planId: ${req.body.planId}`
+    );
+    return res.status(500).send({
+      message: {
+        string: "Behold the error."
+      }
+    });
+  }
+  console.log(`Created new migration for planId: ${req.body.planId}`);
   return res.send(readFile("migration.json"));
 });
 
@@ -87,6 +120,19 @@ app.get("/rest/migrations/:migrationId", (req, res) => {
 });
 
 app.put("/rest/migrations/:migrationId", (req, res) => {
+  if (
+    req.body.execution !== undefined &&
+    req.body.execution.callbackUrl === "http://error.com"
+  ) {
+    console.log(
+      `Failed to update migration with ID: ${req.params.migrationId}`
+    );
+    return res.status(500).send({
+      message: {
+        string: "Behold the error."
+      }
+    });
+  }
   console.log(`Updated migration with ID: ${req.params.migrationId}`);
   return res.send(readFile("migration.json"));
 });

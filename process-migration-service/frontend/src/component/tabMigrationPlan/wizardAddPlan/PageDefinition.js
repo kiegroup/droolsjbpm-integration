@@ -19,6 +19,18 @@ export default class PageDefinition extends React.Component {
     this.props.onIsValid(
       this.validate(this.props.plan.source, this.props.plan.target) === ""
     );
+    if (this.validateItem(this.props.plan.source)) {
+      this.getDefinition(
+        this.props.plan.source,
+        this.props.setSourceDefinition
+      );
+    }
+    if (this.validateItem(this.props.plan.target)) {
+      this.getDefinition(
+        this.props.plan.target,
+        this.props.setTargetDefinition
+      );
+    }
   }
 
   loadProcessIds = () => {

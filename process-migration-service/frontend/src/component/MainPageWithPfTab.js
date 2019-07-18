@@ -9,13 +9,14 @@ import {
   DropdownButton,
   MenuItem,
   Button,
-  Icon,
-  ALERT_TYPE_ERROR
+  Icon
 } from "patternfly-react";
 
 import MigrationPlans from "./tabMigrationPlan/MigrationPlans";
 import MigrationDefinitions from "./tabMigration/MigrationDefinitions";
 import KieServerClient from "../clients/kieServerClient";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
+import Notification from "./Notification";
 
 export default class MainPageWithPfTab extends Component {
   constructor(props) {
@@ -24,7 +25,8 @@ export default class MainPageWithPfTab extends Component {
     this.state = {
       kieServerId: "",
       title: "KIE Server Name",
-      menuItems: []
+      menuItems: [],
+      errorMsg: ""
     };
   }
 
@@ -125,7 +127,10 @@ export default class MainPageWithPfTab extends Component {
                 />
               </TabPane>
               <TabPane eventKey="second">
-                <MigrationDefinitions onError={this.setErrorMsg} />
+                <MigrationDefinitions
+                  onError={this.setErrorMsg}
+                  migrationUpdated={this.state.refreshMigrations}
+                />
               </TabPane>
             </TabContent>
           </div>

@@ -13,7 +13,6 @@
       "type": "property"
     },
     {
-      "name": "",
       "id": "_CD02ADDD-FDE8-46A9-BFAF-79CD8DA3EA39",
       "type": "exclusiveGateway"
     },
@@ -23,7 +22,6 @@
       "type": "businessRuleTask"
     },
     {
-      "name": "",
       "id": "_ED55C042-3737-467D-A6D7-C628E16F2542",
       "type": "exclusiveGateway"
     },
@@ -48,7 +46,6 @@
       "type": "userTask"
     },
     {
-      "name": "",
       "id": "_EA9E581B-D39F-4479-BD6D-DF53FAD9D51D",
       "type": "exclusiveGateway"
     },
@@ -63,7 +60,6 @@
       "type": "userTask"
     },
     {
-      "name": "",
       "id": "_5C3ECCC2-C616-4E3C-98F6-E2F812E4D1F9",
       "type": "exclusiveGateway"
     }

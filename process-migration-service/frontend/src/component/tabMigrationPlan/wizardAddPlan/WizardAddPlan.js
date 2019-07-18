@@ -12,6 +12,8 @@ import PageDefinition from "./PageDefinition";
 import PagePlanName from "./PagePlanName";
 
 import { AddPlanItems } from "../../common/WizardItems";
+import Notification from "../../Notification";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
 export default class WizardAddPlan extends WizardBase {
   constructor(props) {
@@ -51,7 +53,11 @@ export default class WizardAddPlan extends WizardBase {
 
   onPlanFieldChange = (field, newValue) => {
     const plan = this.props.plan;
-    plan[field] = newValue;
+    if (newValue === null) {
+      delete plan[field];
+    } else {
+      plan[field] = newValue;
+    }
     this.props.onPlanChanged(plan);
   };
 
@@ -66,8 +72,12 @@ export default class WizardAddPlan extends WizardBase {
   };
 
   submitPlan = () => {
-    this.onNextButtonClick();
-    this.props.onSavePlan();
+    this.props
+      .onSavePlan()
+      .then(() => this.onNextButtonClick())
+      .catch(() =>
+        this.setState({ errorMsg: "Unable to submit the migration plan" })
+      );
   };
 
   render() {
@@ -152,9 +162,17 @@ export default class WizardAddPlan extends WizardBase {
                 activeStepIndex={activeStepIndex}
                 activeSubStepIndex={activeSubStepIndex}
               >
+                {this.state.errorMsg && (
+                  <Notification
+                    type={ALERT_TYPE_ERROR}
+                    message={this.state.errorMsg}
+                    onDismiss={() => this.setState({ errorMsg: "" })}
+                  />
+                )}
                 <PageReview
                   object={this.props.plan}
                   exportedFileName={this.props.plan.name}
+                  errorMsg={this.state.errorMsg}
                 />
               </Wizard.Contents>
             );
@@ -207,21 +225,25 @@ export default class WizardAddPlan extends WizardBase {
               </Wizard.Row>
             </Wizard.Body>
             <Wizard.Footer>
-              <Button
-                bsStyle="default"
-                className="btn-cancel"
-                onClick={this.props.closeAddPlanWizard}
-              >
-                Cancel
-              </Button>
-              <Button
-                bsStyle="default"
-                disabled={activeStepIndex === 0 && activeSubStepIndex === 0}
-                onClick={this.onBackButtonClick}
-              >
-                <Icon type="fa" name="angle-left" />
-                Back
-              </Button>
+              {activeStepIndex !== 4 && (
+                <React.Fragment>
+                  <Button
+                    bsStyle="default"
+                    className="btn-cancel"
+                    onClick={this.props.closeAddPlanWizard}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    bsStyle="default"
+                    disabled={activeStepIndex === 0 && activeSubStepIndex === 0}
+                    onClick={this.onBackButtonClick}
+                  >
+                    <Icon type="fa" name="angle-left" />
+                    Back
+                  </Button>
+                </React.Fragment>
+              )}
               {activeStepIndex < 3 && (
                 <Button
                   bsStyle="primary"

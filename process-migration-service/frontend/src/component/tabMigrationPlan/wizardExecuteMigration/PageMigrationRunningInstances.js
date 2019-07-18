@@ -48,6 +48,26 @@ export default class PageMigrationRunningInstances extends React.Component {
       strategy: sort.strategies.byProperty
     });
 
+    const stateFormatter = value => {
+      const formatState = state => {
+        switch (state) {
+          case 0:
+            return "Pending";
+          case 1:
+            return "Active";
+          case 2:
+            return "Completed";
+          case 3:
+            return "Aborted";
+          case 4:
+            return "Suspended";
+          default:
+            return "Other";
+        }
+      };
+      return <Table.Cell>{formatState(value)}</Table.Cell>;
+    };
+
     // enables our custom header formatters extensions to reactabular
     this.customHeaderFormatters = customHeaderFormattersDefinition;
     this.state = {
@@ -91,7 +111,7 @@ export default class PageMigrationRunningInstances extends React.Component {
         {
           property: "processInstanceId",
           header: {
-            label: "Process instance ID",
+            label: "ID",
             props: {
               index: 1,
               rowSpan: 1,
@@ -185,7 +205,7 @@ export default class PageMigrationRunningInstances extends React.Component {
             props: {
               index: 5
             },
-            formatters: [tableCellFormatter]
+            formatters: [stateFormatter]
           }
         }
       ],

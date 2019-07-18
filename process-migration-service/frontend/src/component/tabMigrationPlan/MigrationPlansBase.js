@@ -40,26 +40,33 @@ export default class MigrationPlansBase extends React.Component {
     });
   };
 
-  deletePlan = () => {
-    PlanClient.delete(this.state.deletePlanId).then(() => {
+  deletePlan = async () => {
+    return PlanClient.delete(this.state.deletePlanId).then(() => {
       this.retrieveAllPlans();
       this.hideDeleteDialog();
     });
   };
 
-  savePlan = () => {
-    let promise;
-    if (this.state.plan.id === undefined) {
-      promise = PlanClient.create(this.state.plan);
-    } else {
-      promise = PlanClient.update(this.state.plan.id, this.state.plan);
-    }
-    promise.then(response => {
-      this.setState({
-        plan: response
-      });
+  savePlan = async () => {
+    return this.persistPlan(this.state.plan).then(plan => {
+      this.setState({ plan });
       this.retrieveAllPlans();
     });
+  };
+
+  importPlan = async plan => {
+    return this.persistPlan(plan).then(() => this.retrieveAllPlans());
+  };
+
+  persistPlan = async plan => {
+    if (plan.id === undefined) {
+      return PlanClient.create(plan);
+    }
+    return PlanClient.update(plan.id, plan);
+  };
+
+  onPlanUpdated = plan => {
+    this.setState({ plan });
   };
 
   openMigrationWizard = rowData => {

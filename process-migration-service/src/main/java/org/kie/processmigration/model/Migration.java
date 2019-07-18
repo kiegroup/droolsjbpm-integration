@@ -61,14 +61,18 @@ public class Migration implements Serializable {
   @Embedded
   private MigrationDefinition definition;
 
+  @JsonInclude(Include.NON_NULL)
   @Column(name = "created_at")
   private Instant createdAt;
 
+  @JsonInclude(Include.NON_NULL)
+  @Column(name = "finished_at")
+  private Instant finishedAt;
+
+  @JsonInclude(Include.NON_NULL)
   @Column(name = "started_at")
   private Instant startedAt;
 
-  @Column(name = "finished_at")
-  private Instant finishedAt;
 
   @JsonInclude(Include.NON_NULL)
   @Column(name = "cancelled_at")

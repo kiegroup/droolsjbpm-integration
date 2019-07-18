@@ -36,7 +36,11 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
 
   onExecutionFieldChange = (field, value) => {
     const { definition } = this.state;
-    definition.execution[field] = value;
+    if (value === null) {
+      delete definition.execution[field];
+    } else {
+      definition.execution[field] = value;
+    }
     this.setState({ definition });
   };
 

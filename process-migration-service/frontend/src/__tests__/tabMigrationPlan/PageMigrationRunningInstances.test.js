@@ -10,6 +10,7 @@ test("PageMigrationRunningInstances renders correctly using snapshot", () => {
       <PageMigrationRunningInstances
         runningInstances={running_instances}
         setRunngingInstancesIds={myMock}
+        onIsValid={myMock}
       />
     )
     .toJSON();

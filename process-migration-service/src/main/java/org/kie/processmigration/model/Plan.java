@@ -37,6 +37,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Entity
 @Table(name = "plans")
 @SequenceGenerator(name = "planIdSeq", sequenceName = "PLAN_ID_SEQ")
@@ -54,6 +56,7 @@ public class Plan implements Serializable {
 
   private String name;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String description;
 
   @Embedded

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import validator from "validator";
 
 import {
@@ -14,7 +14,7 @@ import PageViewMigrationLogs from "./PageViewMigrationLogs";
 import PageEditMigrationDefinitionModal from "./PageEditMigrationDefinitionModal";
 import MigrationClient from "../../clients/migrationClient";
 
-export default class MigrationDefinitions extends Component {
+export default class MigrationDefinitions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

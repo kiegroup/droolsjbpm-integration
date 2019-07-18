@@ -10,19 +10,27 @@ export default class PageMappingDropdownNode extends React.Component {
 
   createMenuItems(options) {
     let menuItems = [];
-    for (var i = 0; i < options.length; i++) {
-      const name = options[i].name;
-      const type = options[i].type;
-      if (name !== undefined && name.trim().length > 0) {
-        menuItems.push(
-          <MenuItem
-            key={i}
-            eventKey={options[i]}
-            onSelect={this.props.onDropdownChange}
-          >
-            {name} ({type})
-          </MenuItem>
-        );
+    if (options !== undefined && options !== null) {
+      options = options.sort(
+        (a, b) =>
+          a.name !== undefined &&
+          a.name !== null &&
+          a.name.localeCompare(b.name)
+      );
+      for (var i = 0; i < options.length; i++) {
+        const name = options[i].name;
+        const type = options[i].type;
+        if (name !== undefined && name !== null && name.trim().length > 0) {
+          menuItems.push(
+            <MenuItem
+              key={i}
+              eventKey={options[i]}
+              onSelect={this.props.onDropdownChange}
+            >
+              {name} ({type})
+            </MenuItem>
+          );
+        }
       }
     }
     return menuItems;

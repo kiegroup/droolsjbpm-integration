@@ -13,9 +13,5 @@
     "kieServerId": "sample-server"
   },
   "status": "CREATED",
-  "createdAt": "2019-01-12T01:04:52.035",
-  "startedAt": null,
-  "finishedAt": null,
-  "cancelledAt": null,
-  "errorMessage": null
+  "createdAt": "2019-07-17T20:59:22.128Z"
 }

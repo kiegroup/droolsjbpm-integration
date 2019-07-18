@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -35,6 +36,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
+import org.kie.processmigration.model.BpmNode;
 import org.kie.processmigration.model.KieServerConfig;
 import org.kie.processmigration.model.ProcessInfo;
 import org.kie.processmigration.model.ProcessRef;
@@ -162,7 +164,7 @@ public class KieServiceImpl implements KieService {
         if (processes.size() < DEFAULT_PAGE_SIZE) {
           finished = true;
         }
-        processes.forEach(definition -> definitions.get(container.getContainerId()).add(definition.getName()));
+        processes.forEach(definition -> definitions.get(container.getContainerId()).add(definition.getId()));
       }
     });
     return definitions;
@@ -202,20 +204,16 @@ public class KieServiceImpl implements KieService {
     if (!pd.getContainerId().equals(processRef.getContainerId())) {
       throw new ProcessDefinitionNotFoundException(kieServerId, processRef);
     }
-    ArrayList<String> values = new ArrayList<>();
-    ArrayList<String> labels = new ArrayList<>();
+    List<BpmNode> nodes = new ArrayList<>();
     if (pd.getNodes() != null) {
-      Collection<NodeDefinition> nodes = pd.getNodes();
-      for (NodeDefinition node : nodes) {
-        if (node.getType().equals("HumanTaskNode")) {
-          values.add(node.getUniqueId());
-          labels.add(node.getName() + ":" + node.getUniqueId());
-        }
-      }
+      nodes = pd.getNodes()
+          .stream()
+          .map(n -> new BpmNode().setId(n.getUniqueId()).setName(n.getName()).setType(n.getType()))
+          .collect(Collectors.toCollection(ArrayList::new));
     }
-    processInfo.setValues(values);
-    processInfo.setLabels(labels);
+    processInfo.setNodes(nodes);
     processInfo.setContainerId(processRef.getContainerId());
+    processInfo.setProcessId(processRef.getProcessId());
     return processInfo;
   }
 
