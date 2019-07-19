@@ -1,5 +1,6 @@
 import React from "react";
 import { render, cleanup, fireEvent } from "react-testing-library";
+
 import PageMigrationScheduler from "../../component/tabMigrationPlan/wizardExecuteMigration/PageMigrationScheduler.js";
 
 // automatically unmount and cleanup DOM after the test is finished.
@@ -61,8 +62,8 @@ test("PageMigrationScheduler is scheduled", () => {
   const callbackFn = jest.fn();
   const isValidFn = jest.fn();
   const callbackUrl = "https://example.com/callback";
-  const scheduledTime = "2119-01-12T01:04:52.035";
-  const { container, getByLabelText } = render(
+  const scheduledTime = "2019-7-17T20:59:22.128Z";
+  const { getByLabelText } = render(
     <PageMigrationScheduler
       callbackUrl={callbackUrl}
       scheduledStartTime={scheduledTime}
@@ -71,7 +72,5 @@ test("PageMigrationScheduler is scheduled", () => {
     />
   );
 
-  expect(container).toMatchSnapshot();
-  const callbackInput = getByLabelText("Callback URL");
-  expect(callbackInput).toHaveProperty("value", callbackUrl);
+  expect(getByLabelText("Schedule")).toHaveProperty("checked", true);
 });
