@@ -13,6 +13,7 @@ import {
 import PageViewMigrationLogs from "./PageViewMigrationLogs";
 import PageEditMigrationDefinitionModal from "./PageEditMigrationDefinitionModal";
 import MigrationClient from "../../clients/migrationClient";
+import { HelpBlock } from "patternfly-react/dist/js/components/Form";
 
 export default class MigrationDefinitions extends React.Component {
   constructor(props) {
@@ -79,16 +80,6 @@ export default class MigrationDefinitions extends React.Component {
       //during user input, need to check for migration id should be numeric
       this.setState({
         validationMessage: "Error: migration id should be numeric"
-      });
-    } else if (
-      event != null &&
-      event.currentTarget.id == "id_migrationDefinition_search_button" &&
-      (input == null || input.value == "")
-    ) {
-      //search button is pressed, need to judge migration id can't be empty
-      this.setState({
-        validationMessage:
-          "Error: To do a search, the migration id can't be empty"
       });
     } else {
       //all good, so no need to outpt validation error message
@@ -305,7 +296,7 @@ export default class MigrationDefinitions extends React.Component {
     }
 
     return (
-      <div>
+      <React.Fragment>
         {/* View migration logs pop-up */}
         <MessageDialog
           show={this.state.showLogDialog}
@@ -336,10 +327,9 @@ export default class MigrationDefinitions extends React.Component {
           accessibleName="deleteConfirmationDialog"
           accessibleDescription="deleteConfirmationDialogContent"
         />
-
         <br />
         <div className="row">
-          <div className="col-xs-12">
+          <div className="col-xs-9">
             <input
               id="id_migrationsDefinitions_input1"
               type="search"
@@ -352,8 +342,11 @@ export default class MigrationDefinitions extends React.Component {
             >
               <span className="fa fa-search" />
             </button>
-            {this.state.validationMessage}
-
+            {this.state.validationMessage && (
+              <HelpBlock>{this.state.validationMessage}</HelpBlock>
+            )}
+          </div>
+          <div className="col-xs-3">
             <div className="pull-right">
               <OverlayTrigger overlay={tooltipRefresh} placement={"bottom"}>
                 <button
@@ -368,15 +361,11 @@ export default class MigrationDefinitions extends React.Component {
           </div>
         </div>
         <br />
-        <div className="row">
-          <div className="col-xs-12">
-            <Table.PfProvider striped columns={resultBootstrapColumns}>
-              <Table.Header />
-              <Table.Body rows={this.state.migrationsDefinitions} rowKey="id" />
-            </Table.PfProvider>
-          </div>
-        </div>
-      </div>
+        <Table.PfProvider striped hover columns={resultBootstrapColumns}>
+          <Table.Header />
+          <Table.Body rows={this.state.migrationsDefinitions} rowKey="id" />
+        </Table.PfProvider>
+      </React.Fragment>
     );
   }
 }

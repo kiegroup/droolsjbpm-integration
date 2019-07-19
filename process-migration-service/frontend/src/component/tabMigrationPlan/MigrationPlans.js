@@ -81,7 +81,7 @@ export default class MigrationPlans extends MigrationPlansBase {
     const icon = <Icon type="pf" name="error-circle-o" />;
 
     return (
-      <div>
+      <React.Fragment>
         {/* Delete Plan pop-up */}
         <MessageDialog
           show={this.state.showDeleteConfirmation}
@@ -135,7 +135,7 @@ export default class MigrationPlans extends MigrationPlansBase {
             plan={this.state.plan}
           />
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }

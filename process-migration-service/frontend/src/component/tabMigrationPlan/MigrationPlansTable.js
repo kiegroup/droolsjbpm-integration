@@ -184,7 +184,7 @@ export default class MigrationPlansTable extends React.Component {
 
     return (
       <React.Fragment>
-        <Table.PfProvider striped bordered hover columns={planBootstrapColumns}>
+        <Table.PfProvider striped hover columns={planBootstrapColumns}>
           <Table.Header />
           <Table.Body rows={this.props.plans} rowKey="id" />
         </Table.PfProvider>

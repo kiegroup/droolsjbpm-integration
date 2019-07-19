@@ -2,7 +2,7 @@
 
 exports[`MigrationPlansTable renders correctly using snapshot 1`] = `
 <table
-  className="table table-striped table-bordered table-hover"
+  className="table table-striped table-hover"
 >
   <thead>
     <tr>
