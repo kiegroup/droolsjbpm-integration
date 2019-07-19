@@ -1,6 +1,6 @@
 <kmodule xmlns="http://www.drools.org/xsd/kmodule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <kbase name="kieBase1" default="true" eventProcessingMode="stream" equalsBehavior="identity" packages="org.kie.scorecard">
-    <ksession name="defaultkieSession" type="stateless" default="true" clockType="realtime"/>
+    <ksession name="defaultkieSession" type="stateful" default="true" clockType="realtime"/>
   </kbase>
   <kbase name="kieBase2" default="false" eventProcessingMode="stream" equalsBehavior="identity" packages="org.kie.extrarules">
     <ksession name="kieSession2" type="stateless" default="false" clockType="realtime"/>

@@ -32,6 +32,7 @@ public class ApplyScorecardMultiModuleIntegrationTest extends PMMLApplyModelBase
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "scorecard_mm", "1.0.0.Final");
 
     private static final String CONTAINER_ID = "scorecard_mm";
+    private static final String KJAR_RESOURCE_PATH = "/kjars-sources/scorecard_mm";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
     private static ClassLoader classLoader;
@@ -39,7 +40,7 @@ public class ApplyScorecardMultiModuleIntegrationTest extends PMMLApplyModelBase
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/scorecard");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource(KJAR_RESOURCE_PATH);
         KieMavenRepository kmp = KieMavenRepository.getKieMavenRepository();
         File artifact = kmp.resolveArtifact(releaseId).getFile();
         if (artifact != null) {
