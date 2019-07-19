@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-autoconfiguration</artifactId>
-    <version>7.24.0-SNAPSHOT</version>
+    <version>7.25.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-autoconfiguration-drools</artifactId>
   <name>KIE :: Spring :: Boot :: KIE Server Auto Configuration :: Drools</name>
