@@ -10,6 +10,10 @@
 
   <packaging>kjar</packaging>
 
+  <properties>
+    <generateModel>NO</generateModel>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
