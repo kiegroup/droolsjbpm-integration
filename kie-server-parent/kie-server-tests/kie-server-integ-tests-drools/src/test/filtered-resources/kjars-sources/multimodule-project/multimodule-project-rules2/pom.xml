@@ -10,6 +10,10 @@
   <artifactId>multimodule-project-rules2</artifactId>
   <packaging>kjar</packaging>
 
+  <properties>
+    <generateModel>NO</generateModel>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server.testing</groupId>

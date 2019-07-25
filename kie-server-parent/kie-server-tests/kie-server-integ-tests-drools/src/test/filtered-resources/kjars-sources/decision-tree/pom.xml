@@ -10,7 +10,10 @@
   <artifactId>decision-tree</artifactId>
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
-  
+
+  <properties>
+    <generateModel>NO</generateModel>
+  </properties>
 
   <build>
     <plugins>
