@@ -50,6 +50,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
+import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
@@ -168,7 +169,7 @@ public class BuildMojo extends AbstractKieMojo {
                 kModule.addKieDependency(kmoduleDep);
             }
 
-            kieBuilder.buildAll();
+            kieBuilder.buildAll(DrlProject.class);
             ResultsImpl messages = (ResultsImpl)kieBuilder.getResults();
 
             List<Message> errors = messages != null ? messages.filterMessages( Message.Level.ERROR): Collections.emptyList();
