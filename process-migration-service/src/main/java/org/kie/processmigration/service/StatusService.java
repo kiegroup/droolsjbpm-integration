@@ -20,7 +20,7 @@ import org.kie.processmigration.model.Status;
 
 public interface StatusService {
 
-  Status getStatus();
+    Status getStatus();
 
-  String getHealth();
+    String getHealth();
 }

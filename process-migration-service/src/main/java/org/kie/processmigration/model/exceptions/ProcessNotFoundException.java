@@ -18,14 +18,14 @@ package org.kie.processmigration.model.exceptions;
 
 public class ProcessNotFoundException extends InvalidMigrationException {
 
-  private static final long serialVersionUID = 8119544485261592740L;
+    private static final long serialVersionUID = 8119544485261592740L;
 
-  public ProcessNotFoundException(String containerId) {
-    super(containerId);
-  }
+    public ProcessNotFoundException(String containerId) {
+        super(containerId);
+    }
 
-  @Override
-  public String getMessage() {
-    return String.format("Missing ProcessRef with ContainerID: %s", super.getMessage());
-  }
+    @Override
+    public String getMessage() {
+        return String.format("Missing ProcessRef with ContainerID: %s", super.getMessage());
+    }
 }

@@ -62,7 +62,6 @@ export default class MigrationDefinitions extends React.Component {
   };
 
   deleteMigration = () => {
-    //need to create a temp variable "self" to store this, so I can invoke this inside axios call
     MigrationClient.delete(this.state.deleteMigrationId).then(() => {
       this.hideDeleteDialog();
       this.retrieveMigrationDefinitions();

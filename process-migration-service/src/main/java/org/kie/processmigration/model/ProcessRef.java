@@ -1,8 +1,3 @@
-package org.kie.processmigration.model;
-
-import javax.persistence.Embeddable;
-
-@Embeddable
 /*
  * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
@@ -18,34 +13,39 @@ import javax.persistence.Embeddable;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kie.processmigration.model;
+
+import javax.persistence.Embeddable;
+
+@Embeddable
 public class ProcessRef {
 
-  private String containerId;
-  private String processId;
+    private String containerId;
+    private String processId;
 
-  public String getContainerId() {
-    return containerId;
-  }
+    public String getContainerId() {
+        return containerId;
+    }
 
-  public ProcessRef setContainerId(String containerId) {
-    this.containerId = containerId;
-    return this;
-  }
+    public ProcessRef setContainerId(String containerId) {
+        this.containerId = containerId;
+        return this;
+    }
 
-  public String getProcessId() {
-    return processId;
-  }
+    public String getProcessId() {
+        return processId;
+    }
 
-  public ProcessRef setProcessId(String processId) {
-    this.processId = processId;
-    return this;
-  }
+    public ProcessRef setProcessId(String processId) {
+        this.processId = processId;
+        return this;
+    }
 
-  @Override
-  public String toString() {
-    return "ProcessRef{" +
-        "containerId='" + containerId + '\'' +
-        ", processId='" + processId + '\'' +
-        '}';
-  }
+    @Override
+    public String toString() {
+        return "ProcessRef{" +
+            "containerId='" + containerId + '\'' +
+            ", processId='" + processId + '\'' +
+            '}';
+    }
 }

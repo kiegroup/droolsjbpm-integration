@@ -58,7 +58,7 @@ export default class WizardExecuteMigration extends WizardBase {
       });
   };
 
-  setRunngingInstancesIds = ids => {
+  setRunningInstancesIds = ids => {
     const { definition } = this.state;
     definition.processInstanceIds = ids;
     this.setState({ definition });
@@ -110,7 +110,7 @@ export default class WizardExecuteMigration extends WizardBase {
                 {this.state.runningInstances && (
                   <PageMigrationRunningInstances
                     runningInstances={this.state.runningInstances}
-                    setRunngingInstancesIds={this.setRunngingInstancesIds}
+                    setRunningInstancesIds={this.setRunningInstancesIds}
                     onIsValid={isValid => this.setStepIsValid(0, isValid)}
                   />
                 )}

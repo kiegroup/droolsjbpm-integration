@@ -30,19 +30,19 @@ import org.kie.processmigration.service.StatusService;
 @Produces(MediaType.APPLICATION_JSON)
 public class HealthStatusResource {
 
-  @Inject
-  private StatusService statusService;
+    @Inject
+    private StatusService statusService;
 
-  @GET
-  @Path("/readiness")
-  @Health
-  public Response checkReadiness() {
-    return Response.ok(statusService.getHealth()).build();
-  }
+    @GET
+    @Path("/readiness")
+    @Health
+    public Response checkReadiness() {
+        return Response.ok(statusService.getHealth()).build();
+    }
 
-  @GET
-  @Path("/status")
-  public Response getStatus() {
-    return Response.ok(statusService.getStatus()).build();
-  }
+    @GET
+    @Path("/status")
+    public Response getStatus() {
+        return Response.ok(statusService.getStatus()).build();
+    }
 }

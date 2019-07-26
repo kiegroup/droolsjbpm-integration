@@ -28,9 +28,9 @@ import org.kie.processmigration.model.exceptions.ReScheduleException;
 @Provider
 public class ReScheduleExceptionMapper implements ExceptionMapper<ReScheduleException> {
 
-  @Override
-  public Response toResponse(ReScheduleException exception) {
-    JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
-    return Response.status(Response.Status.BAD_REQUEST).entity(json).type(MediaType.APPLICATION_JSON).build();
-  }
+    @Override
+    public Response toResponse(ReScheduleException exception) {
+        JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(json).type(MediaType.APPLICATION_JSON).build();
+    }
 }

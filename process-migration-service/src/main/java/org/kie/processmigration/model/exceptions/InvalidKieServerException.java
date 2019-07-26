@@ -18,14 +18,14 @@ package org.kie.processmigration.model.exceptions;
 
 public class InvalidKieServerException extends InvalidMigrationException {
 
-  private static final long serialVersionUID = -7640655290779519838L;
+    private static final long serialVersionUID = -7640655290779519838L;
 
-  public InvalidKieServerException(String kieServerId) {
-    super(kieServerId);
-  }
+    public InvalidKieServerException(String kieServerId) {
+        super(kieServerId);
+    }
 
-  @Override
-  public String getMessage() {
-    return String.format("Invalid KIE Server provided: %s", super.getMessage());
-  }
+    @Override
+    public String getMessage() {
+        return String.format("Invalid KIE Server provided: %s", super.getMessage());
+    }
 }

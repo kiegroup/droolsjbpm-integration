@@ -46,61 +46,61 @@ import org.kie.processmigration.service.MigrationService;
 @ApplicationScoped
 public class MigrationResource {
 
-  private static final String ANONYMOUS = "ANONYMOUS";
+    private static final String ANONYMOUS = "ANONYMOUS";
 
-  @Context
-  private SecurityContext securityContext;
+    @Context
+    private SecurityContext securityContext;
 
-  @Inject
-  private MigrationService migrationService;
+    @Inject
+    private MigrationService migrationService;
 
-  @GET
-  public Response findAll() {
-    return Response.ok(migrationService.findAll()).build();
-  }
-
-  @GET
-  @Path("/{id}")
-  public Response get(@PathParam("id") Long id) throws MigrationNotFoundException {
-    return Response.ok(migrationService.get(id)).build();
-  }
-
-  @GET
-  @Path("/{id}/results")
-  public Response getResults(@PathParam("id") Long id) throws MigrationNotFoundException {
-    return Response.ok(migrationService.getResults(id)).build();
-  }
-
-  @POST
-  public Response submit(@Context HttpHeaders headers, MigrationDefinition definition) throws InvalidMigrationException {
-    setRequester(definition);
-    Migration result = migrationService.submit(definition);
-    if (ExecutionType.ASYNC.equals(definition.getExecution().getType())) {
-      return Response.accepted(result).build();
-    } else {
-      return Response.ok(result).build();
+    @GET
+    public Response findAll() {
+        return Response.ok(migrationService.findAll()).build();
     }
-  }
 
-  @PUT
-  @Path("/{id}")
-  public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition definition) throws MigrationNotFoundException, InvalidMigrationException, ReScheduleException {
-    setRequester(definition);
-    Migration migration = migrationService.update(id, definition);
-    return Response.ok(migration).build();
-  }
-
-  @DELETE
-  @Path("/{id}")
-  public Response delete(@PathParam("id") Long id) throws MigrationNotFoundException {
-    return Response.ok(migrationService.delete(id)).build();
-  }
-
-  private void setRequester(MigrationDefinition migration) {
-    String requester = ANONYMOUS;
-    if (securityContext.getUserPrincipal() != null) {
-      requester = securityContext.getUserPrincipal().getName();
+    @GET
+    @Path("/{id}")
+    public Response get(@PathParam("id") Long id) throws MigrationNotFoundException {
+        return Response.ok(migrationService.get(id)).build();
     }
-    migration.setRequester(requester);
-  }
+
+    @GET
+    @Path("/{id}/results")
+    public Response getResults(@PathParam("id") Long id) throws MigrationNotFoundException {
+        return Response.ok(migrationService.getResults(id)).build();
+    }
+
+    @POST
+    public Response submit(@Context HttpHeaders headers, MigrationDefinition definition) throws InvalidMigrationException {
+        setRequester(definition);
+        Migration result = migrationService.submit(definition);
+        if (ExecutionType.ASYNC.equals(definition.getExecution().getType())) {
+            return Response.accepted(result).build();
+        } else {
+            return Response.ok(result).build();
+        }
+    }
+
+    @PUT
+    @Path("/{id}")
+    public Response update(@Context HttpHeaders headers, @PathParam("id") Long id, MigrationDefinition definition) throws MigrationNotFoundException, InvalidMigrationException, ReScheduleException {
+        setRequester(definition);
+        Migration migration = migrationService.update(id, definition);
+        return Response.ok(migration).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) throws MigrationNotFoundException {
+        return Response.ok(migrationService.delete(id)).build();
+    }
+
+    private void setRequester(MigrationDefinition migration) {
+        String requester = ANONYMOUS;
+        if (securityContext.getUserPrincipal() != null) {
+            requester = securityContext.getUserPrincipal().getName();
+        }
+        migration.setRequester(requester);
+    }
 }

@@ -26,16 +26,16 @@ import org.kie.processmigration.service.StatusService;
 @ApplicationScoped
 public class StatusServiceImpl implements StatusService {
 
-  @Inject
-  private KieService kieService;
+    @Inject
+    private KieService kieService;
 
-  @Override
-  public Status getStatus() {
-    return new Status(kieService.getConfigs());
-  }
+    @Override
+    public Status getStatus() {
+        return new Status(kieService.getConfigs());
+    }
 
-  @Override
-  public String getHealth() {
-    return Status.UP;
-  }
+    @Override
+    public String getHealth() {
+        return Status.UP;
+    }
 }

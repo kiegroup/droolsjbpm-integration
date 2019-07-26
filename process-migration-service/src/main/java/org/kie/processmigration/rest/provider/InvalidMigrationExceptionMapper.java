@@ -28,9 +28,9 @@ import org.kie.processmigration.model.exceptions.InvalidMigrationException;
 @Provider
 public class InvalidMigrationExceptionMapper implements ExceptionMapper<InvalidMigrationException> {
 
-  @Override
-  public Response toResponse(InvalidMigrationException exception) {
-    JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
-    return Response.status(Response.Status.BAD_REQUEST).entity(json).type(MediaType.APPLICATION_JSON).build();
-  }
+    @Override
+    public Response toResponse(InvalidMigrationException exception) {
+        JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(json).type(MediaType.APPLICATION_JSON).build();
+    }
 }

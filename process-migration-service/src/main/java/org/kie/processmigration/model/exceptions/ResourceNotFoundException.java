@@ -18,17 +18,17 @@ package org.kie.processmigration.model.exceptions;
 
 public class ResourceNotFoundException extends Exception {
 
-  private static final long serialVersionUID = 2319415509210342979L;
+    private static final long serialVersionUID = 2319415509210342979L;
 
-  private final String resource;
-  private final Long id;
+    private final String resource;
+    private final Long id;
 
-  public ResourceNotFoundException(String resource, Long id) {
-    this.resource = resource;
-    this.id = id;
-  }
+    public ResourceNotFoundException(String resource, Long id) {
+        this.resource = resource;
+        this.id = id;
+    }
 
-  public String getMessage() {
-    return String.format("%s not found with id %s", resource, id);
-  }
+    public String getMessage() {
+        return String.format("%s not found with id %s", resource, id);
+    }
 }

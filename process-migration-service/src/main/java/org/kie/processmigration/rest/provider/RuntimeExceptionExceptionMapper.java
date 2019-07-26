@@ -26,9 +26,9 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class RuntimeExceptionExceptionMapper implements ExceptionMapper<RuntimeException> {
 
-  @Override
-  public Response toResponse(RuntimeException exception) {
-    JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
-    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(json).type(MediaType.APPLICATION_JSON).build();
-  }
+    @Override
+    public Response toResponse(RuntimeException exception) {
+        JsonObject json = Json.createObjectBuilder().add("message", exception.getMessage()).build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(json).type(MediaType.APPLICATION_JSON).build();
+    }
 }

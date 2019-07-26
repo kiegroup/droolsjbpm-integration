@@ -37,27 +37,27 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class RecoveryService {
 
-  private static final Logger logger = LoggerFactory.getLogger(RecoveryService.class);
-  private static final List<ExecutionStatus> PENDING_STATUSES = Arrays.asList(ExecutionStatus.STARTED,
-                                                                              ExecutionStatus.CREATED);
+    private static final Logger logger = LoggerFactory.getLogger(RecoveryService.class);
+    private static final List<ExecutionStatus> PENDING_STATUSES = Arrays.asList(ExecutionStatus.STARTED,
+                                                                                ExecutionStatus.CREATED);
 
-  @PersistenceContext
-  private EntityManager em;
+    @PersistenceContext
+    private EntityManager em;
 
-  @Inject
-  MigrationService migrationService;
+    @Inject
+    MigrationService migrationService;
 
-  @PostConstruct
-  public void resumeMigrations() {
-    logger.info("Resuming ongoing migrations ...");
-    TypedQuery<Migration> query = em.createNamedQuery("Migration.findByStatus", Migration.class);
-    query.setParameter("statuses", PENDING_STATUSES);
-    query.getResultList().forEach(m -> {
-      try {
-        migrationService.migrate(m);
-      } catch (InvalidMigrationException e) {
-        logger.warn("Unable to resume migration with id: " + m.getId(), e);
-      }
-    });
-  }
+    @PostConstruct
+    public void resumeMigrations() {
+        logger.info("Resuming ongoing migrations ...");
+        TypedQuery<Migration> query = em.createNamedQuery("Migration.findByStatus", Migration.class);
+        query.setParameter("statuses", PENDING_STATUSES);
+        query.getResultList().forEach(m -> {
+            try {
+                migrationService.migrate(m);
+            } catch (InvalidMigrationException e) {
+                logger.warn("Unable to resume migration with id: " + m.getId(), e);
+            }
+        });
+    }
 }

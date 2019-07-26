@@ -28,15 +28,15 @@ import org.mockito.Mockito;
 
 public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
 
-  protected EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("migration-test");
+    protected EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("migration-test");
 
-  protected EntityManager entityManager = Mockito.spy(new TestEntityManager(entityManagerFactory));
+    protected EntityManager entityManager = Mockito.spy(new TestEntityManager(entityManagerFactory));
 
-  protected EntityManager getEntityManager() {
-    return entityManager;
-  }
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
 
-  protected Function<InjectionPoint, Object> getPCFactory() {
-    return ip -> entityManager;
-  }
+    protected Function<InjectionPoint, Object> getPCFactory() {
+        return ip -> entityManager;
+    }
 }

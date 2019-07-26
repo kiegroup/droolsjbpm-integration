@@ -19,47 +19,47 @@ import java.util.List;
 
 public class ProcessInfo {
 
-  private List<BpmNode> nodes;
-  private String containerId;
-  private String processId;
-  private String svgFile;
+    private List<BpmNode> nodes;
+    private String containerId;
+    private String processId;
+    private String svgFile;
 
-  public String getProcessId() {
-    return processId;
-  }
+    public String getProcessId() {
+        return processId;
+    }
 
-  public void setProcessId(String processId) {
-    this.processId = processId;
-  }
+    public void setProcessId(String processId) {
+        this.processId = processId;
+    }
 
-  public List<BpmNode> getNodes() {
-    return nodes;
-  }
+    public List<BpmNode> getNodes() {
+        return nodes;
+    }
 
-  public void setNodes(List<BpmNode> nodes) {
-    this.nodes = nodes;
-  }
+    public void setNodes(List<BpmNode> nodes) {
+        this.nodes = nodes;
+    }
 
-  public String getSvgFile() {
-    return svgFile;
-  }
+    public String getSvgFile() {
+        return svgFile;
+    }
 
-  public void setSvgFile(String svgFile) {
-    this.svgFile = svgFile;
-  }
+    public void setSvgFile(String svgFile) {
+        this.svgFile = svgFile;
+    }
 
-  public String getContainerId() {
-    return containerId;
-  }
+    public String getContainerId() {
+        return containerId;
+    }
 
-  public void setContainerId(String containerId) {
-    this.containerId = containerId;
-  }
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
+    }
 
-  @Override
-  public String toString() {
-    return "ProcessInfo [nodes=" + nodes
-        + ", containerId=" + containerId
-        + ", processId=" + processId + "]";
-  }
+    @Override
+    public String toString() {
+        return "ProcessInfo [nodes=" + nodes
+            + ", containerId=" + containerId
+            + ", processId=" + processId + "]";
+    }
 }

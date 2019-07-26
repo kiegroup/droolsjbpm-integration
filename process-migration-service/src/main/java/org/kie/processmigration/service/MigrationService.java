@@ -27,17 +27,17 @@ import org.kie.processmigration.model.exceptions.ReScheduleException;
 
 public interface MigrationService {
 
-  Migration get(Long id) throws MigrationNotFoundException;
+    Migration get(Long id) throws MigrationNotFoundException;
 
-  List<MigrationReport> getResults(Long id) throws MigrationNotFoundException;
+    List<MigrationReport> getResults(Long id) throws MigrationNotFoundException;
 
-  List<Migration> findAll();
+    List<Migration> findAll();
 
-  Migration submit(MigrationDefinition definition) throws InvalidMigrationException;
+    Migration submit(MigrationDefinition definition) throws InvalidMigrationException;
 
-  Migration update(Long id, MigrationDefinition migration) throws ReScheduleException, MigrationNotFoundException, InvalidMigrationException;
+    Migration update(Long id, MigrationDefinition migration) throws ReScheduleException, MigrationNotFoundException, InvalidMigrationException;
 
-  Migration delete(Long id) throws MigrationNotFoundException;
+    Migration delete(Long id) throws MigrationNotFoundException;
 
-  Migration migrate(Migration migration) throws InvalidMigrationException;
+    Migration migrate(Migration migration) throws InvalidMigrationException;
 }

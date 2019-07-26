@@ -30,64 +30,64 @@ import javax.persistence.JoinColumn;
 @Embeddable
 public class MigrationDefinition {
 
-  @Column(name = "plan_id")
-  private Long planId;
+    @Column(name = "plan_id")
+    private Long planId;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(
-      name = "process_instance_ids",
-      joinColumns = @JoinColumn(name = "migration_definition_id")
-  )
-  private List<Long> processInstanceIds;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "process_instance_ids",
+        joinColumns = @JoinColumn(name = "migration_definition_id")
+    )
+    private List<Long> processInstanceIds;
 
-  private String kieServerId;
+    private String kieServerId;
 
-  private String requester;
+    private String requester;
 
-  @Embedded
-  private Execution execution;
+    @Embedded
+    private Execution execution;
 
-  public Long getPlanId() {
-    return planId;
-  }
-
-  public void setPlanId(Long planId) {
-    this.planId = planId;
-  }
-
-  public List<Long> getProcessInstanceIds() {
-    return processInstanceIds;
-  }
-
-  public void setProcessInstanceIds(List<Long> processInstanceIds) {
-    if (processInstanceIds != null) {
-      this.processInstanceIds = new ArrayList<>(processInstanceIds);
-    } else {
-      this.processInstanceIds = null;
+    public Long getPlanId() {
+        return planId;
     }
-  }
 
-  public String getKieServerId() {
-    return kieServerId;
-  }
+    public void setPlanId(Long planId) {
+        this.planId = planId;
+    }
 
-  public void setKieServerId(String kieServerId) {
-    this.kieServerId = kieServerId;
-  }
+    public List<Long> getProcessInstanceIds() {
+        return processInstanceIds;
+    }
 
-  public String getRequester() {
-    return requester;
-  }
+    public void setProcessInstanceIds(List<Long> processInstanceIds) {
+        if (processInstanceIds != null) {
+            this.processInstanceIds = new ArrayList<>(processInstanceIds);
+        } else {
+            this.processInstanceIds = null;
+        }
+    }
 
-  public void setRequester(String requester) {
-    this.requester = requester;
-  }
+    public String getKieServerId() {
+        return kieServerId;
+    }
 
-  public Execution getExecution() {
-    return execution;
-  }
+    public void setKieServerId(String kieServerId) {
+        this.kieServerId = kieServerId;
+    }
 
-  public void setExecution(Execution execution) {
-    this.execution = execution;
-  }
+    public String getRequester() {
+        return requester;
+    }
+
+    public void setRequester(String requester) {
+        this.requester = requester;
+    }
+
+    public Execution getExecution() {
+        return execution;
+    }
+
+    public void setExecution(Execution execution) {
+        this.execution = execution;
+    }
 }

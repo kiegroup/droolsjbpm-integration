@@ -39,46 +39,46 @@ import org.slf4j.LoggerFactory;
 @Startup
 public class EjbTimerSchedulerServiceImpl implements SchedulerService {
 
-  private static final Logger logger = LoggerFactory.getLogger(EjbTimerSchedulerServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(EjbTimerSchedulerServiceImpl.class);
 
-  @Resource
-  private TimerService timerService;
+    @Resource
+    private TimerService timerService;
 
-  @Inject
-  private MigrationService migrationService;
+    @Inject
+    private MigrationService migrationService;
 
-  @Timeout
-  public void doMigration(Timer timer) {
-    Long migrationId = (Long) timer.getInfo();
-    try {
-      migrationService.migrate(migrationService.get(migrationId));
-    } catch (InvalidMigrationException | MigrationNotFoundException e) {
-      logger.error("Unable to perform asynchronous migration", e);
+    @Timeout
+    public void doMigration(Timer timer) {
+        Long migrationId = (Long) timer.getInfo();
+        try {
+            migrationService.migrate(migrationService.get(migrationId));
+        } catch (InvalidMigrationException | MigrationNotFoundException e) {
+            logger.error("Unable to perform asynchronous migration", e);
+        }
     }
-  }
 
-  @Override
-  public void scheduleMigration(Migration migration) {
-    Long migrationId = migration.getId();
-    if (migration.getDefinition().getExecution().getScheduledStartTime() == null) {
-      timerService.createTimer(new Date(), migrationId);
-    } else {
-      Date startTime = Date.from(migration
-                                     .getDefinition()
-                                     .getExecution()
-                                     .getScheduledStartTime());
-      timerService.createTimer(startTime, migrationId);
+    @Override
+    public void scheduleMigration(Migration migration) {
+        Long migrationId = migration.getId();
+        if (migration.getDefinition().getExecution().getScheduledStartTime() == null) {
+            timerService.createTimer(new Date(), migrationId);
+        } else {
+            Date startTime = Date.from(migration
+                                           .getDefinition()
+                                           .getExecution()
+                                           .getScheduledStartTime());
+            timerService.createTimer(startTime, migrationId);
+        }
     }
-  }
 
-  @Override
-  public void reScheduleMigration(Migration migration) {
-    Optional<Timer> timer = timerService.getTimers()
-        .stream()
-        .filter(t -> t.getInfo().equals(migration.getId())).findFirst();
-    if (timer.isPresent()) {
-      timer.get().cancel();
-      scheduleMigration(migration);
+    @Override
+    public void reScheduleMigration(Migration migration) {
+        Optional<Timer> timer = timerService.getTimers()
+            .stream()
+            .filter(t -> t.getInfo().equals(migration.getId())).findFirst();
+        if (timer.isPresent()) {
+            timer.get().cancel();
+            scheduleMigration(migration);
+        }
     }
-  }
 }

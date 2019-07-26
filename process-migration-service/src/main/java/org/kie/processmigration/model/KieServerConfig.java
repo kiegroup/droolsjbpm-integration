@@ -24,78 +24,78 @@ import org.kie.server.client.KieServicesClient;
 
 public class KieServerConfig {
 
-  private String id;
+    private String id;
 
-  private String host;
+    private String host;
 
-  @JsonIgnore
-  private CredentialsProvider credentialsProvider;
+    @JsonIgnore
+    private CredentialsProvider credentialsProvider;
 
-  @JsonIgnore
-  private KieServicesClient client;
+    @JsonIgnore
+    private KieServicesClient client;
 
-  public String getId() {
-    if (client == null) {
-      return null;
+    public String getId() {
+        if (client == null) {
+            return null;
+        }
+        try {
+            if (this.id == null) {
+                ServiceResponse<KieServerInfo> info = client.getServerInfo();
+                this.id = info.getResult().getServerId();
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return id;
     }
-    try {
-      if (this.id == null) {
-        ServiceResponse<KieServerInfo> info = client.getServerInfo();
-        this.id = info.getResult().getServerId();
-      }
-    } catch (Exception e) {
-      return null;
+
+    public KieServerConfig setId(String id) {
+        this.id = id;
+        return this;
     }
-    return id;
-  }
 
-  public KieServerConfig setId(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public KieServerConfig setHost(String host) {
-    this.host = host;
-    return this;
-  }
-
-  public CredentialsProvider getCredentialsProvider() {
-    return credentialsProvider;
-  }
-
-  public KieServerConfig setCredentialsProvider(CredentialsProvider credentialsProvider) {
-    this.credentialsProvider = credentialsProvider;
-    return this;
-  }
-
-  public KieServicesClient getClient() {
-    return client;
-  }
-
-  public KieServerConfig setClient(KieServicesClient client) {
-    this.client = client;
-    return this;
-  }
-
-  public String getStatus() {
-    if (client == null) {
-      return Status.UNKNOWN;
+    public String getHost() {
+        return host;
     }
-    try {
-      return client.getServerInfo().getType().name();
-    } catch (Exception e) {
-      return Status.UNKNOWN;
-    }
-  }
 
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("KieServerConfig [id=").append(id).append(", host=").append(host).append(", status=").append(getStatus()).append("]");
-    return builder.toString();
-  }
+    public KieServerConfig setHost(String host) {
+        this.host = host;
+        return this;
+    }
+
+    public CredentialsProvider getCredentialsProvider() {
+        return credentialsProvider;
+    }
+
+    public KieServerConfig setCredentialsProvider(CredentialsProvider credentialsProvider) {
+        this.credentialsProvider = credentialsProvider;
+        return this;
+    }
+
+    public KieServicesClient getClient() {
+        return client;
+    }
+
+    public KieServerConfig setClient(KieServicesClient client) {
+        this.client = client;
+        return this;
+    }
+
+    public String getStatus() {
+        if (client == null) {
+            return Status.UNKNOWN;
+        }
+        try {
+            return client.getServerInfo().getType().name();
+        } catch (Exception e) {
+            return Status.UNKNOWN;
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KieServerConfig [id=").append(id).append(", host=").append(host).append(", status=").append(getStatus()).append("]");
+        return builder.toString();
+    }
 }

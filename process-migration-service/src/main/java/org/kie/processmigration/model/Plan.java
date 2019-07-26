@@ -48,94 +48,94 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 })
 public class Plan implements Serializable {
 
-  private static final long serialVersionUID = 1244535648642365858L;
+    private static final long serialVersionUID = 1244535648642365858L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO, generator = "planIdSeq")
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "planIdSeq")
+    private long id;
 
-  private String name;
+    private String name;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String description;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String description;
 
-  @Embedded
-  @AttributeOverrides({
-      @AttributeOverride(name = "containerId", column = @Column(name = "source_container_id")),
-      @AttributeOverride(name = "processId", column = @Column(name = "source_process_id")),
-  })
-  private ProcessRef source;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "containerId", column = @Column(name = "source_container_id")),
+        @AttributeOverride(name = "processId", column = @Column(name = "source_process_id")),
+    })
+    private ProcessRef source;
 
-  @Embedded
-  @AttributeOverrides({
-      @AttributeOverride(name = "containerId", column = @Column(name = "target_container_id")),
-      @AttributeOverride(name = "processId", column = @Column(name = "target_process_id")),
-  })
-  private ProcessRef target;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "containerId", column = @Column(name = "target_container_id")),
+        @AttributeOverride(name = "processId", column = @Column(name = "target_process_id")),
+    })
+    private ProcessRef target;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @MapKeyColumn(name = "source")
-  @Column(name = "target")
-  @CollectionTable(
-      name = "plan_mappings",
-      joinColumns = @JoinColumn(name = "plan_id")
-  )
-  private Map<String, String> mappings;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "source")
+    @Column(name = "target")
+    @CollectionTable(
+        name = "plan_mappings",
+        joinColumns = @JoinColumn(name = "plan_id")
+    )
+    private Map<String, String> mappings;
 
-  public long getId() {
-    return id;
-  }
+    public long getId() {
+        return id;
+    }
 
-  public void setId(long id) {
-    this.id = id;
-  }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public ProcessRef getSource() {
-    return source;
-  }
+    public ProcessRef getSource() {
+        return source;
+    }
 
-  public void setSource(ProcessRef source) {
-    this.source = source;
-  }
+    public void setSource(ProcessRef source) {
+        this.source = source;
+    }
 
-  public ProcessRef getTarget() {
-    return target;
-  }
+    public ProcessRef getTarget() {
+        return target;
+    }
 
-  public void setTarget(ProcessRef target) {
-    this.target = target;
-  }
+    public void setTarget(ProcessRef target) {
+        this.target = target;
+    }
 
-  public Map<String, String> getMappings() {
-    return mappings;
-  }
+    public Map<String, String> getMappings() {
+        return mappings;
+    }
 
-  public void setMappings(Map<String, String> mappings) {
-    this.mappings = mappings;
-  }
+    public void setMappings(Map<String, String> mappings) {
+        this.mappings = mappings;
+    }
 
-  public Plan copy(Plan plan) {
-    this.name = plan.getName();
-    this.description = plan.getDescription();
-    this.source = plan.getSource();
-    this.target = plan.getTarget();
-    this.mappings = plan.getMappings();
-    return this;
-  }
+    public Plan copy(Plan plan) {
+        this.name = plan.getName();
+        this.description = plan.getDescription();
+        this.source = plan.getSource();
+        this.target = plan.getTarget();
+        this.mappings = plan.getMappings();
+        return this;
+    }
 }

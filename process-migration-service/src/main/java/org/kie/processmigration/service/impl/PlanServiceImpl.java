@@ -32,43 +32,43 @@ import org.kie.processmigration.service.PlanService;
 @ApplicationScoped
 public class PlanServiceImpl implements PlanService {
 
-  @PersistenceContext
-  private EntityManager em;
+    @PersistenceContext
+    private EntityManager em;
 
-  @Override
-  public List<Plan> findAll() {
-    return em.createNamedQuery("Plan.findAll", Plan.class).getResultList();
-  }
-
-  @Override
-  public Plan get(Long id) throws PlanNotFoundException {
-    TypedQuery<Plan> query = em.createNamedQuery("Plan.findById", Plan.class);
-    query.setParameter("id", id);
-    try {
-      return query.getSingleResult();
-    } catch (NoResultException e) {
-      throw new PlanNotFoundException(id);
+    @Override
+    public List<Plan> findAll() {
+        return em.createNamedQuery("Plan.findAll", Plan.class).getResultList();
     }
-  }
 
-  @Override
-  @Transactional
-  public Plan delete(Long id) throws PlanNotFoundException {
-    Plan plan = get(id);
-    em.remove(plan);
-    return plan;
-  }
+    @Override
+    public Plan get(Long id) throws PlanNotFoundException {
+        TypedQuery<Plan> query = em.createNamedQuery("Plan.findById", Plan.class);
+        query.setParameter("id", id);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new PlanNotFoundException(id);
+        }
+    }
 
-  @Override
-  @Transactional
-  public Plan create(Plan plan) {
-    em.persist(plan);
-    return plan;
-  }
+    @Override
+    @Transactional
+    public Plan delete(Long id) throws PlanNotFoundException {
+        Plan plan = get(id);
+        em.remove(plan);
+        return plan;
+    }
 
-  @Override
-  @Transactional
-  public Plan update(Long id, Plan plan) throws PlanNotFoundException {
-    return create(get(id).copy(plan));
-  }
+    @Override
+    @Transactional
+    public Plan create(Plan plan) {
+        em.persist(plan);
+        return plan;
+    }
+
+    @Override
+    @Transactional
+    public Plan update(Long id, Plan plan) throws PlanNotFoundException {
+        return create(get(id).copy(plan));
+    }
 }

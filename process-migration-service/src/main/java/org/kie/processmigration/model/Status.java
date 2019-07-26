@@ -20,20 +20,20 @@ import java.util.Collection;
 
 public class Status {
 
-  public static final String UP = "UP";
-  public static final String UNKNOWN = "UNKNOWN";
+    public static final String UP = "UP";
+    public static final String UNKNOWN = "UNKNOWN";
 
-  private final Collection<KieServerConfig> kieServers;
+    private final Collection<KieServerConfig> kieServers;
 
-  public Status(Collection<KieServerConfig> kieServers) {
-    this.kieServers = kieServers;
-  }
+    public Status(Collection<KieServerConfig> kieServers) {
+        this.kieServers = kieServers;
+    }
 
-  public Collection<KieServerConfig> getKieServers() {
-    return kieServers;
-  }
+    public Collection<KieServerConfig> getKieServers() {
+        return kieServers;
+    }
 
-  public String getHealth() {
-    return UP;
-  }
+    public String getHealth() {
+        return UP;
+    }
 }

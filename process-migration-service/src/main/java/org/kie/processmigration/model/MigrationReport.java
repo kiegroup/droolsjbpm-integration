@@ -47,104 +47,104 @@ import org.kie.server.api.model.admin.MigrationReportInstance;
 })
 public class MigrationReport implements Serializable {
 
-  private static final long serialVersionUID = 5817223334991683064L;
+    private static final long serialVersionUID = 5817223334991683064L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO, generator = "migRepIdSeq")
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "migRepIdSeq")
+    private Long id;
 
-  @Column(name = "migration_id")
-  private Long migrationId;
+    @Column(name = "migration_id")
+    private Long migrationId;
 
-  @Column(name = "process_instance_id")
-  private Long processInstanceId;
+    @Column(name = "process_instance_id")
+    private Long processInstanceId;
 
-  @Column(name = "start_date")
-  private Instant startDate;
+    @Column(name = "start_date")
+    private Instant startDate;
 
-  @Column(name = "end_date")
-  private Instant endDate;
+    @Column(name = "end_date")
+    private Instant endDate;
 
-  private Boolean successful;
+    private Boolean successful;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Column(name = "log")
-  @Lob
-  @CollectionTable(
-      name = "migration_report_logs",
-      joinColumns = @JoinColumn(name = "report_id")
-  )
-  private List<String> logs;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(name = "log")
+    @Lob
+    @CollectionTable(
+        name = "migration_report_logs",
+        joinColumns = @JoinColumn(name = "report_id")
+    )
+    private List<String> logs;
 
-  public MigrationReport() {
-  }
-
-  public MigrationReport(Long migrationId, MigrationReportInstance reportInstance) {
-    this.migrationId = migrationId;
-    this.processInstanceId = reportInstance.getProcessInstanceId();
-    if (reportInstance.getStartDate() != null) {
-      this.startDate = reportInstance.getStartDate().toInstant();
+    public MigrationReport() {
     }
-    if (reportInstance.getEndDate() != null) {
-      this.endDate = reportInstance.getEndDate().toInstant();
+
+    public MigrationReport(Long migrationId, MigrationReportInstance reportInstance) {
+        this.migrationId = migrationId;
+        this.processInstanceId = reportInstance.getProcessInstanceId();
+        if (reportInstance.getStartDate() != null) {
+            this.startDate = reportInstance.getStartDate().toInstant();
+        }
+        if (reportInstance.getEndDate() != null) {
+            this.endDate = reportInstance.getEndDate().toInstant();
+        }
+        this.successful = reportInstance.isSuccessful();
+        this.logs = new ArrayList<>(reportInstance.getLogs());
     }
-    this.successful = reportInstance.isSuccessful();
-    this.logs = new ArrayList<>(reportInstance.getLogs());
-  }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public Long getMigrationId() {
-    return migrationId;
-  }
+    public Long getMigrationId() {
+        return migrationId;
+    }
 
-  public void setMigrationId(Long migrationId) {
-    this.migrationId = migrationId;
-  }
+    public void setMigrationId(Long migrationId) {
+        this.migrationId = migrationId;
+    }
 
-  public Long getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public Long getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  public void setProcessInstanceId(Long processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public void setProcessInstanceId(Long processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-  public Instant getStartDate() {
-    return startDate;
-  }
+    public Instant getStartDate() {
+        return startDate;
+    }
 
-  public void setStartDate(Instant startDate) {
-    this.startDate = startDate;
-  }
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
+    }
 
-  public Instant getEndDate() {
-    return endDate;
-  }
+    public Instant getEndDate() {
+        return endDate;
+    }
 
-  public void setEndDate(Instant endDate) {
-    this.endDate = endDate;
-  }
+    public void setEndDate(Instant endDate) {
+        this.endDate = endDate;
+    }
 
-  public Boolean getSuccessful() {
-    return successful;
-  }
+    public Boolean getSuccessful() {
+        return successful;
+    }
 
-  public void setSuccessful(Boolean successful) {
-    this.successful = successful;
-  }
+    public void setSuccessful(Boolean successful) {
+        this.successful = successful;
+    }
 
-  public List<String> getLogs() {
-    return logs;
-  }
+    public List<String> getLogs() {
+        return logs;
+    }
 
-  public void setLogs(List<String> logs) {
-    this.logs = logs;
-  }
+    public void setLogs(List<String> logs) {
+        this.logs = logs;
+    }
 }

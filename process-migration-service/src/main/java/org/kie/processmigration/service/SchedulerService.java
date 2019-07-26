@@ -20,7 +20,7 @@ import org.kie.processmigration.model.Migration;
 
 public interface SchedulerService {
 
-  void scheduleMigration(Migration migration);
+    void scheduleMigration(Migration migration);
 
-  void reScheduleMigration(Migration migration);
+    void reScheduleMigration(Migration migration);
 }
