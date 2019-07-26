@@ -19,10 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.Message;
@@ -59,7 +56,7 @@ public class OptaplannerKieServerExtension
     // will use a standard java thread pool for the job.
     // If necessary, we will need to look for alternatives
     // in the future.
-    private ExecutorService threadPool = null;
+    private ThreadPoolExecutor threadPool = null;
 
     private final List<Object> services = new ArrayList<>();
     private boolean initialized = false;
@@ -86,14 +83,33 @@ public class OptaplannerKieServerExtension
         // The following thread pool will have a max thread count equal to the number of cores on the machine minus 2,
         // leaving a few cores unoccupied to handle REST/JMS requests and run the OS.
         // If new jobs are submitted and all threads are busy, the default reject policy will kick in.
-        int availableProcessorCount = Runtime.getRuntime().availableProcessors();
-        int resolvedActiveThreadCount = Math.max(1, availableProcessorCount - 2);
+        //int availableProcessorCount = Runtime.getRuntime().availableProcessors();
+        //int resolvedActiveThreadCount = Math.max(1, availableProcessorCount - 2);
+       
+        String corePoolSize = System.getProperty("corePoolSize").isEmpty() ? System.getProperty("corePoolSize") : "2";
+        String maxPoolSize = System.getProperty("maxPoolSize").isEmpty() ? System.getProperty("maxPoolSize") : "10";
+        String keepAliveTimeSeconds = System.getProperty("keepAliveTimeSeconds").isEmpty() ? System.getProperty("keepAliveTimeSeconds") : "10";
+
         this.threadPool = new ThreadPoolExecutor(
-                resolvedActiveThreadCount,
-                resolvedActiveThreadCount,
-                10, // thread keep alive time
+                Integer.parseInt(corePoolSize),
+                Integer.parseInt(maxPoolSize),
+                Integer.parseInt(keepAliveTimeSeconds), // thread keep alive time
                 TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(resolvedActiveThreadCount)); // queue with a size
+                new LinkedBlockingQueue<>());
+
+        StringBuilder s = new StringBuilder();
+        s.append("poolSize = ")
+                .append(this.threadPool.getPoolSize())
+                .append(", corePoolSize = ")
+                .append(this.threadPool.getCorePoolSize())
+                .append(", queueSize = ")
+                .append(this.threadPool.getQueue().size())
+                .append(", queueRemainingCapacity = ")
+                .append(this.threadPool.getQueue().remainingCapacity())
+                .append(", maximumPoolSize = ")
+                .append(this.threadPool.getMaximumPoolSize());
+
+        logger.info(s.toString());
         this.solverServiceBase = new SolverServiceBase(registry, threadPool);
 
         this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);
