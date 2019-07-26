@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieFileSystemImpl;
@@ -341,7 +342,7 @@ public class CompilerHelperTest {
 
         KieBuilder kBuilder = ks.newKieBuilder(kfs);
 
-        kBuilder.buildAll();
+        kBuilder.buildAll(DrlProject.class);
         MemoryKieModule kieModule = (MemoryKieModule) kBuilder.getKieModule();
         return kieModule;
     }
