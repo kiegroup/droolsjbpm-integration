@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents a KieContainer to deploy.
- * Single string format is containerId=groupId:artifactId:version
- * Multiple string format is c0=g0:a0:v0|c1=g1:a1:v1|c2=g2:a2:v2
+ * Single string format is containerId(containerAlias)=groupId:artifactId:version
+ * Multiple string format is c0(n0)=g0:a0:v0|c1(n1)=g1:a1:v1|c2=g2:a2:v2
  * @see org.kie.server.services.impl.storage.file.KieServerStateFileInit
  */
 public class KieServerContainerDeployment {
@@ -43,9 +43,14 @@ public class KieServerContainerDeployment {
     private static final Logger LOG = LoggerFactory.getLogger(KieServerContainerDeployment.class);
 
     private final String containerId;
+    private final String containerAlias;
     private final ReleaseId releaseId;
 
     public KieServerContainerDeployment(String containerId, ReleaseId releaseId) {
+        this(containerId, null, releaseId);
+    }
+
+    public KieServerContainerDeployment(String containerId, String containerAlias, ReleaseId releaseId) {
         if (containerId == null || containerId.trim().isEmpty()) {
             throw new IllegalArgumentException("illegal containerId: " + containerId);
         }
@@ -53,11 +58,22 @@ public class KieServerContainerDeployment {
             throw new IllegalArgumentException("null releaseId");
         }
         this.containerId = containerId;
+        if (containerAlias != null) {
+            containerAlias = containerAlias.trim();
+            if (containerAlias.length() == 0) {
+                containerAlias = null;
+            }
+        }
+        this.containerAlias = containerAlias;
         this.releaseId = releaseId;
     }
 
     public String getContainerId() {
         return containerId;
+    }
+
+    public String getContainerAlias() {
+        return containerAlias;
     }
 
     public ReleaseId getReleaseId() {
@@ -83,6 +99,13 @@ public class KieServerContainerDeployment {
         } else if (!containerId.equals(other.containerId)) {
             return false;
         }
+        if (containerAlias == null) {
+            if (other.containerAlias != null) {
+                return false;
+            }
+        } else if (!containerAlias.equals(other.containerAlias)) {
+            return false;
+        }
         if (releaseId == null) {
             if (other.releaseId != null) {
                 return false;
@@ -98,14 +121,21 @@ public class KieServerContainerDeployment {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((containerId == null) ? 0 : containerId.hashCode());
+        result = prime * result + ((containerAlias == null) ? 0 : containerAlias.hashCode());
         result = prime * result + ((releaseId == null) ? 0 : releaseId.hashCode());
         return result;
     }
 
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(containerId)
+        StringBuilder sb = new StringBuilder();
+        sb.append(containerId);
+        if (containerAlias != null) {
+            sb.append('(');
+            sb.append(containerAlias);
+            sb.append(')');
+        }
+        return sb
                 .append('=')
                 .append(releaseId.getGroupId())
                 .append(':')
@@ -138,15 +168,26 @@ public class KieServerContainerDeployment {
     public static Set<KieServerContainerDeployment> fromString(String str, boolean onlyLatest) {
         Set<KieServerContainerDeployment> deployments = new LinkedHashSet<KieServerContainerDeployment>();
         if (str != null && !str.isEmpty()) {
+            Map<String,String> containerIds_containerAliases = new TreeMap<String,String>();
             Map<String,Set<ReleaseId>> containerIds_releaseIds = new TreeMap<String,Set<ReleaseId>>();
             for (String unit : str.split("\\|")) {
                 boolean recognized = false;
                 String[] split = unit.split("=");
                 if (split.length == 2) {
-                    String containerId = split[0].trim();
+                    String containerId = null;
+                    String containerAlias = null;
+                    String identification = split[0].trim();
+                    int left_paren_pos = identification.indexOf("(");
+                    if (left_paren_pos > 0 && identification.endsWith(")")) {
+                        containerId = identification.substring(0, left_paren_pos);
+                        containerAlias = identification.substring(left_paren_pos+1, identification.length()-1);
+                    } else {
+                        containerId = identification;
+                    }
                     String[] gav = split[1].trim().split(":");
                     if (!containerId.isEmpty() && gav.length == 3) {
                         recognized = true;
+                        containerIds_containerAliases.put(containerId, containerAlias);
                         Set<ReleaseId> releaseIds = containerIds_releaseIds.get(containerId);
                         if (releaseIds == null) {
                             // the descending sort means the first releaseId will be the most recent (latest) version
@@ -162,11 +203,12 @@ public class KieServerContainerDeployment {
             }
             for (Entry<String,Set<ReleaseId>> entry : containerIds_releaseIds.entrySet()) {
                 String containerId = entry.getKey();
+                String containerAlias = containerIds_containerAliases.get(containerId);
                 Set<ReleaseId> releaseIds = entry.getValue();
                 Iterator<ReleaseId> releaseIdIter = releaseIds.iterator();
                 releaseIdLoop: while (releaseIdIter.hasNext()) {
                     ReleaseId releaseId = releaseIdIter.next();
-                    KieServerContainerDeployment deployment = new KieServerContainerDeployment(containerId, releaseId);
+                    KieServerContainerDeployment deployment = new KieServerContainerDeployment(containerId, containerAlias, releaseId);
                     deployments.add(deployment);
                     if (onlyLatest) {
                         // we will only use the most recent (latest) version when there are duplicate container ids

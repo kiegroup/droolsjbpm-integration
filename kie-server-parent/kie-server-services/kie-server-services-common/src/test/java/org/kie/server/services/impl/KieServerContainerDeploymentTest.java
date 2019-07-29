@@ -28,6 +28,8 @@ public class KieServerContainerDeploymentTest {
     private static final String letters = "letters";
     private static final String test = "test";
     private static final String example = "example";
+    private static final String robert = "robert";
+    private static final String bob = "bob";
 
     private static final ReleaseId gav0 = newReleaseId("abc.def:ghi:9.0.1.GA");
     private static final ReleaseId gav1 = newReleaseId("com.test:foo:1.0.0-SNAPSHOT");
@@ -37,8 +39,9 @@ public class KieServerContainerDeploymentTest {
     private static final ReleaseId gav5 = newReleaseId("com.test:foo:2.0.0.Beta2");
     private static final ReleaseId gav6 = newReleaseId("org.example:test:0.0.1-SNAPSHOT");
     private static final ReleaseId gav7 = newReleaseId("org.example:test:1.0");
+    private static final ReleaseId gav8 = newReleaseId("net.names:who:1.0.0.Final");
 
-    private static final String canonicalRepresentation = "example=org.example:test:1.0|letters=abc.def:ghi:9.0.1.GA|test=com.test:foo:2.0.0.Beta2";
+    private static final String canonicalRepresentation = "example=org.example:test:1.0|letters=abc.def:ghi:9.0.1.GA|robert(bob)=net.names:who:1.0.0.Final|test=com.test:foo:2.0.0.Beta2";
     private static final String serverContainerDeployment;
     static {
         StringBuilder sb = new StringBuilder();
@@ -47,7 +50,8 @@ public class KieServerContainerDeploymentTest {
             sb.append(test).append('=').append(gav.toExternalForm()).append('|');
         }
         sb.append(example).append('=').append(gav6.toExternalForm()).append('|');
-        sb.append(example).append('=').append(gav7.toExternalForm());
+        sb.append(example).append('=').append(gav7.toExternalForm()).append('|');
+        sb.append(robert).append("(").append(bob).append(")=").append(gav8.toExternalForm());
         serverContainerDeployment = sb.toString();
     }
 
@@ -59,21 +63,21 @@ public class KieServerContainerDeploymentTest {
     @Test
     public void testDeploymentFiltering() throws Exception {
         Set<KieServerContainerDeployment> deployments = KieServerContainerDeployment.fromString(serverContainerDeployment, false);
-        assertEquals(8, deployments.size());
+        assertEquals(9, deployments.size());
         deployments = KieServerContainerDeployment.fromString(serverContainerDeployment, true);
-        assertEquals(3, deployments.size());
+        assertEquals(4, deployments.size());
         deployments = KieServerContainerDeployment.fromString(serverContainerDeployment);
-        assertEquals(3, deployments.size());
+        assertEquals(4, deployments.size());
     }
 
     @Test
     public void testDeploymentRepresentation() throws Exception {
         Set<KieServerContainerDeployment> deploymentsA = KieServerContainerDeployment.fromString(serverContainerDeployment);
-        assertEquals(3, deploymentsA.size());
+        assertEquals(4, deploymentsA.size());
         String out = KieServerContainerDeployment.toString(deploymentsA);
         assertEquals(canonicalRepresentation, out);
         Set<KieServerContainerDeployment> deploymentsB = KieServerContainerDeployment.fromString(out);
-        assertEquals(3, deploymentsB.size());
+        assertEquals(4, deploymentsB.size());
         assertEquals(deploymentsA, deploymentsB);
     }
 
