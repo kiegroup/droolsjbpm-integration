@@ -164,7 +164,7 @@ public class BuildMojo extends AbstractKieMojo {
             }
 
             KieBuilderImpl kieBuilder = new KieBuilderImpl(kfs);
-            InternalKieModule kModule = (InternalKieModule)kieBuilder.getKieModule();
+            InternalKieModule kModule = (InternalKieModule)kieBuilder.getKieModule(DrlProject.class);
             for (InternalKieModule kmoduleDep : kmoduleDeps) {
                 kModule.addKieDependency(kmoduleDep);
             }
