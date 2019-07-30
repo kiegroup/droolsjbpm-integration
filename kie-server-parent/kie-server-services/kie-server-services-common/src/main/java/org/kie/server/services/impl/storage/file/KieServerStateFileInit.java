@@ -112,6 +112,7 @@ public class KieServerStateFileInit {
                     deployment.getContainerId(),
                     new ReleaseId(deployment.getReleaseId()),
                     KieContainerStatus.STARTED);
+            container.setContainerAlias(deployment.getContainerAlias());
             containers.add(container);
         }
         serverState.setContainers(containers);
