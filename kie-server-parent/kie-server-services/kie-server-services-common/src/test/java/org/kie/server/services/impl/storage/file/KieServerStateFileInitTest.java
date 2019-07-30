@@ -16,6 +16,7 @@
 package org.kie.server.services.impl.storage.file;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_CONTAINER_DEPLOYMENT;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_ID;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_STATE_REPO;
@@ -39,6 +40,8 @@ public class KieServerStateFileInitTest {
     private static final String letters = "letters";
     private static final String test = "test";
     private static final String example = "example";
+    private static final String robert = "robert";
+    private static final String bob = "bob";
 
     private static final ReleaseId gav0 = newReleaseId("abc.def:ghi:9.0.1.GA");
     private static final ReleaseId gav1 = newReleaseId("com.test:foo:1.0.0-SNAPSHOT");
@@ -48,6 +51,7 @@ public class KieServerStateFileInitTest {
     private static final ReleaseId gav5 = newReleaseId("com.test:foo:2.0.0.Beta2");
     private static final ReleaseId gav6 = newReleaseId("org.example:test:0.0.1-SNAPSHOT");
     private static final ReleaseId gav7 = newReleaseId("org.example:test:1.0");
+    private static final ReleaseId gav8 = newReleaseId("net.names:who:1.0.0.Final");
 
     private static final String serverContainerDeployment;
     static {
@@ -57,7 +61,8 @@ public class KieServerStateFileInitTest {
             sb.append(test).append('=').append(gav.toExternalForm()).append('|');
         }
         sb.append(example).append('=').append(gav6.toExternalForm()).append('|');
-        sb.append(example).append('=').append(gav7.toExternalForm());
+        sb.append(example).append('=').append(gav7.toExternalForm()).append('|');
+        sb.append(robert).append("(").append(bob).append(")=").append(gav8.toExternalForm());
         serverContainerDeployment = sb.toString();
     }
 
@@ -109,10 +114,18 @@ public class KieServerStateFileInitTest {
         assertEquals(gav0.toExternalForm(), lettersContainer.getReleaseId().toExternalForm());
         assertEquals(STARTED, lettersContainer.getStatus());
 
+        KieContainerResource robertContainer = containers.next();
+        assertEquals(robert, robertContainer.getContainerId());
+        assertEquals(bob, robertContainer.getContainerAlias());
+        assertEquals(gav8.toExternalForm(), robertContainer.getReleaseId().toExternalForm());
+        assertEquals(STARTED, robertContainer.getStatus());
+        
         KieContainerResource testContainer = containers.next();
         assertEquals(test, testContainer.getContainerId());
         assertEquals(gav5.toExternalForm(), testContainer.getReleaseId().toExternalForm());
         assertEquals(STARTED, testContainer.getStatus());
+        
+        assertFalse(containers.hasNext());
     }
 
     private String getServerRepo(File serverStateFile) throws Exception {
