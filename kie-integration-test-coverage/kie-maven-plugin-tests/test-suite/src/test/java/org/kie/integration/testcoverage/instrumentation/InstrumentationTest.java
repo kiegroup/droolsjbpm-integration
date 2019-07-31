@@ -95,7 +95,7 @@ public class InstrumentationTest {
 
     @Test
     public void testMetaInfoExists() {
-        ZipKieModule kieModule = (ZipKieModule)((InternalKieContainer)kieContainer).getMainKieModule();
+        CanonicalKieModule kieModule = (CanonicalKieModule)((InternalKieContainer)kieContainer).getMainKieModule();
         Collection<String> fileNames = kieModule.getFileNames();
 
         assertThat(fileNames).contains("META-INF/kmodule.info");
