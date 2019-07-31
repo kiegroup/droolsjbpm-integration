@@ -39,8 +39,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.wildfly.swarm.Swarm;
-import org.wildfly.swarm.spi.api.SwarmProperties;
+import org.wildfly.swarm.container.config.ConfigViewFactory;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(KieServicesFactory.class)
@@ -51,14 +50,13 @@ public class KieServiceImplTest extends KieServiceImpl {
 
     public KieServiceImplTest() {
         URL projectConfig = getClass().getClassLoader().getResource("project-test.yml");
-        System.setProperty(SwarmProperties.PROJECT_STAGE_FILE, projectConfig.toExternalForm());
-        Swarm swarm = null;
+        ConfigViewFactory configViewFactory = new ConfigViewFactory(new Properties());
         try {
-            swarm = new Swarm(new Properties());
+            configViewFactory.load("test", projectConfig);
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            throw new RuntimeException(e);
         }
-        this.configView = swarm.configView();
+        this.configView = configViewFactory.get();
     }
 
     @Before
