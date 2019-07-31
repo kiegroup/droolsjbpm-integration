@@ -14,8 +14,6 @@
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <generateModel>NO</generateModel>
   </properties>
 
   <dependencyManagement>
@@ -24,6 +22,11 @@
         <groupId>org.jboss.spec.javax.xml.bind</groupId>
         <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
         <version>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-model-compiler</artifactId>
+        <version>${version.org.kie}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -97,7 +97,7 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
             kfs.write("src/main/resources/rule.drl", rule);
         }
 
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll(DrlProject.class);
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
 
         List<Message> errors = kieBuilder.getResults().getMessages(Message.Level.ERROR);
         if (!errors.isEmpty()) {

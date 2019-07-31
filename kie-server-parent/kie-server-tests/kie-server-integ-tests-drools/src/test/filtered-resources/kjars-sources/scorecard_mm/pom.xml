@@ -11,16 +11,16 @@
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 
-  <properties>
-    <generateModel>NO</generateModel>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
       <version>${version.org.kie}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
     </dependency>
   </dependencies>
 

@@ -10,15 +10,15 @@
   <artifactId>multimodule-project-domain</artifactId>
   <packaging>jar</packaging>
 
-  <properties>
-    <generateModel>NO</generateModel>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec.javax.xml.bind</groupId>
       <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
     </dependency>
   </dependencies>
 </project>

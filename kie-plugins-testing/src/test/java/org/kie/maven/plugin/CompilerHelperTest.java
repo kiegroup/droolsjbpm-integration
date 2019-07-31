@@ -115,7 +115,7 @@ public class CompilerHelperTest {
         StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
         kieMap.get(sbkModule.toString());
         KieModuleMetaInfo metaInfo = (KieModuleMetaInfo) kieMap.get(sbModelMetaInfo.toString());
-        MemoryKieModule module = (MemoryKieModule) kieMap.get(sbkModule.toString());
+        KieModule module = (KieModule) kieMap.get(sbkModule.toString());
         assertThat(metaInfo).isNotNull();
         assertThat(module).isNotNull();
     }
@@ -342,9 +342,8 @@ public class CompilerHelperTest {
 
         KieBuilder kBuilder = ks.newKieBuilder(kfs);
 
-        kBuilder.buildAll(DrlProject.class);
-        MemoryKieModule kieModule = (MemoryKieModule) kBuilder.getKieModule();
-        return kieModule;
+        kBuilder.buildAll();
+        return kBuilder.getKieModule();
     }
 
     public String getRule(String packageName,

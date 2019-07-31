@@ -10,14 +10,14 @@
   <artifactId>multimodule-project-rules1</artifactId>
   <packaging>kjar</packaging>
 
-  <properties>
-    <generateModel>NO</generateModel>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.kie.server.testing</groupId>
       <artifactId>multimodule-project-domain</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
     </dependency>
   </dependencies>
 

@@ -35,6 +35,11 @@
         <artifactId>jboss-jaxws-api_2.3_spec</artifactId>
         <version>${version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.3_spec}</version>
       </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-model-compiler</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
