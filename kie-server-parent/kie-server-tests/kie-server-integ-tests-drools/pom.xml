@@ -256,6 +256,7 @@
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
             </systemProperties>
+            <dependencies combine.children="append"/>
           </container>
         </configuration>
       </plugin>
