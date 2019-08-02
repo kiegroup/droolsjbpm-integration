@@ -10,6 +10,14 @@
 
   <packaging>kjar</packaging>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+      <version>${it-plugin.version}</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -19,7 +27,7 @@
         <extensions>true</extensions>
         <configuration>
           <properties>
-            <drools.dialect.java.compiler.lnglevel>1.6</drools.dialect.java.compiler.lnglevel>
+            <drools.dialect.java.compiler.lnglevel>1.8</drools.dialect.java.compiler.lnglevel>
           </properties>
         </configuration>
       </plugin>

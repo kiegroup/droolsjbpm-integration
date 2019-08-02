@@ -27,7 +27,7 @@
         <extensions>true</extensions>
         <configuration>
           <properties>
-            <drools.dialect.java.compiler.lnglevel>1.6</drools.dialect.java.compiler.lnglevel>
+            <drools.dialect.java.compiler.lnglevel>1.8</drools.dialect.java.compiler.lnglevel>
           </properties>
         </configuration>
       </plugin>

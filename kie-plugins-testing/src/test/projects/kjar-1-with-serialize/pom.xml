@@ -26,6 +26,11 @@
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
       <scope>test</scope>
     </dependency>
