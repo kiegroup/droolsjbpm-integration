@@ -828,17 +828,21 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public TaskInstance findTaskById(Long taskId) {
+    public TaskInstance findTaskById(Long taskId){
+        return findTaskById(taskId, false);
+    }
+
+    @Override
+    public TaskInstance findTaskById(Long taskId, boolean withSLA) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASK_GET_URI, valuesMap), TaskInstance.class);
-
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASK_GET_URI + "?withSLA=" + withSLA, valuesMap), TaskInstance.class);
 
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "QueryService", "getTaskById", new Object[]{taskId}) ) );
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "QueryService", "getTaskById", new Object[]{taskId, withSLA}) ) );
             ServiceResponse<TaskInstance> response = (ServiceResponse<TaskInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);

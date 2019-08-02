@@ -528,16 +528,15 @@ public class RuntimeDataResource {
     @Path(TASK_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTaskById(@Context HttpHeaders headers, 
-            @ApiParam(value = "task id to load task instance", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId) {
+            @ApiParam(value = "task id to load task instance", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId,
+            @ApiParam(value = "optional include SLA data - defaults to false", required = false) @QueryParam("withSLA") @DefaultValue("false") boolean withSLA) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        TaskInstance userTaskDesc = null;
         try {
-            userTaskDesc = runtimeDataServiceBase.getTaskById(taskId);
+            TaskInstance userTaskDesc = runtimeDataServiceBase.getTaskById(taskId, withSLA);
             return createCorrectVariant(userTaskDesc, headers, Response.Status.OK, conversationIdHeader);
-
         } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
