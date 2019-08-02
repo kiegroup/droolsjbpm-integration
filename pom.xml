@@ -22,7 +22,6 @@
 
   <properties>
     <spotbugs.failOnViolation>true</spotbugs.failOnViolation>
-    <version.tomcat9>9.0.12</version.tomcat9>
   </properties>
 
   <repositories>
