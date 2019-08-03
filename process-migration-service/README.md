@@ -33,7 +33,7 @@ Is the execution of a defined plan, applied to a set of process instances. These
 
 ## Build
 
-```{bash}
+```bash
 mvn clean package
 ```
 
@@ -41,19 +41,19 @@ mvn clean package
 
 It is a [Thorntail 2.x](http://docs.wildfly-swarm.io/2.4.0.Final/) application.
 
-```{bash}
+```bash
 java -jar target/process-migration-thorntail.jar
 ```
 
 You can provide your custom configuration file. Check [project-defaults.yml](./src/main/resources/project-defaults.yml) to see an example. The provided configuration will be added or override the one existing in project-defaults.yml
 
-```{bash}
+```bash
 java -jar target/process-migration-thorntail.jar -s./myconfig.yml
 ```
 
 Start the server on a different ports set:
 
-```{bash}
+```bash
 java -jar target/process-migration-thorntail.jar -Dswarm.network.socket-binding-groups.standard-sockets.port-offset=10
 ```
 
@@ -61,7 +61,7 @@ java -jar target/process-migration-thorntail.jar -Dswarm.network.socket-binding-
 
 Default configuration is as follows:
 
-```{yaml}
+```yaml
 thorntail:
   deployment:
     process-migration.war:
@@ -116,7 +116,7 @@ It is possible to override or extend the provided configuration.
 
 The right way to configure the connection to one or more KIE Servers in order to perform the migrations, a list of kieservers should exist in the configuration file.
 
-```{yaml}
+```yaml
 kieservers:
   - host: http://kieserver1.example.com:8080/kie-server/services/rest/server
     username: joe
@@ -130,7 +130,7 @@ kieservers:
 
 See [Using non-provided JDBC drivers](#using-non-provided-jdbc-drivers) for details on how to include additional JDBC drivers to the runtime.
 
-```{yaml}
+```yaml
 thorntail:
   datasources:
     data-sources:
@@ -148,7 +148,7 @@ _Refer to the [Thorntail Datasource](https://docs.thorntail.io/2.4.0.Final/#crea
 The H2 JDBC driver is included by default. However, users will want to use different JDBC drivers to connect to external databases. For that purpose you will
 have to provide a `-Dthorntail.classpath` parameter with the path to the JDBC driver.
 
-```{bash}
+```bash
 $ java -jar -Dthorntail.classpath=./mariadb-java-client-2.4.2.jar -jar target/process-migration-thorntail.jar -s./mariadb-config.yml
 ...
 19-07-19 11:00:00,566 INFO  [org.wildfly.swarm.datasources] (main) THORN1003: Auto-detected JDBC driver for h2
@@ -162,7 +162,7 @@ $ java -jar -Dthorntail.classpath=./mariadb-java-client-2.4.2.jar -jar target/pr
 
 Request:
 
-```{}
+```bash
 URL: http://localhost:8180/plans
 Method: POST
 HTTP Headers:
@@ -181,7 +181,7 @@ Body:
 
 Response:
 
-```{}
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -205,7 +205,7 @@ Body:
 
 ### Create a sync migration
 
-```{}
+```http
 URL: http://localhost:8180/migrations
 Method: POST
 HTTP Headers:
@@ -224,7 +224,7 @@ Body:
 
 Response:
 
-```{}
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -255,7 +255,7 @@ The following request will fetch the overall result of the migration
 
 Request:
 
-```{}
+```http
 URL: http://localhost:8180/migrations/1
 Method: GET
 HTTP Headers:
@@ -265,7 +265,7 @@ HTTP Headers:
 
 Response:
 
-```{}
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -292,7 +292,7 @@ To retrieve the individual results of the migration of each process instance
 
 Request:
 
-```{}
+```http
 URL: http://localhost:8180/migrations/1/results
 Method: GET
 HTTP Headers:
@@ -302,7 +302,7 @@ HTTP Headers:
 
 Response:
 
-```{}
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -366,7 +366,7 @@ Body:
 
 Request:
 
-```{}
+```http
 URL: http://localhost:8180/migrations
 Method: POST
 HTTP Headers:
@@ -386,7 +386,7 @@ Body:
 
 Response:
 
-```{}
+```http
 Status: 202 Accepted
 HTTP Headers:
   Content-Type: application/json
