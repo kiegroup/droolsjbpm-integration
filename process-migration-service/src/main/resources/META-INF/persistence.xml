@@ -11,6 +11,7 @@
     <class>org.kie.processmigration.model.MigrationReport</class>
     <properties>
       <property name="hibernate.max_fetch_depth" value="3"/>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
       <property name="hibernate.show_sql" value="false"/>
     </properties>
   </persistence-unit>
