@@ -41,7 +41,17 @@
   "ignores": {
     "revapi": {
       "_comment": "Changes between 7.23.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": []
+      "ignore": [
+        {
+           "code": "java.method.addedToInterface",
+           "new": "method org.kie.server.api.model.instance.TaskInstance org.kie.server.client.UserTaskServicesClient::findTaskById(java.lang.Long, boolean)",
+           "package": "org.kie.server.client",
+           "classSimpleName": "UserTaskServicesClient",
+           "methodName": "findTaskById",
+           "elementKind": "method",
+           "justification": "JBPM-8655: Task operations are slower after a join was introduced by JBPM-8116"
+         }
+      ]
     }
   }
 }
