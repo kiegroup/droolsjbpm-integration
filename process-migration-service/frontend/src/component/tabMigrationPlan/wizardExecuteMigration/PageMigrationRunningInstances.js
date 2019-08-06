@@ -319,10 +319,12 @@ export default class PageMigrationRunningInstances extends React.Component {
       let updatedSelectedRows;
       let updatedRow;
       if (row.selected) {
-        updatedSelectedRows = selectedRows.filter(r => !(r === row.id));
+        updatedSelectedRows = selectedRows.filter(
+          r => !(r === row.processInstanceId)
+        );
         updatedRow = this.deselectRow(row);
       } else {
-        selectedRows.push(row.id);
+        selectedRows.push(row.processInstanceId);
         updatedSelectedRows = selectedRows;
         updatedRow = this.selectRow(row);
       }
