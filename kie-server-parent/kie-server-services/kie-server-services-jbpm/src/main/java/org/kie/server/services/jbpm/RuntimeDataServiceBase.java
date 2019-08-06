@@ -364,17 +364,17 @@ public class RuntimeDataServiceBase {
     }
 
     public TaskInstance getTaskById(long taskId) {
+        return getTaskById(taskId, false);
+    }
 
-        UserTaskInstanceDesc userTaskDesc = runtimeDataService.getTaskById(taskId);
-
+    public TaskInstance getTaskById(long taskId, boolean withSLA) {
+        UserTaskInstanceDesc userTaskDesc = runtimeDataService.getTaskById(taskId, withSLA);
         if (userTaskDesc == null) {
             throw new TaskNotFoundException("No task found with id " + taskId);
         }
 
         return convertToTask(userTaskDesc);
     }
-
-
 
     public TaskSummaryList getTasksAssignedAsBusinessAdministratorByStatus(List<String> status, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
 

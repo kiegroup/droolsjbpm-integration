@@ -110,6 +110,8 @@ public interface UserTaskServicesClient {
 
     TaskInstance findTaskById(Long taskId);
 
+    TaskInstance findTaskById(Long taskId, boolean withSLA);
+
     List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, Integer page, Integer pageSize);
 
     List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, List<String> status, Integer page, Integer pageSize);
