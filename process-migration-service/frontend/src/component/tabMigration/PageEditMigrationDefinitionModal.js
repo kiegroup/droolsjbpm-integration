@@ -1,10 +1,7 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-import { Button } from "patternfly-react";
-import { Modal } from "patternfly-react";
-import { Icon } from "patternfly-react";
-import { OverlayTrigger } from "patternfly-react";
-import { Tooltip } from "patternfly-react";
+import { Button, Modal, Icon, OverlayTrigger, Tooltip } from "patternfly-react";
 
 import PageMigrationScheduler from "../tabMigrationPlan/wizardExecuteMigration/PageMigrationScheduler";
 import MigrationClient from "../../clients/migrationClient";
@@ -17,21 +14,35 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: this.props.rowData.id,
+      id: this.props.migrationId,
       showEditDialog: false,
-      definition: this.props.rowData.definition,
-      isValid: true
+      isValid: true,
+      definition: {
+        execution: {},
+        processInstanceIds: []
+      }
     };
   }
+
+  openEditDialog = () => {
+    MigrationClient.get(this.props.migrationId).then(migration => {
+      this.setState({
+        showEditDialog: true,
+        definition: migration.definition
+      });
+    });
+  };
 
   hideEditDialog = () => {
     this.setState({ showEditDialog: false });
   };
 
   submit = () => {
-    MigrationClient.update(this.state.id, this.state.definition).then(() => {
-      this.hideEditDialog();
-    });
+    MigrationClient.update(this.props.migrationId, this.state.definition).then(
+      () => {
+        this.hideEditDialog();
+      }
+    );
   };
 
   onExecutionFieldChange = (field, value) => {
@@ -62,7 +73,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
           <FormControl
             type="text"
             readOnly
-            value={this.props.rowData.definition.planId}
+            value={this.state.definition.planId}
           />
         </FormGroup>
         <FormGroup controlId="EditMigration_Pids">
@@ -70,7 +81,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
           <FormControl
             type="text"
             readOnly
-            value={this.props.rowData.definition.processInstanceIds.sort()}
+            value={this.state.definition.processInstanceIds.sort()}
           />
         </FormGroup>
         <FormGroup controlId="EditMigration_kieId">
@@ -78,7 +89,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
           <FormControl
             type="text"
             readOnly
-            value={this.props.rowData.definition.kieServerId}
+            value={this.state.definition.kieServerId}
           />
         </FormGroup>
         <PageMigrationScheduler
@@ -95,10 +106,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
     return (
       <div>
         <OverlayTrigger overlay={tooltipEdit} placement={"bottom"}>
-          <Button
-            bsStyle="link"
-            onClick={() => this.setState({ showEditDialog: true })}
-          >
+          <Button bsStyle="link" onClick={this.openEditDialog}>
             <Icon type="fa" name="edit" />
           </Button>
         </OverlayTrigger>
@@ -133,3 +141,7 @@ export default class PageEditMigrationDefinitionModal extends React.Component {
     );
   }
 }
+
+PageEditMigrationDefinitionModal.propTypes = {
+  migrationId: PropTypes.number.isRequired
+};

@@ -237,11 +237,7 @@ export default class MigrationDefinitions extends React.Component {
                   </Table.Button>
                 </OverlayTrigger>
               </Table.Actions>,
-              <DisplayActions
-                key="1"
-                rowData={rowData}
-                openEditMigration={this.openEditMigration}
-              />
+              <DisplayActions key="1" rowData={rowData} />
             ]
           ]
         },
@@ -265,13 +261,13 @@ export default class MigrationDefinitions extends React.Component {
     );
     const deleteIcon = <Icon type="pf" name="error-circle-o" />;
 
-    //only for status is "SCHEDULED" enable the "Edit" button
+    //only "SCHEDULED" migrations allow the "Edit" button
     function DisplayActions(props) {
       const rowData = props.rowData;
       if (rowData.status == "SCHEDULED") {
         return (
           <Table.Actions key="1">
-            <PageEditMigrationDefinitionModal rowData={rowData} />
+            <PageEditMigrationDefinitionModal migrationId={rowData.id} />
           </Table.Actions>
         );
       } else {
