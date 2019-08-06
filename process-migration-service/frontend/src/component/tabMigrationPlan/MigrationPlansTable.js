@@ -159,7 +159,7 @@ export default class MigrationPlansTable extends React.Component {
                 <OverlayTrigger overlay={tooltipDelete} placement={"bottom"}>
                   <Table.Button
                     bsStyle="link"
-                    onClick={() => this.showDeleteDialog(rowData.name)}
+                    onClick={() => this.props.onDeletePlan(rowData)}
                   >
                     <Icon type="fa" name="trash" />
                   </Table.Button>
@@ -205,5 +205,6 @@ export default class MigrationPlansTable extends React.Component {
 MigrationPlansTable.propTypes = {
   plans: PropTypes.array.isRequired,
   kieServerId: PropTypes.string.isRequired,
-  onEditPlan: PropTypes.func.isRequired
+  onEditPlan: PropTypes.func.isRequired,
+  onDeletePlan: PropTypes.func.isRequired
 };

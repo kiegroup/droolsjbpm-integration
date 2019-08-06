@@ -8,8 +8,10 @@ import MigrationPlansTable from "./MigrationPlansTable";
 import MigrationPlanListFilter from "./MigrationPlanListFilter";
 
 import WizardAddPlan from "./wizardAddPlan/WizardAddPlan";
-import planClient from "../../clients/planClient";
+import PlanClient from "../../clients/planClient";
 import ImportPlanModal from "./ImportPlanModal";
+import Notification from "../Notification";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
 export default class MigrationPlans extends MigrationPlansBase {
   constructor(props) {
@@ -20,9 +22,9 @@ export default class MigrationPlans extends MigrationPlansBase {
       showDeleteConfirmation: false,
       showMigrationWizard: false,
       showPlanWizard: false,
-      deletePlanId: "",
       runningInstances: [],
-      addPlanResponseJsonStr: ""
+      addPlanResponseJsonStr: "",
+      errorMsg: ""
     };
   }
 
@@ -40,7 +42,7 @@ export default class MigrationPlans extends MigrationPlansBase {
 
   openAddPlanWizard = id => {
     if (id) {
-      planClient.get(id).then(plan => {
+      PlanClient.get(id).then(plan => {
         this.setState({ plan, showPlanWizard: true });
       });
     } else {
@@ -54,6 +56,32 @@ export default class MigrationPlans extends MigrationPlansBase {
       plan: this.getDefaultPlan()
     });
     this.retrieveAllPlans();
+  };
+
+  openDeletePlanDialog = plan => {
+    this.setState({
+      plan: plan,
+      showDeleteConfirmation: true
+    });
+  };
+
+  deletePlan = async () => {
+    return PlanClient.delete(this.state.plan.id)
+      .then(() => {
+        this.retrieveAllPlans();
+        this.closeDeletePlanDialog();
+      })
+      .catch(() => {
+        this.setState({ errorMsg: "Unable to delete plan" });
+        this.closeDeletePlanDialog();
+      });
+  };
+
+  closeDeletePlanDialog = () => {
+    this.setState({
+      plan: this.getDefaultPlan(),
+      showDeleteConfirmation: false
+    });
   };
 
   onFilterChange = planFilter => {
@@ -74,20 +102,27 @@ export default class MigrationPlans extends MigrationPlansBase {
     const primaryContent = (
       <p className="lead">
         Please confirm you will delete this migration plan{" "}
-        {this.state.deletePlanId}
+        {this.state.plan.name}
       </p>
     );
     const secondaryContent = <p />;
     const icon = <Icon type="pf" name="error-circle-o" />;
+    const notification = (
+      <Notification
+        type={ALERT_TYPE_ERROR}
+        message={this.state.errorMsg}
+        onDismiss={() => this.setState({ errorMsg: "" })}
+      />
+    );
 
     return (
       <React.Fragment>
         {/* Delete Plan pop-up */}
         <MessageDialog
           show={this.state.showDeleteConfirmation}
-          onHide={this.hideDeleteDialog}
+          onHide={this.closeDeletePlanDialog}
           primaryAction={this.deletePlan}
-          secondaryAction={this.hideDeleteDialog}
+          secondaryAction={this.closeDeletePlanDialog}
           primaryActionButtonContent="Delete"
           secondaryActionButtonContent="Cancel"
           primaryActionButtonBsStyle="danger"
@@ -98,6 +133,7 @@ export default class MigrationPlans extends MigrationPlansBase {
           accessibleName="deleteConfirmationDialog"
           accessibleDescription="deleteConfirmationDialogContent"
         />
+        {this.state.errorMsg && notification}
         <br />
         {/* import plan & Add Plan */}
         <div className="row">
@@ -123,6 +159,7 @@ export default class MigrationPlans extends MigrationPlansBase {
           plans={this.state.filteredPlans}
           kieServerId={this.props.kieServerId}
           onEditPlan={id => this.openAddPlanWizard(id)}
+          onDeletePlan={plan => this.openDeletePlanDialog(plan)}
         />
 
         {/* Add Plan Wizard */}

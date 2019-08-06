@@ -11,6 +11,7 @@ test("MigrationPlansTable renders correctly using snapshot", () => {
         plans={plans}
         kieServerId="kieServer1"
         onEditPlan={myMock}
+        onDeletePlan={myMock}
       />
     )
     .toJSON();

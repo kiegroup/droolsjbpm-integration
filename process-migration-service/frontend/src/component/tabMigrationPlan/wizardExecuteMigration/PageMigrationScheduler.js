@@ -38,7 +38,7 @@ export default class PageMigrationScheduler extends React.Component {
     if (
       callbackUrl !== undefined &&
       callbackUrl !== "" &&
-      !validator.isURL(callbackUrl)
+      !validator.isURL(callbackUrl, { require_tld: false })
     ) {
       validationMessageUrl = "error";
     }

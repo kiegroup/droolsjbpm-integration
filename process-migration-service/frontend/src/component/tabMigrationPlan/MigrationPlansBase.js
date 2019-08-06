@@ -27,26 +27,6 @@ export default class MigrationPlansBase extends React.Component {
     });
   };
 
-  showDeleteDialog = id => {
-    this.setState({
-      showDeleteConfirmation: true,
-      deletePlanId: id
-    });
-  };
-
-  hideDeleteDialog = () => {
-    this.setState({
-      showDeleteConfirmation: false
-    });
-  };
-
-  deletePlan = async () => {
-    return PlanClient.delete(this.state.deletePlanId).then(() => {
-      this.retrieveAllPlans();
-      this.hideDeleteDialog();
-    });
-  };
-
   savePlan = async () => {
     return this.persistPlan(this.state.plan).then(plan => {
       this.setState({ plan });

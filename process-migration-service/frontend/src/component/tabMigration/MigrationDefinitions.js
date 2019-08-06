@@ -57,7 +57,8 @@ export default class MigrationDefinitions extends React.Component {
 
   hideDeleteDialog = () => {
     this.setState({
-      showDeleteConfirmation: false
+      showDeleteConfirmation: false,
+      deleteMigrationId: ""
     });
   };
 

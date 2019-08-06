@@ -308,7 +308,7 @@ export default class PageMigrationRunningInstances extends React.Component {
   };
 
   updateSelectedProcessIds = (rows, selectedRows) => {
-    this.props.setRunngingInstancesIds(selectedRows);
+    this.props.setRunningInstancesIds(selectedRows);
     this.props.onIsValid(selectedRows.length > 0);
   };
 
@@ -422,6 +422,6 @@ export default class PageMigrationRunningInstances extends React.Component {
 
 PageMigrationRunningInstances.propTypes = {
   runningInstances: PropTypes.array.isRequired,
-  setRunngingInstancesIds: PropTypes.func.isRequired,
+  setRunningInstancesIds: PropTypes.func.isRequired,
   onIsValid: PropTypes.func.isRequired
 };
