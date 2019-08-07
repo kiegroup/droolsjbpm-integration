@@ -16,7 +16,7 @@ Array [
   "definition": {
     "execution": {
       "type": "ASYNC",
-      "callbackUrl": "This is mockup reponse",
+      "callbackUrl": "This is mockup response",
       "scheduledStartTime": null
     },
     "planId": 2,
