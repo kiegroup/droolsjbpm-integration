@@ -49,6 +49,18 @@
     <pim.server.http.health>${pim.server.http.rest}/health/readiness</pim.server.http.health>
     <pim.username>kermit</pim.username>
     <pim.password>thefrog</pim.password>
+
+    <!-- JDBC Properties -->
+    <maven.hibernate.dialect>org.hibernate.dialect.H2Dialect</maven.hibernate.dialect>
+    <maven.datasource.classname>org.h2.jdbcx.JdbcDataSource</maven.datasource.classname>
+    <maven.jdbc.driver.class>org.h2.Driver</maven.jdbc.driver.class>
+    <maven.jdbc.username>sa</maven.jdbc.username>
+    <maven.jdbc.password>foo</maven.jdbc.password>
+    <maven.jdbc.url>jdbc:h2:mem:test</maven.jdbc.url>
+    <maven.jdbc.db.name/>
+    <maven.jdbc.db.server/>
+    <maven.jdbc.db.port/>
+    <maven.jdbc.schema>public</maven.jdbc.schema>
   </properties>
 
   <dependencyManagement>
@@ -171,6 +183,11 @@
 
     <!-- Test -->
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.weld</groupId>
       <artifactId>weld-junit4</artifactId>
       <scope>test</scope>
@@ -227,6 +244,16 @@
   </dependencies>
   <build>
     <finalName>process-migration</finalName>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>

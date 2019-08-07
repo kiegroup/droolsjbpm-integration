@@ -38,6 +38,7 @@ public class PlanServiceImplTest extends AbstractPersistenceTest {
         .setPersistenceContextFactory(getPCFactory())
         .inject(this)
         .build();
+
     @Inject
     private PlanService planService;
 
