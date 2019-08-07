@@ -49,9 +49,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      title: "Process instance migration"
-    })
-  ]
+  plugins: [HtmlWebpackPluginConfig]
 };
