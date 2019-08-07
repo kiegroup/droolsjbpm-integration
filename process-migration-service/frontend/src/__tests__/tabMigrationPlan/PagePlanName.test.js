@@ -2,7 +2,7 @@ import renderer from "react-test-renderer";
 import React from "react";
 import PagePlanName from "../../component/tabMigrationPlan/wizardAddPlan/PagePlanName";
 
-test("PagePlanName renders correctly", () => {
+test("PagePlanName opens with an empty plan", () => {
   const plan = {};
   const mockFn = jest.fn();
   const tree = renderer
@@ -13,7 +13,7 @@ test("PagePlanName renders correctly", () => {
   expect(tree).toMatchSnapshot();
 });
 
-test("PagePlanName renders correctly using existing data", () => {
+test("PagePlanName opens using an existing plan", () => {
   const plan = {
     name: "plan name",
     description: "description"
