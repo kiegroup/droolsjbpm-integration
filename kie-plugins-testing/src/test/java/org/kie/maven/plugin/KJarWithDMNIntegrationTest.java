@@ -15,7 +15,6 @@
  */
 package org.kie.maven.plugin;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class KJarWithDMNIntegrationTest extends KieMavenPluginBaseIntegrationTes
 
     @Test
     public void testCleanInstall() throws Exception {
-        buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions(false));
+        buildKJarProject(KJAR_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
     }
 
     @Test
@@ -62,9 +61,9 @@ public class KJarWithDMNIntegrationTest extends KieMavenPluginBaseIntegrationTes
 
     private void testComplexDMNModel(final boolean useExecutableModel) throws Exception {
         if (useExecutableModel) {
-            buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions(true));
+            buildKJarProject(KJAR_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
         } else {
-            buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions(false));
+            buildKJarProject(KJAR_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion(), "-DgenerateDMNModel=NO"}, "clean", "install");
         }
         final KieServices kieServices = KieServices.get();
         final ReleaseId releaseId = kieServices.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
@@ -90,14 +89,6 @@ public class KJarWithDMNIntegrationTest extends KieMavenPluginBaseIntegrationTes
             assertThat(result.get("Routing")).isEqualTo("ACCEPT");
         } finally {
             kieSession.dispose();
-        }
-    }
-
-    private String[] getMavenGoalsAndOptions(final boolean useExecutableModel) throws IOException {
-        if (useExecutableModel) {
-            return new String[] {"clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion(), "-DgenerateDMNModel=YES"};
-        } else {
-            return new String[] {"clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion()};
         }
     }
 

@@ -44,6 +44,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

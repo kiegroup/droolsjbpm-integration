@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+package kjar1;
+
 import org.kie.server.testing.Person;
 
 rule "Update person's id"

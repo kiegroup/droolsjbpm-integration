@@ -63,7 +63,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
     }
 
     private ClassLoader createClassLoaderFromProject(String kjarProjectName) throws Exception {
-        MavenExecutionResult result = buildKJarProject(kjarProjectName, "clean", "install");
+        MavenExecutionResult result = buildKJarProject(kjarProjectName, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
         File classDir = new File(result.getBasedir(), "target/classes");
 
         logger.info(classDir.toString());

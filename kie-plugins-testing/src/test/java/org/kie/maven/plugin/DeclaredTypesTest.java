@@ -50,9 +50,13 @@ public class DeclaredTypesTest extends KieMavenPluginBaseIntegrationTest {
 
     private void testDeclaredTypeWithJavaField(final boolean useExecutableModel) throws Exception {
         if (useExecutableModel) {
-            buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions(true));
+            buildKJarProject(KJAR_NAME,
+                             new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()},
+                             "clean", "install");
         } else {
-            buildKJarProject(KJAR_NAME, getMavenGoalsAndOptions(false));
+            buildKJarProject(KJAR_NAME,
+                             new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=NO"},
+                             "clean", "install");
         }
         final KieServices kieServices = KieServices.get();
         final ReleaseId releaseId = kieServices.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
@@ -74,14 +78,6 @@ public class DeclaredTypesTest extends KieMavenPluginBaseIntegrationTest {
             assertEquals(1, rulesFired);
         } finally {
             kSession.dispose();
-        }
-    }
-
-    private String[] getMavenGoalsAndOptions(final boolean useExecutableModel) throws IOException {
-        if (useExecutableModel) {
-            return new String[]{"clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=YES"};
-        } else {
-            return new String[]{"clean", "install", "-Ddrools.version=" + TestUtil.getProjectVersion()};
         }
     }
 }

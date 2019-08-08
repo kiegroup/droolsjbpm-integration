@@ -9,12 +9,15 @@
   <version>1.0.0.Final</version>
 
   <packaging>kjar</packaging>
+  <properties>
+    <org.kie.version>1.0.0.Final</org.kie.version>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
-      <version>${it-plugin.version}</version>
+      <version>${org.kie.version}</version>
     </dependency>
   </dependencies>
 
@@ -23,7 +26,7 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
-        <version>${it-plugin.version}</version>
+        <version>${org.kie.version}</version>
         <extensions>true</extensions>
         <configuration>
           <properties>
