@@ -12,6 +12,7 @@
 
   <properties>
     <org.kie.version>1.0.0.Final</org.kie.version>
+    <generateModel>NO</generateModel>
   </properties>
 
   <dependencies>
