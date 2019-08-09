@@ -222,7 +222,6 @@ public class KieServiceImpl implements KieService {
         KieServerConfig kieConfig = new KieServerConfig();
         kieConfig.setHost(config.get(HOST))
             .setCredentialsProvider(credentialsProvider);
-        configs.put(kieConfig.getHost(), kieConfig);
         try {
             kieConfig.setClient(createKieServicesClient(kieConfig));
             logger.info("Loaded kie server configuration: {}", kieConfig);
