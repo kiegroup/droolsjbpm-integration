@@ -27,9 +27,12 @@ import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
@@ -39,7 +42,6 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
             "1.0.0.Final" );
 
     private static final String CONTAINER_1_ID  = "dmn-pmml";
-    private static final String CONTAINER_1_ALIAS  = "pmml";
 
     private static final String SCORECARD_MODEL_NAMESPACE
             = "http://www.trisotech.com/definitions/_ca466dbe-20b4-4e88-a43f-4ce3aff26e4f";
@@ -53,7 +55,7 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
     private static final String REGRESSION_DECISION_NAME = "Decision";
     private static final String REGRESSION_DECISION_RESULT = "result";
 
-
+    private static final long EXTENDED_TIMEOUT = 300000L;
 
     @BeforeClass
     public static void deployArtifacts() {
@@ -61,7 +63,11 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
-        createContainer(CONTAINER_1_ID, kjar1, CONTAINER_1_ALIAS);
+
+        // Having timeout issues due to pmml -> raised timeout.
+        KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
+        ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1));
+        KieServerAssert.assertSuccess(reply);
     }
 
     @Test
