@@ -88,7 +88,6 @@ public class KieServiceImplTest extends KieServiceImpl {
         countDownLatch.await();
 
         PowerMockito.verifyStatic(KieServicesFactory.class, Mockito.times(2));
-        KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class));
         Collection<KieServerConfig> configs = kieService.getConfigs();
         Assert.assertNotNull(configs);
         Assert.assertEquals(1, configs.size());

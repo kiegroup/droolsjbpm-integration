@@ -125,6 +125,12 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>microprofile-config</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>narayana-jts-idlj</artifactId>
+          <groupId>org.jboss.narayana.jts</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.thorntail</groupId>
