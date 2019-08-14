@@ -129,6 +129,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
 
     Create xa recovery file next to the context.xml with data base configuration with following content:
 
+```
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
     <properties>
@@ -137,6 +138,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
         <entry key="DB_1_DatabaseDynamicClass"></entry>
         <entry key="DB_1_DatabaseURL">java:xads</entry>
     </properties>
+```
 
     This causes the recovery process to utilise the underlying data source defined in the GlobalNamingResources section of the server.xml file.
     Append to CATALINA_OPTS in setenv.sh|bat file following:
