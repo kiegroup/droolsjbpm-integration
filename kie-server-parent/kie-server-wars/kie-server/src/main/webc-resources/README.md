@@ -80,11 +80,11 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
 
   Edit TOMCAT_HOME/conf/context.xml and add following within Context tags of the file:
   ```
-   	<ResourceLink name="xads"
+   <ResourceLink name="xads"
     	global="xads"
     	type="javax.sql.XADataSource"/>
 
-    <Resource 
+   <Resource 
         name="poolingXaDs"
         uniqueName="poolingXaDs"
         auth="Container" 
