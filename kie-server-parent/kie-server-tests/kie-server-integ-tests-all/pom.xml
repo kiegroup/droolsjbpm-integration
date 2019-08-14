@@ -429,6 +429,8 @@
         <kieserver.casemgmt.enabled>true</kieserver.casemgmt.enabled>
         <kieserver.prometheus.enabled>true</kieserver.prometheus.enabled>
         <jbpm.executor.disabled>true</jbpm.executor.disabled>
+        <!-- For including complete stack trace in the response -->
+        <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
       </properties>
       <build>
         <plugins>
