@@ -127,7 +127,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
 
  8. Configure XA Recovery
 
-    Create xa recovery file next to the context.xml with data base configuration with following content:
+    Create an xa recovery file next to the context.xml called for example xa-recovery-properties.xml with data base configuration with following content:
 
 ```
     <?xml version="1.0" encoding="UTF-8"?>
