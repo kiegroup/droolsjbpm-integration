@@ -22,46 +22,46 @@ Is the execution of a defined plan, applied to a set of process instances. These
 * Plan ID
 * Instances to migrate.
 * Execution type
-    * Sync or Async
-    * Scheduled start time
-    * Callback URL
+  * Sync or Async
+  * Scheduled start time
+  * Callback URL
 
-# Requirements
+## Requirements
 
 * JRE 1.8 or greater
 * Running KIE Process server
 
-# Build
+## Build
 
-```
-$ mvn clean package
-```
-
-# Run application
-
-It is a [Thorntail 2.x](http://docs.wildfly-swarm.io/2.4.0.Final/) application
-
-```
-$ java -jar target/process-migration-thorntail.jar
+```bash
+mvn clean package
 ```
 
-You can provide your custom configuration file. Check [project-defaults.yml](./src/main/resources/project-defaults.yml) to see an example
+## Run application
 
-```
-$ java -jar target/process-migration-thorntail.jar -s./myconfig.yml
-```
+It is a [Thorntail 2.x](http://docs.wildfly-swarm.io/2.4.0.Final/) application.
 
-Start the server on a different ports:
-
-```
-$ java -jar target/process-migration-thorntail.jar -Dswarm.network.socket-binding-groups.standard-sockets.port-offset=10
+```bash
+java -jar target/process-migration-thorntail.jar
 ```
 
-# Configuration
+You can provide your custom configuration file. Check [project-defaults.yml](./src/main/resources/project-defaults.yml) to see an example. The provided configuration will be added or override the one existing in project-defaults.yml
+
+```bash
+java -jar target/process-migration-thorntail.jar -s./myconfig.yml
+```
+
+Start the server on a different ports set:
+
+```bash
+java -jar target/process-migration-thorntail.jar -Dswarm.network.socket-binding-groups.standard-sockets.port-offset=10
+```
+
+## Configuration
 
 Default configuration is as follows:
 
-```
+```yaml
 thorntail:
   deployment:
     process-migration.war:
@@ -108,15 +108,15 @@ thorntail:
 1. EJB Timers persistence configuration
 1. Properties based authentication. Default admin user/password is `kermit`/`thefrog`
 
-## Configuration overrides
+### Configuration overrides
 
 It is possible to override or extend the provided configuration.
 
-### Defining KIE Servers
+#### Defining KIE Servers
 
 The right way to configure the connection to one or more KIE Servers in order to perform the migrations, a list of kieservers should exist in the configuration file.
 
-```
+```yaml
 kieservers:
   - host: http://kieserver1.example.com:8080/kie-server/services/rest/server
     username: joe
@@ -126,9 +126,11 @@ kieservers:
     password: secret
 ```
 
-### MySQL Datasource
+#### MySQL Datasource
 
-```
+See [Using non-provided JDBC drivers](#using-non-provided-jdbc-drivers) for details on how to include additional JDBC drivers to the runtime.
+
+```yaml
 thorntail:
   datasources:
     data-sources:
@@ -141,13 +143,26 @@ thorntail:
 
 _Refer to the [Thorntail Datasource](https://docs.thorntail.io/2.4.0.Final/#creating-a-datasource_thorntail) configuration for further details_
 
-# Usage
+## Using non-provided JDBC drivers
 
-## Define the plan (without node mappings)
+The H2 JDBC driver is included by default. However, users will want to use different JDBC drivers to connect to external databases. For that purpose you will
+have to provide a `-Dthorntail.classpath` parameter with the path to the JDBC driver.
+
+```bash
+$ java -jar -Dthorntail.classpath=./mariadb-java-client-2.4.2.jar -jar target/process-migration-thorntail.jar -s./mariadb-config.yml
+...
+19-07-19 11:00:00,566 INFO  [org.wildfly.swarm.datasources] (main) THORN1003: Auto-detected JDBC driver for h2
+2019-07-19 11:00:00,572 INFO  [org.wildfly.swarm.datasources] (main) THORN1003: Auto-detected JDBC driver for mariadb
+...
+```
+
+## Usage
+
+### Define the plan (without node mappings)
 
 Request:
 
-```
+```bash
 URL: http://localhost:8180/plans
 Method: POST
 HTTP Headers:
@@ -166,7 +181,7 @@ Body:
 
 Response:
 
-```
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -182,15 +197,15 @@ Body:
 }
 ```
 
-## Deploy some processes to test the migration
+### Deploy some processes to test the migration
 
 1. Start a KIE Server
 1. Deploy two versions of the evaluation project (evaluation_1.0 and evaluation_1.1)
 1. Start one instance of the evaluation process (evaluation_1.0)
 
-## Create a sync migration
+### Create a sync migration
 
-```
+```http
 URL: http://localhost:8180/migrations
 Method: POST
 HTTP Headers:
@@ -202,14 +217,14 @@ Body:
     "processInstanceIds": [1],
     "kieserverId": "sample-server",
     "execution": {
-   	 "type": "SYNC"
+      "type": "SYNC"
     }
 }
 ```
 
 Response:
 
-```
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -234,13 +249,13 @@ Body:
 
 As it is a Synchronous migration, the result of the migration will be returned once it has finished.
 
-## Check the migration output
+### Check the migration output
 
 The following request will fetch the overall result of the migration
 
 Request:
 
-```
+```http
 URL: http://localhost:8180/migrations/1
 Method: GET
 HTTP Headers:
@@ -250,7 +265,7 @@ HTTP Headers:
 
 Response:
 
-```
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -276,7 +291,8 @@ Body:
 To retrieve the individual results of the migration of each process instance
 
 Request:
-```
+
+```http
 URL: http://localhost:8180/migrations/1/results
 Method: GET
 HTTP Headers:
@@ -285,7 +301,8 @@ HTTP Headers:
 ```
 
 Response:
-```
+
+```http
 Status: 200 OK
 HTTP Headers:
   Content-Type: application/json
@@ -342,14 +359,14 @@ Body:
 ]
 ```
 
-## Create an Async migration
+### Create an Async migration
 
 1. Start two more processes
 1. Trigger the migration of all the existing active processes
 
 Request:
 
-```
+```http
 URL: http://localhost:8180/migrations
 Method: POST
 HTTP Headers:
@@ -361,15 +378,15 @@ Body:
     "processInstanceIds": [],
     "kieserverId": "sample-server",
     "execution": {
-   	 "type": "ASYNC",
-   	 "scheduledStartTime": "2018-12-11T12:35:00.000Z"
+      "type": "ASYNC",
+      "scheduledStartTime": "2018-12-11T12:35:00.000Z"
     }
 }
 ```
 
 Response:
 
-```
+```http
 Status: 202 Accepted
 HTTP Headers:
   Content-Type: application/json
@@ -394,8 +411,8 @@ Body:
 
 The migration status can be checked using the migrations api with the id returned as done before
 
-# User Interface
+## User Interface
 
 The Process Instance Migration User Interface can be accessed in the following URL
 
-http://localhost:8080/
+[http://localhost:8080/](http://localhost:8080/)
