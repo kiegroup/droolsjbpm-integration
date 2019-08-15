@@ -161,7 +161,22 @@
       </dependency>
       <dependency>
         <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-core-uberjar</artifactId>
+        <artifactId>cargo-core-api-container</artifactId>
+        <version>${version.org.codehaus.cargo}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-core-api-generic</artifactId>
+        <version>${version.org.codehaus.cargo}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-core-container-weblogic</artifactId>
+        <version>${version.org.codehaus.cargo}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-core-container-wildfly</artifactId>
         <version>${version.org.codehaus.cargo}</version>
       </dependency>
       <dependency>
