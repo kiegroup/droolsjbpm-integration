@@ -14,8 +14,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
    - org.jboss:jboss-transaction-spi
    - org.jboss.logging:jboss-logging
 
- versions of these libraries will depend on the release, so best to check what versions are shipped with KIE
- **TODO** *add URL reference to github of the parent pom that contains the dependency version values. I went looking but after about 3 levels of parent I got lost, ended up using Maven Central and didn't get it quite right initially*
+ versions of these libraries will depend on the release, so best to check what versions are shipped with KIE. The parent POM containing the versions is located at https://github.com/kiegroup/droolsjbpm-build-bootstrap/blob/master/pom.xml - just select the appropriate branch for the version you're using
 
  3. Copy JDBC driver lib into TOMCAT_HOME/lib depending on the data base of your choice, as example H2 is used
 
@@ -54,8 +53,8 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
         testOnBorrow="false" 
         driverType="4"
 
-        portNumber="${datasource.port}"
         serverName="${datasource.hostname}" 
+        portNumber="${datasource.port}"
         databaseName="${datasource.dbName}" 
         type="${datasource.class}" 
         url="${datasource.url}" 
