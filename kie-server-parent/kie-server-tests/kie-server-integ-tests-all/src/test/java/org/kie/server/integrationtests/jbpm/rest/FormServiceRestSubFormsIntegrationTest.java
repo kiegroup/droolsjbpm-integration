@@ -24,13 +24,12 @@ import java.util.Map;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -90,8 +89,7 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
         // make sure fields from the two sub-forms are included in the result
         // checking for json only (same will apply for xml as well)
         if(getMediaType().getSubtype().equals("json")) {
-            JSONParser parser = new JSONParser();
-            JSONObject resultJSON = (JSONObject) parser.parse(result);
+            JSONObject resultJSON = new JSONObject(result);
             assertNotNull(resultJSON);
 
             JSONObject formKey = (JSONObject) resultJSON.get("form");
@@ -99,7 +97,7 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
 
             assertNotNull(allFormFields);
             // two subforms
-            assertEquals(2, allFormFields.size());
+            assertEquals(2, allFormFields.length());
             assertEquals("component-ticket.form", ((JSONObject) allFormFields.get(0)).get("defaultSubform"));
             assertEquals("issue-subform.form", ((JSONObject) allFormFields.get(1)).get("defaultSubform"));
 
@@ -107,10 +105,10 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
             JSONArray allFormInfo = (JSONArray) formKey.get("form");
             assertNotNull(allFormInfo);
             // two subform info
-            assertEquals(2, allFormInfo.size());
+            assertEquals(2, allFormInfo.length());
 
-            assertEquals(2, ((JSONArray) ((JSONObject) allFormInfo.get(0)).get("field")).size());
-            assertEquals(5, ((JSONArray) ((JSONObject) allFormInfo.get(1)).get("field")).size());
+            assertEquals(2, ((JSONArray) ((JSONObject) allFormInfo.get(0)).get("field")).length());
+            assertEquals(5, ((JSONArray) ((JSONObject) allFormInfo.get(1)).get("field")).length());
         } else if(getMediaType().getSubtype().equals("xml")) {
             try (ByteArrayInputStream stream = new java.io.ByteArrayInputStream(result.getBytes("UTF-8"))) {
                 Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
