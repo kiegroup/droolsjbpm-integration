@@ -36,6 +36,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -58,15 +59,11 @@ import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
-import org.kie.internal.io.ResourceFactory;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
-import static org.drools.compiler.kproject.models.KieModuleModelImpl.KMODULE_FILE_NAME;
 
 /**
  * This goal builds the Drools files belonging to the kproject.
@@ -150,19 +147,10 @@ public class BuildMojo extends AbstractKieMojo {
             throw new RuntimeException(e);
         }
 
-        KieServices ks = KieServices.Factory.get();
-
         try {
             setSystemProperties(properties);
 
-            KieFileSystem kfs = ks.newKieFileSystem();
-            for (File file : getResourceFiles(sourceFolder)) {
-                if (file.getName().equals( KMODULE_FILE_NAME ) || !file.getPath().contains("META-INF")) {
-                    kfs.write( ResourceFactory.newFileResource(file) );
-                }
-            }
-
-            KieBuilderImpl kieBuilder = new KieBuilderImpl(kfs);
+            KieBuilderImpl kieBuilder = new KieBuilderImpl(project.getBasedir());
             InternalKieModule kModule = (InternalKieModule)kieBuilder.getKieModule();
             for (InternalKieModule kmoduleDep : kmoduleDeps) {
                 kModule.addKieDependency(kmoduleDep);

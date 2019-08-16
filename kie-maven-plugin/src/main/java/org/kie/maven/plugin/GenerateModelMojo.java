@@ -135,9 +135,8 @@ public class GenerateModelMojo extends AbstractKieMojo {
             setSystemProperties(properties);
 
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-            kieBuilder.buildAll(ExecutableModelMavenProject.SUPPLIER, s -> {
-                return !s.contains("src/test/java") && !s.contains("src\\test\\java");
-            });
+            kieBuilder.buildAll(ExecutableModelMavenProject.SUPPLIER,
+                                s -> !s.contains("src/test/java") && !s.contains("src\\test\\java"));
 
             InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
             List<String> generatedFiles = kieModule.getFileNames()
