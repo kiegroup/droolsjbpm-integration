@@ -172,10 +172,14 @@ Body:
 {
     "name": "Test plan",
     "description": "Evaluation Process Test Plan",
-    "sourceContainerId": "evaluation_1.0",
-    "sourceProcessId": "evaluation",
-    "targetContainerId": "evaluation_1.1",
-    "targetProcessId": "evaluation"
+    "source": {
+      "containerId": "evaluation_1.0",
+      "processId": "evaluation"
+    },
+    "target": {
+      "containerId": "evaluation_1.1",
+      "processId": "evaluation"
+    }
 }
 ```
 
@@ -190,10 +194,14 @@ Body:
     "id": 1,
     "name": "Test plan",
     "description": "Evaluation Process Test Plan",
-    "sourceContainerId": "evaluation_1.0",
-    "sourceProcessId": "evaluation",
-    "targetContainerId": "evaluation_1.1",
-    "targetProcessId": "evaluation"
+    "source": {
+      "containerId": "evaluation_1.0",
+      "processId": "evaluation"
+    },
+    "target": {
+      "containerId": "evaluation_1.1",
+      "processId": "evaluation"
+    }
 }
 ```
 
@@ -396,16 +404,16 @@ Body:
     "definition": {
         "execution": {
             "type": "ASYNC",
-            "scheduled_start_time": "2018-12-11T12:35:00.000Z"
+            "scheduledStartTime": "2018-12-11T12:35:00.000Z"
         },
-        "plan_id": 1,
-        "process_instance_ids": [],
-        "kieserver_id": "sample-server",
+        "planId": 1,
+        "processInstanceIds": [],
+        "kieServerId": "sample-server",
     },
     "status": "SCHEDULED",
-    "created_at": "2018-11-07T11:28:43.828Z",
-    "started_at": null,
-    "finished_at": null
+    "createdAt": "2018-11-07T11:28:43.828Z",
+    "startedAt": null,
+    "finishedAt": null
 }
 ```
 

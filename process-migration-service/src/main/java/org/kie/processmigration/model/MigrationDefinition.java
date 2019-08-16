@@ -35,8 +35,8 @@ public class MigrationDefinition {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "process_instance_ids",
-            joinColumns = @JoinColumn(name = "migration_definition_id")
+        name = "process_instance_ids",
+        joinColumns = @JoinColumn(name = "migration_definition_id")
     )
     private List<Long> processInstanceIds;
 

@@ -5,7 +5,7 @@ import migration from "../../../mock_data/migration.json";
 
 test("PageReview renders correctly using snapshot", () => {
   const tree = renderer
-    .create(<PageReview inputJsonStr={JSON.stringify(migration)} />)
+    .create(<PageReview object={migration} exportedFileName="miration" />)
     .toJSON();
   expect(tree).toMatchSnapshot();
 });

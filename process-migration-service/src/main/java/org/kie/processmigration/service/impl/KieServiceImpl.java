@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -33,14 +36,18 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
+import org.kie.processmigration.model.BpmNode;
 import org.kie.processmigration.model.KieServerConfig;
 import org.kie.processmigration.model.ProcessInfo;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
 import org.kie.processmigration.service.KieService;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -68,6 +75,7 @@ public class KieServiceImpl implements KieService {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final long CONFIGURATION_TIMEOUT = 60000;
+    private static final Integer DEFAULT_PAGE_SIZE = 100;
     private static final long AWAIT_EXECUTOR = 5;
     private static final long RETRY_DELAY = 2;
     private static final Logger logger = LoggerFactory.getLogger(KieServiceImpl.class);
@@ -108,14 +116,14 @@ public class KieServiceImpl implements KieService {
     @Override
     public boolean hasKieServer(String kieServerId) {
         return configs
-                .values()
-                .stream()
-                .anyMatch(config -> config.getId() != null && config.getId().equals(kieServerId));
+            .values()
+            .stream()
+            .anyMatch(config -> config.getId() != null && config.getId().equals(kieServerId));
     }
 
     @Override
     public ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws
-            InvalidKieServerException {
+        InvalidKieServerException {
         return getClient(kieServerId).getServicesClient(ProcessAdminServicesClient.class);
     }
 
@@ -125,8 +133,8 @@ public class KieServiceImpl implements KieService {
     }
 
     @Override
-    public List<RunningInstance> getRunningInstances(String containerId, String kieServerId, Integer page, Integer
-            pageSize) throws InvalidKieServerException {
+    public List<RunningInstance> getRunningInstances(String kieServerId, String containerId, Integer page, Integer
+        pageSize) throws InvalidKieServerException {
         ProcessServicesClient processServicesClient = getProcessServicesClient(kieServerId);
         List<ProcessInstance> instanceList = processServicesClient.findProcessInstances(containerId, page, pageSize);
 
@@ -141,25 +149,47 @@ public class KieServiceImpl implements KieService {
     }
 
     @Override
-    public boolean existsProcessDefinition(String containerId, String processId, String kieServerId) throws
-            InvalidKieServerException {
-        QueryServicesClient queryService = getQueryServicesClient(kieServerId);
-        return queryService.findProcessByContainerIdProcessId(containerId, processId) != null;
+    public Map<String, Set<String>> getDefinitions(String kieServerId) throws InvalidKieServerException {
+        Map<String, Set<String>> definitions = new HashMap<>();
+        ServiceResponse<KieContainerResourceList> response = getClient(kieServerId).listContainers();
+        QueryServicesClient queryServicesClient = getQueryServicesClient(kieServerId);
+        response.getResult().getContainers().forEach(container -> {
+            if (!definitions.containsKey(container.getContainerId())) {
+                definitions.put(container.getContainerId(), new HashSet<>());
+            }
+            boolean finished = false;
+            Integer page = 0;
+            while (!finished) {
+                List<ProcessDefinition> processes = queryServicesClient.findProcessesByContainerId(container.getContainerId(), page++, DEFAULT_PAGE_SIZE);
+                if (processes.size() < DEFAULT_PAGE_SIZE) {
+                    finished = true;
+                }
+                processes.forEach(definition -> definitions.get(container.getContainerId()).add(definition.getId()));
+            }
+        });
+        return definitions;
     }
 
     @Override
-    public ProcessInfo getDefinition(String kieServerId, String containerId, String processId) throws
-            ProcessDefinitionNotFoundException, InvalidKieServerException {
+    public boolean existsProcessDefinition(String kieServerId, ProcessRef processRef) throws
+        InvalidKieServerException {
+        QueryServicesClient queryService = getQueryServicesClient(kieServerId);
+        return queryService.findProcessByContainerIdProcessId(processRef.getContainerId(), processRef.getProcessId()) != null;
+    }
+
+    @Override
+    public ProcessInfo getDefinition(String kieServerId, ProcessRef processRef) throws
+        ProcessDefinitionNotFoundException, InvalidKieServerException {
         ProcessInfo processInfo = new ProcessInfo();
 
         //get SVG file
         String svgFile;
         try {
-            svgFile = getUIServicesClient(kieServerId).getProcessImage(containerId, processId);
+            svgFile = getUIServicesClient(kieServerId).getProcessImage(processRef.getContainerId(), processRef.getProcessId());
         } catch (KieServicesHttpException e) {
             if (Response.Status.NOT_FOUND.getStatusCode() == e.getHttpCode()) {
-                logger.debug("Process definition {}:{} not found in {}", containerId, processId, kieServerId);
-                throw new ProcessDefinitionNotFoundException(kieServerId, containerId, processId);
+                logger.debug("Process definition {} not found in {}", processRef, kieServerId);
+                throw new ProcessDefinitionNotFoundException(kieServerId, processRef);
             } else {
                 logger.warn("Unable to fetch SVG file from {}", kieServerId, e);
                 throw e;
@@ -170,24 +200,20 @@ public class KieServiceImpl implements KieService {
         svgFile = svgFile.replaceAll("\\?shapeType=BACKGROUND", "_shapeType_BACKGROUND");
         processInfo.setSvgFile(svgFile);
 
-        ProcessDefinition pd = getProcessServicesClient(kieServerId).getProcessDefinition(containerId, processId);
-        if (!pd.getContainerId().equals(containerId)) {
-            throw new ProcessDefinitionNotFoundException(kieServerId, containerId, processId);
+        ProcessDefinition pd = getProcessServicesClient(kieServerId).getProcessDefinition(processRef.getContainerId(), processRef.getProcessId());
+        if (!pd.getContainerId().equals(processRef.getContainerId())) {
+            throw new ProcessDefinitionNotFoundException(kieServerId, processRef);
         }
-        ArrayList<String> values = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+        List<BpmNode> nodes = new ArrayList<>();
         if (pd.getNodes() != null) {
-            Collection<NodeDefinition> nodes = pd.getNodes();
-            for (NodeDefinition node : nodes) {
-                if (node.getType().equals("HumanTaskNode")) {
-                    values.add(node.getUniqueId());
-                    labels.add(node.getName() + ":" + node.getUniqueId());
-                }
-            }
+            nodes = pd.getNodes()
+                .stream()
+                .map(n -> new BpmNode().setId(n.getUniqueId()).setName(n.getName()).setType(n.getType()))
+                .collect(Collectors.toCollection(ArrayList::new));
         }
-        processInfo.setValues(values);
-        processInfo.setLabels(labels);
-        processInfo.setContainerId(containerId);
+        processInfo.setNodes(nodes);
+        processInfo.setContainerId(processRef.getContainerId());
+        processInfo.setProcessId(processRef.getProcessId());
         return processInfo;
     }
 
@@ -195,8 +221,7 @@ public class KieServiceImpl implements KieService {
         CredentialsProvider credentialsProvider = new EnteredCredentialsProvider(config.get(USERNAME), config.get(PASSWORD));
         KieServerConfig kieConfig = new KieServerConfig();
         kieConfig.setHost(config.get(HOST))
-                .setCredentialsProvider(credentialsProvider);
-        configs.put(kieConfig.getHost(), kieConfig);
+            .setCredentialsProvider(credentialsProvider);
         try {
             kieConfig.setClient(createKieServicesClient(kieConfig));
             logger.info("Loaded kie server configuration: {}", kieConfig);
@@ -217,11 +242,11 @@ public class KieServiceImpl implements KieService {
 
     private KieServicesClient getClient(String kieServerId) throws InvalidKieServerException {
         return configs.values()
-                .stream()
-                .filter(config -> kieServerId.equals(config.getId()))
-                .findFirst()
-                .orElseThrow(() -> new InvalidKieServerException(kieServerId))
-                .getClient();
+            .stream()
+            .filter(config -> kieServerId.equals(config.getId()))
+            .findFirst()
+            .orElseThrow(() -> new InvalidKieServerException(kieServerId))
+            .getClient();
     }
 
     private UIServicesClient getUIServicesClient(String kieServerId) throws InvalidKieServerException {

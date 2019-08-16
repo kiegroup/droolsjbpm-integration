@@ -15,6 +15,8 @@
  */
 package org.kie.processmigration.model;
 
+import java.time.Instant;
+
 import org.kie.server.api.model.instance.ProcessInstance;
 
 public class RunningInstance {
@@ -24,7 +26,7 @@ public class RunningInstance {
     private String name;
     private String description;
     private Integer state;
-    private String startTime;
+    private Instant startTime;
 
     public RunningInstance(int i, ProcessInstance p) {
         id = i;
@@ -32,7 +34,7 @@ public class RunningInstance {
         name = p.getProcessName();
         description = p.getProcessInstanceDescription();
         state = p.getState();
-        startTime = p.getDate().toString();
+        startTime = p.getDate().toInstant();
     }
 
     public int getId() {
@@ -75,11 +77,11 @@ public class RunningInstance {
         this.state = state;
     }
 
-    public String getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
 }

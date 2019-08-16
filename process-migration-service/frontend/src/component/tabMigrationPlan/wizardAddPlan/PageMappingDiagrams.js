@@ -1,66 +1,81 @@
-import React, { Component } from "react";
-
+import React from "react";
+import PropTypes from "prop-types";
 import { Button } from "patternfly-react";
 
-import PageMappingDiagramsSvgPan from "./PageMappingDiagramsSvgPan";
+import PageMappingDiagramSvgPan from "./PageMappingDiagramSvgPan";
+import { ControlLabel } from "patternfly-react/dist/js/components/Form";
+import Col from "patternfly-react/dist/js/components/Grid/Col";
 
-export default class PageMappingDiagrams extends Component {
-  displayDiagramButton(onclickAction, displayText) {
-    return (
-      <Button bsStyle="default" onClick={onclickAction}>
-        {displayText}
-      </Button>
-    );
+export default class PageMappingDiagrams extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showSourceDiagram: false,
+      showTargetDiagram: false
+    };
   }
 
+  toggleShowSourceDiagram = () => {
+    this.setState({
+      showSourceDiagram: !this.state.showSourceDiagram
+    });
+  };
+
+  toggleShowTargetDiagram = () => {
+    this.setState({
+      showTargetDiagram: !this.state.showTargetDiagram
+    });
+  };
+
   render() {
-    const sourceShown = {
-      display: this.props.sourceDiagramShown ? "block" : "none"
-    };
-
-    const targetShown = {
-      display: this.props.targetDiagramShown ? "block" : "none"
-    };
-
-    const sourceDisplayText = this.props.sourceDiagramShown
-      ? "Hide Source Diagram"
-      : "Show Source Diagram";
-    const targetDisplayText = this.props.targetDiagramShown
-      ? "Hide Target Diagram"
-      : "Show Target Diagram";
-
     return (
-      <div className="form-group">
-        <div>
-          {this.displayDiagramButton(
-            this.props.sourceDiagramButtonClick,
-            sourceDisplayText
-          )}
-          &nbsp;
-          {this.displayDiagramButton(
-            this.props.targetDiagramButtonClick,
-            targetDisplayText
-          )}
-        </div>
-        <br />
-        <label style={sourceShown}>
-          Source Process Definition Diagram
-          <PageMappingDiagramsSvgPan
-            svgcontents={this.props.sourceInfo.svgFile}
-            previousSelector={this.props.sourcePreviousSelector}
-            currentSelector={this.props.sourceCurrentSelector}
-          />
-        </label>
-        <br />
-        <label style={targetShown}>
-          Target Process Definition Diagram
-          <PageMappingDiagramsSvgPan
-            svgcontents={this.props.targetInfo.svgFile}
-            previousSelector={this.props.targetPreviousSelector}
-            currentSelector={this.props.targetCurrentSelector}
-          />
-        </label>
-      </div>
+      <React.Fragment>
+        <Col sm={4} className="text-right">
+          <Button onClick={this.toggleShowSourceDiagram}>
+            {this.state.showSourceDiagram ? "Hide" : "Show"} Source Diagram
+          </Button>
+        </Col>
+        <Col sm={4} className="text-right">
+          <Button onClick={this.toggleShowTargetDiagram}>
+            {this.state.showTargetDiagram ? "Hide" : "Show"} Target Diagram
+          </Button>
+        </Col>
+        {this.state.showSourceDiagram && (
+          <div className="col-sm-12">
+            <Col componentClass={ControlLabel}>Source diagram</Col>
+            <PageMappingDiagramSvgPan
+              svg={this.props.sourceProcess.svgFile}
+              previous={this.props.sourcePreviousNode}
+              current={this.props.sourceCurrentNode}
+            />
+          </div>
+        )}
+        {this.state.showTargetDiagram && (
+          <div className="col-sm-12">
+            <Col componentClass={ControlLabel}>Target diagram</Col>
+            <PageMappingDiagramSvgPan
+              svg={this.props.targetProcess.svgFile}
+              previous={this.props.targetPreviousNode}
+              current={this.props.targetCurrentNode}
+            />
+          </div>
+        )}
+      </React.Fragment>
     );
   }
 }
+PageMappingDiagrams.defaultProps = {
+  sourcePreviousNode: "",
+  sourceCurrentNode: "",
+  targetPreviousNode: "",
+  targetCurrentNode: ""
+};
+
+PageMappingDiagrams.propTypes = {
+  sourceProcess: PropTypes.object.isRequired,
+  targetProcess: PropTypes.object.isRequired,
+  sourcePreviousNode: PropTypes.string,
+  sourceCurrentNode: PropTypes.string,
+  targetPreviousNode: PropTypes.string,
+  targetCurrentNode: PropTypes.string
+};

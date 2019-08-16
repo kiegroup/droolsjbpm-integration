@@ -1,22 +1,76 @@
 import React from "react";
-import { render, cleanup } from "react-testing-library";
+import { render, cleanup, fireEvent } from "react-testing-library";
+
 import PageMigrationScheduler from "../../component/tabMigrationPlan/wizardExecuteMigration/PageMigrationScheduler.js";
 
 // automatically unmount and cleanup DOM after the test is finished.
 afterEach(cleanup);
 
-//Because PageMigrationScheduler's DataTime component will update everyday to disable selection of old dates, so using snap-shot wont' work.
-//instead I use react-testing-library here to compare expect components which I set a testId.
 test("PageMigrationScheduler renders expected components", () => {
-  const myMock = jest.fn();
-  const { getByTestId } = render(
+  const callbackFn = jest.fn();
+  const isValidFn = jest.fn();
+  const { container, getByLabelText } = render(
+    <PageMigrationScheduler onFieldChange={callbackFn} onIsValid={isValidFn} />
+  );
+
+  expect(container).toMatchSnapshot();
+  const callbackInput = getByLabelText("Callback URL");
+  expect(callbackInput).toHaveProperty("value", "");
+
+  fireEvent.change(callbackInput, {
+    target: { value: "some url" }
+  });
+
+  expect(callbackFn).toHaveBeenCalled();
+  expect(callbackFn.mock.calls[0][1]).toBe("some url");
+});
+
+test("PageMigrationScheduler renders error for wrong url", () => {
+  const callbackFn = jest.fn();
+  const isValidFn = jest.fn();
+  const { container, getByLabelText } = render(
     <PageMigrationScheduler
-      setCallbackUrl={myMock}
-      setScheduleStartTime={myMock}
+      callbackUrl="wrong url"
+      onFieldChange={callbackFn}
+      onIsValid={isValidFn}
     />
   );
 
-  expect(getByTestId("testid_callback")).toBeTruthy();
-  expect(getByTestId("testid_syncMode")).toBeTruthy();
-  expect(getByTestId("testid_asyncMode")).toBeTruthy();
+  expect(container).toMatchSnapshot();
+  const callbackInput = getByLabelText("Callback URL");
+  expect(callbackInput).toHaveProperty("value", "wrong url");
+});
+
+test("PageMigrationScheduler renders callback url", () => {
+  const callbackFn = jest.fn();
+  const isValidFn = jest.fn();
+  const callbackUrl = "https://example.com/callback";
+  const { container, getByLabelText } = render(
+    <PageMigrationScheduler
+      callbackUrl={callbackUrl}
+      onFieldChange={callbackFn}
+      onIsValid={isValidFn}
+    />
+  );
+
+  expect(container).toMatchSnapshot();
+  const callbackInput = getByLabelText("Callback URL");
+  expect(callbackInput).toHaveProperty("value", callbackUrl);
+});
+
+test("PageMigrationScheduler is scheduled", () => {
+  const callbackFn = jest.fn();
+  const isValidFn = jest.fn();
+  const callbackUrl = "https://example.com/callback";
+  const scheduledTime = "2019-7-17T20:59:22.128Z";
+  const { getByLabelText } = render(
+    <PageMigrationScheduler
+      callbackUrl={callbackUrl}
+      scheduledStartTime={scheduledTime}
+      onFieldChange={callbackFn}
+      onIsValid={isValidFn}
+    />
+  );
+
+  expect(getByLabelText("Schedule")).toHaveProperty("checked", true);
 });

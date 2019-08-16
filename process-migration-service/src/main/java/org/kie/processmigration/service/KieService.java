@@ -18,9 +18,12 @@ package org.kie.processmigration.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.kie.processmigration.model.KieServerConfig;
 import org.kie.processmigration.model.ProcessInfo;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
@@ -37,9 +40,11 @@ public interface KieService {
 
     boolean hasKieServer(String kieServerId);
 
-    ProcessInfo getDefinition(String kieServerId, String containerId, String processId) throws ProcessDefinitionNotFoundException, InvalidKieServerException;
+    Map<String, Set<String>> getDefinitions(String kieServerId) throws InvalidKieServerException;
 
-    boolean existsProcessDefinition(String containerId, String processId, String kieServerId) throws InvalidKieServerException;
+    ProcessInfo getDefinition(String kieServerId, ProcessRef processRef) throws ProcessDefinitionNotFoundException, InvalidKieServerException;
 
-    List<RunningInstance> getRunningInstances(String containerId, String kieServerId, Integer page, Integer pageSize) throws InvalidKieServerException;
+    boolean existsProcessDefinition(String kieServerId, ProcessRef processRef) throws InvalidKieServerException;
+
+    List<RunningInstance> getRunningInstances(String kieServerId, String containerId, Integer page, Integer pageSize) throws InvalidKieServerException;
 }

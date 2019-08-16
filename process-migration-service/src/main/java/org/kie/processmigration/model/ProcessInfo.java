@@ -15,15 +15,13 @@
  */
 package org.kie.processmigration.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ProcessInfo {
 
-    private ArrayList<BpmNode> nodes;
+    private List<BpmNode> nodes;
     private String containerId;
     private String processId;
-    private ArrayList<String> values;
-    private ArrayList<String> labels;
     private String svgFile;
 
     public String getProcessId() {
@@ -34,11 +32,11 @@ public class ProcessInfo {
         this.processId = processId;
     }
 
-    public ArrayList<BpmNode> getNodes() {
+    public List<BpmNode> getNodes() {
         return nodes;
     }
 
-    public void setNodes(ArrayList<BpmNode> nodes) {
+    public void setNodes(List<BpmNode> nodes) {
         this.nodes = nodes;
     }
 
@@ -48,22 +46,6 @@ public class ProcessInfo {
 
     public void setSvgFile(String svgFile) {
         this.svgFile = svgFile;
-    }
-
-    public ArrayList<String> getValues() {
-        return values;
-    }
-
-    public void setValues(ArrayList<String> values) {
-        this.values = values;
-    }
-
-    public ArrayList<String> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(ArrayList<String> labels) {
-        this.labels = labels;
     }
 
     public String getContainerId() {
@@ -77,8 +59,7 @@ public class ProcessInfo {
     @Override
     public String toString() {
         return "ProcessInfo [nodes=" + nodes
-                + ", containerId=" + containerId + ", processId=" + processId
-                + ", values=" + values + ", labels=" + labels
-                + "]";
+            + ", containerId=" + containerId
+            + ", processId=" + processId + "]";
     }
 }

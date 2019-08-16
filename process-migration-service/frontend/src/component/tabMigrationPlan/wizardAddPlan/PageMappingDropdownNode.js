@@ -1,43 +1,52 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { DropdownButton, MenuItem } from "patternfly-react";
 
 export default class PageMappingDropdownNode extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      title: this.props.title
-    };
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(option) {
-    const newTitle = this.props.title + ":" + option;
-    this.setState({ title: newTitle });
-    this.props.onDropdownChange(option);
   }
 
   createMenuItems(options) {
     let menuItems = [];
-    for (var i = 0; i < options.length; i++) {
-      const value = options[i].value;
-      const label = options[i].label;
-      menuItems.push(
-        <MenuItem key={i} eventKey={value} onSelect={this.handleChange}>
-          {label}
-        </MenuItem>
+    if (options !== undefined && options !== null) {
+      options = options.sort(
+        (a, b) =>
+          a.name !== undefined &&
+          a.name !== null &&
+          a.name.localeCompare(b.name)
       );
+      for (var i = 0; i < options.length; i++) {
+        const name = options[i].name;
+        const type = options[i].type;
+        if (name !== undefined && name !== null && name.trim().length > 0) {
+          menuItems.push(
+            <MenuItem
+              key={i}
+              eventKey={options[i]}
+              onSelect={this.props.onDropdownChange}
+            >
+              {name} ({type})
+            </MenuItem>
+          );
+        }
+      }
     }
     return menuItems;
   }
 
   render() {
     return (
-      <div>
-        <DropdownButton title={this.state.title} id="PageMappingDropdownButton">
-          {this.createMenuItems(this.props.options)}
-        </DropdownButton>
-      </div>
+      <DropdownButton title={this.props.title} id="nodeMappingDropdown">
+        {this.createMenuItems(this.props.options)}
+      </DropdownButton>
     );
   }
 }
+
+PageMappingDropdownNode.propTypes = {
+  title: PropTypes.string.isRequired,
+  options: PropTypes.array.isRequired,
+  onDropdownChange: PropTypes.func.isRequired
+};

@@ -5,6 +5,6 @@ import MigrationPlans from "../../component/tabMigrationPlan/MigrationPlans";
 describe("Main Page for Migration Plan", () => {
   it("renders without crashing", () => {
     const div = document.createElement("div");
-    ReactDOM.render(<MigrationPlans />, div);
+    ReactDOM.render(<MigrationPlans kieServerId="kieServer1" />, div);
   });
 });

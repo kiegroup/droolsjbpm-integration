@@ -1,0 +1,17 @@
+{
+  "evaluation_2.0.0-SNAPSHOT": [
+    "old_evaluation",
+    "some_process_1"
+  ],
+  "evaluation_3.0.0-SNAPSHOT": [
+    "new_evaluation"
+  ],
+  "Mortgage_Process.MortgageApprovalProcess_1.0.0-SNAPSHOT": [
+    "Mortgage_Process.MortgageApprovalProcess",
+    "Mortgage_Process.MortgageRejectionProcess"
+  ],
+  "mock_error": [
+    "notfound",
+    "other"
+  ]
+}

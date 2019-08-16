@@ -1,191 +1,191 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { Button } from "patternfly-react";
 
 import PageMappingDiagrams from "./PageMappingDiagrams";
 import PageMappingDropdownNode from "./PageMappingDropdownNode";
+import Notification from "../../Notification";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
+import { Form } from "patternfly-react/dist/js/components/Form";
+import Col from "patternfly-react/dist/js/components/Grid/Col";
+import FormGroup from "patternfly-react/dist/js/components/Form/FormGroup";
+import ControlLabel from "patternfly-react/dist/js/components/Form/ControlLabel";
+import Label from "patternfly-react/dist/js/components/Label/Label";
 
 export default class PageMapping extends Component {
-  //need to provide some dummy data for the selectors which are used in svg pan, because
-  //it's required and can't be empty, and need to start with "_"
-  //can't do the initial in the sub components like PageMappingDiagramsSvgPan because they
-  //are passed in through props
   constructor(props) {
     super(props);
     this.state = {
-      sourceNodeStr: "",
-      targetNodeStr: "",
-      sourceDiagramShown: false,
-      targetDiagramShown: false,
-      sourceCurrentSelector: "_Dummy123",
-      sourcePreviousSelector: "_Dummy123",
-      targetCurrentSelector: "_Dummy123",
-      targetPreviousSelector: "_Dummy123"
+      errorMsg: ""
     };
+    // The mappings page doesn't require any validation
+    this.props.onIsValid(true);
   }
-
-  componentDidUpdate() {
-    var mappingField = document.getElementById("nodeMappingField");
-    if (mappingField != null) {
-      if (this.props.mappings !== null && this.props.mappings != "") {
-        if (mappingField.value === null || mappingField.value === "") {
-          mappingField.value = JSON.stringify(this.props.mappings);
-        }
-      }
-    }
-  }
-
-  handleSourceDiagramButtonClick = () => {
-    this.setState({
-      sourceDiagramShown: !this.state.sourceDiagramShown
-    });
-  };
-
-  handleTargetDiagramButtonClick = () => {
-    this.setState({
-      targetDiagramShown: !this.state.targetDiagramShown
-    });
-  };
 
   handleSourceDropdownChange = option => {
-    let tmpPreviousSelector = this.state.sourceCurrentSelector;
-    let tmpCurrentSelector = "#" + option + "_shapeType_BACKGROUND";
     this.setState({
-      sourceNodeStr: option,
-      sourcePreviousSelector: tmpPreviousSelector,
-      sourceCurrentSelector: tmpCurrentSelector,
-      sourceDiagramShown: true,
-      targetDiagramShown: false
+      sourceNodeTitle: `${option.name} (${option.type})`,
+      sourceNode: option,
+      sourcePreviousNode: this.state.sourceCurrentNode,
+      sourceCurrentNode: option.id
     });
   };
 
   handleTargetDropdownChange = option => {
-    let tmpPreviousSelector = this.state.targetCurrentSelector;
-    let tmpCurrentSelector = "#" + option + "_shapeType_BACKGROUND";
-
     this.setState({
-      targetNodeStr: option,
-      targetPreviousSelector: tmpPreviousSelector,
-      targetCurrentSelector: tmpCurrentSelector,
-      sourceDiagramShown: false,
-      targetDiagramShown: true
+      targetNodeTitle: `${option.name} (${option.type})`,
+      targetNode: option,
+      targetPreviousNode: this.state.targetCurrentNode,
+      targetCurrentNode: option.id
     });
   };
 
   handleMapButtonClick = () => {
     if (
-      this.state.sourceNodeStr.length > 0 &&
-      this.state.targetNodeStr.length > 0
+      this.state.sourceNode !== undefined &&
+      this.state.targetNode !== undefined
     ) {
-      var currentNodeMapping =
-        '"' +
-        this.state.sourceNodeStr +
-        '"' +
-        ":" +
-        '"' +
-        this.state.targetNodeStr +
-        '"';
-
-      var input = document.getElementById("nodeMappingField");
-      var currentInputValue = input.value;
-      //remove {} before add new node mapping values
-      currentInputValue = currentInputValue.replace(/{/g, "");
-      currentInputValue = currentInputValue.replace(/}/g, "");
-      if (currentInputValue.length > 0) {
-        currentInputValue = currentInputValue + "," + currentNodeMapping;
-      } else {
-        currentInputValue = currentNodeMapping;
+      if (this.state.sourceNode.type !== this.state.targetNode.type) {
+        this.setState({
+          errorMsg: "Source and Target nodes must be of the same type"
+        });
+        return;
       }
-
-      currentInputValue = "{" + currentInputValue + "}";
-
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype,
-        "value"
-      ).set;
-      nativeInputValueSetter.call(input, currentInputValue);
-
-      //once fired the event, this currentInputValue will be saved in the wizard form's values
-      var ev2 = new Event("input", { bubbles: true });
-      input.dispatchEvent(ev2);
+      let mappings = this.props.plan.mappings;
+      if (mappings === undefined) {
+        mappings = {};
+      }
+      if (mappings[this.state.sourceNode.id]) {
+        this.setState({
+          errorMsg: "You cannot map the same source node multiple times"
+        });
+        return;
+      }
+      mappings[this.state.sourceNode.id] = this.state.targetNode.id;
+      this.props.onMappingsChange(mappings);
     }
   };
 
-  MappingButton() {
-    return (
-      <Button bsStyle="primary" onClick={this.handleMapButtonClick}>
-        Map these two nodes
-      </Button>
-    );
-  }
+  deleteMapping = id => {
+    const mappings = this.props.plan.mappings;
+    delete mappings[id];
+    this.props.onMappingsChange(mappings);
+  };
+
+  buildMappings = () => {
+    const mappingValues = [];
+    const mappings = this.props.plan.mappings;
+    if (mappings === undefined || mappings === {}) {
+      return mappingValues;
+    }
+    Object.keys(mappings).forEach(key => {
+      const filteredSource = this.props.sourceProcess.nodes.filter(
+        node => node.id === key
+      );
+      let sourceNode;
+      if (filteredSource.length === 1) {
+        sourceNode = filteredSource[0];
+      }
+      const filteredTarget = this.props.targetProcess.nodes.filter(
+        node => node.id === mappings[key]
+      );
+      let targetNode;
+      if (filteredTarget.length === 1) {
+        targetNode = filteredTarget[0];
+      }
+      if (sourceNode && targetNode) {
+        mappingValues.push({
+          id: sourceNode.id,
+          label: sourceNode.name + ">" + targetNode.name
+        });
+      }
+    });
+    return mappingValues;
+  };
+
+  buildMappingLabels = () =>
+    this.buildMappings().map(mapping => (
+      <Label
+        key={mapping.id}
+        style={{ margin: "5px 5px 0 0", display: "inline-block" }}
+        onRemoveClick={() => this.deleteMapping(mapping.id)}
+      >
+        {mapping.label}
+      </Label>
+    ));
 
   render() {
-    const sourceValues = this.props.sourceInfo.values;
-    const sourceLabels = this.props.sourceInfo.labels;
-    const sourceNode = [];
+    const notification = (
+      <Notification
+        type={ALERT_TYPE_ERROR}
+        message={this.state.errorMsg}
+        onDismiss={() => this.setState({ errorMsg: "" })}
+      />
+    );
     if (
-      this.props.sourceInfo !== null &&
-      this.props.sourceInfo !== "" &&
-      this.props.targetInfo !== null &&
-      this.props.targetInfo !== ""
+      this.props.sourceProcess.processId !== undefined &&
+      this.props.targetProcess.processId !== undefined
     ) {
-      for (var i = 0; i < sourceValues.length; i++) {
-        sourceNode.push({ value: sourceValues[i], label: sourceLabels[i] });
-      }
-
-      const targetValues = this.props.targetInfo.values;
-      const targetLabels = this.props.targetInfo.labels;
-      const targetNode = [];
-      for (var j = 0; j < targetValues.length; j++) {
-        targetNode.push({ value: targetValues[j], label: targetLabels[j] });
-      }
-
       return (
-        <div className="form-horizontal">
-          <div className="form-group">
-            <label>Source: {this.props.sourceInfo.processId}</label>
-            <PageMappingDropdownNode
-              options={sourceNode}
-              title="Source Nodes "
-              onDropdownChange={this.handleSourceDropdownChange}
+        <Form horizontal>
+          {this.state.errorMsg && notification}
+          <FormGroup controlId="mappingHeader">
+            <Col sm={4} componentClass={ControlLabel}>
+              Source: {this.props.sourceProcess.containerId} {" / "}
+              {this.props.sourceProcess.processId}
+            </Col>
+            <Col sm={4} componentClass={ControlLabel}>
+              Target: {this.props.targetProcess.containerId} {" / "}
+              {this.props.targetProcess.processId}
+            </Col>
+            <Col sm={4} />
+          </FormGroup>
+          <FormGroup controlId="mappingDropdowns">
+            <Col sm={4} className="text-right">
+              <PageMappingDropdownNode
+                options={this.props.sourceProcess.nodes}
+                title={
+                  this.state.sourceNodeTitle
+                    ? this.state.sourceNodeTitle
+                    : "Source Nodes"
+                }
+                onDropdownChange={this.handleSourceDropdownChange}
+              />
+            </Col>
+            <Col sm={4} className="text-right">
+              <PageMappingDropdownNode
+                options={this.props.targetProcess.nodes}
+                title={
+                  this.state.targetNodeTitle
+                    ? this.state.targetNodeTitle
+                    : "Target Nodes"
+                }
+                onDropdownChange={this.handleTargetDropdownChange}
+              />
+            </Col>
+            <Col sm={4}>
+              <Button bsStyle="primary" onClick={this.handleMapButtonClick}>
+                Map these two nodes
+              </Button>
+            </Col>
+          </FormGroup>
+          <FormGroup controlId="mappingLabels">
+            <Col sm={4} componentClass={ControlLabel}>
+              Mappings:
+            </Col>
+            <Col sm={8}>{this.buildMappingLabels()}</Col>
+          </FormGroup>
+          <FormGroup controlId="mappingDiagrams">
+            <PageMappingDiagrams
+              sourceCurrentNode={this.state.sourceCurrentNode}
+              sourcePreviousNode={this.state.sourcePreviousNode}
+              targetCurrentNode={this.state.targetCurrentNode}
+              targetPreviousNode={this.state.targetPreviousNode}
+              sourceProcess={this.props.sourceProcess}
+              targetProcess={this.props.targetProcess}
             />
-            <br />
-            <label>Target: {this.props.targetInfo.processId}</label>
-            <PageMappingDropdownNode
-              options={targetNode}
-              title="Target Nodes "
-              onDropdownChange={this.handleTargetDropdownChange}
-            />
-            <br />
-            {this.MappingButton()}
-          </div>
-
-          <div className="form-group">
-            <label>
-              Use the text field below to update mappings directly (e.g. to
-              delete an incorrect mapping)
-            </label>
-
-            <textarea
-              className="form-control"
-              name="mappings"
-              id="nodeMappingField"
-              rows="2"
-            />
-          </div>
-
-          <PageMappingDiagrams
-            sourceCurrentSelector={this.state.sourceCurrentSelector}
-            sourcePreviousSelector={this.state.sourcePreviousSelector}
-            targetCurrentSelector={this.state.targetCurrentSelector}
-            targetPreviousSelector={this.state.targetPreviousSelector}
-            sourceDiagramButtonClick={this.handleSourceDiagramButtonClick}
-            targetDiagramButtonClick={this.handleTargetDiagramButtonClick}
-            sourceDiagramShown={this.state.sourceDiagramShown}
-            targetDiagramShown={this.state.targetDiagramShown}
-            sourceInfo={this.props.sourceInfo}
-            targetInfo={this.props.targetInfo}
-          />
-        </div>
+          </FormGroup>
+        </Form>
       );
     } else {
       //no process info retrieved from backend yet, just display an empty tag to avoid error.
@@ -193,3 +193,11 @@ export default class PageMapping extends Component {
     }
   }
 }
+
+PageMapping.propTypes = {
+  plan: PropTypes.object.isRequired,
+  sourceProcess: PropTypes.object.isRequired,
+  targetProcess: PropTypes.object.isRequired,
+  onMappingsChange: PropTypes.func.isRequired,
+  onIsValid: PropTypes.func.isRequired
+};

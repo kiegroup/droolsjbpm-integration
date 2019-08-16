@@ -5,20 +5,11 @@ import evaluationDef from "../../../mock_data/process_definition_evaluation.json
 import mortgageDef from "../../../mock_data/process_definition_mortgage.json";
 
 test("PageMappingDiagrams renders correctly using snapshot", () => {
-  const myMock = jest.fn();
   const tree = renderer
     .create(
       <PageMappingDiagrams
-        sourceCurrentSelector=""
-        sourcePreviousSelector=""
-        targetCurrentSelector=""
-        targetPreviousSelector=""
-        sourceDiagramButtonClick={myMock}
-        targetDiagramButtonClick={myMock}
-        sourceDiagramShown="false"
-        targetDiagramShown="false"
-        sourceInfo={evaluationDef}
-        targetInfo={mortgageDef}
+        sourceProcess={evaluationDef}
+        targetProcess={mortgageDef}
       />
     )
     .toJSON();

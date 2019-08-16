@@ -2,8 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 
 export default class WizardBase extends React.Component {
+  constructor(props, steps) {
+    super(props);
+    this.steps = steps;
+  }
   onBackButtonClick = () => {
-    const { steps } = this.props;
     const { activeStepIndex, activeSubStepIndex } = this.state;
 
     if (activeSubStepIndex > 0) {
@@ -14,26 +17,24 @@ export default class WizardBase extends React.Component {
       this.setState(prevState => ({
         activeStepIndex: prevState.activeStepIndex - 1,
         activeSubStepIndex:
-          steps[prevState.activeStepIndex - 1].subSteps.length - 1
+          this.steps[prevState.activeStepIndex - 1].subSteps.length - 1
       }));
     }
   };
 
   onNextButtonClick = () => {
-    const { steps } = this.props;
     const { activeStepIndex, activeSubStepIndex } = this.state;
-    const activeStep = steps[activeStepIndex];
+    const activeStep = this.steps[activeStepIndex];
     if (activeSubStepIndex < activeStep.subSteps.length - 1) {
       this.setState(prevState => ({
         activeSubStepIndex: prevState.activeSubStepIndex + 1
       }));
-    } else if (activeStepIndex < steps.length - 1) {
+    } else if (activeStepIndex < this.steps.length - 1) {
       this.setState(prevState => ({
         activeStepIndex: prevState.activeStepIndex + 1,
         activeSubStepIndex: 0
       }));
     }
-    this.convertFormDataToJson();
   };
 
   onStepClick = stepIndex => {
@@ -54,10 +55,9 @@ WizardBase.propTypes = {
   /** Initial step index */
   initialStepIndex: PropTypes.number,
   /** Initial sub step index */
-  initialSubStepIndex: PropTypes.number,
-  /** Wizard steps */
-  steps: PropTypes.array.isRequired
+  initialSubStepIndex: PropTypes.number
 };
+
 WizardBase.defaultProps = {
   initialStepIndex: 0,
   initialSubStepIndex: 0

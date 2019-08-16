@@ -16,19 +16,28 @@
 
 package org.kie.processmigration.service;
 
+import java.util.Properties;
 import java.util.function.Function;
 
 import javax.enterprise.inject.spi.InjectionPoint;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.junit.After;
 import org.kie.processmigration.persistence.TestEntityManager;
+import org.kie.test.util.db.PersistenceUtil;
+import org.kie.test.util.db.PoolingDataSourceWrapper;
 import org.mockito.Mockito;
 
 public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
 
-    protected EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("migration-test");
+    private PoolingDataSourceWrapper ds;
+    private EntityManagerFactory emf;
+
+    protected EntityManagerFactory entityManagerFactory = getEntityManagerFactory();
 
     protected EntityManager entityManager = Mockito.spy(new TestEntityManager(entityManagerFactory));
 
@@ -38,5 +47,22 @@ public abstract class AbstractPersistenceTest extends AbstractBeanBasedTest {
 
     protected Function<InjectionPoint, Object> getPCFactory() {
         return ip -> entityManager;
+    }
+
+    private EntityManagerFactory getEntityManagerFactory() {
+        Properties dsProps = PersistenceUtil.getDatasourceProperties();
+        ds = PersistenceUtil.setupPoolingDataSource(dsProps, "jdbc/testDS1");
+        emf = Persistence.createEntityManagerFactory("org.kie.test.persistence");
+        return emf;
+    }
+
+    @After
+    public void closeResources() {
+        if(emf != null) {
+            emf.close();
+        }
+        if(ds != null) {
+            ds.close();
+        }
     }
 }

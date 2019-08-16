@@ -40,6 +40,7 @@ import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
 import org.kie.processmigration.model.MigrationReport;
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.InvalidMigrationException;
 import org.kie.processmigration.model.exceptions.MigrationNotFoundException;
@@ -59,6 +60,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMapOf;
@@ -73,11 +75,11 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
     @Rule
     public WeldInitiator weld = WeldInitiator
-            .from(PlanServiceImpl.class, MigrationServiceImpl.class, TransactionHelper.class)
-            .addBeans(createMockBean(KieService.class), createMockBean(SchedulerService.class))
-            .setPersistenceContextFactory(getPCFactory())
-            .inject(this)
-            .build();
+        .from(PlanServiceImpl.class, MigrationServiceImpl.class, TransactionHelper.class)
+        .addBeans(createMockBean(KieService.class), createMockBean(SchedulerService.class))
+        .setPersistenceContextFactory(getPCFactory())
+        .inject(this)
+        .build();
     @Inject
     private MigrationService migrationService;
     @Inject
@@ -106,15 +108,15 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         // Setup mock
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
         QueryServicesClient mockQueryServicesClient = Mockito.mock(QueryServicesClient.class);
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         for (long i = 1; i <= 3; i++) {
-            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSourceContainerId()));
+            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSource().getContainerId()));
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
 
         Mockito.when(kieServiceMock.getQueryServicesClient(anyString())).thenReturn(mockQueryServicesClient);
@@ -128,10 +130,10 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
         // Then
         for (long i = 1; i <= 3; i++) {
-            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSourceContainerId(),
+            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSource().getContainerId(),
                                                                           i,
-                                                                          plan.getTargetContainerId(),
-                                                                          plan.getTargetProcessId(),
+                                                                          plan.getTarget().getContainerId(),
+                                                                          plan.getTarget().getProcessId(),
                                                                           plan.getMappings());
         }
         List<Migration> migrations = migrationService.findAll();
@@ -159,7 +161,7 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
         QueryServicesClient mockQueryServicesClient = Mockito.mock(QueryServicesClient.class);
 
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         Mockito.when(kieServiceMock.getQueryServicesClient(anyString())).thenReturn(mockQueryServicesClient);
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
         addMockConfigs(kieServiceMock);
@@ -193,24 +195,24 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         // Setup mocks
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
         QueryServicesClient mockQueryServicesClient = Mockito.mock(QueryServicesClient.class);
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         for (long i = 1; i <= 110; i++) {
-            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSourceContainerId()));
+            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSource().getContainerId()));
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString()))
-                .thenReturn(mockProcessAdminServicesClient);
+            .thenReturn(mockProcessAdminServicesClient);
         Mockito.when(mockQueryServicesClient.findProcessInstancesByContainerId(anyString(), anyListOf(Integer.class), eq(0), anyInt()))
-                .thenReturn(buildProcessInstances(1, 100));
+            .thenReturn(buildProcessInstances(1, 100));
         Mockito.when(mockQueryServicesClient.findProcessInstancesByContainerId(anyString(), anyListOf(Integer.class), eq(1), anyInt()))
-                .thenReturn(buildProcessInstances(101, 110));
+            .thenReturn(buildProcessInstances(101, 110));
         Mockito.when(kieServiceMock.getQueryServicesClient(anyString()))
-                .thenReturn(mockQueryServicesClient);
+            .thenReturn(mockQueryServicesClient);
         addMockConfigs(kieServiceMock);
 
         // When
@@ -220,10 +222,10 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
         // Then
         for (long i = 1; i <= 110; i++) {
-            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSourceContainerId(),
+            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSource().getContainerId(),
                                                                           i,
-                                                                          plan.getTargetContainerId(),
-                                                                          plan.getTargetProcessId(),
+                                                                          plan.getTarget().getContainerId(),
+                                                                          plan.getTarget().getProcessId(),
                                                                           plan.getMappings());
         }
         List<Migration> migrations = migrationService.findAll();
@@ -253,15 +255,15 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
         QueryServicesClient mockQueryServicesClient = Mockito.mock(QueryServicesClient.class);
         for (long i = 2; i <= 3; i++) {
-            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSourceContainerId()));
+            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSource().getContainerId()));
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         Mockito.when(kieServiceMock.getQueryServicesClient(anyString())).thenReturn(mockQueryServicesClient);
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
         addMockConfigs(kieServiceMock);
@@ -273,10 +275,10 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
         // Then
         for (long i = 2; i <= 3; i++) {
-            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSourceContainerId(),
+            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSource().getContainerId(),
                                                                           i,
-                                                                          plan.getTargetContainerId(),
-                                                                          plan.getTargetProcessId(),
+                                                                          plan.getTarget().getContainerId(),
+                                                                          plan.getTarget().getProcessId(),
                                                                           plan.getMappings());
         }
         List<Migration> migrations = migrationService.findAll();
@@ -303,16 +305,16 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
         QueryServicesClient mockQueryServicesClient = Mockito.mock(QueryServicesClient.class);
         for (long i = 1; i <= 2; i++) {
-            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSourceContainerId()));
+            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSource().getContainerId()));
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
         Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(3L))).thenReturn(null);
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         Mockito.when(kieServiceMock.getQueryServicesClient(anyString())).thenReturn(mockQueryServicesClient);
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
         addMockConfigs(kieServiceMock);
@@ -324,10 +326,10 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
         // Then
         for (long i = 1; i <= 2; i++) {
-            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSourceContainerId(),
+            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSource().getContainerId(),
                                                                           i,
-                                                                          plan.getTargetContainerId(),
-                                                                          plan.getTargetProcessId(),
+                                                                          plan.getTarget().getContainerId(),
+                                                                          plan.getTarget().getProcessId(),
                                                                           plan.getMappings());
         }
         List<Migration> migrations = migrationService.findAll();
@@ -354,14 +356,14 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
         // Setup mock
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         for (long i = 1; i <= 3; i++) {
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
         addMockConfigs(kieServiceMock);
@@ -379,21 +381,21 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         // Given
         Plan plan = createPlan();
         Execution execution = new Execution()
-                .setType(ExecutionType.ASYNC)
-                .setScheduledStartTime(LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.UTC))
-                .setCallbackUrl(new URI("http://test.com/callback"));
+            .setType(ExecutionType.ASYNC)
+            .setScheduledStartTime(LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.UTC))
+            .setCallbackUrl(new URI("http://test.com/callback"));
         MigrationDefinition def = createMigrationDefinition(plan, execution);
 
         // Setup mock
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         for (long i = 1; i <= 3; i++) {
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
         addMockConfigs(kieServiceMock);
@@ -423,11 +425,11 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         // Setup mocks
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
         QueryServicesClient mockQueryServicesClient = Mockito.mock(QueryServicesClient.class);
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.FALSE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.FALSE);
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString()))
-                .thenReturn(mockProcessAdminServicesClient);
+            .thenReturn(mockProcessAdminServicesClient);
         Mockito.when(kieServiceMock.getQueryServicesClient(anyString()))
-                .thenReturn(mockQueryServicesClient);
+            .thenReturn(mockQueryServicesClient);
         addMockConfigs(kieServiceMock);
 
         // When
@@ -530,17 +532,17 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
                                                                            anyString(),
                                                                            anyString(),
                                                                            anyMapOf(String.class, String.class)))
-                .thenThrow(new RuntimeException("Foo"));
-        Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(1L))).thenReturn(buildProcessInstance(1L, plan.getSourceContainerId()));
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+            .thenThrow(new RuntimeException("Foo"));
+        Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(1L))).thenReturn(buildProcessInstance(1L, plan.getSource().getContainerId()));
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         for (long i = 2; i <= 3; i++) {
-            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSourceContainerId()));
+            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSource().getContainerId()));
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
 
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
@@ -554,10 +556,10 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
         // Then
         for (long i = 1; i <= 3; i++) {
-            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSourceContainerId(),
+            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSource().getContainerId(),
                                                                           i,
-                                                                          plan.getTargetContainerId(),
-                                                                          plan.getTargetProcessId(),
+                                                                          plan.getTarget().getContainerId(),
+                                                                          plan.getTarget().getProcessId(),
                                                                           plan.getMappings());
         }
         List<Migration> migrations = migrationService.findAll();
@@ -595,15 +597,15 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         Mockito.doNothing().when(getEntityManager()).persist(m);
         ProcessAdminServicesClient mockProcessAdminServicesClient = Mockito.mock(ProcessAdminServicesClient.class);
         QueryServicesClient mockQueryServicesClient = Mockito.mock(QueryServicesClient.class);
-        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), anyString(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(kieServiceMock.existsProcessDefinition(anyString(), any(ProcessRef.class))).thenReturn(Boolean.TRUE);
         for (long i = 1; i <= 3; i++) {
-            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSourceContainerId()));
+            Mockito.when(mockQueryServicesClient.findProcessInstanceById(eq(i))).thenReturn(buildProcessInstance(i, plan.getSource().getContainerId()));
             Mockito.when(mockProcessAdminServicesClient.migrateProcessInstance(anyString(),
                                                                                eq(i),
                                                                                anyString(),
                                                                                anyString(),
                                                                                anyMapOf(String.class, String.class)))
-                    .thenReturn(createReport(i));
+                .thenReturn(createReport(i));
         }
         Mockito.when(kieServiceMock.getProcessAdminServicesClient(anyString())).thenReturn(mockProcessAdminServicesClient);
         Mockito.when(kieServiceMock.getQueryServicesClient(anyString())).thenReturn(mockQueryServicesClient);
@@ -618,15 +620,15 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
         ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
         verify(getEntityManager(), times(5)).persist(argument.capture());
         List<MigrationReport> reports = argument.getAllValues().stream()
-                .filter(o -> o.getClass().equals(MigrationReport.class))
-                .map(o -> (MigrationReport) o)
-                .sorted((a, b) -> a.getProcessInstanceId().compareTo(b.getProcessInstanceId()))
-                .collect(Collectors.toList());
+            .filter(o -> o.getClass().equals(MigrationReport.class))
+            .map(o -> (MigrationReport) o)
+            .sorted((a, b) -> a.getProcessInstanceId().compareTo(b.getProcessInstanceId()))
+            .collect(Collectors.toList());
         for (Long i = 1L; i <= 3; i++) {
-            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSourceContainerId(),
+            verify(mockProcessAdminServicesClient).migrateProcessInstance(plan.getSource().getContainerId(),
                                                                           i,
-                                                                          plan.getTargetContainerId(),
-                                                                          plan.getTargetProcessId(),
+                                                                          plan.getTarget().getContainerId(),
+                                                                          plan.getTarget().getProcessId(),
                                                                           plan.getMappings());
             MigrationReport r = reports.get(i.intValue() - 1);
             assertEquals(Long.valueOf(m.getId()), r.getMigrationId());
@@ -650,10 +652,9 @@ public class MigrationServiceImplTest extends AbstractPersistenceTest {
 
     private Plan createPlan() {
         Plan plan = new Plan();
-        plan.setSourceContainerId("containerId");
         plan.setName("name");
-        plan.setTargetContainerId("targetContainerId");
-        plan.setTargetProcessId("targetProcessId");
+        plan.setSource(new ProcessRef().setContainerId("sourceContainerId").setProcessId("sourceProcessId"));
+        plan.setTarget(new ProcessRef().setContainerId("targetContainerId").setProcessId("targetProcessId"));
         plan.setDescription("description");
         Map<String, String> mappings = new HashMap<>();
         mappings.put("source1", "target1");

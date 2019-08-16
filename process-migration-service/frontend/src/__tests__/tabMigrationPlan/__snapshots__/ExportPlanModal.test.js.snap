@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExportPlanModal renders correctly using snapshot 1`] = `
+<button
+  className="btn btn-link"
+  disabled={false}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseOut={[Function]}
+  onMouseOver={[Function]}
+  type="button"
+>
+  <span
+    aria-hidden="true"
+    className="pficon pficon-export"
+  />
+</button>
+`;
