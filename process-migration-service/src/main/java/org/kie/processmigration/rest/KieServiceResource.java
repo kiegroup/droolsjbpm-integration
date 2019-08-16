@@ -16,6 +16,8 @@
 package org.kie.processmigration.rest;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -28,12 +30,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.kie.processmigration.model.ProcessInfo;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.model.RunningInstance;
 import org.kie.processmigration.model.exceptions.InvalidKieServerException;
 import org.kie.processmigration.model.exceptions.ProcessDefinitionNotFoundException;
 import org.kie.processmigration.service.KieService;
 
-@Path("/kieserver")
+@Path("/kieservers")
 @Produces(MediaType.APPLICATION_JSON)
 public class KieServiceResource {
 
@@ -49,14 +52,21 @@ public class KieServiceResource {
     }
 
     @GET
+    @Path("/{kieServerId}/definitions")
+    public Response getDefinitions(@PathParam("kieServerId") String kieServerId) throws InvalidKieServerException {
+        Map<String, Set<String>> definitions = kieService.getDefinitions(kieServerId);
+        return Response.ok(definitions).build();
+    }
+
+    @GET
     @Path("/{kieServerId}/definitions/{containerId}/{processId}")
     public Response getDefinition(
-            @PathParam("kieServerId") String kieServerId,
-            @PathParam("containerId") String containerId,
-            @PathParam("processId") String processId
+        @PathParam("kieServerId") String kieServerId,
+        @PathParam("containerId") String containerId,
+        @PathParam("processId") String processId
     ) throws InvalidKieServerException {
         try {
-            ProcessInfo definition = kieService.getDefinition(kieServerId, containerId, processId);
+            ProcessInfo definition = kieService.getDefinition(kieServerId, new ProcessRef().setContainerId(containerId).setProcessId(processId));
             return Response.ok(definition).build();
         } catch (ProcessDefinitionNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
@@ -64,12 +74,12 @@ public class KieServiceResource {
     }
 
     @GET
-    @Path("/instances")
-    public Response getRunningInstances(@QueryParam("containerId") String containerId,
-                                        @QueryParam("kieServerId") String kieServerId,
+    @Path("/{kieServerId}/instances/{containerId}")
+    public Response getRunningInstances(@PathParam("kieServerId") String kieServerId,
+                                        @PathParam("containerId") String containerId,
                                         @DefaultValue(DEFAULT_PAGE) @QueryParam("page") Integer page,
                                         @DefaultValue(DEFAULT_PAGE_SIZE) @QueryParam("pageSize") Integer pageSize) throws InvalidKieServerException {
-        List<RunningInstance> result = kieService.getRunningInstances(containerId, kieServerId, page, pageSize);
+        List<RunningInstance> result = kieService.getRunningInstances(kieServerId, containerId, page, pageSize);
         return Response.ok(result).build();
     }
 }

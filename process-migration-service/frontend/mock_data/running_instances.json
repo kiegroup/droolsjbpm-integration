@@ -5,7 +5,7 @@
       "name": "Evaluation",
       "description": "mockup_Evaluation",
       "state": 1,
-      "startTime": "2019-01-06 21:06:55"
+      "startTime": "2019-01-06T21:06:55:123Z"
     },
     {
       "id": 2,
@@ -13,7 +13,7 @@
       "name": "Evaluation",
       "description": "mockup_Evaluation",
       "state": 1,
-      "startTime": "2019-01-06 21:30:23"
+      "startTime": "2019-01-06T21:30:23:123Z"
     },
     {
       "id": 3,
@@ -21,7 +21,7 @@
       "name": "Evaluation",
       "description": "mockup_Evaluation",
       "state": 1,
-      "startTime": "2019-01-06 21:49:27"
+      "startTime": "2019-01-06T21:49:27:123Z"
     },
     {
       "id": 4,
@@ -29,7 +29,7 @@
       "name": "Evaluation",
       "description": "mockup_Evaluation",
       "state": 1,
-      "startTime": "2019-01-06 21:49:34"
+      "startTime": "2019-01-06T21:49:34:123Z"
     },
     {
       "id": 5,
@@ -37,7 +37,7 @@
       "name": "Evaluation",
       "description": "mockup_Evaluation",
       "state": 1,
-      "startTime": "2019-01-06 21:58:54"
+      "startTime": "2019-01-06T21:58:54:123Z"
     },
     {
       "id": 6,
@@ -45,6 +45,6 @@
       "name": "Evaluation",
       "description": "mockup_Evaluation",
       "state": 1,
-      "startTime": "2019-01-06 21:59:04"
+      "startTime": "2019-01-06T21:59:04:123Z"
     }
   ]

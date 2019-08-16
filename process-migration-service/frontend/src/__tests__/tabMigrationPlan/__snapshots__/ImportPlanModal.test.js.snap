@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ImportPlanModal renders correctly using snapshot 1`] = `
+<button
+  className="btn btn-default"
+  disabled={false}
+  onClick={[Function]}
+  type="button"
+>
+  Import
+</button>
+`;

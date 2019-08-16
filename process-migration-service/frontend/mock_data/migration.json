@@ -3,19 +3,15 @@
   "definition": {
     "execution": {
       "type": "ASYNC",
-      "callback_url": "This is mockup reponse",
-      "scheduled_start_time": null
+      "callbackUrl": "This is mockup response",
+      "scheduledStartTime": null
     },
-    "plan_id": 2,
-    "process_instance_ids": [
+    "planId": 2,
+    "processInstanceIds": [
       1
     ],
     "kieServerId": "sample-server"
   },
   "status": "CREATED",
-  "created_at": "2019-01-12T01:04:52.035",
-  "started_at": null,
-  "finished_at": null,
-  "cancelled_at": null,
-  "error_message": null
+  "createdAt": "2019-07-17T20:59:22.128Z"
 }

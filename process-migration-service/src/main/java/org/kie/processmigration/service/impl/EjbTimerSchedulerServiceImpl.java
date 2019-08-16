@@ -64,9 +64,9 @@ public class EjbTimerSchedulerServiceImpl implements SchedulerService {
             timerService.createTimer(new Date(), migrationId);
         } else {
             Date startTime = Date.from(migration
-                                               .getDefinition()
-                                               .getExecution()
-                                               .getScheduledStartTime());
+                                           .getDefinition()
+                                           .getExecution()
+                                           .getScheduledStartTime());
             timerService.createTimer(startTime, migrationId);
         }
     }
@@ -74,8 +74,8 @@ public class EjbTimerSchedulerServiceImpl implements SchedulerService {
     @Override
     public void reScheduleMigration(Migration migration) {
         Optional<Timer> timer = timerService.getTimers()
-                .stream()
-                .filter(t -> t.getInfo().equals(migration.getId())).findFirst();
+            .stream()
+            .filter(t -> t.getInfo().equals(migration.getId())).findFirst();
         if (timer.isPresent()) {
             timer.get().cancel();
             scheduleMigration(migration);

@@ -1,125 +1,185 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PageDefinition renders correctly using snapshot 1`] = `
-<div
+<form
   className="form-horizontal"
 >
   
-  <p />
-  <div>
-    <div
-      className="form-group required"
-    >
-      <label
-        className="col-sm-2 control-label"
-      >
-        Source 
-         Container ID
-      </label>
-      <div
-        className="col-sm-10"
-      >
-        <input
-          className="form-control"
-          name="ContainerId"
-          onChange={[Function]}
-          type="text"
-        />
-      </div>
-    </div>
-    <div
-      className="form-group required"
-    >
-      <label
-        className="col-sm-2 control-label"
-      >
-        Source 
-         Process ID
-      </label>
-      <div
-        className="col-sm-10"
-      >
-        <input
-          className="form-control"
-          name="processId"
-          onChange={[Function]}
-          type="text"
-        />
-      </div>
-    </div>
-  </div>
-  <button
-    className="btn btn-default"
-    disabled={false}
-    onClick={[Function]}
-    type="button"
-  >
-    Copy Source To Target
-  </button>
-  <p />
-  <div>
-    <div
-      className="form-group required"
-    >
-      <label
-        className="col-sm-2 control-label"
-      >
-        Target 
-         Container ID
-      </label>
-      <div
-        className="col-sm-10"
-      >
-        <input
-          className="form-control"
-          name="ContainerId"
-          onChange={[Function]}
-          type="text"
-        />
-      </div>
-    </div>
-    <div
-      className="form-group required"
-    >
-      <label
-        className="col-sm-2 control-label"
-      >
-        Target 
-         Process ID
-      </label>
-      <div
-        className="col-sm-10"
-      >
-        <input
-          className="form-control"
-          name="processId"
-          onChange={[Function]}
-          type="text"
-        />
-      </div>
-    </div>
-  </div>
-  <button
-    className="btn btn-default"
-    disabled={false}
-    onClick={[Function]}
-    type="button"
-  >
-    Retrieve definitions from backend
-  </button>
   <div
-    className="form-group"
+    className="col-sm-12"
+  >
+    <h3>
+      Source
+    </h3>
+  </div>
+  <div
+    className="required form-group"
   >
     <label
-      className="col-sm-2 control-label"
+      className="col-sm-3 control-label"
+      htmlFor="Sourcedropdown_containerid"
     >
-      evaluation_2.0.0-SNAPSHOT
+      Container:
     </label>
-    <label
-      className="col-sm-2 control-label"
+    <div
+      className="col-sm-9"
     >
-      mortgage-process_1.0.0-SNAPSHOT
-    </label>
+      <div
+        className="dropdown btn-group"
+      >
+        <button
+          aria-expanded={false}
+          aria-haspopup={true}
+          className="dropdown-toggle btn btn-default"
+          disabled={false}
+          id="Source-ContainerDropdown"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+          type="button"
+        >
+          sourceContainerId
+           
+          <span
+            className="caret"
+          />
+        </button>
+        <ul
+          aria-labelledby="Source-ContainerDropdown"
+          className="dropdown-menu"
+          role="menu"
+        />
+      </div>
+    </div>
   </div>
-</div>
+  <div
+    className="required form-group"
+  >
+    <label
+      className="col-sm-3 control-label"
+      htmlFor="Sourcedropdown_processid"
+    >
+      Process:
+    </label>
+    <div
+      className="col-sm-9"
+    >
+      <div
+        className="dropdown btn-group"
+      >
+        <button
+          aria-expanded={false}
+          aria-haspopup={true}
+          className="dropdown-toggle btn btn-default"
+          disabled={false}
+          id="Source-ProcessDropdown"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+          type="button"
+        >
+          Select a process
+           
+          <span
+            className="caret"
+          />
+        </button>
+        <ul
+          aria-labelledby="Source-ProcessDropdown"
+          className="dropdown-menu"
+          role="menu"
+        />
+      </div>
+      
+    </div>
+  </div>
+  <div
+    className="col-sm-12"
+  >
+    <h3>
+      Target
+    </h3>
+  </div>
+  <div
+    className="required form-group"
+  >
+    <label
+      className="col-sm-3 control-label"
+      htmlFor="Targetdropdown_containerid"
+    >
+      Container:
+    </label>
+    <div
+      className="col-sm-9"
+    >
+      <div
+        className="dropdown btn-group"
+      >
+        <button
+          aria-expanded={false}
+          aria-haspopup={true}
+          className="dropdown-toggle btn btn-default"
+          disabled={false}
+          id="Target-ContainerDropdown"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+          type="button"
+        >
+          targetContainerId
+           
+          <span
+            className="caret"
+          />
+        </button>
+        <ul
+          aria-labelledby="Target-ContainerDropdown"
+          className="dropdown-menu"
+          role="menu"
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    className="required form-group"
+  >
+    <label
+      className="col-sm-3 control-label"
+      htmlFor="Targetdropdown_processid"
+    >
+      Process:
+    </label>
+    <div
+      className="col-sm-9"
+    >
+      <div
+        className="dropdown btn-group"
+      >
+        <button
+          aria-expanded={false}
+          aria-haspopup={true}
+          className="dropdown-toggle btn btn-default"
+          disabled={false}
+          id="Target-ProcessDropdown"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+          type="button"
+        >
+          Select a process
+           
+          <span
+            className="caret"
+          />
+        </button>
+        <ul
+          aria-labelledby="Target-ProcessDropdown"
+          className="dropdown-menu"
+          role="menu"
+        />
+      </div>
+      
+    </div>
+  </div>
+</form>
 `;

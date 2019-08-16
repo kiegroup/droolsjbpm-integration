@@ -69,26 +69,25 @@ public class KieServiceImplTest extends KieServiceImpl {
     public void testKieServerClients() throws InterruptedException {
         KieServiceImpl kieService = new KieServiceImplTest();
         Mockito.when(KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class)))
-                .thenAnswer(new Answer<KieServicesConfiguration>() {
-                    private int count = 0;
+            .thenAnswer(new Answer<KieServicesConfiguration>() {
+                private int count = 0;
 
-                    @Override
-                    public KieServicesConfiguration answer(InvocationOnMock invocation) {
-                        if (count++ == 1) {
-                            return getKieServicesConfig();
-                        }
-                        throw new NoEndpointFoundException("Mock error");
+                @Override
+                public KieServicesConfiguration answer(InvocationOnMock invocation) {
+                    if (count++ == 1) {
+                        return getKieServicesConfig();
                     }
-                });
+                    throw new NoEndpointFoundException("Mock error");
+                }
+            });
         Mockito.when(KieServicesFactory.newKieServicesClient(Mockito.any(KieServicesConfiguration.class)))
-                .thenReturn(Mockito.mock(KieServicesClient.class));
+            .thenReturn(Mockito.mock(KieServicesClient.class));
 
         countDownLatch = new CountDownLatch(1);
         kieService.loadConfigs();
         countDownLatch.await();
 
         PowerMockito.verifyStatic(KieServicesFactory.class, Mockito.times(2));
-        KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class));
         Collection<KieServerConfig> configs = kieService.getConfigs();
         Assert.assertNotNull(configs);
         Assert.assertEquals(1, configs.size());

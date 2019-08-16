@@ -49,6 +49,18 @@
     <pim.server.http.health>${pim.server.http.rest}/health/readiness</pim.server.http.health>
     <pim.username>kermit</pim.username>
     <pim.password>thefrog</pim.password>
+
+    <!-- JDBC Properties -->
+    <maven.hibernate.dialect>org.hibernate.dialect.H2Dialect</maven.hibernate.dialect>
+    <maven.datasource.classname>org.h2.jdbcx.JdbcDataSource</maven.datasource.classname>
+    <maven.jdbc.driver.class>org.h2.Driver</maven.jdbc.driver.class>
+    <maven.jdbc.username>sa</maven.jdbc.username>
+    <maven.jdbc.password>foo</maven.jdbc.password>
+    <maven.jdbc.url>jdbc:h2:mem:test</maven.jdbc.url>
+    <maven.jdbc.db.name/>
+    <maven.jdbc.db.server/>
+    <maven.jdbc.db.port/>
+    <maven.jdbc.schema>public</maven.jdbc.schema>
   </properties>
 
   <dependencyManagement>
@@ -113,6 +125,12 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>microprofile-config</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>narayana-jts-idlj</artifactId>
+          <groupId>org.jboss.narayana.jts</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.thorntail</groupId>
@@ -171,6 +189,11 @@
 
     <!-- Test -->
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.weld</groupId>
       <artifactId>weld-junit4</artifactId>
       <scope>test</scope>
@@ -227,6 +250,16 @@
   </dependencies>
   <build>
     <finalName>process-migration</finalName>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -314,10 +347,7 @@
               <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
               <resources>
                 <resource>
-                  <directory>frontend</directory>
-                  <includes>
-                    <include>bundle.js</include>
-                  </includes>
+                  <directory>frontend/dist</directory>
                 </resource>
               </resources>
             </configuration>
@@ -337,9 +367,6 @@
                   <includes>
                     <include>**/*</include>
                   </includes>
-                  <excludes>
-                    <exclude>*.map</exclude>
-                  </excludes>
                 </resource>
               </resources>
             </configuration>
@@ -600,38 +627,6 @@
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>openshift</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>io.fabric8</groupId>
-            <artifactId>fabric8-maven-plugin</artifactId>
-            <version>${version.fabric8-maven}</version>
-            <configuration>
-              <!-- <enricher> -->
-              <!-- <excludes> -->
-              <!-- <exclude>f8-expose</exclude> -->
-              <!-- </excludes> -->
-              <!-- <config> -->
-              <!-- <fmp-service> -->
-              <!-- <type>NodePort</type> -->
-              <!-- </fmp-service> -->
-              <!-- </config> -->
-              <!-- </enricher> -->
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>resource</goal>
-                  <goal>build</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
       </build>
     </profile>
   </profiles>

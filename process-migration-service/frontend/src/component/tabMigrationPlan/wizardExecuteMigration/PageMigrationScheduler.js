@@ -1,138 +1,167 @@
-import React, { Component } from "react";
+import React from "react";
+import PropTypes from "prop-types";
+
 import Datetime from "react-datetime";
 import validator from "validator";
 import moment from "moment";
+import FormGroup from "patternfly-react/dist/js/components/Form/FormGroup";
+import {
+  ControlLabel,
+  FormControl,
+  HelpBlock
+} from "patternfly-react/dist/js/components/Form";
+import Radio from "patternfly-react/dist/js/components/Form/Radio";
 
-export default class PageMigrationScheduler extends Component {
+export default class PageMigrationScheduler extends React.Component {
   constructor(props) {
     super(props);
+    const isValidUrl = this.validateCallbackUrl(props.callbackUrl) === null;
+    const isValidTime =
+      this.validateScheduledStartTime(
+        this.formatScheduledStartTime(props.scheduledStartTime)
+      ) === null;
     this.state = {
-      validationMessageUrl: "",
-      validationMessageTime: "",
-      scheduleMigration: false
+      scheduleMigration: this.props.scheduledStartTime !== "",
+      isValidUrl,
+      isValidTime,
+      showTimePicker: false
     };
+    this.onValidationChange(isValidUrl, isValidTime);
   }
+
+  onValidationChange = (isValidUrl, isValidTime) => {
+    this.props.onIsValid(isValidUrl && isValidTime);
+  };
+
+  validateCallbackUrl = callbackUrl => {
+    let validationMessageUrl = null;
+    if (
+      callbackUrl !== undefined &&
+      callbackUrl !== "" &&
+      !validator.isURL(callbackUrl, { require_tld: false })
+    ) {
+      validationMessageUrl = "error";
+    }
+    return validationMessageUrl;
+  };
+
+  validateScheduledStartTime = scheduledStartTime => {
+    if (scheduledStartTime === null || moment().diff(scheduledStartTime) < 0) {
+      return null;
+    }
+    return "error";
+  };
 
   changeCallbackUrl = event => {
     const inputUrl = event.target.value;
-    //user validator to set only the valid URL.
-    if (validator.isURL(inputUrl)) {
-      this.props.setCallbackUrl(inputUrl);
-      this.setState({
-        validationMessageUrl: ""
-      });
-    } else if (inputUrl == "") {
-      this.setState({
-        validationMessageUrl: ""
-      });
-    } else {
-      this.props.setCallbackUrl("");
-      this.setState({
-        validationMessageUrl: "Error: Callback input is not a valid URL."
-      });
-    }
-  };
-
-  disableScheduleTime = () => {
-    this.setState({
-      scheduleMigration: false
-    });
-    this.props.setScheduleStartTime("");
-  };
-
-  enableScheduleTime = () => {
-    this.setState({
-      scheduleMigration: true
-    });
+    const isValidUrl = this.validateCallbackUrl(inputUrl) === null;
+    this.props.onFieldChange("callbackUrl", inputUrl === "" ? null : inputUrl);
+    this.setState({ isValidUrl });
+    this.onValidationChange(isValidUrl, this.state.isValidTime);
   };
 
   handleDateTimeInput = inputMoment => {
-    if (moment(inputMoment, "YYYY-MM-DDTHH:mm:ss", true).isValid()) {
-      this.props.setScheduleStartTime(inputMoment.toDate());
-      this.setState({
-        validationMessageTime: ""
-      });
-    } else {
-      this.setState({
-        validationMessageTime: "Error: not valid time"
-      });
+    const validationMessageTime = this.validateScheduledStartTime(inputMoment);
+    const isValidTime = validationMessageTime === null;
+    if (isValidTime) {
+      this.props.onFieldChange("scheduledStartTime", inputMoment.format());
     }
+    this.setState({ isValidTime, validationMessageTime });
+    this.onValidationChange(this.state.isValidUrl, isValidTime);
   };
 
-  validDate = current => {
-    var yesterday = Datetime.moment().subtract(1, "day");
-    return current.isAfter(yesterday);
+  isDateSelectable = current =>
+    current.isAfter(Datetime.moment().subtract(1, "day"));
+
+  hideScheduleMigration = () => {
+    this.setState({
+      scheduleMigration: false
+    });
+    this.props.onFieldChange("scheduledStartTime", null);
+  };
+
+  formatScheduledStartTime = scheduledStartTime => {
+    if (scheduledStartTime === "") {
+      return null;
+    }
+    return moment(this.props.scheduledStartTime, "YYYY-MM-DDTHH:mm:ssZ", true);
   };
 
   render() {
+    const scheduledStartTime = this.formatScheduledStartTime(
+      this.props.scheduledStartTime
+    );
+    const callbackUrlValidation = this.validateCallbackUrl(
+      this.props.callbackUrl
+    );
+    const scheduledStartTimeValidation = this.validateScheduledStartTime(
+      scheduledStartTime
+    );
+
     return (
-      <div className="form-horizontal">
-        <div className="form-group">
-          <label
-            className="col-md-4 control-label"
-            data-testid="testid_callback"
-          >
-            Callback URL:
-          </label>
-          <div className="col-md-8">
-            <input
-              type="text"
-              name="callbackUrl"
-              onChange={this.changeCallbackUrl}
+      <React.Fragment>
+        <FormGroup
+          controlId="formMigrationScheduler_CallbackURL"
+          validationState={callbackUrlValidation}
+        >
+          <ControlLabel>Callback URL</ControlLabel>
+          <FormControl
+            type="text"
+            value={this.props.callbackUrl}
+            onChange={this.changeCallbackUrl}
+          />
+          <FormControl.Feedback />
+          {callbackUrlValidation && <HelpBlock>Enter a valid URL</HelpBlock>}
+        </FormGroup>
+        <FormGroup
+          controlId="formMigrationScheduler_Schedule"
+          validationState={scheduledStartTimeValidation}
+        >
+          <ControlLabel>Run migration</ControlLabel>
+          <FormGroup controlId="formMigrationScheduler_ScheduleRadio">
+            <Radio
+              checked={!this.state.scheduleMigration}
+              onChange={this.hideScheduleMigration}
+            >
+              Now
+            </Radio>
+            <Radio
+              checked={this.state.scheduleMigration}
+              onChange={() => this.setState({ scheduleMigration: true })}
+            >
+              Schedule
+            </Radio>
+          </FormGroup>
+          {this.state.scheduleMigration && (
+            <Datetime
+              id="PageMigrationScheduler_scheduleTime"
+              onChange={this.handleDateTimeInput}
+              isValidDate={this.isDateSelectable}
+              value={scheduledStartTime}
+              input
+              onFocus={() => this.setState({ showTimePicker: true })}
+              onBlur={() => this.setState({ showTimePicker: false })}
+              open={this.state.showTimePicker}
             />
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="col-md-4 control-label">Run migration:</label>
-          <div className="col-md-8">
-            <div className="radio">
-              <label data-testid="testid_syncMode">
-                <input
-                  type="radio"
-                  name="timeType"
-                  checked={!this.state.scheduleMigration}
-                  onChange={this.disableScheduleTime}
-                />
-                Now
-              </label>
-            </div>
-            <div className="radio">
-              <label data-testid="testid_asyncMode">
-                <input
-                  type="radio"
-                  name="timeType"
-                  onChange={this.enableScheduleTime}
-                />
-                Schedule
-                <Datetime
-                  id="PageMigrationScheduler_scheduleTime"
-                  input={this.state.scheduleMigration}
-                  onChange={this.handleDateTimeInput}
-                  isValidDate={this.validDate}
-                  open={this.state.scheduleMigration}
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div className="form-group" />
-
-        <div className="form-group" />
-
-        <div className="form-group" />
-
-        <div className="form-group">
-          <b>
-            <div className="col-md-8">{this.state.validationMessageUrl}</div>
-          </b>
-        </div>
-        <div className="form-group">
-          <b>
-            <div className="col-md-8">{this.state.validationMessageTime}</div>
-          </b>
-        </div>
-      </div>
+          )}
+          <FormControl.Feedback />
+          {scheduledStartTimeValidation && (
+            <HelpBlock>Select a valid date in the future</HelpBlock>
+          )}
+        </FormGroup>
+      </React.Fragment>
     );
   }
 }
+
+PageMigrationScheduler.defaultProps = {
+  callbackUrl: "",
+  scheduledStartTime: ""
+};
+
+PageMigrationScheduler.propTypes = {
+  callbackUrl: PropTypes.string,
+  scheduledStartTime: PropTypes.string,
+  onFieldChange: PropTypes.func.isRequired,
+  onIsValid: PropTypes.func.isRequired
+};

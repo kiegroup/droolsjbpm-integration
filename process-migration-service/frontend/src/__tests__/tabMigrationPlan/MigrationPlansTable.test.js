@@ -8,13 +8,10 @@ test("MigrationPlansTable renders correctly using snapshot", () => {
   const tree = renderer
     .create(
       <MigrationPlansTable
-        openMigrationWizard={myMock}
-        openAddPlanWizard={myMock}
-        openAddPlanWizardWithInitialData={myMock}
-        showDeleteDialog={myMock}
-        filteredPlans={plans}
-        updatePlan={myMock}
-        retrieveAllPlans={myMock}
+        plans={plans}
+        kieServerId="kieServer1"
+        onEditPlan={myMock}
+        onDeletePlan={myMock}
       />
     )
     .toJSON();

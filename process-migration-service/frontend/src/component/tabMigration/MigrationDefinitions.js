@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import axios from "axios";
+import React from "react";
 import validator from "validator";
 
 import {
@@ -11,11 +10,12 @@ import {
   actionHeaderCellFormatter
 } from "patternfly-react";
 
-import { BACKEND_URL } from "../common/PimConstants";
 import PageViewMigrationLogs from "./PageViewMigrationLogs";
 import PageEditMigrationDefinitionModal from "./PageEditMigrationDefinitionModal";
+import MigrationClient from "../../clients/migrationClient";
+import { HelpBlock } from "patternfly-react/dist/js/components/Form";
 
-export default class MigrationDefinitions extends Component {
+export default class MigrationDefinitions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,14 +40,10 @@ export default class MigrationDefinitions extends Component {
   };
 
   retrieveMigrationLogs = rowData => {
-    this.setState({
-      showLogDialog: true
-    });
-    const servicesUrl = BACKEND_URL + "/migrations/" + rowData.id + "/results";
-    axios.get(servicesUrl, {}).then(res => {
-      const results = res.data;
+    MigrationClient.getResults(rowData.id).then(migrationLogs => {
       this.setState({
-        migrationLogs: results
+        showLogDialog: true,
+        migrationLogs
       });
     });
   };
@@ -61,18 +57,15 @@ export default class MigrationDefinitions extends Component {
 
   hideDeleteDialog = () => {
     this.setState({
-      showDeleteConfirmation: false
+      showDeleteConfirmation: false,
+      deleteMigrationId: ""
     });
   };
 
   deleteMigration = () => {
-    //need to create a temp variable "self" to store this, so I can invoke this inside axios call
-    const self = this;
-    const servicesUrl =
-      BACKEND_URL + "/migrations/" + this.state.deleteMigrationId;
-    axios.delete(servicesUrl, {}).then(() => {
-      self.hideDeleteDialog();
-      self.retrieveMigrationDefinitions();
+    MigrationClient.delete(this.state.deleteMigrationId).then(() => {
+      this.hideDeleteDialog();
+      this.retrieveMigrationDefinitions();
     });
   };
 
@@ -88,34 +81,25 @@ export default class MigrationDefinitions extends Component {
       this.setState({
         validationMessage: "Error: migration id should be numeric"
       });
-    } else if (
-      event != null &&
-      event.currentTarget.id == "id_migrationDefinition_search_button" &&
-      (input == null || input.value == "")
-    ) {
-      //search button is pressed, need to judge migration id can't be empty
-      this.setState({
-        validationMessage:
-          "Error: To do a search, the migration id can't be empty"
-      });
     } else {
       //all good, so no need to outpt validation error message
       this.setState({
         validationMessage: ""
       });
       //search the migration record
+      let migrationRequest;
       if (input != null) {
-        let serviceUrl = BACKEND_URL + "/migrations/" + input.value;
         if (
           event != null &&
           event.currentTarget.id == "id_migrationDefinition_refresh_button"
         ) {
           //For refresh, just retrieve all records
-          serviceUrl = BACKEND_URL + "/migrations/";
+          migrationRequest = MigrationClient.getAll();
+        } else {
+          migrationRequest = MigrationClient.get(input.value);
         }
 
-        axios.get(serviceUrl, {}).then(res => {
-          var migrationsDefinitions = res.data;
+        migrationRequest.then(migrationsDefinitions => {
           if (migrationsDefinitions != null) {
             const tmpStr = JSON.stringify(migrationsDefinitions);
             if (tmpStr != "" && tmpStr.charAt(0) != "[") {
@@ -253,11 +237,7 @@ export default class MigrationDefinitions extends Component {
                   </Table.Button>
                 </OverlayTrigger>
               </Table.Actions>,
-              <DisplayActions
-                key="1"
-                rowData={rowData}
-                openEditMigration={this.openEditMigration}
-              />
+              <DisplayActions key="1" rowData={rowData} />
             ]
           ]
         },
@@ -281,13 +261,13 @@ export default class MigrationDefinitions extends Component {
     );
     const deleteIcon = <Icon type="pf" name="error-circle-o" />;
 
-    //only for status is "SCHEDULED" enable the "Edit" button
+    //only "SCHEDULED" migrations allow the "Edit" button
     function DisplayActions(props) {
       const rowData = props.rowData;
       if (rowData.status == "SCHEDULED") {
         return (
           <Table.Actions key="1">
-            <PageEditMigrationDefinitionModal rowData={rowData} />
+            <PageEditMigrationDefinitionModal migrationId={rowData.id} />
           </Table.Actions>
         );
       } else {
@@ -312,7 +292,7 @@ export default class MigrationDefinitions extends Component {
     }
 
     return (
-      <div>
+      <React.Fragment>
         {/* View migration logs pop-up */}
         <MessageDialog
           show={this.state.showLogDialog}
@@ -343,10 +323,9 @@ export default class MigrationDefinitions extends Component {
           accessibleName="deleteConfirmationDialog"
           accessibleDescription="deleteConfirmationDialogContent"
         />
-
         <br />
         <div className="row">
-          <div className="col-xs-12">
+          <div className="col-xs-9">
             <input
               id="id_migrationsDefinitions_input1"
               type="search"
@@ -359,8 +338,11 @@ export default class MigrationDefinitions extends Component {
             >
               <span className="fa fa-search" />
             </button>
-            {this.state.validationMessage}
-
+            {this.state.validationMessage && (
+              <HelpBlock>{this.state.validationMessage}</HelpBlock>
+            )}
+          </div>
+          <div className="col-xs-3">
             <div className="pull-right">
               <OverlayTrigger overlay={tooltipRefresh} placement={"bottom"}>
                 <button
@@ -375,15 +357,11 @@ export default class MigrationDefinitions extends Component {
           </div>
         </div>
         <br />
-        <div className="row">
-          <div className="col-xs-12">
-            <Table.PfProvider striped columns={resultBootstrapColumns}>
-              <Table.Header />
-              <Table.Body rows={this.state.migrationsDefinitions} rowKey="id" />
-            </Table.PfProvider>
-          </div>
-        </div>
-      </div>
+        <Table.PfProvider striped hover columns={resultBootstrapColumns}>
+          <Table.Header />
+          <Table.Body rows={this.state.migrationsDefinitions} rowKey="id" />
+        </Table.PfProvider>
+      </React.Fragment>
     );
   }
 }

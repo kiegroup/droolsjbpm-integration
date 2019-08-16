@@ -1,0 +1,228 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Main Page renders without crashing 1`] = `
+Array [
+  <nav
+    className="navbar navbar-default navbar-pf"
+  >
+    <nav
+      className="navbar navbar-default navbar-pf"
+    >
+      <div
+        className="navbar-header"
+      >
+        <button
+          className="navbar-toggle"
+          onClick={[Function]}
+        >
+          <span
+            className="sr-only"
+          >
+            Toggle navigation
+          </span>
+          <span
+            aria-hidden="true"
+            className="icon-bar"
+          />
+          <span
+            aria-hidden="true"
+            className="icon-bar"
+          />
+          <span
+            aria-hidden="true"
+            className="icon-bar"
+          />
+        </button>
+        <a
+          className="navbar-brand"
+          href="#"
+          onClick={[Function]}
+          role="button"
+        >
+          
+          
+          Process instance migration
+        </a>
+      </div>
+      <nav
+        className="collapse navbar-collapse"
+      >
+        <ul
+          className="nav navbar-nav navbar-right navbar-iconic navbar-utility"
+        >
+          <li
+            className="dropdown"
+          >
+            <button
+              aria-expanded={false}
+              aria-haspopup={true}
+              className="nav-item-iconic dropdown-toggle btn btn-link"
+              disabled={false}
+              id="kieservers-dropdown"
+              onClick={[Function]}
+              onKeyDown={[Function]}
+              role="button"
+              type="button"
+            >
+              <span>
+                <span
+                  aria-hidden={true}
+                  className="fa fa-server"
+                />
+                 
+                
+              </span>
+               
+              <span
+                className="caret"
+              />
+            </button>
+            <ul
+              aria-labelledby="kieservers-dropdown"
+              className="dropdown-menu"
+              role="menu"
+            />
+          </li>
+        </ul>
+      </nav>
+    </nav>
+    
+    <div
+      className="collapse navbar-collapse navbar-collapse-1"
+    >
+      <ul
+        className="nav navbar-nav navbar-primary"
+      >
+        <li
+          className=""
+          id="plans"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+          >
+            Migration plans
+          </a>
+        </li>
+        <li
+          className=""
+          id="migrations"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+          >
+            Migrations
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>,
+  <div
+    id="pim-content"
+  >
+    
+    <br />
+    <div
+      className="row"
+    >
+      <div
+        className="col-xs-9"
+      >
+        <div>
+          <label
+            htmlFor="filter"
+          >
+            Filter by Source Container ID: 
+          </label>
+           
+          <input
+            id="inputFilter"
+            onChange={[Function]}
+            type="text"
+            value=""
+          />
+        </div>
+      </div>
+      <div
+        className="col-xs-3"
+      >
+        <div
+          className="pull-right"
+        >
+          <button
+            className="btn btn-default"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Import
+          </button>
+           
+          <button
+            className="btn btn-primary"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Add Plan
+          </button>
+        </div>
+      </div>
+    </div>
+    <br />
+    <table
+      className="table table-striped table-hover"
+    >
+      <thead>
+        <tr>
+          <th
+            className=""
+          >
+            ID
+          </th>
+          <th
+            className=""
+          >
+            Plan Name
+          </th>
+          <th
+            className=""
+          >
+            Description
+          </th>
+          <th
+            className=""
+          >
+            Source container
+          </th>
+          <th
+            className=""
+          >
+            Source process
+          </th>
+          <th
+            className=""
+          >
+            Target container
+          </th>
+          <th
+            className=""
+          >
+            Target process
+          </th>
+          <th
+            aria-label="Actions"
+            className=""
+            colSpan={4}
+            rowSpan={1}
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody />
+    </table>
+  </div>,
+]
+`;

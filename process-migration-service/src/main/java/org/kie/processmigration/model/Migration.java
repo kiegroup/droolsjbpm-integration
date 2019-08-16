@@ -46,9 +46,9 @@ import org.kie.processmigration.model.Execution.ExecutionType;
 @Table(name = "migrations")
 @SequenceGenerator(name = "migrationIdSeq", sequenceName = "MIGRATION_ID_SEQ")
 @NamedQueries({
-        @NamedQuery(name = "Migration.findAll", query = "SELECT m FROM Migration m"),
-        @NamedQuery(name = "Migration.findById", query = "SELECT m FROM Migration m WHERE m.id = :id"),
-        @NamedQuery(name = "Migration.findByStatus", query = "SELECT m FROM Migration m WHERE m.status IN :statuses")
+    @NamedQuery(name = "Migration.findAll", query = "SELECT m FROM Migration m"),
+    @NamedQuery(name = "Migration.findById", query = "SELECT m FROM Migration m WHERE m.id = :id"),
+    @NamedQuery(name = "Migration.findByStatus", query = "SELECT m FROM Migration m WHERE m.status IN :statuses")
 })
 public class Migration implements Serializable {
 
@@ -61,14 +61,17 @@ public class Migration implements Serializable {
     @Embedded
     private MigrationDefinition definition;
 
+    @JsonInclude(Include.NON_NULL)
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @Column(name = "started_at")
-    private Instant startedAt;
-
+    @JsonInclude(Include.NON_NULL)
     @Column(name = "finished_at")
     private Instant finishedAt;
+
+    @JsonInclude(Include.NON_NULL)
+    @Column(name = "started_at")
+    private Instant startedAt;
 
     @JsonInclude(Include.NON_NULL)
     @Column(name = "cancelled_at")
@@ -94,8 +97,8 @@ public class Migration implements Serializable {
         Instant now = Instant.now();
         createdAt = now;
         if (ExecutionType.ASYNC.equals(definition.getExecution().getType()) &&
-                definition.getExecution().getScheduledStartTime() != null &&
-                now.isBefore(definition.getExecution().getScheduledStartTime())) {
+            definition.getExecution().getScheduledStartTime() != null &&
+            now.isBefore(definition.getExecution().getScheduledStartTime())) {
             status = Execution.ExecutionStatus.SCHEDULED;
         } else {
             status = Execution.ExecutionStatus.CREATED;

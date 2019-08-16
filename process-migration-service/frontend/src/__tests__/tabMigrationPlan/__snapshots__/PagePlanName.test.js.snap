@@ -1,25 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PagePlanName renders correctly using snapshot 1`] = `
-<div
+exports[`PagePlanName opens using an existing plan 1`] = `
+<form
   className="form-horizontal"
 >
   <div
-    className="form-group required"
+    className="required form-group has-feedback"
   >
     <label
-      className="col-sm-2 control-label"
+      className="col-sm-3 control-label"
+      htmlFor="formPlanName"
     >
       Name
     </label>
     <div
-      className="col-sm-10"
+      className="col-sm-9"
     >
       <input
         className="form-control"
-        id="id_PagePlanName_name"
-        name="name"
+        id="formPlanName"
+        onChange={[Function]}
         type="text"
+        value="plan name"
       />
     </div>
   </div>
@@ -27,20 +29,71 @@ exports[`PagePlanName renders correctly using snapshot 1`] = `
     className="form-group"
   >
     <label
-      className="col-sm-2 control-label"
+      className="col-sm-3 control-label"
+      htmlFor="formPlanDescription"
     >
       Description
     </label>
     <div
-      className="col-sm-10"
+      className="col-sm-9"
     >
-      <textarea
+      <input
         className="form-control"
-        id="id_PagePlanName_description"
-        name="description"
-        rows="2"
+        id="formPlanDescription"
+        onChange={[Function]}
+        type="text"
+        value="description"
       />
     </div>
   </div>
-</div>
+</form>
+`;
+
+exports[`PagePlanName opens with an empty plan 1`] = `
+<form
+  className="form-horizontal"
+>
+  <div
+    className="required form-group has-feedback"
+  >
+    <label
+      className="col-sm-3 control-label"
+      htmlFor="formPlanName"
+    >
+      Name
+    </label>
+    <div
+      className="col-sm-9"
+    >
+      <input
+        className="form-control"
+        id="formPlanName"
+        onChange={[Function]}
+        type="text"
+        value=""
+      />
+    </div>
+  </div>
+  <div
+    className="form-group"
+  >
+    <label
+      className="col-sm-3 control-label"
+      htmlFor="formPlanDescription"
+    >
+      Description
+    </label>
+    <div
+      className="col-sm-9"
+    >
+      <input
+        className="form-control"
+        id="formPlanDescription"
+        onChange={[Function]}
+        type="text"
+        value=""
+      />
+    </div>
+  </div>
+</form>
 `;

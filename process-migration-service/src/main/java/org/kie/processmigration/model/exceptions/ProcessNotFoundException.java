@@ -26,6 +26,6 @@ public class ProcessNotFoundException extends InvalidMigrationException {
 
     @Override
     public String getMessage() {
-        return String.format("Missing Process with ContainerID: %s", super.getMessage());
+        return String.format("Missing ProcessRef with ContainerID: %s", super.getMessage());
     }
 }

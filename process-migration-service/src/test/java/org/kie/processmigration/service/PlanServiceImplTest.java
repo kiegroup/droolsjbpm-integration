@@ -24,6 +24,7 @@ import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.processmigration.service.impl.PlanServiceImpl;
 
 import static org.junit.Assert.assertEquals;
@@ -33,10 +34,11 @@ public class PlanServiceImplTest extends AbstractPersistenceTest {
 
     @Rule
     public WeldInitiator weld = WeldInitiator
-            .from(PlanServiceImpl.class)
-            .setPersistenceContextFactory(getPCFactory())
-            .inject(this)
-            .build();
+        .from(PlanServiceImpl.class)
+        .setPersistenceContextFactory(getPCFactory())
+        .inject(this)
+        .build();
+
     @Inject
     private PlanService planService;
 
@@ -46,11 +48,9 @@ public class PlanServiceImplTest extends AbstractPersistenceTest {
         assertNotNull(planService);
 
         Plan plan = new Plan();
-        plan.setSourceContainerId("containerId");
-        plan.setSourceProcessId("sourceProcessId");
         plan.setName("name");
-        plan.setTargetContainerId("targetContainerId");
-        plan.setTargetProcessId("targetProcessId");
+        plan.setSource(new ProcessRef().setContainerId("containerId").setProcessId("sourceProcessId"));
+        plan.setTarget(new ProcessRef().setContainerId("targetContainerId").setProcessId("targetProcessId"));
         plan.setDescription("description");
 
         // When

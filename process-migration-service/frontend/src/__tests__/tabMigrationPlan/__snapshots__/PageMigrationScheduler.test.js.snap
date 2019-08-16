@@ -1,0 +1,189 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PageMigrationScheduler renders callback url 1`] = `
+<div>
+  <div
+    class="form-group has-feedback"
+  >
+    <label
+      class="control-label"
+      for="formMigrationScheduler_CallbackURL"
+    >
+      Callback URL
+    </label>
+    <input
+      class="form-control"
+      id="formMigrationScheduler_CallbackURL"
+      type="text"
+      value="https://example.com/callback"
+    />
+  </div>
+  <div
+    class="form-group has-feedback"
+  >
+    <label
+      class="control-label"
+      for="formMigrationScheduler_Schedule"
+    >
+      Run migration
+    </label>
+    <div
+      class="form-group"
+    >
+      <div
+        class="radio"
+      >
+        <label
+          title=""
+        >
+          <input
+            checked=""
+            type="radio"
+          />
+          Now
+        </label>
+      </div>
+      <div
+        class="radio"
+      >
+        <label
+          title=""
+        >
+          <input
+            type="radio"
+          />
+          Schedule
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PageMigrationScheduler renders error for wrong url 1`] = `
+<div>
+  <div
+    class="form-group has-feedback has-error"
+  >
+    <label
+      class="control-label"
+      for="formMigrationScheduler_CallbackURL"
+    >
+      Callback URL
+    </label>
+    <input
+      class="form-control"
+      id="formMigrationScheduler_CallbackURL"
+      type="text"
+      value="wrong url"
+    />
+    <span
+      class="form-control-feedback glyphicon glyphicon-remove"
+    />
+    <span
+      class="help-block"
+    >
+      Enter a valid URL
+    </span>
+  </div>
+  <div
+    class="form-group has-feedback"
+  >
+    <label
+      class="control-label"
+      for="formMigrationScheduler_Schedule"
+    >
+      Run migration
+    </label>
+    <div
+      class="form-group"
+    >
+      <div
+        class="radio"
+      >
+        <label
+          title=""
+        >
+          <input
+            checked=""
+            type="radio"
+          />
+          Now
+        </label>
+      </div>
+      <div
+        class="radio"
+      >
+        <label
+          title=""
+        >
+          <input
+            type="radio"
+          />
+          Schedule
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PageMigrationScheduler renders expected components 1`] = `
+<div>
+  <div
+    class="form-group has-feedback"
+  >
+    <label
+      class="control-label"
+      for="formMigrationScheduler_CallbackURL"
+    >
+      Callback URL
+    </label>
+    <input
+      class="form-control"
+      id="formMigrationScheduler_CallbackURL"
+      type="text"
+      value=""
+    />
+  </div>
+  <div
+    class="form-group has-feedback"
+  >
+    <label
+      class="control-label"
+      for="formMigrationScheduler_Schedule"
+    >
+      Run migration
+    </label>
+    <div
+      class="form-group"
+    >
+      <div
+        class="radio"
+      >
+        <label
+          title=""
+        >
+          <input
+            checked=""
+            type="radio"
+          />
+          Now
+        </label>
+      </div>
+      <div
+        class="radio"
+      >
+        <label
+          title=""
+        >
+          <input
+            type="radio"
+          />
+          Schedule
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+`;

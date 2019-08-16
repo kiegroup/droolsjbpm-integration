@@ -63,7 +63,6 @@ public class KieServerConfig {
         return this;
     }
 
-
     public CredentialsProvider getCredentialsProvider() {
         return credentialsProvider;
     }

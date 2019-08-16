@@ -50,6 +50,7 @@ import org.kie.processmigration.model.Execution;
 import org.kie.processmigration.model.Migration;
 import org.kie.processmigration.model.MigrationDefinition;
 import org.kie.processmigration.model.Plan;
+import org.kie.processmigration.model.ProcessRef;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
@@ -134,10 +135,8 @@ public class ProcessMigrationIntegrationTest {
 
     private Plan createPlan() throws IOException, JAXBException {
         Plan plan = new Plan();
-        plan.setSourceContainerId(SOURCE_CONTAINER_ID);
-        plan.setSourceProcessId(PROCESS_ID);
-        plan.setTargetContainerId(TARGET_CONTAINER_ID);
-        plan.setTargetProcessId(PROCESS_ID);
+        plan.setSource(new ProcessRef().setContainerId(SOURCE_CONTAINER_ID).setProcessId(PROCESS_ID));
+        plan.setTarget(new ProcessRef().setContainerId(TARGET_CONTAINER_ID).setProcessId(PROCESS_ID));
 
         HttpPost post = preparePost("/plans");
 

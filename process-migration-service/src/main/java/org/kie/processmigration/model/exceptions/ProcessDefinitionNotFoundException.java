@@ -16,23 +16,26 @@
 
 package org.kie.processmigration.model.exceptions;
 
+import org.kie.processmigration.model.ProcessRef;
+
 public class ProcessDefinitionNotFoundException extends InvalidMigrationException {
 
     private static final long serialVersionUID = 8119544485261592740L;
 
     private final String kieServerID;
-    private final String containerID;
-    private final String processID;
+    private final ProcessRef processRef;
 
-    public ProcessDefinitionNotFoundException(String kieServerID, String containerId, String processID) {
+    public ProcessDefinitionNotFoundException(String kieServerID, ProcessRef processRef) {
         super(kieServerID);
         this.kieServerID = kieServerID;
-        this.containerID = containerId;
-        this.processID = processID;
+        this.processRef = processRef;
     }
 
     @Override
     public String getMessage() {
-        return String.format("Cound not find ContainerID: %s and Process Definition: %s Running in KieServer: %s", this.containerID, this.processID, this.kieServerID);
+        return String.format("Cound not find ContainerID: %s and Process Definition: %s Running in KieServer: %s",
+                             this.processRef.getContainerId(),
+                             this.processRef.getProcessId(),
+                             this.kieServerID);
     }
 }

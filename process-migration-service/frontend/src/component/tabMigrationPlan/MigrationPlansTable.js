@@ -1,19 +1,50 @@
-import React, { Component } from "react";
-import { Table } from "patternfly-react";
-import { Icon } from "patternfly-react";
-import { OverlayTrigger } from "patternfly-react";
-import { Tooltip } from "patternfly-react";
-import { actionHeaderCellFormatter } from "patternfly-react";
+import React from "react";
+import PropTypes from "prop-types";
+import {
+  Table,
+  Icon,
+  OverlayTrigger,
+  Tooltip,
+  actionHeaderCellFormatter
+} from "patternfly-react";
 
-import MigrationPlansEditPopup from "./MigrationPlansEditPopup";
+import WizardExecuteMigration from "./wizardExecuteMigration/WizardExecuteMigration";
+import planClient from "../../clients/planClient";
+import ExportPlanModal from "./ExportPlanModal";
 
-export default class MigrationPlansTable extends Component {
+export default class MigrationPlansTable extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showMigrationWizard: false,
+      containerId: ""
+    };
+  }
+
+  openMigrationWizard = id => {
+    planClient.get(id).then(plan => {
+      this.setState({
+        showMigrationWizard: true,
+        containerId: plan.source.containerId,
+        planId: id
+      });
+    });
+  };
+
   render() {
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>;
-    const cellFormat = value => <Table.Cell>{value}</Table.Cell>;
+    const cellFormat = (value, def) => {
+      const parts = def.property.split(".");
+      let newVal = def.rowData;
+      parts.forEach(part => {
+        newVal = newVal[part];
+      });
+      return <Table.Cell>{newVal}</Table.Cell>;
+    };
+
     const tooltipExecute = (
       <Tooltip id="tooltip">
-        <div>Execute Migration Plan</div>
+        <div>Execute migration</div>
       </Tooltip>
     );
 
@@ -61,43 +92,43 @@ export default class MigrationPlansTable extends Component {
       },
       {
         header: {
-          label: "Source Container ID",
+          label: "Source container",
           formatters: [headerFormat]
         },
         cell: {
           formatters: [cellFormat]
         },
-        property: "sourceContainerId"
+        property: "source.containerId"
       },
       {
         header: {
-          label: "Source Process ID",
+          label: "Source process",
           formatters: [headerFormat]
         },
         cell: {
           formatters: [cellFormat]
         },
-        property: "sourceProcessId"
+        property: "source.processId"
       },
       {
         header: {
-          label: "Target Container ID",
+          label: "Target container",
           formatters: [headerFormat]
         },
         cell: {
           formatters: [cellFormat]
         },
-        property: "targetContainerId"
+        property: "target.containerId"
       },
       {
         header: {
-          label: "Target Process ID",
+          label: "Target process",
           formatters: [headerFormat]
         },
         cell: {
           formatters: [cellFormat]
         },
-        property: "targetProcessId"
+        property: "target.processId"
       },
       {
         header: {
@@ -111,44 +142,34 @@ export default class MigrationPlansTable extends Component {
         cell: {
           formatters: [
             (value, { rowData }) => [
-              <Table.Actions key="0">
+              <Table.Actions key="Actions_Migration">
                 <OverlayTrigger overlay={tooltipExecute} placement={"bottom"}>
                   <Table.Button
                     bsStyle="link"
-                    onClick={() => this.props.openMigrationWizard(rowData)}
+                    onClick={() => this.openMigrationWizard(rowData.id)}
                   >
                     <Icon type="fa" name="play" />
                   </Table.Button>
                 </OverlayTrigger>
               </Table.Actions>,
-              <Table.Actions key="1">
-                <MigrationPlansEditPopup
-                  title="Export Migration Plan"
-                  actionName="Export"
-                  buttonLabel="Copy To Clipboard"
-                  content={JSON.stringify(rowData)}
-                  retrieveAllPlans={this.props.retrieveAllPlans}
-                  updatePlan={this.props.updatePlan}
-                  planId={rowData.id}
-                />
+              <Table.Actions key="Actions_Export">
+                <ExportPlanModal plan={rowData} />
               </Table.Actions>,
-              <Table.Actions key="2">
+              <Table.Actions key="Actions_Delete">
                 <OverlayTrigger overlay={tooltipDelete} placement={"bottom"}>
                   <Table.Button
                     bsStyle="link"
-                    onClick={() => this.props.showDeleteDialog(rowData.id)}
+                    onClick={() => this.props.onDeletePlan(rowData)}
                   >
                     <Icon type="fa" name="trash" />
                   </Table.Button>
                 </OverlayTrigger>
               </Table.Actions>,
-              <Table.Actions key="3">
+              <Table.Actions key="Actions_Edit">
                 <OverlayTrigger overlay={tooltipEdit} placement={"bottom"}>
                   <Table.Button
                     bsStyle="link"
-                    onClick={() =>
-                      this.props.openAddPlanWizardWithInitialData(rowData)
-                    }
+                    onClick={() => this.props.onEditPlan(rowData.id)}
                   >
                     <Icon type="fa" name="edit" />
                   </Table.Button>
@@ -162,12 +183,28 @@ export default class MigrationPlansTable extends Component {
     ];
 
     return (
-      <div>
-        <Table.PfProvider striped bordered hover columns={planBootstrapColumns}>
+      <React.Fragment>
+        <Table.PfProvider striped hover columns={planBootstrapColumns}>
           <Table.Header />
-          <Table.Body rows={this.props.filteredPlans} rowKey="id" />
+          <Table.Body rows={this.props.plans} rowKey="id" />
         </Table.PfProvider>
-      </div>
+        {this.state.showMigrationWizard && (
+          <WizardExecuteMigration
+            isOpen={this.state.showMigrationWizard}
+            onClose={() => this.setState({ showMigrationWizard: false })}
+            containerId={this.state.containerId}
+            kieServerId={this.props.kieServerId}
+            planId={this.state.planId}
+          />
+        )}
+      </React.Fragment>
     );
   }
 }
+
+MigrationPlansTable.propTypes = {
+  plans: PropTypes.array.isRequired,
+  kieServerId: PropTypes.string.isRequired,
+  onEditPlan: PropTypes.func.isRequired,
+  onDeletePlan: PropTypes.func.isRequired
+};

@@ -1,8 +1,7 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-import { Wizard } from "patternfly-react";
-import { Button } from "patternfly-react";
-import { Icon } from "patternfly-react";
+import { Wizard, Button, Icon } from "patternfly-react";
 
 import WizardBase from "../WizardBase";
 import PageReview from "../PageReview";
@@ -13,138 +12,72 @@ import PageDefinition from "./PageDefinition";
 import PagePlanName from "./PagePlanName";
 
 import { AddPlanItems } from "../../common/WizardItems";
+import Notification from "../../Notification";
+import { ALERT_TYPE_ERROR } from "patternfly-react/dist/js/components/Alert/AlertConstants";
 
 export default class WizardAddPlan extends WizardBase {
   constructor(props) {
-    super(props);
+    super(props, AddPlanItems);
     this.state = {
       activeStepIndex: 0,
       activeSubStepIndex: 0,
-      sourceInfo: "",
-      targetInfo: "",
-      name: "",
-      description: "",
-      sourceContainerId: "",
-      sourceProcessId: "",
-      targetContainerId: "",
-      targetProcessId: "",
-      mappings: "",
-      migrationPlanJsonStr: "",
-      wizardHeaderTitle: "Add Migration Plan Wizard"
+      sourceInfo: {},
+      targetInfo: {},
+      wizardHeaderTitle: this.props.plan.id
+        ? "Edit migration plan"
+        : "Add migration plan",
+      stepValidation: {}
     };
-  }
-
-  //using Ref, this is called from parent before open the wizard to reset all the states.
-  resetWizardStates() {
-    this.setState({
-      activeStepIndex: 0,
-      activeSubStepIndex: 0,
-      sourceInfo: "",
-      targetInfo: "",
-      name: "",
-      description: "",
-      sourceContainerId: "",
-      sourceProcessId: "",
-      targetContainerId: "",
-      targetProcessId: "",
-      mappings: "",
-      migrationPlanJsonStr: "",
-      editPlanMode: false,
-      planId: "",
-      wizardHeaderTitle: "Add Migration Plan Wizard"
-    });
-  }
-
-  //using Ref, this is called from parent before open the wizard for edit existing migration plan
-  initialWizardStates(rowData) {
-    const jsonStr = JSON.stringify(rowData);
-    this.setState({
-      activeStepIndex: 0,
-      activeSubStepIndex: 0,
-      sourceInfo: "",
-      targetInfo: "",
-      name: rowData.name,
-      description: rowData.description,
-      sourceContainerId: rowData.sourceContainerId,
-      sourceProcessId: rowData.sourceProcessId,
-      targetContainerId: rowData.targetContainerId,
-      targetProcessId: rowData.targetProcessId,
-      mappings: rowData.mappings,
-      migrationPlanJsonStr: jsonStr,
-      editPlanMode: true,
-      planId: rowData.id,
-      wizardHeaderTitle: "Edit Migration Plan Wizard"
-    });
   }
 
   setSourceDefinition = sourceInfo => this.setState({ sourceInfo });
   setTargetDefinition = targetInfo => this.setState({ targetInfo });
 
-  handleAddPlanFormChange = e => {
-    if (e.target.name == "name") {
-      this.setState({ name: e.target.value });
-    } else if (e.target.name == "description") {
-      this.setState({ description: e.target.value });
-    } else if (e.target.name == "sourceContainerId") {
-      this.setState({ sourceContainerId: e.target.value });
-    } else if (e.target.name == "sourceProcessId") {
-      this.setState({ sourceProcessId: e.target.value });
-    } else if (e.target.name == "targetContainerId") {
-      this.setState({ targetContainerId: e.target.value });
-    } else if (e.target.name == "targetProcessId") {
-      this.setState({ targetProcessId: e.target.value });
-    } else if (e.target.name == "mappings") {
-      this.setState({ mappings: e.target.value });
-    }
-  };
-
-  convertFormDataToJson() {
-    const formData = {
-      name: this.state.name,
-      description: this.state.description,
-      sourceContainerId: this.state.sourceContainerId,
-      sourceProcessId: this.state.sourceProcessId,
-      targetContainerId: this.state.targetContainerId,
-      targetProcessId: this.state.targetProcessId
+  onChangeSource = (newContainerId, newProcessId) => {
+    const source = {
+      containerId: newContainerId,
+      processId: newProcessId
     };
+    this.onPlanFieldChange("source", source);
+    this.onPlanFieldChange("mappings", {});
+  };
 
-    if (this.state.mappings !== null && this.state.mappings !== "") {
-      formData.mappings = this.state.mappings;
-    }
+  onChangeTarget = (newContainerId, newProcessId) => {
+    const target = {
+      containerId: newContainerId,
+      processId: newProcessId
+    };
+    this.onPlanFieldChange("target", target);
+    this.onPlanFieldChange("mappings", {});
+  };
 
-    if (this.state.editPlanMode) {
-      formData.id = this.state.planId;
-    }
-
-    const jsonStr = JSON.stringify(formData, null, 2);
-
-    this.setState({ migrationPlanJsonStr: jsonStr });
-  }
-
-  onSubmitMigrationPlan = () => {
-    //call the addPlan. addPlan need to be in the parent because it's shared between WizardAddPlan and Import Plan pop-up
-    if (!this.state.editPlanMode) {
-      this.props.addPlan(this.state.migrationPlanJsonStr);
+  onPlanFieldChange = (field, newValue) => {
+    const plan = this.props.plan;
+    if (newValue === null) {
+      delete plan[field];
     } else {
-      this.props.editPlan(this.state.migrationPlanJsonStr, this.state.planId);
+      plan[field] = newValue;
     }
-    this.onNextButtonClick();
+    this.props.onPlanChanged(plan);
   };
 
-  handleSourceProcessIdChange = value => {
-    this.setState({ sourceProcessId: value });
+  setStepIsValid = (step, isValid) => {
+    const { stepValidation } = this.state;
+    stepValidation[step] = isValid;
+    this.setState({ stepValidation });
   };
 
-  handleSourceContainerIdChange = value => {
-    this.setState({ sourceContainerId: value });
+  isStepValid = step => {
+    return this.state.stepValidation[step];
   };
 
-  handleTargetProcessIdChange = value => {
-    this.setState({ targetProcessId: value });
-  };
-
-  handleTargetContainerIdChange = value => {
-    this.setState({ targetContainerId: value });
+  submitPlan = () => {
+    this.props
+      .onSavePlan()
+      .then(() => this.onNextButtonClick())
+      .catch(() =>
+        this.setState({ errorMsg: "Unable to submit the migration plan" })
+      );
   };
 
   render() {
@@ -152,15 +85,14 @@ export default class WizardAddPlan extends WizardBase {
       activeStepIndex,
       activeSubStepIndex,
       sourceInfo,
-      targetInfo,
-      migrationPlanJsonStr
+      targetInfo
     } = this.state;
 
     const renderAddPlanWizardContents = wizardSteps => {
       return wizardSteps.map((step, stepIndex) =>
         step.subSteps.map((sub, subStepIndex) => {
           if (stepIndex === 0) {
-            // render steps 1
+            // render steps 0
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -170,13 +102,14 @@ export default class WizardAddPlan extends WizardBase {
                 activeSubStepIndex={activeSubStepIndex}
               >
                 <PagePlanName
-                  name={this.state.name}
-                  description={this.state.description}
+                  plan={this.props.plan}
+                  onFieldChanged={this.onPlanFieldChange}
+                  onIsValid={isValid => this.setStepIsValid(0, isValid)}
                 />
               </Wizard.Contents>
             );
           } else if (stepIndex === 1) {
-            // render steps 2
+            // render steps 1
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -190,20 +123,16 @@ export default class WizardAddPlan extends WizardBase {
                   targetInfo={targetInfo}
                   setSourceDefinition={this.setSourceDefinition}
                   setTargetDefinition={this.setTargetDefinition}
-                  sourceContainerId={this.state.sourceContainerId}
-                  sourceProcessId={this.state.sourceProcessId}
-                  targetContainerId={this.state.targetContainerId}
-                  targetProcessId={this.state.targetProcessId}
-                  onChangeSourceContainerId={this.handleSourceContainerIdChange}
-                  onChangeSourceProcessId={this.handleSourceProcessIdChange}
-                  onChangeTargetContainerId={this.handleTargetContainerIdChange}
-                  onChangeTargetProcessId={this.handleTargetProcessIdChange}
+                  plan={this.props.plan}
+                  onChangeSource={this.onChangeSource}
+                  onChangeTarget={this.onChangeTarget}
                   kieServerId={this.props.kieServerId}
+                  onIsValid={isValid => this.setStepIsValid(1, isValid)}
                 />
               </Wizard.Contents>
             );
           } else if (stepIndex === 2) {
-            // render steps 3
+            // render steps 2
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -213,9 +142,13 @@ export default class WizardAddPlan extends WizardBase {
                 activeSubStepIndex={activeSubStepIndex}
               >
                 <PageMapping
-                  sourceInfo={sourceInfo}
-                  targetInfo={targetInfo}
-                  mappings={this.state.mappings}
+                  plan={this.props.plan}
+                  sourceProcess={this.state.sourceInfo}
+                  targetProcess={this.state.targetInfo}
+                  onMappingsChange={mappings =>
+                    this.onPlanFieldChange("mappings", mappings)
+                  }
+                  onIsValid={isValid => this.setStepIsValid(2, isValid)}
                 />
               </Wizard.Contents>
             );
@@ -229,11 +162,21 @@ export default class WizardAddPlan extends WizardBase {
                 activeStepIndex={activeStepIndex}
                 activeSubStepIndex={activeSubStepIndex}
               >
-                <PageReview inputJsonStr={migrationPlanJsonStr} />
+                {this.state.errorMsg && (
+                  <Notification
+                    type={ALERT_TYPE_ERROR}
+                    message={this.state.errorMsg}
+                    onDismiss={() => this.setState({ errorMsg: "" })}
+                  />
+                )}
+                <PageReview
+                  object={this.props.plan}
+                  exportedFileName={this.props.plan.name}
+                  errorMsg={this.state.errorMsg}
+                />
               </Wizard.Contents>
             );
           } else if (stepIndex === 4) {
-            // render mock progress
             return (
               <Wizard.Contents
                 key={subStepIndex}
@@ -242,7 +185,10 @@ export default class WizardAddPlan extends WizardBase {
                 activeStepIndex={activeStepIndex}
                 activeSubStepIndex={activeSubStepIndex}
               >
-                <PageReview inputJsonStr={this.props.addPlanResponseJsonStr} />
+                <PageReview
+                  object={this.props.plan}
+                  exportedFileName={this.props.plan.name}
+                />
               </Wizard.Contents>
             );
           }
@@ -257,12 +203,8 @@ export default class WizardAddPlan extends WizardBase {
           className="form-horizontal"
           name="form_migration_plan"
           id="WizardAddPlan_id_form1"
-          onChange={this.handleAddPlanFormChange}
         >
-          <Wizard
-            show={this.props.showPlanWizard}
-            onHide={this.props.closeAddPlanWizard}
-          >
+          <Wizard show={true} onHide={this.props.closeAddPlanWizard}>
             <Wizard.Header
               onClose={this.props.closeAddPlanWizard}
               title={this.state.wizardHeaderTitle}
@@ -270,7 +212,7 @@ export default class WizardAddPlan extends WizardBase {
             <Wizard.Body>
               <Wizard.Steps
                 steps={renderWizardSteps(
-                  AddPlanItems,
+                  this.steps,
                   activeStepIndex,
                   activeSubStepIndex,
                   this.onStepClick
@@ -278,49 +220,44 @@ export default class WizardAddPlan extends WizardBase {
               />
               <Wizard.Row>
                 <Wizard.Main>
-                  {renderAddPlanWizardContents(AddPlanItems)}
+                  {renderAddPlanWizardContents(this.steps)}
                 </Wizard.Main>
               </Wizard.Row>
             </Wizard.Body>
             <Wizard.Footer>
-              <Button
-                bsStyle="default"
-                className="btn-cancel"
-                onClick={this.props.closeAddPlanWizard}
-              >
-                Cancel
-              </Button>
-              <Button
-                bsStyle="default"
-                disabled={activeStepIndex === 0 && activeSubStepIndex === 0}
-                onClick={this.onBackButtonClick}
-              >
-                <Icon type="fa" name="angle-left" />
-                Back
-              </Button>
-              {(activeStepIndex === 0 || activeStepIndex === 2) && (
-                <Button bsStyle="primary" onClick={this.onNextButtonClick}>
-                  Next
-                  <Icon type="fa" name="angle-right" />
-                </Button>
+              {activeStepIndex !== 4 && (
+                <React.Fragment>
+                  <Button
+                    bsStyle="default"
+                    className="btn-cancel"
+                    onClick={this.props.closeAddPlanWizard}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    bsStyle="default"
+                    disabled={activeStepIndex === 0 && activeSubStepIndex === 0}
+                    onClick={this.onBackButtonClick}
+                  >
+                    <Icon type="fa" name="angle-left" />
+                    Back
+                  </Button>
+                </React.Fragment>
               )}
-
-              {activeStepIndex === 1 && (
+              {activeStepIndex < 3 && (
                 <Button
                   bsStyle="primary"
-                  disabled={
-                    this.state.sourceInfo == "" || this.state.targetInfo == ""
-                  }
                   onClick={this.onNextButtonClick}
+                  disabled={!this.isStepValid(activeStepIndex)}
                 >
                   Next
                   <Icon type="fa" name="angle-right" />
                 </Button>
               )}
+
               {activeStepIndex === 3 && (
-                <Button bsStyle="primary" onClick={this.onSubmitMigrationPlan}>
+                <Button bsStyle="primary" onClick={this.submitPlan}>
                   Submit Plan
-                  <Icon type="fa" name="angle-right" />
                 </Button>
               )}
               {activeStepIndex === 4 && (
@@ -329,7 +266,6 @@ export default class WizardAddPlan extends WizardBase {
                   onClick={this.props.closeAddPlanWizard}
                 >
                   Close
-                  <Icon type="fa" name="angle-right" />
                 </Button>
               )}
             </Wizard.Footer>
@@ -339,3 +275,11 @@ export default class WizardAddPlan extends WizardBase {
     );
   }
 }
+
+WizardAddPlan.propTypes = {
+  kieServerId: PropTypes.string.isRequired,
+  plan: PropTypes.object.isRequired,
+  onPlanChanged: PropTypes.func.isRequired,
+  onSavePlan: PropTypes.func.isRequired,
+  closeAddPlanWizard: PropTypes.func.isRequired
+};
