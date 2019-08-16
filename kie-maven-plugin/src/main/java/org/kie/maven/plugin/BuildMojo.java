@@ -116,8 +116,6 @@ public class BuildMojo extends AbstractKieMojo {
     private void buildDrl() throws MojoFailureException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        List<InternalKieModule> kmoduleDeps = new ArrayList<>();
-
         try {
             Set<URL> urls = new HashSet<URL>();
             for (String element : project.getCompileClasspathElements()) {
@@ -129,11 +127,6 @@ public class BuildMojo extends AbstractKieMojo {
                 File file = artifact.getFile();
                 if (file != null) {
                     urls.add(file.toURI().toURL());
-                    KieModuleModel depModel = getDependencyKieModel(file);
-                    if (depModel != null) {
-                        ReleaseId releaseId = new ReleaseIdImpl(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
-                        kmoduleDeps.add(new ZipKieModule(releaseId, depModel, file));
-                    }
                 }
             }
             urls.add(outputDirectory.toURI().toURL());
@@ -152,10 +145,6 @@ public class BuildMojo extends AbstractKieMojo {
 
             KieBuilderImpl kieBuilder = new KieBuilderImpl(project.getBasedir());
             InternalKieModule kModule = (InternalKieModule)kieBuilder.getKieModule();
-            for (InternalKieModule kmoduleDep : kmoduleDeps) {
-                kModule.addKieDependency(kmoduleDep);
-            }
-
             kieBuilder.buildAll();
             ResultsImpl messages = (ResultsImpl)kieBuilder.getResults();
 

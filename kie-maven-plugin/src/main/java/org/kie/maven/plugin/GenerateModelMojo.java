@@ -94,8 +94,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
     private void generateModel() throws MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        List<InternalKieModule> kmoduleDeps = new ArrayList<>();
-
         KieServices ks = KieServices.Factory.get();
 
         try {
@@ -110,15 +108,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 File file = artifact.getFile();
                 if (file != null) {
                     urls.add(file.toURI().toURL());
-                    KieModuleModel depModel = getDependencyKieModel(file);
-                    if (depModel != null) {
-                        ReleaseId releaseId = new ReleaseIdImpl(artifact.getGroupId(),
-                                                                artifact.getArtifactId(),
-                                                                artifact.getVersion());
-                        kmoduleDeps.add(new ZipKieModule(releaseId,
-                                                         depModel,
-                                                         file));
-                    }
                 }
             }
             urls.add(outputDirectory.toURI().toURL());
