@@ -51,16 +51,15 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
+import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
-import org.drools.compiler.kie.builder.impl.ZipKieModule;
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
+import org.kie.api.KieServices;
 import org.kie.api.builder.Message;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
@@ -115,14 +114,14 @@ public class BuildMojo extends AbstractKieMojo {
 
     private void buildDrl() throws MojoFailureException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
         try {
-            Set<URL> urls = new HashSet<URL>();
+            Set<URL> urls = new HashSet<>();
             for (String element : project.getCompileClasspathElements()) {
                 urls.add(new File(element).toURI().toURL());
             }
 
-            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile", "runtime")));
+            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile",
+                                                                                      "runtime")));
             for (Artifact artifact : project.getArtifacts()) {
                 File file = artifact.getFile();
                 if (file != null) {
@@ -131,21 +130,21 @@ public class BuildMojo extends AbstractKieMojo {
             }
             urls.add(outputDirectory.toURI().toURL());
 
-            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
+            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
+                                                                        getClass().getClassLoader());
 
             Thread.currentThread().setContextClassLoader(projectClassLoader);
-        } catch (DependencyResolutionRequiredException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
+        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
 
         try {
             setSystemProperties(properties);
 
-            KieBuilderImpl kieBuilder = new KieBuilderImpl(project.getBasedir());
-            InternalKieModule kModule = (InternalKieModule)kieBuilder.getKieModule();
-            kieBuilder.buildAll();
+            KieServices ks = KieServices.Factory.get();
+            KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(project.getBasedir());
+            kieBuilder.buildAll(DrlProject.SUPPLIER, s -> !s.contains("src/test/java") && !s.contains("src\\test\\java"));
+            InternalKieModule kModule = (InternalKieModule) kieBuilder.getKieModule();
             ResultsImpl messages = (ResultsImpl)kieBuilder.getResults();
 
             List<Message> errors = messages != null ? messages.filterMessages( Message.Level.ERROR): Collections.emptyList();

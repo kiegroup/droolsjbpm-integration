@@ -41,8 +41,6 @@ import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
-import org.drools.compiler.kie.builder.impl.ZipKieModule;
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
@@ -50,7 +48,6 @@ import org.drools.modelcompiler.builder.ModelBuilderImpl;
 import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
@@ -93,9 +90,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
     private void generateModel() throws MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
-        KieServices ks = KieServices.Factory.get();
-
         try {
             Set<URL> urls = new HashSet<>();
             for (String element : project.getCompileClasspathElements()) {
@@ -123,6 +117,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
         try {
             setSystemProperties(properties);
 
+            KieServices ks = KieServices.Factory.get();
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
             kieBuilder.buildAll(ExecutableModelMavenProject.SUPPLIER,
                                 s -> !s.contains("src/test/java") && !s.contains("src\\test\\java"));
