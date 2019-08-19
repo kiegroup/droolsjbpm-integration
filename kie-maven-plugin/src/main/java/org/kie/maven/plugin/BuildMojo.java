@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 
@@ -57,12 +54,8 @@ import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
-import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message;
-import org.kie.api.builder.model.KieModuleModel;
-
-import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 
 /**
  * This goal builds the Drools files belonging to the kproject.
@@ -171,29 +164,11 @@ public class BuildMojo extends AbstractKieMojo {
         getLog().info("KieModule successfully built!");
     }
 
-    private List<File> getResourceFiles(File parent) {
-        List<File> files = new ArrayList<>();
-        if (parent.isDirectory()) {
-            File children[] = parent.listFiles();
-            for (File child: children) {
-                if (child.isDirectory()) {
-                    List<File> childsFiles = getResourceFiles(child);
-                    if (childsFiles != null && !childsFiles.isEmpty()) {
-                        files.addAll(childsFiles);
-                    }
-                } else {
-                    files.add(child);
-                }
-            }
-        }
-        return files;
-    }
-
     private void writeClassFiles( InternalKieModule kModule ) throws MojoFailureException {
         MemoryFileSystem mfs = ((MemoryKieModule )kModule).getMemoryFileSystem();
         kModule.getFileNames()
                 .stream()
-                .filter(name -> name.endsWith(".class"))
+                .filter(name -> name.endsWith(".class") && !name.contains("target/classes") && !name.contains("target\\classes"))
                 .forEach( fileName -> {
                     try {
                         saveFile( mfs, fileName );
@@ -230,28 +205,5 @@ public class BuildMojo extends AbstractKieMojo {
             getLog().info("kieMap not present");
             return Collections.emptyMap();
         }
-    }
-
-
-    private KieModuleModel getDependencyKieModel(File jar) {
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(jar);
-            ZipEntry zipEntry = zipFile.getEntry(KieModuleModelImpl.KMODULE_JAR_PATH);
-            if (zipEntry != null) {
-                KieModuleModel kieModuleModel = KieModuleModelImpl.fromXML(zipFile.getInputStream(zipEntry));
-                setDefaultsforEmptyKieModule(kieModuleModel);
-                return kieModuleModel;
-            }
-        } catch (Exception e) {
-        } finally {
-            if (zipFile != null) {
-                try {
-                    zipFile.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-        return null;
     }
 }
