@@ -66,13 +66,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.thorntail</groupId>
-        <artifactId>bom-all</artifactId>
-        <version>${version.thorntail}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
         <groupId>org.eclipse.microprofile.health</groupId>
         <artifactId>microprofile-health-api</artifactId>
         <version>${version.microprofile-health}</version>
@@ -135,10 +128,6 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>microprofile-health</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.thorntail</groupId>
-      <artifactId>swagger</artifactId>
     </dependency>
     <dependency>
       <groupId>io.thorntail</groupId>
