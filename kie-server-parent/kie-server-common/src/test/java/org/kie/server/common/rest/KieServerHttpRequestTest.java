@@ -877,7 +877,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
                 h2.set(request.getHeader("h2"));
             }
         };
-        KieServerHttpRequest request = newRequest(url).header("h1", 5).header("h2", (Number) null);
+        KieServerHttpRequest request = newRequest(url).header("h1", 5).header("h2", null);
         assertEquals(HTTP_OK, request.get().response().code());
         assertEquals("5", h1.get());
         assertEquals(null, h2.get());
