@@ -16,6 +16,8 @@
 
 package org.kie.server.springboot.autoconfiguration;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,6 +47,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ReflectionUtils;
 
 @Configuration
 @ConditionalOnClass({ KieServerImpl.class })
@@ -135,12 +138,15 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
         List<Feature> features = new ArrayList<>(super.getFeatures());
         if (properties.getSwagger().isEnabled()) {
             try {
-                features.add((Feature) Class.forName("org.apache.cxf.jaxrs.swagger.Swagger2Feature").newInstance());
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                Feature feature = (Feature) Class.forName("org.apache.cxf.jaxrs.swagger.Swagger2Feature").newInstance();
+                Method method = ReflectionUtils.findMethod(feature.getClass(), "setRunAsFilter", Boolean.TYPE);
+                method.invoke(feature, true);
+                features.add(feature);
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IllegalArgumentException | InvocationTargetException e) {
                 logger.error("Swagger feature was enabled but cannot be created", e);
             }
         }
         return features;
-    }    
+    }
     
 }
