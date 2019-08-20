@@ -136,7 +136,8 @@ public class BuildMojo extends AbstractKieMojo {
 
             KieServices ks = KieServices.Factory.get();
             KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(project.getBasedir());
-            kieBuilder.buildAll(DrlProject.SUPPLIER, s -> !s.contains("src/test/java") && !s.contains("src\\test\\java"));
+            kieBuilder.buildAll(DrlProject.SUPPLIER,
+                                s -> s.contains(sourceFolder.getAbsolutePath()) || s.endsWith("pom.xml"));
             InternalKieModule kModule = (InternalKieModule) kieBuilder.getKieModule();
             ResultsImpl messages = (ResultsImpl)kieBuilder.getResults();
 
