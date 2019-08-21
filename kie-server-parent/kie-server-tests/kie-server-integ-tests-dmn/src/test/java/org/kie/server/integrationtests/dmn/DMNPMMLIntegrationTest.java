@@ -33,6 +33,10 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
+/*
+ * This it.test is reportedly not working in the "embedded" EE container,
+ * working correctly instead with the proper EE container activated with mvn profiles ("wildfly, etc.)"
+ */
 public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
@@ -68,6 +72,10 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
         KieServerAssert.assertSuccess(reply);
     }
 
+    /*
+     * This it.test is reportedly not working in the "embedded" EE container,
+     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly, etc.)"
+     */
     @Test
     public void testDMNwithPMMLScorecard() {
         final DMNContext dmnContext = dmnClient.newContext();
@@ -88,6 +96,10 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
         Assertions.assertThat(result).isEqualTo(new BigDecimal("41.345"));
     }
 
+    /*
+     * This it.test is reportedly not working in the "embedded" EE container,
+     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly, etc.)"
+     */
     @Test
     public void testDMNWithPMMLRegression() {
         final DMNContext dmnContext = dmnClient.newContext();
