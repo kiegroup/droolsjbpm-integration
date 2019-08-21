@@ -20,13 +20,11 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
@@ -72,7 +70,6 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
     @Test
     public void testDMNwithPMMLScorecard() {
-        Assume.assumeFalse(marshallingFormat == MarshallingFormat.JSON); // RHDM-1050
         final DMNContext dmnContext = dmnClient.newContext();
         final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
                 CONTAINER_1_ID,
