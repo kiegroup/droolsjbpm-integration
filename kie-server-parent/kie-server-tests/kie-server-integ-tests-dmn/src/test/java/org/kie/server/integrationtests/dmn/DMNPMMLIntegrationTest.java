@@ -20,13 +20,11 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
@@ -35,6 +33,10 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
+/*
+ * This it.test is reportedly not working in the "embedded" EE container,
+ * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
+ */
 public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
@@ -70,9 +72,12 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
         KieServerAssert.assertSuccess(reply);
     }
 
+    /*
+     * This it.test is reportedly not working in the "embedded" EE container,
+     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
+     */
     @Test
     public void testDMNwithPMMLScorecard() {
-        Assume.assumeFalse(marshallingFormat == MarshallingFormat.JSON); // RHDM-1050
         final DMNContext dmnContext = dmnClient.newContext();
         final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
                 CONTAINER_1_ID,
@@ -91,6 +96,10 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
         Assertions.assertThat(result).isEqualTo(new BigDecimal("41.345"));
     }
 
+    /*
+     * This it.test is reportedly not working in the "embedded" EE container,
+     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
+     */
     @Test
     public void testDMNWithPMMLRegression() {
         final DMNContext dmnContext = dmnClient.newContext();
