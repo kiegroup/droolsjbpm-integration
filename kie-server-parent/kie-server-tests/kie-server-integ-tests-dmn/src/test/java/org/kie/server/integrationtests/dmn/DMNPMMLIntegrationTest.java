@@ -35,7 +35,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 /*
  * This it.test is reportedly not working in the "embedded" EE container,
- * working correctly instead with the proper EE container activated with mvn profiles ("wildfly, etc.)"
+ * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
  */
 public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
@@ -74,7 +74,7 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
     /*
      * This it.test is reportedly not working in the "embedded" EE container,
-     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly, etc.)"
+     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
      */
     @Test
     public void testDMNwithPMMLScorecard() {
@@ -98,7 +98,7 @@ public class DMNPMMLIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
     /*
      * This it.test is reportedly not working in the "embedded" EE container,
-     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly, etc.)"
+     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
      */
     @Test
     public void testDMNWithPMMLRegression() {
