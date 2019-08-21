@@ -188,33 +188,52 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return new DMNResultKS().getContext();
         }
         
-        // copied from DMN FEEL utils
-        private static BigDecimal getBigDecimalOrNull(Object value) {
-            if ( !(value instanceof Number || value instanceof String) ) {
-                return null;
-            }
-            if ( !BigDecimal.class.isAssignableFrom( value.getClass() ) ) {
-                if ( value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte ||
-                     value instanceof AtomicLong || value instanceof AtomicInteger ) {
-                    value = new BigDecimal( ((Number) value).longValue(), MathContext.DECIMAL128 );
-                } else if ( value instanceof BigInteger ) {
-                    value = new BigDecimal( ((BigInteger) value).toString(), MathContext.DECIMAL128 );
-                } else if ( value instanceof String ) {
+    // copied from DMN FEEL utils
+    public static BigDecimal getBigDecimalOrNull(Object value) {
+        if (value == null ||
+            !(value instanceof Number || value instanceof String) || (value instanceof Double && (value.toString().equals("NaN") || value.toString().equals("Infinity") || value.toString().equals("-Infinity")))) {
+            return null;
+        }
+        if (!BigDecimal.class.isAssignableFrom(value.getClass())) {
+            if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte ||
+                value instanceof AtomicLong || value instanceof AtomicInteger) {
+                value = new BigDecimal(((Number) value).longValue(), MathContext.DECIMAL128);
+            } else if (value instanceof BigInteger) {
+                value = new BigDecimal((BigInteger) value, MathContext.DECIMAL128);
+            } else if (value instanceof String) {
+                try {
                     // we need to remove leading zeros to prevent octal conversion
-                    value = new BigDecimal( ((String) value).replaceFirst("^0+(?!$)", ""), MathContext.DECIMAL128 );
-                } else {
-                    value = new BigDecimal( ((Number) value).doubleValue(), MathContext.DECIMAL128 );
+                    value = new BigDecimal(((String) value).replaceFirst("^0+(?!$)", ""), MathContext.DECIMAL128);
+                } catch (NumberFormatException e) {
+                    return null;
                 }
-            }
-            return (BigDecimal) value;
-        }
-        // copied from DMN FEEL utils
-        private static Object coerceNumber(Object value) {
-            if ( value instanceof Number && !(value instanceof BigDecimal) ) {
-                return getBigDecimalOrNull( value );
             } else {
-                return value;
+                // doubleValue() sometimes produce rounding errors, so we need to use toString() instead
+                // We also need to remove trailing zeros, if there are some so for 10d we get BigDecimal.valueOf(10)
+                // instead of BigDecimal.valueOf(10.0).
+                value = new BigDecimal(removeTrailingZeros(value.toString()), MathContext.DECIMAL128);
             }
         }
+        return (BigDecimal) value;
+    }
+
+    // copied from DMN FEEL utils
+    private static Object coerceNumber(Object value) {
+        if (value instanceof Number && !(value instanceof BigDecimal)) {
+            return getBigDecimalOrNull(value);
+        } else {
+            return value;
+        }
+    }
+
+    // copied from DMN FEEL utils
+    private static String removeTrailingZeros(final String stringNumber) {
+        final String stringWithoutZeros = stringNumber.replaceAll("0*$", "");
+        if (Character.isDigit(stringWithoutZeros.charAt(stringWithoutZeros.length() - 1))) {
+            return stringWithoutZeros;
+        } else {
+            return stringWithoutZeros.substring(0, stringWithoutZeros.length() - 1);
+        }
+    }
 
 }
