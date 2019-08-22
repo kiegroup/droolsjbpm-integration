@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,10 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -50,23 +48,14 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
+import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
-import org.drools.compiler.kie.builder.impl.ZipKieModule;
-import org.drools.compiler.kproject.ReleaseIdImpl;
-import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.kie.api.KieServices;
-import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.builder.model.KieModuleModel;
-import org.kie.internal.io.ResourceFactory;
-
-import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
-import static org.drools.compiler.kproject.models.KieModuleModelImpl.KMODULE_FILE_NAME;
 
 /**
  * This goal builds the Drools files belonging to the kproject.
@@ -118,57 +107,38 @@ public class BuildMojo extends AbstractKieMojo {
 
     private void buildDrl() throws MojoFailureException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
-        List<InternalKieModule> kmoduleDeps = new ArrayList<>();
-
         try {
-            Set<URL> urls = new HashSet<URL>();
+            Set<URL> urls = new HashSet<>();
             for (String element : project.getCompileClasspathElements()) {
                 urls.add(new File(element).toURI().toURL());
             }
 
-            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile", "runtime")));
+            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile",
+                                                                                      "runtime")));
             for (Artifact artifact : project.getArtifacts()) {
                 File file = artifact.getFile();
                 if (file != null) {
                     urls.add(file.toURI().toURL());
-                    KieModuleModel depModel = getDependencyKieModel(file);
-                    if (depModel != null) {
-                        ReleaseId releaseId = new ReleaseIdImpl(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
-                        kmoduleDeps.add(new ZipKieModule(releaseId, depModel, file));
-                    }
                 }
             }
             urls.add(outputDirectory.toURI().toURL());
 
-            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
+            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
+                                                                        getClass().getClassLoader());
 
             Thread.currentThread().setContextClassLoader(projectClassLoader);
-        } catch (DependencyResolutionRequiredException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
+        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
-
-        KieServices ks = KieServices.Factory.get();
 
         try {
             setSystemProperties(properties);
 
-            KieFileSystem kfs = ks.newKieFileSystem();
-            for (File file : getResourceFiles(sourceFolder)) {
-                if (file.getName().equals( KMODULE_FILE_NAME ) || !file.getPath().contains("META-INF")) {
-                    kfs.write( ResourceFactory.newFileResource(file) );
-                }
-            }
-
-            KieBuilderImpl kieBuilder = new KieBuilderImpl(kfs);
-            InternalKieModule kModule = (InternalKieModule)kieBuilder.getKieModule();
-            for (InternalKieModule kmoduleDep : kmoduleDeps) {
-                kModule.addKieDependency(kmoduleDep);
-            }
-
-            kieBuilder.buildAll();
+            KieServices ks = KieServices.Factory.get();
+            KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(project.getBasedir());
+            kieBuilder.buildAll(DrlProject.SUPPLIER,
+                                s -> s.contains(sourceFolder.getAbsolutePath()) || s.endsWith("pom.xml"));
+            InternalKieModule kModule = (InternalKieModule) kieBuilder.getKieModule();
             ResultsImpl messages = (ResultsImpl)kieBuilder.getResults();
 
             List<Message> errors = messages != null ? messages.filterMessages( Message.Level.ERROR): Collections.emptyList();
@@ -195,29 +165,11 @@ public class BuildMojo extends AbstractKieMojo {
         getLog().info("KieModule successfully built!");
     }
 
-    private List<File> getResourceFiles(File parent) {
-        List<File> files = new ArrayList<>();
-        if (parent.isDirectory()) {
-            File children[] = parent.listFiles();
-            for (File child: children) {
-                if (child.isDirectory()) {
-                    List<File> childsFiles = getResourceFiles(child);
-                    if (childsFiles != null && !childsFiles.isEmpty()) {
-                        files.addAll(childsFiles);
-                    }
-                } else {
-                    files.add(child);
-                }
-            }
-        }
-        return files;
-    }
-
     private void writeClassFiles( InternalKieModule kModule ) throws MojoFailureException {
         MemoryFileSystem mfs = ((MemoryKieModule )kModule).getMemoryFileSystem();
         kModule.getFileNames()
                 .stream()
-                .filter(name -> name.endsWith(".class"))
+                .filter(name -> name.endsWith(".class") && !name.contains("target/classes") && !name.contains("target\\classes"))
                 .forEach( fileName -> {
                     try {
                         saveFile( mfs, fileName );
@@ -254,28 +206,5 @@ public class BuildMojo extends AbstractKieMojo {
             getLog().info("kieMap not present");
             return Collections.emptyMap();
         }
-    }
-
-
-    private KieModuleModel getDependencyKieModel(File jar) {
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(jar);
-            ZipEntry zipEntry = zipFile.getEntry(KieModuleModelImpl.KMODULE_JAR_PATH);
-            if (zipEntry != null) {
-                KieModuleModel kieModuleModel = KieModuleModelImpl.fromXML(zipFile.getInputStream(zipEntry));
-                setDefaultsforEmptyKieModule(kieModuleModel);
-                return kieModuleModel;
-            }
-        } catch (Exception e) {
-        } finally {
-            if (zipFile != null) {
-                try {
-                    zipFile.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-        return null;
     }
 }
