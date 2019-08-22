@@ -29,15 +29,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.kie.processmigration.model.Plan;
 import org.kie.processmigration.model.exceptions.PlanNotFoundException;
 import org.kie.processmigration.service.PlanService;
 
 @Path("/plans")
-@Api(value = "Plans")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
@@ -47,21 +43,18 @@ public class PlanResource {
     private PlanService planService;
 
     @GET
-    @ApiOperation(value = "Get all existing Migration plans")
     public Response findAll() {
         return Response.ok(planService.findAll()).build();
     }
 
     @GET
     @Path("/{id}")
-    @ApiOperation(value = "Finds a migration plan by the given plan Id")
-    public Response get(@ApiParam(value = "Plan Id") @PathParam("id") Long id) throws PlanNotFoundException {
+    public Response get(@PathParam("id") Long id) throws PlanNotFoundException {
         return Response.ok(planService.get(id)).build();
     }
 
     @POST
-    @ApiOperation(value = "Create a migration plan")
-    public Response create(@ApiParam(value = "Plan") Plan plan) {
+    public Response create(Plan plan) {
         if (plan.getId() != 0) {
             throw new IllegalArgumentException("The plan ID must not be provided when creating a new plan");
         }
@@ -70,16 +63,13 @@ public class PlanResource {
 
     @PUT
     @Path("/{id}")
-    @ApiOperation(value = "Save a migration plan")
-    public Response save(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id,
-                         @ApiParam(value = "Plan") Plan plan) throws PlanNotFoundException {
+    public Response save(@PathParam("id") Long id, Plan plan) throws PlanNotFoundException {
         return Response.ok(planService.update(id, plan)).build();
     }
 
     @DELETE
     @Path("/{id}")
-    @ApiOperation(value = "Delete an existing migration plan")
-    public Response delete(@ApiParam(value = "Plan Id to update") @PathParam("id") Long id) throws PlanNotFoundException {
+    public Response delete(@PathParam("id") Long id) throws PlanNotFoundException {
         return Response.ok(planService.delete(id)).build();
     }
 }
