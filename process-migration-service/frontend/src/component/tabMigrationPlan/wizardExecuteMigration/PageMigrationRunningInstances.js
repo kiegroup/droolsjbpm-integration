@@ -266,7 +266,7 @@ export default class PageMigrationRunningInstances extends React.Component {
   };
   onRow = row => {
     const { selectedRows } = this.state;
-    const selected = selectedRows.indexOf(row.id) > -1;
+    const selected = selectedRows.indexOf(row.processInstanceId) > -1;
     return {
       className: classNames({ selected }),
       role: "row"
@@ -279,10 +279,15 @@ export default class PageMigrationRunningInstances extends React.Component {
 
     if (checked) {
       const updatedSelections = [
-        ...new Set([...currentRows.map(r => r.id), ...selectedRows])
+        ...new Set([
+          ...currentRows.map(r => r.processInstanceId),
+          ...selectedRows
+        ])
       ];
       const updatedRows = rows.map(r =>
-        updatedSelections.indexOf(r.id) > -1 ? this.selectRow(r) : r
+        updatedSelections.indexOf(r.processInstanceId) > -1
+          ? this.selectRow(r)
+          : r
       );
       this.setState({
         // important: you must update rows to force a re-render and trigger onRow hook
@@ -291,12 +296,14 @@ export default class PageMigrationRunningInstances extends React.Component {
       });
       this.updateSelectedProcessIds(rows, updatedSelections);
     } else {
-      const ids = currentRows.map(r => r.id);
+      const ids = currentRows.map(r => r.processInstanceId);
       const updatedSelections = selectedRows.filter(
         r => !(ids.indexOf(r) > -1)
       );
       const updatedRows = rows.map(r =>
-        updatedSelections.indexOf(r.id) > -1 ? r : this.deselectRow(r)
+        updatedSelections.indexOf(r.processInstanceId) > -1
+          ? r
+          : this.deselectRow(r)
       );
       this.setState({
         rows: updatedRows,

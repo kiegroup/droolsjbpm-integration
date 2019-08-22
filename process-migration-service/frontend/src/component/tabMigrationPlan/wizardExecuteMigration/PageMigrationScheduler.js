@@ -63,8 +63,8 @@ export default class PageMigrationScheduler extends React.Component {
   handleDateTimeInput = inputMoment => {
     const validationMessageTime = this.validateScheduledStartTime(inputMoment);
     const isValidTime = validationMessageTime === null;
-    if (isValidTime) {
-      this.props.onFieldChange("scheduledStartTime", inputMoment.format());
+    if (moment(inputMoment).isValid()) {
+      this.props.onFieldChange("scheduledStartTime", inputMoment.toISOString());
     }
     this.setState({ isValidTime, validationMessageTime });
     this.onValidationChange(this.state.isValidUrl, isValidTime);
@@ -84,7 +84,7 @@ export default class PageMigrationScheduler extends React.Component {
     if (scheduledStartTime === "") {
       return null;
     }
-    return moment(this.props.scheduledStartTime, "YYYY-MM-DDTHH:mm:ssZ", true);
+    return moment(this.props.scheduledStartTime);
   };
 
   render() {
