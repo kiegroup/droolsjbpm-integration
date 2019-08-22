@@ -1188,6 +1188,8 @@
         <org.kie.server.persistence.ds>dummyDataSource</org.kie.server.persistence.ds>
         <!-- Same groups as for Tomcat -->
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
+        <!-- Disable stacktrace inclusion by default -->
+        <org.kie.server.stacktrace.included>false</org.kie.server.stacktrace.included>
       </properties>
       <build>
         <pluginManagement>
@@ -1253,6 +1255,7 @@
                       <argument>-Dorg.jbpm.document.storage=${org.jbpm.document.storage}</argument>
                       <argument>-Dkie.server.base.http.url=${kie.server.base.http.url}</argument>
                       <argument>-Dorg.kie.server.mode=${org.kie.server.mode.production}</argument>
+                      <argument>-Dorg.kie.server.stacktrace.included=${org.kie.server.stacktrace.included}</argument>
                       <argument>org.springframework.boot.loader.JarLauncher</argument>
                     </arguments>
                   </configuration>
