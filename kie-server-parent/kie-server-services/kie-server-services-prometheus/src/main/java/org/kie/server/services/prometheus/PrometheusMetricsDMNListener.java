@@ -30,7 +30,7 @@ import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
 import org.kie.dmn.core.impl.AfterEvaluateDecisionEventImpl;
 import org.kie.dmn.core.impl.BeforeEvaluateDecisionEventImpl;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.api.KieContainerInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +39,9 @@ public class PrometheusMetricsDMNListener implements DMNRuntimeEventListener {
     private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsDMNListener.class);
 
     private final PrometheusMetrics metrics;
-    private final KieContainerInstanceImpl kieContainer;
+    private final KieContainerInstance kieContainer;
 
-    public PrometheusMetricsDMNListener(PrometheusMetrics metrics, KieContainerInstanceImpl kieContainer) {
+    public PrometheusMetricsDMNListener(PrometheusMetrics metrics, KieContainerInstance kieContainer) {
         this.metrics = metrics;
         this.kieContainer = kieContainer;
     }

@@ -17,6 +17,7 @@
   <modules>
     <module>kie-server-integ-tests-custom-extension-services</module>
     <module>kie-server-integ-tests-custom-extension-rest</module>
+    <module>kie-server-integ-tests-custom-extension-prometheus</module>
     <module>kie-server-integ-tests-custom-extension-client</module>
     <module>kie-server-integ-tests-custom-extension-test</module>
   </modules>

@@ -160,6 +160,11 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-custom-extension-prometheus</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-core-api-container</artifactId>
         <version>${version.org.codehaus.cargo}</version>

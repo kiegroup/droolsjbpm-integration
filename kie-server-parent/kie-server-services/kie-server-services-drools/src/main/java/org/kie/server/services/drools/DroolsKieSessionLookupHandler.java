@@ -15,16 +15,17 @@
 
 package org.kie.server.services.drools;
 
+import java.util.List;
+
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.RuleRuntimeEventManager;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.server.services.api.KieContainerInstance;
-import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieSessionLookupHandler;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
-import org.kie.server.services.prometheus.PrometheusMetrics;
 import org.kie.server.services.prometheus.PrometheusMetricsDroolsListener;
 
 public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
@@ -46,12 +47,23 @@ public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
                 }
             }
 
-            KieServerExtension extension = registry.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
+            PrometheusKieServerExtension extension = (PrometheusKieServerExtension)registry.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
             if (extension != null && ks != null) {
-                RuleRuntimeEventManager eventManager = (RuleRuntimeEventManager)ks;
-                PrometheusMetrics metrics = PrometheusKieServerExtension.getMetrics();
-                PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(metrics, kieSessionId, containerInstance);
+                RuleRuntimeEventManager eventManager = (RuleRuntimeEventManager) ks;
+
+                //default handler
+                PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(PrometheusKieServerExtension.getMetrics(),
+                        kieSessionId, containerInstance);
                 eventManager.addEventListener(listener);
+
+                //custom handlers
+                List<AgendaEventListener> droolsListeners = extension.getDroolsListeners(kieSessionId, containerInstance);
+                droolsListeners.forEach(l -> {
+                    if (!eventManager.getAgendaEventListeners().contains(l)) {
+                        eventManager.addEventListener(l);
+                    }
+                });
+
             }
             return ks;
         }
