@@ -115,9 +115,8 @@ public abstract class AbstractKieServicesClientImpl {
         }
         urlString += "services/"+servicePrefix + "/server";
 
-        URL serverPlusServicePrefixUrl;
         try {
-            serverPlusServicePrefixUrl = new URL( urlString );
+            new URL( urlString );
         } catch ( MalformedURLException murle ) {
             throw new IllegalArgumentException(
                     "URL (" + url.toExternalForm() + ") is incorrectly formatted: " + murle.getMessage(), murle );
@@ -547,6 +546,14 @@ public abstract class AbstractKieServicesClientImpl {
                 producer.send(textMsg);
             } catch( JMSException jmse ) {
                 throw new KieServicesException("Unable to send a JMS message.", jmse);
+            } finally {
+                if ( producer != null ) {
+                    try {
+                        producer.close();
+                    } catch (JMSException jmse) {
+                        logger.warn("Unable to close producer!", jmse);
+                    }
+                }
             }
 
             // receive

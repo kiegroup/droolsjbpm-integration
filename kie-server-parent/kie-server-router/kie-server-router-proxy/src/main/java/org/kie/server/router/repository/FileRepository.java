@@ -45,30 +45,20 @@ public class FileRepository implements ConfigRepository {
 
     @Override
     public void persist(Configuration configuration) {
-                
-        
-        FileOutputStream fos = null;
-        try {
-            File configFile = new File(repositoryDir, "kie-server-router.json");
-            fos = new FileOutputStream(configFile);
+
+        File configFile = new File(repositoryDir, "kie-server-router.json");
+        try (FileOutputStream fos = new FileOutputStream(configFile)) {
             
             String config = marshaller.marshall(configuration);
-            
-            PrintWriter writer = new PrintWriter(fos);
-            writer.write(config);
-            writer.close();
-            
+
+            try (PrintWriter writer = new PrintWriter(fos)) {
+                writer.write(config);
+            }
+
             configFile.setLastModified(System.currentTimeMillis());
 
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                }
-            }
         }
     }
 

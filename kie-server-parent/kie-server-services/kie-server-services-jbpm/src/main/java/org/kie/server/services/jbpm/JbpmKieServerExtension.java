@@ -16,6 +16,7 @@
 package org.kie.server.services.jbpm;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -448,11 +449,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
             // add any query definition found in kjar
             Enumeration<URL> queryDefinitionsFiles = kieContainer.getClassLoader().getResources("query-definitions.json");
             while (queryDefinitionsFiles.hasMoreElements()) {
-
-                URL definitionsURL = queryDefinitionsFiles.nextElement();
-                InputStream qdStream = definitionsURL.openStream();
-
-                loadAndRegisterQueryDefinitions(qdStream, kieContainerInstance.getMarshaller(MarshallingFormat.JSON), id);
+                try (InputStream qdStream = queryDefinitionsFiles.nextElement().openStream()) {
+                    loadAndRegisterQueryDefinitions(qdStream, kieContainerInstance.getMarshaller(MarshallingFormat.JSON), id);
+                }
             }
 
             logger.debug("Container {} created successfully by extension {}", id, this);
@@ -812,24 +811,23 @@ public class JbpmKieServerExtension implements KieServerExtension {
     }
 
     protected void registerDefaultQueryDefinitions() {
-        try {
-            // load any default query definitions
-            InputStream qdStream = this.getClass().getResourceAsStream("/default-query-definitions.json");
-            if (qdStream == null) {
-                String externalLocationQueryDefinitions = System.getProperty(KieServerConstants.CFG_DEFAULT_QUERY_DEFS_LOCATION);
-                if (externalLocationQueryDefinitions != null) {
-                    qdStream = new FileInputStream(externalLocationQueryDefinitions);
-                }
-            }
-
+        try (InputStream qdStream = getDefaultQueryDefinitionsInputStream()) {
             loadAndRegisterQueryDefinitions(qdStream, MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader()), null);
-
-            if (qdStream != null) {
-                qdStream.close();
-            }
         } catch (Exception e) {
             logger.error("Error when loading default query definitions from default-query-definitions.json", e);
         }
+    }
+
+    private InputStream getDefaultQueryDefinitionsInputStream() throws FileNotFoundException {
+        // load any default query definitions
+        InputStream qdStream = this.getClass().getResourceAsStream("/default-query-definitions.json");
+        if (qdStream == null) {
+            String externalLocationQueryDefinitions = System.getProperty(KieServerConstants.CFG_DEFAULT_QUERY_DEFS_LOCATION);
+            if (externalLocationQueryDefinitions != null) {
+                qdStream = new FileInputStream(externalLocationQueryDefinitions);
+            }
+        }
+        return qdStream;
     }
 
     // just for tests

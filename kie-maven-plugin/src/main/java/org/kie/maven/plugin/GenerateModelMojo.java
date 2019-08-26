@@ -184,8 +184,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
     private void deleteDrlFiles(Set<String> actualDrlFiles) throws MojoExecutionException {
         // Remove drl files
-        try {
-            final Stream<Path> drlFilesToDeleted = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p));
+        try (final Stream<Path> drlFilesToDeleted = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p))) {
             Set<String> deletedFiles = new HashSet<>();
             drlFilesToDeleted.forEach(p -> {
                 try {
