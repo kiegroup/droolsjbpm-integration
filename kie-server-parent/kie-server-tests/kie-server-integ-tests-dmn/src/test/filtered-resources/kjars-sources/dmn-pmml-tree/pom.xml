@@ -7,7 +7,7 @@
     <version>1.0.0.Final</version>
   </parent>
 
-  <artifactId>dmn-pmml-kjar</artifactId>
+  <artifactId>dmn-pmml-tree-kjar</artifactId>
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 
