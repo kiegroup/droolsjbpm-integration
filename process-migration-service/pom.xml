@@ -46,7 +46,7 @@
 
     <!-- PIM service configuration -->
     <pim.server.http.rest>http://${container.hostname}:8180/rest</pim.server.http.rest>
-    <pim.server.http.health>${pim.server.http.rest}/health/readiness</pim.server.http.health>
+    <pim.server.http.health>${pim.server.http.rest}/health</pim.server.http.health>
     <pim.username>kermit</pim.username>
     <pim.password>thefrog</pim.password>
 

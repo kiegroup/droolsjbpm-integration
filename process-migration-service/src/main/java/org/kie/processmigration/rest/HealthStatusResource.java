@@ -16,33 +16,22 @@
 
 package org.kie.processmigration.rest;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.eclipse.microprofile.health.Health;
-import org.kie.processmigration.service.StatusService;
+import org.kie.processmigration.model.Health;
 
 @Path("/health")
 @Produces(MediaType.APPLICATION_JSON)
 public class HealthStatusResource {
 
-    @Inject
-    private StatusService statusService;
+    private static final Response UP = Response.ok(Health.UP).build();
 
     @GET
-    @Path("/readiness")
-    @Health
-    public Response checkReadiness() {
-        return Response.ok(statusService.getHealth()).build();
-    }
-
-    @GET
-    @Path("/status")
-    public Response getStatus() {
-        return Response.ok(statusService.getStatus()).build();
+    public Response getUpStatus() {
+        return UP;
     }
 }

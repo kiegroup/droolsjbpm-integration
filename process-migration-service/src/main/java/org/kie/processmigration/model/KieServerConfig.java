@@ -24,6 +24,7 @@ import org.kie.server.client.KieServicesClient;
 
 public class KieServerConfig {
 
+    private static final String UNKNOWN_STATUS = "UNKNOWN";
     private String id;
 
     private String host;
@@ -83,12 +84,12 @@ public class KieServerConfig {
 
     public String getStatus() {
         if (client == null) {
-            return Status.UNKNOWN;
+            return UNKNOWN_STATUS;
         }
         try {
             return client.getServerInfo().getType().name();
         } catch (Exception e) {
-            return Status.UNKNOWN;
+            return UNKNOWN_STATUS;
         }
     }
 

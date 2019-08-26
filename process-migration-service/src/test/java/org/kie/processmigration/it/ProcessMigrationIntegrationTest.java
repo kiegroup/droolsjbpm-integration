@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -63,6 +65,7 @@ import org.kie.server.client.ProcessServicesClient;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class ProcessMigrationIntegrationTest {
 
@@ -90,6 +93,13 @@ public class ProcessMigrationIntegrationTest {
         assertNotNull(definition);
         assertEquals(PROCESS_ID, definition.getId());
         client = HttpClientBuilder.create().setDefaultCredentialsProvider(getBasicAuth()).build();
+    }
+
+    @Test
+    public void testHealthCheck() throws IOException {
+        HttpGet get = new HttpGet(PIM_ENDPOINT + "/health");
+        HttpResponse response = client.execute(get);
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatusLine().getStatusCode());
     }
 
     @Test
