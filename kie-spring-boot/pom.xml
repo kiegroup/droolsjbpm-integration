@@ -16,7 +16,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.26.0-SNAPSHOT</version>
+    <version>7.26.1-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
