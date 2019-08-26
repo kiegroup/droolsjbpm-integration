@@ -11,6 +11,7 @@ thorntail:
           - url-pattern: /*
             roles: [ admin ]
           - url-pattern: /health/*
+          - url-pattern: /rest/health/*
   datasources:
     data-sources:
       pimDS:

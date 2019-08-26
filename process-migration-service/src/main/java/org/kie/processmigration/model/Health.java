@@ -16,24 +16,17 @@
 
 package org.kie.processmigration.model;
 
-import java.util.Collection;
+public class Health {
 
-public class Status {
+    public static final Health UP = new Health("UP");
 
-    public static final String UP = "UP";
-    public static final String UNKNOWN = "UNKNOWN";
+    private final String status;
 
-    private final Collection<KieServerConfig> kieServers;
-
-    public Status(Collection<KieServerConfig> kieServers) {
-        this.kieServers = kieServers;
+    private Health(String status) {
+        this.status = status;
     }
 
-    public Collection<KieServerConfig> getKieServers() {
-        return kieServers;
-    }
-
-    public String getHealth() {
-        return UP;
+    public String getStatus() {
+        return status;
     }
 }
