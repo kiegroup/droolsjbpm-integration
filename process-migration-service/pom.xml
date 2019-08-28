@@ -614,5 +614,30 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <id>run-code-coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.bazaarvoice.maven.plugins</groupId>
+            <artifactId>process-exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>start-process-migration-service</id>
+                <configuration>
+                  <arguments>
+                    <argument>java</argument>
+                    <argument>${jacoco.agent.line}</argument>
+                    <argument>-jar</argument>
+                    <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
+                    <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
