@@ -11,6 +11,10 @@
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 
+  <properties>
+    <generateModel>NO</generateModel>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec.javax.xml.bind</groupId>
@@ -20,6 +24,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

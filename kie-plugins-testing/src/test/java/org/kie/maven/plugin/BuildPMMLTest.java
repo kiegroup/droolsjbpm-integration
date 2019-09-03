@@ -43,10 +43,10 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
     private static final String GAV_VERSION = "1.0.0.Final";
 
     private static final String KIE_SESSION_NAME = "PMML.session";
-    private static final String KIE_PACKAGE_WITH_PMML = "org.kie.scorecards.example.SampleScore";
+    private static final String KIE_PACKAGE_WITH_PMML = "PMMLResources.SampleScore";
 
     private static final String PMML_FILE_NAME = "PMMLResources/simple-pmml.pmml";
-    private static final String EXAMPLE_PMML_CLASS = "org/kie/scorecards/example/SampleScore/OverallScore.class";
+    private static final String EXAMPLE_PMML_CLASS = "PMMLResources/SampleScore/OverallScore.class";
 
     public BuildPMMLTest(MavenRuntime.MavenRuntimeBuilder builder) {
         super(builder);
