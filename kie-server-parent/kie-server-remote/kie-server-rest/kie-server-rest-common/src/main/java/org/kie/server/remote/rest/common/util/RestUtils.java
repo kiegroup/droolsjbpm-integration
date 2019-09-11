@@ -25,6 +25,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.ConversationId;
 import org.kie.server.api.KieServerConstants;
@@ -237,5 +239,30 @@ public class RestUtils {
     
     public static String errorMessage(Throwable e) {        
         return errorMessage(e, MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()));
+    }
+
+
+    @XmlRootElement
+    public static class Wrapper<T> {
+
+        @XmlAttribute
+        private T id;
+
+        public Wrapper(T id) {
+            this.id = id;
+        }
+
+        public T getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + id + "]";
+        }
+    }
+
+    public static <T> Wrapper<T> toIdentifier(T id) {
+        return new Wrapper<T>(id);
     }
 }

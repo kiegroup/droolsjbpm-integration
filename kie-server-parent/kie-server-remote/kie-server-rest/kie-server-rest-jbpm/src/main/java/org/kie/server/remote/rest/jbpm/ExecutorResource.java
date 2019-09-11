@@ -15,37 +15,6 @@
 
 package org.kie.server.remote.rest.jbpm;
 
-import static org.kie.server.api.rest.RestURI.CANCEL_JOB_DEL_URI;
-import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
-import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_CMD_GET_URI;
-import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_CONTAINER_GET_URI;
-import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_KEY_GET_URI;
-import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI;
-import static org.kie.server.api.rest.RestURI.JOB_INSTANCE_GET_URI;
-import static org.kie.server.api.rest.RestURI.JOB_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
-import static org.kie.server.api.rest.RestURI.REQUEUE_JOB_PUT_URI;
-import static org.kie.server.api.rest.RestURI.UPDATE_JOB_DATA_POST_URI;
-import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
-import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
-import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
-import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
-import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.CREATE_JOB_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_REQUESTS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_REQUEST_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JOB_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JOB_XML;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
-
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -63,14 +32,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.kie.server.api.model.instance.RequestInfoInstance;
-import org.kie.server.api.model.instance.RequestInfoInstanceList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.ExecutorServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -78,6 +39,45 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
+import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.api.model.instance.RequestInfoInstanceList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.util.RestUtils;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.ExecutorServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.kie.server.api.rest.RestURI.CANCEL_JOB_DEL_URI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_CMD_GET_URI;
+import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_CONTAINER_GET_URI;
+import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_KEY_GET_URI;
+import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.JOB_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.JOB_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
+import static org.kie.server.api.rest.RestURI.REQUEUE_JOB_PUT_URI;
+import static org.kie.server.api.rest.RestURI.UPDATE_JOB_DATA_POST_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.CREATE_JOB_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_REQUESTS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_REQUEST_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JOB_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JOB_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 
 @Api(value="Jobs")
 @Path("server/" + JOB_URI)
@@ -123,7 +123,7 @@ public class ExecutorResource {
             String response = executorServiceBase.scheduleRequest(containerId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+            return createResponse(RestUtils.toIdentifier(response), v, Response.Status.CREATED, conversationIdHeader);
 
         } catch (IllegalArgumentException e) {
             logger.error("Invalid Command type ", e.getMessage(), e);

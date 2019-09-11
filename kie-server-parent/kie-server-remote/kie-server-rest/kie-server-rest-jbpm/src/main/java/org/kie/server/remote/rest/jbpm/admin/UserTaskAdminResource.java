@@ -15,6 +15,47 @@
 
 package org.kie.server.remote.rest.jbpm.admin;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.TaskNotFoundException;
+import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.TaskNotificationList;
+import org.kie.server.api.model.admin.TaskReassignmentList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.util.RestUtils;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.ACK_ERRORS_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ACK_ERROR_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ADMIN_TASK_URI;
@@ -42,12 +83,12 @@ import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_EXEC_ERRORS_RESPONSE_JSON;
@@ -63,47 +104,6 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.TaskNotFoundException;
-import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
-import org.kie.server.api.model.admin.ExecutionErrorInstance;
-import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
-import org.kie.server.api.model.admin.TaskNotificationList;
-import org.kie.server.api.model.admin.TaskReassignmentList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Task instance administration")
 @Path("server/" + ADMIN_TASK_URI)
@@ -398,7 +398,7 @@ public class UserTaskAdminResource {
             if (whenNotCompleted) {
                 id = userTaskAdminServiceBase.reassignWhenNotCompleted(containerId, tInstanceId, expiresAt, payload, type);
             }
-            return createResponse(id, v, Response.Status.CREATED, conversationIdHeader);
+            return createResponse(RestUtils.toIdentifier(id), v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
@@ -448,7 +448,7 @@ public class UserTaskAdminResource {
             if (whenNotCompleted) {
                 id = userTaskAdminServiceBase.notifyWhenNotCompleted(containerId, tInstanceId, expiresAt, payload, type);
             }
-            return createResponse(id, v, Response.Status.CREATED, conversationIdHeader);
+            return createResponse(RestUtils.toIdentifier(id), v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {

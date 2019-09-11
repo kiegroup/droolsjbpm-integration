@@ -15,9 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm.rest;
 
-import static org.junit.Assert.*;
-import static org.kie.server.api.rest.RestURI.*;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +45,23 @@ import org.kie.server.integrationtests.shared.KieServerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INST_DEL_URI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_ID;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_URI;
+import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
+import static org.kie.server.api.rest.RestURI.build;
+
 
 public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
 
@@ -62,7 +76,6 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/rest-processes");
         // set the accepted formats with quality param to express preference
-        acceptHeadersByFormat.put(MarshallingFormat.JAXB, "application/xml;q=0.9,application/json;q=0.3");// xml is preferred over json
         acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml
 
         createContainer(CONTAINER, releaseId);

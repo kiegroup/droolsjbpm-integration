@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
 
-import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
+import org.kie.server.remote.rest.common.util.WrapperMessageBodyWriter;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
@@ -51,6 +49,7 @@ public class KieServerApplication extends Application {
 				for (KieServerExtension extension : extensions) {
 					addAll(extension.getAppComponents(SupportedTransports.REST));
 				}
+                add(new WrapperMessageBodyWriter());
 			}
 		};
 	}

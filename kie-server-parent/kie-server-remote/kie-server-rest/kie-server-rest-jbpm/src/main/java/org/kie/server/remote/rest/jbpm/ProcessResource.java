@@ -15,6 +15,54 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.DeploymentNotActiveException;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessDefinitionNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.WorkItemNotFoundException;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.util.RestUtils;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.ProcessServiceBase;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INSTANCES_DEL_URI;
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INST_DEL_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
@@ -45,12 +93,12 @@ import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON;
@@ -74,54 +122,6 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.CREATE_RESPONSE
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.WORK_ITEM_NOT_FOUND;
-
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.DeploymentNotActiveException;
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessDefinitionNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.WorkItemNotFoundException;
-import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.model.instance.WorkItemInstanceList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.ProcessServiceBase;
-import org.kie.server.services.jbpm.RuntimeDataServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Process instances")
 @Path("server/" + PROCESS_URI)
@@ -175,7 +175,7 @@ public class ProcessResource  {
 
             logger.debug("Returning CREATED response with content '{}'", response);
             Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+            return createResponse(RestUtils.toIdentifier(response), v, Response.Status.CREATED, conversationIdHeader);
         } catch (DeploymentNotActiveException e) {
             return badRequest(
                     e.getMessage(), v);
@@ -218,7 +218,7 @@ public class ProcessResource  {
 
             logger.debug("Returning CREATED response with content '{}'", response);
             Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+            return createResponse(RestUtils.toIdentifier(response), v, Response.Status.CREATED, conversationIdHeader);
         } catch (DeploymentNotActiveException e) {
             return badRequest(
                     e.getMessage(), v);

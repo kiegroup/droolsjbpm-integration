@@ -15,27 +15,6 @@
 
 package org.kie.server.remote.rest.jbpm;
 
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_CONTENT_GET_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_DELETE_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_GET_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_PUT_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
-import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
-import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
-import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.CREATE_DOC_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_XML;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENTS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENT_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -57,15 +36,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Variant;
 
-import org.kie.server.api.model.instance.DocumentInstance;
-import org.kie.server.api.model.instance.DocumentInstanceList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.api.KieServerRuntimeException;
-import org.kie.server.services.jbpm.DocumentServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -74,6 +44,36 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import io.swagger.annotations.ResponseHeader;
+import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstanceList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.util.RestUtils;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.api.KieServerRuntimeException;
+import org.kie.server.services.jbpm.DocumentServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.CREATE_DOC_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENTS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENT_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 
 @Api(value="Documents")
 @Path("server/" + DOCUMENT_URI)
@@ -204,7 +204,7 @@ public class DocumentResource {
 
             String identifier = documentServiceBase.storeDocument(payload, type);
 
-            return createCorrectVariant(identifier, headers, Response.Status.CREATED, conversationIdHeader);
+            return createCorrectVariant(RestUtils.toIdentifier(identifier), headers, Response.Status.CREATED, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);

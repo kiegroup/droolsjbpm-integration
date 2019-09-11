@@ -120,6 +120,7 @@ import org.kie.server.api.model.cases.CaseStageList;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.util.RestUtils;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.kie.server.services.casemgmt.CaseManagementServiceBase;
@@ -860,7 +861,7 @@ public class CaseResource extends AbstractCaseResource {
                     String commentId = this.caseManagementServiceBase.addCommentToCase(containerId, caseId, author, restrictions, payload, type);
 
                     logger.debug("Returning CREATED response");
-                    return createResponse(commentId, v, Response.Status.CREATED, customHeaders);
+                    return createResponse(RestUtils.toIdentifier(commentId), v, Response.Status.CREATED, customHeaders);
                 });
     }
 
