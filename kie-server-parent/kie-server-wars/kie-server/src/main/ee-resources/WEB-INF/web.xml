@@ -13,6 +13,16 @@
     <url-pattern>/services/rest/*</url-pattern>
   </servlet-mapping>
 
+  <filter>
+    <filter-name>request-capture</filter-name>
+    <filter-class>org.kie.server.services.impl.security.adapters.KeycloakSecurityFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>request-capture</filter-name>
+    <url-pattern>/services/rest/*</url-pattern>
+  </filter-mapping>
+
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Swagger web resources</web-resource-name>
