@@ -1,25 +1,24 @@
-import React from "react";
-
-import { orderBy } from "lodash";
 import classNames from "classnames";
-import * as sort from "sortabular";
-import * as resolve from "table-resolver";
-import { compose } from "recompose";
-
-import PropTypes from "prop-types";
-
+import { orderBy } from "lodash";
 import {
   customHeaderFormattersDefinition,
   defaultSortingOrder,
+  Grid,
+  paginate,
+  PAGINATION_VIEW,
+  PaginationRow,
   selectionCellFormatter,
   selectionHeaderCellFormatter,
   sortableHeaderCellFormatter,
-  tableCellFormatter,
   Table,
-  TABLE_SORT_DIRECTION
+  TABLE_SORT_DIRECTION,
+  tableCellFormatter
 } from "patternfly-react";
-import { Grid } from "patternfly-react";
-import { PaginationRow, paginate, PAGINATION_VIEW } from "patternfly-react";
+import PropTypes from "prop-types";
+import React from "react";
+import { compose } from "recompose";
+import * as sort from "sortabular";
+import * as resolve from "table-resolver";
 
 export default class PageMigrationRunningInstances extends React.Component {
   constructor(props) {
@@ -266,7 +265,7 @@ export default class PageMigrationRunningInstances extends React.Component {
   };
   onRow = row => {
     const { selectedRows } = this.state;
-    const selected = selectedRows.indexOf(row.processInstanceId) > -1;
+    const selected = selectedRows.includes(row.processInstanceId);
     return {
       className: classNames({ selected }),
       role: "row"
@@ -285,9 +284,7 @@ export default class PageMigrationRunningInstances extends React.Component {
         ])
       ];
       const updatedRows = rows.map(r =>
-        updatedSelections.indexOf(r.processInstanceId) > -1
-          ? this.selectRow(r)
-          : r
+        updatedSelections.includes(r.processInstanceId) ? this.selectRow(r) : r
       );
       this.setState({
         // important: you must update rows to force a re-render and trigger onRow hook
@@ -297,11 +294,9 @@ export default class PageMigrationRunningInstances extends React.Component {
       this.updateSelectedProcessIds(rows, updatedSelections);
     } else {
       const ids = currentRows.map(r => r.processInstanceId);
-      const updatedSelections = selectedRows.filter(
-        r => !(ids.indexOf(r) > -1)
-      );
+      const updatedSelections = selectedRows.filter(r => !ids.includes(r));
       const updatedRows = rows.map(r =>
-        updatedSelections.indexOf(r.processInstanceId) > -1
+        updatedSelections.includes(r.processInstanceId)
           ? r
           : this.deselectRow(r)
       );
