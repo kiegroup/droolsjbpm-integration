@@ -15,6 +15,8 @@
 
 package org.kie.server.services.impl.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.ArrayList;
@@ -27,26 +29,59 @@ import java.util.stream.StreamSupport;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 
-import org.wildfly.security.auth.server.SecurityDomain;
-
 public class IdentityProviderUtils {
-
-    private static final String USE_KEYCLOAK_PROPERTY = "org.jbpm.workbench.kie_server.keycloak";
-
-    private static boolean KIE_SERVER_KEYCLOAK = Boolean.parseBoolean(System.getProperty(USE_KEYCLOAK_PROPERTY, "false"));
 
     private static IdentityProviderUtils utils = new IdentityProviderUtils();
 
-    private IdentityProviderUtils(){}
+    private static ThreadLocal<Object> currentSecurityIdentityLocal = new ThreadLocal<Object>();
 
-    public static IdentityProviderUtils getUtils(){
+    private Class securityDomain;
+    private Class securityIdentity;
+    private Method currentSecurityDomain;
+    private Method currentSecurityIdentity;
+    private Method currentPrincipal;
+    private Method currentRoles;
+
+    private boolean isWildflyElytronKeycloak;
+
+    private IdentityProviderUtils() {
+        try {
+            Class.forName("org.keycloak.KeycloakPrincipal");
+            securityDomain = Class.forName("org.wildfly.security.auth.server.SecurityDomain");
+            securityIdentity = Class.forName("org.wildfly.security.auth.server.SecurityIdentity");
+            currentSecurityDomain = securityDomain.getMethod("getCurrent", new Class[0]);
+            currentSecurityIdentity = securityDomain.getMethod("getCurrentSecurityIdentity", new Class[0]);
+            currentPrincipal = securityIdentity.getMethod("getPrincipal", new Class[0]);
+            currentRoles = securityIdentity.getMethod("getRoles", new Class[0]);
+
+            isWildflyElytronKeycloak = true;
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            isWildflyElytronKeycloak = false;
+            e.printStackTrace();
+        }
+    }
+
+    public static IdentityProviderUtils getUtils() {
         return utils;
     }
 
     public String getName() {
 
-        if (KIE_SERVER_KEYCLOAK){
-            return SecurityDomain.getCurrent().getCurrentSecurityIdentity().getPrincipal().getName();
+        if (isWildflyElytronKeycloak) {
+            try {
+                Object currentSecurityIdentityObject = currentSecurityIdentityLocal.get();
+                if (currentSecurityIdentityObject == null) {
+                    Object securityDomainObject = currentSecurityDomain.invoke(null, new Object[0]);
+                    currentSecurityIdentityObject = currentSecurityIdentity.invoke(securityDomainObject, new Object[0]);
+                    currentSecurityIdentityLocal.set(currentSecurityIdentityObject);
+                }
+                Principal principal = (Principal) currentPrincipal.invoke(currentSecurityIdentityObject, new Object[0]);
+                return principal.getName();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
 
         Subject subject = getSubjectFromContainer();
@@ -67,8 +102,22 @@ public class IdentityProviderUtils {
 
     public List<String> getRoles() {
 
-        if (KIE_SERVER_KEYCLOAK){
-            return StreamSupport.stream(SecurityDomain.getCurrent().getCurrentSecurityIdentity().getRoles().spliterator(), false).collect(Collectors.toList());
+        if (isWildflyElytronKeycloak) {
+            try {
+                Object currentSecurityIdentityObject = currentSecurityIdentityLocal.get();
+                if (currentSecurityIdentityObject == null) {
+                    Object securityDomainObject = currentSecurityDomain.invoke(null, new Object[0]);
+                    currentSecurityIdentityObject = currentSecurityIdentity.invoke(securityDomainObject, new Object[0]);
+                    currentSecurityIdentityLocal.set(currentSecurityIdentityObject);
+                }
+
+                Iterable<String> roles = (Iterable<String>) currentRoles.invoke(currentSecurityIdentityObject, new Object[0]);
+                return StreamSupport.stream(roles.spliterator(), false).collect(Collectors.toList());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
 
         List<String> roles = new ArrayList<String>();
@@ -90,7 +139,6 @@ public class IdentityProviderUtils {
                     }
                 }
             }
-
         }
 
         return roles;
