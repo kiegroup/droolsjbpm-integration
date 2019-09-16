@@ -12,15 +12,15 @@
     <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
   </listener>
 
-  <filter>
-    <filter-name>request-capture</filter-name>
-    <filter-class>org.kie.server.services.impl.security.adapters.KeycloakSecurityFilter</filter-class>
-  </filter>
+  <!--<filter>-->
+    <!--<filter-name>request-capture</filter-name>-->
+    <!--<filter-class>org.kie.server.services.impl.security.adapters.KeycloakSecurityFilter</filter-class>-->
+  <!--</filter>-->
 
-  <filter-mapping>
-    <filter-name>request-capture</filter-name>
-    <url-pattern>/services/rest/*</url-pattern>
-  </filter-mapping>
+  <!--<filter-mapping>-->
+    <!--<filter-name>request-capture</filter-name>-->
+    <!--<url-pattern>/services/rest/*</url-pattern>-->
+  <!--</filter-mapping>-->
 
   <filter>
     <filter-name>capture-request-filter</filter-name>

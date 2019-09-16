@@ -15,24 +15,23 @@
 
 package org.kie.server.services.impl.security;
 
-import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.Set;
-import javax.security.auth.Subject;
-import javax.security.jacc.PolicyContext;
 
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.security.SecurityAdapter;
+import org.kie.server.services.impl.util.IdentityProviderUtils;
 
 public class JACCIdentityProvider implements IdentityProvider {
 
     private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
 
     private List<SecurityAdapter> adapters = new ArrayList<>();
+
+    private static final String USE_KEYCLOAK_PROPERTY = "org.jbpm.workbench.kie_server.keycloak";
+
+    private static boolean KIE_SERVER_KEYCLOAK = Boolean.parseBoolean(System.getProperty(USE_KEYCLOAK_PROPERTY, "false"));
 
     public JACCIdentityProvider() {
         for (SecurityAdapter adapter : securityAdapters) {
@@ -42,48 +41,20 @@ public class JACCIdentityProvider implements IdentityProvider {
 
     @Override
     public String getName() {
-        Subject subject = getSubjectFromContainer();
 
-        if (subject != null) {
-            Set<Principal> principals = subject.getPrincipals();
-
-            if (principals != null) {
-                for (Principal principal : principals) {
-                    if (supportedPrincipal(principal)) {
-                        return principal.getName();
-                    }
-                }
-            }
+        String name = IdentityProviderUtils.getUtils().getName();
+        if (name.isEmpty() || name == null) {
+            return getNameFromAdapter();
         }
-        return getNameFromAdapter();
+        return name;
     }
 
     @Override
     public List<String> getRoles() {
+
         List<String> roles = new ArrayList<String>();
 
-        Subject subject = getSubjectFromContainer();
-        if (subject != null) {
-            Set<Principal> principals = subject.getPrincipals();
-
-            if (principals != null) {
-
-                roles = new ArrayList<String>();
-                for (Principal principal : principals) {
-                    if (principal instanceof Group) {
-                        Enumeration<? extends Principal> groups = ((Group) principal).members();
-
-                        while (groups.hasMoreElements()) {
-                            Principal groupPrincipal = (Principal) groups.nextElement();
-                            roles.add(groupPrincipal.getName());
-                        }
-                        break;
-                    }
-                }
-            }
-
-        }
-
+        roles.addAll(IdentityProviderUtils.getUtils().getRoles());
         roles.addAll(getRolesFromAdapter());
 
         return roles;
@@ -94,13 +65,6 @@ public class JACCIdentityProvider implements IdentityProvider {
         return false;
     }
 
-    protected Subject getSubjectFromContainer() {
-        try {
-            return (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     protected String getNameFromAdapter() {
         for (SecurityAdapter adapter : adapters) {
@@ -126,11 +90,4 @@ public class JACCIdentityProvider implements IdentityProvider {
         return roles;
     }
 
-    protected boolean supportedPrincipal(Principal principal) {
-        if (!(principal instanceof Group) && !principal.getClass().getName().endsWith("BasicAuthorizationPrincipal")) {
-            return true;
-        }
-
-        return false;
-    }
 }
