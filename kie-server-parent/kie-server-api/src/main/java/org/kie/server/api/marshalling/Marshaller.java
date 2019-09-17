@@ -16,10 +16,18 @@
 
 package org.kie.server.api.marshalling;
 
+import java.util.Map;
+
 /**
  * These Marshallers implementations must be thread-safe
  */
 public interface Marshaller {
+
+    static String MARSHALLER_PARAMETER_STRICT = "strict";
+
+    public default String marshall(Object input, Map<String, Object> parameters) {
+        return marshall(input);
+    }
 
     public String marshall(Object input);
 

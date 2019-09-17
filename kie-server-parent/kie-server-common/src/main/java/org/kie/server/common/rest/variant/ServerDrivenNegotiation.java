@@ -172,13 +172,13 @@ public class ServerDrivenNegotiation
             // Same type
             if (bestType.getSubtype().equals(optionType.getSubtype()))
             {
-               // Same subtype
-               int bestCount = bestType.getParameters().size();
-               int optionCount = optionType.getParameters().size();
-               if (optionCount > bestCount)
-                  return true;   // more matching parameters
-               else if (optionCount < bestCount)
-                  return false;   // less matching parameters
+                    // Same subtype
+                    // if quality is the same we prefer less parameters
+                    if (bestQuality.compareTo(optionQuality) == 0) {
+                        return bestType.getParameters().size() > optionType.getParameters().size();
+                    } else {
+                        return bestQuality.compareTo(optionQuality) < 0;
+                    }
             }
             else if ("*".equals(bestType.getSubtype()))
             {
@@ -219,74 +219,79 @@ public class ServerDrivenNegotiation
    }
 
 
-   private boolean applyMediaType(Variant option, VariantQuality quality)
-   {
-      if (requestedMediaTypes == null)
-         return true;
-      MediaType mediaType = option.getMediaType();
-      if (mediaType == null)
-         return true;
+    private boolean applyMediaType(Variant option, VariantQuality quality) {
+        if (requestedMediaTypes == null)
+            return true;
+        MediaType mediaType = option.getMediaType();
+        if (mediaType == null)
+            return true;
 
-      String type = mediaType.getType();
-      if ("*".equals(type))
-         type = null;
-      String subtype = mediaType.getSubtype();
-      if ("*".equals(subtype))
-         subtype = null;
-      Map<String, String> parameters = mediaType.getParameters();
-      if (parameters.isEmpty())
-         parameters = null;
+        String type = mediaType.getType();
+        if ("*".equals(type))
+            type = null;
+        String subtype = mediaType.getSubtype();
+        if ("*".equals(subtype))
+            subtype = null;
+        // parameters needed
+        Map<String, String> parameters = mediaType.getParameters();
 
-      QualityValue bestQuality = QualityValue.NOT_ACCEPTABLE;
-      int bestMatchCount = -1;
+        QualityValue bestQuality = QualityValue.NOT_ACCEPTABLE;
+        int bestMatchCount = -1;
 
-      for (MediaType requested : requestedMediaTypes.keySet())
-      {
-         int matchCount = 0;
-         if (type != null)
-         {
-            String requestedType = requested.getType();
-            if (requestedType.equals(type))
-               ++matchCount;
-            else if (!"*".equals(requestedType))
-               continue;
-         }
-         if (subtype != null)
-         {
-            String requestedSubtype = requested.getSubtype();
-            if (requestedSubtype.equals(subtype))
-               ++matchCount;
-            else if (!"*".equals(requestedSubtype))
-               continue;
-         }
-         if (parameters != null)
-         {
-            Map<String, String> requestedParameters = requested.getParameters();
-            if (!hasRequiredParameters(requestedParameters, parameters))
-               continue;
-            matchCount += requestedParameters.size();
-         }
+        for (MediaType requested : requestedMediaTypes.keySet()) {
+            int matchCount = 0;
+            if (type != null) {
+                String requestedType = requested.getType();
+                if (requestedType.equals(type))
+                    ++matchCount;
+                else if (!"*".equals(requestedType))
+                    continue;
+            }
+            if (subtype != null) {
+                String requestedSubtype = requested.getSubtype();
+                if (requestedSubtype.equals(subtype))
+                    ++matchCount;
+                else if (!"*".equals(requestedSubtype))
+                    continue;
+            }
+            if (parameters != null) {
+                Map<String, String> requestedParameters = requested.getParameters();
+                if (!requestedParameters.isEmpty() && hasRequiredParameters(requestedParameters, parameters)) {
+                    matchCount += countRequiredParameters(requestedParameters, parameters);
+                }
+            }
 
-         if (matchCount > bestMatchCount)
-         {
-            bestMatchCount = matchCount;
-            bestQuality = requestedMediaTypes.get(requested);
-         }
-         else if (matchCount == bestMatchCount)
-         {
-            QualityValue qualityValue = requestedMediaTypes.get(requested);
-            if (bestQuality.compareTo(qualityValue) < 0)
-               bestQuality = qualityValue;
-         }
-      }
+            if (matchCount > bestMatchCount) {
+                bestMatchCount = matchCount;
+                bestQuality = requestedMediaTypes.get(requested);
+            } else if (matchCount == bestMatchCount) {
+                QualityValue qualityValue = requestedMediaTypes.get(requested);
+                if (bestQuality.compareTo(qualityValue) < 0)
+                    bestQuality = qualityValue;
+            }
+        }
 
-      if (!bestQuality.isAcceptable())
-         return false;
+        if (!bestQuality.isAcceptable())
+            return false;
 
-      quality.setMediaTypeQualityValue(bestQuality);
-      return true;
-   }
+        quality.setMatchCountQualityValue(bestMatchCount == 0 ? QualityValue.LOWEST : QualityValue.valueOf(bestMatchCount));
+        quality.setMediaTypeQualityValue(bestQuality);
+        return true;
+    }
 
+    private int countRequiredParameters(Map<String, String> required, Map<String, String> available) {
+        int numberOfRequiredParameters = 0;
+        for (Entry<String, String> requiredEntry : required.entrySet()) {
+            String name = requiredEntry.getKey();
+            String value = requiredEntry.getValue();
+            String availableValue = available.get(name);
+            // if it accepts any value or it is the same value
+            if (availableValue.equals("*") || value.equals(availableValue)) {
+                numberOfRequiredParameters++;
+            }
+        }
+        return numberOfRequiredParameters;
+    }
 
    private boolean hasRequiredParameters(Map<String, String> required, Map<String, String> available)
    {
@@ -295,15 +300,15 @@ public class ServerDrivenNegotiation
          String name = requiredEntry.getKey();
          String value = requiredEntry.getValue();
          String availableValue = available.get(name);
-         if (availableValue == null && "charset".equals(name))
-         {
+         if (availableValue == null && "charset".equals(name)) {
             if (requestedCharacterSets != null
                     && !requestedCharacterSets.containsKey(null)
-                    && !requestedCharacterSets.containsKey(value))
+                    && !requestedCharacterSets.containsKey(value)) {
                return false;
+                }
+            } else if (!value.equals(availableValue)) {
+                return false;
          }
-         else if (!value.equals(availableValue))
-            return false;
       }
       return true;
    }

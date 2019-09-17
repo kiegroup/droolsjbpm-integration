@@ -15,6 +15,7 @@
 
 package org.kie.server.services.impl.marshal;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,9 @@ import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+
+import static org.kie.server.api.marshalling.Marshaller.MARSHALLER_PARAMETER_STRICT;
+import static org.kie.server.api.marshalling.MarshallingFormat.isStrictType;
 
 public class MarshallerHelper {
 
@@ -63,7 +67,7 @@ public class MarshallerHelper {
             throw new IllegalArgumentException("No marshaller found for format " + format);
         }
 
-        return marshaller.marshall(entity);
+        return marshaller.marshall(entity, Collections.singletonMap(MARSHALLER_PARAMETER_STRICT, isStrictType(marshallingFormat)));
 
     }
 
@@ -80,7 +84,7 @@ public class MarshallerHelper {
         	serverMarshallers.put(format, marshaller);
         }
 
-        return marshaller.marshall(entity);
+        return marshaller.marshall(entity, Collections.singletonMap(MARSHALLER_PARAMETER_STRICT, isStrictType(marshallingFormat)));
     }
     
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<T> unmarshalType) {

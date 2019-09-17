@@ -76,10 +76,12 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import org.drools.core.xml.jaxb.util.JaxbListAdapter;
 import org.drools.core.xml.jaxb.util.JaxbListWrapper;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.type.JaxbByteArray;
 import org.slf4j.Logger;
@@ -89,13 +91,47 @@ public class JSONMarshaller implements Marshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(MarshallerFactory.class);
 
+    private static final boolean STRICT_ID_FORMAT = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_STRICT_ID_FORMAT, "false"));
+
     private boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
-    private ThreadLocal<Boolean> stripped = new ThreadLocal<Boolean>() {
+    static public class JSONContext {
+
+        private boolean stripped;
+
+        private boolean wrap;
+
+        public JSONContext() {
+            this.reset();
+        }
+
+        public void reset() {
+            stripped = false;
+            wrap = false;
+        }
+
+        public boolean isStripped() {
+            return stripped;
+        }
+
+        public void setStripped(boolean stripped) {
+            this.stripped = stripped;
+        }
+
+        public void setWrap(boolean wrap) {
+            this.wrap = wrap;
+        }
+
+        public boolean isWrap() {
+            return wrap;
+        }
+    }
+
+    private ThreadLocal<JSONContext> jsonContext = new ThreadLocal<JSONContext>() {
         @Override
-        protected Boolean initialValue() {
-            return false;
+        protected JSONContext initialValue() {
+            return new JSONContext();
         }
     };
 
@@ -268,6 +304,19 @@ public class JSONMarshaller implements Marshaller {
     }
 
     @Override
+    public String marshall(Object input, Map<String, Object> parameters) {
+        try {
+            if (parameters.containsKey(MARSHALLER_PARAMETER_STRICT)) {
+                jsonContext.get().setWrap((boolean) parameters.get(MARSHALLER_PARAMETER_STRICT));
+            }
+            return marshall(input);
+        } finally {
+            jsonContext.get().reset();
+        }
+
+    }
+
+    @Override
     public String marshall(Object objectInput) {
         try {
             return objectMapper.writeValueAsString(wrap(objectInput));
@@ -285,7 +334,7 @@ public class JSONMarshaller implements Marshaller {
         } catch (IOException e) {
             throw new MarshallingException("Error unmarshalling input", e);
         } finally {
-            stripped.set(false);
+            jsonContext.get().reset();
         }
     }
 
@@ -300,7 +349,10 @@ public class JSONMarshaller implements Marshaller {
     }
 
     protected Object wrap(Object data) {
-        if (data instanceof byte[]) {
+        if (STRICT_ID_FORMAT || jsonContext.get().isWrap()) {
+            // wrap primitives
+            data = ModelWrapper.wrap(data);
+        } else if (data instanceof byte[]) {
             return new JaxbByteArray((byte[]) data);
         }
 
@@ -660,7 +712,7 @@ public class JSONMarshaller implements Marshaller {
             String field1 = jp.getText();
             jp.nextToken();
             if (classes.containsKey(field1)) {
-                stripped.set(true);
+                jsonContext.get().setStripped(true);
                 Object value = deserializeObjectMapper.readValue(jp, classes.get(field1));
                 jp.nextToken();
 
@@ -780,7 +832,7 @@ public class JSONMarshaller implements Marshaller {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
-                if (classesSet.contains(_baseType.getRawClass()) && !stripped.get()) {
+                if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
 
                     try {
                         return super.deserializeTypedFromObject(jp, ctxt);
@@ -790,7 +842,7 @@ public class JSONMarshaller implements Marshaller {
                         return value;
                     }
                 }
-                stripped.set(false);
+                jsonContext.get().reset();
                 JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
                 Object value = deser.deserialize(jp, ctxt);
                 return value;
