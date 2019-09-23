@@ -223,7 +223,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
                 for (ModelBuilderImpl modelBuilder : modelBuilders) {
-                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageModels());
+                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageSources());
                     modelFiles.addAll(result.getModelFiles());
                     final Folder sourceFolder = srcMfs.getFolder("src/main/java");
                     final Folder targetFolder = trgMfs.getFolder(".");
