@@ -40,6 +40,7 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNDecisionResultKS;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.client.DMNServicesClient;
@@ -153,7 +154,8 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             if ( config.getMarshallingFormat() == MarshallingFormat.JSON ) {
                 recurseAndModifyByCoercingNumbers(result2.getResult().getContext());
                 for ( DMNDecisionResult dr : result2.getResult().getDecisionResults() ) {
-                    recurseAndModifyByCoercingNumbers( dr.getResult() );
+                    DMNDecisionResultKS drKS = (DMNDecisionResultKS) dr;
+                    drKS.setResult(recurseAndModifyByCoercingNumbers( dr.getResult() ));
                 }
             }
             

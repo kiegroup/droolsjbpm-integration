@@ -17,7 +17,6 @@
 package org.kie.server.integrationtests.dmn.pmml;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
@@ -50,7 +49,6 @@ public class DMNPMMLRegressionIntegrationTest extends DMNKieServerBaseIntegratio
             = "https://kiegroup.org/dmn/_51A1FD67-8A67-4332-9889-B718BE8B7456";
     private static final String REGRESSION_MODEL_NAME = "TestRegressionDMN";
     private static final String REGRESSION_DECISION_NAME = "Decision";
-    private static final String REGRESSION_DECISION_RESULT = "result";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
@@ -89,8 +87,7 @@ public class DMNPMMLRegressionIntegrationTest extends DMNKieServerBaseIntegratio
         final DMNResult dmnResult = serviceResponse.getResult();
         Assertions.assertThat(dmnResult).isNotNull();
         Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final BigDecimal result = (BigDecimal) ((Map) dmnResult.getDecisionResultByName(REGRESSION_DECISION_NAME)
-                .getResult()).get(REGRESSION_DECISION_RESULT);
+        final BigDecimal result = (BigDecimal) dmnResult.getDecisionResultByName(REGRESSION_DECISION_NAME).getResult();
         Assertions.assertThat(result).isEqualTo(new BigDecimal("52.5"));
     }
 }

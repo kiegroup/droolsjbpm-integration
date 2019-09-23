@@ -16,9 +16,6 @@
 
 package org.kie.server.integrationtests.dmn.pmml;
 
-import java.math.BigDecimal;
-import java.util.Map;
-
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -88,8 +85,7 @@ public class DMNPMMLTreeIntegrationTest extends DMNKieServerBaseIntegrationTest 
         final DMNResult dmnResult = serviceResponse.getResult();
         Assertions.assertThat(dmnResult).isNotNull();
         Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final String result = (String) ((Map) dmnResult.getDecisionResultByName(TREE_DECISION_NAME)
-                .getResult()).get(TREE_DECISION_RESULT);
+        final String result = (String) dmnResult.getDecisionResultByName(TREE_DECISION_NAME).getResult();
         Assertions.assertThat(result).isEqualTo("sunglasses");
     }
 }
