@@ -17,7 +17,6 @@
 package org.kie.server.integrationtests.dmn.pmml;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
@@ -50,7 +49,6 @@ public class DMNPMMLMiningIntegrationTest extends DMNKieServerBaseIntegrationTes
             = "https://kiegroup.org/dmn/_0E8EC382-BB89-4877-8D37-A59B64285F05";
     private static final String MINING_MODEL_NAME = "MiningModelDMN";
     private static final String MINING_DECISION_NAME = "Decision";
-    private static final String MINING_DECISION_RESULT = "result";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
@@ -89,8 +87,7 @@ public class DMNPMMLMiningIntegrationTest extends DMNKieServerBaseIntegrationTes
         final DMNResult dmnResult = serviceResponse.getResult();
         Assertions.assertThat(dmnResult).isNotNull();
         Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final BigDecimal result = (BigDecimal) ((Map) dmnResult.getDecisionResultByName(MINING_DECISION_NAME)
-                .getResult()).get(MINING_DECISION_RESULT);
+        final BigDecimal result = (BigDecimal) dmnResult.getDecisionResultByName(MINING_DECISION_NAME).getResult();
         Assertions.assertThat(result).isEqualTo(new BigDecimal("-299"));
     }
 }

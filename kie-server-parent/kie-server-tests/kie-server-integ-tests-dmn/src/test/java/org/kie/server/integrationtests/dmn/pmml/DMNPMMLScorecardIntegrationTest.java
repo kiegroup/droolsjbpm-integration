@@ -17,7 +17,6 @@
 package org.kie.server.integrationtests.dmn.pmml;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
@@ -50,7 +49,6 @@ public class DMNPMMLScorecardIntegrationTest extends DMNKieServerBaseIntegration
             = "http://www.trisotech.com/definitions/_ca466dbe-20b4-4e88-a43f-4ce3aff26e4f";
     private static final String SCORECARD_MODEL_NAME = "KiePMMLScoreCard";
     private static final String SCORECARD_DECISION_NAME = "my decision";
-    private static final String SCORECARD_DECISION_RESULT = "calculatedScore";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
@@ -86,8 +84,7 @@ public class DMNPMMLScorecardIntegrationTest extends DMNKieServerBaseIntegration
         final DMNResult dmnResult = serviceResponse.getResult();
         Assertions.assertThat(dmnResult).isNotNull();
         Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final BigDecimal result = (BigDecimal) ((Map) dmnResult.getDecisionResultByName(SCORECARD_DECISION_NAME)
-                .getResult()).get(SCORECARD_DECISION_RESULT);
+        final BigDecimal result = (BigDecimal) dmnResult.getDecisionResultByName(SCORECARD_DECISION_NAME).getResult();
         Assertions.assertThat(result).isEqualTo(new BigDecimal("41.345"));
     }
 }
