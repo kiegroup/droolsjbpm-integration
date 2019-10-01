@@ -15,6 +15,8 @@
   <properties>
     <java.module.name>org.kie.server.itests.custom.extension.test</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
+    <org.optaplanner.server.ext.disabled>false</org.optaplanner.server.ext.disabled>
+    <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
     <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
   </properties>
 
@@ -67,7 +69,7 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee7</classifier>
+      <classifier>ee8</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -85,7 +87,7 @@
               <phase>pre-integration-test</phase>
               <configuration>
                 <target>
-                  <unzip src="${maven.dependency.org.kie.server.kie-server.ee7.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
+                  <unzip src="${maven.dependency.org.kie.server.kie-server.ee8.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
                   <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-services.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
                   <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-prometheus.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
                   <copy file="${maven.dependency.org.kie.server.kie-server-integ-tests-custom-extension-rest.jar.path}" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
@@ -146,9 +148,9 @@
         <configuration>
           <container>
             <systemProperties>
-              <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
+              <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
-              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
+              <org.optaplanner.server.ext.disabled>${org.optaplanner.server.ext.disabled}</org.optaplanner.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
             </systemProperties>
           </container>
