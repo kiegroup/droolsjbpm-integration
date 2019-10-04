@@ -54,6 +54,9 @@ import org.springframework.util.ReflectionUtils;
 @EnableConfigurationProperties(KieServerProperties.class)
 public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     
+    @Value("${cxf.path:/}")
+    private String cxfPath;
+
     private static final Logger logger = LoggerFactory.getLogger(KieServerAutoConfiguration.class);
     
     private KieServerProperties properties;   
@@ -141,6 +144,8 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
                 Feature feature = (Feature) Class.forName("org.apache.cxf.jaxrs.swagger.Swagger2Feature").newInstance();
                 Method method = ReflectionUtils.findMethod(feature.getClass(), "setRunAsFilter", Boolean.TYPE);
                 method.invoke(feature, true);
+                Method setBasePathMethod = ReflectionUtils.findMethod(feature.getClass(), "setBasePath", String.class);
+                setBasePathMethod.invoke(feature, cxfPath);
                 features.add(feature);
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IllegalArgumentException | InvocationTargetException e) {
                 logger.error("Swagger feature was enabled but cannot be created", e);
