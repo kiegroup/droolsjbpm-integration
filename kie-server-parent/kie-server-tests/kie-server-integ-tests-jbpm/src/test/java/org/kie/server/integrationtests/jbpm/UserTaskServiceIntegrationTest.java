@@ -417,7 +417,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // first verify task input
             Map<String, Object> taskInput = taskClient.getTaskInputContentByTaskId(CONTAINER_ID, taskSummary.getId());
             assertNotNull(taskInput);
-            assertEquals(5, taskInput.size());
+            assertEquals(6, taskInput.size());
             assertTrue(taskInput.containsKey("_string"));
             assertTrue(taskInput.containsKey("_person"));
 
@@ -570,7 +570,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertTrue(taskInstance.getBusinessAdmins().contains("Administrators"));
 
             assertNotNull(taskInstance.getInputData());
-            assertEquals(5, taskInstance.getInputData().size());
+            assertEquals(6, taskInstance.getInputData().size());
 
             Map<String, Object> inputs = taskInstance.getInputData();
             assertTrue(inputs.containsKey("ActorId"));

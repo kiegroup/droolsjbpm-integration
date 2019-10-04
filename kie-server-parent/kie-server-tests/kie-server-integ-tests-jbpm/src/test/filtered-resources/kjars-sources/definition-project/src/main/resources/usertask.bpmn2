@@ -21,12 +21,14 @@
         <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413__stringInputX" drools:dtype="String" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413__stringInputXItem" name="_string"/>
         <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413__personInputX" drools:dtype="org.jbpm.data.Person" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413__personInputXItem" name="_person"/>
         <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413_SkippableInputX" name="Skippable"/>
+        <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX" drools:dtype="String" name="CreatedBy"/>
         <bpmn2:dataOutput id="_44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputX" drools:dtype="String" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputXItem" name="string_"/>
         <bpmn2:dataOutput id="_44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputX" drools:dtype="org.jbpm.data.Person" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputXItem" name="person_"/>
         <bpmn2:inputSet id="_u5JCEvpbEeSqMsMWx6c2wQ">
           <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413__stringInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413__personInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413_SkippableInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX</bpmn2:dataInputRefs>
         </bpmn2:inputSet>
         <bpmn2:outputSet id="_u5JpIPpbEeSqMsMWx6c2wQ">
           <bpmn2:dataOutputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputX</bpmn2:dataOutputRefs>
@@ -46,6 +48,13 @@
         <bpmn2:assignment id="_u5JpJPpbEeSqMsMWx6c2wQ">
           <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_u5JpJfpbEeSqMsMWx6c2wQ">true</bpmn2:from>
           <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_u5JpJvpbEeSqMsMWx6c2wQ">_44BE4412-91B0-4707-89DD-D45CECA36413_SkippableInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_u5JpI_pbEeSqMsMWx6c2wW">
+        <bpmn2:targetRef>_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_u5JpJPpbEeSqMsMWx6c2wW">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_u5JpJfpbEeSqMsMWx6c2wW">yoda</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_u5JpJvpbEeSqMsMWx6c2wQ">_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX</bpmn2:to>
         </bpmn2:assignment>
       </bpmn2:dataInputAssociation>
       <bpmn2:dataOutputAssociation id="_u5JpJ_pbEeSqMsMWx6c2wQ">
