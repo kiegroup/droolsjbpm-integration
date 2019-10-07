@@ -15,10 +15,7 @@
 
 package org.kie.server.services.openshift.impl;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -27,7 +24,6 @@ import java.util.function.Supplier;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
@@ -52,7 +48,6 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
     private static final String KIE_SERVER_ROLLOUT_IN_PROGRESS = "kieserver-rollout-in-progress";
     private static final String KIE_SERVER_INSTANCE_ID = "kieserver-" + UUID.randomUUID().toString();
-    private static final String ROLLOUT_TRIGGER_TIMESTAMP = "services.server.kie.org/openshift-startup-strategy.changeTimestamp";
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftStartupStrategy.class);
 
     private static Supplier<OpenShiftClient> clouldClientHelper = () -> (new CloudClientFactory() {}).createOpenShiftClient();
@@ -80,14 +75,9 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                         
                         getKieServerDC(client, kieServerId).ifPresent(dc -> { 
                             if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
-                                ObjectMeta md = dc.getSpec().getTemplate().getMetadata();
-                                Map<String, String> ann = md.getAnnotations() == null ? new HashMap<>() : md.getAnnotations();
-                                md.setAnnotations(ann);
-                                ann.put(ROLLOUT_TRIGGER_TIMESTAMP,
-                                        ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-                                client.deploymentConfigs().createOrReplace(dc);
-    
-                                logger.info("Updated DeploymentConfig: {}", md.getName());
+                                String dcName = dc.getMetadata().getName();
+                                client.deploymentConfigs().withName(dcName).deployLatest();
+                                logger.info("Triggering rollout for DeploymentConfig: {}", dcName);
                             } else {
                                 logger.debug("Event - Ignored");
                             }
