@@ -44,6 +44,14 @@ public final class QualityValue extends Number implements Comparable<QualityValu
       WEIGHT = weight;
    }
 
+    /**
+    * @param qvalue the quality value or {@code null} if undefined.
+    */
+    public static QualityValue valueOf(Integer qvalue) {
+        if (qvalue == null)
+            return DEFAULT;
+        return new QualityValue(qvalue);
+    }
 
    /**
     * @param qvalue the quality value or {@code null} if undefined.

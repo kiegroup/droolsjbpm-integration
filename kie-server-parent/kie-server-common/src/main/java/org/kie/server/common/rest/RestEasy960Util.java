@@ -16,6 +16,7 @@
 package org.kie.server.common.rest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -37,7 +38,10 @@ public class RestEasy960Util {
     private static final String ACCEPT_LANGUAGE = "Accept-Language";
    
     public static List<Variant> variants 
-        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).add().build();
+            = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE,
+                                 new MediaType("application", "json", Collections.singletonMap("strict", "true")),
+                                 MediaType.APPLICATION_JSON_TYPE)
+                     .add().build();
     public static Variant defaultVariant 
         = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE).add().build().get(0);
     public static final Variant jsonVariant 

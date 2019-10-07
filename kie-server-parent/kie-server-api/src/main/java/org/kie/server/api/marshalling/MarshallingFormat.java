@@ -16,6 +16,10 @@
 
 package org.kie.server.api.marshalling;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.upperCase;
 
@@ -51,6 +55,20 @@ public enum MarshallingFormat {
             default:
                 return null;
         }
+    }
+
+    public static boolean isStrictType(String type) {
+        int idx;
+        if ((idx = type.indexOf(';')) < 0 || (idx + 1) == type.length()) {
+            return false;
+        }
+        // we map parameter=1, pararmeter=2,.... into a map
+        Map<String, String> parameters = Arrays.asList(type.substring(idx + 1).split(","))
+                                               .stream()
+                                               .filter(e -> e.split("=").length > 1) // remove bad parameters
+                                               .map(e -> e.split("="))
+                                               .collect(Collectors.toMap(e -> ((String[]) e)[0].trim(), e -> ((String[]) e)[1]));
+        return Boolean.parseBoolean(parameters.get(Marshaller.MARSHALLER_PARAMETER_STRICT));
     }
 
     public static MarshallingFormat fromType(String type) {

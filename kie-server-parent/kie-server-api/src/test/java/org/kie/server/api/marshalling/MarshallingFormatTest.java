@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MarshallingFormatTest {
 
@@ -75,5 +77,13 @@ public class MarshallingFormatTest {
     public void testEdgeCaseWithJaxb() {
         assertEquals(MarshallingFormat.JAXB, MarshallingFormat.fromType("jaxb"));
         assertEquals(MarshallingFormat.JAXB, MarshallingFormat.fromType("JAXB"));
+    }
+
+    @Test
+    public void testStricttype() {
+        assertTrue(MarshallingFormat.isStrictType("application/json; strict=true"));
+        assertFalse(MarshallingFormat.isStrictType("application/xml;strict=false"));
+        assertFalse(MarshallingFormat.isStrictType("application/json;")); // no parameter
+        assertFalse(MarshallingFormat.isStrictType("application/xml;strict=")); // bad parameter
     }
 }
