@@ -96,7 +96,7 @@ public class JSONMarshaller implements Marshaller {
     private boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
-    static public class JSONContext {
+    public static class JSONContext {
 
         private boolean stripped;
 
@@ -128,12 +128,7 @@ public class JSONMarshaller implements Marshaller {
         }
     }
 
-    private ThreadLocal<JSONContext> jsonContext = new ThreadLocal<JSONContext>() {
-        @Override
-        protected JSONContext initialValue() {
-            return new JSONContext();
-        }
-    };
+    private ThreadLocal<JSONContext> jsonContext = ThreadLocal.withInitial(() -> new JSONContext());
 
     protected ClassLoader classLoader;
     protected ObjectMapper objectMapper;
