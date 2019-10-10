@@ -102,18 +102,18 @@ public class FormResource {
     @ApiOperation(value="Returns the form information for a specified process definition.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process definition, form or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Process definition, form or Container Id not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=PROCESS_FORM_DEF_JSON)})) })
     @GET
     @Path(PROCESS_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of process definition that form should be fetched for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
-            @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
+            @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language,
             @ApiParam(value = "optional filter flag if form should be filtered or returned as is", required = false) @QueryParam("filter") boolean filter,
-            @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType, 
+            @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType,
             @ApiParam(value = "optional marshall content flag if the content should be transformed or not, defaults to true", required = false) @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent) {
 
         Variant variant = getVariant(headers);
@@ -143,18 +143,18 @@ public class FormResource {
     @ApiOperation(value="Returns the form information for a specified task instance.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Task, form or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Task, form or Container Id not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=TASK_FORM_DEF_JSON)})) })
     @GET
     @Path(TASK_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of task instance that form should be fetched for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId,
-            @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
+            @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language,
             @ApiParam(value = "optional filter flag if form should be filtered or returned as is", required = false) @QueryParam("filter") boolean filter,
-            @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType, 
+            @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType,
             @ApiParam(value = "optional marshall content flag if the content should be transformed or not, defaults to true", required = false) @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent ) {
 
         Variant variant = getVariant(headers);
@@ -181,7 +181,7 @@ public class FormResource {
             return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
     }
-    
+
     @ApiOperation(value="Returns the rendered form for a specified process definition",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
@@ -190,18 +190,18 @@ public class FormResource {
     @Path(PROCESS_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
     public Response getProcessRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
+            @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-                
+
         try {
             String renderedForm = formRendererBase.getProcessRenderedForm(renderer, containerId, processId);
             if (renderedForm == null) {
                 return Response.status(Status.NOT_FOUND).build();
             }
-         
+
             return Response.ok().entity(renderedForm).build();
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), variant, conversationIdHeader);
@@ -213,9 +213,9 @@ public class FormResource {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
-        
+
     }
-    
+
     @ApiOperation(value="Returns the rendered form for a specified task instance.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
@@ -224,18 +224,18 @@ public class FormResource {
     @Path(TASK_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
     public Response getTaskRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
+            @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId,
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-                
+
         try {
             String renderedForm = formRendererBase.getTaskRenderedForm(renderer, containerId, taskId);
             if (renderedForm == null) {
                 return Response.status(Status.NOT_FOUND).build();
             }
-         
+
             return Response.ok().entity(renderedForm).build();
         } catch (PermissionDeniedException e) {
             return permissionDenied(MessageFormat.format(TASK_PERMISSION_ERROR, taskId), variant, conversationIdHeader);
@@ -249,9 +249,9 @@ public class FormResource {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
-        
+
     }
-    
+
     @ApiOperation(value="Returns the rendered form for a specified case definition.",
             response=String.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
@@ -260,18 +260,18 @@ public class FormResource {
     @Path(CASE_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
     public Response getCaseRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of case definition that form should be fetched for", required = true, example = "orderhardware") @PathParam("caseDefId") String caseDefId, 
+            @ApiParam(value = "container id that case definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of case definition that form should be fetched for", required = true, example = "orderhardware") @PathParam("caseDefId") String caseDefId,
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-                
+
         try {
             String renderedForm = formRendererBase.getCaseRenderedForm(renderer, containerId, caseDefId);
             if (renderedForm == null) {
                 return Response.status(Status.NOT_FOUND).build();
             }
-         
+
             return Response.ok().entity(renderedForm).build();
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), variant, conversationIdHeader);
@@ -283,7 +283,7 @@ public class FormResource {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), variant, conversationIdHeader);
         }
-        
+
     }
 
     protected String marshallFormContent( String formContent, String formType, Variant variant ) throws Exception {

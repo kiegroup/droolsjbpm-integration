@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -59,13 +59,13 @@ public class KieServerResource {
 
     @ApiOperation(value="Executes one or more KIE Server commands for server-related or container-related operations",
             response=ServiceResponsesList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_RESPONSE_JSON)})) })
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response executeCommands(@Context HttpHeaders headers, 
+    public Response executeCommands(@Context HttpHeaders headers,
             @ApiParam(value = "command script payload", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_JSON)})) String commandScriptPayload ) {
 

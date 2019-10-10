@@ -156,16 +156,16 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Starts a new case instance for a specified case definition.",
             response=String.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case definition or Container Id not found"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case definition or Container Id not found"),
+            @ApiResponse(code = 201, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ID_JSON)})) })
     @POST
     @Path(START_CASE_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response startCase(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id where the case definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "case definition id that new instance should be created from", required = true, example = "CASE-0000000001") @PathParam(CASE_DEF_ID) String caseDefId, 
+            @ApiParam(value = "container id where the case definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "case definition id that new instance should be created from", required = true, example = "CASE-0000000001") @PathParam(CASE_DEF_ID) String caseDefId,
             @ApiParam(value = "optional CaseFile with variables and/or case role assignments", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_FILE_JSON),
                     @ExampleProperty(mediaType=XML, value=CASE_FILE_XML)})) String payload) {
@@ -189,14 +189,14 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns information about a specified case instance.",
             response=CaseInstance.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCE_JSON)})) })
     @GET
     @Path(CASE_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstance(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData,
             @ApiParam(value = "optional flag to load roles when loading case instance", required = false) @QueryParam("withRoles") @DefaultValue("false") boolean withRoles,
@@ -222,7 +222,7 @@ public class CaseResource extends AbstractCaseResource {
     @Path(CASE_INSTANCE_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response cancelCaseInstance(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "allows to destroy (permanently) case instance as part of the cancel operation, defaults to false", required = false) @QueryParam("destroy") @DefaultValue("false") boolean destroy) {
         return invokeCaseOperation(headers,
@@ -235,7 +235,7 @@ public class CaseResource extends AbstractCaseResource {
                     return noContent(v, customHeaders);
                 });
     }
-    
+
     @ApiOperation(value="Closes a specified case instance.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
@@ -244,7 +244,7 @@ public class CaseResource extends AbstractCaseResource {
     @Path(CASE_INSTANCE_POST_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response closeCaseInstance(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional comment when closing a case instance as String", required = false) String payload) {
         return invokeCaseOperation(headers,
@@ -267,9 +267,9 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response reopenCase(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id where the case definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "case definition id that new instance should be created from", required = true, example = "evaluation") @PathParam(CASE_DEF_ID) String caseDefId, 
-            @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId, 
+            @ApiParam(value = "container id where the case definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "case definition id that new instance should be created from", required = true, example = "evaluation") @PathParam(CASE_DEF_ID) String caseDefId,
+            @ApiParam(value = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional CaseFile with variables and/or case role assignments", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_FILE_JSON),
                     @ExampleProperty(mediaType=XML, value=CASE_FILE_XML)})) String payload) {
@@ -288,14 +288,14 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns data from the case files of a specified case instance.",
             response=Map.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON)})) })
     @GET
     @Path(CASE_FILE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceData(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional name(s) of the data items to retrieve", required = false) @QueryParam("name") List<String> names) {
         return invokeCaseOperation(headers,
@@ -313,15 +313,15 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns the value of a specified case file data item in a specified case instance.",
             response=Object.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON)})) })
     @GET
     @Path(CASE_FILE_BY_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceDataByName(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "name of the data item within case file to retrieve", required = true) @PathParam(CASE_FILE_ITEM) String caseDataName) {
         return invokeCaseOperation(headers,
                 containerId,
@@ -344,7 +344,7 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response putCaseInstanceData(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "map of data to be placed in case file as Map", required = true, examples=@Example(value= {
@@ -373,8 +373,8 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response putCaseInstanceDataByName(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "name of the data item to be added to case file", required = true) @PathParam(CASE_FILE_ITEM) String caseDataName,
             @ApiParam(value = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "data to be placed in case file, any type can be provided", required = true, examples=@Example(value= {
@@ -401,8 +401,8 @@ public class CaseResource extends AbstractCaseResource {
     @Path(CASE_FILE_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteCaseInstanceData(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "one or more names of the data items to be removed from case file", required = true) @QueryParam(CASE_FILE_ITEM) List<String> variableNames) {
 
         return invokeCaseOperation(headers,
@@ -430,7 +430,7 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addDynamicTaskToCase(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
@@ -456,8 +456,8 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addDynamicTaskToCase(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "identifier of the stage within case instance where dynamic task should be added", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId,
             @ApiParam(value = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
@@ -483,7 +483,7 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addDynamicProcessToCase(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "process id of the subprocess to be added", required = true, example = "placeOrder") @PathParam(PROCESS_ID) String processId,
             @ApiParam(value = "data for dynamic subprocess", required = true, examples=@Example(value= {
@@ -511,9 +511,9 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addDynamicProcessToCase(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "identifier of the stage within case instance where dynamic subprocess should be added", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId, 
+            @ApiParam(value = "identifier of the stage within case instance where dynamic subprocess should be added", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId,
             @ApiParam(value = "process id of the subprocess to be added", required = true) @PathParam(PROCESS_ID) String processId,
             @ApiParam(value = "data for dynamic subprocess", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
@@ -540,9 +540,9 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response triggerAdHocNodeInStage(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "identifier of the stage within case instance where adhoc fragment should be triggered", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId, 
+            @ApiParam(value = "identifier of the stage within case instance where adhoc fragment should be triggered", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId,
             @ApiParam(value = "name of the adhoc fragment to be triggered", required = true) @PathParam(CASE_NODE_NAME) String adHocName,
             @ApiParam(value = "optional data to be given when triggering adhoc fragment", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
@@ -568,7 +568,7 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response triggerAdHocNode(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "name of the adhoc fragment to be triggered", required = true, example = "sampleTask") @PathParam(CASE_NODE_NAME) String adHocName,
             @ApiParam(value = "optional data to be given when triggering adhoc fragment", required = false, examples=@Example(value= {
@@ -589,14 +589,14 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns milestones for a specified case instance.",
             response=CaseMilestoneList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_MILESTONES_JSON)})) })
     @GET
     @Path(CASE_MILESTONES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceMilestones(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional flag that allows to control which milestones to load - achieved only or actives ones too, defaults to true", required = false) @QueryParam("achievedOnly") @DefaultValue("true") boolean achievedOnly,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
@@ -617,17 +617,17 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns stages for a specified case instance.",
             response=CaseStageList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_STAGES_JSON)})) })
     @GET
     @Path(CASE_STAGES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceStages(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional flag that allows to control which stages to load - active only or completed ones too, defaults to true", required = false) @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         return invokeCaseOperation(headers,
@@ -645,14 +645,14 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns ad hoc fragments for a specified case instance.",
             response=CaseAdHocFragmentList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ADHOC_FRAGMENTS_JSON)})) })
     @GET
     @Path(CASE_AD_HOC_FRAGMENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceAdHocFragments(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId) {
 
         return invokeCaseOperation(headers,
@@ -670,19 +670,19 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns process instances in a specified case instance.",
             response=ProcessInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=PROCESS_INSTANCES_JSON)})) })
     @GET
     @Path(CASE_PROCESS_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
             @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
@@ -705,17 +705,17 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns node instances for a specified case instance.",
             response=NodeInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=NODE_INSTANCES_JSON)})) })
     @GET
     @Path(CASE_NODE_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceActiveNodes(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional flag that allows to control which node instances to load - active or completed, defaults to false loading only active ones", required = false) @QueryParam("completed") @DefaultValue("false") Boolean completed,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         return invokeCaseOperation(headers,
@@ -738,14 +738,14 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns role assignments for a specified case instance.",
             response=CaseRoleAssignmentList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ROLES_ASSIGNMENTS_JSON)})) })
     @GET
     @Path(CASE_ROLES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceRoleAssignments(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId) {
 
         return invokeCaseOperation(headers,
@@ -768,10 +768,10 @@ public class CaseResource extends AbstractCaseResource {
     @Path(CASE_ROLES_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addRoleAssignment(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "name of the case role the assignment should be set", required = true, example = "owner") @PathParam(CASE_ROLE_NAME) String roleName,
-            @ApiParam(value = "user to be aded to case role for given case instance", required = true) @QueryParam("user") String user, 
+            @ApiParam(value = "user to be aded to case role for given case instance", required = true) @QueryParam("user") String user,
             @ApiParam(value = "group to be aded to case role for given case instance", required = true) @QueryParam("group") String group) {
         return invokeCaseOperation(headers,
                 containerId,
@@ -793,10 +793,10 @@ public class CaseResource extends AbstractCaseResource {
     @Path(CASE_ROLES_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeRoleAssignment(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "name of the case role the assignment should be removed", required = true, example = "owner") @PathParam(CASE_ROLE_NAME) String roleName,
-            @ApiParam(value = "user to be removed from case role for given case instance", required = true) @QueryParam("user") String user, 
+            @ApiParam(value = "user to be removed from case role for given case instance", required = true) @QueryParam("user") String user,
             @ApiParam(value = "group to be removed from case role for given case instance", required = true) @QueryParam("group") String group) {
         return invokeCaseOperation(headers,
                 containerId,
@@ -813,17 +813,17 @@ public class CaseResource extends AbstractCaseResource {
     @ApiOperation(value="Returns comments from a specified case instance.",
             response=CaseCommentList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 404, message = "Case instance not found"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_COMMENTS_JSON)})) })
     @GET
     @Path(CASE_COMMENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceComments(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         return invokeCaseOperation(headers,
@@ -847,9 +847,9 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addComment(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author,
             @ApiParam(value = "optional role name(s) that given comment should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "actual content of the comment to be added as String", required = true) String payload) {
         return invokeCaseOperation(headers,
@@ -873,10 +873,10 @@ public class CaseResource extends AbstractCaseResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateComment(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "identifier of the comment to be updated", required = true, example = "xxx-yyy-zzz") @PathParam(CASE_COMMENT_ID) String commentId, 
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author, 
+            @ApiParam(value = "identifier of the comment to be updated", required = true, example = "xxx-yyy-zzz") @PathParam(CASE_COMMENT_ID) String commentId,
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("author") String author,
             @ApiParam(value = "optional role name(s) that given comment should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
             @ApiParam(value = "actual content of the comment to be updated to as String", required = true) String payload) {
         return invokeCaseOperation(headers,
@@ -905,7 +905,7 @@ public class CaseResource extends AbstractCaseResource {
     @Path(CASE_COMMENTS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeComment(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "identifier of the comment to be removed", required = true, example = "xxx-yyy-zzz") @PathParam(CASE_COMMENT_ID) String commentId) {
         return invokeCaseOperation(headers,
@@ -932,8 +932,8 @@ public class CaseResource extends AbstractCaseResource {
 
     @ApiOperation(value="Returns case instances in a specified KIE container.",
             response=CaseInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_GET_URI)
@@ -941,9 +941,9 @@ public class CaseResource extends AbstractCaseResource {
     public Response getCaseInstancesByContainer(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that should be used to filter case instances", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
             @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
@@ -965,19 +965,19 @@ public class CaseResource extends AbstractCaseResource {
 
     @ApiOperation(value="Returns case instances for a specified case definition.",
             response=CaseInstanceList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_BY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstancesByDefinition(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that should be used to filter case instances", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that should be used to filter case instances", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "case definition id that should be used to filter case instances", required = true, example = "CASE-00000000001") @PathParam(CASE_DEF_ID) String caseDefId,
             @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
             @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
@@ -999,17 +999,17 @@ public class CaseResource extends AbstractCaseResource {
 
     @ApiOperation(value="Returns case definitions in a specified KIE container.",
             response=CaseDefinitionList.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
     @GET
     @Path(CASE_ALL_DEFINITIONS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseDefinitionsByContainer(@javax.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that should be used to filter case definitions", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
             @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
@@ -1027,14 +1027,14 @@ public class CaseResource extends AbstractCaseResource {
 
     @ApiOperation(value="Returns information about a specified case definition.",
             response=CaseDefinition.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 200, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITION_JSON)}))})
     @GET
     @Path(CASE_DEFINITIONS_BY_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseDefinitionsByDefinition(@javax.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that should be used to filter case definitions", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "container id that should be used to filter case definitions", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "case definition id that should be loaded", required = true, example = "CASE-00000000001") @PathParam(CASE_DEF_ID) String caseDefId) {
 
         return invokeCaseOperation(headers,
