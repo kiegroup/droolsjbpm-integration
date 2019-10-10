@@ -246,12 +246,19 @@ public class JSONMarshaller implements Marshaller {
             customSerializationMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         }
 
+        customSerializationMapper.setSerializationInclusion(Include.NON_NULL);
+        customSerializationMapper.setSerializationInclusion(Include.NON_EMPTY);
+        customSerializationMapper.setPropertyInclusion(
+    		   JsonInclude.Value.construct(Include.ALWAYS, Include.NON_NULL));
+        customSerializationMapper.setPropertyInclusion(
+  		   JsonInclude.Value.construct(Include.ALWAYS, Include.NON_EMPTY));
         this.classesSet = classes;
 
         // Extend the marshaller with optional extensions
         for(JSONMarshallerExtension extension : EXTENSIONS){
             extension.extend(this, objectMapper, deserializeObjectMapper);
         }
+        
     }
 
     protected List<NamedType> prepareCustomClasses(Set<Class<?>> classes) {
