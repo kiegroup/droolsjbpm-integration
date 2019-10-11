@@ -59,161 +59,161 @@ import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = { JBPMApplication.class,
-		TestAutoConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+        TestAutoConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-quartz.properties")
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class JMXQuartzSchedulerTest {
 
-	private static final String GROUP_ID = "org.jbpm";
-	private static final String ARTIFACT_ID = "intermediate-timer-sample";
-	private static final String VERSION = "1.0";
+    private static final String GROUP_ID = "org.jbpm";
+    private static final String ARTIFACT_ID = "intermediate-timer-sample";
+    private static final String VERSION = "1.0";
 
-	private static final String PROCESS_ID = "org.jbpm.sample.intermediate-timer";
+    private static final String PROCESS_ID = "org.jbpm.sample.intermediate-timer";
 
-	private KModuleDeploymentUnit unit = null;
-	private MBeanServer mBeanServer = null;
-	private ObjectName oName = null;
+    private KModuleDeploymentUnit unit = null;
+    private MBeanServer mBeanServer = null;
+    private ObjectName oName = null;
 
-	@Autowired
-	private ProcessService processService;
+    @Autowired
+    private ProcessService processService;
 
-	@Autowired
-	private DeploymentService deploymentService;
+    @Autowired
+    private DeploymentService deploymentService;
 
-	@Autowired
-	private CountDownLatchEventListener countDownListener;
+    @Autowired
+    private CountDownLatchEventListener countDownListener;
 
-	@BeforeClass
-	public static void generalSetup() {
-		KieServices ks = KieServices.Factory.get();
-		org.kie.api.builder.ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
-		File kjar = new File("../kjars/intermediate-timer-sample/intermediate-timer-sample-1.0.jar");
-		File pom = new File("../kjars/intermediate-timer-sample/pom.xml");
-		MavenRepository repository = getMavenRepository();
-		repository.installArtifact(releaseId, kjar, pom);
-	}
+    @BeforeClass
+    public static void generalSetup() {
+        KieServices ks = KieServices.Factory.get();
+        org.kie.api.builder.ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
+        File kjar = new File("../kjars/intermediate-timer-sample/intermediate-timer-sample-1.0.jar");
+        File pom = new File("../kjars/intermediate-timer-sample/pom.xml");
+        MavenRepository repository = getMavenRepository();
+        repository.installArtifact(releaseId, kjar, pom);
+    }
 
-	@Before
-	public void setup() {
-		unit = new KModuleDeploymentUnit(GROUP_ID, ARTIFACT_ID, VERSION);
-		deploymentService.deploy(unit);		
-		countDownListener.configure(PROCESS_ID, 1);
-	}
+    @Before
+    public void setup() {
+        unit = new KModuleDeploymentUnit(GROUP_ID, ARTIFACT_ID, VERSION);
+        deploymentService.deploy(unit);
+        countDownListener.configure(PROCESS_ID, 1);
+    }
 
-	@After
-	public void cleanup() {
-		deploymentService.undeploy(unit);
-	}
+    @After
+    public void cleanup() {
+        deploymentService.undeploy(unit);
+    }
 
-	@Test(timeout = 30000)
-	public void whenSchedulerStartedThenTimerIsFired() throws Exception {
-		long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
-		assertNotNull(processInstanceId);
+    @Test(timeout = 30000)
+    public void whenSchedulerStartedThenTimerIsFired() throws Exception {
+        long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
+        assertNotNull(processInstanceId);
 
-		countDownListener.getCountDown().await();
-		assertTrue(countDownListener.getExecutingThread().startsWith("SpringBootScheduler"));
+        countDownListener.getCountDown().await();
+        assertTrue(countDownListener.getExecutingThread().startsWith("SpringBootScheduler"));
 
-		ProcessInstance pi = processService.getProcessInstance(processInstanceId);
-		assertNull(pi);
-	}
+        ProcessInstance pi = processService.getProcessInstance(processInstanceId);
+        assertNull(pi);
+    }
 
-	@Test(timeout = 30000)
-	public void whenSchedulerPausedThenTimerNotFired() throws Exception {
-		long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
-		assertNotNull(processInstanceId);
+    @Test(timeout = 30000)
+    public void whenSchedulerPausedThenTimerNotFired() throws Exception {
+        long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
+        assertNotNull(processInstanceId);
 
-		pauseScheduler();
+        pauseScheduler();
 
-		awaitWithoutInterruption();
+        awaitWithoutInterruption();
 
-		ProcessInstance pi = processService.getProcessInstance(processInstanceId);
-		assertNotNull(processInstanceId);
+        ProcessInstance pi = processService.getProcessInstance(processInstanceId);
+        assertNotNull(processInstanceId);
 
-		assertEquals(STATE_ACTIVE, pi.getState());
+        assertEquals(STATE_ACTIVE, pi.getState());
 
-		processService.abortProcessInstance(processInstanceId);
-	}
+        processService.abortProcessInstance(processInstanceId);
+    }
 
-	@Test(timeout = 40000)
-	public void whenSchedulerRestartedThenTimerIsFired() throws Exception {		
-		long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
-		assertNotNull(processInstanceId);
+    @Test(timeout = 40000)
+    public void whenSchedulerRestartedThenTimerIsFired() throws Exception {
+        long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
+        assertNotNull(processInstanceId);
 
-		pauseScheduler();
-		
-		awaitWithoutInterruption();
-		
-		restartScheduler();
+        pauseScheduler();
 
-		countDownListener.getCountDown().await();
-		assertTrue(countDownListener.getExecutingThread().startsWith("SpringBootScheduler"));
+        awaitWithoutInterruption();
 
-		ProcessInstance pi = processService.getProcessInstance(processInstanceId);
-		assertNull(pi);
-	}
-	
-	private void awaitWithoutInterruption() throws InterruptedException {
-		// Wait 20 seconds, as the timer was scheduled for 15 seconds
-		boolean await = countDownListener.getCountDown().await(20, TimeUnit.SECONDS);
-		assertFalse(await);
-	}
+        restartScheduler();
 
-	private void pauseScheduler() throws Exception {
-		findTargetObjectName();
+        countDownListener.getCountDown().await();
+        assertTrue(countDownListener.getExecutingThread().startsWith("SpringBootScheduler"));
 
-		waitUntilSchedulerStarted();
+        ProcessInstance pi = processService.getProcessInstance(processInstanceId);
+        assertNull(pi);
+    }
 
-		mBeanServer.invoke(oName, "standby", null, null);
+    private void awaitWithoutInterruption() throws InterruptedException {
+        // Wait 20 seconds, as the timer was scheduled for 15 seconds
+        boolean await = countDownListener.getCountDown().await(20, TimeUnit.SECONDS);
+        assertFalse(await);
+    }
 
-		assertFalse("There should be Started attribute set to false",
-				(boolean) mBeanServer.getAttribute(oName, "Started"));
-		assertTrue("There should be StandbyMode attribute set to true",
-				(boolean) mBeanServer.getAttribute(oName, "StandbyMode"));
-	}
+    private void pauseScheduler() throws Exception {
+        findTargetObjectName();
 
-	private void restartScheduler() throws Exception {
-		mBeanServer.invoke(oName, "start", null, null);
+        waitUntilSchedulerStarted();
 
-		assertTrue("There should be Started attribute set to true",
-				(boolean) mBeanServer.getAttribute(oName, "Started"));
-		assertFalse("There should be StandbyMode attribute set to false",
-				(boolean) mBeanServer.getAttribute(oName, "StandbyMode"));
-	}
+        mBeanServer.invoke(oName, "standby", null, null);
 
-	private void findTargetObjectName() throws MalformedObjectNameException {
-		mBeanServer = ManagementFactory.getPlatformMBeanServer();
-		Set<ObjectName> objectNames = mBeanServer
-				.queryNames(new ObjectName("quartz:type=QuartzScheduler,name=*,instance=*"), null);
+        assertFalse("There should be Started attribute set to false",
+                (boolean) mBeanServer.getAttribute(oName, "Started"));
+        assertTrue("There should be StandbyMode attribute set to true",
+                (boolean) mBeanServer.getAttribute(oName, "StandbyMode"));
+    }
 
-		assertFalse("There should be a quartz scheduler MBean", objectNames.isEmpty());
-		oName = objectNames.stream().findFirst().get();
-	}
+    private void restartScheduler() throws Exception {
+        mBeanServer.invoke(oName, "start", null, null);
 
-	private void waitUntilSchedulerStarted() {
-		BooleanSupplier schedulerStarted = () -> {
-			try {
-				return (boolean) mBeanServer.getAttribute(oName, "Started");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		};
-		wait(Duration.of(30, ChronoUnit.SECONDS), Duration.of(1, ChronoUnit.SECONDS), schedulerStarted);
-	}
+        assertTrue("There should be Started attribute set to true",
+                (boolean) mBeanServer.getAttribute(oName, "Started"));
+        assertFalse("There should be StandbyMode attribute set to false",
+                (boolean) mBeanServer.getAttribute(oName, "StandbyMode"));
+    }
 
-	private static void wait(Duration maxDuration, Duration waitStep, BooleanSupplier booleanSupplier) {
-		Instant startTime = Instant.now();
+    private void findTargetObjectName() throws MalformedObjectNameException {
+        mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        Set<ObjectName> objectNames = mBeanServer
+                .queryNames(new ObjectName("quartz:type=QuartzScheduler,name=*,instance=*"), null);
 
-		while (startTime.plus(maxDuration).isAfter(Instant.now()) && !booleanSupplier.getAsBoolean()) {
-			wait(waitStep);
-		}
-	}
+        assertFalse("There should be a quartz scheduler MBean", objectNames.isEmpty());
+        oName = objectNames.stream().findFirst().get();
+    }
 
-	private static void wait(Duration duration) {
-		try {
-			Thread.sleep(duration.toMillis());
-		} catch (InterruptedException e) {
-			throw new RuntimeException("Waiting was interrupted", e);
-		}
-	}
+    private void waitUntilSchedulerStarted() {
+        BooleanSupplier schedulerStarted = () -> {
+            try {
+                return (boolean) mBeanServer.getAttribute(oName, "Started");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+        wait(Duration.of(30, ChronoUnit.SECONDS), Duration.of(1, ChronoUnit.SECONDS), schedulerStarted);
+    }
+
+    private static void wait(Duration maxDuration, Duration waitStep, BooleanSupplier booleanSupplier) {
+        Instant startTime = Instant.now();
+
+        while (startTime.plus(maxDuration).isAfter(Instant.now()) && !booleanSupplier.getAsBoolean()) {
+            wait(waitStep);
+        }
+    }
+
+    private static void wait(Duration duration) {
+        try {
+            Thread.sleep(duration.toMillis());
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Waiting was interrupted", e);
+        }
+    }
 
 }
