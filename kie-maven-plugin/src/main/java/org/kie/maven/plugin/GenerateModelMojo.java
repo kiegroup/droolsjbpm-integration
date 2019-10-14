@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -53,6 +54,9 @@ import org.kie.api.builder.KieBuilder;
 public class GenerateModelMojo extends AbstractKieMojo {
 
     public static PathMatcher drlFileMatcher = FileSystems.getDefault().getPathMatcher("glob:**.drl");
+
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
+    private MavenSession mavenSession;
 
     @Parameter(required = true, defaultValue = "${project.build.directory}")
     private File targetDirectory;
@@ -113,6 +117,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
             KieServices ks = KieServices.Factory.get();
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
+            kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
             kieBuilder.buildAll(ExecutableModelMavenProject.SUPPLIER,
                                 s -> !s.contains("src/test/java") && !s.contains("src\\test\\java"));
 

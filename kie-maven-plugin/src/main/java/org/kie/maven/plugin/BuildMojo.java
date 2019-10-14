@@ -37,6 +37,7 @@ import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -66,6 +67,9 @@ import org.kie.api.builder.Message;
         defaultPhase = LifecyclePhase.COMPILE)
 public class BuildMojo extends AbstractKieMojo {
 
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
+    private MavenSession mavenSession;
+
     /**
      * Directory containing the generated JAR.
      */
@@ -86,8 +90,6 @@ public class BuildMojo extends AbstractKieMojo {
 
     @Parameter(required = false, defaultValue = "no")
     private String usesPMML;
-
-
 
     /**
      * This container is the same accessed in the KieMavenCli in the kie-wb-common
@@ -136,6 +138,7 @@ public class BuildMojo extends AbstractKieMojo {
 
             KieServices ks = KieServices.Factory.get();
             KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(project.getBasedir());
+            kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
             kieBuilder.buildAll(DrlProject.SUPPLIER,
                                 s -> s.contains(sourceFolder.getAbsolutePath()) || s.endsWith("pom.xml"));
             InternalKieModule kModule = (InternalKieModule) kieBuilder.getKieModule();
