@@ -1,3 +1,6 @@
+#logDetailWizard .table-view-pf-actions:last-child {
+  width: 100% !important;
+}
 .form-group.required .control-label:after {
   content:"*";
   color:red;
