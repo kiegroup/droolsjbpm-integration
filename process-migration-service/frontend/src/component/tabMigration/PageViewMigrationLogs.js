@@ -167,6 +167,7 @@ export default class PageViewMigrationLogs extends Component {
                       key={
                         rowData.migrationId + "_" + rowData.id + "_" + "SUCCESS"
                       }
+                      className="success"
                     >
                       SUCCESS
                     </Table.Cell>
@@ -177,6 +178,7 @@ export default class PageViewMigrationLogs extends Component {
                       key={
                         rowData.migrationId + "_" + rowData.id + "_" + "FAILED"
                       }
+                      className="danger"
                     >
                       FAILED
                     </Table.Cell>
@@ -241,7 +243,7 @@ export default class PageViewMigrationLogs extends Component {
           >
             <Wizard.Header
               onClose={this.hideLogDetails}
-              title="View Migration Logs"
+              title="Migration Log Detail"
             />
             <Wizard.Body>
               <Wizard.Row>
