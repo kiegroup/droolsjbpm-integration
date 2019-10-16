@@ -1,8 +1,4 @@
 thorntail:
-  deployment:
-    process-migration.war:
-      jaxrs:
-        application-path: /rest
   datasources:
     data-sources:
       pimDS:

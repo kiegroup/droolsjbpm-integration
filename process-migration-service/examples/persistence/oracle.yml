@@ -1,15 +1,11 @@
 thorntail:
-  deployment:
-    process-migration.war:
-      jaxrs:
-        application-path: /rest
   datasources:
     data-sources:
       pimDS:
-        driver-name: h2
-        connection-url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-        user-name: sa
-        password: sa
+        driver-name: com.oracle
+        connection-url: jdbc:oracle:thin:@oracle-12cr1.hosts.mwqe.eng.bos.redhat.com:1521:dballo
+        user-name: dballo08
+        password: dballo08
   ejb3:
     timer-service:
       default-data-store: timers-store
