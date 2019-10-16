@@ -62,7 +62,7 @@ test("PageMigrationScheduler is scheduled", () => {
   const callbackFn = jest.fn();
   const isValidFn = jest.fn();
   const callbackUrl = "https://example.com/callback";
-  const scheduledTime = "2019-7-17T20:59:22.128Z";
+  const scheduledTime = "2019-02-04T03:28:19.139Z";
   const { getByLabelText } = render(
     <PageMigrationScheduler
       callbackUrl={callbackUrl}
