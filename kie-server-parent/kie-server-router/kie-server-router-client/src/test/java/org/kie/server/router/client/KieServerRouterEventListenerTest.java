@@ -18,16 +18,26 @@ package org.kie.server.router.client;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class KieServerRouterEventListenerTest {
 
     @After
     public void cleanup() {
         System.clearProperty(KieServerConstants.KIE_SERVER_ROUTER);
+        System.clearProperty(KieServerConstants.KIE_SERVER_ID);
+    }
+
+    @Before
+    public void setup() {
+        System.setProperty(KieServerConstants.KIE_SERVER_ID, "sample-id");
     }
 
     @Test
@@ -76,5 +86,21 @@ public class KieServerRouterEventListenerTest {
         assertTrue(routerUrls.contains("http://localhost:9000"));
         assertTrue(routerUrls.contains("http://localhost:9001"));
         assertTrue(routerUrls.contains("http://localhost:9002"));
+    }
+
+    @Test
+    public void testListenerUsername() {
+        KieServerRouterEventListener client = new KieServerRouterEventListener();
+        Assert.assertEquals(client.getUsername(), "sample-id");
+    }
+
+    @Test
+    public void testListenerOverwriteUsername() {
+        System.setProperty(KieServerConstants.KIE_ROUTER_MANAGEMENT_USERNAME, "sample-id-overwrite");
+
+        KieServerRouterEventListener client = new KieServerRouterEventListener();
+        Assert.assertEquals(client.getUsername(), "sample-id-overwrite");
+
+        System.clearProperty(KieServerConstants.KIE_ROUTER_MANAGEMENT_USERNAME);
     }
 }
