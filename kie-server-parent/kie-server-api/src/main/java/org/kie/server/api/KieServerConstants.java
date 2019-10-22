@@ -34,6 +34,8 @@ public class KieServerConstants {
     public static final String KIE_SWAGGER_SERVER_EXT_DISABLED = "org.kie.swagger.server.ext.disabled";
     public static final String KIE_PROMETHEUS_SERVER_EXT_DISABLED = "org.kie.prometheus.server.ext.disabled";
     public static final String KIE_SCENARIO_SIMULATION_SERVER_EXT_DISABLED = "org.kie.scenariosimulation.server.ext.disabled";
+    public static final String KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED = "org.kie.server.taskAssigning.planning.ext.disabled";
+    public static final String KIE_TASK_ASSIGNING_RUNTIME_EXT_DISABLED = "org.kie.server.taskAssigning.runtime.ext.disabled";
 
     public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";
 
@@ -134,6 +136,7 @@ public class KieServerConstants {
     public static final String CAPABILITY_SWAGGER = "Swagger"; // Swagger
     public static final String CAPABILITY_PROMETHEUS = "Prometheus"; // Prometheus
     public static final String CAPABILITY_SCENARIO_SIMULATION = "Scenario Simulation"; // Scenario Simulation
+    public static final String CAPABILITY_TASK_ASSIGNING_RUNTIME = "TaskAssigningRuntime"; //Task Assigning Runtime
 
     public static final String FAILURE_REASON_PROP = "failure-reason";
 

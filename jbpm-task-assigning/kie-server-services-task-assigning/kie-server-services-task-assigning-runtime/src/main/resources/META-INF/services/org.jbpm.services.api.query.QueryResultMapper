@@ -1,0 +1,3 @@
+org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataRawQueryMapper
+org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataQueryMapper
+org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataSummaryQueryMapper
