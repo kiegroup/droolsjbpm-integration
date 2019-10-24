@@ -121,14 +121,8 @@ export default class AdvancedTable extends React.Component {
   onSubmit = () => {
     this.setPage(this.state.pageChangeValue);
   };
-  setPage = value => {
-    const page = Number(value);
-    if (
-      !Number.isNaN(value) &&
-      value !== "" &&
-      page > 0 &&
-      page <= this.totalPages()
-    ) {
+  setPage = page => {
+    if (!isNaN(page) && page !== "" && page > 0 && page <= this.totalPages()) {
       const newPaginationState = Object.assign({}, this.state.pagination);
       newPaginationState.page = page;
       this.setState({ pagination: newPaginationState, pageChangeValue: page });
