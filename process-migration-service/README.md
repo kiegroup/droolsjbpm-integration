@@ -165,7 +165,7 @@ thorntail:
 1. Authentication type `BASIC`
 1. Every resource under root path requires the `admin` role
 1. Health checks are not secured
-1. Properties files absolute path as they are not part of the classpath. See the existing files in the examples folder to see how to use them.
+1. Properties files use absolute path as they are not part of the classpath. See the existing files in the examples folder to see how to use them.
 
 ## Using non-provided JDBC drivers
 
