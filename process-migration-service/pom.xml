@@ -458,6 +458,8 @@
                 <argument>-jar</argument>
                 <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
                 <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                <argument>-Dthorntail.security.security-domains.pim.classic-authentication.login-modules.UsersRoles.module-options.usersProperties=${project.basedir}/src/test/resources/application-users.properties</argument>
+                <argument>-Dthorntail.security.security-domains.pim.classic-authentication.login-modules.UsersRoles.module-options.rolesProperties=${project.basedir}/src/test/resources/application-roles.properties</argument>
               </arguments>
             </configuration>
           </execution>
@@ -631,6 +633,8 @@
                     <argument>-jar</argument>
                     <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
                     <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                    <argument>-Dthorntail.security.security-domains.pim.classic-authentication.login-modules.UsersRoles.module-options.usersProperties=${project.basedir}/src/test/resources/application-users.properties</argument>
+                    <argument>-Dthorntail.security.security-domains.pim.classic-authentication.login-modules.UsersRoles.module-options.rolesProperties=${project.basedir}/src/test/resources/application-roles.properties</argument>
                   </arguments>
                 </configuration>
               </execution>
