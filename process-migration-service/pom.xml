@@ -23,6 +23,7 @@
     <frontend-maven-plugin.version>1.7.6</frontend-maven-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <node.version>v11.6.0</node.version>
+    <npm.version>6.9.0</npm.version>
     <!-- Following properties are used only for testing -->
     <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running
          SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
@@ -639,5 +640,55 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>productizedProfile</id>
+      <activation>
+          <property>
+              <name>productized</name>
+          </property>
+      </activation>
+
+      <build>
+          <plugins>
+              <plugin>
+                  <groupId>com.github.eirslett</groupId>
+                  <artifactId>frontend-maven-plugin</artifactId>
+                  <executions>
+                      <execution>
+                          <id>install node and npm</id>
+                          <phase>initialize</phase>
+                          <goals>
+                              <goal>install-node-and-npm</goal>
+                          </goals>
+                          <configuration>
+                              <nodeVersion>${node.version}</nodeVersion>
+                              <npmVersion>${npm.version}</npmVersion>
+                          </configuration>
+                      </execution>
+                      <execution>
+                          <id>npm install lock-treatment-tool and run-node</id>
+                          <phase>initialize</phase>
+                          <goals>
+                              <goal>npm</goal>
+                          </goals>
+                          <configuration>
+                              <arguments>install lock-treatment-tool --global-style --no-package-lock</arguments>
+                          </configuration>
+                      </execution>
+                      <execution>
+                          <id>lock-treatment-tool execution</id>
+                          <phase>initialize</phase>
+                          <goals>
+                              <goal>npm</goal>
+                          </goals>
+                          <configuration>
+                              <arguments>run env -- locktt</arguments>
+                          </configuration>
+                      </execution>
+                  </executions>
+              </plugin>
+          </plugins>
+      </build>
+  </profile>    
   </profiles>
 </project>
