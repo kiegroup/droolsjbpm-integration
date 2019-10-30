@@ -24,6 +24,8 @@ import org.jbpm.task.assigning.model.User;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
+import static org.jbpm.task.assigning.model.Task.PREVIOUS_TASK_OR_USER;
+
 /**
  * Implements the "direct" assignment of an existing Task to a User.
  * This PFC can be useful in scenarios were e.g. a system administrator manually assigns a Task to a given user from the
@@ -99,9 +101,9 @@ public class AssignTaskProblemFactChange implements ProblemFactChange<TaskAssign
                 Task nextTask = workingTask.getNextTask();
                 if (nextTask != null) {
                     //re-link the chain where the workingTask belonged if any
-                    scoreDirector.beforeVariableChanged(nextTask, "previousTaskOrUser");
+                    scoreDirector.beforeVariableChanged(nextTask, PREVIOUS_TASK_OR_USER);
                     nextTask.setPreviousTaskOrUser(previousTaskOrUser);
-                    scoreDirector.afterVariableChanged(nextTask, "previousTaskOrUser");
+                    scoreDirector.afterVariableChanged(nextTask, PREVIOUS_TASK_OR_USER);
                 }
             }
 
@@ -112,15 +114,15 @@ public class AssignTaskProblemFactChange implements ProblemFactChange<TaskAssign
                 solution.getTaskList().add(workingTask);
                 scoreDirector.afterEntityAdded(workingTask);
             } else {
-                scoreDirector.beforeVariableChanged(workingTask, "previousTaskOrUser");
+                scoreDirector.beforeVariableChanged(workingTask, PREVIOUS_TASK_OR_USER);
                 workingTask.setPreviousTaskOrUser(insertPosition);
-                scoreDirector.afterVariableChanged(workingTask, "previousTaskOrUser");
+                scoreDirector.afterVariableChanged(workingTask, PREVIOUS_TASK_OR_USER);
             }
 
             if (insertPositionNextTask != null) {
-                scoreDirector.beforeVariableChanged(insertPositionNextTask, "previousTaskOrUser");
+                scoreDirector.beforeVariableChanged(insertPositionNextTask, PREVIOUS_TASK_OR_USER);
                 insertPositionNextTask.setPreviousTaskOrUser(workingTask);
-                scoreDirector.afterVariableChanged(insertPositionNextTask, "previousTaskOrUser");
+                scoreDirector.afterVariableChanged(insertPositionNextTask, PREVIOUS_TASK_OR_USER);
             }
 
             scoreDirector.beforeProblemPropertyChanged(workingTask);

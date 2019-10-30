@@ -44,12 +44,12 @@ end
 // ############################################################################
 
 // First level soft constraint for penalizing the assignment of the PLANNING_USER. The PLANNING_USER is by definition
-// a potential owner for all the tasks. But we want to avoid the assignming of this user "as soon as possible".
+// a potential owner for all the tasks. But we want to avoid the assigning of this user "as soon as possible".
 // The PLANNING_USER is e.g. a jBPM user with administration grants for enabling the management of Tasks that couldn't
 // be assigned to anybody. e.g. if a Task needs to be assigned to user that belongs to group HR, but no users with that
 // group exists the PLANNING_USER is assigned instead.
 // This tasks can e.g. be latter manually completed by the PLANNING_USER or manually reassigned
-// to a different jBPM user by using the jBPM tasks lists adminitration, etc.
+// to a different jBPM user by using the jBPM tasks lists administration, etc.
 rule "PlanningUser assignment"
     when
         Task(user != null && User.PLANNING_USER.getEntityId().equals(user.getEntityId()))

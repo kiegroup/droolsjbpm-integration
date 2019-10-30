@@ -24,6 +24,9 @@ import org.jbpm.task.assigning.TaskAssigningRuntimeException;
  */
 public class PriorityHelper {
 
+    private PriorityHelper() {
+    }
+
     public static boolean isHighLevel(int priority) {
         return priority == 0 || priority == 1 || priority == 2;
     }
@@ -43,9 +46,9 @@ public class PriorityHelper {
 
     private static void assertValue(int priority) {
         if (priority < 0 || priority > 10) {
-            throw new TaskAssigningRuntimeException(String.format("Task priority %s is out of range. " +
-                                                                           "A valid priority value must be between 0 (inclusive) " +
-                                                                           " and 10 (inclusive)", priority));
+            throw new IllegalArgumentException(String.format("Task priority %s is out of range. " +
+                                                                     "A valid priority value must be between 0 (inclusive) " +
+                                                                     " and 10 (inclusive)", priority));
         }
     }
 }

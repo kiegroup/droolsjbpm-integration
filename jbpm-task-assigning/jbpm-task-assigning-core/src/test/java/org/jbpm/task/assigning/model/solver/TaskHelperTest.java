@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TaskHelperTest {
 
-    private static final int SIZE = 10;
+    private static final int SIZE = 2;
     private static final Random RANDOM = new Random();
 
     private List<User> availableUsers;

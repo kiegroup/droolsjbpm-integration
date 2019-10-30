@@ -29,6 +29,9 @@ import org.jbpm.task.assigning.model.User;
 
 public class TaskHelper {
 
+    private TaskHelper() {
+    }
+
     /**
      * @return true if the user is a potential owner for the given task. This basically means that the user can be
      * assigned to the given task, false in any other case.
@@ -46,9 +49,8 @@ public class TaskHelper {
         final Set<String> acceptedGroupIds = task.getPotentialOwners().stream()
                 .filter(entity -> !entity.isUser())
                 .map(OrganizationalEntity::getEntityId).collect(Collectors.toSet());
-        final boolean indirectlyAssigned = user.getGroups().stream()
+        return user.getGroups().stream()
                 .anyMatch(group -> acceptedGroupIds.contains(group.getEntityId()));
-        return indirectlyAssigned;
     }
 
     public static List<Task> extractTaskList(TaskOrUser taskOrUser) {

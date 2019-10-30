@@ -23,6 +23,43 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("TaUser")
 public class User extends TaskOrUser implements OrganizationalEntity {
+    
+    private static class ImmutableUser extends User {
+
+        private ImmutableUser() {
+            //required by the FieldSolutionCloner
+        }
+
+        private ImmutableUser(long id, String entityId) {
+            super(id, entityId);
+            super.setGroups(new HashSet<>());
+            super.setTypedLabels(new HashSet<>());
+        }
+
+        @Override
+        public void setEntityId(String entityId) {
+            throwImmutableException();
+        }
+
+        @Override
+        public void setGroups(Set<Group> groups) {
+            throwImmutableException();
+        }
+
+        @Override
+        public void setTypedLabels(Set<TypedLabel> typedLabels) {
+            throwImmutableException();
+        }
+
+        @Override
+        public void setId(Long id) {
+            throwImmutableException();
+        }
+
+        private void throwImmutableException() {
+            throw new UnsupportedOperationException("PLANNING_USER: " + getEntityId() + " object can not be modified.");
+        }
+    }
 
     /**
      * System property for configuring the PLANNING_USER entityId.
@@ -97,42 +134,5 @@ public class User extends TaskOrUser implements OrganizationalEntity {
                 ", groups=" + groups +
                 ", typedLabels=" + typedLabels +
                 '}';
-    }
-
-    private static class ImmutableUser extends User {
-
-        private ImmutableUser() {
-            //required by the FieldSolutionCloner
-        }
-
-        private ImmutableUser(long id, String entityId) {
-            super(id, entityId);
-            super.setGroups(new HashSet<>());
-            super.setTypedLabels(new HashSet<>());
-        }
-
-        @Override
-        public void setEntityId(String entityId) {
-            throwImmutableException();
-        }
-
-        @Override
-        public void setGroups(Set<Group> groups) {
-            throwImmutableException();
-        }
-
-        @Override
-        public void setTypedLabels(Set<TypedLabel> typedLabels) {
-            throwImmutableException();
-        }
-
-        @Override
-        public void setId(Long id) {
-            throwImmutableException();
-        }
-
-        private void throwImmutableException() {
-            throw new RuntimeException("PLANNING_USER: " + getEntityId() + " object can not be modified.");
-        }
     }
 }

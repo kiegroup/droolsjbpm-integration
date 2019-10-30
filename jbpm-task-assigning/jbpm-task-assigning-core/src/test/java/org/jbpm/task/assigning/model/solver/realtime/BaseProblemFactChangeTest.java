@@ -33,7 +33,7 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
+public abstract class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -143,7 +143,7 @@ public class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
 
         assertTrue(programmedChanges.isEmpty());
         assertEquals(totalProgrammedChanges, scheduledChanges.size());
-        assertEquals(pendingChanges[0], 0);
+        assertEquals(0, pendingChanges[0]);
         return initialSolution[0];
     }
 }

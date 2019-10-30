@@ -19,6 +19,8 @@ package org.jbpm.task.assigning.model;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 
+import static org.jbpm.task.assigning.model.Task.PREVIOUS_TASK_OR_USER;
+
 @PlanningEntity
 public abstract class TaskOrUser extends AbstractPersistable {
 
@@ -32,7 +34,7 @@ public abstract class TaskOrUser extends AbstractPersistable {
      * <p>
      * In this way given a TaskOrUser in a solution it's possible to iterate back and forward through the data structure.
      */
-    @InverseRelationShadowVariable(sourceVariableName = "previousTaskOrUser")
+    @InverseRelationShadowVariable(sourceVariableName = PREVIOUS_TASK_OR_USER)
     protected Task nextTask;
 
     public TaskOrUser() {

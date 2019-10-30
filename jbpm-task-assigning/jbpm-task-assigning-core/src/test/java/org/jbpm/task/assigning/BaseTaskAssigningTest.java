@@ -35,7 +35,7 @@ import org.optaplanner.core.config.solver.SolverConfig;
 import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.persistence.xstream.impl.domain.solution.XStreamSolutionFileIO;
 
-public class BaseTaskAssigningTest {
+public abstract class BaseTaskAssigningTest {
 
     public static final String _24TASKS_8USERS_SOLUTION = "/data/unsolved/24tasks-8users.xml";
     public static final String _50TASKS_5USERS_SOLUTION = "/data/unsolved/50tasks-5users.xml";
@@ -47,12 +47,11 @@ public class BaseTaskAssigningTest {
     }
 
     protected SolverFactory<TaskAssigningSolution> createSolverFactory() {
-        SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.createEmpty();
-        SolverConfig config = solverFactory.getSolverConfig();
+        SolverConfig config = new SolverConfig();
         config.setSolutionClass(TaskAssigningSolution.class);
         config.setEntityClassList(Arrays.asList(TaskOrUser.class, Task.class));
         config.setScoreDirectorFactoryConfig(new ScoreDirectorFactoryConfig().withScoreDrls("org/jbpm/task/assigning/solver/taskAssigningScoreRules.drl"));
-        return solverFactory;
+        return SolverFactory.create(config);
     }
 
     protected Solver<TaskAssigningSolution> createDaemonSolver() {

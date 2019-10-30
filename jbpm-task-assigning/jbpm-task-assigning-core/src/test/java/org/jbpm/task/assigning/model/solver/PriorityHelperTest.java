@@ -16,10 +16,8 @@
 
 package org.jbpm.task.assigning.model.solver;
 
-import java.util.Random;
 import java.util.stream.Stream;
 
-import org.jbpm.task.assigning.model.solver.PriorityHelper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -49,7 +47,12 @@ public class PriorityHelperTest {
 
     @Test
     public void calculateWeightedPenaltySuccessfulTest() {
-        int priority = new Random().nextInt(11);
+        for (int priority = 0; priority < 11; priority++) {
+            calculateWeightedPenaltySuccessTest(priority);
+        }
+    }
+
+    private void calculateWeightedPenaltySuccessTest(int priority) {
         int endTime = 1234;
         int expectedValue = -(11 - priority) * endTime;
         assertEquals(expectedValue, PriorityHelper.calculateWeightedPenalty(priority, endTime));

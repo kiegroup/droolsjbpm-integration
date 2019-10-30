@@ -22,6 +22,8 @@ import org.jbpm.task.assigning.model.TaskOrUser;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
+import static org.jbpm.task.assigning.model.Task.PREVIOUS_TASK_OR_USER;
+
 /**
  * Implements the removal of a Task from the working solution. If a task with the given identifier not exists it does
  * no action.
@@ -46,9 +48,9 @@ public class RemoveTaskProblemFactChange implements ProblemFactChange<TaskAssign
             TaskOrUser previousTaskOrUser = workingTask.getPreviousTaskOrUser();
             Task nextTask = workingTask.getNextTask();
             if (nextTask != null) {
-                scoreDirector.beforeVariableChanged(nextTask, "previousTaskOrUser");
+                scoreDirector.beforeVariableChanged(nextTask, PREVIOUS_TASK_OR_USER);
                 nextTask.setPreviousTaskOrUser(previousTaskOrUser);
-                scoreDirector.afterVariableChanged(nextTask, "previousTaskOrUser");
+                scoreDirector.afterVariableChanged(nextTask, PREVIOUS_TASK_OR_USER);
             }
             scoreDirector.beforeEntityRemoved(workingTask);
             // Planning entity lists are already cloned by the SolutionCloner, no need to clone.

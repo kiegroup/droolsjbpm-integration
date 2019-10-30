@@ -23,6 +23,9 @@ import org.jbpm.task.assigning.model.TaskOrUser;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import static org.jbpm.task.assigning.model.Task.END_TIME;
+import static org.jbpm.task.assigning.model.Task.START_TIME;
+
 /**
  * Given a chained graph:
  * <p>
@@ -71,13 +74,13 @@ public class StartAndEndTimeUpdatingVariableListener implements VariableListener
         Integer startTime = previousEndTime;
         Integer endTime = calculateEndTime(shadowTask, startTime);
         while (shadowTask != null && !Objects.equals(shadowTask.getStartTime(), startTime)) {
-            scoreDirector.beforeVariableChanged(shadowTask, "startTime");
+            scoreDirector.beforeVariableChanged(shadowTask, START_TIME);
             shadowTask.setStartTime(startTime);
-            scoreDirector.afterVariableChanged(shadowTask, "startTime");
+            scoreDirector.afterVariableChanged(shadowTask, START_TIME);
 
-            scoreDirector.beforeVariableChanged(shadowTask, "endTime");
+            scoreDirector.beforeVariableChanged(shadowTask, END_TIME);
             shadowTask.setEndTime(endTime);
-            scoreDirector.afterVariableChanged(shadowTask, "endTime");
+            scoreDirector.afterVariableChanged(shadowTask, END_TIME);
 
             previousEndTime = shadowTask.getEndTime();
             shadowTask = shadowTask.getNextTask();

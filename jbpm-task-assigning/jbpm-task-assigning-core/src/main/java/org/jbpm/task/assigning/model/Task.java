@@ -43,8 +43,8 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
  * <p>
  * User2: E <- F
  * <p>
- * The initial task of each sequence really points to the user that will own all the tasks in the list, so when a
- * solution is created we'll really have something like this.
+ * The initial task of each sequence points to the user that will own all the tasks in the list, so when a solution is
+ * created we'll have something like this.
  * <p>
  * User1 <- A <- B <- C <- D  (In this example we say that User1 the anchor)
  * <p>
@@ -93,6 +93,12 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 @XStreamAlias("TaTask")
 public class Task extends TaskOrUser {
 
+    public static final String PREVIOUS_TASK_OR_USER = "previousTaskOrUser";
+    public static final String USER_RANGE = "userRange";
+    public static final String TASK_RANGE = "taskRange";
+    public static final String START_TIME = "startTime";
+    public static final String END_TIME = "endTime";
+
     private long processInstanceId;
     private String processId;
     private String containerId;
@@ -110,14 +116,14 @@ public class Task extends TaskOrUser {
     /**
      * Planning variable: changes during planning, between score calculations.
      */
-    @PlanningVariable(valueRangeProviderRefs = {"userRange", "taskRange"},
+    @PlanningVariable(valueRangeProviderRefs = {USER_RANGE, TASK_RANGE},
             graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrUser previousTaskOrUser;
 
     /**
      * Shadow variable, let all Tasks have a reference to the anchor of the chain, the assigned user.
      */
-    @AnchorShadowVariable(sourceVariableName = "previousTaskOrUser")
+    @AnchorShadowVariable(sourceVariableName = PREVIOUS_TASK_OR_USER)
     private User user;
 
     /**
@@ -128,7 +134,7 @@ public class Task extends TaskOrUser {
     @CustomShadowVariable(variableListenerClass = StartAndEndTimeUpdatingVariableListener.class,
             // Arguable, to adhere to API specs (although this works), nextTask and user should also be a source,
             // because this shadow must be triggered after nextTask and user (but there is no need to be triggered by those)
-            sources = {@PlanningVariableReference(variableName = "previousTaskOrUser")})
+            sources = {@PlanningVariableReference(variableName = PREVIOUS_TASK_OR_USER)})
     private Integer startTime; // In minutes
 
     /**
@@ -140,7 +146,7 @@ public class Task extends TaskOrUser {
      * This declaration basically indicates that the endTime is actually calculated as part of the startTime shadow
      * variable calculation.
      */
-    @CustomShadowVariable(variableListenerRef = @PlanningVariableReference(variableName = "startTime"))
+    @CustomShadowVariable(variableListenerRef = @PlanningVariableReference(variableName = START_TIME))
     private Integer endTime; // In minutes
 
     public Task() {
