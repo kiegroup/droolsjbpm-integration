@@ -65,5 +65,8 @@
     "webpack": "^4.35.0",
     "webpack-cli": "^3.3.5",
     "webpack-dev-middleware": "^3.7.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
   }
 }
