@@ -20,7 +20,6 @@
 
   <properties>
     <java.module.name>org.kie.spring</java.module.name>
-    <version.org.springframework>5.1.3.RELEASE</version.org.springframework>
   </properties>
 
   <dependencies>
