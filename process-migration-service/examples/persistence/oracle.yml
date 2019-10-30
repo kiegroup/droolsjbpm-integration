@@ -2,7 +2,7 @@ thorntail:
   datasources:
     data-sources:
       pimDS:
-        driver-name: com.oracle
-        connection-url: jdbc:oracle:thin:@oracle-12cr1.hosts.mwqe.eng.bos.redhat.com:1521:dballo
-        user-name: dballo08
-        password: dballo08
+        driver-name: oracle
+        connection-url: jdbc:oracle:thin:@oracle-12cr1.example.com:1521:pimdb
+        user-name: pim
+        password: pim
