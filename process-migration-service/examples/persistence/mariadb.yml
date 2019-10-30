@@ -6,10 +6,4 @@ thorntail:
         connection-url: jdbc:mariadb://localhost:3306/pimdb
         user-name: pim
         password: pim123
-  ejb3:
-    timer-service:
-      default-data-store: timers-store
-      database-data-stores:
-        timers-store:
-          datasource-jndi-name: java:jboss/datasources/pimDS
-          partition: timer
+

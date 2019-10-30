@@ -6,10 +6,3 @@ thorntail:
         connection-url: jdbc:oracle:thin:@oracle-12cr1.hosts.mwqe.eng.bos.redhat.com:1521:dballo
         user-name: dballo08
         password: dballo08
-  ejb3:
-    timer-service:
-      default-data-store: timers-store
-      database-data-stores:
-        timers-store:
-          datasource-jndi-name: java:jboss/datasources/pimDS
-          partition: timer
