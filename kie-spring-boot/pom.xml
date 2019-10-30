@@ -33,7 +33,6 @@
   </modules>
 
   <properties>
-    <version.org.springframework>5.1.3.RELEASE</version.org.springframework>
     <version.org.spring-boot>2.1.1.RELEASE</version.org.spring-boot>
     <version.org.apache.cxf>3.2.6</version.org.apache.cxf>
     <version.me.snowdrop.narayana>2.1.0</version.me.snowdrop.narayana>
