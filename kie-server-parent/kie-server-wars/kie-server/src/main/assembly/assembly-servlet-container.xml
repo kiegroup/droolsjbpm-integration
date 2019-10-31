@@ -57,6 +57,7 @@
         <include>org.kie.server:kie-server-rest-dmn</include>
         <include>org.kie.server:kie-server-rest-swagger</include>
         <include>org.kie.server:kie-server-rest-prometheus</include>
+        <include>org.kie.server:kie-server-rest-scenario-simulation</include>
         <include>org.kie.server:kie-server-router-client</include>
         <include>org.kie.server:kie-server-client</include>
         <include>org.kie:jbpm-process-svg</include>

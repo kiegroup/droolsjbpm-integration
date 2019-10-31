@@ -106,6 +106,7 @@ import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.api.model.scenariosimulation.ScenarioSimulationResult;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbByte;
 import org.kie.server.api.model.type.JaxbCharacter;
@@ -244,7 +245,10 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             @XmlElement(name = "dmn-model-info-list", type = DMNModelInfoList.class),
 
             // PMML
-            @XmlElement(name = "pmml-result", type = PMML4Result.class)
+            @XmlElement(name = "pmml-result", type = PMML4Result.class),
+
+            // Scenario Simulation
+            @XmlElement(name = "scenario-simulation-result", type = ScenarioSimulationResult.class),
     })
     @JsonProperty
     private T result;
