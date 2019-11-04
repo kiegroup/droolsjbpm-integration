@@ -33,7 +33,7 @@ public class ScenarioSimulationServicesClientBuilder
 
     @Override
     public Map<Class<?>, Object> build(KieServicesConfiguration configuration, ClassLoader classLoader) {
-        Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
+        Map<Class<?>, Object> services = new HashMap<>();
 
         services.put(ScenarioSimulationServicesClient.class, new ScenarioSimulationServicesClientImpl(configuration, classLoader));
 

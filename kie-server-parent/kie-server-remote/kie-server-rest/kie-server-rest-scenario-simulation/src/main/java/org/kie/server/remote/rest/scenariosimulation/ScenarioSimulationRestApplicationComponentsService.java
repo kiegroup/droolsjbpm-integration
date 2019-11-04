@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.kie.server.services.api.KieServerApplicationComponentsService;
-import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.scenariosimulation.ScenarioSimulationKieServerExtension;
 import org.kie.server.services.scenariosimulation.ScenarioSimulationService;
@@ -45,7 +44,7 @@ public class ScenarioSimulationRestApplicationComponentsService implements KieSe
                 .findFirst()
                 .orElse(null);
 
-        List<Object> components = new ArrayList<Object>(1);
+        List<Object> components = new ArrayList<>(1);
         if (SupportedTransports.REST.equals(type)) {
             components.add(new ScenarioSimulationResource(scenarioSimulationService));
         }

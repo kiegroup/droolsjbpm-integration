@@ -23,7 +23,7 @@ import org.kie.server.api.model.scenariosimulation.ScenarioSimulationResult;
 public interface ScenarioSimulationServicesClient {
 
     /**
-     * Execute given test scenario against specified containerId*
+     * Execute given test scenario against specified containerId
      * @param containerId
      * @param path
      * @return

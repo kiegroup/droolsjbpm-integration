@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.drools.scenariosimulation.api.model.ScenarioSimulationModel;
 import org.drools.scenariosimulation.api.model.Simulation;
 import org.drools.scenariosimulation.backend.runner.AbstractScenarioRunner;
+import org.drools.scenariosimulation.backend.util.ScenarioSimulationXMLPersistence;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -28,39 +29,50 @@ import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.scenariosimulation.ScenarioSimulationFailure;
 import org.kie.server.api.model.scenariosimulation.ScenarioSimulationResult;
+import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 
 public class ScenarioSimulationService {
 
-    private KieServerRegistry context;
+    private KieServerRegistry kieServerRegistry;
 
-    public ScenarioSimulationService(KieServerRegistry context) {
-        this.context = context;
+    public ScenarioSimulationService(KieServerRegistry kieServerRegistry) {
+        this.kieServerRegistry = kieServerRegistry;
     }
 
-    public ServiceResponse<ScenarioSimulationResult> executeScenario(String id, ScenarioSimulationModel scenarioSimulationModel) {
-        KieContainer kieContainer = Optional.ofNullable(context)
-                .map(elem -> elem.getContainer(id))
-                .map(KieContainerInstance::getKieContainer)
-                .orElseThrow(() -> new IllegalStateException("Impossible to retrieve kieContainer with id " + id));
+    public ServiceResponse<ScenarioSimulationResult> executeScenario(KieContainer kieContainer, ScenarioSimulationModel scenarioSimulationModel) {
 
         AbstractScenarioRunner runner = newRunner(kieContainer, scenarioSimulationModel.getSimulation());
 
         JUnitCore jUnitCore = new JUnitCore();
 
-        Result result = null;
-        try {
-            result = jUnitCore.run(runner);
-        } catch(Exception e) {
-            return new ServiceResponse<>(KieServiceResponse.ResponseType.FAILURE, e.getMessage());
-        }
+        Result result = jUnitCore.run(runner);
 
         if (result.wasSuccessful()) {
             return new ServiceResponse<>(KieServiceResponse.ResponseType.SUCCESS, "Test Scenario successfully executed", convertResult(result));
         } else {
             return new ServiceResponse<>(KieServiceResponse.ResponseType.FAILURE, "Test Scenario execution failed", convertResult(result));
         }
+    }
+
+    public KieServerRegistry getKieServerRegistry() {
+        return kieServerRegistry;
+    }
+
+    public ScenarioSimulationModel parseModel(String rawContent) throws Exception {
+        return ScenarioSimulationXMLPersistence.getInstance().unmarshal(rawContent);
+    }
+
+    public KieContainer getKieContainerById(String containerId) {
+        ContainerLocator locator = ContainerLocatorProvider.get().getLocator();
+        return Optional.ofNullable(kieServerRegistry)
+                .map(elem -> {
+                    return elem.getContainer(containerId, locator);
+                })
+                .map(KieContainerInstance::getKieContainer)
+                .orElseThrow(() -> new IllegalStateException("Impossible to retrieve kieContainer with id " + containerId));
     }
 
     protected AbstractScenarioRunner newRunner(KieContainer kieContainer, Simulation simulation) {

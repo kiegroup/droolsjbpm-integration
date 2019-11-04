@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.scenariosimulation.ScenarioSimulationResult;
@@ -44,9 +45,10 @@ public class ScenarioSimulationServicesClientImpl extends AbstractKieServicesCli
 
     @Override
     public ServiceResponse<ScenarioSimulationResult> executeScenarioByPath(String containerId, String path) throws IOException {
-        String fileContent = Files.lines(Paths.get(path), StandardCharsets.UTF_8)
-                .collect(Collectors.joining("\n"));
-        return executeScenario(containerId, fileContent);
+        try (Stream<String> contentStream = Files.lines(Paths.get(path), StandardCharsets.UTF_8)) {
+            String fileContent = contentStream.collect(Collectors.joining("\n"));
+            return executeScenario(containerId, fileContent);
+        }
     }
 
     @Override
@@ -56,7 +58,7 @@ public class ScenarioSimulationServicesClientImpl extends AbstractKieServicesCli
             throw new IllegalStateException("Only REST is supported");
         }
 
-        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put(CONTAINER_ID, containerId);
 
         ServiceResponse<ScenarioSimulationResult> response = makeHttpPostRequestAndCreateServiceResponse(

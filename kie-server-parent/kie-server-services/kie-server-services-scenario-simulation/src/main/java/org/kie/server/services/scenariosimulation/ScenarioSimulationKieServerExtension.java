@@ -34,9 +34,9 @@ public class ScenarioSimulationKieServerExtension implements KieServerExtension 
 
     public static final String EXTENSION_NAME = "Scenario Simulation";
 
-    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SCENARIO_SIMULATION_SERVER_EXT_DISABLED, "true"));
-    private static final Boolean disabledDroold = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
-    private static final Boolean disabledDMN = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DMN_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean SCESIM_DISABLED = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SCENARIO_SIMULATION_SERVER_EXT_DISABLED, "true"));
+    private static final Boolean DROOLS_DISABLED = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean DMN_DISABLED = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DMN_SERVER_EXT_DISABLED, "false"));
 
     private KieServerRegistry context;
     private ScenarioSimulationService scenarioSimulationService;
@@ -53,7 +53,7 @@ public class ScenarioSimulationKieServerExtension implements KieServerExtension 
      */
     @Override
     public boolean isActive() {
-        return !disabled && (!disabledDroold || !disabledDMN);
+        return !SCESIM_DISABLED && (!DROOLS_DISABLED || !DMN_DISABLED);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ScenarioSimulationKieServerExtension implements KieServerExtension 
     public List<Object> getAppComponents(SupportedTransports type) {
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
                 = ServiceLoader.load(KieServerApplicationComponentsService.class);
-        List<Object> appComponentsList = new ArrayList<Object>();
+        List<Object> appComponentsList = new ArrayList<>();
         Object[] services = {context, scenarioSimulationService};
         for (KieServerApplicationComponentsService appComponentsService : appComponentsServices) {
             appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
