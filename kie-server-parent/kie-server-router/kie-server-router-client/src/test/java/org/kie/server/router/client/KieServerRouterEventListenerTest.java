@@ -91,7 +91,7 @@ public class KieServerRouterEventListenerTest {
     @Test
     public void testListenerUsername() {
         KieServerRouterEventListener client = new KieServerRouterEventListener();
-        Assert.assertEquals(client.getUsername(), "sample-id");
+        Assert.assertEquals("sample-id", client.getUsername());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class KieServerRouterEventListenerTest {
         System.setProperty(KieServerConstants.KIE_ROUTER_MANAGEMENT_USERNAME, "sample-id-overwrite");
 
         KieServerRouterEventListener client = new KieServerRouterEventListener();
-        Assert.assertEquals(client.getUsername(), "sample-id-overwrite");
+        Assert.assertEquals("sample-id-overwrite", client.getUsername());
 
         System.clearProperty(KieServerConstants.KIE_ROUTER_MANAGEMENT_USERNAME);
     }
