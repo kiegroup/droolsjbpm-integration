@@ -68,9 +68,7 @@ public class ScenarioSimulationService {
     public KieContainer getKieContainerById(String containerId) {
         ContainerLocator locator = ContainerLocatorProvider.get().getLocator();
         return Optional.ofNullable(kieServerRegistry)
-                .map(elem -> {
-                    return elem.getContainer(containerId, locator);
-                })
+                .map(elem -> elem.getContainer(containerId, locator))
                 .map(KieContainerInstance::getKieContainer)
                 .orElseThrow(() -> new IllegalStateException("Impossible to retrieve kieContainer with id " + containerId));
     }
