@@ -298,6 +298,7 @@
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
+              <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <!-- For JMS executor tests. -->
               <org.kie.executor.jms>true</org.kie.executor.jms>
