@@ -16,19 +16,12 @@
 
 package org.kie.server.router;
 
-import static org.kie.server.router.KieServerRouterConstants.KIE_CONTROLLER;
-import static org.kie.server.router.KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_HOST;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_KEYALIAS;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_PASSWORD;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT_TLS;
-
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +34,26 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.security.api.AuthenticationMechanism;
+import io.undertow.security.api.AuthenticationMode;
+import io.undertow.security.handlers.AuthenticationCallHandler;
+import io.undertow.security.handlers.AuthenticationConstraintHandler;
+import io.undertow.security.handlers.AuthenticationMechanismsHandler;
+import io.undertow.security.handlers.SecurityInitialHandler;
+import io.undertow.security.idm.IdentityManager;
+import io.undertow.security.impl.BasicAuthenticationMechanism;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.BlockingHandler;
+import io.undertow.server.handlers.PathHandler;
+import io.undertow.server.handlers.ResponseCodeHandler;
+import io.undertow.server.handlers.proxy.ProxyHandler;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.jboss.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,19 +66,22 @@ import org.kie.server.router.handlers.KieServerInfoHandler;
 import org.kie.server.router.handlers.OptionsHttpHandler;
 import org.kie.server.router.handlers.QueriesDataHttpHandler;
 import org.kie.server.router.handlers.QueriesHttpHandler;
+import org.kie.server.router.identity.IdentityService;
 import org.kie.server.router.proxy.KieServerProxyClient;
 import org.kie.server.router.repository.FileRepository;
 import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.HttpUtils;
 import org.kie.server.router.utils.SSLContextBuilder;
 
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.BlockingHandler;
-import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.ResponseCodeHandler;
-import io.undertow.server.handlers.proxy.ProxyHandler;
+import static org.kie.server.router.KieServerRouterConstants.KIE_CONTROLLER;
+import static org.kie.server.router.KieServerRouterConstants.KIE_ROUTER_MANAGEMENT_SECURED;
+import static org.kie.server.router.KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_HOST;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_KEYALIAS;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_PASSWORD;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT;
+import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT_TLS;
 
 public class KieServerRouter {
 
@@ -81,8 +97,13 @@ public class KieServerRouter {
     private static final String KEYSTORE_PASSWORD = System.getProperty(ROUTER_KEYSTORE_PASSWORD);
     private static final String KEYSTORE_KEYALIAS = System.getProperty(ROUTER_KEYSTORE_KEYALIAS);
     private static final boolean TLS_ENABLED = KEYSTORE_PATH != null && !KEYSTORE_PATH.isEmpty();
-    private int failedAttemptsInterval = Integer.parseInt(System.getProperty(KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL,
-                                                                             "10"));
+    private int failedAttemptsInterval = Integer.parseInt(System.getProperty(KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "10"));
+
+    private static final boolean MANAGEMENT_SECURED = Boolean.parseBoolean(System.getProperty(KIE_ROUTER_MANAGEMENT_SECURED, "false"));
+    private static final String IDENTITY_PROVIDER = System.getProperty(KieServerRouterConstants.KIE_ROUTER_IDENTITY_PROVIDER, "default");
+
+    public static final String CMD_ADD_USER = "addUser";
+    public static final String CMD_REMOVE_USER = "removeUser";
 
     private String CONTROLLER = System.getProperty(KIE_CONTROLLER);
 
@@ -96,6 +117,7 @@ public class KieServerRouter {
             "      \"id\" : \"" + KieServerInfoHandler.getRouterId() + "\"\n" +
             "}";
 
+
     private ServiceLoader<ConfigRepository> configRepositoryServiceLoader = ServiceLoader.load(ConfigRepository.class);
 
     private Undertow server;
@@ -103,14 +125,53 @@ public class KieServerRouter {
 
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> controllerConnectionAttempts;
+    private boolean isSecured;
+    private String identityServiceName;
 
     public KieServerRouter() {
-        configRepositoryServiceLoader.forEach(repo -> repository = repo);
-        log.info("KIE Server router repository implementation is " + repository);
+        this(MANAGEMENT_SECURED, IDENTITY_PROVIDER);
     }
 
-    public static void main(String[] args) {
+    public KieServerRouter(boolean isSecured, String identityServiceName) {
+        configRepositoryServiceLoader.forEach(repo -> repository = repo);
+        log.info("KIE Server router repository implementation is " + repository);
+        this.isSecured = isSecured;
+        this.identityServiceName = identityServiceName;
+    }
+
+    public static void main(String[] args) throws Exception {
+        Options options = new Options();
+
+        Option addInstanceOption = Option.builder(CMD_ADD_USER)
+                                         .desc(CMD_ADD_USER + " <user> <password>")
+                                         .hasArg(true)
+                                         .numberOfArgs(2)
+                                         .build();
+        options.addOption(addInstanceOption);
+        Option removeInstanceOption = Option.builder(CMD_REMOVE_USER)
+                                            .desc(CMD_REMOVE_USER + " <user>")
+                                            .hasArg(true)
+                                            .build();
+        options.addOption(removeInstanceOption);
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
         KieServerRouter router = new KieServerRouter();
+        if (cmd.hasOption(CMD_ADD_USER)) {
+            String[] values = cmd.getOptionValues(CMD_ADD_USER);
+            router.getIdentityService().addKieServerInstance(values[0], values[1]);
+            log.infof("User <%1$s> added", values[0]);
+            return;
+        }
+        if (cmd.hasOption(CMD_REMOVE_USER)) {
+            String value = cmd.getOptionValue(CMD_REMOVE_USER);
+            router.getIdentityService().removeKieServerInstance(value);
+            log.infof("User <%1$s> removed", value);
+            return;
+        }
+
+        // default behavior
         router.start(HOST,
                      PORT,
                      PORT_TLS);
@@ -189,8 +250,21 @@ public class KieServerRouter {
         pathHandler.addExactPath("/containers",
                                  new ContainersHttpHandler(notFoundHandler,
                                                            adminHandler));
-        pathHandler.addPrefixPath("/mgmt",
-                                  adminHandler);
+
+        if (isSecured) {
+            IdentityManager idm = getIdentityService();
+            HttpHandler authenticationCallHandler = new AuthenticationCallHandler(adminHandler);
+            HttpHandler authenticationConstraintHandler = new AuthenticationConstraintHandler(authenticationCallHandler);
+            List<AuthenticationMechanism> mechanisms = Collections.singletonList(new BasicAuthenticationMechanism("KieServerRouterRealm"));
+            AuthenticationMechanismsHandler authenticationMechanismsHandler = new AuthenticationMechanismsHandler(authenticationConstraintHandler, mechanisms);
+            SecurityInitialHandler securityInitialHandler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, idm, authenticationMechanismsHandler);
+            pathHandler.addPrefixPath("/mgmt", securityInitialHandler);
+        } else {
+            pathHandler.addPrefixPath("/mgmt", adminHandler);
+        }
+
+
+        
         pathHandler.addExactPath("/",
                                  new KieServerInfoHandler());
 
@@ -330,5 +404,26 @@ public class KieServerRouter {
         }
 
         adminHandler.addControllerContainers(containers);
+    }
+
+    private static class IdentityServiceNotFound extends RuntimeException {
+
+        private static final long serialVersionUID = 7156962325493936307L;
+
+        public IdentityServiceNotFound(String msg) {
+            super(msg);
+        }
+    }
+
+    public IdentityService getIdentityService() {
+        ServiceLoader<IdentityService> services = ServiceLoader.load(IdentityService.class, Thread.currentThread().getContextClassLoader());
+        Iterator<IdentityService> iterator = services.iterator();
+        while (iterator.hasNext()) {
+            IdentityService identityService = iterator.next();
+            if (identityServiceName.contentEquals(identityService.id())) {
+                return identityService;
+            }
+        }
+        throw new IdentityServiceNotFound("Identity Provider " + IDENTITY_PROVIDER + " not found !");
     }
 }

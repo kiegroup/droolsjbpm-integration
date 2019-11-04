@@ -19,10 +19,12 @@ import java.io.StringReader;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.thoughtworks.xstream.core.util.Base64Encoder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 import org.kie.server.router.Configuration;
@@ -41,6 +43,10 @@ public class KieServerRouterClient implements AutoCloseable {
     private String mediaType = MediaType.APPLICATION_JSON;
     private ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
 
+    private String user;
+
+    private String password;
+
     public KieServerRouterClient(String routerBaseUrl) {
         this.routerBaseUrl = routerBaseUrl;
         httpClient = new ResteasyClientBuilder()
@@ -49,6 +55,10 @@ public class KieServerRouterClient implements AutoCloseable {
                 .build();
     }
 
+    public void setCredentials(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
     public Configuration getRouterConfig() {
         return makeGetRequestAndCreateCustomResponse(routerBaseUrl + MANAGEMENT_LIST_URI_PART);
     }
@@ -64,9 +74,12 @@ public class KieServerRouterClient implements AutoCloseable {
 
     private Configuration makeGetRequestAndCreateCustomResponse(String uri) {
         WebTarget clientRequest = httpClient.target(uri);
-        Response response;
 
-        response = clientRequest.request(mediaType).get();
+        Invocation.Builder requestBuilder = clientRequest.request(mediaType);
+        if (user != null && !user.isEmpty()) {
+            requestBuilder = requestBuilder.header("Authorization", "Basic " + new Base64Encoder().encode((user + ":" + password).getBytes()));
+        }
+        Response response = requestBuilder.get();
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() ) {
             return deserialize(response);
