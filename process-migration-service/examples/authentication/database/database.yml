@@ -1,0 +1,39 @@
+thorntail:
+  deployment:
+    process-migration.war:
+      web:
+        login-config:
+          auth-method: BASIC
+          security-domain: pim
+        security-constraints:
+          - url-pattern: /*
+            methods: [GET]
+            roles: [admin, user]
+  security:
+    security-domains:
+      pim:
+        classic-authentication:
+          login-modules:
+            Database:
+              code: Database
+              flag: required
+              module-options:
+                dsJndiName: java:jboss/datasources/pimDS
+                principalsQuery: SELECT password FROM User WHERE name=?
+                rolesQuery: SELECT role, 'Roles' FROM User WHERE name=?
+                hashAlgorithm: MD5
+                hashEncoding: base64
+  datasources:
+    data-sources:
+      pimDS:
+        driver-name: h2
+        connection-url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        user-name: sa
+        password: sa
+  ejb3:
+    timer-service:
+      default-data-store: timers-store
+      database-data-stores:
+        timers-store:
+          datasource-jndi-name: java:jboss/datasources/pimDS
+          partition: timer

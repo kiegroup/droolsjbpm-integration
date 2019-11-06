@@ -66,51 +66,40 @@ thorntail:
   deployment:
     process-migration.war:
       jaxrs:                   (1)
-        application-path: /
-      web:                     (2)
-        login-config:
-          auth-method: BASIC
-          security-domain: pim
-        security-constraints:
-          - url-pattern: /*
-            roles: [ admin ]
-          - url-pattern: /health/*
-  datasources:                 (3)
+        application-path: /rest
+  datasources:                 (2)
     data-sources:
       pimDS:
         driver-name: h2
         connection-url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
         user-name: sa
         password: sa
-  ejb3:                        (4)
+  ejb3:                        (3)
     timer-service:
       default-data-store: timers-store
       database-data-stores:
         timers-store:
           datasource-jndi-name: java:jboss/datasources/pimDS
           partition: timer
-  security:
-    security-domains:
-      pim:                     (5)
-        classic-authentication:
-          login-modules:
-            UsersRoles:
-              code: UsersRoles
-              flag: required
-              module-options:
-                usersProperties: application-users.properties
-                rolesProperties: application-roles.properties
 ```
 
-1. Deploy the application in the root path
-1. Configure Basic authentication for the application. Only the admin role is allowed to access the API. The `health` endpoint is available to anyone
+1. Deploy the application on `/rest`
 1. H2 inmemory datasource. Override it by one of your choice
 1. EJB Timers persistence configuration
-1. Properties based authentication. Default admin user/password is `kermit`/`thefrog`
 
 ### Configuration overrides
 
-It is possible to override or extend the provided configuration.
+It is possible to override or extend the provided configuration. You can provide one or more additional configuration files that will allow you to customize the application. Several examples are provided in the [examples](./examples/) folder.
+
+As an example, if you want to replace the H2 default persistence configuration by [MariaDB](./examples/persistence/mariadb.yml) and the authentication mechanism to use [LDAP](./examples/authentication/ldap/ldapExtended.yml) you could use the following command to start the application:
+
+```bash
+java -Dthorntail.classpath=./mariadb-java-client-2.4.2.jar -jar target/process-migration-thorntail.jar -s./examples/authentication/ldap/ldapExtended.yml -s./examples/persistence/mariadb.yml
+```
+
+**Note:** As the MariaDB jdbc driver is not included in the classpath it must be added.
+
+**Note:** These files will override or extend the already defined properties in the project-defaults.yml file
 
 #### Defining KIE Servers
 
@@ -143,6 +132,41 @@ thorntail:
 
 _Refer to the [Thorntail Datasource](https://docs.thorntail.io/2.4.0.Final/#creating-a-datasource_thorntail) configuration for further details_
 
+#### Basic authentication
+
+Authentication example available [here](./examples/authentication/properties). Shows how to define basic authentication using properties files.
+
+```{yaml}
+thorntail:
+  deployment:
+    process-migration.war:
+      web:
+        login-config:
+          auth-method: BASIC (1)
+          security-domain: pim
+        security-constraints:
+          - url-pattern: /* (2)
+            roles: [ admin ]
+          - url-pattern: /health/* (3)
+          - url-pattern: /rest/health/* (3)
+  security:
+    security-domains:
+      pim:
+        classic-authentication:
+          login-modules:
+            UsersRoles:
+              code: UsersRoles
+              flag: required
+              module-options: (4)
+                usersProperties: /opt/process-migration/config/application-users.properties
+                rolesProperties: /opt/process-migration/config/application-roles.properties
+```
+
+1. Authentication type `BASIC`
+1. Every resource under root path requires the `admin` role
+1. Health checks are not secured
+1. Properties files use absolute path as they are not part of the classpath. See the existing files in the examples folder to see how to use them.
+
 ## Using non-provided JDBC drivers
 
 The H2 JDBC driver is included by default. However, users will want to use different JDBC drivers to connect to external databases. For that purpose you will
@@ -163,7 +187,7 @@ $ java -jar -Dthorntail.classpath=./mariadb-java-client-2.4.2.jar -jar target/pr
 Request:
 
 ```bash
-URL: http://localhost:8180/plans
+URL: http://localhost:8180/rest/plans
 Method: POST
 HTTP Headers:
   Content-Type: application/json
@@ -214,7 +238,7 @@ Body:
 ### Create a sync migration
 
 ```http
-URL: http://localhost:8180/migrations
+URL: http://localhost:8180/rest/migrations
 Method: POST
 HTTP Headers:
   Content-Type: application/json
@@ -264,7 +288,7 @@ The following request will fetch the overall result of the migration
 Request:
 
 ```http
-URL: http://localhost:8180/migrations/1
+URL: http://localhost:8180/rest/migrations/1
 Method: GET
 HTTP Headers:
   Content-Type: application/json
@@ -301,7 +325,7 @@ To retrieve the individual results of the migration of each process instance
 Request:
 
 ```http
-URL: http://localhost:8180/migrations/1/results
+URL: http://localhost:8180/rest/migrations/1/results
 Method: GET
 HTTP Headers:
   Content-Type: application/json
@@ -375,7 +399,7 @@ Body:
 Request:
 
 ```http
-URL: http://localhost:8180/migrations
+URL: http://localhost:8180/rest/migrations
 Method: POST
 HTTP Headers:
   Content-Type: application/json

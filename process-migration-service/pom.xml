@@ -457,7 +457,7 @@
                 <argument>java</argument>
                 <argument>-jar</argument>
                 <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
-                <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                <argument>-s${project.build.testOutputDirectory}/project-test.yml</argument>
               </arguments>
             </configuration>
           </execution>
@@ -630,7 +630,7 @@
                     <argument>${jacoco.agent.line}</argument>
                     <argument>-jar</argument>
                     <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
-                    <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                    <argument>-s${project.build.testOutputDirectory}/project-test.yml</argument>
                   </arguments>
                 </configuration>
               </execution>

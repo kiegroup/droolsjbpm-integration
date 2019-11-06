@@ -1,0 +1,23 @@
+thorntail:
+  deployment:
+    process-migration.war:
+      web:
+        login-config:
+          auth-method: BASIC
+          security-domain: pim
+        security-constraints:
+          - url-pattern: /*
+            roles: [ admin ]
+          - url-pattern: /health/*
+          - url-pattern: /rest/health/*
+  security:
+    security-domains:
+      pim:
+        classic-authentication:
+          login-modules:
+            UsersRoles:
+              code: UsersRoles
+              flag: required
+              module-options:
+                usersProperties: /opt/process-migration/config/application-users.properties
+                rolesProperties: /opt/process-migration/config/application-roles.properties

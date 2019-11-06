@@ -1,0 +1,7 @@
+kieservers:
+  - host: http://kieserver1.example.com:8080/kie-server/services/rest/server
+    username: krisv
+    password: krisv
+  - host: http://kieserver2.example.com:8080/kie-server/services/rest/server
+    username: admin
+    password: admin123

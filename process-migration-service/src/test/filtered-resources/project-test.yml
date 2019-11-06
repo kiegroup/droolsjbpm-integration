@@ -3,7 +3,7 @@ thorntail:
     offset: 100
   logging:
     root-logger:
-      level: DEBUG
+      level: INFO
   deployment:
     process-migration.war:
       jaxrs:
@@ -25,9 +25,9 @@ thorntail:
               code: UsersRoles
               flag: required
               module-options:
-                usersProperties: application-users.properties
-                rolesProperties: application-roles.properties
+                usersProperties: ${project.build.testOutputDirectory}/application-users.properties
+                rolesProperties: ${project.build.testOutputDirectory}/application-roles.properties
 kieservers:
-  - host: http://localhost:19090/kie-server/services/rest/server
-    username: yoda
-    password: usetheforce123@
+  - host: ${kie.server.base.http.url}
+    username: ${kie.server.username}
+    password: ${kie.server.password}
