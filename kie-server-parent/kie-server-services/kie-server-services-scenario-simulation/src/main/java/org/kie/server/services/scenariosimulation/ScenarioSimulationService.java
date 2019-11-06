@@ -18,6 +18,7 @@ package org.kie.server.services.scenariosimulation;
 import java.util.Optional;
 
 import org.drools.scenariosimulation.api.model.ScenarioSimulationModel;
+import org.drools.scenariosimulation.api.model.Settings;
 import org.drools.scenariosimulation.api.model.Simulation;
 import org.drools.scenariosimulation.backend.runner.AbstractScenarioRunner;
 import org.drools.scenariosimulation.backend.util.ScenarioSimulationXMLPersistence;
@@ -44,7 +45,7 @@ public class ScenarioSimulationService {
 
     public ServiceResponse<ScenarioSimulationResult> executeScenario(KieContainer kieContainer, ScenarioSimulationModel scenarioSimulationModel) {
 
-        AbstractScenarioRunner runner = newRunner(kieContainer, scenarioSimulationModel.getSimulation());
+        AbstractScenarioRunner runner = newRunner(kieContainer, scenarioSimulationModel);
 
         JUnitCore jUnitCore = new JUnitCore();
 
@@ -73,9 +74,11 @@ public class ScenarioSimulationService {
                 .orElseThrow(() -> new IllegalStateException("Impossible to retrieve kieContainer with id " + containerId));
     }
 
-    protected AbstractScenarioRunner newRunner(KieContainer kieContainer, Simulation simulation) {
-        return AbstractScenarioRunner.getSpecificRunnerProvider(simulation.getSimulationDescriptor())
-                .create(kieContainer, simulation.getSimulationDescriptor(), simulation.getScenarioWithIndex());
+    protected AbstractScenarioRunner newRunner(KieContainer kieContainer, ScenarioSimulationModel scenarioSimulationModel) {
+        Simulation simulation = scenarioSimulationModel.getSimulation();
+        Settings settings = scenarioSimulationModel.getSettings();
+        return AbstractScenarioRunner.getSpecificRunnerProvider(settings.getType())
+                .create(kieContainer, simulation.getScesimModelDescriptor(), simulation.getScenarioWithIndex(), settings);
     }
 
     protected ScenarioSimulationResult convertResult(Result result) {
