@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.services.task.assigning.solver;
+package org.jbpm.task.assigning.solver;
     dialect "java"
 
 import org.optaplanner.core.api.score.buildin.bendable.BendableScoreHolder;
@@ -48,7 +48,7 @@ end
 // The PLANNING_USER is e.g. a jBPM user with administration grants for enabling the management of Tasks that couldn't
 // be assigned to anybody. e.g. if a Task needs to be assigned to user that belongs to group HR, but no users with that
 // group exists the PLANNING_USER is assigned instead.
-// This tasks can e.g. be latter manually completed by the PLANNING_USER or manually reassigned
+// This tasks can e.g. be later manually completed by the PLANNING_USER or manually reassigned
 // to a different jBPM user by using the jBPM tasks lists administration, etc.
 rule "PlanningUser assignment"
     when
@@ -65,7 +65,7 @@ rule "High level priority"
         scoreHolder.addSoftConstraintMatch(kcontext, 1, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTime()));
 end
 
-rule "Minimze makespan (starting with the latest ending user first)"
+rule "Minimize makespan (starting with the latest ending user first)"
     when
         Task(user != null, nextTask == null, $endTime : endTime)
     then

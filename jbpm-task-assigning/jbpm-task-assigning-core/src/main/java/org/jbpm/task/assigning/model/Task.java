@@ -46,11 +46,11 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
  * The initial task of each sequence points to the user that will own all the tasks in the list, so when a solution is
  * created we'll have something like this.
  * <p>
- * User1 <- A <- B <- C <- D  (In this example we say that User1 the anchor)
+ * User1 <- A <- B <- C <- D  (In this example, User1 is the anchor)
  * <p>
  * This explains why property "previousTaskOrUser" can be assigned with User or a Task.
  * <p>
- * BUT the solver will build the solutions in a way that only the first item of the "chain" will point to
+ * BUT the solver builds the solutions in a way that only the first item of the "chain" points to
  * a user. This is how a CHAINED configuration works. And the way the solver knows which must be the fact class
  * that must be used for setting the previousTaskOrUser property is by considering the order in the PlanningVariable
  * configuration.

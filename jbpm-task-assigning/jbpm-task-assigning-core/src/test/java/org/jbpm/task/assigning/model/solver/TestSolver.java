@@ -25,6 +25,10 @@ import org.jbpm.task.assigning.model.User;
 import org.junit.Test;
 import org.optaplanner.core.api.solver.Solver;
 
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_100TASKS_5USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.jbpm.task.assigning.model.solver.TaskHelper.extractTaskList;
 import static org.jbpm.task.assigning.model.solver.TaskHelper.isPotentialOwner;
 import static org.junit.Assert.assertEquals;
@@ -39,22 +43,22 @@ public class TestSolver extends BaseTaskAssigningTest {
 
     @Test
     public void startSolverAndSolution24Tasks8UsersTest() throws Exception {
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, _24TASKS_8USERS_SOLUTION);
+        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
     public void startSolverAndSolution50Tasks5UsersTest() throws Exception {
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, _50TASKS_5USERS_SOLUTION);
+        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
     public void startSolverAndSolution100Tasks5UsersTest() throws Exception {
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, _100TASKS_5USERS_SOLUTION);
+        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void startSolverAndSolution500Tasks5UsersTest() throws Exception {
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT * 3, _500TASKS_20USERS_SOLUTION);
+    public void startSolverAndSolution500Tasks20UsersTest() throws Exception {
+        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT * 3, SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
     /**
@@ -82,13 +86,13 @@ public class TestSolver extends BaseTaskAssigningTest {
      * @param solution a solution.
      */
     private void assertConstraints(TaskAssigningSolution solution) {
-        int[] totalTasks = {0};
-        solution.getUserList().forEach(user -> {
+        int totalTasks = 0;
+        for (User user : solution.getUserList()) {
             List<Task> taskList = extractTaskList(user);
-            totalTasks[0] += taskList.size();
+            totalTasks += taskList.size();
             taskList.forEach(task -> assertAssignment(user, task, solution.getUserList()));
-        });
-        assertEquals(solution.getTaskList().size(), totalTasks[0]);
+        }
+        assertEquals(solution.getTaskList().size(), totalTasks);
     }
 
     private void assertAssignment(User user, Task task, List<User> availableUsers) {

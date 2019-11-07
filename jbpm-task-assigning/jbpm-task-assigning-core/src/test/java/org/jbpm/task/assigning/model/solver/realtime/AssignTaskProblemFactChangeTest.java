@@ -16,9 +16,6 @@
 
 package org.jbpm.task.assigning.model.solver.realtime;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +31,10 @@ import org.jbpm.task.assigning.model.User;
 import org.junit.Test;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_100TASKS_5USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -86,47 +87,47 @@ public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
 
     @Test
     public void assignTaskProblemFactChange24Tasks8UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(_24TASKS_8USERS_SOLUTION);
+        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
     public void assignTaskProblemFactChange24Tasks8UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(_24TASKS_8USERS_SOLUTION);
+        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
     public void assignTaskProblemFactChange50Tasks5UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(_50TASKS_5USERS_SOLUTION);
+        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
     public void assignTaskProblemFactChange50Tasks5UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(_50TASKS_5USERS_SOLUTION);
+        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
     public void assignTaskProblemFactChange100Tasks5UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(_100TASKS_5USERS_SOLUTION);
+        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
     public void assignTaskProblemFactChange100Tasks5UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(_100TASKS_5USERS_SOLUTION);
+        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange500Tasks5UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(_500TASKS_20USERS_SOLUTION);
+    public void assignTaskProblemFactChange500Tasks20UsersTest() throws Exception {
+        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange500Tasks5UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(_500TASKS_20USERS_SOLUTION);
+    public void assignTaskProblemFactChange500Tasks20UsersRandomTest() throws Exception {
+        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
     @Test
     public void assignTaskProblemFactChangeUserNotFoundTest() throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(_24TASKS_8USERS_SOLUTION);
+        TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
         Task task = solution.getTaskList().get(0);
         User user = new User(-12345, "Non Existing");
         expectedException.expectMessage("Expected user: " + user + " was not found in current working solution");
@@ -246,17 +247,13 @@ public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
                                                  List<ProgrammedAssignTaskProblemFactChange> programmedChanges) throws Exception {
         TaskAssigningSolution initialSolution = executeSequentialChanges(solution, programmedChanges);
         if (writeTestFiles()) {
-            String resourceName = solutionResource.substring(solutionResource.lastIndexOf("/") + 1);
-            writeToTempFile("AssignTaskProblemFactChangeTest.assignTaskProblemFactChangeTest." + testType + ".InitialSolution_", printSolution(initialSolution));
-            for (int i = 0; i < programmedChanges.size(); i++) {
-                ProgrammedAssignTaskProblemFactChange scheduledChange = programmedChanges.get(i);
-                try {
-                    writeToTempFile("AssignTaskProblemFactChangeTest.assignTaskProblemFactChangeTest." + testType + ".WorkingSolutionBeforeChange_" + resourceName + "_" + i + "__", scheduledChange.workingSolutionBeforeChangeAsString());
-                    writeToTempFile("AssignTaskProblemFactChangeTest.assignTaskProblemFactChangeTest." + testType + ".SolutionAfterChange_" + resourceName + "_" + i + "__", scheduledChange.solutionAfterChangeAsString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            writeProblemFactChangesTestFiles(initialSolution,
+                                             solutionResource,
+                                             "AssignTaskProblemFactChangeTest.assignTaskProblemFactChangeTest",
+                                             testType,
+                                             programmedChanges,
+                                             ProgrammedAssignTaskProblemFactChange::workingSolutionBeforeChangeAsString,
+                                             ProgrammedAssignTaskProblemFactChange::solutionAfterChangeAsString);
         }
 
         //each partial solution must have the change that was applied on it.
@@ -311,10 +308,5 @@ public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
             assertEquals(internalUser, nextTask.getUser());
             nextTask = nextTask.getNextTask();
         }
-    }
-
-    private static void writeToTempFile(String fileName, String content) throws IOException {
-        File tmpFile = File.createTempFile(fileName, null);
-        Files.write(tmpFile.toPath(), content.getBytes());
     }
 }

@@ -19,9 +19,10 @@ package org.jbpm.task.assigning.model.solver.realtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import org.jbpm.task.assigning.BaseTaskAssigningTest;
 import org.jbpm.task.assigning.model.TaskAssigningSolution;
@@ -29,11 +30,15 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public abstract class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseProblemFactChangeTest.class);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -76,11 +81,10 @@ public abstract class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
         //store the first solution that was produced by the solver for knowing how things looked like at the very
         //beginning before any change was produced.
         final TaskAssigningSolution[] initialSolution = {null};
-        final boolean[] changesInProgress = {false};
+        final AtomicBoolean changesInProgress = new AtomicBoolean(false);
 
         final Semaphore programNextChange = new Semaphore(0);
         final Semaphore allChangesWereProduced = new Semaphore(0);
-        final Semaphore executorThreadStarted = new Semaphore(0);
 
         //prepare the list of changes to program
         List<ProgrammedProblemFactChange> programmedChanges = new ArrayList<>(changes);
@@ -95,8 +99,7 @@ public abstract class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
                 initialSolution[0] = event.getNewBestSolution();
                 //let the problem fact changes start being produced.
                 programNextChange.release();
-            } else if (changesInProgress[0] && event.isEveryProblemFactChangeProcessed()) {
-                changesInProgress[0] = false;
+            } else if (event.isEveryProblemFactChangeProcessed() && changesInProgress.compareAndSet(true, false)) {
                 ProgrammedProblemFactChange programmedChange = scheduledChanges.get(scheduledChanges.size() - 1);
                 programmedChange.setSolutionAfterChange(event.getNewBestSolution());
 
@@ -111,39 +114,57 @@ public abstract class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
         });
 
         //Programmed changes producer Thread.
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
+        CompletableFuture.runAsync(() -> {
             boolean hasMoreChanges = true;
             while (hasMoreChanges) {
                 try {
                     //wait until next problem fact change can be added to the solver.
                     //by construction the lock is only released when no problem fact change is in progress.
-                    executorThreadStarted.release();
                     programNextChange.acquire();
                     ProgrammedProblemFactChange programmedChange = programmedChanges.remove(0);
                     hasMoreChanges = !programmedChanges.isEmpty();
                     pendingChanges[0] = programmedChanges.size();
                     scheduledChanges.add(programmedChange);
-                    changesInProgress[0] = true;
+                    changesInProgress.set(true);
                     solver.addProblemFactChange(programmedChange.getChange());
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    LOGGER.error("It looks like the test Future was interrupted.", e);
                 }
             }
             try {
                 //wait until the solver listener has processed all the changes.
                 allChangesWereProduced.acquire();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("It looks like the test Future was interrupted while waiting to finish.", e);
             }
         });
 
-        executorThreadStarted.acquire();
         solver.solve(solution);
 
         assertTrue(programmedChanges.isEmpty());
         assertEquals(totalProgrammedChanges, scheduledChanges.size());
         assertEquals(0, pendingChanges[0]);
         return initialSolution[0];
+    }
+
+    protected <T extends ProgrammedProblemFactChange> void writeProblemFactChangesTestFiles(TaskAssigningSolution initialSolution,
+                                                                                            String solutionResource,
+                                                                                            String filePrefix,
+                                                                                            String testType,
+                                                                                            List<T> programmedChanges,
+                                                                                            Function<T, String> solutionBeforeChange,
+                                                                                            Function<T, String> solutionAfterChange) throws Exception {
+
+        String resourceName = solutionResource.substring(solutionResource.lastIndexOf("/") + 1);
+        writeToTempFile(filePrefix + "." + testType + ".InitialSolution_", printSolution(initialSolution));
+        for (int i = 0; i < programmedChanges.size(); i++) {
+            T scheduledChange = programmedChanges.get(i);
+            try {
+                writeToTempFile(filePrefix + "." + testType + ".WorkingSolutionBeforeChange_" + resourceName + "_" + i + "__", solutionBeforeChange.apply(scheduledChange));
+                writeToTempFile(filePrefix + "." + testType + ".SolutionAfterChange_" + resourceName + "_" + i + "__", solutionAfterChange.apply(scheduledChange));
+            } catch (Exception e) {
+                LOGGER.error("An error was produced during test files writing.", e);
+            }
+        }
     }
 }

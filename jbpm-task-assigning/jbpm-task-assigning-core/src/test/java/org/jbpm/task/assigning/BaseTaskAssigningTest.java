@@ -19,6 +19,7 @@ package org.jbpm.task.assigning;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -37,32 +38,29 @@ import org.optaplanner.persistence.xstream.impl.domain.solution.XStreamSolutionF
 
 public abstract class BaseTaskAssigningTest {
 
-    public static final String _24TASKS_8USERS_SOLUTION = "/data/unsolved/24tasks-8users.xml";
-    public static final String _50TASKS_5USERS_SOLUTION = "/data/unsolved/50tasks-5users.xml";
-    public static final String _100TASKS_5USERS_SOLUTION = "/data/unsolved/100tasks-5users.xml";
-    public static final String _500TASKS_20USERS_SOLUTION = "/data/unsolved/500tasks-20users.xml";
-
     protected boolean writeTestFiles() {
         return Boolean.parseBoolean(System.getProperty("org.jbpm.task.assigning.test.writeFiles", "false"));
     }
 
-    protected SolverFactory<TaskAssigningSolution> createSolverFactory() {
+    protected SolverConfig createBaseConfig() {
         SolverConfig config = new SolverConfig();
         config.setSolutionClass(TaskAssigningSolution.class);
         config.setEntityClassList(Arrays.asList(TaskOrUser.class, Task.class));
         config.setScoreDirectorFactoryConfig(new ScoreDirectorFactoryConfig().withScoreDrls("org/jbpm/task/assigning/solver/taskAssigningScoreRules.drl"));
-        return SolverFactory.create(config);
+        return config;
     }
 
     protected Solver<TaskAssigningSolution> createDaemonSolver() {
-        SolverFactory<TaskAssigningSolution> solverFactory = createSolverFactory();
-        solverFactory.getSolverConfig().setDaemon(true);
+        SolverConfig config = createBaseConfig();
+        config.setDaemon(true);
+        SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.create(config);
         return solverFactory.buildSolver();
     }
 
     protected Solver<TaskAssigningSolution> createNonDaemonSolver(long millisecondsSpentLimit) {
-        SolverFactory<TaskAssigningSolution> solverFactory = createSolverFactory();
-        solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMillisecondsSpentLimit(millisecondsSpentLimit));
+        SolverConfig config = createBaseConfig();
+        config.setTerminationConfig(new TerminationConfig().withMillisecondsSpentLimit(millisecondsSpentLimit));
+        SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.create(config);
         return solverFactory.buildSolver();
     }
 
@@ -150,5 +148,10 @@ public abstract class BaseTaskAssigningTest {
         }
         builder.append("}");
         return builder.toString();
+    }
+
+    public static void writeToTempFile(String fileName, String content) throws IOException {
+        File tmpFile = File.createTempFile(fileName, null);
+        Files.write(tmpFile.toPath(), content.getBytes());
     }
 }

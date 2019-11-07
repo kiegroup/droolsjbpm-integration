@@ -86,7 +86,7 @@ public class TaskAssigningGenerator extends LoggingMain {
     private final SolutionFileIO<TaskAssigningSolution> solutionFileIO;
     private final File outputDir;
 
-    private Random random;
+    private Random random = new Random(37);
 
     private TaskAssigningGenerator() {
         System.setProperty(DATA_DIR_SYSTEM_PROPERTY, "jbpm-task-assigning-core/src/test/resources");
@@ -107,7 +107,6 @@ public class TaskAssigningGenerator extends LoggingMain {
     }
 
     private TaskAssigningSolution createTaskAssigningSolution(String fileName, int taskListSize, int groupListSize, int userListSize) {
-        random = new Random(37);
         TaskAssigningSolution solution = new TaskAssigningSolution();
         solution.setId(0L);
 
@@ -115,9 +114,9 @@ public class TaskAssigningGenerator extends LoggingMain {
         createUserList(solution, userListSize, groupList);
         createTaskList(solution, taskListSize, groupList);
 
-        BigInteger a = AbstractSolutionImporter.factorial(taskListSize + userListSize - 1);
-        BigInteger b = AbstractSolutionImporter.factorial(userListSize - 1);
-        BigInteger possibleSolutionSize = (a == null || b == null) ? null : a.divide(b);
+        BigInteger totalFacts = AbstractSolutionImporter.factorial(taskListSize + userListSize - 1);
+        BigInteger fixedFacts = AbstractSolutionImporter.factorial(userListSize - 1);
+        BigInteger possibleSolutionSize = (totalFacts == null || fixedFacts == null) ? null : totalFacts.divide(fixedFacts);
         logger.info("TaskAssigningSolution {} has {} tasks, {} groups, and {} users with a search space of {}.",
                     fileName,
                     taskListSize,

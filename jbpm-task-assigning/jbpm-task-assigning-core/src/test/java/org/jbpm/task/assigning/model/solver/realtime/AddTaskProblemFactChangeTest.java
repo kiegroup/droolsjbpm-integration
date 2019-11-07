@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.jbpm.task.assigning.model.Task;
@@ -29,54 +28,58 @@ import org.jbpm.task.assigning.model.TaskAssigningSolution;
 import org.jbpm.task.assigning.model.User;
 import org.junit.Test;
 
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_100TASKS_5USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTION;
+import static org.jbpm.task.assigning.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.junit.Assert.assertTrue;
 
 public class AddTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
 
     @Test
-    public void addTaskProblemFactChange24Tasks5UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(_24TASKS_8USERS_SOLUTION, Arrays.asList(24L, 25L, 30L, 40L));
+    public void addTaskProblemFactChange24Tasks8UsersTest() throws Exception {
+        addTaskProblemFactChangeTest(SET_OF_24TASKS_8USERS_SOLUTION.resource(), Arrays.asList(24L, 25L, 30L, 40L));
     }
 
     @Test
-    public void addTaskProblemFactChange24Tasks5UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(_24TASKS_8USERS_SOLUTION);
+    public void addTaskProblemFactChange24Tasks8UsersRandomTest() throws Exception {
+        addTaskProblemFactChangeRandomSetTest(SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
     public void addTaskProblemFactChange50Tasks5UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(_50TASKS_5USERS_SOLUTION, Arrays.asList(50L, 520L, 70L, 85L, 100L));
+        addTaskProblemFactChangeTest(SET_OF_50TASKS_5USERS_SOLUTION.resource(), Arrays.asList(50L, 520L, 70L, 85L, 100L));
     }
 
     @Test
     public void addTaskProblemFactChange50Tasks5UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(_50TASKS_5USERS_SOLUTION);
+        addTaskProblemFactChangeRandomSetTest(SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
     public void addTaskProblemFactChange100Tasks5UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(_100TASKS_5USERS_SOLUTION, Arrays.asList(100L, 105L, 200L, 350L));
+        addTaskProblemFactChangeTest(SET_OF_100TASKS_5USERS_SOLUTION.resource(), Arrays.asList(100L, 105L, 200L, 350L));
     }
 
     @Test
     public void addTaskProblemFactChange100Tasks5UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(_100TASKS_5USERS_SOLUTION);
+        addTaskProblemFactChangeRandomSetTest(SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void addTaskProblemFactChange500Tasks5UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(_500TASKS_20USERS_SOLUTION, Arrays.asList(500L, 600L, 700L));
+    public void addTaskProblemFactChange500Tasks20UsersTest() throws Exception {
+        addTaskProblemFactChangeTest(SET_OF_500TASKS_20USERS_SOLUTION.resource(), Arrays.asList(500L, 600L, 700L));
     }
 
     @Test
-    public void addTaskProblemFactChange500Tasks5UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(_500TASKS_20USERS_SOLUTION);
+    public void addTaskProblemFactChange500Tasks20UsersRandomTest() throws Exception {
+        addTaskProblemFactChangeRandomSetTest(SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
     @Test
     public void addTaskProblemFactChangeTaskAlreadyExistsTest() throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(_24TASKS_8USERS_SOLUTION);
-        long taskId = new Random().nextInt(solution.getTaskList().size());
+        TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
+        long taskId = 20; //randomly selected task.
         Task task = new Task(taskId, null, 1);
         expectedException.expectMessage("A task with the given identifier id: " + taskId + " already exists");
         executeSequentialChanges(solution, Collections.singletonList(new ProgrammedProblemFactChange<>(new AddTaskProblemFactChange(task))));
