@@ -28,6 +28,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.uberfire.backend.server.security.BasicAuthorizationPrincipal;
 
 public class KieLoginModule implements LoginModule {
 

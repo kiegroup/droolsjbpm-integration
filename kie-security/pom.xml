@@ -16,4 +16,11 @@
     <java.module.name>org.kie.security</java.module.name>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-backend-server</artifactId>
+    </dependency>
+  </dependencies>
+
 </project>
