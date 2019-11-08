@@ -320,6 +320,12 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-security</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
