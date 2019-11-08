@@ -19,7 +19,7 @@
   <dependencies>
     <dependency>
       <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-backend-server</artifactId>
+      <artifactId>uberfire-security-backend</artifactId>
     </dependency>
   </dependencies>
 
