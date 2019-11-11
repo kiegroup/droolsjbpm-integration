@@ -229,9 +229,36 @@ public abstract class AbstractKieServerImplTest {
 
         assertEquals(healthMessages.size(), 1);
         Message failedContainer = healthMessages.get(0);
+        assertEquals(Severity.WARN, failedContainer.getSeverity());
+        assertEquals(1, failedContainer.getMessages().size());
+        assertEquals("KIE Container 'test' is in FAILED state", failedContainer.getMessages().iterator().next());
+    }
+
+    @Test
+    public void testHealthCheckFailedContainerManagementDisabled() {
+        System.setProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED, "true");
+
+        kieServer.destroy();
+        kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR)) {
+
+            @Override
+            protected List<KieContainerInstanceImpl> getContainers() {
+                List<KieContainerInstanceImpl> containers = new ArrayList<>();
+                KieContainerInstanceImpl container = new KieContainerInstanceImpl("test", KieContainerStatus.FAILED);
+                containers.add(container);
+                return containers;
+            }
+
+        };
+        kieServer.init();
+        List<Message> healthMessages = kieServer.healthCheck(false);
+
+        assertEquals(1, healthMessages.size());
+        Message failedContainer = healthMessages.get(0);
         assertEquals(Severity.ERROR, failedContainer.getSeverity());
         assertEquals(1, failedContainer.getMessages().size());
         assertEquals("KIE Container 'test' is in FAILED state", failedContainer.getMessages().iterator().next());
+        System.clearProperty(KieServerConstants.KIE_SERVER_MGMT_API_DISABLED);
     }
 
     @Test
