@@ -16,6 +16,8 @@
     <org.kie.dmn.server.ext.disabled>false</org.kie.dmn.server.ext.disabled>
     <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
     <org.kie.scenariosimulation.server.ext.disabled>false</org.kie.scenariosimulation.server.ext.disabled>
+    <!-- only REST is supported -->
+    <jms.skip>true</jms.skip>
   </properties>
 
   <dependencies>
@@ -201,6 +203,7 @@
               <!-- Added: -->
               <org.kie.dmn.server.ext.disabled>${org.kie.dmn.server.ext.disabled}</org.kie.dmn.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
+              <jms.skip>${jms.skip}</jms.skip>
             </systemPropertyVariables>
           </configuration>
         </plugin>

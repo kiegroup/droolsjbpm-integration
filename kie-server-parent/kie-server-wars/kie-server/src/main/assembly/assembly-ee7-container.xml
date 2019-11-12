@@ -50,6 +50,7 @@
         <include>org.kie.server:kie-server-services-dmn</include>
         <include>org.kie.server:kie-server-services-swagger</include>
         <include>org.kie.server:kie-server-services-scenario-simulation</include>
+        <include>junit:junit</include>
         <include>org.kie.server:kie-server-jms</include>
         <include>org.kie.server:kie-server-rest-common</include>
         <include>org.kie.server:kie-server-rest-drools</include>

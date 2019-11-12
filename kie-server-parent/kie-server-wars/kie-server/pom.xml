@@ -146,6 +146,11 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-scenario-simulation</artifactId>
     </dependency>
+    <!-- NOTE: Test Scenario uses a jUnit runner to execute the tests so jUnit is needed at runtime -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-jms</artifactId>
