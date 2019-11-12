@@ -99,8 +99,8 @@ public class KieServerRouter {
     private static final boolean TLS_ENABLED = KEYSTORE_PATH != null && !KEYSTORE_PATH.isEmpty();
     private int failedAttemptsInterval = Integer.parseInt(System.getProperty(KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "10"));
 
-    private static final boolean MANAGEMENT_SECURED = Boolean.parseBoolean(System.getProperty(KIE_ROUTER_MANAGEMENT_SECURED, "false"));
-    private static final String IDENTITY_PROVIDER = System.getProperty(KieServerRouterConstants.KIE_ROUTER_IDENTITY_PROVIDER, "default");
+    private static boolean MANAGEMENT_SECURED = isManagementSecured();
+    private static String IDENTITY_PROVIDER = getIdentityProvider();
 
     public static final String CMD_ADD_USER = "addUser";
     public static final String CMD_REMOVE_USER = "removeUser";
@@ -129,7 +129,7 @@ public class KieServerRouter {
     private String identityServiceName;
 
     public KieServerRouter() {
-        this(MANAGEMENT_SECURED, IDENTITY_PROVIDER);
+        this(reloadManagementSecured(), reloadIdentityProvider()); //Reload for easier testing
     }
 
     public KieServerRouter(boolean isSecured, String identityServiceName) {
@@ -424,6 +424,24 @@ public class KieServerRouter {
                 return identityService;
             }
         }
-        throw new IdentityServiceNotFound("Identity Provider " + IDENTITY_PROVIDER + " not found !");
+        throw new IdentityServiceNotFound("Identity Provider " + identityServiceName + " not found !");
+    }
+
+    private static boolean isManagementSecured() {
+        return Boolean.parseBoolean(System.getProperty(KIE_ROUTER_MANAGEMENT_SECURED, "false"));
+    }
+
+    private static boolean reloadManagementSecured() {
+        MANAGEMENT_SECURED = isManagementSecured();
+        return MANAGEMENT_SECURED;
+    }
+
+    private static String getIdentityProvider() {
+        return System.getProperty(KieServerRouterConstants.KIE_ROUTER_IDENTITY_PROVIDER, "default");
+    }
+
+    private static String reloadIdentityProvider() {
+        IDENTITY_PROVIDER = getIdentityProvider();
+        return IDENTITY_PROVIDER;
     }
 }
