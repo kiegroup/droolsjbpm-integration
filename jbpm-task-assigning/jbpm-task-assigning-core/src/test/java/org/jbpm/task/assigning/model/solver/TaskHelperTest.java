@@ -18,7 +18,6 @@ package org.jbpm.task.assigning.model.solver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.jbpm.task.assigning.model.Group;
 import org.jbpm.task.assigning.model.OrganizationalEntity;
@@ -34,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 public class TaskHelperTest {
 
     private static final int SIZE = 2;
-    private static final Random RANDOM = new Random();
 
     private List<User> availableUsers;
     private List<Group> availableGroups;
@@ -50,36 +48,43 @@ public class TaskHelperTest {
     }
 
     @Test
-    public void isPotentialOwnerDirectAssignmentTrueTest() {
-        User user = availableUsers.get(RANDOM.nextInt(SIZE));
-        assertTrue(isPotentialOwner(task, user));
+    public void isPotentialOwnerDirectAssignmentTrue() {
+        for (User user : availableUsers) {
+            assertTrue(isPotentialOwner(task, user));
+        }
     }
 
     @Test
-    public void isPotentialOwnerDirectAssignmentFalseTest() {
-        User user = availableUsers.get(RANDOM.nextInt(SIZE));
-        task.getPotentialOwners().remove(user);
-        assertFalse(isPotentialOwner(task, user));
+    public void isPotentialOwnerDirectAssignmentFalse() {
+        for (User user : availableUsers) {
+            task.getPotentialOwners().remove(user);
+            assertFalse(isPotentialOwner(task, user));
+        }
     }
 
     @Test
-    public void isPotentialOwnerInDirectAssignmentTrueTest() {
-        User user = availableUsers.get(RANDOM.nextInt(SIZE));
-        Group group = availableGroups.get(RANDOM.nextInt(SIZE));
-        task.getPotentialOwners().remove(user);
-        user.getGroups().add(group);
-        assertTrue(isPotentialOwner(task, user));
+    public void isPotentialOwnerInDirectAssignmentTrue() {
+        for (User user : availableUsers) {
+            task.getPotentialOwners().remove(user);
+            for (Group group : availableGroups) {
+                user.getGroups().add(group);
+                assertTrue(isPotentialOwner(task, user));
+                user.getGroups().remove(group);
+            }
+        }
     }
 
     @Test
-    public void isPotentialOwnerInDirectAssignmentFalseTest() {
-        User user = availableUsers.get(RANDOM.nextInt(SIZE));
-        Group group = availableGroups.get(RANDOM.nextInt(SIZE));
-        task.getPotentialOwners().remove(user);
-        user.getGroups().add(group);
-        assertTrue(isPotentialOwner(task, user));
-        user.getGroups().remove(group);
-        assertFalse(isPotentialOwner(task, user));
+    public void isPotentialOwnerInDirectAssignmentFalse() {
+        for (User user : availableUsers) {
+            task.getPotentialOwners().remove(user);
+            for (Group group : availableGroups) {
+                user.getGroups().add(group);
+                assertTrue(isPotentialOwner(task, user));
+                user.getGroups().remove(group);
+                assertFalse(isPotentialOwner(task, user));
+            }
+        }
     }
 
     private Task buildTask(List<OrganizationalEntity> potentialOwners) {

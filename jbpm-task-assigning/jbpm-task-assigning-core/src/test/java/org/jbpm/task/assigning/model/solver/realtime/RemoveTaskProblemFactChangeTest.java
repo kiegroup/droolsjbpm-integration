@@ -32,53 +32,60 @@ import static org.jbpm.task.assigning.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTI
 import static org.jbpm.task.assigning.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.junit.Assert.assertFalse;
 
-public class RemoveTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
+public class RemoveTaskProblemFactChangeTest extends AbstractProblemFactChangeTest {
 
     @Test
-    public void removeTaskProblemFactChange24Tasks8UsersTest() throws Exception {
-        removeTaskProblemFactChangeTest(SET_OF_24TASKS_8USERS_SOLUTION.resource(), Arrays.asList(0L, 10L, 11L, 4L, 20L, 100L, 78L));
-    }
-
-    @Test
-    public void removeTaskProblemFactChange24Tasks8UsersRandomTest() throws Exception {
-        removeTaskProblemFactChangeRandomSetTest(SET_OF_24TASKS_8USERS_SOLUTION.resource());
+    public void removeTaskProblemFactChange24Tasks8Users() throws Exception {
+        removeTaskProblemFactChange(SET_OF_24TASKS_8USERS_SOLUTION.resource(), Arrays.asList(0L, 10L, 11L, 4L, 20L, 100L, 78L));
     }
 
     @Test
-    public void removeTaskProblemFactChange50Tasks5UsersTest() throws Exception {
-        removeTaskProblemFactChangeTest(SET_OF_50TASKS_5USERS_SOLUTION.resource(), Arrays.asList(0L, 10L, 11L, 4L, 20L, 30L, 35L, 40L, 45L, 57L, 60L));
+    public void removeTaskProblemFactChange24Tasks8UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        removeTaskProblemFactChangeRandomSet(SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
-    public void removeTaskProblemFactChange50Tasks5UsersRandomTest() throws Exception {
-        removeTaskProblemFactChangeRandomSetTest(SET_OF_50TASKS_5USERS_SOLUTION.resource());
+    public void removeTaskProblemFactChange50Tasks5Users() throws Exception {
+        checkRunTurtleTests();
+        removeTaskProblemFactChange(SET_OF_50TASKS_5USERS_SOLUTION.resource(), Arrays.asList(0L, 10L, 11L, 4L, 20L, 30L, 35L, 40L, 45L, 57L, 60L));
     }
 
     @Test
-    public void removeTaskProblemFactChange100Tasks5UsersTest() throws Exception {
-        removeTaskProblemFactChangeTest(SET_OF_100TASKS_5USERS_SOLUTION.resource(), Arrays.asList(5L, 15L, 11L, 4L, 20L, 30L, 36L, 40L, 45L, 58L, 99L, 130L, 200L));
+    public void removeTaskProblemFactChange50Tasks5UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        removeTaskProblemFactChangeRandomSet(SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void removeTaskProblemFactChange100Tasks5UsersRandomTest() throws Exception {
-        removeTaskProblemFactChangeRandomSetTest(SET_OF_100TASKS_5USERS_SOLUTION.resource());
+    public void removeTaskProblemFactChange100Tasks5Users() throws Exception {
+        checkRunTurtleTests();
+        removeTaskProblemFactChange(SET_OF_100TASKS_5USERS_SOLUTION.resource(), Arrays.asList(5L, 15L, 11L, 4L, 20L, 30L, 36L, 40L, 45L, 58L, 99L, 130L, 200L));
     }
 
     @Test
-    public void removeTaskProblemFactChange500Tasks20UsersTest() throws Exception {
-        removeTaskProblemFactChangeTest(SET_OF_500TASKS_20USERS_SOLUTION.resource(), Arrays.asList(5L, 15L, 11L, 4L, 20L, 30L, 36L, 40L, 45L, 58L, 99L, 300L, 400L, 25L, 1000L, 1001L));
+    public void removeTaskProblemFactChange100Tasks5UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        removeTaskProblemFactChangeRandomSet(SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void removeTaskProblemFactChange500Tasks20UsersRandomTest() throws Exception {
-        removeTaskProblemFactChangeRandomSetTest(SET_OF_500TASKS_20USERS_SOLUTION.resource());
+    public void removeTaskProblemFactChange500Tasks20Users() throws Exception {
+        checkRunTurtleTests();
+        removeTaskProblemFactChange(SET_OF_500TASKS_20USERS_SOLUTION.resource(), Arrays.asList(5L, 15L, 11L, 4L, 20L, 30L, 36L, 40L, 45L, 58L, 99L, 300L, 400L, 25L, 1000L, 1001L));
     }
 
-    private void removeTaskProblemFactChangeTest(String solutionResource, List<Long> taskIds) throws Exception {
-        removeTaskProblemFactChangeTest(readTaskAssigningSolution(solutionResource), taskIds);
+    @Test
+    public void removeTaskProblemFactChange500Tasks20UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        removeTaskProblemFactChangeRandomSet(SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
-    private void removeTaskProblemFactChangeTest(TaskAssigningSolution solution, List<Long> taskIds) throws Exception {
+    private void removeTaskProblemFactChange(String solutionResource, List<Long> taskIds) throws Exception {
+        removeTaskProblemFactChange(readTaskAssigningSolution(solutionResource), taskIds);
+    }
+
+    private void removeTaskProblemFactChange(TaskAssigningSolution solution, List<Long> taskIds) throws Exception {
         List<ProgrammedProblemFactChange<RemoveTaskProblemFactChange>> programmedChanges = taskIds.stream()
                 .map(id -> findTaskOrCreate(solution, id))
                 .map(task -> new ProgrammedProblemFactChange<>(new RemoveTaskProblemFactChange(task)))
@@ -93,7 +100,7 @@ public class RemoveTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
         programmedChanges.forEach(change -> assertRemoveTaskProblemFactChangeWasProduced(change.getChange(), lastSolution));
     }
 
-    private void removeTaskProblemFactChangeRandomSetTest(String solutionResource) throws Exception {
+    private void removeTaskProblemFactChangeRandomSet(String solutionResource) throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
         int taskCount = solution.getTaskList().size();
         int randomChanges = taskCount / 2 + random.nextInt(taskCount / 2);
@@ -101,7 +108,7 @@ public class RemoveTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
         for (int i = 0; i < randomChanges; i++) {
             taskIds.add((long) taskCount++);
         }
-        removeTaskProblemFactChangeTest(solution, taskIds);
+        removeTaskProblemFactChange(solution, taskIds);
     }
 
     /**

@@ -24,21 +24,17 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-import org.jbpm.task.assigning.BaseTaskAssigningTest;
+import org.jbpm.task.assigning.AbstractTaskAssigningCoreTest;
 import org.jbpm.task.assigning.model.TaskAssigningSolution;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public abstract class BaseProblemFactChangeTest extends BaseTaskAssigningTest {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseProblemFactChangeTest.class);
+public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssigningCoreTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

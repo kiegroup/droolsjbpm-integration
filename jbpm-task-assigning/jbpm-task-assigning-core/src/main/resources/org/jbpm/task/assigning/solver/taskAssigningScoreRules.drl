@@ -34,9 +34,9 @@ global BendableScoreHolder scoreHolder;
 // A task can only be assigned to one of it's potential owners.
 rule "Required Potential Owner"
     when
-        Task(user != null, acceptsAssignedUser < 0, $acceptsAssignedUser : acceptsAssignedUser)
+        Task(user != null, !acceptsAssignedUser)
     then
-        scoreHolder.addHardConstraintMatch(kcontext, 0, $acceptsAssignedUser);
+        scoreHolder.addHardConstraintMatch(kcontext, 0, -1);
 end
 
 // ############################################################################

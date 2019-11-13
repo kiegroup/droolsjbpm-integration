@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import org.jbpm.task.assigning.model.Task;
 import org.jbpm.task.assigning.model.User;
-import org.jbpm.task.assigning.model.solver.StartAndEndTimeUpdatingVariableListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,43 +50,43 @@ public class StartAndEndTimeUpdatingVariableListenerTest {
     public void setUp() {
         listener = new StartAndEndTimeUpdatingVariableListener();
 
-        anchor = new User(1, null);
-        task1 = new Task(1, null, 1);
+        anchor = new User(1, "User1");
+        task1 = new Task(1, "Task1", 1);
         task1.setStartTime(anchor.getEndTime());
         task1.setDuration(1);
         task1.setEndTime(task1.getStartTime() + task1.getDuration());
         task1.setPreviousTaskOrUser(anchor);
 
-        task2 = new Task(2, null, 1);
+        task2 = new Task(2, "Task2", 1);
         task2.setDuration(2);
         task2.setPreviousTaskOrUser(task1);
         task2.setStartTime(task1.getEndTime());
         task2.setEndTime(task2.getStartTime() + task2.getDuration());
         task1.setNextTask(task2);
 
-        task3 = new Task(3, null, 1);
+        task3 = new Task(3, "Task3", 1);
         task3.setDuration(3);
         task3.setPreviousTaskOrUser(task2);
 
-        task4 = new Task(4, null, 1);
+        task4 = new Task(4, "Task4", 1);
         task4.setDuration(4);
         task4.setPreviousTaskOrUser(task3);
         task3.setNextTask(task4);
 
-        task5 = new Task(5, null, 1);
+        task5 = new Task(5, "Task5", 1);
         task5.setDuration(5);
         task5.setPreviousTaskOrUser(task4);
         task4.setNextTask(task5);
     }
 
     @Test
-    public void afterEntityAddedTest() {
+    public void afterEntityAdded() {
         listener.afterEntityAdded(scoreDirector, task3);
         verifyTimes();
     }
 
     @Test
-    public void afterVariableChangedTest() {
+    public void afterVariableChanged() {
         listener.afterVariableChanged(scoreDirector, task3);
         verifyTimes();
     }

@@ -18,7 +18,7 @@ package org.jbpm.task.assigning.model.solver;
 
 import java.util.List;
 
-import org.jbpm.task.assigning.BaseTaskAssigningTest;
+import org.jbpm.task.assigning.AbstractTaskAssigningCoreTest;
 import org.jbpm.task.assigning.model.Task;
 import org.jbpm.task.assigning.model.TaskAssigningSolution;
 import org.jbpm.task.assigning.model.User;
@@ -37,27 +37,30 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class TestSolver extends BaseTaskAssigningTest {
+public class TestSolver extends AbstractTaskAssigningCoreTest {
 
     private static final long MILLISECONDS_TIME_SPENT_LIMIT = 20000;
 
     @Test
-    public void startSolverAndSolution24Tasks8UsersTest() throws Exception {
+    public void startSolverAndSolution24Tasks8Users() throws Exception {
         testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
-    public void startSolverAndSolution50Tasks5UsersTest() throws Exception {
+    public void startSolverAndSolution50Tasks5Users() throws Exception {
+        checkRunTurtleTests();
         testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void startSolverAndSolution100Tasks5UsersTest() throws Exception {
+    public void startSolverAndSolution100Tasks5Users() throws Exception {
+        checkRunTurtleTests();
         testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void startSolverAndSolution500Tasks20UsersTest() throws Exception {
+    public void startSolverAndSolution500Tasks20Users() throws Exception {
+        checkRunTurtleTests();
         testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT * 3, SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 

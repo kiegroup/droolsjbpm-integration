@@ -326,14 +326,13 @@ public class Task extends TaskOrUser {
     /**
      * Indicates if the currently assigned user can execute this task. If this is the case, the user is a potential
      * owner of the task.
-     * @return 0 if the assigned user can execute this task, -1 in any other case.
+     * @return true the assigned user can execute this task, false in any other case.
      */
-    public int acceptsAssignedUser() {
+    public boolean acceptsAssignedUser() {
         if (User.PLANNING_USER.getEntityId().equals(getUser().getEntityId())) {
             //planning user belongs to all the groups by definition.
-            return 0;
+            return true;
         }
-        //the user is a potential owner.
-        return TaskHelper.isPotentialOwner(this, getUser()) ? 0 : -1;
+        return TaskHelper.isPotentialOwner(this, getUser());
     }
 }

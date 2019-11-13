@@ -34,50 +34,57 @@ import static org.jbpm.task.assigning.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTI
 import static org.jbpm.task.assigning.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.junit.Assert.assertTrue;
 
-public class AddTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
+public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest {
 
     @Test
-    public void addTaskProblemFactChange24Tasks8UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(SET_OF_24TASKS_8USERS_SOLUTION.resource(), Arrays.asList(24L, 25L, 30L, 40L));
+    public void addTaskProblemFactChange24Tasks8Users() throws Exception {
+        addTaskProblemFactChange(SET_OF_24TASKS_8USERS_SOLUTION.resource(), Arrays.asList(24L, 25L, 30L, 40L));
     }
 
     @Test
-    public void addTaskProblemFactChange24Tasks8UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(SET_OF_24TASKS_8USERS_SOLUTION.resource());
+    public void addTaskProblemFactChange24Tasks8UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        addTaskProblemFactChangeRandomSet(SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
-    public void addTaskProblemFactChange50Tasks5UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(SET_OF_50TASKS_5USERS_SOLUTION.resource(), Arrays.asList(50L, 520L, 70L, 85L, 100L));
+    public void addTaskProblemFactChange50Tasks5Users() throws Exception {
+        checkRunTurtleTests();
+        addTaskProblemFactChange(SET_OF_50TASKS_5USERS_SOLUTION.resource(), Arrays.asList(50L, 520L, 70L, 85L, 100L));
     }
 
     @Test
-    public void addTaskProblemFactChange50Tasks5UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(SET_OF_50TASKS_5USERS_SOLUTION.resource());
+    public void addTaskProblemFactChange50Tasks5UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        addTaskProblemFactChangeRandomSet(SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void addTaskProblemFactChange100Tasks5UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(SET_OF_100TASKS_5USERS_SOLUTION.resource(), Arrays.asList(100L, 105L, 200L, 350L));
+    public void addTaskProblemFactChange100Tasks5Users() throws Exception {
+        checkRunTurtleTests();
+        addTaskProblemFactChange(SET_OF_100TASKS_5USERS_SOLUTION.resource(), Arrays.asList(100L, 105L, 200L, 350L));
     }
 
     @Test
-    public void addTaskProblemFactChange100Tasks5UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(SET_OF_100TASKS_5USERS_SOLUTION.resource());
+    public void addTaskProblemFactChange100Tasks5UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        addTaskProblemFactChangeRandomSet(SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void addTaskProblemFactChange500Tasks20UsersTest() throws Exception {
-        addTaskProblemFactChangeTest(SET_OF_500TASKS_20USERS_SOLUTION.resource(), Arrays.asList(500L, 600L, 700L));
+    public void addTaskProblemFactChange500Tasks20Users() throws Exception {
+        checkRunTurtleTests();
+        addTaskProblemFactChange(SET_OF_500TASKS_20USERS_SOLUTION.resource(), Arrays.asList(500L, 600L, 700L));
     }
 
     @Test
-    public void addTaskProblemFactChange500Tasks20UsersRandomTest() throws Exception {
-        addTaskProblemFactChangeRandomSetTest(SET_OF_500TASKS_20USERS_SOLUTION.resource());
+    public void addTaskProblemFactChange500Tasks20UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        addTaskProblemFactChangeRandomSet(SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
     @Test
-    public void addTaskProblemFactChangeTaskAlreadyExistsTest() throws Exception {
+    public void addTaskProblemFactChangeTaskAlreadyExists() throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
         long taskId = 20; //randomly selected task.
         Task task = new Task(taskId, null, 1);
@@ -85,7 +92,7 @@ public class AddTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
         executeSequentialChanges(solution, Collections.singletonList(new ProgrammedProblemFactChange<>(new AddTaskProblemFactChange(task))));
     }
 
-    private void addTaskProblemFactChangeRandomSetTest(String solutionResource) throws Exception {
+    private void addTaskProblemFactChangeRandomSet(String solutionResource) throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
         int taskCount = solution.getTaskList().size();
         int randomChanges = taskCount / 2 + random.nextInt(taskCount / 2);
@@ -93,10 +100,10 @@ public class AddTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
         for (int i = 0; i < randomChanges; i++) {
             taskIds.add((long) taskCount++);
         }
-        addTaskProblemFactChangeTest(solution, taskIds);
+        addTaskProblemFactChange(solution, taskIds);
     }
 
-    private void addTaskProblemFactChangeTest(TaskAssigningSolution solution, List<Long> taskIds) throws Exception {
+    private void addTaskProblemFactChange(TaskAssigningSolution solution, List<Long> taskIds) throws Exception {
         solution.getUserList().add(User.PLANNING_USER);
         List<ProgrammedProblemFactChange<AddTaskProblemFactChange>> programmedChanges = taskIds.stream()
                 .map(id -> new ProgrammedProblemFactChange<>(new AddTaskProblemFactChange(new Task(id, "NewTask_" + id, 1))))
@@ -111,8 +118,8 @@ public class AddTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
         programmedChanges.forEach(change -> assertAddTaskProblemFactChangeWasProduced(change.getChange(), lastSolution));
     }
 
-    private void addTaskProblemFactChangeTest(String solutionResource, List<Long> taskIds) throws Exception {
-        addTaskProblemFactChangeTest(readTaskAssigningSolution(solutionResource), taskIds);
+    private void addTaskProblemFactChange(String solutionResource, List<Long> taskIds) throws Exception {
+        addTaskProblemFactChange(readTaskAssigningSolution(solutionResource), taskIds);
     }
 
     private void assertAddTaskProblemFactChangeWasProduced(AddTaskProblemFactChange change, TaskAssigningSolution solution) {

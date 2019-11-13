@@ -19,18 +19,18 @@ package org.jbpm.task.assigning.model.solver;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.jbpm.task.assigning.model.Task;
 
 public class TaskDifficultyComparator implements Comparator<Task>,
                                                  Serializable {
 
+    private static final Comparator<Task> COMPARATOR =
+            //priority goes from [0(high)... 5 (medium)... 10 (low)] so we switch factors for the comparison.
+            Comparator.comparingInt((Task task) -> -task.getPriority())
+                    .thenComparingLong(Task::getId);
+
     @Override
     public int compare(Task a, Task b) {
-        return new CompareToBuilder()
-                //priority goes from [0(high)... 5 (medium)... 10 (low)] so we switch factors for the comparison.
-                .append(b.getPriority(), a.getPriority())
-                .append(a.getId(), b.getId())
-                .toComparison();
+        return COMPARATOR.compare(a, b);
     }
 }

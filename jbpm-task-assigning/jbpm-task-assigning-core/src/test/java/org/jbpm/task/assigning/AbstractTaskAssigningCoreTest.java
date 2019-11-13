@@ -36,7 +36,7 @@ import org.optaplanner.core.config.solver.SolverConfig;
 import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.persistence.xstream.impl.domain.solution.XStreamSolutionFileIO;
 
-public abstract class BaseTaskAssigningTest {
+public abstract class AbstractTaskAssigningCoreTest extends AbstractTaskAssigningTest {
 
     protected boolean writeTestFiles() {
         return Boolean.parseBoolean(System.getProperty("org.jbpm.task.assigning.test.writeFiles", "false"));

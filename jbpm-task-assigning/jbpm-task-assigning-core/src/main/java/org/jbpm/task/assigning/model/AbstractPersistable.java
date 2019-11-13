@@ -18,11 +18,9 @@ package org.jbpm.task.assigning.model;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.optaplanner.core.api.domain.lookup.PlanningId;
 
-public abstract class AbstractPersistable implements Serializable,
-                                                     Comparable<AbstractPersistable> {
+public abstract class AbstractPersistable implements Serializable {
 
     protected Long id;
 
@@ -40,20 +38,6 @@ public abstract class AbstractPersistable implements Serializable,
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    /**
-     * Used by the GUI to sort the {@link ConstraintMatch} list
-     * by {@link ConstraintMatch#getJustificationList()}.
-     * @param other never null
-     * @return comparison
-     */
-    @Override
-    public int compareTo(AbstractPersistable other) {
-        return new CompareToBuilder()
-                .append(getClass().getName(), other.getClass().getName())
-                .append(id, other.id)
-                .toComparison();
     }
 
     @Override

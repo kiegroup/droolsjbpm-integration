@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
+public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTest {
 
     private static final String FIXED_TEST = "Fixed";
     private static final String RANDOM_TEST = "Random";
@@ -86,47 +86,54 @@ public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
     }
 
     @Test
-    public void assignTaskProblemFactChange24Tasks8UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_24TASKS_8USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange24Tasks8Users() throws Exception {
+        assignTaskProblemFactChangeFixedChangeSet(SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange24Tasks8UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_24TASKS_8USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange24Tasks8UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        assignTaskProblemFactChangeRandomChangeSet(SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange50Tasks5UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_50TASKS_5USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange50Tasks5Users() throws Exception {
+        checkRunTurtleTests();
+        assignTaskProblemFactChangeFixedChangeSet(SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange50Tasks5UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_50TASKS_5USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange50Tasks5UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        assignTaskProblemFactChangeRandomChangeSet(SET_OF_50TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange100Tasks5UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_100TASKS_5USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange100Tasks5Users() throws Exception {
+        checkRunTurtleTests();
+        assignTaskProblemFactChangeFixedChangeSet(SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange100Tasks5UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_100TASKS_5USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange100Tasks5UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        assignTaskProblemFactChangeRandomChangeSet(SET_OF_100TASKS_5USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange500Tasks20UsersTest() throws Exception {
-        assignTaskProblemFactChangeFixedChangeSetTest(SET_OF_500TASKS_20USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange500Tasks20Users() throws Exception {
+        checkRunTurtleTests();
+        assignTaskProblemFactChangeFixedChangeSet(SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChange500Tasks20UsersRandomTest() throws Exception {
-        assignTaskProblemFactChangeRandomChangeSetTest(SET_OF_500TASKS_20USERS_SOLUTION.resource());
+    public void assignTaskProblemFactChange500Tasks20UsersRandom() throws Exception {
+        checkRunDevelopmentOnlyTests();
+        assignTaskProblemFactChangeRandomChangeSet(SET_OF_500TASKS_20USERS_SOLUTION.resource());
     }
 
     @Test
-    public void assignTaskProblemFactChangeUserNotFoundTest() throws Exception {
+    public void assignTaskProblemFactChangeUserNotFound() throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
         Task task = solution.getTaskList().get(0);
         User user = new User(-12345, "Non Existing");
@@ -134,7 +141,7 @@ public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
         executeSequentialChanges(solution, Collections.singletonList(new ProgrammedAssignTaskProblemFactChange(task, user)));
     }
 
-    private void assignTaskProblemFactChangeFixedChangeSetTest(String solutionResource) throws Exception {
+    private void assignTaskProblemFactChangeFixedChangeSet(String solutionResource) throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
         solution.getUserList().add(User.PLANNING_USER);
 
@@ -217,10 +224,10 @@ public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
         task = new Task(nextTaskId, "NewTask_" + nextTaskId, 1);
         programmedChanges.add(new ProgrammedAssignTaskProblemFactChange(task, user));
 
-        assignTaskProblemFactChangeTest(solution, solutionResource, FIXED_TEST, programmedChanges);
+        assignTaskProblemFactChange(solution, solutionResource, FIXED_TEST, programmedChanges);
     }
 
-    private void assignTaskProblemFactChangeRandomChangeSetTest(String solutionResource) throws Exception {
+    private void assignTaskProblemFactChangeRandomChangeSet(String solutionResource) throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
         solution.getUserList().add(User.PLANNING_USER);
 
@@ -238,13 +245,13 @@ public class AssignTaskProblemFactChangeTest extends BaseProblemFactChangeTest {
             randomUser = solution.getUserList().get(random.nextInt(userCount));
             programmedChanges.add(new ProgrammedAssignTaskProblemFactChange(randomTask, randomUser));
         }
-        assignTaskProblemFactChangeTest(solution, solutionResource, RANDOM_TEST, programmedChanges);
+        assignTaskProblemFactChange(solution, solutionResource, RANDOM_TEST, programmedChanges);
     }
 
-    private void assignTaskProblemFactChangeTest(TaskAssigningSolution solution,
-                                                 String solutionResource,
-                                                 String testType,
-                                                 List<ProgrammedAssignTaskProblemFactChange> programmedChanges) throws Exception {
+    private void assignTaskProblemFactChange(TaskAssigningSolution solution,
+                                             String solutionResource,
+                                             String testType,
+                                             List<ProgrammedAssignTaskProblemFactChange> programmedChanges) throws Exception {
         TaskAssigningSolution initialSolution = executeSequentialChanges(solution, programmedChanges);
         if (writeTestFiles()) {
             writeProblemFactChangesTestFiles(initialSolution,
