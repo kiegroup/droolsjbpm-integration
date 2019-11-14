@@ -1,0 +1,8 @@
+thorntail:
+  datasources:
+    data-sources:
+      pimDS:
+        driver-name: mariadb
+        connection-url: jdbc:mariadb://localhost:3306/pimdb
+        user-name: pim
+        password: pim123

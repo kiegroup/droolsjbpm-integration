@@ -41,10 +41,18 @@ import org.slf4j.LoggerFactory;
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_IMAGESERVICE_MAX_NODES;
 
 public class ImageServiceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(ImageServiceBase.class);
+
+    /**
+     * This causes the image service to limit the number of nodes (performance). 
+     * Due to this limitation it could cause a known issue not blurring all the nodes active or completed depending on
+     * the process size.
+     */
+    private static final int MAX_NODES = Integer.parseInt(System.getProperty(KIE_SERVER_IMAGESERVICE_MAX_NODES, "1000"));
 
     private RuntimeDataService dataService;
     private Map<String, ImageReference> imageReferenceMap;
@@ -121,8 +129,9 @@ public class ImageServiceBase {
         if (imageSVG != null) {
             // find active nodes and modify image
             Map<String, String> subProcessLinks = new HashMap<>();
-            Collection<NodeInstanceDesc> activeLogs = dataService.getProcessInstanceHistoryActive(procInstId, new QueryContext(0, 1000));
-            Collection<NodeInstanceDesc> completedLogs = dataService.getProcessInstanceHistoryCompleted(procInstId, new QueryContext(0, 1000));
+            QueryContext qc = MAX_NODES > 0 ? new QueryContext(0, MAX_NODES) : null;
+            Collection<NodeInstanceDesc> activeLogs = dataService.getProcessInstanceHistoryActive(procInstId, qc);
+            Collection<NodeInstanceDesc> completedLogs = dataService.getProcessInstanceHistoryCompleted(procInstId, qc);
             Map<Long, String> active = new HashMap<Long, String>();
             List<String> completed = new ArrayList<String>();
 
