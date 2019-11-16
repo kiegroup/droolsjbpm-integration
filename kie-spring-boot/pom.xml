@@ -62,27 +62,6 @@
             </exclusion>
 	  </exclusions>
       </dependency>
-      <!-- overrides of narayana version -->
-      <dependency>
-        <groupId>org.jboss.narayana.jta</groupId>
-        <artifactId>jdbc</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.narayana.jta</groupId>
-        <artifactId>jms</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.narayana.jta</groupId>
-        <artifactId>jta</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.narayana.jts</groupId>
-        <artifactId>narayana-jts-integration</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
-      </dependency>
 
       <!-- spring boot auto configuration modules -->
       <dependency>
