@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.31.0-SNAPSHOT</version>
+    <version>7.30.1-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-test-web-service</artifactId>
   <packaging>war</packaging>
