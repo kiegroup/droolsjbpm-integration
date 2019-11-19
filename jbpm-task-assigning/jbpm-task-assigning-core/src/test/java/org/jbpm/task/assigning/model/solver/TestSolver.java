@@ -36,31 +36,27 @@ import static org.junit.Assert.fail;
 
 public class TestSolver extends AbstractTaskAssigningCoreTest {
 
-    private static final long MILLISECONDS_TIME_SPENT_LIMIT = 20000;
-    private static final long TEST_TIMEOUT = MILLISECONDS_TIME_SPENT_LIMIT + 3000;
+    private static final long TEST_TIMEOUT = 20000;
 
     @Test(timeout = TEST_TIMEOUT)
     public void startSolverAndSolution24Tasks8Users() throws Exception {
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_24TASKS_8USERS_SOLUTION.resource(), 20);
+        testSolverStartAndSolution(1, SET_OF_24TASKS_8USERS_SOLUTION.resource());
     }
 
     /**
      * Tests that solver for the tasks assigning problem definition can be properly started, a solution can be produced,
      * and that some minimal constrains are met by de solution.
      */
-    private void testSolverStartAndSolution(long millisecondsSpentLimit, String solutionResource, int expectedSteps) throws Exception {
-        Solver<TaskAssigningSolution> solver = createNonDaemonSolver(millisecondsSpentLimit);
-        int steps[] = {0};
-        solver.addEventListener(event -> steps[0]++);
+    private void testSolverStartAndSolution(int stepCountLimit, String solutionResource) throws Exception {
+        Solver<TaskAssigningSolution> solver = createNonDaemonSolver(stepCountLimit);
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
         solution.getUserList().add(User.PLANNING_USER);
         TaskAssigningSolution result = solver.solve(solution);
         if (!result.getScore().isFeasible()) {
-            fail(String.format("With current problem definition and time spent of %s milliseconds it's expected " +
-                                       "that a feasible solution has been produced.", millisecondsSpentLimit));
+            fail(String.format("With current problem definition and stepCountLimit of %s it's expected " +
+                                       "that a feasible solution has been produced.", stepCountLimit));
         }
         assertConstraints(result);
-        assertEquals(expectedSteps, steps[0]);
     }
 
     /**

@@ -31,6 +31,9 @@ import org.jbpm.task.assigning.model.TaskOrUser;
 import org.jbpm.task.assigning.model.User;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
+import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicType;
+import org.optaplanner.core.config.localsearch.LocalSearchPhaseConfig;
 import org.optaplanner.core.config.score.director.ScoreDirectorFactoryConfig;
 import org.optaplanner.core.config.solver.SolverConfig;
 import org.optaplanner.core.config.solver.termination.TerminationConfig;
@@ -57,9 +60,13 @@ public abstract class AbstractTaskAssigningCoreTest extends AbstractTaskAssignin
         return solverFactory.buildSolver();
     }
 
-    protected Solver<TaskAssigningSolution> createNonDaemonSolver(long millisecondsSpentLimit) {
+    protected Solver<TaskAssigningSolution> createNonDaemonSolver(int stepCountLimit) {
         SolverConfig config = createBaseConfig();
-        config.setTerminationConfig(new TerminationConfig().withMillisecondsSpentLimit(millisecondsSpentLimit));
+        ConstructionHeuristicPhaseConfig constructionHeuristicPhaseConfig = new ConstructionHeuristicPhaseConfig();
+        constructionHeuristicPhaseConfig.setConstructionHeuristicType(ConstructionHeuristicType.FIRST_FIT);
+        LocalSearchPhaseConfig phaseConfig = new LocalSearchPhaseConfig();
+        phaseConfig.setTerminationConfig(new TerminationConfig().withStepCountLimit(stepCountLimit));
+        config.setPhaseConfigList(Arrays.asList(constructionHeuristicPhaseConfig, phaseConfig));
         SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.create(config);
         return solverFactory.buildSolver();
     }
