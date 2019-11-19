@@ -79,13 +79,11 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
  * @AnchorShadowVariable(sourceVariableName = "previousTaskOrUser")
  * private User user;
  * <p>
- * CustomShadowVariable startTime:
- * Additionally is a convenient shadow variable is declared for having the startTime of a task already calculated.
- * @CustomShadowVariable(variableListenerClass = StartTimeUpdatingVariableListener.class,
- * // Arguable, to adhere to API specs (although this works), nextTask and user should also be a source,
- * // because this shadow must be triggered after nextTask and user (but there is no need to be triggered by those)
+ * CustomShadowVariable startTimeInMinutes:
+ * Convenient shadow variable is declared for having the startTimeInMinutes of a task already calculated.
+ * @CustomShadowVariable(variableListenerClass = StartAndEndTimeUpdatingVariableListener.class,
  * sources = {@PlanningVariableReference(variableName = "previousTaskOrUser")})
- * private Integer startTime;
+ * private Integer startTimeInMinutes;
  * <p>
  * So the variableListenerClass is invoked when the source variable is changed/assigned.
  */
@@ -96,8 +94,8 @@ public class Task extends TaskOrUser {
     public static final String PREVIOUS_TASK_OR_USER = "previousTaskOrUser";
     public static final String USER_RANGE = "userRange";
     public static final String TASK_RANGE = "taskRange";
-    public static final String START_TIME = "startTime";
-    public static final String END_TIME = "endTime";
+    public static final String START_TIME_IN_MINUTES = "startTimeInMinutes";
+    public static final String END_TIME_IN_MINUTES = "endTimeInMinutes";
 
     private long processInstanceId;
     private String processId;
@@ -127,27 +125,26 @@ public class Task extends TaskOrUser {
     private User user;
 
     /**
-     * When the previousTask changes we need to update the startTime for current task and also the startTime
-     * for all the tasks that comes after.  previousTask -> currentTask -> C -> D -> E since each task can only start
-     * after his previous one has finished. As part of the update the endTime for the modified tasks will also be updated.
+     * When the previousTask changes we need to update the startTimeInMinutes for current task and also the
+     * startTimeInMinutes for all the tasks that comes after.  previousTask -> currentTask -> C -> D -> E since each
+     * task can only start after his previous one has finished. As part of the update the endTimeInMinutes for the
+     * modified tasks will also be updated.
      */
     @CustomShadowVariable(variableListenerClass = StartAndEndTimeUpdatingVariableListener.class,
-            // Arguable, to adhere to API specs (although this works), nextTask and user should also be a source,
-            // because this shadow must be triggered after nextTask and user (but there is no need to be triggered by those)
             sources = {@PlanningVariableReference(variableName = PREVIOUS_TASK_OR_USER)})
-    private Integer startTime; // In minutes
+    private Integer startTimeInMinutes;
 
     /**
-     * Assume a duration of 1 minute for all tasks
+     * Assume a duration of 1 minute for all tasks.
      */
-    private int duration = 1;
+    private int durationInMinutes = 1;
 
     /**
-     * This declaration basically indicates that the endTime is actually calculated as part of the startTime shadow
-     * variable calculation.
+     * This declaration basically indicates that the endTimeInMinutes is actually calculated as part of the
+     * startTimeInMinutes time shadow variable calculation.
      */
-    @CustomShadowVariable(variableListenerRef = @PlanningVariableReference(variableName = START_TIME))
-    private Integer endTime; // In minutes
+    @CustomShadowVariable(variableListenerRef = @PlanningVariableReference(variableName = START_TIME_IN_MINUTES))
+    private Integer endTimeInMinutes;
 
     public Task() {
     }
@@ -278,29 +275,29 @@ public class Task extends TaskOrUser {
         this.user = user;
     }
 
-    public Integer getStartTime() {
-        return startTime;
+    public Integer getStartTimeInMinutes() {
+        return startTimeInMinutes;
     }
 
-    public void setStartTime(Integer startTime) {
-        this.startTime = startTime;
+    public void setStartTimeInMinutes(Integer startTimeInMinutes) {
+        this.startTimeInMinutes = startTimeInMinutes;
     }
 
     @Override
-    public Integer getEndTime() {
-        return endTime;
+    public Integer getEndTimeInMinutes() {
+        return endTimeInMinutes;
     }
 
-    public void setEndTime(Integer endTime) {
-        this.endTime = endTime;
+    public void setEndTime(Integer endTimeInMinutes) {
+        this.endTimeInMinutes = endTimeInMinutes;
     }
 
-    public int getDuration() {
-        return duration;
+    public int getDurationInMinutes() {
+        return durationInMinutes;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public void setDurationInMinutes(int durationInMinutes) {
+        this.durationInMinutes = durationInMinutes;
     }
 
     @Override
@@ -314,8 +311,9 @@ public class Task extends TaskOrUser {
                 ", typedLabels=" + typedLabels +
                 ", previousTaskOrUser=" + previousTaskOrUser +
                 ", user=" + user +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
+                ", startTimeInMinutes=" + startTimeInMinutes +
+                ", durationInMinutes=" + durationInMinutes +
+                ", endTimeInMinutes=" + endTimeInMinutes +
                 '}';
     }
 

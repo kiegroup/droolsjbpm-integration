@@ -53,10 +53,10 @@ public abstract class TaskOrUser extends AbstractPersistable {
     }
 
     /**
-     * @return The endTime of a task in minutes. Can be null when the endTime of a just created task wasn't yet
+     * @return The endTimeInMinutes of a task. Can be null when the endTimeInMinutes of a just created task wasn't yet
      * calculated.
      */
-    public abstract Integer getEndTime();
+    public abstract Integer getEndTimeInMinutes();
 
     /**
      * @return sometimes null, when a just created task wasn't yet assigned.

@@ -124,8 +124,9 @@ public abstract class AbstractTaskAssigningCoreTest extends AbstractTaskAssignin
         builder.append(task.getName() +
                                ", pinned: " + task.isPinned() +
                                ", priority: " + task.getPriority() +
-                               ", startTime: " + task.getStartTime() +
-                               ", endTime: " + task.getEndTime() +
+                               ", startTimeInMinutes: " + task.getStartTimeInMinutes() +
+                               ", durationInMinutes:" + task.getDurationInMinutes() +
+                               ", endTimeInMinutes: " + task.getEndTimeInMinutes() +
                                ", user: " + task.getUser().getEntityId() +
                                ", potentialOwners: " + printOrganizationalEntities(task.getPotentialOwners()));
         return builder.toString();

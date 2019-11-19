@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.assertj.core.api.Assertions;
 import org.jbpm.task.assigning.model.Task;
 import org.jbpm.task.assigning.model.TaskAssigningSolution;
 import org.jbpm.task.assigning.model.User;
@@ -88,8 +89,9 @@ public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest 
         TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
         long taskId = 20; //randomly selected task.
         Task task = new Task(taskId, null, 1);
-        expectedException.expectMessage("A task with the given identifier id: " + taskId + " already exists");
-        executeSequentialChanges(solution, Collections.singletonList(new ProgrammedProblemFactChange<>(new AddTaskProblemFactChange(task))));
+        Assertions.assertThatThrownBy(() -> executeSequentialChanges(solution,
+                                                                     Collections.singletonList(new ProgrammedProblemFactChange<>(new AddTaskProblemFactChange(task)))))
+                .hasMessage(String.format("A task with the given identifier id: " + taskId + " already exists", taskId));
     }
 
     private void addTaskProblemFactChangeRandomSet(String solutionResource) throws Exception {

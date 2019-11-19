@@ -52,29 +52,29 @@ public class StartAndEndTimeUpdatingVariableListenerTest {
 
         anchor = new User(1, "User1");
         task1 = new Task(1, "Task1", 1);
-        task1.setStartTime(anchor.getEndTime());
-        task1.setDuration(1);
-        task1.setEndTime(task1.getStartTime() + task1.getDuration());
+        task1.setStartTimeInMinutes(anchor.getEndTimeInMinutes());
+        task1.setDurationInMinutes(1);
+        task1.setEndTime(task1.getStartTimeInMinutes() + task1.getDurationInMinutes());
         task1.setPreviousTaskOrUser(anchor);
 
         task2 = new Task(2, "Task2", 1);
-        task2.setDuration(2);
+        task2.setDurationInMinutes(2);
         task2.setPreviousTaskOrUser(task1);
-        task2.setStartTime(task1.getEndTime());
-        task2.setEndTime(task2.getStartTime() + task2.getDuration());
+        task2.setStartTimeInMinutes(task1.getEndTimeInMinutes());
+        task2.setEndTime(task2.getStartTimeInMinutes() + task2.getDurationInMinutes());
         task1.setNextTask(task2);
 
         task3 = new Task(3, "Task3", 1);
-        task3.setDuration(3);
+        task3.setDurationInMinutes(3);
         task3.setPreviousTaskOrUser(task2);
 
         task4 = new Task(4, "Task4", 1);
-        task4.setDuration(4);
+        task4.setDurationInMinutes(4);
         task4.setPreviousTaskOrUser(task3);
         task3.setNextTask(task4);
 
         task5 = new Task(5, "Task5", 1);
-        task5.setDuration(5);
+        task5.setDurationInMinutes(5);
         task5.setPreviousTaskOrUser(task4);
         task4.setNextTask(task5);
     }
@@ -92,18 +92,18 @@ public class StartAndEndTimeUpdatingVariableListenerTest {
     }
 
     private void verifyTimes() {
-        assertEquals((long) (task1.getDuration() + task2.getDuration()), (long) task3.getStartTime());
-        assertEquals((long) (task1.getDuration() + task2.getDuration() + task3.getDuration()), (long) task3.getEndTime());
-        assertEquals((long) (task1.getDuration() + task2.getDuration() + task3.getDuration()), (long) task4.getStartTime());
-        assertEquals((long) (task1.getDuration() + task2.getDuration() + task3.getDuration() + task4.getDuration()), (long) task4.getEndTime());
-        assertEquals((long) (task1.getDuration() + task2.getDuration()) + task3.getDuration() + task4.getDuration(), (long) task5.getStartTime());
-        assertEquals((long) (task1.getDuration() + task2.getDuration()) + task3.getDuration() + task4.getDuration() + task5.getDuration(), (long) task5.getEndTime());
+        assertEquals((long) (task1.getDurationInMinutes() + task2.getDurationInMinutes()), (long) task3.getStartTimeInMinutes());
+        assertEquals((long) (task1.getDurationInMinutes() + task2.getDurationInMinutes() + task3.getDurationInMinutes()), (long) task3.getEndTimeInMinutes());
+        assertEquals((long) (task1.getDurationInMinutes() + task2.getDurationInMinutes() + task3.getDurationInMinutes()), (long) task4.getStartTimeInMinutes());
+        assertEquals((long) (task1.getDurationInMinutes() + task2.getDurationInMinutes() + task3.getDurationInMinutes() + task4.getDurationInMinutes()), (long) task4.getEndTimeInMinutes());
+        assertEquals((long) (task1.getDurationInMinutes() + task2.getDurationInMinutes()) + task3.getDurationInMinutes() + task4.getDurationInMinutes(), (long) task5.getStartTimeInMinutes());
+        assertEquals((long) (task1.getDurationInMinutes() + task2.getDurationInMinutes()) + task3.getDurationInMinutes() + task4.getDurationInMinutes() + task5.getDurationInMinutes(), (long) task5.getEndTimeInMinutes());
 
         Stream.of(task3, task4, task5).forEach(task -> {
-            verify(scoreDirector).beforeVariableChanged(task, "startTime");
-            verify(scoreDirector).afterVariableChanged(task, "startTime");
-            verify(scoreDirector).beforeVariableChanged(task, "endTime");
-            verify(scoreDirector).afterVariableChanged(task, "endTime");
+            verify(scoreDirector).beforeVariableChanged(task, Task.START_TIME_IN_MINUTES);
+            verify(scoreDirector).afterVariableChanged(task, Task.START_TIME_IN_MINUTES);
+            verify(scoreDirector).beforeVariableChanged(task, Task.END_TIME_IN_MINUTES);
+            verify(scoreDirector).afterVariableChanged(task, Task.END_TIME_IN_MINUTES);
         });
     }
 }

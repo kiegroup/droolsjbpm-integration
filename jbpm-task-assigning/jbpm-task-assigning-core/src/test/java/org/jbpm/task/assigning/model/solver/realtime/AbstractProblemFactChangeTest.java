@@ -26,8 +26,6 @@ import java.util.function.Function;
 
 import org.jbpm.task.assigning.AbstractTaskAssigningCoreTest;
 import org.jbpm.task.assigning.model.TaskAssigningSolution;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
@@ -35,9 +33,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssigningCoreTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     final Random random = new Random();
 

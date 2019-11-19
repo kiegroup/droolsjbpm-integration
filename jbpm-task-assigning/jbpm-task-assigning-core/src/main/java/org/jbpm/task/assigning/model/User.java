@@ -23,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("TaUser")
 public class User extends TaskOrUser implements OrganizationalEntity {
-    
+
     private static class ImmutableUser extends User {
 
         private ImmutableUser() {
@@ -122,7 +122,7 @@ public class User extends TaskOrUser implements OrganizationalEntity {
     }
 
     @Override
-    public Integer getEndTime() {
+    public Integer getEndTimeInMinutes() {
         return 0;
     }
 

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.assertj.core.api.Assertions;
 import org.jbpm.task.assigning.model.Task;
 import org.jbpm.task.assigning.model.TaskAssigningSolution;
 import org.jbpm.task.assigning.model.TaskOrUser;
@@ -36,7 +37,6 @@ import static org.jbpm.task.assigning.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION
 import static org.jbpm.task.assigning.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTION;
 import static org.jbpm.task.assigning.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTest {
@@ -137,8 +137,8 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
         TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
         Task task = solution.getTaskList().get(0);
         User user = new User(-12345, "Non Existing");
-        expectedException.expectMessage("Expected user: " + user + " was not found in current working solution");
-        executeSequentialChanges(solution, Collections.singletonList(new ProgrammedAssignTaskProblemFactChange(task, user)));
+        Assertions.assertThatThrownBy(() -> executeSequentialChanges(solution, Collections.singletonList(new ProgrammedAssignTaskProblemFactChange(task, user))))
+                .hasMessage(String.format("Expected user: " + user + " was not found in current working solution", user));
     }
 
     private void assignTaskProblemFactChangeFixedChangeSet(String solutionResource) throws Exception {
@@ -264,7 +264,9 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
         }
 
         //each partial solution must have the change that was applied on it.
-        programmedChanges.forEach(change -> assertAssignTaskProblemFactChangeWasProduced(change.getChange(), change.getSolutionAfterChange()));
+        for (ProgrammedAssignTaskProblemFactChange change : programmedChanges) {
+            assertAssignTaskProblemFactChangeWasProduced(change.getChange(), change.getSolutionAfterChange());
+        }
 
         //finally the last solution must have the result of all the changes.
         TaskAssigningSolution lastSolution = programmedChanges.get(programmedChanges.size() - 1).getSolutionAfterChange();
@@ -273,7 +275,9 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
             //if  task was changed multiple times record only the last change.
             summarizedChanges.put(change.getChange().getTask().getId(), change.getChange());
         });
-        summarizedChanges.values().forEach(change -> assertAssignTaskProblemFactChangeWasProduced(change, lastSolution));
+        for (AssignTaskProblemFactChange change : summarizedChanges.values()) {
+            assertAssignTaskProblemFactChangeWasProduced(change, lastSolution);
+        }
     }
 
     /**
@@ -284,16 +288,14 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
      * @param change The change that was executed for producing the solution.
      * @param solution The produced solution.
      */
-    private void assertAssignTaskProblemFactChangeWasProduced(AssignTaskProblemFactChange change, TaskAssigningSolution solution) {
+    private void assertAssignTaskProblemFactChangeWasProduced(AssignTaskProblemFactChange change, TaskAssigningSolution solution) throws Exception {
         User internalUser = solution.getUserList().stream()
                 .filter(user -> Objects.equals(user.getId(), change.getUser().getId()))
-                .findFirst().orElse(null);
+                .findFirst().orElseThrow(() -> new Exception("User: " + change.getUser() + " was not found in solution."));
 
-        assertNotNull(internalUser);
         Task internalTask = solution.getTaskList().stream()
                 .filter(task -> Objects.equals(task.getId(), change.getTask().getId()))
-                .findFirst().orElse(null);
-        assertNotNull(internalTask);
+                .findFirst().orElseThrow(() -> new Exception("Task: " + change + " was not found in solution."));
         assertEquals(internalUser, internalTask.getUser());
         assertTrue(internalTask.isPinned());
         //all the previous tasks must be pinned by construction and be assigned to the user

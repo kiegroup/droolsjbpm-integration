@@ -79,7 +79,7 @@ public class AssignTaskProblemFactChange implements ProblemFactChange<TaskAssign
             task.setUser(null);
             task.setPinned(false);
             task.setNextTask(null);
-            task.setStartTime(null);
+            task.setStartTimeInMinutes(null);
             task.setEndTime(null);
             workingTask = task;
             isNew = true;

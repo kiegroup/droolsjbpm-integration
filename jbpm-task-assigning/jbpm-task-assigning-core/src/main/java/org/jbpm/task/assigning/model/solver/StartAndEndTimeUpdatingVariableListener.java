@@ -23,8 +23,8 @@ import org.jbpm.task.assigning.model.TaskOrUser;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
-import static org.jbpm.task.assigning.model.Task.END_TIME;
-import static org.jbpm.task.assigning.model.Task.START_TIME;
+import static org.jbpm.task.assigning.model.Task.END_TIME_IN_MINUTES;
+import static org.jbpm.task.assigning.model.Task.START_TIME_IN_MINUTES;
 
 /**
  * Given a chained graph:
@@ -70,19 +70,19 @@ public class StartAndEndTimeUpdatingVariableListener implements VariableListener
     private static void updateStartAndEndTime(final ScoreDirector scoreDirector, final Task sourceTask) {
         TaskOrUser previous = sourceTask.getPreviousTaskOrUser();
         Task shadowTask = sourceTask;
-        Integer previousEndTime = previous == null ? null : previous.getEndTime();
+        Integer previousEndTime = previous == null ? null : previous.getEndTimeInMinutes();
         Integer startTime = previousEndTime;
         Integer endTime = calculateEndTime(shadowTask, startTime);
-        while (shadowTask != null && !Objects.equals(shadowTask.getStartTime(), startTime)) {
-            scoreDirector.beforeVariableChanged(shadowTask, START_TIME);
-            shadowTask.setStartTime(startTime);
-            scoreDirector.afterVariableChanged(shadowTask, START_TIME);
+        while (shadowTask != null && !Objects.equals(shadowTask.getStartTimeInMinutes(), startTime)) {
+            scoreDirector.beforeVariableChanged(shadowTask, START_TIME_IN_MINUTES);
+            shadowTask.setStartTimeInMinutes(startTime);
+            scoreDirector.afterVariableChanged(shadowTask, START_TIME_IN_MINUTES);
 
-            scoreDirector.beforeVariableChanged(shadowTask, END_TIME);
+            scoreDirector.beforeVariableChanged(shadowTask, END_TIME_IN_MINUTES);
             shadowTask.setEndTime(endTime);
-            scoreDirector.afterVariableChanged(shadowTask, END_TIME);
+            scoreDirector.afterVariableChanged(shadowTask, END_TIME_IN_MINUTES);
 
-            previousEndTime = shadowTask.getEndTime();
+            previousEndTime = shadowTask.getEndTimeInMinutes();
             shadowTask = shadowTask.getNextTask();
             startTime = previousEndTime;
             endTime = calculateEndTime(shadowTask, startTime);
@@ -93,6 +93,6 @@ public class StartAndEndTimeUpdatingVariableListener implements VariableListener
         if (startTime == null || shadowTask == null) {
             return 0;
         }
-        return startTime + shadowTask.getDuration();
+        return startTime + shadowTask.getDurationInMinutes();
     }
 }

@@ -99,7 +99,7 @@
         <TaUser reference="24"/>
       </potentialOwners>
       <typedLabels id="36"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="37">
       <id>1</id>
@@ -110,7 +110,7 @@
       <published>false</published>
       <potentialOwners class="linked-hash-set" id="38"/>
       <typedLabels id="39"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="40">
       <id>2</id>
@@ -123,7 +123,7 @@
         <TaUser reference="19"/>
       </potentialOwners>
       <typedLabels id="42"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="43">
       <id>3</id>
@@ -136,7 +136,7 @@
         <TaUser reference="11"/>
       </potentialOwners>
       <typedLabels id="45"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="46">
       <id>4</id>
@@ -153,7 +153,7 @@
         </TaGroup>
       </potentialOwners>
       <typedLabels id="49"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="50">
       <id>5</id>
@@ -167,7 +167,7 @@
         <TaGroup reference="22"/>
       </potentialOwners>
       <typedLabels id="52"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="53">
       <id>6</id>
@@ -180,7 +180,7 @@
         <TaGroup reference="6"/>
       </potentialOwners>
       <typedLabels id="55"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="56">
       <id>7</id>
@@ -196,7 +196,7 @@
         </TaGroup>
       </potentialOwners>
       <typedLabels id="59"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="60">
       <id>8</id>
@@ -210,7 +210,7 @@
         <TaUser reference="16"/>
       </potentialOwners>
       <typedLabels id="62"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="63">
       <id>9</id>
@@ -224,7 +224,7 @@
         <TaUser reference="24"/>
       </potentialOwners>
       <typedLabels id="65"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="66">
       <id>10</id>
@@ -238,7 +238,7 @@
         <TaUser reference="8"/>
       </potentialOwners>
       <typedLabels id="68"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="69">
       <id>11</id>
@@ -255,7 +255,7 @@
         <TaGroup reference="5"/>
       </potentialOwners>
       <typedLabels id="72"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="73">
       <id>12</id>
@@ -266,7 +266,7 @@
       <published>false</published>
       <potentialOwners class="linked-hash-set" id="74"/>
       <typedLabels id="75"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="76">
       <id>13</id>
@@ -279,7 +279,7 @@
         <TaUser reference="27"/>
       </potentialOwners>
       <typedLabels id="78"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="79">
       <id>14</id>
@@ -293,7 +293,7 @@
         <TaGroup reference="71"/>
       </potentialOwners>
       <typedLabels id="81"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="82">
       <id>15</id>
@@ -307,7 +307,7 @@
         <TaUser reference="8"/>
       </potentialOwners>
       <typedLabels id="84"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="85">
       <id>16</id>
@@ -320,7 +320,7 @@
         <TaGroup reference="14"/>
       </potentialOwners>
       <typedLabels id="87"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="88">
       <id>17</id>
@@ -337,7 +337,7 @@
         </TaGroup>
       </potentialOwners>
       <typedLabels id="91"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="92">
       <id>18</id>
@@ -350,7 +350,7 @@
         <TaGroup reference="21"/>
       </potentialOwners>
       <typedLabels id="94"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="95">
       <id>19</id>
@@ -361,7 +361,7 @@
       <published>false</published>
       <potentialOwners class="linked-hash-set" id="96"/>
       <typedLabels id="97"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="98">
       <id>20</id>
@@ -374,7 +374,7 @@
         <TaGroup reference="21"/>
       </potentialOwners>
       <typedLabels id="100"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="101">
       <id>21</id>
@@ -388,7 +388,7 @@
         <TaUser reference="8"/>
       </potentialOwners>
       <typedLabels id="103"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="104">
       <id>22</id>
@@ -403,7 +403,7 @@
         <TaUser reference="24"/>
       </potentialOwners>
       <typedLabels id="106"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
     <TaTask id="107">
       <id>23</id>
@@ -417,7 +417,7 @@
         <TaGroup reference="14"/>
       </potentialOwners>
       <typedLabels id="109"/>
-      <duration>1</duration>
+      <durationInMinutes>1</durationInMinutes>
     </TaTask>
   </taskList>
 </TaTaskAssignmentSolution>

@@ -62,27 +62,27 @@ rule "High level priority"
     when
         $task : Task(user != null, PriorityHelper.isHighLevel(priority))
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, 1, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTime()));
+        scoreHolder.addSoftConstraintMatch(kcontext, 1, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
 end
 
 rule "Minimize makespan (starting with the latest ending user first)"
     when
-        Task(user != null, nextTask == null, $endTime : endTime)
+        Task(user != null, nextTask == null, $endTimeInMinutes : endTimeInMinutes)
     then
         // Fairness and load balancing trick (see docs): squared to assure correctness in corner cases
-        scoreHolder.addSoftConstraintMatch(kcontext, 2, - ($endTime * $endTime));
+        scoreHolder.addSoftConstraintMatch(kcontext, 2, - ($endTimeInMinutes * $endTimeInMinutes));
 end
 
 rule "Medium level priority"
     when
         $task : Task(user != null, PriorityHelper.isMediumLevel(priority))
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, 3, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTime()));
+        scoreHolder.addSoftConstraintMatch(kcontext, 3, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
 end
 
 rule "Low level priority"
     when
         $task : Task(user != null, PriorityHelper.isLowLevel(priority))
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, 4, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTime()));
+        scoreHolder.addSoftConstraintMatch(kcontext, 4, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
 end

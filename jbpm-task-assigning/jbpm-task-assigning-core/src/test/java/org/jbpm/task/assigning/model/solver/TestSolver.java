@@ -25,10 +25,7 @@ import org.jbpm.task.assigning.model.User;
 import org.junit.Test;
 import org.optaplanner.core.api.solver.Solver;
 
-import static org.jbpm.task.assigning.TestDataSet.SET_OF_100TASKS_5USERS_SOLUTION;
 import static org.jbpm.task.assigning.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
-import static org.jbpm.task.assigning.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTION;
-import static org.jbpm.task.assigning.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.jbpm.task.assigning.model.solver.TaskHelper.extractTaskList;
 import static org.jbpm.task.assigning.model.solver.TaskHelper.isPotentialOwner;
 import static org.junit.Assert.assertEquals;
@@ -40,36 +37,21 @@ import static org.junit.Assert.fail;
 public class TestSolver extends AbstractTaskAssigningCoreTest {
 
     private static final long MILLISECONDS_TIME_SPENT_LIMIT = 20000;
+    private static final long TEST_TIMEOUT = MILLISECONDS_TIME_SPENT_LIMIT + 3000;
 
-    @Test
+    @Test(timeout = TEST_TIMEOUT)
     public void startSolverAndSolution24Tasks8Users() throws Exception {
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_24TASKS_8USERS_SOLUTION.resource());
-    }
-
-    @Test
-    public void startSolverAndSolution50Tasks5Users() throws Exception {
-        checkRunTurtleTests();
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_50TASKS_5USERS_SOLUTION.resource());
-    }
-
-    @Test
-    public void startSolverAndSolution100Tasks5Users() throws Exception {
-        checkRunTurtleTests();
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_100TASKS_5USERS_SOLUTION.resource());
-    }
-
-    @Test
-    public void startSolverAndSolution500Tasks20Users() throws Exception {
-        checkRunTurtleTests();
-        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT * 3, SET_OF_500TASKS_20USERS_SOLUTION.resource());
+        testSolverStartAndSolution(MILLISECONDS_TIME_SPENT_LIMIT, SET_OF_24TASKS_8USERS_SOLUTION.resource(), 20);
     }
 
     /**
      * Tests that solver for the tasks assigning problem definition can be properly started, a solution can be produced,
      * and that some minimal constrains are met by de solution.
      */
-    private void testSolverStartAndSolution(long millisecondsSpentLimit, String solutionResource) throws Exception {
+    private void testSolverStartAndSolution(long millisecondsSpentLimit, String solutionResource, int expectedSteps) throws Exception {
         Solver<TaskAssigningSolution> solver = createNonDaemonSolver(millisecondsSpentLimit);
+        int steps[] = {0};
+        solver.addEventListener(event -> steps[0]++);
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
         solution.getUserList().add(User.PLANNING_USER);
         TaskAssigningSolution result = solver.solve(solution);
@@ -78,6 +60,7 @@ public class TestSolver extends AbstractTaskAssigningCoreTest {
                                        "that a feasible solution has been produced.", millisecondsSpentLimit));
         }
         assertConstraints(result);
+        assertEquals(expectedSteps, steps[0]);
     }
 
     /**
