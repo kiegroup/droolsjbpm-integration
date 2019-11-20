@@ -137,7 +137,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
 
     public void createScanner() {
         this.scanner = (InternalKieScanner) KieServices.Factory.get().newKieScanner(kieContainer);
-        // we also need to update the underlaying scanner resource to avoid inconsistency
+        // we also need to update the underlying scanner resource to avoid inconsistency
         KieScannerStatus status = KieContainerInstanceImpl.mapScannerStatus(scanner.getStatus());
         long pollingInterval = scanner.getPollingInterval();
         resource.setScanner(new KieScannerResource(status, pollingInterval));
