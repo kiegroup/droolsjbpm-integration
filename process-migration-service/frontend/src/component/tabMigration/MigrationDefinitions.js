@@ -7,7 +7,8 @@ import {
   OverlayTrigger,
   Tooltip,
   Table,
-  actionHeaderCellFormatter
+  actionHeaderCellFormatter,
+  Wizard
 } from "patternfly-react";
 
 import PageViewMigrationLogs from "./PageViewMigrationLogs";
@@ -247,10 +248,10 @@ export default class MigrationDefinitions extends React.Component {
 
     //for View migration logs pop-up
     const primaryContent = (
-      <PageViewMigrationLogs migrationLogs={this.state.migrationLogs} />
+      <div>
+        <PageViewMigrationLogs migrationLogs={this.state.migrationLogs} />
+      </div>
     );
-    const secondaryContent = <p />;
-    const icon = <Icon type="pf" name="info" />;
 
     //for Delete migration definition pop-up
     const primaryDeleteContent = (
@@ -294,19 +295,21 @@ export default class MigrationDefinitions extends React.Component {
     return (
       <React.Fragment>
         {/* View migration logs pop-up */}
-        <MessageDialog
-          show={this.state.showLogDialog}
-          onHide={this.hideDetailDialog}
-          primaryAction={this.hideDetailDialog}
-          primaryActionButtonContent="Close"
-          title="View Migration Logs"
-          icon={icon}
-          primaryContent={primaryContent}
-          secondaryContent={secondaryContent}
-          accessibleName="viewMigrationLogsDialog"
-          accessibleDescription="migrationDetailDialogContent"
-          className="kie-pim-dialog--wide"
-        />
+        <Wizard show={this.state.showLogDialog} onHide={this.hideDetailDialog}>
+          <Wizard.Header
+            onClose={this.hideDetailDialog}
+            title="View Migration Logs"
+          />
+          <Wizard.Body>
+            <Wizard.Row>
+              <Wizard.Main>
+                <Wizard.Contents stepIndex={0} activeStepIndex={0}>
+                  {primaryContent}
+                </Wizard.Contents>
+              </Wizard.Main>
+            </Wizard.Row>
+          </Wizard.Body>
+        </Wizard>
 
         {/* Delete migration definition pop-up */}
         <MessageDialog

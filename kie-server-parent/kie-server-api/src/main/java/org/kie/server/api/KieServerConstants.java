@@ -55,6 +55,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_MODE = "org.kie.server.mode";
     public static final String KIE_SERVER_INCLUDE_STACKTRACE = "org.kie.server.stacktrace.included";
     public static final String KIE_SERVER_STRICT_ID_FORMAT = "org.kie.server.strict.id.format";
+    public static final String KIE_SERVER_IMAGESERVICE_MAX_NODES = "org.kie.server.service.image.max_nodes";
 
     // configuration parameters
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";
@@ -110,6 +111,9 @@ public class KieServerConstants {
     public static final String KIE_SERVER_PARAM_RESET_BEFORE_UPDATE = "KieServerResetBeforeUpdate";
 
     public static final String KIE_SERVER_ROUTER = "org.kie.server.router";
+    public static final String KIE_ROUTER_MANAGEMENT_PASSWORD = "org.kie.server.router.management.password";
+    public static final String KIE_ROUTER_MANAGEMENT_USERNAME = "org.kie.server.router.management.username";
+
     public static final String KIE_SERVER_ROUTER_ATTEMPT_INTERVAL = "org.kie.server.router.connect";
 
     public static final String KIE_OPTAPLANNER_THREAD_POOL_QUEUE_SIZE = "org.optaplanner.server.ext.thread.pool.queue.size";
