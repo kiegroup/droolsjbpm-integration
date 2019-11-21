@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-osgi</artifactId>
-    <version>7.30.0-SNAPSHOT</version>
+    <version>7.31.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-karaf-features</artifactId>
@@ -89,6 +89,8 @@
     <fuse.version.com.h2database>1.3.168</fuse.version.com.h2database>
 
     <karaf.version.com.github.javaparser>3.10.2</karaf.version.com.github.javaparser>
+
+    <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
   </properties>
 
   <dependencyManagement>

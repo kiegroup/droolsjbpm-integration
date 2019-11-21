@@ -16,7 +16,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.30.0-SNAPSHOT</version>
+    <version>7.31.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -61,27 +61,6 @@
               <artifactId>log4j-api</artifactId>
             </exclusion>
 	  </exclusions>
-      </dependency>
-      <!-- overrides of narayana version -->
-      <dependency>
-        <groupId>org.jboss.narayana.jta</groupId>
-        <artifactId>jdbc</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.narayana.jta</groupId>
-        <artifactId>jms</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.narayana.jta</groupId>
-        <artifactId>jta</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.narayana.jts</groupId>
-        <artifactId>narayana-jts-integration</artifactId>
-        <version>${version.org.jboss.narayana.tomcat}</version>
       </dependency>
 
       <!-- spring boot auto configuration modules -->
