@@ -22,6 +22,10 @@
           <groupId>org.apache.tomcat</groupId>
           <artifactId>tomcat-annotations-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>jakarta.validation</groupId>
+          <artifactId>jakarta.validation-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
