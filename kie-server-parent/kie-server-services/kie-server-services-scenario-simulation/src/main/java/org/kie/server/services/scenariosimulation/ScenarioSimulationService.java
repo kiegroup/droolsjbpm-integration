@@ -19,8 +19,8 @@ import java.util.Optional;
 
 import org.drools.scenariosimulation.api.model.ScenarioSimulationModel;
 import org.drools.scenariosimulation.api.model.Settings;
-import org.drools.scenariosimulation.api.model.Simulation;
 import org.drools.scenariosimulation.backend.runner.AbstractScenarioRunner;
+import org.drools.scenariosimulation.backend.runner.model.ScenarioRunnerDTO;
 import org.drools.scenariosimulation.backend.util.ScenarioSimulationXMLPersistence;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -75,10 +75,10 @@ public class ScenarioSimulationService {
     }
 
     protected AbstractScenarioRunner newRunner(KieContainer kieContainer, ScenarioSimulationModel scenarioSimulationModel) {
-        Simulation simulation = scenarioSimulationModel.getSimulation();
+        ScenarioRunnerDTO scenarioRunnerDTO = new ScenarioRunnerDTO(scenarioSimulationModel, null);
         Settings settings = scenarioSimulationModel.getSettings();
         return AbstractScenarioRunner.getSpecificRunnerProvider(settings.getType())
-                .create(kieContainer, simulation.getScesimModelDescriptor(), simulation.getScenarioWithIndex(), settings);
+                .create(kieContainer, scenarioRunnerDTO);
     }
 
     protected ScenarioSimulationResult convertResult(Result result) {
