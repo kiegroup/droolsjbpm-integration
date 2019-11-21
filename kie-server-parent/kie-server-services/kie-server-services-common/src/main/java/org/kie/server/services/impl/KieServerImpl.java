@@ -1127,7 +1127,12 @@ public class KieServerImpl implements KieServer {
         }
         // first check of KIE Server's containers if any of them is in failed state
         for (KieContainerInstance container : getContainers()) {
-            if (container.getStatus().equals(KieContainerStatus.FAILED)) {
+            // RHPAM-1793 - relax health check in case of management is enabled.
+            if (container.getStatus().equals(KieContainerStatus.FAILED) && !managementDisabled) {
+                healthMessages.add(new Message(Severity.WARN, String.format("KIE Container '%s' is in FAILED state",
+                                                                             container.getContainerId()) ));
+
+            } else if (container.getStatus().equals(KieContainerStatus.FAILED) && managementDisabled) {
                 healthMessages.add(new Message(Severity.ERROR, String.format("KIE Container '%s' is in FAILED state",
                                                                              container.getContainerId()) ));
             }
