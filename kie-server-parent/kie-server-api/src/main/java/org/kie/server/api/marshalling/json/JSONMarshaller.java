@@ -64,7 +64,9 @@ import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
@@ -241,7 +243,11 @@ public class JSONMarshaller implements Marshaller {
                             return null;
                         }
 
-                        TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
+                        PolymorphicTypeValidator validator = BasicPolymorphicTypeValidator
+                                .builder()
+                                .allowIfSubType(baseType.getRawClass())
+                                .build();
+                        TypeIdResolver idRes = idResolver(config, baseType, validator, subtypes, false, true);
                         switch (_includeAs) {
                             case WRAPPER_OBJECT:
                                 return new CustomAsWrapperTypeDeserializer(baseType, idRes, _typeProperty, true, baseType);
