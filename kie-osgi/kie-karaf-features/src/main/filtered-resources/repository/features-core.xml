@@ -14,6 +14,8 @@
     <bundle>mvn:org.drools/drools-model-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-core-reflective/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-core-dynamic/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-cdi/${version.org.drools}</bundle>
     <bundle>mvn:org.kie/kie-osgi-integration/${version.org.drools}</bundle>
   </feature>
