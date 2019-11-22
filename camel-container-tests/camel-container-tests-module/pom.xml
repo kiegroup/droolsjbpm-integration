@@ -127,6 +127,12 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-spring</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-jcl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
