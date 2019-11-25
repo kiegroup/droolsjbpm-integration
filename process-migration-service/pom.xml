@@ -248,11 +248,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.github.eirslett</groupId>
-          <artifactId>frontend-maven-plugin</artifactId>
-          <version>${version.frontend-maven-plugin}</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${maven-resources-plugin.version}</version>
         </plugin>
