@@ -22,7 +22,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
-import org.drools.core.common.ProjectClassLoader;
 import org.drools.core.rule.KieModuleMetaInfo;
 import org.drools.core.rule.TypeMetaInfo;
 
@@ -31,7 +30,6 @@ class CompilerHelper {
     public void share(Map<String, Object> kieMap, InternalKieModule kModule, Log log) {
         String compilationID = getCompilationID(kieMap, log);
         shareKieObjectsWithMap(kModule, compilationID, kieMap, log);
-        shareStoreWithMap(kModule.getModuleClassLoader(), compilationID, kieMap, log);
         shareTypesMetaInfoWithMap(getTypeMetaInfo(kModule),
                                   kieMap,
                                   compilationID, log);
@@ -63,18 +61,6 @@ class CompilerHelper {
                 StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
                 kieMap.put(sbkModule.toString(), kModule);
                 log.info("KieModule available in the map shared with the Maven Embedder with key:" + sbkModule.toString());
-            }
-        }
-    }
-
-    public void shareStoreWithMap(ClassLoader classLoader, String compilationID, Map<String, Object> kieMap, Log log) {
-        if (classLoader instanceof ProjectClassLoader) {
-            ProjectClassLoader projectClassloder = (ProjectClassLoader) classLoader;
-            Map<String, byte[]> types = projectClassloder.getStore();
-            if (projectClassloder.getStore() != null) {
-                StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
-                kieMap.put(sbTypes.toString(), types);
-                log.info("ProjectClassloader Store available in the map shared with the Maven Embedder");
             }
         }
     }

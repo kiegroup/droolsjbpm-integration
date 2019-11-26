@@ -16,7 +16,7 @@
 
 package org.drools.android;
 
-import org.drools.core.common.ProjectClassLoader;
+import org.drools.reflective.classloader.ProjectClassLoader;
 
 public class DexInternalTypesClassLoader extends MultiDexClassLoader {
 

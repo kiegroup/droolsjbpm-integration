@@ -14,10 +14,6 @@
  */
 package org.kie.maven.plugin;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +26,6 @@ import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieFileSystemImpl;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
-import org.drools.core.common.ProjectClassLoader;
 import org.drools.core.rule.KieModuleMetaInfo;
 import org.drools.core.rule.TypeDeclaration;
 import org.drools.core.rule.TypeMetaInfo;
@@ -53,9 +48,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
 import org.kie.api.runtime.conf.ClockTypeOption;
 
-import static ch.qos.logback.core.encoder.ByteArrayUtil.hexStringToByteArray;
-import static ch.qos.logback.core.encoder.ByteArrayUtil.toHexString;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CompilerHelperTest {
 
@@ -96,86 +89,6 @@ public class CompilerHelperTest {
         String compilationID = helper.getCompilationID(map,
                                                        log);
         assertThat(compilationID).isEqualTo("main");
-    }
-
-    @Test
-    public void shareStoreWithMapTest() {
-        //prepare
-        CompilerHelper helper = new CompilerHelper();
-        Map<String, Object> kieMap = new HashMap<>();
-        String compilationID = UUID.randomUUID().toString();
-        kieMap.put("compilation.ID",
-                   compilationID);
-        ProjectClassLoader pcl = ProjectClassLoader.createProjectClassLoader();
-        String hexContent = "e04fd020ea3a6910a2d808002b30309d";
-        String className = "org/my/Clazz";
-        //we store bytes of hexString for an easy compare
-        pcl.storeClass(className,
-                       hexStringToByteArray(hexContent));
-
-        //call the class under test
-        helper.shareStoreWithMap(pcl,
-                                 compilationID,
-                                 kieMap,
-                                 log);
-
-        //verify
-        StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
-        kieMap.get(sbTypes.toString());
-        Map store = (Map) kieMap.get(sbTypes.toString());
-        assertThat(store).isNotNull();
-        assertThat(store).hasSize(1);
-        byte[] bytez = (byte[]) store.get(className + ".class");
-        assertThat(bytez).isNotNull();
-        String hex = toHexString(bytez);
-        assertThat(hex).isEqualTo(hexContent);
-    }
-
-    @Test
-    public void shareNoStoreWithMapTest() {
-        //prepare
-        CompilerHelper helper = new CompilerHelper();
-        Map<String, Object> kieMap = new HashMap<>();
-        String compilationID = UUID.randomUUID().toString();
-        kieMap.put("compilation.ID",
-                   compilationID);
-        ProjectClassLoader pcl = ProjectClassLoader.createProjectClassLoader();
-
-        //call the class under test
-        helper.shareStoreWithMap(pcl,
-                                 compilationID,
-                                 kieMap,
-                                 log);
-
-        //verify
-        StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
-        kieMap.get(sbTypes.toString());
-        Map store = (Map) kieMap.get(sbTypes.toString());
-        assertThat(store).isNull();
-    }
-
-    @Test
-    public void shareWrongStoreWithMapTest() throws Exception {
-        //prepare
-        CompilerHelper helper = new CompilerHelper();
-        String compilationID = UUID.randomUUID().toString();
-        Map<String,Object> kieMap = Collections.singletonMap("compilation.ID", compilationID);
-
-        File dir = new File(System.getProperty("user.dir")
-                                    + File.separator + "dir" + File.separator);
-        URL url = dir.toURL();
-        ClassLoader cl = new URLClassLoader(new URL[]{url});
-        //call the class under test
-        helper.shareStoreWithMap(cl,
-                                 compilationID,
-                                 kieMap,
-                                 log);
-
-        //verify
-        StringBuilder sbTypes = new StringBuilder(compilationID).append(".").append("ProjectClassloaderStore");
-        kieMap.get(sbTypes.toString());
-        Map store = (Map) kieMap.get(sbTypes.toString());
-        assertThat(store).isNull();
     }
 
     @Test

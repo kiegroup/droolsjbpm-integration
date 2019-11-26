@@ -8,6 +8,8 @@
     <feature version="${project.version}">drools-common</feature>
     <feature version="${project.version}">kie</feature>
     <bundle>mvn:com.github.javaparser/javaparser-core/${karaf.version.com.github.javaparser}</bundle>
+    <bundle>mvn:org.drools/drools-core-reflective/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-core-dynamic/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-mvel-parser/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-mvel-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-canonical-model/${version.org.drools}</bundle>
@@ -41,6 +43,8 @@
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-core-reflective/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-core-dynamic/${version.org.drools}</bundle>
   </feature>
 
   <feature name="kie-ci" version="${project.version}" description="KIE CI">

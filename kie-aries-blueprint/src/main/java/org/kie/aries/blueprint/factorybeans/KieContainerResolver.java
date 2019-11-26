@@ -30,7 +30,6 @@ import org.kie.api.runtime.KieContainerSessionsPool;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
-import org.kie.api.runtime.rule.RuleUnitExecutor;
 import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 
 public class KieContainerResolver extends AbstractKieObjectsResolver implements KieContainer {
@@ -200,25 +199,5 @@ public class KieContainerResolver extends AbstractKieObjectsResolver implements 
     @Override
     public KieSessionModel getKieSessionModel( String s ) {
         return getKieContainer().getKieSessionModel( s );
-    }
-
-    @Override
-    public RuleUnitExecutor newRuleUnitExecutor() {
-        return getKieContainer().newRuleUnitExecutor();
-    }
-
-    @Override
-    public RuleUnitExecutor newRuleUnitExecutor( KieSessionConfiguration conf) {
-        return getKieContainer().newRuleUnitExecutor(conf);
-    }
-
-    @Override
-    public RuleUnitExecutor newRuleUnitExecutor(String kSessionName) {
-        return getKieContainer().newRuleUnitExecutor(kSessionName);
-    }
-
-    @Override
-    public RuleUnitExecutor newRuleUnitExecutor(String kSessionName, KieSessionConfiguration conf) {
-        return getKieContainer().newRuleUnitExecutor(kSessionName, conf );
     }
 }

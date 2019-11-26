@@ -67,6 +67,7 @@
     "webpack-dev-middleware": "^3.7.0"
   },
   "dependencies": {
+    "lock-treatment-tool": "^0.4.1",
     "lodash": "^4.17.15"
   }
 }
