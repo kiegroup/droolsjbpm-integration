@@ -12,7 +12,8 @@
     "build": "webpack -p",
     "start": "node src/bin/server.js",
     "test": "jest",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "locktt": "locktt"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,json,css,md}": [
@@ -46,6 +47,7 @@
     "jest-fetch-mock": "^2.1.2",
     "jest-junit": "^6.4.0",
     "lint-staged": "^8.2.1",
+    "lock-treatment-tool": "^0.4.1",
     "moment": "^2.24.0",
     "patternfly-react": "^2.36.2",
     "prettier": "^1.18.2",
@@ -67,7 +69,6 @@
     "webpack-dev-middleware": "^3.7.0"
   },
   "dependencies": {
-    "lock-treatment-tool": "^0.4.1",
     "lodash": "^4.17.15"
   }
 }
