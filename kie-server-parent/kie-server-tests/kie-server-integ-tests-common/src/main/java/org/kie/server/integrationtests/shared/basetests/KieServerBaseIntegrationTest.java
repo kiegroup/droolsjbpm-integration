@@ -77,12 +77,17 @@ public abstract class KieServerBaseIntegrationTest {
 
     @BeforeClass
     public static void setupClass() throws Exception {
+        setupClass("KeepLatestOnly");
+    }
+
+    public static void setupClass(String oldServerActivePolicy) throws Exception {
         router = new KieServerRouterExecutor();
         router.startKieRouter();
         if (TestConfig.isLocalServer()) {
             controller = new KieControllerExecutor();
             controller.startKieController();
             server = new KieServerExecutor();
+            server.setServerActivePolicies(oldServerActivePolicy);
             server.startKieServer();
         }
         setupCustomSettingsXml();
