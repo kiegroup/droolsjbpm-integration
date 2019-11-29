@@ -20,7 +20,6 @@
     <version.org.jboss.weld.weld>2.4.3.Final</version.org.jboss.weld.weld>
     <version.org.jboss.weld.weld-api>2.4.SP2</version.org.jboss.weld.weld-api>
     <!-- Frontend properties -->
-    <frontend-maven-plugin.version>1.7.6</frontend-maven-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <node.version>v11.6.0</node.version>
     <npm.version>6.9.0</npm.version>
@@ -248,11 +247,6 @@
     </testResources>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>com.github.eirslett</groupId>
-          <artifactId>frontend-maven-plugin</artifactId>
-          <version>${frontend-maven-plugin.version}</version>
-        </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${maven-resources-plugin.version}</version>
