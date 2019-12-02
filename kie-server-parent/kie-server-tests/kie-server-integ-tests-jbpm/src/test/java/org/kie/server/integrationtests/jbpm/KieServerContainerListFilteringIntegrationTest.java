@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.server.integrationtests.common;
+package org.kie.server.integrationtests.jbpm;
 
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
@@ -29,6 +34,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.kie.internal.runtime.conf.DeploymentDescriptor;
+import org.kie.internal.runtime.conf.ObjectModel;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorImpl;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -68,6 +76,17 @@ public class KieServerContainerListFilteringIntegrationTest extends RestJmsShare
     public static void initialize() throws Exception {
         KieServerDeployer.createAndDeployKJar(releaseId1);
         KieServerDeployer.createAndDeployKJar(releaseId2);
+
+        // releaseId3 needs to be a broken kjar to simulate failing deployment
+        DeploymentDescriptor brokenDescriptor = new DeploymentDescriptorImpl("org.jbpm.domain");
+        brokenDescriptor = brokenDescriptor.getBuilder()
+                .addTaskEventListener(new ObjectModel("mvel", "new org.kie.not.existing.TaskEventListener()", new Object[0]))
+                .get();
+
+        Map<String, String> content = new HashMap<>();
+        content.put("src/main/resources/META-INF/kie-deployment-descriptor.xml", brokenDescriptor.toXml());
+        content.put("src/main/resources/script-process.bpmn2", readFile("/script-process.bpmn2"));
+        KieServerDeployer.createAndDeployKJar(releaseId3, content);
     }
 
     @Before
@@ -177,4 +196,12 @@ public class KieServerContainerListFilteringIntegrationTest extends RestJmsShare
         Assert.fail("Status " + status + " is not in expected list " + expectedContainersIds);
     }
 
+    private static String readFile(String resourceName) {
+        try {
+            URI resourceUri = KieServerContainerListFilteringIntegrationTest.class.getResource(resourceName).toURI();
+            return new String(Files.readAllBytes(Paths.get(resourceUri)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
