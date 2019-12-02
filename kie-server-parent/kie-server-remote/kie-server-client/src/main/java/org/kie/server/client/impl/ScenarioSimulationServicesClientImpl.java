@@ -44,8 +44,8 @@ public class ScenarioSimulationServicesClientImpl extends AbstractKieServicesCli
     }
 
     @Override
-    public ServiceResponse<ScenarioSimulationResult> executeScenarioByPath(String containerId, String path) throws IOException {
-        try (Stream<String> contentStream = Files.lines(Paths.get(path), StandardCharsets.UTF_8)) {
+    public ServiceResponse<ScenarioSimulationResult> executeScenarioByPath(String containerId, String localPath) throws IOException {
+        try (Stream<String> contentStream = Files.lines(Paths.get(localPath), StandardCharsets.UTF_8)) {
             String fileContent = contentStream.collect(Collectors.joining("\n"));
             return executeScenario(containerId, fileContent);
         }

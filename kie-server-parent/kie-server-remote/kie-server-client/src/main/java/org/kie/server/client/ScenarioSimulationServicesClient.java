@@ -24,17 +24,17 @@ public interface ScenarioSimulationServicesClient {
 
     /**
      * Execute given test scenario against specified containerId
-     * @param containerId
-     * @param path
-     * @return
+     * @param containerId id of container to be used to execute the scenario
+     * @param localPath to Test Scenario file (scesim) to be executed
+     * @return result of Test Scenario execution (jUnit like)
      */
-    ServiceResponse<ScenarioSimulationResult> executeScenarioByPath(String containerId, String path) throws IOException;
+    ServiceResponse<ScenarioSimulationResult> executeScenarioByPath(String containerId, String localPath) throws IOException;
 
     /**
      * Execute given test scenario against specified containerId
-     * @param containerId
-     * @param content
-     * @return
+     * @param containerId id of container to be used to execute the scenario
+     * @param content of Test Scenario file (scesim) to be executed
+     * @return result of Test Scenario execution (jUnit like)
      */
     ServiceResponse<ScenarioSimulationResult> executeScenario(String containerId, String content);
 }
