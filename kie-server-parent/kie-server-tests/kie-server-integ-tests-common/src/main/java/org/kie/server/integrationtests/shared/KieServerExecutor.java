@@ -15,8 +15,6 @@
  */
 package org.kie.server.integrationtests.shared;
 
-import org.kie.server.api.model.KieServerMode;
-import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +24,9 @@ import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.kie.api.KieServices;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
@@ -39,6 +39,8 @@ public class KieServerExecutor {
     // Need to hold kie server instance because we need to manually handle startup/shutdown behavior defined in
     // context listener org.kie.server.services.Bootstrap. Embedded server doesn't support ServletContextListeners.
     private KieServerImpl kieServer;
+
+    private String serverActivePolicies = "KeepLatestOnly";
 
     private static SimpleDateFormat serverIdSuffixDateFormat = new SimpleDateFormat("yyyy-MM-DD-HHmmss_SSS");
 
@@ -61,6 +63,11 @@ public class KieServerExecutor {
 
         addServerSingletonResources();
     }
+
+    public void setServerActivePolicies(String serverActivePolicies) {
+        this.serverActivePolicies = serverActivePolicies;
+    }
+
     protected void setKieServerProperties(boolean syncWithController) {
         System.setProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "true");
         System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
@@ -76,9 +83,10 @@ public class KieServerExecutor {
         System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.PRODUCTION.name());
 
         // kie server policy settings
-        System.setProperty(KieServerConstants.KIE_SERVER_ACTIVATE_POLICIES, "KeepLatestOnly");
+        System.setProperty(KieServerConstants.KIE_SERVER_ACTIVATE_POLICIES, serverActivePolicies);
         System.setProperty("policy.klo.interval", "5000");
     }
+
     private void registerKieServerId() {
         if (KieServerEnvironment.getServerId() == null) {
             KieServerEnvironment.setServerId(KieServerBaseIntegrationTest.class.getSimpleName() + "@" + serverIdSuffixDateFormat.format(new Date()));

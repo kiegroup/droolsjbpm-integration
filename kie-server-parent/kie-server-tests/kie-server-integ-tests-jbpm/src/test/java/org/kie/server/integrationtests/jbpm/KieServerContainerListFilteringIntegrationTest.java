@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.server.integrationtests.common;
+package org.kie.server.integrationtests.jbpm;
 
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
+
 import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.kie.internal.runtime.conf.DeploymentDescriptor;
+import org.kie.internal.runtime.conf.ObjectModel;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorImpl;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -39,7 +45,12 @@ import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class KieServerContainerListFilteringIntegrationTest extends RestJmsSharedBaseIntegrationTest {
@@ -66,8 +77,23 @@ public class KieServerContainerListFilteringIntegrationTest extends RestJmsShare
 
     @BeforeClass
     public static void initialize() throws Exception {
+        // we need to disable policies, otherwise it will cause a race condition
+        KieServerBaseIntegrationTest.tearDown();
+
+        KieServerBaseIntegrationTest.setupClass("");
+
         KieServerDeployer.createAndDeployKJar(releaseId1);
         KieServerDeployer.createAndDeployKJar(releaseId2);
+
+        DeploymentDescriptor brokenDescriptor = new DeploymentDescriptorImpl("org.jbpm.domain");
+        brokenDescriptor = brokenDescriptor.getBuilder()
+                                           .addTaskEventListener(new ObjectModel("mvel", "new org.kie.not.existing.TaskEventListener()", new Object[0]))
+                                           .get();
+
+        Map<String, String> content = new HashMap<>();
+        content.put("src/main/resources/META-INF/kie-deployment-descriptor.xml", brokenDescriptor.toXml());
+        content.put("src/main/resources/script-process.bpmn2", readFile("/script-process.bpmn2"));
+        KieServerDeployer.createAndDeployKJar(releaseId3, content);
     }
 
     @Before
@@ -127,13 +153,13 @@ public class KieServerContainerListFilteringIntegrationTest extends RestJmsShare
         ServiceResponse<KieContainerResourceList> reply = client.listContainers(new KieContainerResourceFilter(releaseIdFilter, statusFilter));
         KieServerAssert.assertSuccess(reply);
 
-        List<KieContainerResource> contianers = reply.getResult().getContainers();
+        List<KieContainerResource> containers = reply.getResult().getContainers();
         if (expectedContainersIds.isEmpty()) {
-            KieServerAssert.assertNullOrEmpty("Should be return empty list", contianers);
+            KieServerAssert.assertNullOrEmpty("Should be return empty list", containers);
         } else {
-            assertNotNull(contianers);
-            assertEquals(expectedContainersIds.size(), contianers.size());
-            checkContainersList(contianers);
+            assertNotNull(containers);
+            assertEquals(expectedContainersIds.size(), containers.size());
+            checkContainersList(containers);
         }
     }
 
@@ -175,6 +201,15 @@ public class KieServerContainerListFilteringIntegrationTest extends RestJmsShare
             }
         }
         Assert.fail("Status " + status + " is not in expected list " + expectedContainersIds);
+    }
+
+    private static String readFile(String resourceName) {
+        try {
+            URI resourceUri = KieServerContainerListFilteringIntegrationTest.class.getResource(resourceName).toURI();
+            return new String(Files.readAllBytes(Paths.get(resourceUri)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
