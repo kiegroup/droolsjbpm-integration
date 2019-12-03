@@ -15,24 +15,6 @@
 
 package org.kie.server.client;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.stubbing.Scenario;
-import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.kie.server.api.model.KieServerInfo;
-import org.kie.server.api.model.KieServerStateInfo;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.balancer.BalancerStrategy;
-import org.kie.server.client.balancer.LoadBalancer;
-import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
-import org.kie.server.client.impl.AbstractKieServicesClientImpl;
-import org.kie.server.common.rest.KieServerHttpRequestException;
-import org.kie.server.common.rest.NoEndpointFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,9 +22,40 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.*;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
+import org.assertj.core.api.Assertions;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.balancer.BalancerStrategy;
+import org.kie.server.client.balancer.LoadBalancer;
+import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
+import org.kie.server.client.impl.AbstractKieServicesClientImpl;
+import org.kie.server.client.util.SSLUtilities;
+import org.kie.server.common.rest.KieServerHttpRequestException;
+import org.kie.server.common.rest.NoEndpointFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+@RunWith(Parameterized.class)
 public class LoadBalancerClientTest {
 
     private String mockServerBaseUri1;
@@ -57,8 +70,24 @@ public class LoadBalancerClientTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadBalancerClientTest.class);
 
+    {
+        SSLUtilities.trustAllHostnames();
+        SSLUtilities.trustAllHttpsCertificates();
+    }
+
+    @Parameters(name = "Protocol {0}")
+    public static Iterable<? extends Object> data() {
+        return Arrays.asList("http", "https");
+    }
+
+    @Parameter(value = 0)
+    public String protocol;
+
     protected WireMockServer createMockServer(String version, int port) {
-        WireMockServer wireMockServer = new WireMockServer(port);
+        WireMockConfiguration config = WireMockConfiguration.wireMockConfig();
+        config = ("https".equals(protocol)) ? config.httpsPort(port).port(port + 1000) : config.port(port).httpsPort(port + 1000);
+
+        WireMockServer wireMockServer = new WireMockServer(config);
         wireMockServer.stubFor(get(urlEqualTo("/"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
@@ -97,10 +126,10 @@ public class LoadBalancerClientTest {
         wireMockServer3 = createMockServer("3", port3);
         wireMockServer3.start();
 
-        mockServerBaseUri1 = "http://localhost:" + port1;
-        mockServerBaseUri2 = "http://localhost:" + port2;
-        mockServerBaseUri3 = "http://localhost:" + port3;
-        String mockServerBaseUri3Duplicated = "http://localhost:" + port3;
+        mockServerBaseUri1 = protocol + "://localhost:" + port1;
+        mockServerBaseUri2 = protocol + "://localhost:" + port2;
+        mockServerBaseUri3 = protocol + "://localhost:" + port3;
+        String mockServerBaseUri3Duplicated = protocol + "://localhost:" + port3;
 
         config = KieServicesFactory.newRestConfiguration( mockServerBaseUri1+"|"+ mockServerBaseUri2 + "|" + mockServerBaseUri3 + "|" + mockServerBaseUri3Duplicated, null, null );
         // set capabilities upfront to avoid additional request to server info to make the tests more determinable
