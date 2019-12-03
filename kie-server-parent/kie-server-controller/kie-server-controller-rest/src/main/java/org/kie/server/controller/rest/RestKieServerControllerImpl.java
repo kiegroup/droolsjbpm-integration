@@ -18,7 +18,14 @@ package org.kie.server.controller.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
-import javax.ws.rs.*;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -32,7 +39,10 @@ import org.kie.server.controller.impl.storage.InMemoryKieServerControllerStorage
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.controller.rest.ControllerUtils.*;
+import static org.kie.server.controller.rest.ControllerUtils.createCorrectVariant;
+import static org.kie.server.controller.rest.ControllerUtils.getContentType;
+import static org.kie.server.controller.rest.ControllerUtils.marshal;
+import static org.kie.server.controller.rest.ControllerUtils.unmarshal;
 
 @Path("/controller")
 public class RestKieServerControllerImpl extends KieServerControllerImpl {
@@ -58,11 +68,15 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
         logger.debug("Server info {}", serverInfo);
         KieServerSetup serverSetup = connect(serverInfo);
 
-        logger.info("Server with id '{}' connected", id);
-        String response = marshal(contentType, serverSetup);
+        if (serverSetup.hasNoErrors()) {
+            logger.info("Server with id '{}' connected", id);
+        } else {
+            logger.warn("Server with id '{}' failed to connect", id);
+        }
 
+        String response = marshal(contentType, serverSetup);
         logger.debug("Returning response for connect of server '{}': {}", id, response);
-        return createCorrectVariant(response, headers, Response.Status.CREATED);
+        return createCorrectVariant(response, headers, serverSetup.hasNoErrors() ? Response.Status.CREATED : Response.Status.BAD_REQUEST);
     }
 
     @DELETE
