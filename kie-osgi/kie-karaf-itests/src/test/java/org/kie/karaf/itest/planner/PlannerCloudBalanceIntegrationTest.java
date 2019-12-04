@@ -64,7 +64,7 @@ public class PlannerCloudBalanceIntegrationTest extends AbstractKarafIntegration
 
     @Test(expected=IllegalStateException.class)
     public void invalidSolutionPlannerTest() {
-        solveSolution(cloudBalanceGeneratorForFuse(0, 0, 0));
+        solveSolution(cloudBalanceGeneratorForFuse(0, 1, 0));
     }
 
     @Test
