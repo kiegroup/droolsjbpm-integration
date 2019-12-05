@@ -124,6 +124,41 @@ public interface UIServicesClient {
     String getTaskFormByType(String containerId, Long taskId, String formType);
 
     /**
+     * Returns task form for given task id that belongs to given container as specified user. It returns default form type
+     * which is (FORM - build with form modeler). If there is a need to select the type use #getProcessFormForUserByType
+     * Introduced to allow client to take advantage of bypass auth user connecting to server.
+     * @param userId userId making the request to bypass auth user
+     * @param containerId container identifier where task resides
+     * @param taskId unique task id
+     * @param language language that form should be filtered for
+     * @return  string representation (json or xml depending on client marshaling selection) of the task form
+     */
+    String getTaskFormAsUser(String userId, String containerId, Long taskId, String language);
+
+    /**
+     * Returns task form for given task id that belongs to given container as specified user.
+     * Introduced to allow client to take advantage of bypass auth user connecting to server.
+     * @param userId userId making the request to bypass auth user
+     * @param containerId container identifier where task resides
+     * @param taskId unique task id
+     * @param language language that form should be filtered for
+     * @param formType type of form to be returned (FORM - default (form modeler), FRM - v7 forms, FTL - freemarker template)
+     * @return  string representation (json or xml depending on client marshaling selection) of the task form
+     */
+    String getTaskFormByTypeAsUser(String userId, String containerId, Long taskId, String language, String formType);
+
+    /**
+     * Returns task form for given task id that belongs to given container as specified user as raw content - without filtering values by language.
+     * It returns default form type which is (FORM - build with form modeler). If there is a need to select the type use #getProcessFormByType
+     * Introduced to allow client to take advantage of bypass auth user connecting to server.
+     * @param userId userId making the request to bypass auth user
+     * @param containerId container identifier where task resides
+     * @param taskId unique task id
+     * @return  string representation of the task form without any marshalling
+     */
+    String getTaskRawFormAsUser(String userId, String containerId, Long taskId);
+
+    /**
      * Returns process image (svg) of the given process id that belongs to given container
      * @param containerId container identifier where process resides
      * @param processId  unique process id
