@@ -1,0 +1,21 @@
+RULE stop kie server
+CLASS org.jboss.resteasy.plugins.server.tjws.TJWSServletServer
+METHOD stop
+AT ENTRY
+IF TRUE
+DO
+    debug("<<<==================stop kie server===================================");
+    waitFor("getServerTemplate");
+    debug("<<<======= stop kie serve=== end")
+ENDRULE
+
+RULE get ServerTemplate
+CLASS org.kie.server.controller.client.rest.RestKieServerControllerClient
+METHOD makeGetRequestAndCreateCustomResponse
+AT ENTRY
+IF TRUE
+DO
+    debug("<<<=============get ServerTemplate==================");
+    signalWake("get ServerTemplate", true);
+    debug("<<<=================get ServerTemplate === end")
+ENDRULE

@@ -23,12 +23,16 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
+import org.jboss.byteman.contrib.bmunit.BMScript;
+import org.jboss.byteman.contrib.bmunit.BMUnitConfig;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.junit.runner.RunWith;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -53,7 +57,9 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebSocketKieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
+@RunWith(BMUnitRunner.class)
+@BMUnitConfig( loadDirectory = "target/test-classes/bmunit", debug = true )
+public class WebSocketKieControllerStartupIntegrationTest extends KieControllerManagementBaseOneTest {
 
     public static final Logger logger = LoggerFactory.getLogger(WebSocketKieControllerStartupIntegrationTest.class);
 
@@ -115,7 +121,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
             if (TestConfig.isLocalServer()) {
                 server.startKieServer();
             } else {
-                server.stopKieServer();
+//                server.stopKieServer();
             }
         } catch (Exception e) {
             // Exception thrown if there is already kie server started or stopped respectively.
@@ -126,7 +132,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         }
     }
 
-    @Test
+//    @Test
     public void testRegisterKieServerAfterStartup() throws Exception {
         // Turn off embedded kie server.
         server.stopKieServer();
@@ -156,7 +162,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertEquals(reply.getResult().getServerId(), deployedServerInstance.getId());
     }
 
-    @Test
+//    @Test
     public void testTurnOffKieServerAfterShutdown() throws Exception {
         // Register kie server in controller.
         ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
@@ -181,7 +187,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getServerTemplates()[0].getId()); //maybe change to avoid next -> null
     }
 
-    @Test
+//    @Test
     public void testContainerCreatedAfterStartup() throws Exception {
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
@@ -225,20 +231,22 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
     }
 
     @Test
+    @BMScript("ConcurrentModificationException.btm")
     public void testContainerDisposedAfterStartup() throws Exception {
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, kieServerInfo.getType());
         assertNotNull(kieServerInfo.getResult());
-
+        logger.info("-----------------------client.getServerInfo()---------");
         // Create container.
         ServerTemplate serverTemplate = new ServerTemplate(kieServerInfo.getResult().getServerId(), kieServerInfo.getResult().getName());
         serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), kieServerInfo.getResult().getLocation()));
         controllerClient.saveServerTemplate(serverTemplate);
+        logger.info("-----------------------saveServerTemplate---------");
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, RELEASE_ID, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
         controllerClient.saveContainerSpec(kieServerInfo.getResult().getServerId(), containerSpec);
         controllerClient.startContainer(containerSpec);
-
+        logger.info("-----------------------startContainer---------");
         // Check that there is one container deployed.
         try {
             KieServerSynchronization.waitForKieServerSynchronization(client, 1);
@@ -248,35 +256,19 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
             controllerClient.startContainer(containerSpec);
             KieServerSynchronization.waitForKieServerSynchronization(client, 1);
         }
-        ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
-        assertNotNull(containersList.getResult().getContainers());
-        assertEquals(1, containersList.getResult().getContainers().size());
 
-        ServerTemplateList instanceList = controllerClient.listServerTemplates();
-        assertEquals(1, instanceList.getServerTemplates().length);
-
-        ServerTemplate returnedServerTemplate = controllerClient.getServerTemplate(kieServerInfo.getResult().getServerId());
-        logger.info("+++++++++++++++++++++++" + returnedServerTemplate.getServerInstanceKeys());
-
+        Thread stop = new Thread(()->{
+            logger.info("-----------------------stop---------");
+            server.stopKieServer();
+        });
         // Turn kie server off, dispose container and start kie server again.
-        server.stopKieServer();
+        stop.start();
         KieServerSynchronization.waitForServerInstanceSynchronization(controllerClient, kieServerInfo.getResult().getServerId(), 0);
+        Thread get = new Thread(()->{
+            logger.info("-----------------------getServerTemplate---------");
+            controllerClient.getServerTemplate(kieServerInfo.getResult().getServerId());
+        });
 
-        returnedServerTemplate = controllerClient.getServerTemplate(kieServerInfo.getResult().getServerId());
-        logger.info("------------------------" + returnedServerTemplate.getServerInstanceKeys());
-
-        controllerClient.stopContainer(containerSpec);
-        controllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
-        
-        ContainerSpecList containerList = controllerClient.listContainerSpec(serverTemplate.getId());
-        KieServerAssert.assertNullOrEmpty("Active containers spec found!", containerList.getContainerSpecs());
-
-        server.startKieServer(true);
-
-        // Check that no container is deployed on kie server.
-        containersList = client.listContainers();
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
-        KieServerAssert.assertNullOrEmpty("Active containers found!", containersList.getResult().getContainers());
+        get.start();
     }
 }
