@@ -108,17 +108,33 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
     }
 
     @Override
-    public String getTaskFormByType(String containerId, Long taskId, String language, String formType) {
-        return getTaskFormByType( containerId, taskId, language, formType, true );
+    public String getTaskFormAsUser(String userId, String containerId, Long taskId, String language) {
+        return getTaskFormByTypeAsUser(userId, containerId, taskId, language, ANY_FORM);
     }
 
-    private String getTaskFormByType( String containerId, Long taskId, String language, String formType, boolean marshallContent ) {
+    @Override
+    public String getTaskFormByType(String containerId, Long taskId, String language, String formType) {
+        return getTaskFormByTypeAsUser("", containerId, taskId, language, formType, true );
+    }
+
+    @Override
+    public String getTaskFormByTypeAsUser(String userId, String containerId, Long taskId, String language, String formType) {
+        return getTaskFormByTypeAsUser(userId, containerId, taskId, language, formType, true );
+    }
+
+    private String getTaskFormByTypeAsUser(String userId, String containerId, Long taskId, String language, String formType, boolean marshallContent ) {
         if( config.isRest() ) {
-            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            Map<String, Object> valuesMap = new HashMap<>();
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
 
-            StringBuffer params = new StringBuffer();
+            String userQuery = userId.equals("") ? "" : getUserQueryStr(userId);
+            StringBuilder params = new StringBuilder(userQuery);
+            if (params.length() == 0) {
+                params.append("?");
+            } else {
+                params.append("&");
+            }
 
             params.append( "type=" ).append( formType );
             params.append( "&marshallContent=" ).append( marshallContent );
@@ -130,7 +146,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             params.append( "&filter=" ).append( filter );
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?" + params.toString());
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + params.toString());
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -152,12 +168,17 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
 
     @Override
     public String getTaskFormByType(String containerId, Long taskId, String formType) {
-        return getTaskFormByType( containerId, taskId, null, formType, true );
+        return getTaskFormByTypeAsUser("", containerId, taskId, null, formType, true );
     }
 
     @Override
     public String getTaskRawForm( String containerId, Long taskId ) {
-        return getTaskFormByType( containerId, taskId, null, ANY_FORM, false );
+        return getTaskFormByTypeAsUser("", containerId, taskId, null, ANY_FORM, false );
+    }
+
+    @Override
+    public String getTaskRawFormAsUser(String userId, String containerId, Long taskId ) {
+        return getTaskFormByTypeAsUser(userId, containerId, taskId, null, ANY_FORM, false);
     }
 
     @Override
