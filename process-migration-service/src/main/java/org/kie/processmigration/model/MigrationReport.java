@@ -65,6 +65,7 @@ public class MigrationReport implements Serializable {
     @Column(name = "end_date")
     private Instant endDate;
 
+    @Column(name = "success") // successful is a reserved word in Oracle DB
     private Boolean successful;
 
     @ElementCollection(fetch = FetchType.EAGER)
