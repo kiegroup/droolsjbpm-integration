@@ -1,5 +1,3 @@
-package org.kie.server.services.jbpm.ui;
-
 /*
  * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
@@ -14,7 +12,8 @@ package org.kie.server.services.jbpm.ui;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.kie.server.services.jbpm.ui.*;
+package org.kie.server.services.jbpm.ui;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -42,7 +41,6 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerRegistryImpl;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import static org.mockito.Mockito.mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,8 +48,8 @@ public class FormServiceBaseTest {
 
     private final String dummyForm = "{\"id\": \"30f64834-1fe6-4ffb-ba48-024bc6839d5c\", \"name\": \"form-taskform.frm\", \"fields\": [{\"maxLength\": 100,\"placeHolder\": \"Resultado\",\"id\": \"field_id\",\"name\": \"field\",\"label\": \"Field\",\"code\": \"TextBox\"}]}";
 
-    private String CONTAINER_ID = "test-container";
-    private String PROCESS_ID = "test-processId";
+    private final String CONTAINER_ID = "test-container";
+    private final String PROCESS_ID = "test-processId";
 
     @Mock
     KieServerRegistry kieServerRegistry = new KieServerRegistryImpl();
