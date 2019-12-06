@@ -149,9 +149,11 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
                     build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + params.toString());
 
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{containerId, taskId, StringUtils.defaultString( language ), !StringUtils.isEmpty( language ), formType } )) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
+            CommandScript script = new CommandScript(Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("FormService", "getFormDisplayTask",
+                            new Object[]{containerId, taskId, userId, StringUtils.defaultString(language), !StringUtils.isEmpty(language), formType})));
+
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM-UI", containerId).getResponses().get(0);
 
             throwExceptionOnFailure(response);
             if (shouldReturnWithNullResponse(response)) {
