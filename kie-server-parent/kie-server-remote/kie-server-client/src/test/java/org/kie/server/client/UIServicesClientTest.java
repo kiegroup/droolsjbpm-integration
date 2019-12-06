@@ -21,11 +21,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +43,7 @@ public class UIServicesClientTest extends BaseKieServicesClientTest {
     @Before
     public void createClient() {
 
-        config.setCapabilities(List.of(KieServerConstants.CAPABILITY_BPM_UI));
+        config.setCapabilities(Arrays.asList(KieServerConstants.CAPABILITY_BPM_UI));
 
         uiClient = KieServicesFactory.newKieServicesClient(config).getServicesClient(UIServicesClient.class);
     }
