@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -176,14 +178,8 @@ public class ServerTemplate extends ServerTemplateKey {
         if (serverInstances == null) {
             return;
         }
-        Iterator<ServerInstanceKey> iterator = serverInstances.iterator();
-
-        while(iterator.hasNext()) {
-            ServerInstanceKey serverInstanceKey = iterator.next();
-            if (serverInstanceId.equals(serverInstanceKey.getServerInstanceId())) {
-                iterator.remove();
-            }
-        }
+        Collection<ServerInstanceKey> removeServerInstanceKeyList = serverInstances.stream().filter(serverInstance -> serverInstanceId.equals(serverInstance.getServerInstanceId())).collect(Collectors.toList());
+        serverInstances.remove(removeServerInstanceKeyList);
     }
 
     public void setContainersSpec(Collection<ContainerSpec> containersSpec) {
