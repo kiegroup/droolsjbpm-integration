@@ -15,17 +15,20 @@
 
 package org.kie.server.router.proxy.aggregate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.logging.Logger;
 import org.junit.Test;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.router.proxy.aggragate.XstreamXMLResponseAggregator;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class XstreamAggregatorTest extends AbstractAggregateTest {
 
@@ -630,6 +633,25 @@ public class XstreamAggregatorTest extends AbstractAggregateTest {
         NodeList processes = xml.getElementsByTagName("sql-timestamp");
         assertNotNull(processes);
         assertEquals(2, processes.getLength());
+    }
+
+    @Test
+    public void testAggregateProcessInstance() throws Exception {
+
+        String xml1 = read(this.getClass().getResourceAsStream("/xstream/process-instance-3.xml"));
+        String xml2 = read(this.getClass().getResourceAsStream("/xstream/process-instance-4.xml"));
+        XstreamXMLResponseAggregator aggregate = new XstreamXMLResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(xml1);
+        data.add(xml2);
+
+        String result = aggregate.aggregate(data);
+        logger.debug(result);
+
+        org.kie.server.api.marshalling.Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM, Thread.currentThread().getContextClassLoader());
+        ProcessInstance id = marshaller.unmarshall(result, ProcessInstance.class);
+
     }
 }
 
