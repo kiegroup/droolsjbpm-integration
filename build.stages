@@ -1,0 +1,29 @@
+if(!env.kiegroup_droolsjbpm_integration) {
+    stage('Build droolsjbpm-integration projects') {
+        dir("optaplanner") {
+            script {
+                githubscm.checkoutIfExists('optaplanner', "$CHANGE_AUTHOR", "$CHANGE_BRANCH", 'kiegroup', "$CHANGE_TARGET")
+                load("build.stages")
+            }
+        }
+        dir("kie-jpmml-integration") {
+            script {
+                githubscm.checkoutIfExists('kie-jpmml-integration', "$CHANGE_AUTHOR", "$CHANGE_BRANCH", 'kiegroup', "$CHANGE_TARGET")
+                load("build.stages")
+            }
+        }
+        dir("jbpm") {
+            script {
+                githubscm.checkoutIfExists('jbpm', "$CHANGE_AUTHOR", "$CHANGE_BRANCH", 'kiegroup', "$CHANGE_TARGET")
+                load("build.stages")
+            }
+        }
+    }
+    stage('Build droolsjbpm-integration project') {
+        script {
+            githubscm.checkoutIfExists('droolsjbpm-integration', "$CHANGE_AUTHOR", "$CHANGE_BRANCH", 'kiegroup', "$CHANGE_TARGET")
+            maven.runMavenWithSubmarineSettings('clean install', true)
+            env.kiegroup_droolsjbpm_integration = true;
+        }
+    }
+}
