@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
@@ -132,6 +133,10 @@ public class WebSocketKieControllerNotificationIntegrationTest extends KieServer
     }
 
     @Test(timeout = 60 * 1000)
+    @Ignore("Skipped due to race condition between embedded Kie server initialization and Kie server healthcheck.")
+    // Test is unstable due to race condition between embedded Kie server initialization and Kie server healthcheck triggered by controller.
+    // If healthcheck is triggered between KieServerImpl initialization and registering of Kie server REST endpoint then Kie server instance is removed from controller, causing additional events.
+    // Template events are tested in the other integration tests.
     public void testKieServerEvents() throws Exception {
         // Check that there are no kie servers deployed in controller.
         ServerTemplateList instanceList = controllerClient.listServerTemplates();

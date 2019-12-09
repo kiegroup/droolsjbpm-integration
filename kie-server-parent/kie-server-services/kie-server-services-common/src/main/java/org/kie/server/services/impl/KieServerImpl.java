@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
 import javax.naming.InitialContext;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -99,7 +100,7 @@ public class KieServerImpl implements KieServer {
 
     private KieServerEventSupport eventSupport = new KieServerEventSupport();
 
-    private KieServices ks = KieServices.Factory.get();
+    private KieServices ks;
     
     private long startTimestamp;
     
@@ -112,7 +113,12 @@ public class KieServerImpl implements KieServer {
     }
 
     public KieServerImpl(KieServerStateRepository stateRepository) {
+        this(stateRepository, KieServices.Factory.get());
+    }
+
+    public KieServerImpl(KieServerStateRepository stateRepository, KieServices ks) {
         this.repository = stateRepository;
+        this.ks = ks;
 
         String modeParam = System.getProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.DEVELOPMENT.toString());
 
@@ -267,13 +273,14 @@ public class KieServerImpl implements KieServer {
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
             synchronized (ci) {
 
-                previous = context.registerContainer(containerId, ci);
-                if (previous == null) {
+                previous = context.getContainer(containerId);
+                if (canBeDeployed(previous)) {
                     try {
                         eventSupport.fireBeforeContainerStarted(this, ci);
 
                         InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
                         if (kieContainer != null) {
+                            previous = context.registerContainer(containerId, ci);
                             ci.setKieContainer(kieContainer);
                             ci.getResource().setConfigItems(container.getConfigItems());
                             ci.getResource().setMessages(messages);
@@ -297,24 +304,32 @@ public class KieServerImpl implements KieServer {
                                 }
                             }
 
-                            ci.getResource().setStatus(KieContainerStatus.STARTED);
-                            logger.info("Container {} (for release id {}) successfully started", containerId, releaseId);
-
-                            // store the current state of the server
-                            storeServerState(currentState -> {
-                                container.setStatus(KieContainerStatus.STARTED);
-                                currentState.getContainers().add(container);
-                            });
-
                             // add successful message only when there are no errors
                             if (!messages.stream().filter(m -> m.getSeverity().equals(Severity.ERROR)).findAny().isPresent()) {
                                 messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully created with module " + releaseId + "."));
+
+                                ci.getResource().setStatus(KieContainerStatus.STARTED);
+                                logger.info("Container {} (for release id {}) successfully started", containerId, releaseId);
+
+                                // store the current state of the server
+                                storeServerState(currentState -> {
+                                    container.setStatus(KieContainerStatus.STARTED);
+                                    currentState.getContainers().add(container);
+                                });
                                 eventSupport.fireAfterContainerStarted(this, ci);
 
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                             } else {
                                 ci.getResource().setStatus(KieContainerStatus.FAILED);
                                 ci.getResource().setReleaseId(releaseId);
+
+                                logger.info("Container {} (for release id {}) cannot be deployed", containerId, releaseId);
+
+                                // store the current state of the server
+                                storeServerState(currentState -> {
+                                    container.setStatus(KieContainerStatus.FAILED);
+                                    currentState.getContainers().add(container);
+                                });
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + " with module " + releaseId + ".");
                             }
                         } else {
@@ -343,6 +358,10 @@ public class KieServerImpl implements KieServer {
         } finally {
             this.containerMessages.put(containerId, messages);
         }
+    }
+
+    private boolean canBeDeployed(KieContainerInstanceImpl previous) {
+        return previous == null || previous.getStatus().equals(KieContainerStatus.FAILED);
     }
 
     private <T> ServiceResponse<T> validateContainerReleaseAndMode(String preffix, KieContainerResource container) {
@@ -1127,7 +1146,12 @@ public class KieServerImpl implements KieServer {
         }
         // first check of KIE Server's containers if any of them is in failed state
         for (KieContainerInstance container : getContainers()) {
-            if (container.getStatus().equals(KieContainerStatus.FAILED)) {
+            // RHPAM-1793 - relax health check in case of management is enabled.
+            if (container.getStatus().equals(KieContainerStatus.FAILED) && !managementDisabled) {
+                healthMessages.add(new Message(Severity.WARN, String.format("KIE Container '%s' is in FAILED state",
+                                                                             container.getContainerId()) ));
+
+            } else if (container.getStatus().equals(KieContainerStatus.FAILED) && managementDisabled) {
                 healthMessages.add(new Message(Severity.ERROR, String.format("KIE Container '%s' is in FAILED state",
                                                                              container.getContainerId()) ));
             }

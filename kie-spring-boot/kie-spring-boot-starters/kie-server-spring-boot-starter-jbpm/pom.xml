@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-starters</artifactId>
-    <version>7.29.0-SNAPSHOT</version>
+    <version>7.31.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-starter-jbpm</artifactId>
 
@@ -20,6 +20,10 @@
         <exclusion>
           <groupId>org.apache.tomcat</groupId>
           <artifactId>tomcat-annotations-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.validation</groupId>
+          <artifactId>jakarta.validation-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -83,7 +87,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${version.org.spring-boot}</version>
+        <version>${version.org.springframework.boot}</version>
       </plugin>
     </plugins>
   </build>

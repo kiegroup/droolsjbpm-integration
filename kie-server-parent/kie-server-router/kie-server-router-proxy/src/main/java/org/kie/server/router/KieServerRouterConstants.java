@@ -30,6 +30,7 @@ public class KieServerRouterConstants {
     public static final String ROUTER_KEYSTORE_KEYALIAS = "org.kie.server.router.tls.keystore.keyalias";
 
     public static final String ROUTER_REPOSITORY_DIR = "org.kie.server.router.repo";
+    public static final String ROUTER_IDENTITY_FILE = "org.kie.server.router.identity.file";
 
     public static final String KIE_CONTROLLER = "org.kie.server.controller";
     public static final String KIE_CONTROLLER_USER = "org.kie.server.controller.user";
@@ -39,5 +40,7 @@ public class KieServerRouterConstants {
     public static final String CONFIG_FILE_WATCHER_INTERVAL = "org.kie.server.router.config.watcher.interval";
     public static final String KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL = "org.kie.server.controller.retry.interval";
     public static final String KIE_SERVER_RECOVERY_ATTEMPT_LIMIT = "org.kie.server.recovery.retry.limit";
-    
+
+    public static final String KIE_ROUTER_MANAGEMENT_SECURED = "org.kie.server.router.management.password";
+    public static final String KIE_ROUTER_IDENTITY_PROVIDER = "org.kie.router.identity.provider";
 }

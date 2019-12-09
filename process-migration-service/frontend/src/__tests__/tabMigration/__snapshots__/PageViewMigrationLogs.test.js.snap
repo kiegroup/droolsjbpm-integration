@@ -2,119 +2,606 @@
 
 exports[`PageViewMigrationLogs renders correctly using snapshot 1`] = `
 <div>
-  <div>
-    <div
-      className="form-horizontal"
+  <div
+    className="container-fluid"
+  >
+    <table
+      className="table dataTable table-striped table-bordered table-hover"
+      role="grid"
+    >
+      <thead>
+        <tr>
+          <th
+            aria-label="ID"
+            className="sorting sort sort-none"
+            colSpan={1}
+            index={0}
+            onClick={[Function]}
+            rowSpan={1}
+          >
+            ID
+          </th>
+          <th
+            aria-label="Migration ID"
+            className="sorting sort sort-none"
+            colSpan={1}
+            index={1}
+            onClick={[Function]}
+            rowSpan={1}
+          >
+            Migration ID
+          </th>
+          <th
+            aria-label="Process Instance ID"
+            className="sorting sort sort-none"
+            colSpan={1}
+            index={2}
+            onClick={[Function]}
+            rowSpan={1}
+          >
+            Process Instance ID
+          </th>
+          <th
+            aria-label="Started Time"
+            className="sorting sort sort-none"
+            colSpan={1}
+            index={3}
+            onClick={[Function]}
+            rowSpan={1}
+          >
+            Started Time
+          </th>
+          <th
+            aria-label="Finished Time"
+            className="sorting sort sort-none"
+            colSpan={1}
+            index={4}
+            onClick={[Function]}
+            rowSpan={1}
+          >
+            Finished Time
+          </th>
+          <th
+            aria-label="Status"
+            className="sorting sort sort-none"
+            colSpan={1}
+            index={5}
+            onClick={[Function]}
+            rowSpan={1}
+          >
+            Status
+          </th>
+          <th
+            aria-label="Actions"
+            className=""
+            colSpan={1}
+            index={6}
+            rowSpan={1}
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td
+            className=""
+          >
+            1
+          </td>
+          <td
+            className=""
+          >
+            1
+          </td>
+          <td
+            className=""
+          >
+            N/A
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.739Z
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.854Z
+          </td>
+          <td
+            className="success"
+          >
+            SUCCESS
+          </td>
+          <td
+            className="table-view-pf-actions"
+          >
+            <div
+              className="table-view-pf-btn"
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <button
+                className="btn btn-link"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                <span
+                  aria-hidden={true}
+                  className="fa fa-info-circle"
+                />
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td
+            className=""
+          >
+            2
+          </td>
+          <td
+            className=""
+          >
+            1
+          </td>
+          <td
+            className=""
+          >
+            N/A
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.739Z
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.854Z
+          </td>
+          <td
+            className="success"
+          >
+            SUCCESS
+          </td>
+          <td
+            className="table-view-pf-actions"
+          >
+            <div
+              className="table-view-pf-btn"
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <button
+                className="btn btn-link"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                <span
+                  aria-hidden={true}
+                  className="fa fa-info-circle"
+                />
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td
+            className=""
+          >
+            3
+          </td>
+          <td
+            className=""
+          >
+            1
+          </td>
+          <td
+            className=""
+          >
+            N/A
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.739Z
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.854Z
+          </td>
+          <td
+            className="success"
+          >
+            SUCCESS
+          </td>
+          <td
+            className="table-view-pf-actions"
+          >
+            <div
+              className="table-view-pf-btn"
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <button
+                className="btn btn-link"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                <span
+                  aria-hidden={true}
+                  className="fa fa-info-circle"
+                />
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td
+            className=""
+          >
+            4
+          </td>
+          <td
+            className=""
+          >
+            1
+          </td>
+          <td
+            className=""
+          >
+            N/A
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.739Z
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.854Z
+          </td>
+          <td
+            className="success"
+          >
+            SUCCESS
+          </td>
+          <td
+            className="table-view-pf-actions"
+          >
+            <div
+              className="table-view-pf-btn"
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <button
+                className="btn btn-link"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                <span
+                  aria-hidden={true}
+                  className="fa fa-info-circle"
+                />
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td
+            className=""
+          >
+            5
+          </td>
+          <td
+            className=""
+          >
+            1
+          </td>
+          <td
+            className=""
+          >
+            N/A
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.739Z
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.854Z
+          </td>
+          <td
+            className="success"
+          >
+            SUCCESS
+          </td>
+          <td
+            className="table-view-pf-actions"
+          >
+            <div
+              className="table-view-pf-btn"
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <button
+                className="btn btn-link"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                <span
+                  aria-hidden={true}
+                  className="fa fa-info-circle"
+                />
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td
+            className=""
+          >
+            6
+          </td>
+          <td
+            className=""
+          >
+            1
+          </td>
+          <td
+            className=""
+          >
+            N/A
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.739Z
+          </td>
+          <td
+            className=""
+          >
+            2019-02-03T21:17:54.854Z
+          </td>
+          <td
+            className="success"
+          >
+            SUCCESS
+          </td>
+          <td
+            className="table-view-pf-actions"
+          >
+            <div
+              className="table-view-pf-btn"
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <button
+                className="btn btn-link"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                <span
+                  aria-hidden={true}
+                  className="fa fa-info-circle"
+                />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <form
+      className="content-view-pf-pagination migration-log-table-pagination table-view-pf-pagination clearfix"
+      onSubmit={[Function]}
     >
       <div
-        className="form-group required"
+        className="form-group"
       >
-        <label
-          className="col-sm-2 control-label"
-        >
-          ID
-        </label>
         <div
-          className="col-sm-10"
+          className="dropup pagination-pf-pagesize btn-group"
         >
-          1
+          <button
+            aria-expanded={false}
+            aria-haspopup={true}
+            className="dropdown-toggle btn btn-default"
+            disabled={false}
+            id="pagination-row-dropdown"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            type="button"
+          >
+            6
+             
+            <span
+              className="caret"
+            />
+          </button>
+          <ul
+            aria-labelledby="pagination-row-dropdown"
+            className="dropdown-menu"
+            role="menu"
+          >
+            <li
+              className="active"
+              role="presentation"
+            >
+              <a
+                href="#"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="menuitem"
+                tabIndex="-1"
+              >
+                6
+              </a>
+            </li>
+            <li
+              className=""
+              role="presentation"
+            >
+              <a
+                href="#"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="menuitem"
+                tabIndex="-1"
+              >
+                10
+              </a>
+            </li>
+            <li
+              className=""
+              role="presentation"
+            >
+              <a
+                href="#"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="menuitem"
+                tabIndex="-1"
+              >
+                15
+              </a>
+            </li>
+          </ul>
         </div>
+        <span>
+          per page
+        </span>
       </div>
       <div
         className="form-group"
       >
+        <span>
+          <span
+            className="pagination-pf-items-current"
+          >
+            1
+            -
+            6
+          </span>
+           
+          of
+           
+          <span
+            className="pagination-pf-items-total"
+          >
+            18
+          </span>
+        </span>
+        <ul
+          className="pagination pagination-pf-back"
+        >
+          <li
+            className="disabled"
+          >
+            <a
+              href="#"
+              onClick={[Function]}
+              title="First Page"
+            >
+              <span
+                aria-hidden={true}
+                className="fa fa-angle-double-left i"
+              />
+            </a>
+          </li>
+          <li
+            className="disabled"
+          >
+            <a
+              href="#"
+              onClick={[Function]}
+              title="Previous Page"
+            >
+              <span
+                aria-hidden={true}
+                className="fa fa-angle-left i"
+              />
+            </a>
+          </li>
+        </ul>
         <label
-          className="col-sm-2 control-label"
+          className="sr-only control-label"
         >
-          Start Date
+          Current Page
         </label>
-        <div
-          className="col-sm-10"
+        <input
+          className="pagination-pf-page form-control"
+          onChange={[Function]}
+          type="text"
+          value={1}
+        />
+        <span>
+           
+          of
+           
+          <span
+            className="pagination-pf-pages"
+          >
+            3
+          </span>
+        </span>
+        <ul
+          className="pagination pagination-pf-forward"
         >
-          2019-02-03T21:17:54.739Z
-        </div>
+          <li
+            className=""
+          >
+            <a
+              href="#"
+              onClick={[Function]}
+              title="Next Page"
+            >
+              <span
+                aria-hidden={true}
+                className="fa fa-angle-right i"
+              />
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="#"
+              onClick={[Function]}
+              title="Last Page"
+            >
+              <span
+                aria-hidden={true}
+                className="fa fa-angle-double-right i"
+              />
+            </a>
+          </li>
+        </ul>
       </div>
-      <div
-        className="form-group"
-      >
-        <label
-          className="col-sm-2 control-label"
-        >
-          End Date
-        </label>
-        <div
-          className="col-sm-10"
-        >
-          2019-02-03T21:17:54.854Z
-        </div>
-      </div>
-      <div
-        className="form-group"
-      >
-        <label
-          className="col-sm-2 control-label"
-        >
-          Successful
-        </label>
-        <div
-          className="col-sm-10"
-        >
-          true
-        </div>
-      </div>
-      <div
-        className="form-group"
-      >
-        <label
-          className="col-sm-2 control-label"
-        >
-          Logs
-        </label>
-        <div
-          className="col-sm-10"
-        >
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Variable instances updated = 3 for process instance id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Node instances updated = 3 for process instance id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Process instances updated = 1 for process instance id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Task variables updated = 4 for process instance id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Task audit updated = 1 for process instance id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Tasks updated = 1 for process instance id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Context info updated = 0 for process instance id 1
-          </li>
-          <li>
-            WARN Sun Feb 03 16:17:54 EST 2019 Source and target process id is exactly the same (evaluation) it's recommended to use unique process ids
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Node instance logs to be updated  = [1]
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Node instance logs updated = 1 for node instance id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Task audit updated = 1 for task id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Mapping: Task updated = 1 for task id 1
-          </li>
-          <li>
-            INFO Sun Feb 03 16:17:54 EST 2019 Migration of process instance (1) completed successfully to process evaluation
-          </li>
-        </div>
-      </div>
-    </div>
+    </form>
   </div>
 </div>
 `;

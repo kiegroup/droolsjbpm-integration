@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.29.0-SNAPSHOT</version>
+    <version>7.31.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>process-migration-service</artifactId>
@@ -20,7 +20,6 @@
     <version.org.jboss.weld.weld>2.4.3.Final</version.org.jboss.weld.weld>
     <version.org.jboss.weld.weld-api>2.4.SP2</version.org.jboss.weld.weld-api>
     <!-- Frontend properties -->
-    <frontend-maven-plugin.version>1.7.6</frontend-maven-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <node.version>v11.6.0</node.version>
     <npm.version>6.9.0</npm.version>
@@ -249,11 +248,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.github.eirslett</groupId>
-          <artifactId>frontend-maven-plugin</artifactId>
-          <version>${frontend-maven-plugin.version}</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${maven-resources-plugin.version}</version>
         </plugin>
@@ -312,7 +306,7 @@
                 <goal>npm</goal>
             </goals>
             <configuration>
-                <arguments>run env -- locktt</arguments>
+                <arguments>run locktt --</arguments>
             </configuration>
           </execution>
           <execution>
@@ -482,7 +476,7 @@
                 <argument>java</argument>
                 <argument>-jar</argument>
                 <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
-                <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                <argument>-s${project.build.testOutputDirectory}/project-test.yml</argument>
               </arguments>
             </configuration>
           </execution>
@@ -655,7 +649,7 @@
                     <argument>${jacoco.agent.line}</argument>
                     <argument>-jar</argument>
                     <argument>${project.build.directory}/${project.build.finalName}-thorntail.jar</argument>
-                    <argument>-s${project.basedir}/src/test/resources/project-test.yml</argument>
+                    <argument>-s${project.build.testOutputDirectory}/project-test.yml</argument>
                   </arguments>
                 </configuration>
               </execution>
