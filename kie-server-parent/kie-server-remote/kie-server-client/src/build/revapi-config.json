@@ -44,7 +44,7 @@
       "ignore": [
         {
           "code": "java.method.addedToInterface",
-          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormAsUser(java.lang.String, java.lang.String, java.lang.Long, java.lang.String)",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormAsUser(java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
           "package": "org.kie.server.client",
           "classSimpleName": "UIServicesClient",
           "methodName": "getTaskFormAsUser",
@@ -53,7 +53,7 @@
         },
         {
           "code": "java.method.addedToInterface",
-          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormByTypeAsUser(java.lang.String, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormByTypeAsUser(java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)",
           "package": "org.kie.server.client",
           "classSimpleName": "UIServicesClient",
           "methodName": "getTaskFormByTypeAsUser",
@@ -62,7 +62,7 @@
         },
         {
           "code": "java.method.addedToInterface",
-          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskRawFormAsUser(java.lang.String, java.lang.String, java.lang.Long)",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskRawFormAsUser(java.lang.String, java.lang.Long, java.lang.String)",
           "package": "org.kie.server.client",
           "classSimpleName": "UIServicesClient",
           "methodName": "getTaskRawFormAsUser",

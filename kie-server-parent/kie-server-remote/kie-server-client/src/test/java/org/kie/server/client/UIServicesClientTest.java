@@ -69,7 +69,7 @@ public class UIServicesClientTest extends BaseKieServicesClientTest {
                         .withBody(dummyFormContent)));
 
         setBypassAuthUserConfig(Boolean.FALSE);
-        String form = uiClient.getTaskFormAsUser(userId, containerId, taskId, "");
+        String form = uiClient.getTaskFormAsUser(containerId, taskId, "", userId);
         assertEquals(dummyFormContent, form);
 
     }
@@ -96,7 +96,7 @@ public class UIServicesClientTest extends BaseKieServicesClientTest {
                         .withBody(dummyFormContent)));
 
         setBypassAuthUserConfig(Boolean.TRUE);
-        String form = uiClient.getTaskFormAsUser(userId, containerId, taskId, "");
+        String form = uiClient.getTaskFormAsUser(containerId, taskId, "", userId);
         assertEquals(dummyFormContent, form);
     }
 
