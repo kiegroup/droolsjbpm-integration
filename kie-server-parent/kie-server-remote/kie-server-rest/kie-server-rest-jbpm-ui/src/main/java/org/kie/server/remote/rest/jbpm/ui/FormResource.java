@@ -155,12 +155,13 @@ public class FormResource {
             @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
             @ApiParam(value = "optional filter flag if form should be filtered or returned as is", required = false) @QueryParam("filter") boolean filter,
             @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType, 
-            @ApiParam(value = "optional marshall content flag if the content should be transformed or not, defaults to true", required = false) @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent ) {
+            @ApiParam(value = "optional marshall content flag if the content should be transformed or not, defaults to true", required = false) @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent,
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user ) {
 
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            String response = formServiceBase.getFormDisplayTask(containerId, taskId, language, filter, formType);
+            String response = formServiceBase.getFormDisplayTask(containerId, taskId, user, language, filter, formType);
             if ( marshallContent ) {
                 response = marshallFormContent( response, formType, variant);
             }

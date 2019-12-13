@@ -33,6 +33,7 @@ import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.task.commands.GetUserTaskCommand;
 import org.kie.api.task.model.Task;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
@@ -53,6 +54,8 @@ public class FormServiceBase {
     private KieServerRegistry registry;
 
     private Set<UIFormProvider> providers = new LinkedHashSet<UIFormProvider>();
+
+    private boolean bypassAuthUser = false;
 
     public enum FormType {
 
@@ -97,8 +100,17 @@ public class FormServiceBase {
         this.dataService = dataService;
         this.userTaskService = userTaskService;
         this.registry = registry;
+        this.bypassAuthUser = Boolean.parseBoolean(registry.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
         providers.addAll(collectFormProviders(formManagerService));
+    }
+
+    protected String getUser(String queryParamUser) {
+        if (bypassAuthUser) {
+            return queryParamUser;
+        }
+
+        return registry.getIdentityProvider().getName();
     }
 
     public String getFormDisplayProcess(String containerId, String processId, String lang, boolean filterContent, String formType) {
@@ -140,13 +152,16 @@ public class FormServiceBase {
 
     public String getFormDisplayTask(String containerId,
                                      long taskId,
+                                     String userId,
                                      String lang,
                                      boolean filterContent,
                                      String formType) {
 
         containerId = registry.getContainerId(containerId, new ByTaskIdContainerLocator(taskId));
 
-        Task task = userTaskService.execute(containerId, new GetUserTaskCommand(registry.getIdentityProvider().getName(), taskId));
+        userId = getUser(userId);
+
+        Task task = userTaskService.execute(containerId, new GetUserTaskCommand(userId, taskId));
         if (task == null) {
             throw new IllegalStateException("No task with id " + taskId + " found");
         }
