@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.31.0-SNAPSHOT</version>
+    <version>7.32.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -20,7 +20,6 @@
 
   <properties>
     <java.module.name>org.kie.spring</java.module.name>
-    <version.org.springframework>5.1.3.RELEASE</version.org.springframework>
   </properties>
 
   <dependencies>
