@@ -284,6 +284,7 @@ public class JSONMarshaller implements Marshaller {
         // Extend the marshaller with optional extensions
         for (JSONMarshallerExtension extension : EXTENSIONS) {
             extension.extend(this, objectMapper, deserializeObjectMapper);
+            extension.extend(this, customSerializationMapper, customSerializationMapper);
         }
     }
 

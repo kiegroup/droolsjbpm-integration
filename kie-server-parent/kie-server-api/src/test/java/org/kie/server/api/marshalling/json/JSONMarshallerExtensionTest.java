@@ -23,11 +23,14 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.assertj.core.api.Assertions;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.junit.Test;
 import org.kie.api.pmml.PMMLRequestData;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.objects.CustomPerson;
 
 import static org.junit.Assert.assertEquals;
 
@@ -54,5 +57,26 @@ public class JSONMarshallerExtensionTest {
         PMMLRequestData rd = marshaller.unmarshall(mshl, PMMLRequestData.class);
         assertEquals(rd, request);
         System.out.println(rd);
+    }
+
+    @Test
+    public void testObjectInsideCommand() {
+        Set<Class<?>> extraClasses = new HashSet<Class<?>>();
+        extraClasses.add(CustomPerson.class);
+        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JSON, this.getClass().getClassLoader());
+
+        CustomPerson john = new CustomPerson("John", 20);
+        InsertObjectCommand command = new InsertObjectCommand(john);
+        String marshall = marshaller.marshall(command);
+
+        // verify if it's processed by JSONMarshallerExtensionCustomPerson serializer
+        Assertions.assertThat(marshall).contains("John is CustomPerson");
+
+        InsertObjectCommand unmarshall = marshaller.unmarshall(marshall, InsertObjectCommand.class);
+        CustomPerson result = (CustomPerson) unmarshall.getObject();
+
+        // verify if it's processed by JSONMarshallerExtensionCustomPerson deserializer
+        assertEquals(50, result.getAge());
+
     }
 }
