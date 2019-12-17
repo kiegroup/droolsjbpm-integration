@@ -4,6 +4,9 @@
   <!-- Dividing the local Maven repository on the server and the remote repository with kjars closely simulates the
        real-world deployments where the remote repo is typically located on different machine. -->
   <localRepository>${kie.server.testing.server.local.repo.dir}</localRepository>
+
+  ${maven.settings.mirror}
+
   <profiles>
     <profile>
       <id>additional-maven-repos</id>
