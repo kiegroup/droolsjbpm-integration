@@ -50,6 +50,8 @@
     <maven.jdbc.driver.jar/>
     <!-- Set to true if you want to skip JMS tests even for containers with available JMS. -->
     <jms.skip>false</jms.skip>
+    <!-- Property for configuring Maven mirror in Kie server settings.xml. Used to speed up test execution by using cache server. Empty by default. -->
+    <maven.settings.mirror/>
 
     <!-- Kie server datasource configuration. -->
     <!--  <org.kie.server.persistence.ds/> Defined in container profiles.-->
@@ -1381,6 +1383,25 @@
       </activation>
       <properties>
         <cargo.maven.skip>true</cargo.maven.skip>
+      </properties>
+    </profile>
+    <profile>
+      <!-- In case Nexus cache server is defined as environment variable NEXUS_CACHE_URL then use it in Kie server settings.xml. -->
+      <id>nexus-cache-server</id>
+      <activation>
+        <property>
+          <name>env.NEXUS_CACHE_URL</name>
+        </property>
+      </activation>
+      <properties>
+        <maven.settings.mirror><![CDATA[
+   <mirrors>
+     <mirror>
+       <id>mirror-central</id>
+       <mirrorOf>external:*,!remote-testing-repo</mirrorOf>
+       <url>${env.NEXUS_CACHE_URL}</url>
+     </mirror>
+   </mirrors>]]></maven.settings.mirror>
       </properties>
     </profile>
   </profiles>
