@@ -198,10 +198,6 @@ public class KieServerMDB
 
     public void onMessage(Message message) {
         JMSConnection connect = null;
-        logger.info("++++++ WHO IS CALLING THIS METHOD?");
-        RuntimeException runtimeException1 = new RuntimeException();
-        logger.info(runtimeException1.getStackTrace().toString());
-        runtimeException1.printStackTrace();
         try {
             String username = null;
             String password = null;
