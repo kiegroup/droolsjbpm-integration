@@ -4,6 +4,9 @@
   <!-- Using the remote repo dir here, so the kie-ci deploys the artifacts into this one, instead of the default local
        repo. FIXME this will break once the client (test class) is not on same machine as the remote repo -->
   <localRepository>${kie.server.testing.remote.repo.dir}</localRepository>
+
+  ${maven.settings.mirror}
+
   <profiles>
     <profile>
       <id>additional-maven-repos</id>
