@@ -79,7 +79,6 @@
     <module>camel-container-tests</module>
     <module>process-migration-service</module>
     <module>jbpm-task-assigning</module>
-    <module>optaplanner-workbench-models</module>
   </modules>
 
   <dependencyManagement>
