@@ -72,6 +72,10 @@
          here or via system property when running the build (don't forget to use the `file://` prefix when
          referencing the zip from local filesystem). -->
     <eap7.download.url>valid-url-for-eap-7-needs-to-be-specified-here-or-via-cmd-line</eap7.download.url>
+
+    <!-- Integration tests and Cargo are skipped by default. They are activated when specific container profile is used. -->
+    <skipITs>true</skipITs>
+    <cargo.maven.skip>true</cargo.maven.skip>
   </properties>
 
   <modules>
@@ -573,6 +577,9 @@
         <kie.server.war.path>${org.kie.server:kie-server:war:webc}</kie.server.war.path>
         <cargo.container.id>tomcat9x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -740,6 +747,9 @@
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly14x</cargo.container.id>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -841,6 +851,9 @@
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <!-- eap7 is basically wildfly14; until there is a EAP 7 specific containerId, 'wildfly14x' should work just fine -->
         <cargo.container.id>wildfly14x</cargo.container.id>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -925,6 +938,9 @@
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
         <kie.server.classifier>ee7</kie.server.classifier>
         <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -1045,6 +1061,9 @@
         <cargo.container.id>websphere85x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
         <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -1197,6 +1216,8 @@
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
         <!-- Disable stacktrace inclusion by default -->
         <org.kie.server.stacktrace.included>false</org.kie.server.stacktrace.included>
+        <!-- Enable integration tests when running with application server, Cargo is still disabled. -->
+        <skipITs>false</skipITs>
       </properties>
       <build>
         <pluginManagement>
@@ -1226,14 +1247,6 @@
                   </configuration>
                 </execution>
               </executions>
-            </plugin>
-            <plugin>
-              <!-- Turn off cargo completely as we don't need it -->
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <skip>true</skip>
-              </configuration>
             </plugin>
             <plugin>
               <groupId>com.bazaarvoice.maven.plugins</groupId>
@@ -1287,34 +1300,15 @@
     <profile>
       <id>custom-container</id>
       <activation>
-        <!-- The tests are not executed unless specific container profile is used. Disable cargo by default. -->
-        <activeByDefault>true</activeByDefault>
         <property>
           <name>custom-container</name>
         </property>
       </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>start-container</id>
-                <phase>none</phase>
-                <goals/>
-                <!-- do nothing, container is not managed by cargo -->
-              </execution>
-              <execution>
-                <id>stop-container</id>
-                <phase>none</phase>
-                <goals/>
-                <!-- do nothing, container is not managed by cargo -->
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
+      <properties>
+        <!-- Enable integration tests when running with application server, disable Cargo as it is needed to trigger application server profile while keeping Cargo disabled (due to JMS dependencies and such). -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>true</cargo.maven.skip>
+      </properties>
     </profile>
     <profile>
       <!-- Run just smoke tests to check basic functionality. -->
@@ -1347,25 +1341,6 @@
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
                 <excludedGroups>org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder</excludedGroups>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <!-- Integration tests are skipped by default. They are activated when specific container profile is used. -->
-      <id>skipITs-by-default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <skipITs>true</skipITs>
               </configuration>
             </plugin>
           </plugins>
