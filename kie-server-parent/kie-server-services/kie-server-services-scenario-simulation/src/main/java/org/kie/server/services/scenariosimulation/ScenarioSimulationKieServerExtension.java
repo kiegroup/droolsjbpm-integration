@@ -60,6 +60,7 @@ public class ScenarioSimulationKieServerExtension implements KieServerExtension 
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         this.context = registry;
         this.scenarioSimulationService = new ScenarioSimulationService(context);
+        initialized = true;
     }
 
     @Override
