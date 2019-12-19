@@ -16,8 +16,6 @@
 
 package org.kie.karaf.itest.planner;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,18 +39,14 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.core.config.SolverConfigContext;
 import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
 import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicType;
 import org.optaplanner.core.config.localsearch.LocalSearchPhaseConfig;
-import org.optaplanner.core.config.phase.PhaseConfig;
-import org.optaplanner.core.config.score.definition.ScoreDefinitionType;
 import org.optaplanner.core.config.score.director.ScoreDirectorFactoryConfig;
 import org.optaplanner.core.config.solver.SolverConfig;
 import org.optaplanner.core.config.solver.termination.TerminationConfig;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
@@ -62,11 +56,6 @@ public class PlannerCloudBalanceIntegrationTest extends AbstractKarafIntegration
     private static final String CLOUD_BALANCE_INCREMENTAL_CONFIG_FILE = "cloudBalanceIncrementalConfig.xml";
     private static final String CLOUD_BALANCE_DROOLS_CONFIG_FILE = "cloudBalanceDroolsConfig.xml";
 
-    @Test(expected=IllegalStateException.class)
-    public void invalidSolutionPlannerTest() {
-        solveSolution(cloudBalanceGeneratorForFuse(0, 1, 0));
-    }
-
     @Test
     public void plannerCloudBalanceTest() {
         solveSolution(cloudBalanceGeneratorForFuse(5, 10, 0));
@@ -74,13 +63,13 @@ public class PlannerCloudBalanceIntegrationTest extends AbstractKarafIntegration
 
     @Test
     @Ignore("RHPAM-1554")
-    public void plannerSolverFactoryTest() throws IOException {
+    public void plannerSolverFactoryTest() {
         solveUsingSolverFactory(CLOUD_BALANCE_INCREMENTAL_CONFIG_FILE);
     }
 
     @Test
     @Ignore("RHPAM-1554")
-    public void plannerSolverFactoryDroolsTest() throws IOException {
+    public void plannerSolverFactoryDroolsTest() {
         solveUsingSolverFactory(CLOUD_BALANCE_DROOLS_CONFIG_FILE);
     }
 
@@ -100,12 +89,12 @@ public class PlannerCloudBalanceIntegrationTest extends AbstractKarafIntegration
         int networkBaseLine = 10;
 
         CloudBalance cloudBalance = new CloudBalance();
-        String string = String.valueOf(Integer.MIN_VALUE) + "hard";
+        String string = Integer.MIN_VALUE + "hard";
         string += "/";
-        string += String.valueOf(Integer.MIN_VALUE) + "soft";
+        string += Integer.MIN_VALUE + "soft";
         cloudBalance.setScore(HardSoftScore.parseScore(string));
 
-        List<CloudComputer> computerList = new ArrayList<CloudComputer>();
+        List<CloudComputer> computerList = new ArrayList<>();
         for (int i = 0; i < computerNum; i++) {
             CloudComputer computer = new CloudComputer();
             computer.setCost(random.nextInt(costRange) + costBaseline);
@@ -124,7 +113,7 @@ public class PlannerCloudBalanceIntegrationTest extends AbstractKarafIntegration
         int processNetworkRange = 50;
         int processNetworkBaseLine = 1;
 
-        List<CloudProcess> processList = new ArrayList<CloudProcess>();
+        List<CloudProcess> processList = new ArrayList<>();
         for (int i = 0; i < processNum; i++) {
             CloudProcess process = new CloudProcess();
             process.setRequiredCpuPower(random.nextInt(processCpuPowerRange) + processCpuPowerBaseLine);
@@ -138,49 +127,44 @@ public class PlannerCloudBalanceIntegrationTest extends AbstractKarafIntegration
     }
 
     private void solveSolution(CloudBalance cloudBalance) {
-        SolverConfig config = new SolverConfig();
-        config.setEntityClassList(Arrays.<Class<?>>asList(CloudProcess.class));
-        config.setSolutionClass(CloudBalance.class);
-        config.setScoreDirectorFactoryConfig(new ScoreDirectorFactoryConfig());
-        config.getScoreDirectorFactoryConfig().setIncrementalScoreCalculatorClass(CloudBalancingIncrementalScoreCalculator.class);
-        config.getScoreDirectorFactoryConfig().setScoreDefinitionType(ScoreDefinitionType.HARD_SOFT);
-
-        ConstructionHeuristicPhaseConfig constructionHeuristicPhaseConfig = new ConstructionHeuristicPhaseConfig();
-        constructionHeuristicPhaseConfig.setConstructionHeuristicType(ConstructionHeuristicType.FIRST_FIT_DECREASING);
-
         LocalSearchPhaseConfig localSearchPhaseConfig = new LocalSearchPhaseConfig();
-        localSearchPhaseConfig.setTerminationConfig(new TerminationConfig());
-        localSearchPhaseConfig.getTerminationConfig().setStepCountLimit(20);
-
-        List<PhaseConfig> phases = new ArrayList<PhaseConfig>();
-        phases.add(constructionHeuristicPhaseConfig);
-        phases.add(localSearchPhaseConfig);
-        config.setPhaseConfigList(phases);
+        localSearchPhaseConfig.setTerminationConfig(new TerminationConfig().withStepCountLimit(20));
+        SolverConfig config = new SolverConfig()
+                .withEntityClassList(Arrays.asList(CloudProcess.class))
+                .withSolutionClass(CloudBalance.class)
+                .withScoreDirectorFactory(
+                        new ScoreDirectorFactoryConfig()
+                                .withIncrementalScoreCalculatorClass(CloudBalancingIncrementalScoreCalculator.class))
+                .withPhases(
+                        new ConstructionHeuristicPhaseConfig()
+                                .withConstructionHeuristicType(ConstructionHeuristicType.FIRST_FIT_DECREASING),
+                        localSearchPhaseConfig);
 
         Assert.assertEquals(cloudBalance.getScore().getHardScore(), Integer.MIN_VALUE);
         Assert.assertEquals(cloudBalance.getScore().getSoftScore(), Integer.MIN_VALUE);
 
-        Solver solver = config.buildSolver(new SolverConfigContext());
+        SolverFactory<CloudBalance> solverFactory = SolverFactory.create(config);
+        Solver<CloudBalance> solver = solverFactory.buildSolver();
         solver.solve(cloudBalance);
 
-        CloudBalance solution = (CloudBalance) solver.getBestSolution();
+        CloudBalance solution = solver.getBestSolution();
 
         Assert.assertNotEquals(solution.getScore().getHardScore(), Integer.MIN_VALUE);
         Assert.assertNotEquals(solution.getScore().getSoftScore(), Integer.MIN_VALUE);
     }
 
     private void solveUsingSolverFactory(String configFile) {
-        SolverFactory solverFactory = SolverFactory
+        SolverFactory<CloudBalance> solverFactory = SolverFactory
                 .createFromXmlResource(configFile, PlannerCloudBalanceIntegrationTest.class.getClassLoader());
 
         CloudBalance cloudBalance = cloudBalanceGeneratorForFuse(10, 20, 0);
         Assert.assertEquals(cloudBalance.getScore().getHardScore(), Integer.MIN_VALUE);
         Assert.assertEquals(cloudBalance.getScore().getSoftScore(), Integer.MIN_VALUE);
 
-        Solver solver = solverFactory.getSolverConfig().buildSolver(new SolverConfigContext());
+        Solver<CloudBalance> solver = solverFactory.buildSolver();
         solver.solve(cloudBalance);
 
-        CloudBalance solution = (CloudBalance) solver.getBestSolution();
+        CloudBalance solution = solver.getBestSolution();
 
         Assert.assertNotEquals(solution.getScore().getHardScore(), Integer.MIN_VALUE);
         Assert.assertNotEquals(solution.getScore().getSoftScore(), Integer.MIN_VALUE);
