@@ -18,8 +18,8 @@ package org.kie.server.springboot.autoconfiguration.drools;
 
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.scenariosimulation.ScenarioSimulationKieServerExtension;
 import org.kie.server.springboot.autoconfiguration.KieServerProperties;
+import org.kie.server.springboot.autoconfiguration.drools.extensions.SpringBootScenarioSimulationKieServerExtension;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -40,6 +40,6 @@ public class ScenarioSimulationKieServerAutoConfiguration {
     @ConditionalOnMissingBean(name = "scenarioSimulationServerExtension")
     @ConditionalOnProperty(name = "kieserver.scenariosimulation.enabled")
     public KieServerExtension scenarioSimulationServerExtension() {
-        return new ScenarioSimulationKieServerExtension();
+        return new SpringBootScenarioSimulationKieServerExtension();
     }
 }
