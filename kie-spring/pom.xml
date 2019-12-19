@@ -255,7 +255,7 @@
 
     <!-- test -->
     <dependency>
-      <groupId>org.eclipse.jdt</groupId>
+      <groupId>org.eclipse.jdt.core.compiler</groupId>
       <artifactId>ecj</artifactId>
       <scope>test</scope>
     </dependency>
