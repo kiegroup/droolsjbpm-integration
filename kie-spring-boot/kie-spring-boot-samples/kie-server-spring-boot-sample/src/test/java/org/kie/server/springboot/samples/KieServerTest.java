@@ -48,6 +48,7 @@ import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
+import org.kie.server.services.scenariosimulation.ScenarioSimulationKieServerExtension;
 import org.kie.server.springboot.jbpm.ContainerAliasResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,6 +59,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static java.util.Arrays.asList;
 import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -255,9 +257,12 @@ public class KieServerTest {
 
     @Test
     public void testCommandServiceSetup() {
+        List<String> extensionsWithoutCommandSupport = asList(
+                PrometheusKieServerExtension.EXTENSION_NAME,
+                ScenarioSimulationKieServerExtension.EXTENSION_NAME);
         for (KieServerExtension extension : ((KieServerImpl) kieServer).getServerExtensions()) {
             KieContainerCommandService<?> tmp = extension.getAppComponents(KieContainerCommandService.class);
-            if (PrometheusKieServerExtension.EXTENSION_NAME.equals(extension.getExtensionName())) {
+            if (extensionsWithoutCommandSupport.contains(extension.getExtensionName())) {
                 assertNull(tmp);
             } else {
                 assertNotNull(tmp);
