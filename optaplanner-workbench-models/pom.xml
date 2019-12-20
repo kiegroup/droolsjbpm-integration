@@ -4,11 +4,12 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.optaplanner</groupId>
-    <artifactId>optaplanner-integration</artifactId>
+    <groupId>org.drools</groupId>
+    <artifactId>droolsjbpm-integration</artifactId>
     <version>7.32.0-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.optaplanner</groupId>
   <artifactId>optaplanner-workbench-models</artifactId>
   <packaging>pom</packaging>
 
