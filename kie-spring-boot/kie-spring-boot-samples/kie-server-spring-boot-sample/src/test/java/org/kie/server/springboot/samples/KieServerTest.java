@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.appformer.maven.integration.MavenRepository;
 import org.junit.After;
@@ -263,7 +264,9 @@ public class KieServerTest {
         for (KieServerExtension extension : ((KieServerImpl) kieServer).getServerExtensions()) {
             KieContainerCommandService<?> kieContainerCommandService =
                     extension.getAppComponents(KieContainerCommandService.class);
-            if (extensionsWithoutCommandSupport.contains(extension.getExtensionName())) {
+            String extensionName = extension.getExtensionName();
+            Objects.requireNonNull(extensionName, "extension.getExtensionName() should not be null");
+            if (extensionsWithoutCommandSupport.contains(extensionName)) {
                 assertNull(kieContainerCommandService);
             } else {
                 assertNotNull(kieContainerCommandService);
