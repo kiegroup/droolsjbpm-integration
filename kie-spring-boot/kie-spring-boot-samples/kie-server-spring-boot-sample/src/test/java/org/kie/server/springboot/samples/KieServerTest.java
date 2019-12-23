@@ -261,11 +261,12 @@ public class KieServerTest {
                 PrometheusKieServerExtension.EXTENSION_NAME,
                 ScenarioSimulationKieServerExtension.EXTENSION_NAME);
         for (KieServerExtension extension : ((KieServerImpl) kieServer).getServerExtensions()) {
-            KieContainerCommandService<?> tmp = extension.getAppComponents(KieContainerCommandService.class);
+            KieContainerCommandService<?> kieContainerCommandService =
+                    extension.getAppComponents(KieContainerCommandService.class);
             if (extensionsWithoutCommandSupport.contains(extension.getExtensionName())) {
-                assertNull(tmp);
+                assertNull(kieContainerCommandService);
             } else {
-                assertNotNull(tmp);
+                assertNotNull(kieContainerCommandService);
             }
         }
     }
