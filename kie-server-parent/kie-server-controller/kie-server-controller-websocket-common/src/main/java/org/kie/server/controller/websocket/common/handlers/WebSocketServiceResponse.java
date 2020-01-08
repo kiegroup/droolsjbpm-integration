@@ -65,7 +65,7 @@ public class WebSocketServiceResponse extends ServiceResponse implements Interna
     protected KieServiceResponse<?> getWrapperResult() {
         if (latch != null) {
             try {
-                this.latch.await(1, TimeUnit.MINUTES);
+                this.latch.await(5, TimeUnit.MINUTES);
             } catch (InterruptedException e) {                
             }
         }
