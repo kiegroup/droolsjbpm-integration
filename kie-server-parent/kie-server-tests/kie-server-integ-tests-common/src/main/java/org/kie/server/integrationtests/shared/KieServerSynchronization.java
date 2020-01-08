@@ -55,8 +55,8 @@ import org.kie.server.controller.client.KieServerControllerClient;
 
 public class KieServerSynchronization {
 
-    private static final long SERVICE_TIMEOUT = 30000;
-    private static final long TIMEOUT_BETWEEN_CALLS = 200;
+    private static final long SERVICE_TIMEOUT = 60000;
+    private static final long TIMEOUT_BETWEEN_CALLS = 400;
 
     public static void waitForJobToFinish(final JobServicesClient jobServicesClient, final Long jobId) throws Exception {
         waitForJobToFinish(jobServicesClient, jobId, SERVICE_TIMEOUT);
