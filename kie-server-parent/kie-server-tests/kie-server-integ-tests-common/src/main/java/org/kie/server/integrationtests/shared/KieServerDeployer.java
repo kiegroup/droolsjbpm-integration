@@ -78,7 +78,7 @@ public class KieServerDeployer {
             // just read-only list)
             mvnArgs = new ArrayList<String>(Arrays.asList("-B", "clean", "install"));
         } else {
-            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-X", "-e", "clean", "deploy"));
+            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-e", "clean", "deploy"));
         }
 
         // use custom settings.xml file, if one specified
