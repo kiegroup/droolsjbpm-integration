@@ -18,10 +18,6 @@
     </dependency>
   </dependencies>
 
-<!--  <properties>-->
-<!--    <generateModel>NO</generateModel>-->
-<!--  </properties>-->
-
   <build>
     <plugins>
       <plugin>
