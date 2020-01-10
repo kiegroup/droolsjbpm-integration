@@ -648,7 +648,7 @@
                 </container>
                 <configuration>
                   <properties>
-                    <cargo.jvmargs>-Xmx4096m</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                     <cargo.tomcat.valve.jaas>
                       className=org.kie.integration.tomcat.JACCValve
                     </cargo.tomcat.valve.jaas>
