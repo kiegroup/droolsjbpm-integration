@@ -46,6 +46,7 @@ public class KieServerSetupMessageHandler implements InternalMessageHandler {
             
             kieServerSetup.setContainers(setup.getContainers());
             kieServerSetup.setServerConfig(setup.getServerConfig());
+            kieServerSetup.setMessages(setup.getMessages());
         } finally {
             waitLatch.countDown();
         }

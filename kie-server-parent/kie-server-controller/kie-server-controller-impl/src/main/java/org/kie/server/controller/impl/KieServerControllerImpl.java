@@ -16,6 +16,7 @@
 package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.KieServerSetup;
@@ -82,6 +84,9 @@ public abstract class KieServerControllerImpl implements KieServerController {
             serverInstanceKey = ModelFactory.newServerInstanceKey(serverInfo.getServerId(), serverInfo.getLocation());
         }
         if (serverTemplate != null) {
+            if (!checkValidServerInstance(serverTemplate, serverInfo, serverSetup)) {
+                return serverSetup;
+            }
             logger.debug("Server id {} know to the controller, checking if given server exists", serverInfo.getServerId());
 
             if (!serverTemplate.hasServerInstance(serverInfo.getLocation())) {
@@ -216,6 +221,29 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
         notifyOnConnect(serverInstance);
         return serverSetup;
+    }
+
+    private boolean checkValidServerInstance(ServerTemplate serverTemplate, KieServerInfo serverInfo, KieServerSetup serverSetup) {
+        // if there is no mode we go to the next step
+        if (serverTemplate.getMode() != null && !serverInfo.getMode().equals(serverTemplate.getMode())) {
+            serverSetup.getMessages().add(new Message(Severity.ERROR, "Expected mode was " + serverTemplate.getMode()));
+            logger.warn("Server id {} mode expected {} but it was {}", serverInfo.getServerId(), serverTemplate.getMode(), serverInfo.getMode());
+        }
+
+        // not required capabilities so any server is ok
+        if (serverTemplate.getCapabilities() != null && !serverTemplate.getCapabilities().isEmpty()) {
+            List<String> currentCapabilities = serverInfo.getCapabilities() != null ? serverInfo.getCapabilities() : Collections.emptyList();
+            List<String> expectedCababilities = new ArrayList<>(serverTemplate.getCapabilities());
+
+            expectedCababilities.removeAll(currentCapabilities);
+
+            if (!expectedCababilities.isEmpty()) {
+                serverSetup.getMessages().add(new Message(Severity.ERROR, "Expected capabilities were " + serverTemplate.getCapabilities()));
+                logger.warn("Server id {} capabilities expected {} but there was {}", serverInfo.getServerId(), currentCapabilities, serverTemplate.getCapabilities());
+            }
+        }
+
+        return serverSetup.hasNoErrors();
     }
 
     @Override

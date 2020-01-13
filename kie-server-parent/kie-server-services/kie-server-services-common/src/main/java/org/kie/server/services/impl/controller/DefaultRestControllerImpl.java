@@ -150,7 +150,7 @@ public class DefaultRestControllerImpl implements KieServerController {
 
                 if (controllerUrl != null && !controllerUrl.isEmpty()) {
                     KieServerSetup kieServerSetup = connectToSingleController(serverInfo, config, controllerUrl);
-                    if (kieServerSetup != null) {
+                    if (kieServerSetup != null && kieServerSetup.hasNoErrors()) {
                         return kieServerSetup;
                     }
                 }
@@ -191,7 +191,7 @@ public class DefaultRestControllerImpl implements KieServerController {
         try {
             KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password, token);
 
-            if (kieServerSetup != null) {
+            if (kieServerSetup != null && kieServerSetup.hasNoErrors()) {
                 // once there is non null list let's return it
                 return kieServerSetup;
 

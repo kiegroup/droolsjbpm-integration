@@ -17,7 +17,9 @@ package org.kie.server.integrationtests.controller;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.core.Configuration;
 
 import org.assertj.core.api.SoftAssertions;
@@ -25,6 +27,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
@@ -92,18 +95,32 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
     }
 
     protected ServerTemplate createServerTemplate(String id, String name) {
-        ServerTemplate serverTemplate = new ServerTemplate(id, name);
-
-        controllerClient.saveServerTemplate(serverTemplate);
-
-        return serverTemplate;
+        return createServerTemplate(id, name, null, null, null);
     }
 
     protected ServerTemplate createServerTemplate(String id, String name, String location) {
-        ServerTemplate serverTemplate = new ServerTemplate(id, name);
+        return createServerTemplate(id, name, location, null, null);
+    }
 
-        serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), location));
+    protected ServerTemplate createServerTemplate(String id, String name, String location, KieServerMode mode, List<String> capabilities) {
+        ServerTemplate serverTemplate = buildServerTemplate(id, name, location, null, null);
         controllerClient.saveServerTemplate(serverTemplate);
+        return serverTemplate;
+    }
+
+    protected static ServerTemplate buildServerTemplate(String id, String name, String location, KieServerMode mode, List<String> capabilities) {
+        ServerTemplate serverTemplate = new ServerTemplate(id, name);
+        if (mode != null) {
+            serverTemplate.setMode(mode);
+        }
+
+        if (capabilities != null && !capabilities.isEmpty()) {
+            serverTemplate.setCapabilities(capabilities);
+        }
+
+        if (location != null) {
+            serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), location));
+        }
 
         return serverTemplate;
     }
