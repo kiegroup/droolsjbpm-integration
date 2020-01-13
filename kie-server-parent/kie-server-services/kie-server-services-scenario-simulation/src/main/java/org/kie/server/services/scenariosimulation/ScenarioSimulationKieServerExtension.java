@@ -48,12 +48,16 @@ public class ScenarioSimulationKieServerExtension implements KieServerExtension 
     }
 
     /**
-     * This extension is active if it is not disabled and one of DMN or Drools is active
+     * This extension is active if enabled and if at least one of DMN and Drools is active
      * @return
      */
     @Override
     public boolean isActive() {
-        return !SCESIM_DISABLED && (!DROOLS_DISABLED || !DMN_DISABLED);
+        boolean scesimEnabled = !SCESIM_DISABLED;
+        boolean droolsEnabled = !DROOLS_DISABLED;
+        boolean dmnEnabled = !DMN_DISABLED;
+        boolean droolsOrDmnEnabled = droolsEnabled || dmnEnabled;
+        return scesimEnabled && droolsOrDmnEnabled;
     }
 
     @Override

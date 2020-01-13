@@ -25,7 +25,7 @@ public interface ScenarioSimulationServicesClient {
     /**
      * Execute given test scenario against specified containerId
      * @param containerId id of container to be used to execute the scenario
-     * @param localPath to Test Scenario file (scesim) to be executed
+     * @param localPath to Test Scenario file (scesim) to be executed. It must be a valid {@link java.nio.file.Paths#get(String, String...)} parameter
      * @return result of Test Scenario execution (jUnit like)
      */
     ServiceResponse<ScenarioSimulationResult> executeScenarioByPath(String containerId, String localPath) throws IOException;
@@ -33,7 +33,7 @@ public interface ScenarioSimulationServicesClient {
     /**
      * Execute given test scenario against specified containerId
      * @param containerId id of container to be used to execute the scenario
-     * @param content of Test Scenario file (scesim) to be executed
+     * @param content of Test Scenario file (scesim) to be executed. This string should contain the XML of the scesim file
      * @return result of Test Scenario execution (jUnit like)
      */
     ServiceResponse<ScenarioSimulationResult> executeScenario(String containerId, String content);

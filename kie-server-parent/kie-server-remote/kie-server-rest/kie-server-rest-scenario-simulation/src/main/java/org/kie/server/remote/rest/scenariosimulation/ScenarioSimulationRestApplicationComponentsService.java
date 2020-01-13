@@ -20,13 +20,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.scenariosimulation.ScenarioSimulationKieServerExtension;
 import org.kie.server.services.scenariosimulation.ScenarioSimulationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScenarioSimulationRestApplicationComponentsService implements KieServerApplicationComponentsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ScenarioSimulationRestApplicationComponentsService.class);
 
     private static final String OWNER_EXTENSION = ScenarioSimulationKieServerExtension.EXTENSION_NAME;
 
@@ -34,19 +40,23 @@ public class ScenarioSimulationRestApplicationComponentsService implements KieSe
     public Collection<Object> getAppComponents(String extension, SupportedTransports type, Object... services) {
 
         // skip calls from other than owning extension
-        if (!OWNER_EXTENSION.equals(extension)) {
+        if (!Objects.equals(OWNER_EXTENSION, extension)) {
             return Collections.emptyList();
         }
 
-        ScenarioSimulationService scenarioSimulationService = Arrays.stream(services)
+        Optional<ScenarioSimulationService> simulationService = Arrays.stream(services)
                 .filter(elem -> ScenarioSimulationService.class.isAssignableFrom(elem.getClass()))
                 .map(ScenarioSimulationService.class::cast)
-                .findFirst()
-                .orElse(null);
+                .findFirst();
 
         List<Object> components = new ArrayList<>(1);
         if (SupportedTransports.REST.equals(type)) {
-            components.add(new ScenarioSimulationResource(scenarioSimulationService));
+            if (simulationService.isPresent()) {
+                components.add(new ScenarioSimulationResource(simulationService.get()));
+            } else {
+                logger.error("Impossible to load Test Scenario extension because of missing ScenarioSimulationService. " +
+                                     "This should never happen if ScenarioSimulationKieServerExtension is properly deployed and activated");
+            }
         }
 
         return components;
