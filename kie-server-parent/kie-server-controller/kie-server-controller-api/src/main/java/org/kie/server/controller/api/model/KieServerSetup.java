@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 
 /**
  * Complete setup of KieServer that covers containers and its configuration
@@ -39,6 +41,9 @@ public class KieServerSetup {
 
     @XmlElementWrapper(name = "server-containers")
     private Set<KieContainerResource> containers;
+
+    @XmlElementWrapper(name = "server-messages")
+    private Set<Message> messages;
 
     public KieServerConfig getServerConfig() {
         return serverConfig;
@@ -58,4 +63,20 @@ public class KieServerSetup {
     public void setContainers(Set<KieContainerResource> containers) {
         this.containers = containers;
     }
+
+    public Set<Message> getMessages() {
+        if (messages == null) {
+            messages = new HashSet<>();
+        }
+        return messages;
+    }
+
+    public void setMessages(Set<Message> messages) {
+        this.messages = messages;
+    }
+
+    public boolean hasNoErrors() {
+        return getMessages().stream().noneMatch(e -> e.getSeverity().equals(Severity.ERROR));
+    }
+
 }
