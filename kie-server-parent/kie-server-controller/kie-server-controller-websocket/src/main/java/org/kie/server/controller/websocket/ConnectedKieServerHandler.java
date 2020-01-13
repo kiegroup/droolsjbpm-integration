@@ -53,15 +53,18 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
     @Override
     public String onMessage(String message) {
         serverInfo = WebSocketUtils.unmarshal(message, KieServerInfo.class);
-        manager.addSession(serverInfo, session);
-        
+
         logger.debug("Server info {}", serverInfo);
         KieServerSetup serverSetup = controller.connect(serverInfo);
 
-        logger.info("Server with id '{}' connected", serverId);
-        String response = WebSocketUtils.marshal(serverSetup);
-        
-        return response;
+        if (serverSetup.hasNoErrors()) {
+            manager.addSession(serverInfo, session);
+            logger.info("Server with id '{}' connected", serverId);
+        } else {
+            logger.warn("Server with id '{}' failed to connect", serverId);
+        }
+
+        return WebSocketUtils.marshal(serverSetup);
     }
 
     @Override
