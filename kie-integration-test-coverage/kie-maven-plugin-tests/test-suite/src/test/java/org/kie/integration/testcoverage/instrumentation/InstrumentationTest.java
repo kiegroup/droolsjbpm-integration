@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.core.impl.InternalKieContainer;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.junit.After;
@@ -34,7 +33,7 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.kie.integration.testcoverage.instrumentation.model.Dog;
 import org.kie.integration.testcoverage.instrumentation.model.Person;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests using a KJAR built previously by kie-maven-plugin with instrumentation enabled.
