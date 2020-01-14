@@ -72,7 +72,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
         KieServerDeployer.cleanAllRepositories();
     }
 
-    @Test //RHPAM-479
+    @Test(timeout = 240000) //RHPAM-479
     public void testScanNow() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
 
