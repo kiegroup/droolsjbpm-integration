@@ -79,7 +79,7 @@ public interface DMNServicesClient {
 
     /**
      * Convenience method to be used if the container contains only a single DMN model, to evaluate all decisions.
-     * The method {@link DMNServicesClient#evaluateAllDecisions(String, String, String, DMNContext)} shall be used for containers deploying multiple DMN model.
+     * The method {@link DMNServicesClient#evaluateAll(String, String, String, DMNContext)} shall be used for containers deploying multiple DMN model.
      *
      * @param containerId the container id deploying the DMN model
      * @param dmnContext the context with all the input variables
