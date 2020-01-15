@@ -25,6 +25,7 @@
     <module>kie-server-services-swagger</module>
     <module>kie-server-services-prometheus</module>
     <module>kie-server-services-openshift</module>
+    <module>kie-server-services-scenario-simulation</module>
   </modules>
 
 </project>

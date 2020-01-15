@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.kie.server.springboot.autoconfiguration.drools.DroolsKieServerAutoConfiguration,\
 org.kie.server.springboot.autoconfiguration.drools.DMNKieServerAutoConfiguration,\
-org.kie.server.springboot.autoconfiguration.drools.PrometheusKieServerAutoConfiguration
+org.kie.server.springboot.autoconfiguration.drools.PrometheusKieServerAutoConfiguration,\
+org.kie.server.springboot.autoconfiguration.drools.ScenarioSimulationKieServerAutoConfiguration

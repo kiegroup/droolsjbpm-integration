@@ -24,6 +24,7 @@
     <module>kie-server-rest-dmn</module>
     <module>kie-server-rest-swagger</module>
     <module>kie-server-rest-prometheus</module>
+    <module>kie-server-rest-scenario-simulation</module>
   </modules>
 
 </project>

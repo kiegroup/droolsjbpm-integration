@@ -90,7 +90,8 @@
     <module>kie-server-integ-tests-router</module>
     <module>kie-server-integ-tests-case-id-generator</module>
     <module>kie-server-integ-tests-dmn</module>
-    <module>kie-server-integ-tests-custom-extension</module>    
+    <module>kie-server-integ-tests-scenario-simulation</module>
+    <module>kie-server-integ-tests-custom-extension</module>
   </modules>
 
   <dependencyManagement>
@@ -1205,6 +1206,7 @@
         <kieserver.swagger.enabled>false</kieserver.swagger.enabled>
         <jbpm.executor.enabled>false</jbpm.executor.enabled>
         <kieserver.prometheus.enabled>false</kieserver.prometheus.enabled>
+        <kieserver.scenariosimulation.enabled>false</kieserver.scenariosimulation.enabled>
         <!-- Springboot GAV -->
         <springboot.app.group.id>org.kie</springboot.app.group.id>
         <springboot.app.artifact.id>kie-server-spring-boot-integ-tests-sample</springboot.app.artifact.id>

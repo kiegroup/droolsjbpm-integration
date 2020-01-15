@@ -18,6 +18,7 @@
     <org.optaplanner.server.ext.disabled>false</org.optaplanner.server.ext.disabled>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
     <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
+    <org.kie.scenariosimulation.server.ext.disabled>false</org.kie.scenariosimulation.server.ext.disabled>
   </properties>
 
   <dependencies>
@@ -121,6 +122,7 @@
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
+              <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
           </configuration>
@@ -152,6 +154,7 @@
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>${org.optaplanner.server.ext.disabled}</org.optaplanner.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
+              <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
             </systemProperties>
           </container>
           <deployables>
