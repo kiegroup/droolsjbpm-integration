@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.scenariosimulation;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
@@ -65,15 +66,26 @@ public class ScenarioSimulationIntegrationTest
     }
 
     @Test
-    public void executeScenario() throws IOException {
+    public void executeScenarioByPathTest() throws Exception {
+        commonExecuteScenario((containerId, localPath) ->
+                                      scenarioSimulationServicesClient.executeScenarioByPath(containerId, convertToAbsolutePath(localPath)));
+    }
 
-        ServiceResponse<ScenarioSimulationResult> dmnResponseSuccess = scenarioSimulationServicesClient.executeScenario(CONTAINER_1_ID, loadResource(DMN_SCESIM_SUCCESS_PATH));
+    @Test
+    public void executeScenarioTest() throws Exception {
+        commonExecuteScenario((containerId, content) ->
+                                      scenarioSimulationServicesClient.executeScenario(containerId, loadResource(content)));
+    }
+
+    private void commonExecuteScenario(CheckedExceptionBiFunction<String, String, ServiceResponse<ScenarioSimulationResult>> methodToTest) throws Exception {
+
+        ServiceResponse<ScenarioSimulationResult> dmnResponseSuccess = methodToTest.apply(CONTAINER_1_ID, DMN_SCESIM_SUCCESS_PATH);
 
         assertEquals(ResponseType.SUCCESS, dmnResponseSuccess.getType());
         assertEquals(1, dmnResponseSuccess.getResult().getRunCount());
         assertEquals("Test Scenario successfully executed", dmnResponseSuccess.getMsg());
 
-        ServiceResponse<ScenarioSimulationResult> dmnResponseFail = scenarioSimulationServicesClient.executeScenario(CONTAINER_1_ID, loadResource(DMN_SCESIM_FAIL_PATH));
+        ServiceResponse<ScenarioSimulationResult> dmnResponseFail = methodToTest.apply(CONTAINER_1_ID, DMN_SCESIM_FAIL_PATH);
 
         assertEquals(ResponseType.FAILURE, dmnResponseFail.getType());
         assertEquals(1, dmnResponseFail.getResult().getRunCount());
@@ -81,13 +93,13 @@ public class ScenarioSimulationIntegrationTest
         assertFalse(dmnResponseFail.getResult().getFailures().isEmpty());
         assertEquals("#1: Scenario 'KO scenario' failed", dmnResponseFail.getResult().getFailures().get(0).getErrorMessage());
 
-        ServiceResponse<ScenarioSimulationResult> ruleResponseSuccess = scenarioSimulationServicesClient.executeScenario(CONTAINER_1_ID, loadResource(RULE_SCESIM_SUCCESS_PATH));
+        ServiceResponse<ScenarioSimulationResult> ruleResponseSuccess = methodToTest.apply(CONTAINER_1_ID, RULE_SCESIM_SUCCESS_PATH);
 
         assertEquals(ResponseType.SUCCESS, ruleResponseSuccess.getType());
         assertEquals(1, ruleResponseSuccess.getResult().getRunCount());
         assertEquals("Test Scenario successfully executed", ruleResponseSuccess.getMsg());
 
-        ServiceResponse<ScenarioSimulationResult> ruleResponseFail = scenarioSimulationServicesClient.executeScenario(CONTAINER_1_ID, loadResource(RULE_SCESIM_FAIL_PATH));
+        ServiceResponse<ScenarioSimulationResult> ruleResponseFail = methodToTest.apply(CONTAINER_1_ID, RULE_SCESIM_FAIL_PATH);
 
         assertEquals(ResponseType.FAILURE, ruleResponseFail.getType());
         assertEquals(1, ruleResponseFail.getResult().getRunCount());
@@ -98,8 +110,25 @@ public class ScenarioSimulationIntegrationTest
 
     private static String loadResource(String path) throws IOException {
         return Files.lines(
-                Paths.get(ScenarioSimulationIntegrationTest.class.getResource(path).getFile()),
+                loadPathFromResource(path),
                 StandardCharsets.UTF_8)
                 .collect(Collectors.joining("\n"));
+    }
+
+    private static String convertToAbsolutePath(String path) {
+        return loadPathFromResource(path).toFile().getAbsolutePath();
+    }
+
+    private static Path loadPathFromResource(String path) {
+        return Paths.get(
+                ScenarioSimulationIntegrationTest.class
+                        .getResource(path)
+                        .getFile());
+    }
+
+    @FunctionalInterface
+    private interface CheckedExceptionBiFunction<T, U, R> {
+
+        R apply(T t, U u) throws Exception;
     }
 }
