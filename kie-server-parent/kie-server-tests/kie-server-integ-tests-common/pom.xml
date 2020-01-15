@@ -95,6 +95,18 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Scenario Simulation Extension -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-scenario-simulation</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-scenario-simulation</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -276,6 +288,7 @@
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.kie.swagger.server.ext.disabled>true</org.kie.swagger.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>true</org.kie.prometheus.server.ext.disabled>
+              <org.kie.scenariosimulation.server.ext.disabled>true</org.kie.scenariosimulation.server.ext.disabled>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -317,6 +330,7 @@
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>true</org.kie.prometheus.server.ext.disabled>
+              <org.kie.scenariosimulation.server.ext.disabled>true</org.kie.scenariosimulation.server.ext.disabled>
               <org.kie.swagger.server.ext.disabled>true</org.kie.swagger.server.ext.disabled>
               <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
             </systemProperties>

@@ -164,6 +164,16 @@
       <artifactId>kie-server-rest-prometheus</artifactId>
     </dependency>
 
+    <!-- Scenario Simulation support -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-scenario-simulation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-scenario-simulation</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-case-mgmt-api</artifactId>
