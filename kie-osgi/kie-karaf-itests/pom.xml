@@ -330,6 +330,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
+          <!-- skip tests due to DROOLS-4946 -->
+          <skipITs>true</skipITs>
           <systemPropertyVariables>
             <jdbc.driver.path>${maven.jdbc.driver.jar}</jdbc.driver.path>
             <cxf.version>${version.org.apache.cxf}</cxf.version>
@@ -351,6 +353,8 @@
           <plugin>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
+              <!-- skip tests due to DROOLS-4946 -->
+              <skipITs>true</skipITs>
               <systemPropertyVariables>
                 <kie.features.classifier>features-fuse</kie.features.classifier>
                 <!--<additional.features.url>mvn:org.jboss.fuse.features/rhba-features/VERSION/xml/features</additional.features.url>-->
