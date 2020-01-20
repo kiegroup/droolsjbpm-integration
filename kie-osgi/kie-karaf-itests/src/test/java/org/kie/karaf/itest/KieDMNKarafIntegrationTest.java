@@ -21,7 +21,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Results;
 import org.kie.api.io.KieResources;
@@ -34,11 +33,9 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
 import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
@@ -102,14 +99,6 @@ public class KieDMNKarafIntegrationTest extends AbstractKarafIntegrationTest {
         final KieContainer kieContainer = kieHelper.getKieContainer();
         DMNRuntime runtime = kieContainer.newKieSession().getKieRuntime(DMNRuntime.class);
         return runtime;
-    }
-
-
-    private void assertContainsPackage(KieBase kieBase, String packageName) {
-        if (kieBase.getKiePackage(packageName) == null) {
-            Assert.fail("KieBase with packages [" + kieBase.getKiePackages() + "] does not contain expected package [" +
-                    packageName + "]!");
-        }
     }
 
 }

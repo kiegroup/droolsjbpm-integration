@@ -16,10 +16,10 @@
 
 package org.kie.karaf.itest.kieserver;
 
-import org.kie.karaf.itest.AbstractKarafIntegrationTest;
-import org.kie.karaf.itest.util.PaxExamWithWireMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.karaf.itest.AbstractKarafIntegrationTest;
+import org.kie.karaf.itest.util.PaxExamWithWireMock;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -29,7 +29,8 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerClass.class)

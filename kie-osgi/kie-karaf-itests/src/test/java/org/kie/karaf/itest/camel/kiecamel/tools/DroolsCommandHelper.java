@@ -16,15 +16,15 @@
 
 package org.kie.karaf.itest.camel.kiecamel.tools;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class to help create wrapper Drools Expert Command for use with
