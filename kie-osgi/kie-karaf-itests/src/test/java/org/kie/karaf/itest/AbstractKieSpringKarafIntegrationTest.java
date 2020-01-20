@@ -16,10 +16,10 @@
 
 package org.kie.karaf.itest;
 
+import javax.inject.Inject;
+
 import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import javax.inject.Inject;
 
 abstract public class AbstractKieSpringKarafIntegrationTest extends AbstractKarafIntegrationTest {
 

@@ -30,19 +30,15 @@ import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.ExecutableCommand;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
 import org.kie.karaf.itest.camel.kiecamel.proxy.RemoteExecutionService;
 import org.kie.karaf.itest.camel.kiecamel.tools.ExecutionServerCommand;
-import org.kie.karaf.itest.kieserver.BaseKieServerClientKarafIntegrationTest;
 import org.kie.karaf.itest.kieserver.KieServerConstants;
 import org.kie.karaf.itest.util.PaxExamWithWireMock;
 import org.kie.server.api.model.KieContainerResourceList;
-import org.kie.server.api.model.KieServerCommand;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -53,7 +49,6 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExamWithWireMock.class)

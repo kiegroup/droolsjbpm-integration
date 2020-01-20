@@ -16,6 +16,11 @@
 
 package org.kie.karaf.itest;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.karaf.features.FeaturesService;
 import org.junit.After;
 import org.junit.Assert;
@@ -29,12 +34,9 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**
  * Serves as a quick smoke test to verify that all the supported KIE features can be successfully installed.

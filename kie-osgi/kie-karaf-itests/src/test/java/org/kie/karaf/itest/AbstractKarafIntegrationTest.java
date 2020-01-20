@@ -16,38 +16,35 @@
 
 package org.kie.karaf.itest;
 
-import org.apache.commons.io.FileUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.inject.Inject;
+
+import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionBaseConfigurationOption;
 import org.ops4j.pax.exam.karaf.options.configs.CustomProperties;
-import org.ops4j.pax.exam.options.CompositeOption;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
-import org.ops4j.pax.exam.options.OptionalCompositeOption;
+import org.ops4j.pax.exam.options.MavenUrlReference.VersionResolver;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
-import org.ops4j.pax.exam.karaf.options.KarafDistributionBaseConfigurationOption;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.CoreOptions.*;
-import org.ops4j.pax.exam.MavenUtils;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.vmOption;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
-
-import org.ops4j.pax.exam.options.MavenUrlReference.VersionResolver;
 
 abstract public class AbstractKarafIntegrationTest {
 

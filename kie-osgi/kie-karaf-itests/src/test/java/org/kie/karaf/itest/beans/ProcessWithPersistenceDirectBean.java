@@ -16,17 +16,18 @@
 
 package org.kie.karaf.itest.beans;
 
-import org.jbpm.services.task.identity.JBossUserGroupCallbackImpl;
-import org.kie.api.KieBase;
-import org.kie.api.runtime.EnvironmentName;
-import org.kie.api.runtime.manager.RuntimeEnvironment;
-import org.kie.api.runtime.manager.RuntimeEnvironmentBuilder;
+import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
-import java.util.Properties;
+
+import org.jbpm.services.task.identity.JBossUserGroupCallbackImpl;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.EnvironmentName;
+import org.kie.api.runtime.manager.RuntimeEnvironment;
+import org.kie.api.runtime.manager.RuntimeEnvironmentBuilder;
 
 /**
  * A bean creating a KieSession for starting a process with persistence.

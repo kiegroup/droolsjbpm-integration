@@ -16,10 +16,11 @@
 
 package org.kie.karaf.itest.camel.kiecamel.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 
 /**
  * This class has to be JAXB-annotated because it is passed as an argument to

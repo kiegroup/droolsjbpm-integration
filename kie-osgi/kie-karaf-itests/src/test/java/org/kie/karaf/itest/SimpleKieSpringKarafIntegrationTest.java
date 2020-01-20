@@ -39,7 +39,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)

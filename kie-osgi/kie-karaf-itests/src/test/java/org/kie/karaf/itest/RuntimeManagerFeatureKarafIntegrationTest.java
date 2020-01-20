@@ -31,8 +31,10 @@ import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.wiring.BundleWiring;
 
-import static org.junit.Assert.*;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)

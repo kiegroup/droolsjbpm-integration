@@ -16,6 +16,8 @@
 
 package org.kie.karaf.itest.camel.kiecamel;
 
+import javax.inject.Inject;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.bean.PojoProxyHelper;
 import org.junit.AfterClass;
@@ -35,14 +37,9 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import javax.inject.Inject;
-import java.io.IOException;
-
-import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**

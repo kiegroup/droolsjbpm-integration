@@ -16,6 +16,8 @@
 
 package org.kie.karaf.itest;
 
+import javax.inject.Inject;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieSession;
@@ -26,8 +28,6 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.osgi.framework.Constants;
-
-import javax.inject.Inject;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
