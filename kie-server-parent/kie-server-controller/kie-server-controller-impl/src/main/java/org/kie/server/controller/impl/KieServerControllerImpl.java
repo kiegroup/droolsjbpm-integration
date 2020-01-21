@@ -17,7 +17,6 @@ package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -61,12 +60,6 @@ import org.slf4j.LoggerFactory;
 public abstract class KieServerControllerImpl implements KieServerController {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerControllerImpl.class);
-
-    private static Map<String, String> SERVER_INSTANCE_TO_SERVER_TEMPLATE_CAPABILITIES = new HashMap<String, String>() {{
-        put(KieServerConstants.CAPABILITY_BRM, Capability.RULE.toString());
-        put(KieServerConstants.CAPABILITY_BPM, Capability.PROCESS.toString());
-        put(KieServerConstants.CAPABILITY_BRP, Capability.PLANNING.toString());
-    }};
 
     private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
 
@@ -196,8 +189,8 @@ public abstract class KieServerControllerImpl implements KieServerController {
             List<String> capabilities = new ArrayList<String>();
             if (serverInfo.getCapabilities() != null) {
                 for (final String serverCapability : serverInfo.getCapabilities()) {
-                    if (SERVER_INSTANCE_TO_SERVER_TEMPLATE_CAPABILITIES.containsKey(serverCapability)) {
-                        capabilities.add(SERVER_INSTANCE_TO_SERVER_TEMPLATE_CAPABILITIES.get(serverCapability));
+                    if (getCompatibleServerTemplateCapability(serverCapability) != null) {
+                        capabilities.add(getCompatibleServerTemplateCapability(serverCapability));
                     }
                 }
             }
@@ -241,10 +234,9 @@ public abstract class KieServerControllerImpl implements KieServerController {
             List<String> expectedCababilities = new ArrayList<>(serverTemplate.getCapabilities());
 
             List<String> convertedCurrentCapabilities = currentCapabilities.stream()
-                    .filter(currentCapability -> SERVER_INSTANCE_TO_SERVER_TEMPLATE_CAPABILITIES.containsKey(currentCapability))
-                    .map(currentCapability -> SERVER_INSTANCE_TO_SERVER_TEMPLATE_CAPABILITIES.get(currentCapability))
+                    .filter(currentCapability -> getCompatibleServerTemplateCapability(currentCapability) != null)
+                    .map(currentCapability -> getCompatibleServerTemplateCapability(currentCapability))
                     .collect(Collectors.toList());
-
 
             if (!Objects.equals(expectedCababilities, convertedCurrentCapabilities)) {
                 serverSetup.getMessages().add(new Message(Severity.ERROR, "Expected capabilities were " + serverTemplate.getCapabilities()));
@@ -307,5 +299,20 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
+    }
+
+    private static String getCompatibleServerTemplateCapability(final String serverInstanceCapability) {
+
+        if (Objects.equals(KieServerConstants.CAPABILITY_BRM, serverInstanceCapability)) {
+            return Capability.RULE.toString();
+        }
+        if (Objects.equals(KieServerConstants.CAPABILITY_BPM, serverInstanceCapability)) {
+            return Capability.PROCESS.toString();
+        }
+        if (Objects.equals(KieServerConstants.CAPABILITY_BRP, serverInstanceCapability)) {
+            return Capability.PLANNING.toString();
+        }
+
+        return null;
     }
 }
