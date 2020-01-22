@@ -30,6 +30,7 @@ import org.apache.cxf.jaxrs.spring.AbstractJaxrsClassesScanServer;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
@@ -87,7 +88,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     
     @Bean(destroyMethod="destroy")
     @ConditionalOnMissingBean(name = "kieServer")
-    public KieServer kieServer(List<KieServerExtension> extensions) {
+    public KieServer kieServer(List<KieServerExtension> extensions, List<KieContainerResource> containers) {
         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, properties.getControllers());
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, properties.getLocation());
         if (KieServerEnvironment.getServerId() == null) {
@@ -98,7 +99,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
             KieServerEnvironment.setServerName(serverName);
         }
         logger.info("KieServer (id {} (name {})) started initialization process", KieServerEnvironment.getServerId(), KieServerEnvironment.getServerName());
-        kieServer = new SpringBootKieServerImpl(extensions, identityProvider);        
+        kieServer = new SpringBootKieServerImpl(extensions, identityProvider, properties.isUseClasspathContainers(), containers);        
         kieServer.init();
         
         KieServerRestImpl kieServerResource = new KieServerRestImpl(kieServer);

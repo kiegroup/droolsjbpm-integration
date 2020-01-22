@@ -18,22 +18,36 @@ package org.kie.server.springboot;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
+import org.drools.core.impl.InternalKieContainer;
+import org.kie.api.builder.ReleaseId;
 import org.kie.internal.identity.IdentityProvider;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.Message;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.storage.KieServerState;
 
 
 public class SpringBootKieServerImpl extends KieServerImpl{
 
     private IdentityProvider identityProvider;
     private List<KieServerExtension> extensions;
+    private boolean useClasspathContainers;
     
+    private List<KieContainerResource> containers;
     
-    public SpringBootKieServerImpl(List<KieServerExtension> extensions, IdentityProvider identityProvider) {
+    public SpringBootKieServerImpl(List<KieServerExtension> extensions, IdentityProvider identityProvider, boolean useClasspathContainers, List<KieContainerResource> containers) {
         this.extensions = extensions;
         this.identityProvider = identityProvider;
+        this.useClasspathContainers = useClasspathContainers;
+        
+        this.containers = containers;
     }
     
     @Override
@@ -51,7 +65,40 @@ public class SpringBootKieServerImpl extends KieServerImpl{
     @Override
     public void init() {        
         super.init();
+        
+        if (containers != null) {
+            for (KieContainerResource container : containers) {
+                createContainer(container.getContainerId(), container);
+            }
+        }
     }
 
+    @Override
+    protected InternalKieContainer createKieContainer(KieContainerResource containerInfo) {
+        if (useClasspathContainers) {
+            return (InternalKieContainer) ks.newKieClasspathContainer(containerInfo.getContainerId());
+        } else {
+            return super.createKieContainer(containerInfo);
+        }
+    }
 
+    @Override
+    protected void storeServerState(Consumer<KieServerState> kieServerStateConsumer) {
+        if (!useClasspathContainers) {
+            super.storeServerState(kieServerStateConsumer);
+        }
+    }
+
+    @Override
+    protected Map<String, Object> getContainerParameters(ReleaseId releaseId, List<Message> messages) {
+        if (!useClasspathContainers) {
+            return super.getContainerParameters(releaseId, messages);
+        }
+        
+        Map<String, Object> parameters = new HashMap<String, Object>();        
+        parameters.put(KieServerConstants.KIE_SERVER_PARAM_MESSAGES, messages);
+        return parameters;
+    }
+    
+    
 }

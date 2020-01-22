@@ -32,6 +32,8 @@ public class KieServerProperties implements InitializingBean {
     private String controllers = "";
     private String serverId = "SpringBoot";
     private String serverName = "KieServer-SpringBoot";
+    
+    private boolean useClasspathContainers = false;
 
     private Swagger swagger = new Swagger();
     
@@ -83,6 +85,15 @@ public class KieServerProperties implements InitializingBean {
     
     public void setAddons(Map<String, String> addons) {
         this.addons = addons;
+    }
+    
+    public boolean isUseClasspathContainers() {
+        return useClasspathContainers;
+    }
+
+    
+    public void setUseClasspathContainers(boolean useClasspathContainers) {
+        this.useClasspathContainers = useClasspathContainers;
     }
 
     @Override

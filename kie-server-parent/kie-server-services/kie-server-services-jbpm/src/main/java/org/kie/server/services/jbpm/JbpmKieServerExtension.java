@@ -51,6 +51,7 @@ import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.executor.impl.ExecutorImpl;
 import org.jbpm.executor.impl.ExecutorServiceImpl;
 import org.jbpm.kie.services.impl.AbstractDeploymentService;
+import org.jbpm.kie.services.impl.CustomIdKModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -357,7 +358,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         List<Message> messages = (List<Message>) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MESSAGES);
         try {
             KieModuleMetaData metaData = (KieModuleMetaData) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA);
-            if (metaData.getProcesses() == null || metaData.getProcesses().isEmpty()) {
+            if (metaData != null && (metaData.getProcesses() == null || metaData.getProcesses().isEmpty())) {
                 logger.info("Container {} does not include processes, {} skipped", id, this);
                 return;
             }
@@ -387,12 +388,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 return;
             }
             ReleaseId releaseId = kieContainerInstance.getKieContainer().getReleaseId();
+            if (releaseId == null) {
+                releaseId = kieContainerInstance.getResource().getReleaseId();
+            }
 
-            KModuleDeploymentUnit unit = new CustomIdKmoduleDeploymentUnit(id, releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion());
-
+            KModuleDeploymentUnit unit = new CustomIdKModuleDeploymentUnit(id, releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion());
+            unit.setKieContainer(kieContainer);
             if (!hasDefaultSession) {
-                unit.setKbaseName(kbaseNames.iterator().next());
-                unit.setKsessionName(ksessionNames.iterator().next());
+                
+                unit.setKbaseName(kieContainer.getKieBaseModel(id).getName());
+                unit.setKsessionName(kieContainer.getKieSessionNamesInKieBase(id).iterator().next());                                
             }
             // override defaults if config options are given
             KieServerConfig config = new KieServerConfig(kieContainerInstance.getResource().getConfigItems());
@@ -406,9 +411,13 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 unit.setMergeMode(MergeMode.valueOf(mergeMode));
             }
             String ksession = config.getConfigItemValue(KieServerConstants.PCFG_KIE_SESSION);
-            unit.setKsessionName(ksession);
+            if (ksession != null) {
+                unit.setKsessionName(ksession);
+            }
             String kbase = config.getConfigItemValue(KieServerConstants.PCFG_KIE_BASE);
-            unit.setKbaseName(kbase);
+            if (kbase != null) {
+                unit.setKbaseName(kbase);
+            }
 
             // reuse kieContainer to avoid unneeded bootstrap
             unit.setKieContainer(kieContainer);
@@ -535,15 +544,15 @@ public class JbpmKieServerExtension implements KieServerExtension {
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
 
         if (kieServer.getInfo().getResult().getMode().equals(KieServerMode.PRODUCTION)) {
-            deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
+            deploymentService.undeploy(new CustomIdKModuleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
         } else {
             // Checking if we are disposing or updating the container. We must only keep process instances only when updating.
             Boolean isDispose = (Boolean) parameters.getOrDefault(IS_DISPOSE_CONTAINER_PARAM, Boolean.TRUE);
 
             if (isDispose) {
-                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
+                deploymentService.undeploy(new CustomIdKModuleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
             } else {
-                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.doNothing());
+                deploymentService.undeploy(new CustomIdKModuleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.doNothing());
             }
         }
 
@@ -655,21 +664,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private boolean isDevelopmentMode() {
         return kieServer.getInfo().getResult().getMode().equals(KieServerMode.DEVELOPMENT);
-    }
-
-    private static class CustomIdKmoduleDeploymentUnit extends KModuleDeploymentUnit {
-
-        private String id;
-
-        public CustomIdKmoduleDeploymentUnit(String id, String groupId, String artifactId, String version) {
-            super(groupId, artifactId, version);
-            this.id = id;
-        }
-
-        @Override
-        public String getIdentifier() {
-            return this.id;
-        }
     }
 
     protected void addAsyncHandler(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {

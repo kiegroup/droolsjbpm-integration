@@ -100,7 +100,7 @@ public class KieServerImpl implements KieServer {
 
     private KieServerEventSupport eventSupport = new KieServerEventSupport();
 
-    private KieServices ks;
+    protected KieServices ks;
     
     private long startTimestamp;
     
@@ -278,7 +278,7 @@ public class KieServerImpl implements KieServer {
                     try {
                         eventSupport.fireBeforeContainerStarted(this, ci);
 
-                        InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
+                        InternalKieContainer kieContainer = createKieContainer(container);
                         if (kieContainer != null) {
                             previous = context.registerContainer(containerId, ci);
                             ci.setKieContainer(kieContainer);
@@ -711,7 +711,7 @@ public class KieServerImpl implements KieServer {
      * Persists updated KieServer state.
      * @param kieServerStateConsumer
      */
-    private void storeServerState(Consumer<KieServerState> kieServerStateConsumer) {
+    protected void storeServerState(Consumer<KieServerState> kieServerStateConsumer) {
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
         kieServerStateConsumer.accept(currentState);
         repository.store(KieServerEnvironment.getServerId(), currentState);
@@ -1184,6 +1184,11 @@ public class KieServerImpl implements KieServer {
         }
         
         return null;
+    }
+    
+    protected InternalKieContainer createKieContainer(KieContainerResource containerInfo) {
+        
+        return (InternalKieContainer) ks.newKieContainer(containerInfo.getContainerId(), containerInfo.getReleaseId());
     }
     
     @Override

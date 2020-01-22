@@ -95,34 +95,38 @@ public class DroolsKieServerExtension implements KieServerExtension {
         // create kbases so declared types can be created
         Collection<String> kbases = kieContainerInstance.getKieContainer().getKieBaseNames();
         for (String kbase : kbases) {
+            if (kbase.startsWith("KiePMML")) {
+                continue;
+            }
             kieContainerInstance.getKieContainer().getKieBase(kbase);
         }
 
         KieModuleMetaData metaData = (KieModuleMetaData) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA);
-        Collection<String> packages = metaData.getPackages();
-
-        for (String p : packages) {
-            Collection<String> classes = metaData.getClasses(p);
-
-            for (String c : classes) {
-                String type = p + "." + c;
-                try {
-                    logger.debug("Adding {} type into extra jaxb classes set", type);
-                    Class<?> clazz = kieContainerInstance.getKieContainer().getClassLoader().loadClass(type);
-
-                    addExtraClass(extraClasses, clazz, filterRemoteable);
-                    logger.debug("Added {} type into extra jaxb classes set", type);
-
-                } catch (ClassNotFoundException e) {
-                    logger.warn("Unable to create instance of type {} due to {}", type, e.getMessage());
-                    logger.debug("Complete stack trace for exception while creating type {}", type, e);
-                }  catch (Throwable e) {
-                    logger.warn("Unexpected error while create instance of type {} due to {}", type, e.getMessage());
-                    logger.debug("Complete stack trace for unknown error while creating type {}", type, e);
+        if (metaData != null) {
+            Collection<String> packages = metaData.getPackages();
+    
+            for (String p : packages) {
+                Collection<String> classes = metaData.getClasses(p);
+    
+                for (String c : classes) {
+                    String type = p + "." + c;
+                    try {
+                        logger.debug("Adding {} type into extra jaxb classes set", type);
+                        Class<?> clazz = kieContainerInstance.getKieContainer().getClassLoader().loadClass(type);
+    
+                        addExtraClass(extraClasses, clazz, filterRemoteable);
+                        logger.debug("Added {} type into extra jaxb classes set", type);
+    
+                    } catch (ClassNotFoundException e) {
+                        logger.warn("Unable to create instance of type {} due to {}", type, e.getMessage());
+                        logger.debug("Complete stack trace for exception while creating type {}", type, e);
+                    }  catch (Throwable e) {
+                        logger.warn("Unexpected error while create instance of type {} due to {}", type, e.getMessage());
+                        logger.debug("Complete stack trace for unknown error while creating type {}", type, e);
+                    }
                 }
             }
         }
-
         kieContainerInstance.addExtraClasses(extraClasses);
 
     }

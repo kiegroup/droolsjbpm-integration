@@ -241,7 +241,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     protected boolean updateReleaseId() {
         ReleaseId oldReleaseId = this.resource.getReleaseId();
         ReleaseId oldResolvedReleaseId = this.resource.getResolvedReleaseId();
-        if ( kieContainer != null ) {
+        if ( kieContainer != null && kieContainer.getReleaseId() != null) {
             this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
             this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
         }
