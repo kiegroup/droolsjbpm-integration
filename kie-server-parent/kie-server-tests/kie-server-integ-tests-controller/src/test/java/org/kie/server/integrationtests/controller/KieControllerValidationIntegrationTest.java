@@ -1,9 +1,9 @@
 /*
-* Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.integrationtests.controller;
 
@@ -28,6 +28,7 @@ import org.kie.server.api.model.KieServerMode;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
+import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -46,7 +47,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-
 public class KieControllerValidationIntegrationTest extends KieControllerManagementBaseTest {
 
     protected static Logger logger = LoggerFactory.getLogger(KieControllerValidationIntegrationTest.class);
@@ -61,7 +61,8 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         dummyKieServerStateRepository = new KieServerStateRepository() {
 
             @Override
-            public void store(String serverId, KieServerState kieServerState) {}
+            public void store(String serverId, KieServerState kieServerState) {
+            }
 
             @Override
             public KieServerState load(String serverId) {
@@ -69,7 +70,7 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
                 kieServerState.setControllers(Collections.singleton(TestConfig.getControllerHttpUrl()));
                 kieServerState.setConfiguration(new KieServerConfig());
 
-                if(TestConfig.isLocalServer()) {
+                if (TestConfig.isLocalServer()) {
                     kieServerState.getConfiguration().addConfigItem(new KieServerConfigItem(KieServerConstants.CFG_KIE_CONTROLLER_USER, "", null));
                     kieServerState.getConfiguration().addConfigItem(new KieServerConfigItem(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "", null));
                 } else {
@@ -78,7 +79,6 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
                 }
                 return kieServerState;
             }
-
         };
         registry = new KieServerRegistryImpl();
         registry.registerStateRepository(dummyKieServerStateRepository);
@@ -90,7 +90,11 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         final String SERVER_NAME = "server-name";
         KieServerEnvironment.setServerId(SERVER_TEMPLATE_ID);
 
-        ServerTemplate serverTemplate = buildServerTemplate(SERVER_TEMPLATE_ID, SERVER_NAME, null, KieServerMode.DEVELOPMENT, Collections.singletonList("BPMN"));
+        ServerTemplate serverTemplate = buildServerTemplate(SERVER_TEMPLATE_ID,
+                                                            SERVER_NAME,
+                                                            null,
+                                                            KieServerMode.DEVELOPMENT,
+                                                            Collections.singletonList(Capability.PROCESS.name()));
         controllerClient.saveServerTemplate(serverTemplate);
 
         ServerTemplateList instanceList = controllerClient.listServerTemplates();
@@ -102,7 +106,7 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         kieServerInfo.setMode(KieServerMode.PRODUCTION);
         kieServerInfo.setName(SERVER_NAME);
 
-        KieServerController controller =  new DefaultRestControllerImpl(registry);
+        KieServerController controller = new DefaultRestControllerImpl(registry);
         assertThatThrownBy(() -> controller.connect(kieServerInfo)).isInstanceOf(KieControllerNotConnectedException.class);
 
         // Check that kie server is not registered.
@@ -113,7 +117,6 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         // clear up
         controller.disconnect(kieServerInfo);
         controllerClient.deleteServerTemplate(SERVER_TEMPLATE_ID);
-
     }
 
     @Test
@@ -122,7 +125,11 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         final String SERVER_NAME = "server-name";
         KieServerEnvironment.setServerId(SERVER_TEMPLATE_ID);
 
-        ServerTemplate serverTemplate = buildServerTemplate(SERVER_TEMPLATE_ID, SERVER_NAME, null, KieServerMode.DEVELOPMENT, Collections.singletonList("BPMN"));
+        ServerTemplate serverTemplate = buildServerTemplate(SERVER_TEMPLATE_ID,
+                                                            SERVER_NAME,
+                                                            null,
+                                                            KieServerMode.DEVELOPMENT,
+                                                            Collections.singletonList(Capability.PROCESS.name()));
         controllerClient.saveServerTemplate(serverTemplate);
 
         ServerTemplateList instanceList = controllerClient.listServerTemplates();
@@ -132,7 +139,7 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         KieServerInfo kieServerInfo = new KieServerInfo(SERVER_TEMPLATE_ID, "1.0.0");
         kieServerInfo.setLocation("http://127.0.0.1:20000");
         kieServerInfo.setMode(KieServerMode.DEVELOPMENT);
-        kieServerInfo.setCapabilities(Collections.singletonList("BPMN"));
+        kieServerInfo.setCapabilities(Collections.singletonList(KieServerConstants.CAPABILITY_BPM));
         kieServerInfo.setName(SERVER_NAME);
 
         KieServerRegistry registry = new KieServerRegistryImpl();
@@ -151,5 +158,4 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         controller.disconnect(kieServerInfo);
         controllerClient.deleteServerTemplate(SERVER_TEMPLATE_ID);
     }
-
 }
