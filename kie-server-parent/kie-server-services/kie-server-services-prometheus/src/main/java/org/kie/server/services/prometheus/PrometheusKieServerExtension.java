@@ -199,7 +199,7 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        //no-op
+        customMetrics.clearAgendaEventListener(kieContainerInstance);
     }
 
     @Override

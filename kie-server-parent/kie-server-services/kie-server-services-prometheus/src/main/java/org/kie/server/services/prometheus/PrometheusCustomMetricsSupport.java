@@ -93,6 +93,17 @@ class PrometheusCustomMetricsSupport {
         }
     }
 
+
+    void clearAgendaEventListener(KieContainerInstance kieContainerInstanceId) {
+        synchronized (agendaEventListeners) {
+            agendaEventListeners.entrySet().removeIf(entry -> {
+                KieContainerInstance kieContainerInstanceKey = (KieContainerInstance) entry.getKey().getKey(1);
+                return kieContainerInstanceKey.equals(kieContainerInstanceId);
+            });
+        }
+    }
+
+
     List<PhaseLifecycleListener> getPhaseLifecycleListener(String solverId) {
         synchronized (phaseLifecycleListeners) {
             if (!phaseLifecycleListeners.containsKey(solverId)) {
