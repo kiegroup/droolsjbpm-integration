@@ -17,13 +17,10 @@
 package org.kie.server.services.taskassigning.core.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -37,6 +34,8 @@ import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
+
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 
 /**
  * Task is the only planning entity that will be changed during the problem solving, and we have only one
@@ -102,41 +101,6 @@ public class Task extends TaskOrUser {
     public static final String TASK_RANGE = "taskRange";
     public static final String START_TIME_IN_MINUTES = "startTimeInMinutes";
     public static final String END_TIME_IN_MINUTES = "endTimeInMinutes";
-
-    /**
-     * This task was introduced for dealing with situations where the solution ends up with no tasks. e.g. there is a
-     * solution with tasks A and B, and a user completes both tasks in the jBPM runtime. When the completion events
-     * are processed both tasks are removed from the solution with the proper problem fact changes. The solution remains
-     * thus with no tasks and an exception is thrown.
-     * Since the only potential owner for the dummy task is the PLANNING_USER this task won't affect the score dramatically.
-     */
-    public static final Task DUMMY_TASK = new ImmutableTask(-1,
-                                                            -1,
-                                                            "dummy-process",
-                                                            "dummy-container",
-                                                            "dummy-task",
-                                                            10,
-                                                            Collections.unmodifiableMap(new HashMap<>()),
-                                                            false,
-                                                            Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(User.PLANNING_USER))),
-                                                            Collections.unmodifiableSet(new HashSet<>()));
-
-    /**
-     * This task was introduced for dealing with situations where all tasks are pinned and avoid falling into
-     * https://issues.jboss.org/browse/PLANNER-241. Will be removed when issue is fixed.
-     */
-    public static final Task DUMMY_TASK_PLANNER_241 = new ImmutableTask(-2,
-                                                                        -1,
-                                                                        "dummy-process",
-                                                                        "dummy-container",
-                                                                        "dummy-task-planner-241",
-                                                                        10,
-                                                                        Collections.unmodifiableMap(new HashMap<>()),
-                                                                        false,
-                                                                        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(User.PLANNING_USER))),
-                                                                        Collections.unmodifiableSet(new HashSet<>()));
-
-    public static final Predicate<Task> IS_NOT_DUMMY = task -> !DUMMY_TASK.getId().equals(task.getId()) && !DUMMY_TASK_PLANNER_241.getId().equals(task.getId());
 
     private long processInstanceId;
     private String processId;
@@ -393,7 +357,7 @@ public class Task extends TaskOrUser {
      * @return true the assigned user can execute this task, false in any other case.
      */
     public boolean acceptsAssignedUser() {
-        if (User.PLANNING_USER.getEntityId().equals(getUser().getEntityId())) {
+        if (PLANNING_USER.getEntityId().equals(getUser().getEntityId())) {
             //planning user belongs to all the groups by definition.
             return true;
         }
@@ -416,68 +380,5 @@ public class Task extends TaskOrUser {
             userSkills = user.getTypedLabels().stream().filter(TypedLabel::isSkill).map(TypedLabel::getValue).collect(Collectors.toList());
         }
         return !userSkills.isEmpty() && userSkills.contains(skill.getValue());
-    }
-
-    private static class ImmutableTask extends Task {
-
-        private ImmutableTask() {
-            //required by the FieldSolutionCloner.
-        }
-
-        private ImmutableTask(long id, long processInstanceId, String processId, String containerId, String name,
-                              int priority, Map<String, Object> inputData, boolean pinned,
-                              Set<OrganizationalEntity> potentialOwners, Set<TypedLabel> typedLabels) {
-            super(id, processInstanceId, processId, containerId, name, priority, inputData, pinned, potentialOwners,
-                  typedLabels);
-        }
-
-        @Override
-        public void setPinned(boolean pinned) {
-            //this task can never be pined
-        }
-
-        @Override
-        public void setProcessInstanceId(long processInstanceId) {
-            throwImmutableException("processInstanceId");
-        }
-
-        @Override
-        public void setProcessId(String processId) {
-            throwImmutableException("processId");
-        }
-
-        @Override
-        public void setContainerId(String containerId) {
-            throwImmutableException("containerId");
-        }
-
-        @Override
-        public void setName(String name) {
-            throwImmutableException("name");
-        }
-
-        @Override
-        public void setPriority(int priority) {
-            throwImmutableException("priority");
-        }
-
-        @Override
-        public void setInputData(Map<String, Object> inputData) {
-            throwImmutableException("inputData");
-        }
-
-        @Override
-        public void setPotentialOwners(Set<OrganizationalEntity> potentialOwners) {
-            throwImmutableException("potentialOwners");
-        }
-
-        @Override
-        public void setTypedLabels(Set<TypedLabel> typedLabels) {
-            throwImmutableException("typedLabels");
-        }
-
-        private void throwImmutableException(String filedName) {
-            throw new RuntimeException("Task: " + getName() + " don't accept modifications of field: " + filedName);
-        }
     }
 }

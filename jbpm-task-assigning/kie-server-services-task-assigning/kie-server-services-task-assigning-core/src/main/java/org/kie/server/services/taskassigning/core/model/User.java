@@ -18,64 +18,11 @@ package org.kie.server.services.taskassigning.core.model;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("TaUser")
 public class User extends TaskOrUser implements OrganizationalEntity {
-
-    private static class ImmutableUser extends User {
-
-        private ImmutableUser() {
-            //required by the FieldSolutionCloner
-        }
-
-        private ImmutableUser(long id, String entityId) {
-            super(id, entityId);
-            super.setGroups(new HashSet<>());
-            super.setTypedLabels(new HashSet<>());
-        }
-
-        @Override
-        public void setEntityId(String entityId) {
-            throwImmutableException();
-        }
-
-        @Override
-        public void setGroups(Set<Group> groups) {
-            throwImmutableException();
-        }
-
-        @Override
-        public void setTypedLabels(Set<TypedLabel> typedLabels) {
-            throwImmutableException();
-        }
-
-        @Override
-        public void setId(Long id) {
-            throwImmutableException();
-        }
-
-        private void throwImmutableException() {
-            throw new UnsupportedOperationException("PLANNING_USER: " + getEntityId() + " object can not be modified.");
-        }
-    }
-
-    /**
-     * System property for configuring the PLANNING_USER entityId.
-     */
-    private static final String PLANNING_USER_ID_PROPERTY = "org.jbpm.task.assigning.model.planningUserId";
-
-    private static final String PLANNING_USER_ID = System.getProperty(PLANNING_USER_ID_PROPERTY, "planning_user");
-
-    /**
-     * Planning user is defined user for avoid breaking hard constraints. When no user is found that met the task required
-     * potential owners set, or the required skills set, etc, the PLANNING_USER is assigned.
-     */
-    public static final User PLANNING_USER = new ImmutableUser(PLANNING_USER_ID.hashCode(), PLANNING_USER_ID);
-
-    public static final Predicate<String> IS_PLANNING_USER = entityId -> PLANNING_USER.getEntityId().equals(entityId);
 
     private String entityId;
     private Set<Group> groups = new HashSet<>();

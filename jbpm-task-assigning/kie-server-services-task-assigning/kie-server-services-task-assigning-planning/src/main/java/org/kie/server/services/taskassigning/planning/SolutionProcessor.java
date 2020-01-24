@@ -33,8 +33,10 @@ import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.taskassigning.core.model.Task.IS_NOT_DUMMY;
-import static org.kie.server.services.taskassigning.core.model.User.IS_PLANNING_USER;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_NOT_DUMMY;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_PLANNING_USER;
+import static org.kie.server.services.taskassigning.planning.TraceHelper.tracePublishedTasks;
+import static org.kie.server.services.taskassigning.planning.TraceHelper.traceSolution;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkCondition;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
@@ -149,6 +151,7 @@ public class SolutionProcessor extends RunnableBase {
                 }
             } catch (InterruptedException e) {
                 super.destroy();
+                Thread.currentThread().interrupt();
                 LOGGER.error("Solution Processor was interrupted", e);
             }
         }
@@ -156,7 +159,7 @@ public class SolutionProcessor extends RunnableBase {
     }
 
     private void doProcess(final TaskAssigningSolution solution) {
-        LOGGER.debug("Starting processing of solution: " + solution);
+        LOGGER.debug("Starting processing of solution: {}",solution);
         final List<PlanningItem> planningItems = new ArrayList<>(solution.getTaskList().size());
         List<PlanningItem> userPlanningItems;
         Iterator<PlanningItem> userPlanningItemsIt;
@@ -205,8 +208,8 @@ public class SolutionProcessor extends RunnableBase {
         final List<PlanningItem> publishedTasks = planningItems.stream().filter(item -> item.getPlanningTask().isPublished()).collect(Collectors.toList());
 
         if (LOGGER.isTraceEnabled()) {
-            traceSolution(solution);
-            tracePublishedTasks(publishedTasks);
+            traceSolution(LOGGER, solution);
+            tracePublishedTasks(LOGGER, publishedTasks);
         }
 
         Result result;
@@ -218,32 +221,8 @@ public class SolutionProcessor extends RunnableBase {
             result = new Result(e);
         }
 
-        LOGGER.debug("Solution processing finished: " + solution);
+        LOGGER.debug("Solution processing finished: {}", solution);
         processing.set(false);
         resultConsumer.accept(result);
-    }
-
-    private void traceSolution(TaskAssigningSolution solution) {
-        LOGGER.trace("\n");
-        LOGGER.trace("*** Start of solution trace, with users = {} and tasks = {} ***", solution.getUserList().size(), solution.getTaskList().size());
-        for (User user : solution.getUserList()) {
-            Task nextTask = user.getNextTask();
-            while (nextTask != null) {
-                LOGGER.trace(user.getEntityId() + " -> " + nextTask.getId() + ", pinned: " + nextTask.isPinned() + " priority: " + nextTask.getPriority() + ", status: " + nextTask.getStatus());
-                nextTask = nextTask.getNextTask();
-            }
-        }
-        LOGGER.trace("*** End of solution trace ***");
-        LOGGER.trace("\n");
-    }
-
-    private void tracePublishedTasks(List<PlanningItem> publishedTasks) {
-        LOGGER.trace("\n");
-        LOGGER.trace("*** Start of published tasks trace with {} published tasks ***", publishedTasks.size());
-        publishedTasks.forEach(item -> {
-            LOGGER.trace(item.getPlanningTask().getAssignedUser() + " -> " + item.getTaskId() + ", index: " + item.getPlanningTask().getIndex() + ", published: " + item.getPlanningTask().isPublished());
-        });
-        LOGGER.trace("*** End of published trace ***");
-        LOGGER.trace("\n");
     }
 }

@@ -21,4 +21,7 @@ public class TaskAssigningRestURI {
     public static final String TASK_ASSIGNING_RUNTIME_URI = "taskassigning/runtime";
     public static final String TASK_ASSIGNING_EXECUTE_PLANNING_URI = "executeplanning";
     public static final String TASK_ASSIGNING_QUERIES_TASK_DATA_URI = "queries/taskdata";
+
+    private TaskAssigningRestURI() {
+    }
 }

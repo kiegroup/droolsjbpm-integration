@@ -44,7 +44,7 @@ import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull
  */
 public class SolverHandler {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(SolverHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SolverHandler.class);
 
     private final SolverDef solverDef;
     private final KieServerRegistry registry;
@@ -107,6 +107,7 @@ public class SolverHandler {
             executorService.awaitTermination(5, TimeUnit.SECONDS);
             LOGGER.debug("ExecutorService was successfully shutted down.");
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOGGER.debug("An exception was thrown during executionService graceful termination.", e);
             executorService.shutdownNow();
         }

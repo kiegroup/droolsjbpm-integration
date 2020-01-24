@@ -16,11 +16,9 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
-import java.io.Serializable;
-
 import org.optaplanner.core.api.domain.lookup.PlanningId;
 
-public abstract class AbstractPersistable implements Serializable {
+public abstract class AbstractPersistable {
 
     protected Long id;
 

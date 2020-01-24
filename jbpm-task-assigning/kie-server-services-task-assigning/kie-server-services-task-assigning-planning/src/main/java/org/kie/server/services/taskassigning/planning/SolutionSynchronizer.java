@@ -20,13 +20,14 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
-import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.api.model.taskassigning.TaskInputVariablesReadMode;
+import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.user.system.api.User;
+import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +48,10 @@ import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull
  */
 public class SolutionSynchronizer extends RunnableBase {
 
-    public static final int INIT_SOLVER_EXECUTOR = 0;
-    public static final int SYNCHRONIZE_SOLUTION = 1;
+    enum Action {
+        INIT_SOLVER_EXECUTOR,
+        SYNCHRONIZE_SOLUTION,
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolutionSynchronizer.class);
 
@@ -61,8 +64,7 @@ public class SolutionSynchronizer extends RunnableBase {
     private int solverExecutorStarts = 0;
     private TaskAssigningSolution solution;
     private LocalDateTime fromLastModificationDate;
-    private int action = INIT_SOLVER_EXECUTOR;
-
+    private AtomicReference<Action> action = new AtomicReference<>(null);
     private final Semaphore startPermit = new Semaphore(0);
 
     public static class Result {
@@ -100,15 +102,15 @@ public class SolutionSynchronizer extends RunnableBase {
     }
 
     public void initSolverExecutor() {
-        this.action = INIT_SOLVER_EXECUTOR;
+        action.set(Action.INIT_SOLVER_EXECUTOR);
         startPermit.release();
     }
 
     public void synchronizeSolution(TaskAssigningSolution solution, LocalDateTime fromLastModificationDate) {
         this.solution = solution;
         this.fromLastModificationDate = fromLastModificationDate;
-        this.action = SYNCHRONIZE_SOLUTION;
-        LOGGER.debug("Start synchronizeSolution fromLastModificationDate: " + fromLastModificationDate);
+        action.set(Action.SYNCHRONIZE_SOLUTION);
+        LOGGER.debug("Start synchronizeSolution fromLastModificationDate: {}", fromLastModificationDate);
         startPermit.release();
     }
 
@@ -125,82 +127,98 @@ public class SolutionSynchronizer extends RunnableBase {
     @Override
     public void run() {
         LOGGER.debug("Solution Synchronizer Started");
-        boolean waitForNextAction = true;
+        Action nextAction;
         while (isAlive()) {
             try {
-                if (waitForNextAction) {
+                if (action.get() == null) {
                     startPermit.acquire();
                 }
                 if (isAlive()) {
-                    if (action == INIT_SOLVER_EXECUTOR) {
+                    if (action.get() == Action.INIT_SOLVER_EXECUTOR) {
                         try {
-                            LOGGER.debug("Solution Synchronizer will recover the solution from the jBPM runtime for starting the solver.");
-                            if (!solverExecutor.isStopped()) {
-                                LOGGER.debug("Previous solver instance has not yet finished, let's wait for it to stop." +
-                                                     " Next attempt will be in " + syncInterval + " milliseconds.");
-                                waitForNextAction = false;
-                            } else {
-                                final TaskAssigningSolution recoveredSolution = recoverSolution();
-                                if (isAlive() && !solverExecutor.isDestroyed()) {
-                                    if (!recoveredSolution.getTaskList().isEmpty()) {
-                                        solverExecutor.start(recoveredSolution);
-                                        waitForNextAction = true;
-                                        LOGGER.debug("Solution was successfully recovered. Solver was started for #{} time.", ++solverExecutorStarts);
-                                        if (solverExecutorStarts > 1) {
-                                            LOGGER.debug("It looks like it was necessary to restart the solver. It might" +
-                                                                 " have been caused due to errors during the solution applying in the jBPM runtime");
-                                        }
-                                    } else {
-                                        waitForNextAction = false;
-                                        LOGGER.debug("It looks like there are no tasks for recovering the solution at this moment." +
-                                                             " Next attempt will be in " + syncInterval + " milliseconds");
-                                    }
-                                }
-                            }
+                            nextAction = doInitSolverExecutor();
+                            action.set(nextAction);
                         } catch (Exception e) {
-                            waitForNextAction = false;
                             LOGGER.error("An error was produced during solution recovering." +
                                                  " Next attempt will be in " + syncInterval + " milliseconds", e);
                         }
-                    } else if (solverExecutor.isStarted()) {
+                    } else {
                         try {
-                            LOGGER.debug("Refreshing solution status from external repository.");
-                            final List<TaskData> updatedTaskDataList = loadTasksForUpdate(fromLastModificationDate);
-                            LOGGER.debug("Status was read successful.");
-                            if (isAlive()) {
-                                final List<ProblemFactChange<TaskAssigningSolution>> changes = new SolutionChangesBuilder()
-                                        .withSolution(solution)
-                                        .withTasks(updatedTaskDataList)
-                                        .withUserSystem(userSystemService)
-                                        .withContext(context)
-                                        .build();
-
-                                if (!changes.isEmpty()) {
-                                    LOGGER.debug("Current solution will be updated with {} changes from last synchronization", changes.size());
-                                    waitForNextAction = true;
-                                    resultConsumer.accept(new Result(changes));
-                                } else {
-                                    LOGGER.debug("There are no changes to apply from last synchronization.");
-                                    fromLastModificationDate = context.getLastModificationDate();
-                                    waitForNextAction = false;
-                                }
-                            }
+                            nextAction = doSynchronizeSolution();
+                            action.set(nextAction);
                         } catch (Exception e) {
-                            waitForNextAction = false;
-                            LOGGER.error("An error was produced during solution status refresh from external repository." +
+                            LOGGER.error("An error was produced during solution status synchronization from the jBPM runtime." +
                                                  " Next attempt will be in " + syncInterval + " milliseconds", e);
                         }
                     }
-                    if (!waitForNextAction) {
+                    if (action.get() != null) {
                         Thread.sleep(syncInterval);
                     }
                 }
             } catch (InterruptedException e) {
                 super.destroy();
+                Thread.currentThread().interrupt();
                 LOGGER.error("Solution Synchronizer was interrupted.", e);
             }
         }
         LOGGER.debug("Solution Synchronizer finished");
+    }
+
+    private Action doInitSolverExecutor() {
+        Action nextAction = null;
+        LOGGER.debug("Solution Synchronizer will recover the solution from the jBPM runtime for starting the solver.");
+        if (!solverExecutor.isStopped()) {
+            LOGGER.debug("Previous solver instance has not yet finished, let's wait for it to stop." +
+                                 " Next attempt will be in {} milliseconds.", syncInterval);
+            nextAction = Action.INIT_SOLVER_EXECUTOR;
+        } else {
+            final TaskAssigningSolution recoveredSolution = recoverSolution();
+            if (isAlive() && !solverExecutor.isDestroyed()) {
+                if (!recoveredSolution.getTaskList().isEmpty()) {
+                    solverExecutor.start(recoveredSolution);
+                    LOGGER.debug("Solution was successfully recovered. Solver was started for #{} time.", ++solverExecutorStarts);
+                    if (solverExecutorStarts > 1) {
+                        LOGGER.debug("It looks like it was necessary to restart the solver. It might" +
+                                             " have been caused due to errors during the solution applying in the jBPM runtime");
+                    }
+                } else {
+                    nextAction = Action.INIT_SOLVER_EXECUTOR;
+                    LOGGER.debug("It looks like there are no tasks for recovering the solution at this moment." +
+                                         " Next attempt will be in {} milliseconds", syncInterval);
+                }
+            }
+        }
+        return nextAction;
+    }
+
+    private Action doSynchronizeSolution() {
+        Action nextAction = null;
+        if (solverExecutor.isStarted()) {
+            LOGGER.debug("Synchronizing solution status from the jBPM runtime.");
+            final List<TaskData> updatedTaskDataList = loadTasksForUpdate(fromLastModificationDate);
+            LOGGER.debug("Status was read successful.");
+            if (isAlive()) {
+                final List<ProblemFactChange<TaskAssigningSolution>> changes = buildChanges(solution, updatedTaskDataList);
+                if (!changes.isEmpty()) {
+                    LOGGER.debug("Current solution will be updated with {} changes from last synchronization", changes.size());
+                    resultConsumer.accept(new Result(changes));
+                } else {
+                    LOGGER.debug("There are no changes to apply from last synchronization.");
+                    fromLastModificationDate = context.getLastModificationDate();
+                    nextAction = Action.SYNCHRONIZE_SOLUTION;
+                }
+            }
+        }
+        return nextAction;
+    }
+
+    protected List<ProblemFactChange<TaskAssigningSolution>> buildChanges(TaskAssigningSolution solution, List<TaskData> updatedTaskDataList) {
+        return SolutionChangesBuilder.create()
+                .withSolution(solution)
+                .withTasks(updatedTaskDataList)
+                .withUserSystem(userSystemService)
+                .withContext(context)
+                .build();
     }
 
     private TaskAssigningSolution recoverSolution() {
@@ -214,7 +232,11 @@ public class SolutionSynchronizer extends RunnableBase {
         final List<TaskData> taskDataList = result.getTasks();
         LOGGER.debug("{} tasks where loaded for solution recovery, with result.queryTime: {}", taskDataList.size(), result.getQueryTime());
         final List<User> externalUsers = userSystemService.findAllUsers();
-        return new SolutionBuilder()
+        return buildSolution(taskDataList, externalUsers);
+    }
+
+    protected TaskAssigningSolution buildSolution(List<TaskData> taskDataList, List<User> externalUsers) {
+        return SolutionBuilder.create()
                 .withTasks(taskDataList)
                 .withUsers(externalUsers)
                 .build();
@@ -223,12 +245,13 @@ public class SolutionSynchronizer extends RunnableBase {
     private List<TaskData> loadTasksForUpdate(LocalDateTime fromLastModificationDate) {
         // trim to 0 milliseconds to avoid falling into https://issues.redhat.com/browse/JBPM-8970 (but note that
         // the trimming is still good to avoid any other potential date or timestamp DBMS dependent issue)
-        LocalDateTime _fromLastModificationDate = fromLastModificationDate.withNano(0);
+        LocalDateTime fromLastModificationDateRounded = fromLastModificationDate.withNano(0);
         final TaskAssigningRuntimeDelegate.FindTasksResult result = delegate.findTasks(null,
-                                                                                       _fromLastModificationDate,
+                                                                                       fromLastModificationDateRounded,
                                                                                        TaskInputVariablesReadMode.READ_WHEN_PLANNING_TASK_IS_NULL);
         context.setLastModificationDate(result.getQueryTime());
-        LOGGER.debug("Total modifications found: {} since fromLastModificationDate: {}, with result.queryTime: {}", result.getTasks().size(), _fromLastModificationDate, result.getQueryTime());
+        LOGGER.debug("Total modifications found: {} since fromLastModificationDate: {}, with result.queryTime: {}",
+                     result.getTasks().size(), fromLastModificationDateRounded, result.getQueryTime());
         return result.getTasks();
     }
 }

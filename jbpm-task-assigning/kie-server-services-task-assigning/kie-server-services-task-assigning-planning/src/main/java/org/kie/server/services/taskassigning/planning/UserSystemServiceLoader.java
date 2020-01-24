@@ -28,15 +28,18 @@ public class UserSystemServiceLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserSystemServiceLoader.class);
 
+    private UserSystemServiceLoader() {
+    }
+
     public static Map<String, UserSystemService> loadServices(ClassLoader cl) {
         final Map<String, UserSystemService> result = new HashMap<>();
         final ServiceLoader<UserSystemService> availableServices = ServiceLoader.load(UserSystemService.class, cl);
         for (UserSystemService service : availableServices) {
             Object existed = result.putIfAbsent(service.getName(), service);
             if (existed == null) {
-                LOGGER.debug("UserSystemService {} was added", service.getName());
+                LOGGER.debug("UserSystemService {} was added to the result", service.getName());
             } else {
-                LOGGER.warn("UserSystemService {} was already added, this another instance will be discarded.", service.toString());
+                LOGGER.warn("UserSystemService {} was already added to the result, this another instance will be discarded.", service);
             }
         }
         return result;

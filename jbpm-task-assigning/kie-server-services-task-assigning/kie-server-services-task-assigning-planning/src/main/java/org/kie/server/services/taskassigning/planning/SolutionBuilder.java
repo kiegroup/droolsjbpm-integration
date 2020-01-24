@@ -36,13 +36,13 @@ import org.kie.server.api.model.taskassigning.UserType;
 import org.kie.server.services.taskassigning.planning.util.UserUtil;
 
 import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
-import static org.kie.server.services.taskassigning.core.model.Task.DUMMY_TASK;
-import static org.kie.server.services.taskassigning.core.model.User.IS_PLANNING_USER;
-import static org.kie.server.services.taskassigning.core.model.User.PLANNING_USER;
 import static org.kie.server.api.model.taskassigning.TaskStatus.InProgress;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Ready;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Reserved;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Suspended;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.DUMMY_TASK;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_PLANNING_USER;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 
 /**
  * This class is intended for the restoring of a TaskAssigningSolution given a set of TaskData, a set of User and the
@@ -79,7 +79,11 @@ public class SolutionBuilder {
     private List<TaskData> taskDataList;
     private List<org.kie.server.services.taskassigning.user.system.api.User> externalUsers;
 
-    public SolutionBuilder() {
+    private SolutionBuilder() {
+    }
+
+    public static SolutionBuilder create() {
+        return new SolutionBuilder();
     }
 
     public SolutionBuilder withTasks(List<TaskData> taskDataList) {
@@ -127,6 +131,10 @@ public class SolutionBuilder {
                             addTaskToUser(assignedTasksByUserId, task, taskData.getActualOwner(), -1, pinned);
                         }
                     }
+                    break;
+                default:
+                    //no other cases exists, sonar required.
+                    break;
             }
         });
 

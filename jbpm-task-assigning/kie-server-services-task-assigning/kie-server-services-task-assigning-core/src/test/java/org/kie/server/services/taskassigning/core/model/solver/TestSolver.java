@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.optaplanner.core.api.solver.Solver;
 
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.extractTaskList;
 import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.isPotentialOwner;
 import static org.junit.Assert.assertEquals;
@@ -50,7 +51,7 @@ public class TestSolver extends AbstractTaskAssigningCoreTest {
     private void testSolverStartAndSolution(int stepCountLimit, String solutionResource) throws Exception {
         Solver<TaskAssigningSolution> solver = createNonDaemonSolver(stepCountLimit);
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
-        solution.getUserList().add(User.PLANNING_USER);
+        solution.getUserList().add(PLANNING_USER);
         TaskAssigningSolution result = solver.solve(solution);
         if (!result.getScore().isFeasible()) {
             fail(String.format("With current problem definition and stepCountLimit of %s it's expected " +
@@ -81,8 +82,8 @@ public class TestSolver extends AbstractTaskAssigningCoreTest {
         assertNotNull(task.getUser());
         assertEquals("Task is not assigned to expected user", user.getEntityId(), task.getUser().getEntityId());
         if (task.getPotentialOwners() == null || task.getPotentialOwners().isEmpty()) {
-            assertEquals("Task without potentialOwners can only be assigned to the PLANNING_USER", User.PLANNING_USER.getEntityId(), user.getEntityId());
-        } else if (User.PLANNING_USER.getEntityId().equals(user.getEntityId())) {
+            assertEquals("Task without potentialOwners can only be assigned to the PLANNING_USER", PLANNING_USER.getEntityId(), user.getEntityId());
+        } else if (PLANNING_USER.getEntityId().equals(user.getEntityId())) {
             availableUsers.forEach(availableUser -> {
                 assertFalse(String.format("PLANNING_USER user was assigned but another potential owner was found. user: %s task: %s", user, task), isPotentialOwner(task, user));
             });

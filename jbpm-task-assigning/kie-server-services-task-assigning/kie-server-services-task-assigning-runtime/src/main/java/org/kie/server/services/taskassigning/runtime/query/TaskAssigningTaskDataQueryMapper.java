@@ -30,10 +30,8 @@ public class TaskAssigningTaskDataQueryMapper extends AbstractTaskAssigningQuery
 
     public static final String NAME = "TaskAssigningTaskDataQueryMapper";
 
-    /**
-     * Dedicated for ServiceLoader to create instance, use <code>get()</code> method instead
-     */
     public TaskAssigningTaskDataQueryMapper() {
+        // Dedicated for ServiceLoader to create instance, use <code>get()</code> method instead
     }
 
     /**

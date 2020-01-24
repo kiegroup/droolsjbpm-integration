@@ -9,10 +9,8 @@ public class TaskAssigningTaskDataSummaryQueryMapper extends TaskAssigningTaskDa
 
     public static final String NAME = "TaskAssigningTaskDataSummaryQueryMapper";
 
-    /**
-     * Dedicated for ServiceLoader to create instance, use <code>get()</code> method instead
-     */
     public TaskAssigningTaskDataSummaryQueryMapper() {
+        // Dedicated for ServiceLoader to create instance, use <code>get()</code> method instead
     }
 
     /**

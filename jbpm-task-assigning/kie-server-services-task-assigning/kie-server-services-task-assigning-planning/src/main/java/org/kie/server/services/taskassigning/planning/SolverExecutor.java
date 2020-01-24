@@ -167,6 +167,7 @@ public class SolverExecutor extends RunnableBase {
                 }
             } catch (InterruptedException e) {
                 super.destroy();
+                Thread.currentThread().interrupt();
                 LOGGER.error("SolverExecutor was interrupted.", e);
             }
         }

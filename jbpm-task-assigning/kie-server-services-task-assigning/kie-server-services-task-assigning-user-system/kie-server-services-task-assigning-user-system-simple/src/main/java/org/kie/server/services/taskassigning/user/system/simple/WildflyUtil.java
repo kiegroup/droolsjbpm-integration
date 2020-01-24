@@ -38,6 +38,9 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class WildflyUtil {
 
+    private WildflyUtil() {
+    }
+
     public static UserGroupInfo buildInfo(URI uri) throws IOException {
         try (InputStream in = Files.newInputStream(Paths.get(uri))) {
             return buildInfo(in);
@@ -78,10 +81,8 @@ public class WildflyUtil {
                     if (isEmpty(groupName)) {
                         continue;
                     }
-                    Group group = groupMap.get(groupName);
-                    if (group == null) {
-                        group = new GroupImpl(groupName);
-                        groupMap.put(groupName, group);
+                    Group group = groupMap.computeIfAbsent(groupName, GroupImpl::new);
+                    if (!groups.contains(group)) {
                         groups.add(group);
                     }
                     userGroups.add(group);

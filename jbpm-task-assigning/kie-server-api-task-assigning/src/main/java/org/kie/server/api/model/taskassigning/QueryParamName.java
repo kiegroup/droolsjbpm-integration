@@ -25,4 +25,7 @@ public class QueryParamName {
     public static final String PAGE = "page";
     public static final String PAGE_SIZE = "pageSize";
     public static final String TASK_INPUT_VARIABLES_MODE = "inputVariablesMode";
+
+    private QueryParamName() {
+    }
 }

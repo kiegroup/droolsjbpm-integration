@@ -29,9 +29,6 @@ public class TaskAssigningService {
 
     private SolverHandler solverHandler;
 
-    public TaskAssigningService() {
-    }
-
     public void setDelegate(TaskAssigningRuntimeDelegate delegate) {
         this.delegate = delegate;
     }

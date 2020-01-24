@@ -815,7 +815,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                     }
                     logger.debug("Task assigning entities where successfully added.");
                 } else {
-                    logger.error("Unexpected error, it was not possible to get resource for: " + classResource);
+                    logger.error("Unexpected error, it was not possible to get resource for: {}", classResource);
                 }
             }
         }

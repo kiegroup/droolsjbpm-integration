@@ -33,10 +33,10 @@ public class TaskAssigningRuntimeDelegate {
     //TODO configure the page size via System property.
     private static final int PAGE_SIZE = 3000;
 
-    class FindTasksResult {
+    static class FindTasksResult {
 
-        LocalDateTime queryTime;
-        List<TaskData> tasks;
+        private LocalDateTime queryTime;
+        private List<TaskData> tasks;
 
         public LocalDateTime getQueryTime() {
             return queryTime;

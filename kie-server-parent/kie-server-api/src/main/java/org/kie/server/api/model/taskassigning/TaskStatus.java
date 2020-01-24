@@ -18,6 +18,9 @@ package org.kie.server.api.model.taskassigning;
 
 public class TaskStatus {
 
+    private TaskStatus() {
+    }
+
     public static final String Created = "Created";
     public static final String Ready = "Ready";
     public static final String Reserved = "Reserved";

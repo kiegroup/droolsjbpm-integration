@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
 
 public class PropertyUtil {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(PropertyUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyUtil.class);
 
-    public interface PropertyParser<String, T, E extends Exception> {
+    public interface PropertyParser<T, E extends Exception> {
 
         T parse(String value) throws E;
     }
@@ -33,7 +33,7 @@ public class PropertyUtil {
 
     public static <T, E extends Exception> T readSystemProperty(String propertyName,
                                                                 T defaultValue,
-                                                                PropertyParser<String, T, E> parser) {
+                                                                PropertyParser<T, E> parser) {
         String strValue = null;
         try {
             strValue = System.getProperty(propertyName);

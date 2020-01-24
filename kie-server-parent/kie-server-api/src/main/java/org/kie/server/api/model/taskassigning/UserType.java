@@ -18,6 +18,9 @@ package org.kie.server.api.model.taskassigning;
 
 public class UserType {
 
+    private UserType() {
+    }
+
     public static final String User = "User";
     public static final String Group = "Group";
 }

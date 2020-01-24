@@ -63,7 +63,7 @@ import static org.kie.server.services.taskassigning.planning.util.PropertyUtil.r
 
 public class TaskAssigningPlanningKieServerExtension implements KieServerExtension {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(TaskAssigningPlanningKieServerExtension.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskAssigningPlanningKieServerExtension.class);
 
     private static final String CAPABILITY_TASK_ASSIGNING_PLANNING = "TaskAssigningPlanning";
 
@@ -391,8 +391,8 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
             classLoader = this.getClass().getClassLoader();
         }
 
-        Map<String, UserSystemService> services = UserSystemServiceLoader.loadServices(classLoader);
-        userSystemService = services.get(userSystemName);
+        final Map<String, UserSystemService> userServices = UserSystemServiceLoader.loadServices(classLoader);
+        userSystemService = userServices.get(userSystemName);
         if (userSystemService == null) {
             final String msg = String.format(USER_SYSTEM_SERVICE_NOT_FOUND, userSystemName);
             LOGGER.error(msg);

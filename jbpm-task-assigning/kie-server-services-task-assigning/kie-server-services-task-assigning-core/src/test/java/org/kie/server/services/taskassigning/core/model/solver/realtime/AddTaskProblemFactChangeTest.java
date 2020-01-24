@@ -24,16 +24,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Test;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
-import org.kie.server.services.taskassigning.core.model.User;
-import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_100TASKS_5USERS_SOLUTION;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTION;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
-import static org.junit.Assert.assertTrue;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 
 public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest {
 
@@ -106,7 +106,7 @@ public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest 
     }
 
     private void addTaskProblemFactChange(TaskAssigningSolution solution, List<Long> taskIds) throws Exception {
-        solution.getUserList().add(User.PLANNING_USER);
+        solution.getUserList().add(PLANNING_USER);
         List<ProgrammedProblemFactChange<AddTaskProblemFactChange>> programmedChanges = taskIds.stream()
                 .map(id -> new ProgrammedProblemFactChange<>(new AddTaskProblemFactChange(new Task(id, "NewTask_" + id, 1))))
                 .collect(Collectors.toList());

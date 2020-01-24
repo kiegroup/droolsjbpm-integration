@@ -38,6 +38,7 @@ import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_500T
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 
 public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTest {
 
@@ -143,7 +144,7 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
 
     private void assignTaskProblemFactChangeFixedChangeSet(String solutionResource) throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
-        solution.getUserList().add(User.PLANNING_USER);
+        solution.getUserList().add(PLANNING_USER);
 
         //prepare the list of changes to program
         List<ProgrammedAssignTaskProblemFactChange> programmedChanges = new ArrayList<>();
@@ -229,7 +230,7 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
 
     private void assignTaskProblemFactChangeRandomChangeSet(String solutionResource) throws Exception {
         TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
-        solution.getUserList().add(User.PLANNING_USER);
+        solution.getUserList().add(PLANNING_USER);
 
         int taskCount = solution.getTaskList().size();
         int userCount = solution.getUserList().size();

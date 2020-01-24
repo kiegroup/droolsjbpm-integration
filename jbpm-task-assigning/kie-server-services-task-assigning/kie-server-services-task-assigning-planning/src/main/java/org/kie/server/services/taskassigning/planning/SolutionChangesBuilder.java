@@ -39,9 +39,6 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.taskassigning.core.model.Task.DUMMY_TASK_PLANNER_241;
-import static org.kie.server.services.taskassigning.core.model.Task.IS_NOT_DUMMY;
-import static org.kie.server.services.taskassigning.core.model.User.PLANNING_USER;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Completed;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Error;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Exited;
@@ -51,8 +48,12 @@ import static org.kie.server.api.model.taskassigning.TaskStatus.Obsolete;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Ready;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Reserved;
 import static org.kie.server.api.model.taskassigning.TaskStatus.Suspended;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.DUMMY_TASK_PLANNER_241;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_NOT_DUMMY;
+import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 import static org.kie.server.services.taskassigning.planning.SolutionBuilder.addInOrder;
 import static org.kie.server.services.taskassigning.planning.SolutionBuilder.fromTaskData;
+import static org.kie.server.services.taskassigning.planning.TraceHelper.traceProgrammedChanges;
 import static org.kie.server.services.taskassigning.planning.util.UserUtil.fromExternalUser;
 
 /**
@@ -61,7 +62,7 @@ import static org.kie.server.services.taskassigning.planning.util.UserUtil.fromE
  */
 public class SolutionChangesBuilder {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(SolutionChangesBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SolutionChangesBuilder.class);
 
     private TaskAssigningSolution solution;
 
@@ -71,7 +72,11 @@ public class SolutionChangesBuilder {
 
     private SolverHandlerContext context;
 
-    public SolutionChangesBuilder() {
+    private SolutionChangesBuilder() {
+    }
+
+    public static SolutionChangesBuilder create() {
+        return new SolutionChangesBuilder();
     }
 
     public SolutionChangesBuilder withSolution(TaskAssigningSolution solution) {
@@ -224,18 +229,16 @@ public class SolutionChangesBuilder {
 
         if (LOGGER.isTraceEnabled()) {
             if (!totalChanges.isEmpty()) {
-                traceProgrammedChanges(removedTaskChanges, releasedTasksChanges, changesByUserId, propertyChanges, newTaskChanges);
+                traceProgrammedChanges(LOGGER, removedTaskChanges, releasedTasksChanges, changesByUserId, propertyChanges, newTaskChanges);
             } else {
                 LOGGER.trace("No changes has been calculated.");
             }
         }
 
-        applyWorkaroundForPLANNER_241(solution, totalChanges);
+        applyWorkaroundForPLANNER241(solution, totalChanges);
 
         if (!totalChanges.isEmpty()) {
-            totalChanges.add(0, scoreDirector -> {
-                context.setCurrentChangeSetId(context.nextChangeSetId());
-            });
+            totalChanges.add(0, scoreDirector -> context.setCurrentChangeSetId(context.nextChangeSetId()));
         }
         return totalChanges;
     }
@@ -272,77 +275,10 @@ public class SolutionChangesBuilder {
      * and will be removed as soon it's fixed. Note that workaround doesn't have a huge impact on the solution since
      * the dummy task is added only once and to the planning user.
      */
-    private void applyWorkaroundForPLANNER_241(TaskAssigningSolution solution, List<ProblemFactChange<TaskAssigningSolution>> changes) {
+    private void applyWorkaroundForPLANNER241(TaskAssigningSolution solution, List<ProblemFactChange<TaskAssigningSolution>> changes) {
         boolean hasDummyTask241 = solution.getTaskList().stream().anyMatch(task -> DUMMY_TASK_PLANNER_241.getId().equals(task.getId()));
         if (!hasDummyTask241) {
             changes.add(new AssignTaskProblemFactChange(DUMMY_TASK_PLANNER_241, PLANNING_USER));
         }
-    }
-
-    private void traceProgrammedChanges(List<RemoveTaskProblemFactChange> removedTasksChanges,
-                                        List<ReleaseTaskProblemFactChange> releasedTasksChanges,
-                                        Map<String, List<SolutionBuilder.IndexedElement<AssignTaskProblemFactChange>>> changesByUserId,
-                                        List<TaskPropertyChangeProblemFactChange> propertyChanges,
-                                        List<AddTaskProblemFactChange> newTaskChanges) {
-        LOGGER.trace("\n");
-
-        LOGGER.trace("*** Removed tasks ***");
-        LOGGER.trace("Total tasks removed from solution is {}", removedTasksChanges.size());
-        removedTasksChanges.forEach(change -> LOGGER.trace(" -> (" + change.getTask().getId() + ", " + change.getTask().getName() + ")"));
-        LOGGER.trace("*** End of Removed tasks ***");
-
-        LOGGER.trace("\n");
-
-        LOGGER.trace("*** Released tasks ***");
-        LOGGER.trace("Total tasks released from solution is {}", releasedTasksChanges.size());
-        releasedTasksChanges.forEach(change -> LOGGER.trace(" -> (" + change.getTask().getId() + ", " + change.getTask().getName() + ")"));
-        LOGGER.trace("*** End of Released tasks ***");
-
-        LOGGER.trace("\n");
-
-        LOGGER.trace("*** Changes per user ***");
-        LOGGER.trace("Total users with programmed changes is {}", changesByUserId.size());
-        changesByUserId.forEach((key, userChanges) -> {
-            if (userChanges != null) {
-                userChanges.forEach(change -> {
-                    LOGGER.trace("\n");
-                    LOGGER.trace("  AssignTaskToUserChanges for user: " + key);
-
-                    LOGGER.trace("   -> taskId: " + change.getElement().getTask().getId() +
-                                         ", pinned: " + change.isPinned() +
-                                         ", index: " + change.getIndex() +
-                                         ", status: " + change.getElement().getTask().getStatus());
-                    LOGGER.trace("  End of AssignTaskToUserChanges for user: " + key);
-                    LOGGER.trace("\n");
-                });
-            }
-        });
-        LOGGER.trace("*** End of Changes per user ***");
-
-        LOGGER.trace("\n");
-
-        LOGGER.trace("*** Property changes ***");
-        LOGGER.trace("Total tasks with property changes is {}", propertyChanges.size());
-
-        propertyChanges.forEach(change -> {
-            String changeDesc = "";
-            if (change.getPriority() != null) {
-                changeDesc = " setPriority = " + change.getPriority();
-            }
-            if (change.getStatus() != null) {
-                changeDesc = " setStatus = " + change.getStatus();
-            }
-            LOGGER.trace(" -> (" + change.getTask().getId() + ", " + change.getTask().getName() + ")" + changeDesc);
-        });
-        LOGGER.trace("*** End of Property changes ***");
-
-        LOGGER.trace("\n");
-
-        LOGGER.trace("*** New tasks ***");
-        LOGGER.trace("Total new tasks added to solution is {}", newTaskChanges.size());
-        newTaskChanges.forEach(change -> LOGGER.trace(" -> (" + change.getTask().getId() + ", " + change.getTask().getName() + ")"));
-        LOGGER.trace("*** End of New tasks ***");
-
-        LOGGER.trace("\n");
     }
 }

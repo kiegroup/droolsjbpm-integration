@@ -223,8 +223,8 @@ public class TaskAssigningRuntimeServiceBase {
 
     public static class PlanningException extends RuntimeException {
 
-        private String containerId;
-        private ExecutePlanningResult.ErrorCode code;
+        private final String containerId;
+        private final ExecutePlanningResult.ErrorCode code;
 
         public PlanningException(String message, String containerId, ExecutePlanningResult.ErrorCode code) {
             super(message);
@@ -287,7 +287,7 @@ public class TaskAssigningRuntimeServiceBase {
         LOGGER.debug("Bulk delegation for container: {} finished successfully", containerId);
     }
 
-    private static abstract class PlanningCommand extends TaskCommand {
+    private abstract static class PlanningCommand extends TaskCommand {
 
         protected PlanningItem planningItem;
         protected TaskContext taskContext;
@@ -345,8 +345,6 @@ public class TaskAssigningRuntimeServiceBase {
 
     private static class DelegateAndSaveCommand extends PlanningCommand {
 
-        private String userId;
-
         public DelegateAndSaveCommand(PlanningItem planningItem, String userId) {
             super(planningItem);
             this.userId = userId;
@@ -374,7 +372,7 @@ public class TaskAssigningRuntimeServiceBase {
             final OrganizationalEntity existingPotentialOwner = findPotentialOwner(task, planningItem.getPlanningTask().getAssignedUser());
 
             // perform the delegation
-            DelegateTaskCommand delegateTaskCommand = new DelegateTaskCommand(planningItem.getTaskId(), userId, planningItem.getPlanningTask().getAssignedUser());
+            DelegateTaskCommand delegateTaskCommand = new DelegateTaskCommand(planningItem.getTaskId(), getUserId(), planningItem.getPlanningTask().getAssignedUser());
             delegateTaskCommand.execute(context);
 
             if (existingPotentialOwner == null) {
@@ -393,14 +391,14 @@ public class TaskAssigningRuntimeServiceBase {
                                                           new Date()));
             return null;
         }
-    }
 
-    private static OrganizationalEntity findPotentialOwner(Task task, String potentialOwnerId) {
-        if (task.getPeopleAssignments() != null && task.getPeopleAssignments().getPotentialOwners() != null) {
-            return task.getPeopleAssignments().getPotentialOwners().stream()
-                    .filter(organizationalEntity -> organizationalEntity.getId().equals(potentialOwnerId) && organizationalEntity instanceof User)
-                    .findFirst().orElse(null);
+        private static OrganizationalEntity findPotentialOwner(Task task, String potentialOwnerId) {
+            if (task.getPeopleAssignments() != null && task.getPeopleAssignments().getPotentialOwners() != null) {
+                return task.getPeopleAssignments().getPotentialOwners().stream()
+                        .filter(organizationalEntity -> organizationalEntity.getId().equals(potentialOwnerId) && organizationalEntity instanceof User)
+                        .findFirst().orElse(null);
+            }
+            return null;
         }
-        return null;
     }
 }

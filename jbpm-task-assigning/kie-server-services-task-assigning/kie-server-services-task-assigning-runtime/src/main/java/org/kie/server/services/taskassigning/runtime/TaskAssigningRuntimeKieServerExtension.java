@@ -50,7 +50,7 @@ import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_RUNTIME_E
 
 public class TaskAssigningRuntimeKieServerExtension implements KieServerExtension {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(TaskAssigningRuntimeKieServerExtension.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskAssigningRuntimeKieServerExtension.class);
 
     private static final String TASK_ASSIGNING_QUERY_DEFINITIONS_RESOURCE = "/task-assigning-query-definitions.json";
 
@@ -116,15 +116,12 @@ public class TaskAssigningRuntimeKieServerExtension implements KieServerExtensio
 
         for (Object object : jbpmServices) {
             // in case given service is null (meaning was not configured) continue with next one
-            if (object == null) {
-                continue;
-            }
-            if (UserTaskService.class.isAssignableFrom(object.getClass())) {
-                userTaskService = (UserTaskService) object;
-                continue;
-            }
-            if (QueryService.class.isAssignableFrom(object.getClass())) {
-                queryService = (QueryService) object;
+            if (object != null) {
+                if (UserTaskService.class.isAssignableFrom(object.getClass())) {
+                    userTaskService = (UserTaskService) object;
+                } else if (QueryService.class.isAssignableFrom(object.getClass())) {
+                    queryService = (QueryService) object;
+                }
             }
         }
         taskAssigningRuntimeServiceBase = new TaskAssigningRuntimeServiceBase(userTaskService, queryService);
@@ -160,9 +157,9 @@ public class TaskAssigningRuntimeKieServerExtension implements KieServerExtensio
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
                 = ServiceLoader.load(KieServerApplicationComponentsService.class);
         List<Object> appComponentsList = new ArrayList<>();
-        Object[] services = {taskAssigningRuntimeServiceBase, registry};
+        Object[] componentServices = {taskAssigningRuntimeServiceBase, registry};
         for (KieServerApplicationComponentsService appComponentsService : appComponentsServices) {
-            appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
+            appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, componentServices));
         }
         return appComponentsList;
     }

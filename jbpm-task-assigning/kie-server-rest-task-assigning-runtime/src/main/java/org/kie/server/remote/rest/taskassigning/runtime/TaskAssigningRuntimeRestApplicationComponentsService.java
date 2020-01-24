@@ -39,15 +39,12 @@ public class TaskAssigningRuntimeRestApplicationComponentsService implements Kie
 
         for (Object object : services) {
             // in case given service is null (meaning was not configured) continue with next one
-            if (object == null) {
-                continue;
-            }
-            if (TaskAssigningRuntimeServiceBase.class.isAssignableFrom(object.getClass())) {
-                taskAssigningRuntimeServiceBase = (TaskAssigningRuntimeServiceBase) object;
-                continue;
-            } else if (KieServerRegistry.class.isAssignableFrom(object.getClass())) {
-                context = (KieServerRegistry) object;
-                continue;
+            if (object != null) {
+                if (TaskAssigningRuntimeServiceBase.class.isAssignableFrom(object.getClass())) {
+                    taskAssigningRuntimeServiceBase = (TaskAssigningRuntimeServiceBase) object;
+                } else if (KieServerRegistry.class.isAssignableFrom(object.getClass())) {
+                    context = (KieServerRegistry) object;
+                }
             }
         }
 

@@ -25,13 +25,17 @@ import org.kie.server.api.model.taskassigning.LocalDateTimeValue;
 
 import static org.kie.server.api.KieServerConstants.CAPABILITY_BPM;
 import static org.kie.server.api.KieServerConstants.CAPABILITY_TASK_ASSIGNING_RUNTIME;
+import static org.kie.server.api.KieServerConstants.CFG_BYPASS_AUTH_USER;
 
 public class TaskAssigningRuntimeClientFactory {
 
     static {
         // Ensure user bypass is on to be able to e.g. let the client "admin" user to claim/delegate tasks on behalf
         // of other users
-        System.setProperty("org.kie.server.bypass.auth.user", Boolean.TRUE.toString());
+        System.setProperty(CFG_BYPASS_AUTH_USER, Boolean.TRUE.toString());
+    }
+
+    private TaskAssigningRuntimeClientFactory() {
     }
 
     static KieServicesClient createKieServicesClient(final String endpoint,
