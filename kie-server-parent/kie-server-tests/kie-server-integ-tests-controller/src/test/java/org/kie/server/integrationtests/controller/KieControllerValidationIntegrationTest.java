@@ -151,6 +151,14 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
 
         // Check that kie server is registered.
         ServerInstanceKeyList list = controllerClient.getServerInstances(SERVER_TEMPLATE_ID);
+
+        // Sometimes the controller healthcheck deletes server instance sooner than we retrieve it back, in such case register the instance again
+        if (list == null || list.getServerInstanceKeys() == null || list.getServerInstanceKeys().length == 0) {
+            setup = controller.connect(kieServerInfo);
+            Assert.assertTrue(setup.hasNoErrors());
+            list = controllerClient.getServerInstances(SERVER_TEMPLATE_ID);
+        }
+
         assertNotNull(list.getServerInstanceKeys());
         assertEquals(1, list.getServerInstanceKeys().length);
 
