@@ -18,6 +18,7 @@ package org.kie.server.remote.rest.common.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,6 +33,7 @@ import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.Aggregatable;
 import org.kie.server.common.rest.RestEasy960Util;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
@@ -51,7 +53,7 @@ public class RestUtils {
 
     public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
-        Variant v = getVariant(headers);
+        Variant v = getVariant(headers, responseObj);
         String contentType = getContentType(headers);
 
         if( status != null ) {
@@ -65,7 +67,7 @@ public class RestUtils {
 
     public static Response createCorrectVariant(MarshallerHelper marshallerHelper, String containerId, Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
-        Variant v = getVariant(headers);
+        Variant v = getVariant(headers, responseObj);
         String contentType = getContentType(headers);
 
         String marshalledResponse;
@@ -94,13 +96,37 @@ public class RestUtils {
         return responseBuilder.build();
     }
 
-    
-    public static Variant getVariant(HttpHeaders headers) { 
+    public static Variant getVariant(HttpHeaders headers) {
+        return getVariant(headers, null);
+    }
+
+    public static Variant getVariant(HttpHeaders headers, Object obj) {
         Variant v = RestEasy960Util.getVariant(headers);
         if( v == null ) {
             v = Variant.mediaTypes(getMediaType(headers)).add().build().get(0);
         }
+
+        if (!(shouldAggregate(obj))) {
+            MediaType oldMediaType = v.getMediaType();
+            MediaType aggregatableMediaType = new MediaType(oldMediaType.getType(), oldMediaType.getSubtype(),
+                                                            Collections.singletonMap("aggregatable", "false"));
+            v = Variant.mediaTypes(aggregatableMediaType).add().build().get(0);
+
+        }
         return v;
+    }
+
+    private static boolean shouldAggregate(Object obj) {
+        // by default true
+        if (obj == null) {
+            return true;
+        }
+
+        Aggregatable aggregatable = obj.getClass().getAnnotation(Aggregatable.class);
+        if (aggregatable == null) {
+            return true;
+        }
+        return aggregatable.value();
     }
 
     public static String getClassType(HttpHeaders headers) {

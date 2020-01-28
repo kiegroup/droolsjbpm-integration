@@ -1,0 +1,11 @@
+<org.kie.server.api.model.definition.ProcessDefinitionList>
+    <processes>
+        <org.kie.server.api.model.definition.ProcessDefinition>
+            <id>2</id>
+            <name>Other evaluation process</name>
+            <version>32</version>
+            <packageName>org.jbpm</packageName>
+            <containerId>evaluation_11</containerId>
+        </org.kie.server.api.model.definition.ProcessDefinition>
+    </processes>
+</org.kie.server.api.model.definition.ProcessDefinitionList>

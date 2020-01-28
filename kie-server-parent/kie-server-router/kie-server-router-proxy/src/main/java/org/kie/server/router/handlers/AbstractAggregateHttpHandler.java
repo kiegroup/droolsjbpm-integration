@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,15 +31,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.jboss.logging.Logger;
-import org.kie.server.router.proxy.aggragate.ResponseAggregator;
-
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import org.jboss.logging.Logger;
+import org.kie.server.router.proxy.aggragate.ResponseAggregator;
+import org.kie.server.router.utils.MediaTypeUtil;
 
 
 public abstract class AbstractAggregateHttpHandler implements HttpHandler {
@@ -125,10 +126,20 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
         HeaderValues accept = exchange.getRequestHeaders().get(Headers.ACCEPT);
         HeaderValues kieContentType = exchange.getRequestHeaders().get("X-KIE-ContentType");
 
-
         ResponseAggregator responseAggregator = adminHandler.getAggregators().stream().filter(a -> a.supports(kieContentType, accept, DEFAULT_ACCEPT)).findFirst().orElseThrow(() ->
                         new RuntimeException("not possible to find response aggregator for " + responseHeaders.get(Headers.ACCEPT))
         );
+
+        // we should presume the headers are coming are the same type
+        // if the media type comes from the server we just get one of them (the first)
+        boolean aggregatable = isAggregatable(responseHeaders);
+        if (!aggregatable) {
+            returnResponses = Collections.singletonList(returnResponses.get(0));
+        }
+
+        responseHeaders.forEach((name, value) -> {
+            exchange.getResponseHeaders().putAll(HttpString.tryFromString(name), value);
+        });
 
         String response = null;
         if (supportAdvancedAggregate()) {
@@ -137,12 +148,27 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
             response = responseAggregator.aggregate(returnResponses);
         }
 
-        responseHeaders.forEach((name, value) -> {
-            exchange.getResponseHeaders().putAll(HttpString.tryFromString(name), value);
-        });
+
 
         exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, response.getBytes("UTF-8").length);
         exchange.getResponseSender().send(response);
+    }
+
+    private boolean isAggregatable(Map<String, List<String>> responseHeaders) {
+        List<String> type = responseHeaders.get(Headers.CONTENT_TYPE_STRING);
+
+        // we don't know the type so we don't aggregate
+        if (type == null || type.isEmpty()) {
+            return true;
+        }
+
+        Map<String, String> parameters = MediaTypeUtil.extractParameterFromMediaTypeString(type.get(0));
+        if (parameters.containsKey("aggregatable")) {
+            Boolean aggregate = Boolean.parseBoolean(parameters.get("aggregatable"));
+            return (aggregate != null && aggregate);
+        }
+
+        return true;
     }
 
     protected String sendRequest(String url, HttpServerExchange exchange, Map<String,List<String>> responseHeaders, String page, String pageSize) throws Exception {
