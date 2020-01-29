@@ -21,23 +21,19 @@ import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.controller.api.KieServerControllerException;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
-import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerExecutor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class WebSocketKieControllerManagementIntegrationTest extends KieControllerManagementIntegrationTest<KieServerControllerClientException> {
 
