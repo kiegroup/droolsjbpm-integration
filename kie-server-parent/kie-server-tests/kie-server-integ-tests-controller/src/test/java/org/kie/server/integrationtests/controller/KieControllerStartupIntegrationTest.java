@@ -15,8 +15,6 @@
 
 package org.kie.server.integrationtests.controller;
 
-import static org.junit.Assert.*;
-
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
@@ -44,6 +42,9 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerExecutor;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class KieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
 
     @Override
@@ -56,7 +57,6 @@ public class KieControllerStartupIntegrationTest extends KieControllerManagement
 
     @BeforeClass
     public static void initialize() throws Exception {
-        KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
     }
 

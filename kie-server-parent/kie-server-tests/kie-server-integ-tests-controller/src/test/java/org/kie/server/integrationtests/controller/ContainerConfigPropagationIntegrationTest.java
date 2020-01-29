@@ -51,7 +51,6 @@ public class ContainerConfigPropagationIntegrationTest extends KieControllerMana
 
     @BeforeClass
     public static void initialize() throws Exception {
-        KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar101");
     }
