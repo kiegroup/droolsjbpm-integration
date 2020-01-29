@@ -8,7 +8,7 @@
   <imports>
     <imports/>
   </imports>
-  <packageName>org.mortgages</packageName>
+  <packageName>AllResourceTypes</packageName>
   <isNegated>false</isNegated>
   <table>
     <entry>

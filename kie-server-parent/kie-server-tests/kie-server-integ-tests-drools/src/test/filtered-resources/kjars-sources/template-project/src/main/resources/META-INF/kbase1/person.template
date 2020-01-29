@@ -50,7 +50,7 @@
       </org.drools.workbench.models.datamodel.imports.Import>
     </imports>
   </imports>
-  <packageName></packageName>
+  <packageName>kbase1</packageName>
   <isNegated>false</isNegated>
   <table>
     <entry>

@@ -26,7 +26,7 @@ public class BuildMojoIntegrationTest extends KieMavenPluginBaseIntegrationTest 
 
     @Test
     public void testCleanInstallWithAllSupportedResourceTypes() throws Exception {
-        buildKJarProject("kjar-2-all-resources", "clean", "install");
+        buildKJarProject("kjar-2-all-resources", new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
     }
 }
 

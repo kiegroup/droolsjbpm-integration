@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.maven.plugin.test
+package AllResourceTypes
 
 rule R1 when
    $str : String()

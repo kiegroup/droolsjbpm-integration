@@ -1,3 +1,4 @@
+package kbase1;
 import org.kie.server.testing.Person;
 
 rule "person_0"

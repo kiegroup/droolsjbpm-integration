@@ -102,7 +102,7 @@
   <imports>
     <imports/>
   </imports>
-  <packageName>org</packageName>
+  <packageName>AllResourceTypes</packageName>
   <tableFormat>EXTENDED_ENTRY</tableFormat>
   <data>
     <list>

@@ -29,6 +29,6 @@ public class SerializeMojoIntegrationTest extends KieMavenPluginBaseIntegrationT
 
     @Test
     public void testCleanInstallWithSerialize() throws Exception {
-        buildKJarProject("kjar-1-with-serialize", "clean", "install");
+        buildKJarProject("kjar-1-with-serialize", new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
     }
 }

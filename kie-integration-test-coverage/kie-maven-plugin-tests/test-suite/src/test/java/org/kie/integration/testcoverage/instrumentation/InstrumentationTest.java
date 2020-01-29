@@ -15,8 +15,12 @@
 
 package org.kie.integration.testcoverage.instrumentation;
 
-import org.drools.compiler.kie.builder.impl.ZipKieModule;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.drools.core.impl.InternalKieContainer;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -28,10 +32,6 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.integration.testcoverage.instrumentation.model.Dog;
 import org.kie.integration.testcoverage.instrumentation.model.Person;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -94,8 +94,8 @@ public class InstrumentationTest {
 
     @Test
     public void testMetaInfoExists() {
-        ZipKieModule zipKieModule = (ZipKieModule)((InternalKieContainer)kieContainer).getMainKieModule();
-        Collection<String> fileNames = zipKieModule.getFileNames();
+        CanonicalKieModule kieModule = (CanonicalKieModule)((InternalKieContainer)kieContainer).getMainKieModule();
+        Collection<String> fileNames = kieModule.getFileNames();
 
         assertThat(fileNames).contains("META-INF/kmodule.info");
         assertThat(fileNames).contains("META-INF/instrumentationKBase/kbase.cache");

@@ -11,6 +11,10 @@
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 
+  <properties>
+    <generateModel>NO</generateModel>
+  </properties>
+
   <!-- there should be no need for Kie, Kie-DMN, etc dependencies here -->
 
   <build>

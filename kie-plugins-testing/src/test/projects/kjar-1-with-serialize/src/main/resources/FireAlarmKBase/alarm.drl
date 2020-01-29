@@ -13,6 +13,6 @@
  * limitations under the License.
 */
 
-package org.kie.sample.model
+package FireAlarmKBase
 declare Alarm
 end

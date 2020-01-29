@@ -1,4 +1,4 @@
-package org.jboss.qa.brms.bre.functional
+package AllResourceTypes
 
 expander sample.dsl
 

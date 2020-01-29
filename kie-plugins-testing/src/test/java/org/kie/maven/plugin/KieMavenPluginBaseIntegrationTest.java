@@ -18,6 +18,7 @@ package org.kie.maven.plugin;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
@@ -34,15 +35,10 @@ abstract public class KieMavenPluginBaseIntegrationTest {
     @Rule
     public final TestResources resources = new TestResources();
 
-    public final MavenRuntime mavenRuntime;
+    public final MavenRuntime.MavenRuntimeBuilder mavenRuntimeBuilder;
 
     public KieMavenPluginBaseIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) {
-        this.mavenRuntime = builder
-                .forkedBuilder()
-                // To enable logging using slf4j-simple on the internal classes of the plug-in:
-                //.withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
-                .withEnvironment(System.getenv())
-                .build();
+        this.mavenRuntimeBuilder = builder;
     }
 
     protected void prepareTakariPom(String projectName) throws Exception {
@@ -57,7 +53,15 @@ abstract public class KieMavenPluginBaseIntegrationTest {
         Files.move(pomKie.toPath(), new File(basedir, "pom.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
-    protected MavenExecutionResult buildKJarProject(String kjarName, String... mavenGoals) throws Exception {
+    protected MavenExecutionResult buildKJarProject(String kjarName, String[] options, String... mavenGoals) throws Exception {
+        final MavenRuntime mavenRuntime = mavenRuntimeBuilder
+                .forkedBuilder()
+                // To enable logging using slf4j-simple on the internal classes of the plug-in:
+                //.withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
+                .withEnvironment(System.getenv())
+                .withCliOptions(options)
+                .build();
+
         File basedir = resources.getBasedir(kjarName);
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)

@@ -69,7 +69,7 @@
     </filter>
     <entries/>
   </auditLog>
-  <packageName>org.kie.maven.plugin.test.gdstdsl</packageName>
+  <packageName>AllResourceTypes</packageName>
   <tableFormat>EXTENDED_ENTRY</tableFormat>
   <data>
     <list>

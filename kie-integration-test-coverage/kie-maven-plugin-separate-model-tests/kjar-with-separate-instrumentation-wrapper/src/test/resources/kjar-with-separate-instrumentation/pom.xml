@@ -14,7 +14,9 @@
   <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR</name>
 
   <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
 
   <dependencyManagement>
@@ -31,6 +33,16 @@
     <dependency>
       <groupId>org.drools.testcoverage</groupId>
       <artifactId>model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+      <version>@version.org.kie@</version>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-canonical-model</artifactId>
+      <version>@version.org.kie@</version>
     </dependency>
   </dependencies>
   <build>
