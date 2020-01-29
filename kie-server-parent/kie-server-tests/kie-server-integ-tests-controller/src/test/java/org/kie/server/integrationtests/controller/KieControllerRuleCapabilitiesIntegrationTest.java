@@ -15,13 +15,8 @@
  */
 package org.kie.server.integrationtests.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-
-import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
@@ -40,10 +35,12 @@ import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
-import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends KieServerControllerClientException> extends KieControllerManagementBaseTest {
 
@@ -51,7 +48,6 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
 
     @Before
     public void initializeRemoteRepo() throws Exception {
-        KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
     }
 

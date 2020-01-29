@@ -15,9 +15,6 @@
 
 package org.kie.server.integrationtests.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -53,6 +50,9 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class WebSocketKieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
 
     public static final Logger logger = LoggerFactory.getLogger(WebSocketKieControllerStartupIntegrationTest.class);
@@ -73,7 +73,6 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
 
     @BeforeClass
     public static void initialize() throws Exception {
-        KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
     }
 

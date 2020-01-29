@@ -17,7 +17,7 @@ package org.kie.server.integrationtests.controller;
 
 import java.util.Arrays;
 import java.util.Collection;
-import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -25,6 +25,8 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.integrationtests.config.TestConfig;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WebSocketKieControllerRuntimeManagementIntegrationTest extends KieControllerRuntimeManagementIntegrationTest<KieServerControllerClientException> {
 
