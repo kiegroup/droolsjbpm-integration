@@ -11,6 +11,13 @@
   <version>1.0.1</version>
   <packaging>kjar</packaging>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>

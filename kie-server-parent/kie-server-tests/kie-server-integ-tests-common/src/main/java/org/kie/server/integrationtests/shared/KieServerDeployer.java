@@ -172,15 +172,19 @@ public class KieServerDeployer {
         MavenSettings.reinitSettings();
     }
 
-    public static void cleanAllRepositories() throws IOException {
-        File kieServerRemoteRepoDir = new File(TestConfig.getKieServerRemoteRepoDir());
-        File kieServerLocalRepoDir = new File(TestConfig.getKieServerLocalRepoDir());
+    public static void cleanAllRepositories() {
+        cleanDirectory(TestConfig.getKieServerRemoteRepoDir());
+        cleanDirectory(TestConfig.getKieServerLocalRepoDir());
+    }
 
-        FileUtils.deleteDirectory(kieServerRemoteRepoDir);
-        FileUtils.deleteDirectory(kieServerLocalRepoDir);
-
-        kieServerRemoteRepoDir.mkdir();
-        kieServerLocalRepoDir.mkdir();
+    private static void cleanDirectory(String directoryPath) {
+        File directory = new File(directoryPath);
+        try {
+            FileUtils.deleteDirectory(directory);
+            directory.mkdir();
+        } catch (IOException e) {
+            logger.error("Cannot delete directory" + directory, e);
+        }
     }
 
     public static MavenRepository getRepository() {

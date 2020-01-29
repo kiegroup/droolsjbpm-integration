@@ -12,6 +12,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <org.kie.version>1.0.0.Final</org.kie.version>
   </properties>
 
   <dependencies>
@@ -32,7 +33,7 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-takari-plugin</artifactId>
-        <version>${it-plugin.version}</version>
+        <version>${org.kie.version}</version>
         <extensions>true</extensions>
         <configuration>
           <instrument-enabled>true</instrument-enabled>

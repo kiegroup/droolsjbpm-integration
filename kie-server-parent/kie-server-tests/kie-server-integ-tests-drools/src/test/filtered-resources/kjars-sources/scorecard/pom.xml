@@ -10,6 +10,17 @@
   <artifactId>scorecard</artifactId>
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
+
+  <properties>
+    <generateModel>NO</generateModel>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+    </dependency>
+  </dependencies>
   
   <build>
     <plugins>

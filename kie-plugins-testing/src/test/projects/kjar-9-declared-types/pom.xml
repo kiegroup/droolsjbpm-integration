@@ -23,47 +23,49 @@
   <groupId>org.kie</groupId>
   <artifactId>kie-maven-plugin-test-kjar-9</artifactId>
   <version>1.0.0.Final</version>
+
+  <properties>
+    <org.kie.version>1.0.0.Final</org.kie.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
   
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
-      <version>${drools.version}</version>
+      <version>${org.kie.version}</version>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
-      <version>${drools.version}</version>
+      <version>${org.kie.version}</version>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-canonical-model</artifactId>
-      <version>${drools.version}</version>
+      <version>${org.kie.version}</version>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
-      <version>${drools.version}</version>
+      <version>${org.kie.version}</version>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
-      <version>${drools.version}</version>
+      <version>${org.kie.version}</version>
     </dependency>
   </dependencies>
 
   <packaging>kjar</packaging>
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
-        <version>${it-plugin.version}</version>
+        <version>${org.kie.version}</version>
         <extensions>true</extensions>
       </plugin>
     </plugins>

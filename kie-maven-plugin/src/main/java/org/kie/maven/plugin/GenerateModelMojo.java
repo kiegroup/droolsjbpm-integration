@@ -76,7 +76,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-    @Parameter(property = "generateModel", defaultValue = "no")
+    @Parameter(property = "generateModel", defaultValue = "WITHDRL")
     private String generateModel;
 
     @Override

@@ -64,7 +64,7 @@ public abstract class KieServerBaseIntegrationTest {
     protected static KieServerExecutor server;
     protected static KieServerRouterExecutor router;
 
-    protected static final long DEFAULT_TIMEOUT = 60000;
+    protected static final long DEFAULT_TIMEOUT = 120000;
 
     static {
         if (TestConfig.isLocalServer()) {

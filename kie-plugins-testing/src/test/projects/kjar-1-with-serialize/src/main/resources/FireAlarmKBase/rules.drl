@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.sample
+package FireAlarmKBase
 
 import java.util.*
 import org.kie.sample.model.*

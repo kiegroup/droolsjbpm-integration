@@ -26,6 +26,7 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
@@ -72,7 +73,8 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
         KieServerDeployer.cleanAllRepositories();
     }
 
-    @Test //RHPAM-479
+    @Test(timeout = 240000) //RHPAM-479
+    @Ignore("DROOLS-4938")
     public void testScanNow() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
 
