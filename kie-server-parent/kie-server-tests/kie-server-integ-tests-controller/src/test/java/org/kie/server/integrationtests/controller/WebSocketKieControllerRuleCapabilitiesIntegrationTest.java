@@ -27,7 +27,7 @@ import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.integrationtests.config.TestConfig;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WebSocketKieControllerRuleCapabilitiesIntegrationTest extends KieControllerRuleCapabilitiesIntegrationTest<KieServerControllerClientException> {
 
