@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
@@ -73,6 +74,8 @@ import org.jbpm.services.api.admin.UserTaskAdminService;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.audit.TaskAuditServiceFactory;
+import org.jbpm.services.task.deadlines.NotificationListener;
+import org.jbpm.services.task.deadlines.notifications.impl.NotificationListenerManager;
 import org.jbpm.services.task.identity.DefaultUserInfo;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.jbpm.springboot.quartz.SpringConnectionProvider;
@@ -93,6 +96,7 @@ import org.kie.spring.jbpm.services.SpringTransactionalCommandService;
 import org.kie.spring.manager.SpringRuntimeManagerFactoryImpl;
 import org.kie.spring.persistence.KieSpringTransactionManager;
 import org.kie.spring.persistence.KieSpringTransactionManagerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -125,7 +129,7 @@ import org.springframework.util.ClassUtils;
 @ConditionalOnClass({ KModuleDeploymentService.class })
 @EnableConfigurationProperties({JBPMProperties.class, DataSourceProperties.class})
 public class JBPMAutoConfiguration {
-    
+
     protected static final String PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
     protected static final String PERSISTENCE_XML_LOCATION = "classpath:/META-INF/jbpm-persistence.xml";
     
@@ -145,7 +149,10 @@ public class JBPMAutoConfiguration {
     private JBPMProperties properties;
     
     private PlatformTransactionManager transactionManager;
- 
+
+    @Autowired(required = false)
+    private List<NotificationListener> notificationListeners;
+
     public JBPMAutoConfiguration(PlatformTransactionManager transactionManager,
                                  JBPMProperties properties,
                                  ApplicationContext applicationContext) {
@@ -171,10 +178,16 @@ public class JBPMAutoConfiguration {
         if (properties.getQuartz().isEnabled()) {
             SpringConnectionProvider.setApplicationContext(applicationContext);
         }
-    }  
-    
-   
-    
+
+    }
+
+    @PostConstruct
+    public void init() {
+        if (notificationListeners != null) {
+            NotificationListenerManager.get().registerAdditionalNotificationListener(notificationListeners);
+        }
+    }
+
     @Bean
     @ConditionalOnMissingBean(name = "entityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource, JpaProperties jpaProperties){
@@ -331,10 +344,10 @@ public class JBPMAutoConfiguration {
         ((SpringKModuleDeploymentService) deploymentService).setContext(applicationContext);
 
         ((SpringKModuleDeploymentService) deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
-        
+
         return deploymentService;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "runtimeDataService")
     public RuntimeDataService runtimeDataService(EntityManagerFactory entityManagerFactory, UserGroupCallback userGroupCallback, UserInfo userInfo, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider, DeploymentService deploymentService) {
