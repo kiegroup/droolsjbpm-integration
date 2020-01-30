@@ -33,6 +33,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
+import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.events.ServerInstanceConnected;
@@ -221,7 +222,15 @@ public abstract class KieServerControllerImpl implements KieServerController {
         return serverSetup;
     }
 
+    private boolean isOpenShiftSupported() {
+        return "true".equals(System.getProperty(KieServerControllerConstants.KIE_CONTROLLER_OPENSHIFT_ENABLED, "false"));
+    }
+    
     private boolean checkValidServerInstance(ServerTemplate serverTemplate, KieServerInfo serverInfo, KieServerSetup serverSetup) {
+        // No need for OpenShift enhanced BC/WB and KieServer
+        if (isOpenShiftSupported()) {
+            return serverSetup.hasNoErrors();
+        }
         // if there is no mode we go to the next step
         if (serverTemplate.getMode() != null && !serverInfo.getMode().equals(serverTemplate.getMode())) {
             serverSetup.getMessages().add(new Message(Severity.ERROR, "Expected mode was " + serverTemplate.getMode()));
