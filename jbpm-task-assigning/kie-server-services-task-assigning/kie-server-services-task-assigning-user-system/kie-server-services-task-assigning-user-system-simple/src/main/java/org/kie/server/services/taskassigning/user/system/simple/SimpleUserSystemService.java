@@ -27,24 +27,22 @@ import java.util.stream.Collectors;
 import org.kie.server.services.taskassigning.user.system.api.Group;
 import org.kie.server.services.taskassigning.user.system.api.User;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class SimpleUserSystemService implements UserSystemService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleUserSystemService.class);
+    static final String USERS_FILE_NOT_CONFIGURED_ERROR = "No users file configuration was provided. Please configure the property: %s";
 
-    protected static final String USERS_FILE = "org.kie.server.services.taskassigning.user.system.simple.users";
-    protected static final String AFFINITIES_FILE = "org.kie.server.services.taskassigning.user.system.simple.affinities";
-    protected static final String SKILLS_FILE = "org.kie.server.services.taskassigning.user.system.simple.skills";
+    static final String USERS_FILE_LOADING_ERROR = "An error was produced during users loading from file: %s";
 
-    protected WildflyUtil.UserGroupInfo userGroupInfo = new WildflyUtil.UserGroupInfo(new ArrayList<>(), new ArrayList<>());
-    protected Map<String, User> userById = new HashMap<>();
+    static final String USERS_FILE = "org.kie.server.services.taskassigning.user.system.simple.users";
+
+    private WildflyUtil.UserGroupInfo userGroupInfo = new WildflyUtil.UserGroupInfo(new ArrayList<>(), new ArrayList<>());
+    private Map<String, User> userById = new HashMap<>();
     protected Exception error = null;
 
-    private static final String NAME = "SimpleUserSystemService";
+    public static final String NAME = "SimpleUserSystemService";
 
     public SimpleUserSystemService() {
         //SPI constructor
@@ -53,18 +51,17 @@ public class SimpleUserSystemService implements UserSystemService {
     @Override
     public void start() {
         final String usersFile = System.getProperty(USERS_FILE);
+        if (isEmpty(usersFile)) {
+            String msg = String.format(USERS_FILE_NOT_CONFIGURED_ERROR, USERS_FILE);
+            throw new SimpleUserSystemServiceException(msg);
+        }
+
         try {
-            if (isEmpty(usersFile)) {
-                LOGGER.warn("No users file configuration was provided. Please configure the property:" + USERS_FILE);
-                return;
-            }
             this.userGroupInfo = WildflyUtil.buildInfo(URI.create(usersFile));
-            this.userById = userGroupInfo.getUsers().stream().collect(Collectors.toMap(User::getId,
-                                                                                       Function.identity()));
+            this.userById = userGroupInfo.getUsers().stream().collect(Collectors.toMap(User::getId, Function.identity()));
         } catch (Exception e) {
-            LOGGER.error("An error was produced during users file loading from file: " + usersFile, e);
-            error = e;
-            userGroupInfo = new WildflyUtil.UserGroupInfo(new ArrayList<>(), new ArrayList<>());
+            String msg = String.format(USERS_FILE_LOADING_ERROR, usersFile);
+            throw new SimpleUserSystemServiceException(msg, e);
         }
     }
 
@@ -84,14 +81,23 @@ public class SimpleUserSystemService implements UserSystemService {
     }
 
     @Override
-    public void test() throws Exception {
-        if (error != null) {
-            throw error;
-        }
+    public void test() {
+        // no-op for this implementation.
     }
 
     @Override
     public User findUser(String id) {
         return userById.get(id);
+    }
+
+    public class SimpleUserSystemServiceException extends RuntimeException {
+
+        public SimpleUserSystemServiceException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public SimpleUserSystemServiceException(String message) {
+            super(message);
+        }
     }
 }

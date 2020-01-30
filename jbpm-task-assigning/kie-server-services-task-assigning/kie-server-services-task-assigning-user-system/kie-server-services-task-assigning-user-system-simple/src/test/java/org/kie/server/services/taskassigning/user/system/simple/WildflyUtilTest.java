@@ -30,17 +30,17 @@ import static org.junit.Assert.assertNotNull;
 
 public class WildflyUtilTest {
 
-    private static final String USERS_FILE = "/org/kie/server/service/taskassigning/user/system/simple/roles.properties";
+    static final String USERS_FILE = "/org/kie/server/service/taskassigning/user/system/simple/roles.properties";
 
-    private static final String USER1 = "user1";
-    private static final String USER2 = "user2";
-    private static final String USER3 = "user3";
-    private static final String USER4 = "user4";
-    private static final String USER5 = "user5";
+    static final String USER1 = "user1";
+    static final String USER2 = "user2";
+    static final String USER3 = "user3";
+    static final String USER4 = "user4";
+    static final String USER5 = "user5";
 
-    private static final String GROUP1 = "group1";
-    private static final String GROUP2 = "group2";
-    private static final String GROUP3 = "group3";
+    static final String GROUP1 = "group1";
+    static final String GROUP2 = "group2";
+    static final String GROUP3 = "group3";
 
     @Test
     public void buildInfoFromURI() throws Exception {

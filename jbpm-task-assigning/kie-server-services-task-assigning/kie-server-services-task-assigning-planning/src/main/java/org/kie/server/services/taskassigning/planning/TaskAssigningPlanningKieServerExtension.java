@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServiceResponse;
@@ -40,7 +40,9 @@ import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
+import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
+import org.optaplanner.core.api.solver.Solver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,55 +61,36 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_VERSION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_NAME;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.ACTIVATE_CONTAINER_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.CONTAINER_NOT_ACCESSIBLE_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.CREATE_CONTAINER_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.EXTENSION_CONTAINER_NOT_IN_EXPECTED_STATUS_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.HEALTH_CHECK_IS_ALIVE_MESSAGE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_CONTAINER_NOT_AVAILABLE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_NOT_CONFIGURED_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.SOLVER_CONFIGURATION_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.UNDESIRED_EXTENSIONS_RUNNING_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_CONFIGURATION_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_CONTAINER_NOT_AVAILABLE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_NAME_NOT_CONFIGURED_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_SERVICE_NOT_FOUND;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_SERVICE_START_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.addExtensionMessagePrefix;
 import static org.kie.server.services.taskassigning.planning.util.PropertyUtil.readSystemProperty;
 
 public class TaskAssigningPlanningKieServerExtension implements KieServerExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskAssigningPlanningKieServerExtension.class);
 
-    private static final String CAPABILITY_TASK_ASSIGNING_PLANNING = "TaskAssigningPlanning";
+    static final String CAPABILITY_TASK_ASSIGNING_PLANNING = "TaskAssigningPlanning";
 
-    private static final boolean DISABLED = readSystemProperty(KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED, true, value -> !Boolean.FALSE.toString().equals(value));
+    static final String EXTENSION_NAME = "TaskAssigningPlanning";
 
-    public static final String EXTENSION_NAME = "TaskAssigningPlanning";
+    static final int EXTENSION_START_ORDER = 1001;
 
     private static final String DEFAULT_SOLVER_CONFIG = "org/kie/server/services/taskassigning/solver/taskAssigningDefaultSolverConfig.xml";
-
-    private static final String CREATE_CONTAINER_ERROR = "Container creation failed for containerId: %s, error: %s";
-    private static final String ACTIVATE_CONTAINER_ERROR = "Container activation failed for containerId: %s, error: %s";
-    private static final String EXTENSION_CONTAINER_NOT_IN_EXPECTED_STATUS_ERROR = "Container %s must be in %s status but is currently %s." +
-            " " + EXTENSION_NAME + " won't operate properly.";
-
-    private static final String CONTAINER_NOT_ACCESSIBLE_ERROR = "It was not possible get access to containerId: %s" +
-            " " + EXTENSION_NAME + " won't operate properly.";
-
-    private static final String PLANNER_CONTAINER_CONFIGURATION_ERROR = "Planner container is not properly configured, error: %s" +
-            " " + EXTENSION_NAME + " won't operate properly";
-
-    private static final String PLANNER_SOLVER_NOT_CONFIGURED_ERROR = "No solverConfigResource has been configured for starting the task assigning solver." +
-            " " + EXTENSION_NAME + " won't operate properly.";
-
-    private static final String PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR = "An error was produced during solver instantiation check." +
-            " It was not possible to create a solver for the provided configuration, error: %s." +
-            " " + EXTENSION_NAME + " won't operate properly.";
-
-    private static final String PLANNER_CONTAINER_NOT_AVAILABLE = "Planner container %s is not available." +
-            " " + EXTENSION_NAME + " won't operate properly";
-
-    private static final String UNDESIRED_EXTENSIONS_RUNNING_ERROR = "It's was detected that the following extensions %s" +
-            " are running in current server, but it's not recommended to run them on the same server instance as the " + EXTENSION_NAME;
-
-    private static final String USER_SYSTEM_NAME_NOT_CONFIGURED_ERROR = "No user system service name has been configured." +
-            " " + EXTENSION_NAME + " won't operate properly. Please use the property %s to configure it";
-
-    private static final String USER_SYSTEM_CONTAINER_CONFIGURATION_ERROR = "User system service container is not properly configured, error: %s" +
-            " " + EXTENSION_NAME + " won't operate properly";
-
-    private static final String USER_SYSTEM_CONTAINER_NOT_AVAILABLE = "User system service container %s is not available." +
-            " " + EXTENSION_NAME + " won't operate properly";
-
-    private static final String USER_SYSTEM_SERVICE_NOT_FOUND = "User system service %s was not found." +
-            " " + EXTENSION_NAME + " won't operate properly";
 
     private KieServer kieServer;
     private KieServerRegistry registry;
@@ -120,6 +103,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
     private SolverDef solverDef;
     private String userSystemName;
     private KieContainerResource userSystemContainer = null;
+    private List<Message> permanentErrors = new ArrayList<>();
 
     /**
      * Invoked by the KieServer initialization procedure to determine if current extension has been activated in current
@@ -128,7 +112,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
      */
     @Override
     public boolean isActive() {
-        return !DISABLED;
+        return Boolean.FALSE.toString().equals(System.getProperty(KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED, Boolean.TRUE.toString()));
     }
 
     /**
@@ -139,29 +123,30 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         LOGGER.debug("Initializing " + EXTENSION_NAME + " extension.");
         this.kieServer = kieServer;
         this.registry = registry;
-        if (DISABLED) {
-            LOGGER.debug(EXTENSION_NAME + " is currently disabled. Use the " + KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED + " to enable it if needed.");
-            return;
-        }
 
         KieServerExtension jbpmExtension = registry.getServerExtension(JbpmKieServerExtension.EXTENSION_NAME);
         if (jbpmExtension != null) {
             String msg = String.format(UNDESIRED_EXTENSIONS_RUNNING_ERROR, JbpmKieServerExtension.EXTENSION_NAME);
             LOGGER.warn(msg);
-            kieServer.addServerMessage(new Message(Severity.WARN, msg));
+            kieServer.addServerMessage(new Message(Severity.WARN, addExtensionMessagePrefix(msg)));
         }
 
         initRuntimeClient();
 
-        if (!validateAndSetSolverConfiguration()) {
-            return;
+        try {
+            validateAndSetSolverConfiguration();
+        } catch (TaskAssigningValidationException e) {
+            throw new KieServicesException(String.format(SOLVER_CONFIGURATION_ERROR, e.getMessage()), e);
         }
-        if (!validateAndSetUserSystemServiceConfiguration()) {
-            return;
+
+        try {
+            validateAndSetUserSystemServiceConfiguration();
+        } catch (TaskAssigningValidationException e) {
+            throw new KieServicesException(String.format(USER_SYSTEM_CONFIGURATION_ERROR, e.getMessage()), e);
         }
 
         this.executorService = Executors.newFixedThreadPool(3);
-        this.taskAssigningService = new TaskAssigningService();
+        this.taskAssigningService = createTaskAssigningService();
         this.services.add(taskAssigningService);
 
         this.initialized = true;
@@ -179,16 +164,6 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
 
     @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        // no-op are required for this extension.
-    }
-
-    @Override
-    public void activateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        // no-op are required for this extension.
-    }
-
-    @Override
-    public void deactivateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         // no-op are required for this extension.
     }
 
@@ -237,7 +212,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
 
     @Override
     public Integer getStartOrder() {
-        return 1001;
+        return EXTENSION_START_ORDER;
     }
 
     @Override
@@ -271,10 +246,20 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
     @Override
     public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
         LOGGER.debug("Destroying " + EXTENSION_NAME + " extension.");
-        if (DISABLED || !initialized) {
-            return;
+        if (initialized) {
+            taskAssigningService.destroy();
         }
-        taskAssigningService.destroy();
+    }
+
+    @Override
+    public List<Message> healthCheck(boolean report) {
+        List<Message> messages = KieServerExtension.super.healthCheck(report);
+        if (!permanentErrors.isEmpty()) {
+            messages.addAll(permanentErrors);
+        } else if (report) {
+            messages.add(new Message(Severity.INFO, HEALTH_CHECK_IS_ALIVE_MESSAGE));
+        }
+        return messages;
     }
 
     private SolverDef getSolverDef() {
@@ -291,6 +276,10 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                              solverConfigResource);
     }
 
+    TaskAssigningService createTaskAssigningService() {
+        return new TaskAssigningService();
+    }
+
     private UserSystemService getUserSystemService() {
         return userSystemService;
     }
@@ -299,13 +288,10 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         return runtimeClient;
     }
 
-    private boolean validateAndSetSolverConfiguration() {
+    private void validateAndSetSolverConfiguration() throws TaskAssigningValidationException {
         this.solverDef = getSolverDef();
         if (isEmpty(solverDef.getSolverConfigResource())) {
-            String msg = PLANNER_SOLVER_NOT_CONFIGURED_ERROR;
-            LOGGER.error(msg);
-            kieServer.addServerMessage(new Message(Severity.ERROR, msg));
-            return false;
+            throw new TaskAssigningValidationException(PLANNER_SOLVER_NOT_CONFIGURED_ERROR);
         }
 
         if (!isEmpty(solverDef.getContainerId())) {
@@ -314,9 +300,8 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                                                                                    solverDef.getArtifactId(),
                                                                                    solverDef.getVersion()));
 
-            return validateContainerConfiguration(resource, e -> String.format(PLANNER_CONTAINER_CONFIGURATION_ERROR, e.getMessage()));
+            validateContainerRequiredParams(resource);
         }
-        return true;
     }
 
     private boolean initSolverRuntime() {
@@ -329,33 +314,35 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
             if (container == null) {
                 String msg = String.format(PLANNER_CONTAINER_NOT_AVAILABLE, solverDef.getContainerId());
                 LOGGER.error(msg);
-                kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+                registerMessage(Severity.ERROR, msg);
                 return false;
             }
         }
 
         try {
             //early check that solver can be properly started.
-            SolverBuilder.builder()
-                    .registry(registry)
-                    .solverDef(solverDef)
-                    .build();
+            createSolver(registry, solverDef);
         } catch (Exception e) {
             String msg = String.format(PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR, e.getMessage());
             LOGGER.error(msg, e);
-            kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+            registerMessage(Severity.ERROR, msg);
             return false;
         }
         return true;
     }
 
-    private boolean validateAndSetUserSystemServiceConfiguration() {
+    Solver<TaskAssigningSolution> createSolver(KieServerRegistry registry, SolverDef solverDef) {
+        return SolverBuilder.create()
+                .registry(registry)
+                .solverDef(solverDef)
+                .build();
+    }
+
+    private void validateAndSetUserSystemServiceConfiguration() throws TaskAssigningValidationException {
         this.userSystemName = readSystemProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, null, value -> value);
         if (isEmpty(userSystemName)) {
             String msg = String.format(USER_SYSTEM_NAME_NOT_CONFIGURED_ERROR, TASK_ASSIGNING_USER_SYSTEM_NAME);
-            LOGGER.error(msg);
-            kieServer.addServerMessage(new Message(Severity.ERROR, msg));
-            return false;
+            throw new TaskAssigningValidationException(msg);
         }
 
         final String containerId = readSystemProperty(TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID, null, value -> value);
@@ -369,9 +356,8 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                                                                               artifactId,
                                                                               version));
 
-            return validateContainerConfiguration(userSystemContainer, e -> String.format(USER_SYSTEM_CONTAINER_CONFIGURATION_ERROR, e.getMessage()));
+            validateContainerRequiredParams(userSystemContainer);
         }
-        return true;
     }
 
     private boolean initUserSystemService() {
@@ -382,7 +368,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
             if (container == null) {
                 String msg = String.format(USER_SYSTEM_CONTAINER_NOT_AVAILABLE, userSystemContainer.getContainerId());
                 LOGGER.error(msg);
-                kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+                registerMessage(Severity.ERROR, msg);
                 return false;
             }
             classLoader = container.getKieContainer().getClassLoader();
@@ -390,17 +376,23 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
             LOGGER.debug("User system service {} will be loaded from application class loader", userSystemName);
             classLoader = this.getClass().getClassLoader();
         }
-
-        final Map<String, UserSystemService> userServices = UserSystemServiceLoader.loadServices(classLoader);
-        userSystemService = userServices.get(userSystemName);
+        userSystemService = lookupUserSystem(userSystemName, classLoader);
         if (userSystemService == null) {
             final String msg = String.format(USER_SYSTEM_SERVICE_NOT_FOUND, userSystemName);
             LOGGER.error(msg);
-            kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+            registerMessage(Severity.ERROR, msg);
             return false;
         }
 
-        userSystemService.start();
+        try {
+            userSystemService.start();
+        } catch (Exception e) {
+            final String msg = String.format(USER_SYSTEM_SERVICE_START_ERROR, userSystemName, e.getMessage());
+            LOGGER.error(msg, e);
+            registerMessage(Severity.ERROR, msg);
+            return false;
+        }
+
         try {
             userSystemService.test();
             LOGGER.debug("User system service {} test check was successful.", userSystemName);
@@ -410,34 +402,29 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         return true;
     }
 
+    UserSystemService lookupUserSystem(String userSystemName, ClassLoader classLoader) {
+        final Map<String, UserSystemService> userServices = UserSystemServiceLoader.loadServices(classLoader);
+        return userServices.get(userSystemName);
+    }
+
     private void initRuntimeClient() {
         String url = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL, "http://localhost:8080/kie-server/services/rest/server", value -> value);
         String user = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER, "wbadmin", value -> value);
         String pwd = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD, null, value -> value);
-        this.runtimeClient = TaskAssigningRuntimeClientFactory.newRuntimeClient(url, user, pwd);
+        this.runtimeClient = createRuntimeClient(url, user, pwd);
     }
 
-    private boolean validateContainerConfiguration(KieContainerResource resource, Function<Exception, String> printableErrorMessage) {
-        try {
-            validateContainerRequiredParams(resource);
-        } catch (Exception e) {
-            String msg = printableErrorMessage.apply(e);
-            LOGGER.error(msg);
-            kieServer.addServerMessage(new Message(Severity.ERROR, msg));
-            return false;
-        }
-        return true;
+    TaskAssigningRuntimeClient createRuntimeClient(String url, String user, String pwd) {
+        return TaskAssigningRuntimeClientFactory.newRuntimeClient(url, user, pwd);
     }
 
-    private void validateContainerRequiredParams(KieContainerResource resource) throws Exception {
+    private void validateContainerRequiredParams(KieContainerResource resource) throws TaskAssigningValidationException {
         final String containerId = resource.getContainerId();
         final String groupId = resource.getReleaseId().getGroupId();
         final String artifactId = resource.getReleaseId().getArtifactId();
         final String version = resource.getReleaseId().getVersion();
         if (isEmpty(containerId) || isEmpty(artifactId) || isEmpty(groupId) || isEmpty(version)) {
-            throw new Exception("Required parameters for container configuration are missing." +
-                                        " containerId: " + containerId +
-                                        ", groupId: " + groupId + ", artifactId: " + artifactId + ", version: " + version + ".");
+            throw new TaskAssigningValidationException(String.format(REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING, containerId, groupId, artifactId, version));
         }
     }
 
@@ -450,7 +437,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                 if (response.getType() == KieServiceResponse.ResponseType.FAILURE) {
                     String msg = String.format(CREATE_CONTAINER_ERROR, resource.getContainerId(), response.getMsg());
                     LOGGER.error(msg);
-                    kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+                    registerMessage(Severity.ERROR, msg);
                     return null;
                 }
 
@@ -459,13 +446,13 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                 if (container == null) {
                     final String msg = String.format(CONTAINER_NOT_ACCESSIBLE_ERROR, resource.getContainerId());
                     LOGGER.error(msg);
-                    kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+                    registerMessage(Severity.ERROR, msg);
                     return null;
                 }
             } catch (Exception e) {
                 String msg = String.format(CREATE_CONTAINER_ERROR, resource.getContainerId(), e.getMessage());
                 LOGGER.error(msg, e);
-                kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+                registerMessage(Severity.ERROR, msg);
                 return null;
             }
         }
@@ -477,13 +464,13 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                 if (response.getType() == KieServiceResponse.ResponseType.FAILURE) {
                     String msg = String.format(ACTIVATE_CONTAINER_ERROR, resource.getContainerId(), response.getMsg());
                     LOGGER.error(msg);
-                    kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+                    registerMessage(Severity.ERROR, msg);
                     return null;
                 }
             } catch (Exception e) {
                 String msg = String.format(ACTIVATE_CONTAINER_ERROR, resource.getContainerId(), e.getMessage());
                 LOGGER.error(msg, e);
-                kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+                registerMessage(Severity.ERROR, msg);
                 return null;
             }
         }
@@ -491,9 +478,15 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         if (container.getStatus() != KieContainerStatus.STARTED) {
             String msg = String.format(EXTENSION_CONTAINER_NOT_IN_EXPECTED_STATUS_ERROR, resource.getContainerId(), KieContainerStatus.STARTED, container.getStatus());
             LOGGER.error(msg);
-            kieServer.addServerMessage(new Message(Severity.ERROR, msg));
+            registerMessage(Severity.ERROR, msg);
             return null;
         }
         return container;
+    }
+
+    private void registerMessage(Severity severity, String msg) {
+        final String prefixedMsg = addExtensionMessagePrefix(msg);
+        kieServer.addServerMessage(new Message(severity, prefixedMsg));
+        permanentErrors.add(new Message(severity, prefixedMsg));
     }
 }

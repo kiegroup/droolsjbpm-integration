@@ -19,11 +19,8 @@ package org.kie.server.services.taskassigning.runtime.query;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.dashbuilder.dataset.DataSet;
 import org.jbpm.kie.services.impl.query.mapper.AbstractQueryMapper;
@@ -123,16 +120,6 @@ public abstract class AbstractTaskAssigningQueryMapper<T> extends AbstractQueryM
         }
     }
 
-    protected Set<TASK_QUERY_COLUMN> columnSet = new HashSet<>();
-
-    public AbstractTaskAssigningQueryMapper() {
-        columnSet = createColumnSet();
-    }
-
-    protected Set<TASK_QUERY_COLUMN> createColumnSet() {
-        return new HashSet<>(Arrays.asList(TASK_QUERY_COLUMN.values()));
-    }
-
     /**
      * Default access to get instance of the mapper
      */
@@ -213,7 +200,7 @@ public abstract class AbstractTaskAssigningQueryMapper<T> extends AbstractQueryM
 
     protected abstract void addPotentialOwner(T taskRow, String potentialOwnerId, String potentialOwnerType);
 
-    public static LocalDateTime toLocalDateTime(Object value) {
+    protected static LocalDateTime toLocalDateTime(Object value) {
         if (value == null) {
             return null;
         }

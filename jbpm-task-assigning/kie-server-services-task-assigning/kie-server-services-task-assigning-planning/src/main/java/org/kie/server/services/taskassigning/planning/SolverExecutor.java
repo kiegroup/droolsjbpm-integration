@@ -27,6 +27,7 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.DESTROYED;
 import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STARTED;
 import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STARTING;
 import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STOPPED;
@@ -70,14 +71,11 @@ public class SolverExecutor extends RunnableBase {
     public void start(final TaskAssigningSolution solution) {
         checkNotNull("solution", solution);
         if (!status.compareAndSet(STOPPED, STARTING)) {
-            throw new RuntimeException("SolverExecutor start method can only be invoked when the status is STOPPED");
+            throw new IllegalStateException("SolverExecutor start method can only be invoked when the status is STOPPED");
         }
         this.solution = solution;
         try {
-            this.solver = SolverBuilder.builder()
-                    .solverDef(solverDef)
-                    .registry(registry)
-                    .build();
+            this.solver = buildSolver(solverDef, registry);
         } catch (Exception e) {
             status.set(STOPPED);
             throw new RuntimeException(e.getMessage(), e);
@@ -89,6 +87,13 @@ public class SolverExecutor extends RunnableBase {
             }
         });
         startPermit.release();
+    }
+
+    protected Solver<TaskAssigningSolution> buildSolver(SolverDef solverDef, KieServerRegistry registry) {
+        return SolverBuilder.create()
+                .solverDef(solverDef)
+                .registry(registry)
+                .build();
     }
 
     /**
@@ -116,10 +121,6 @@ public class SolverExecutor extends RunnableBase {
         }
     }
 
-    private boolean isStopping() {
-        return status.get() == STOPPING;
-    }
-
     /**
      * This method programmes the subsequent finalization of the solver (if it was started) that will be produced as
      * soon as possible by invoking the solver.terminateEarly() method. If the solver wasn't started it just finalizes
@@ -127,11 +128,10 @@ public class SolverExecutor extends RunnableBase {
      */
     @Override
     public void destroy() {
-        super.destroy();
-        if (isStarted()) {
+        if (status.getAndSet(DESTROYED) == STARTED) {
             solver.terminateEarly();
         } else {
-            startPermit.release();
+            startPermit.release(); //un-lock in case it was waiting for a solution to start.
         }
     }
 

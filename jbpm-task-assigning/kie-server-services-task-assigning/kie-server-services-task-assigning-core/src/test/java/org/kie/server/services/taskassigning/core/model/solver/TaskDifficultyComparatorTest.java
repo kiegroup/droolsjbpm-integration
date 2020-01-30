@@ -1,8 +1,7 @@
 package org.kie.server.services.taskassigning.core.model.solver;
 
-import org.kie.server.services.taskassigning.core.model.Task;
-import org.kie.server.services.taskassigning.core.model.solver.TaskDifficultyComparator;
 import org.junit.Test;
+import org.kie.server.services.taskassigning.core.model.Task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

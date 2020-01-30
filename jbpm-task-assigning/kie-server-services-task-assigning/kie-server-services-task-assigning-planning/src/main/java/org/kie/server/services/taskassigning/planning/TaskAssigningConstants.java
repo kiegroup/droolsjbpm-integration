@@ -71,4 +71,8 @@ public class TaskAssigningConstants {
 
     public static final String TASK_ASSIGNING_USER_SYSTEM_CONTAINER_VERSION = "org.kie.server.taskAssigning.userSystem.container.version";
 
+    /**
+     * Property for configuring the pageSize for the tasks queries that are used for populating/updating the solver.
+     */
+    public static final String TASK_ASSIGNING_RUNTIME_DELEGATE_PAGE_SIZE = "org.kie.server.taskAssigning.runtimeDelegate.pageSize";
 }

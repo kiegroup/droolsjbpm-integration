@@ -29,17 +29,29 @@ import java.util.stream.Collectors;
 
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.query.QueryMapperRegistry;
+import org.jbpm.services.api.query.QueryResultMapper;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.query.QueryContext;
+import org.kie.api.task.model.Status;
+import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.taskassigning.LocalDateTimeValue;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.api.model.taskassigning.TaskInputVariablesReadMode;
+import org.kie.server.api.model.taskassigning.util.StatusConverter;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.taskassigning.runtime.query.AbstractTaskAssigningQueryMapper;
 import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataQueryMapper;
 import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataSummaryQueryMapper;
 
 import static org.apache.commons.lang3.ClassUtils.isPrimitiveWrapper;
+import static org.kie.api.task.model.Status.Created;
+import static org.kie.api.task.model.Status.InProgress;
+import static org.kie.api.task.model.Status.Ready;
+import static org.kie.api.task.model.Status.Reserved;
+import static org.kie.api.task.model.Status.Suspended;
 import static org.kie.server.api.model.taskassigning.QueryParamName.FROM_LAST_MODIFICATION_DATE;
 import static org.kie.server.api.model.taskassigning.QueryParamName.FROM_TASK_ID;
 import static org.kie.server.api.model.taskassigning.QueryParamName.PAGE;
@@ -54,10 +66,12 @@ public class TaskAssigningRuntimeServiceQueryHelper {
 
     private static final String TASK_ASSIGNING_TASKS_WITH_PLANNING_TASK_OPTIMIZED = "task-assigning-tasks-with-planning-task-optimized";
 
+    private KieServerRegistry registry;
     private UserTaskService userTaskService;
     private QueryService queryService;
 
-    public TaskAssigningRuntimeServiceQueryHelper(UserTaskService userTaskService, QueryService queryService) {
+    public TaskAssigningRuntimeServiceQueryHelper(KieServerRegistry registry, UserTaskService userTaskService, QueryService queryService) {
+        this.registry = registry;
         this.userTaskService = userTaskService;
         this.queryService = queryService;
     }
@@ -80,8 +94,8 @@ public class TaskAssigningRuntimeServiceQueryHelper {
                 fromLastModificationDate = (LocalDateTime) params.get(FROM_LAST_MODIFICATION_DATE);
             }
         }
-        Integer page = (Integer) params.get(PAGE);
-        Integer pageSize = (Integer) params.get(PAGE_SIZE);
+        Integer page = params.containsKey(PAGE) ? (Integer) params.get(PAGE) : 0;
+        Integer pageSize = params.containsKey(PAGE_SIZE) ? (Integer) params.get(PAGE_SIZE) : 10;
         String loadVariablesMode = (String) params.get(TASK_INPUT_VARIABLES_MODE);
 
         QueryContext queryContext = new QueryContext(page * pageSize, pageSize, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), true);
@@ -101,21 +115,27 @@ public class TaskAssigningRuntimeServiceQueryHelper {
         }
 
         if (status != null && !status.isEmpty()) {
-            queryParams.add(QueryParam.equalsTo(STATUS, status.toArray(new String[0])));
+            queryParams.add(QueryParam.equalsTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.STATUS.columnName(), status.toArray(new String[0])));
         }
 
         AbstractTaskAssigningQueryMapper<TaskData> resultMapper = (AbstractTaskAssigningQueryMapper<TaskData>) QueryMapperRegistry.get()
                 .mapperFor(TaskAssigningTaskDataQueryMapper.NAME, null);
 
-        String queryName = TASK_ASSIGNING_TASKS_WITH_POTENTIAL_OWNERS_AND_PLANNING_TASK;
-
-        List<TaskData> result = queryService.query(queryName, resultMapper, queryContext, queryParams.toArray(new QueryParam[0]));
+        List<TaskData> result = executeQuery(queryService, TASK_ASSIGNING_TASKS_WITH_POTENTIAL_OWNERS_AND_PLANNING_TASK,
+                                             resultMapper, queryContext, queryParams.toArray(new QueryParam[0]));
 
         Optional<Predicate<TaskData>> loadInputVariables = Optional.empty();
         if (TaskInputVariablesReadMode.READ_FOR_ALL.name().equals(loadVariablesMode)) {
             loadInputVariables = Optional.of(taskData -> true);
-        } else if (TaskInputVariablesReadMode.READ_WHEN_PLANNING_TASK_IS_NULL.name().equals(loadVariablesMode)) {
-            loadInputVariables = Optional.of(taskData -> taskData.getPlanningTask() == null);
+        } else if (TaskInputVariablesReadMode.READ_FOR_ACTIVE_TASKS_WITH_NO_PLANNING_ENTITY.name().equals(loadVariablesMode)) {
+            final Predicate<TaskData> isActive = taskData -> {
+                if (taskData.getPlanningTask() != null) {
+                    return false;
+                }
+                Status taskStatus = StatusConverter.convertFromString(taskData.getStatus());
+                return taskStatus == Created || taskStatus == Ready || taskStatus == Reserved || taskStatus == InProgress || taskStatus == Suspended;
+            };
+            loadInputVariables = Optional.of(isActive);
         }
 
         loadInputVariables.ifPresent(taskDataPredicate -> result.stream()
@@ -156,10 +176,14 @@ public class TaskAssigningRuntimeServiceQueryHelper {
         AbstractTaskAssigningQueryMapper<TaskData> resultMapper = (AbstractTaskAssigningQueryMapper<TaskData>) QueryMapperRegistry.get()
                 .mapperFor(TaskAssigningTaskDataSummaryQueryMapper.NAME, null);
 
-        return queryService.query(TASK_ASSIGNING_TASKS_WITH_PLANNING_TASK_OPTIMIZED, resultMapper, queryContext, queryParams.toArray(new QueryParam[0]));
+        return executeQuery(queryService, TASK_ASSIGNING_TASKS_WITH_PLANNING_TASK_OPTIMIZED, resultMapper, queryContext, queryParams.toArray(new QueryParam[0]));
     }
 
     private Map<String, Object> readTaskVariables(TaskData taskData) {
+        KieContainerInstanceImpl container = registry.getContainer(taskData.getContainerId());
+        if (container == null || (container.getStatus() != KieContainerStatus.STARTED && container.getStatus() != KieContainerStatus.DEACTIVATED)) {
+            throw new KieServicesException("Container " + taskData.getContainerId() + " is not available to serve requests");
+        }
         Map<String, Object> variables = userTaskService.getTaskInputContentByTaskId(taskData.getContainerId(), taskData.getTaskId());
         variables = variables == null ? new HashMap<>() : variables;
         return variables.entrySet().stream()
@@ -169,5 +193,11 @@ public class TaskAssigningRuntimeServiceQueryHelper {
 
     private static boolean isSimpleTypeValue(Object value) {
         return isPrimitiveWrapper(value.getClass()) || value instanceof Date || value instanceof String;
+    }
+
+    // helper method for facilitating testing and avoiding ellipsis parameters capturing.
+    <T> T executeQuery(QueryService queryService,
+                       String queryName, QueryResultMapper<T> resultMapper, QueryContext queryContext, QueryParam[] params) {
+        return queryService.query(queryName, resultMapper, queryContext, params);
     }
 }

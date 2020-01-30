@@ -16,10 +16,15 @@
 
 package org.kie.server.services.taskassigning.planning.util;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import org.kie.server.api.model.taskassigning.UserType;
 import org.kie.server.services.taskassigning.core.model.Group;
+import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.User;
 
 public class UserUtil {
@@ -35,5 +40,21 @@ public class UserUtil {
             externalUser.getGroups().forEach(externalGroup -> groups.add(new Group(externalGroup.getId().hashCode(), externalGroup.getId())));
         }
         return user;
+    }
+
+    public static boolean isUser(String userType) {
+        return UserType.User.equals(userType);
+    }
+
+    public static List<Task> extractTasks(User user, Predicate<Task> predicate) {
+        List<Task> result = new ArrayList<>();
+        Task nextTask = user != null ? user.getNextTask() : null;
+        while (nextTask != null) {
+            if (predicate.test(nextTask)) {
+                result.add(nextTask);
+            }
+            nextTask = nextTask.getNextTask();
+        }
+        return result;
     }
 }

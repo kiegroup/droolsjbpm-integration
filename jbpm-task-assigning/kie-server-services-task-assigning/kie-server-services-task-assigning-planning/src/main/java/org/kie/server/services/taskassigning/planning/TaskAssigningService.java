@@ -42,7 +42,7 @@ public class TaskAssigningService {
     }
 
     public void start(SolverDef solverDef, KieServerRegistry registry) {
-        solverHandler = new SolverHandler(solverDef, registry, delegate, userSystemService, executorService);
+        solverHandler = createSolverHandler(solverDef, registry, delegate, userSystemService, executorService);
         solverHandler.start();
     }
 
@@ -50,5 +50,11 @@ public class TaskAssigningService {
         if (solverHandler != null) {
             solverHandler.destroy();
         }
+    }
+
+    SolverHandler createSolverHandler(SolverDef solverDef, KieServerRegistry registry,
+                                      TaskAssigningRuntimeDelegate delegate, UserSystemService userSystemService,
+                                      ExecutorService executorService) {
+        return new SolverHandler(solverDef, registry, delegate, userSystemService, executorService);
     }
 }

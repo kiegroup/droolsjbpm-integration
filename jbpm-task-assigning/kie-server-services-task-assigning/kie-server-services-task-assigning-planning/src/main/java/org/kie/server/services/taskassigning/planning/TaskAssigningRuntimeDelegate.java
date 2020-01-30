@@ -19,6 +19,7 @@ package org.kie.server.services.taskassigning.planning;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.kie.api.task.model.Status;
 import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
@@ -26,12 +27,15 @@ import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.api.model.taskassigning.TaskInputVariablesReadMode;
 import org.kie.server.client.TaskAssigningRuntimeClient;
 import org.kie.server.client.util.TaskDataReader;
+import org.kie.server.services.taskassigning.planning.util.PropertyUtil;
+
+import static org.kie.server.api.model.taskassigning.util.StatusConverter.convertToStringList;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_RUNTIME_DELEGATE_PAGE_SIZE;
 
 public class TaskAssigningRuntimeDelegate {
 
     private final TaskAssigningRuntimeClient runtimeClient;
-    //TODO configure the page size via System property.
-    private static final int PAGE_SIZE = 3000;
+    private static final int PAGE_SIZE = PropertyUtil.readSystemProperty(TASK_ASSIGNING_RUNTIME_DELEGATE_PAGE_SIZE, 3000, Integer::parseInt);
 
     static class FindTasksResult {
 
@@ -56,8 +60,9 @@ public class TaskAssigningRuntimeDelegate {
         this.runtimeClient = runtimeClient;
     }
 
-    public FindTasksResult findTasks(List<String> status, LocalDateTime fromLastModificationDate, TaskInputVariablesReadMode inputVariablesReadMode) {
-        TaskDataReader.Result result = TaskDataReader.from(runtimeClient).readTasks(0, status, fromLastModificationDate, PAGE_SIZE, inputVariablesReadMode);
+    public FindTasksResult findTasks(List<Status> status, LocalDateTime fromLastModificationDate, TaskInputVariablesReadMode inputVariablesReadMode) {
+        TaskDataReader.Result result = TaskDataReader.from(runtimeClient).readTasks(0, convertToStringList(status),
+                                                                                    fromLastModificationDate, PAGE_SIZE, inputVariablesReadMode);
         return new FindTasksResult(result.getQueryTime(), result.getTasks());
     }
 

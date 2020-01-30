@@ -16,25 +16,19 @@
 
 package org.kie.server.services.taskassigning.planning;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-import org.kie.server.services.taskassigning.core.model.Task;
-import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
-import org.kie.server.services.taskassigning.core.model.User;
 import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
-import org.kie.server.api.model.taskassigning.PlanningTask;
+import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_NOT_DUMMY;
-import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_PLANNING_USER;
+import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STARTED;
+import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STARTING;
+import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STOPPED;
 import static org.kie.server.services.taskassigning.planning.TraceHelper.tracePublishedTasks;
 import static org.kie.server.services.taskassigning.planning.TraceHelper.traceSolution;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkCondition;
@@ -53,7 +47,6 @@ public class SolutionProcessor extends RunnableBase {
     private final int publishWindowSize;
 
     private final Semaphore solutionResource = new Semaphore(0);
-    private final AtomicBoolean processing = new AtomicBoolean(false);
 
     private TaskAssigningSolution solution;
 
@@ -67,7 +60,7 @@ public class SolutionProcessor extends RunnableBase {
 
         }
 
-        private Result(Exception exception) {
+        public Result(Exception exception) {
             this.exception = exception;
         }
 
@@ -112,25 +105,28 @@ public class SolutionProcessor extends RunnableBase {
      * @return true if a solution is being processed at this time, false in any other case.
      */
     public boolean isProcessing() {
-        return processing.get();
+        Status currentStatus = status.get();
+        return STARTING == currentStatus || STARTED == currentStatus;
     }
 
     /**
-     * This method is invoked form a different thread for doing the processing of a solution. This method is not
-     * thread-safe and it's expected that any synchronization required between the isProcessing() and process()
-     * methods is performed by the caller. Since only one solution can be processed at time, the caller should typically
-     * execute in the following sequence.
+     * This method is invoked from a different thread for doing the processing of a solution.
+     * If a solution is being processed an exception is thrown, so it's expected that any synchronization required
+     * between the isProcessing() and process() methods is performed by the caller.
+     * Since only one solution can be processed at time, the caller should typically execute in the following sequence.
      * if (!solutionProcessor.isProcessing()) {
      * solutionProcessor.process(solution);
      * } else {
      * //invoke at a later time.
      * }
-     * A null value will throw an exception.
+     * A null value will throw an exception too.
      * @param solution a solution to process.
      */
     public void process(final TaskAssigningSolution solution) {
         checkNotNull("solution", solution);
-        processing.set(true);
+        if (!status.compareAndSet(STOPPED, STARTING)) {
+            throw new IllegalStateException("SolutionProcessor process method can only be invoked when the status is STOPPED");
+        }
         this.solution = solution;
         solutionResource.release();
     }
@@ -146,7 +142,7 @@ public class SolutionProcessor extends RunnableBase {
         while (isAlive()) {
             try {
                 solutionResource.acquire();
-                if (isAlive()) {
+                if (isAlive() && status.compareAndSet(STARTING, STARTED)) {
                     doProcess(solution);
                 }
             } catch (InterruptedException e) {
@@ -158,55 +154,9 @@ public class SolutionProcessor extends RunnableBase {
         LOGGER.debug("Solution Processor finished");
     }
 
-    private void doProcess(final TaskAssigningSolution solution) {
-        LOGGER.debug("Starting processing of solution: {}",solution);
-        final List<PlanningItem> planningItems = new ArrayList<>(solution.getTaskList().size());
-        List<PlanningItem> userPlanningItems;
-        Iterator<PlanningItem> userPlanningItemsIt;
-        PlanningItem planningItem;
-        int index;
-        int publishedCount;
-        for (User user : solution.getUserList()) {
-            userPlanningItems = new ArrayList<>();
-            index = 0;
-            publishedCount = 0;
-            Task nextTask = user.getNextTask();
-
-            while (nextTask != null) {
-                if (IS_NOT_DUMMY.test(nextTask)) {
-                    //dummy tasks has nothing to with the jBPM runtime, don't process them
-                    planningItem = PlanningItem.builder()
-                            .containerId(nextTask.getContainerId())
-                            .taskId(nextTask.getId())
-                            .processInstanceId(nextTask.getProcessInstanceId())
-                            .planningTask(PlanningTask.builder()
-                                                  .taskId(nextTask.getId())
-                                                  .published(nextTask.isPinned())
-                                                  .assignedUser(user.getUser().getEntityId())
-                                                  .index(index++)
-                                                  .build())
-                            .build();
-
-                    userPlanningItems.add(planningItem);
-                    publishedCount += planningItem.getPlanningTask().isPublished() ? 1 : 0;
-                }
-                nextTask = nextTask.getNextTask();
-            }
-            if (!IS_PLANNING_USER.test(user.getEntityId())) {
-                userPlanningItemsIt = userPlanningItems.iterator();
-                while (userPlanningItemsIt.hasNext() && publishedCount < publishWindowSize) {
-                    planningItem = userPlanningItemsIt.next();
-                    if (!planningItem.getPlanningTask().isPublished()) {
-                        planningItem.getPlanningTask().setPublished(true);
-                        publishedCount++;
-                    }
-                }
-            }
-            planningItems.addAll(userPlanningItems);
-        }
-
-        final List<PlanningItem> publishedTasks = planningItems.stream().filter(item -> item.getPlanningTask().isPublished()).collect(Collectors.toList());
-
+    protected void doProcess(final TaskAssigningSolution solution) {
+        LOGGER.debug("Starting processing of solution: {}", solution);
+        final List<PlanningItem> publishedTasks = buildPlanning(solution, publishWindowSize);
         if (LOGGER.isTraceEnabled()) {
             traceSolution(LOGGER, solution);
             tracePublishedTasks(LOGGER, publishedTasks);
@@ -222,7 +172,16 @@ public class SolutionProcessor extends RunnableBase {
         }
 
         LOGGER.debug("Solution processing finished: {}", solution);
-        processing.set(false);
-        resultConsumer.accept(result);
+        if (isAlive()) {
+            resultConsumer.accept(result);
+            status.set(Status.STOPPED);
+        }
+    }
+
+    List<PlanningItem> buildPlanning(TaskAssigningSolution solution, int publishWindowSize) {
+        return PlanningBuilder.create()
+                .withSolution(solution)
+                .withPublishWindowSize(publishWindowSize)
+                .build();
     }
 }

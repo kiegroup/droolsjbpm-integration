@@ -19,7 +19,6 @@ package org.kie.server.services.taskassigning.core.model.solver;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
-import org.kie.server.services.taskassigning.core.model.solver.PriorityHelper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

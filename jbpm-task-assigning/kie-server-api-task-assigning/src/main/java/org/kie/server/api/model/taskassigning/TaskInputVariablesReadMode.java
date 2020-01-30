@@ -17,7 +17,17 @@
 package org.kie.server.api.model.taskassigning;
 
 public enum TaskInputVariablesReadMode {
+    /**
+     * Don't load the task variables.
+     */
     DONT_READ,
+    /**
+     * Load the task variables for all the returned tasks.
+     */
     READ_FOR_ALL,
-    READ_WHEN_PLANNING_TASK_IS_NULL
+    /**
+     * Optimization, read the task variables only for the tasks that aren't in a sink status and hasn't an associated planning task.
+     * This option is intended for internal use.
+     */
+    READ_FOR_ACTIVE_TASKS_WITH_NO_PLANNING_ENTITY
 }

@@ -25,6 +25,10 @@ public class SolverDef {
 
     private String solverConfigResource;
 
+    public SolverDef(String solverConfigResource) {
+        this.solverConfigResource = solverConfigResource;
+    }
+
     public SolverDef(String containerId,
                      String groupId,
                      String artifactId,

@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.core.model.solver.realtime;
 
+import org.kie.server.services.taskassigning.core.TaskAssigningRuntimeException;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
@@ -56,6 +57,9 @@ public class TaskPropertyChangeProblemFactChange implements ProblemFactChange<Ta
     @Override
     public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
         Task workingTask = scoreDirector.lookUpWorkingObjectOrReturnNull(task);
+        if (workingTask == null) {
+            throw new TaskAssigningRuntimeException(String.format("Expected task: %s was not found in current working solution", task));
+        }
         if (priority != null) {
             scoreDirector.beforeProblemPropertyChanged(workingTask);
             workingTask.setPriority(priority);

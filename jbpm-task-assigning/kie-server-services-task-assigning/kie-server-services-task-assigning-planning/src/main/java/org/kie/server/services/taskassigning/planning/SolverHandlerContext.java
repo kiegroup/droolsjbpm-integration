@@ -20,28 +20,28 @@ import java.time.LocalDateTime;
 
 public class SolverHandlerContext {
 
-    private int changeSetIds;
-    private int currentChangeSetId;
-    private int lastProcessedChangeSetId = -1;
+    private long changeSetIds;
+    private long currentChangeSetId;
+    private long lastProcessedChangeSetId = -1;
     private LocalDateTime lastModificationDate;
 
-    public int getCurrentChangeSetId() {
+    public long getCurrentChangeSetId() {
         return currentChangeSetId;
     }
 
-    public void setCurrentChangeSetId(int currentChangeSetId) {
+    public void setCurrentChangeSetId(long currentChangeSetId) {
         this.currentChangeSetId = currentChangeSetId;
     }
 
-    public int nextChangeSetId() {
+    public long nextChangeSetId() {
         return ++changeSetIds;
     }
 
-    public boolean isProcessedChangeSet(int changeSetId) {
+    public boolean isProcessedChangeSet(long changeSetId) {
         return changeSetId <= lastProcessedChangeSetId;
     }
 
-    public void setProcessedChangeSet(int changeSetId) {
+    public void setProcessedChangeSet(long changeSetId) {
         this.lastProcessedChangeSetId = changeSetId;
     }
 

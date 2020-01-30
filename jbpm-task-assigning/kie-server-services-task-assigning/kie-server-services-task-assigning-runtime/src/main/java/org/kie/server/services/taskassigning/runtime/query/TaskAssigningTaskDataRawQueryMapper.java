@@ -58,14 +58,15 @@ public class TaskAssigningTaskDataRawQueryMapper extends AbstractTaskAssigningQu
                                      String assignedUser, Integer taskIndex, Integer published) {
         row.add(taskId);
         row.add(createdOn);
-        row.add(processInstanceId);
-        row.add(processId);
-        row.add(deploymentId);
-        row.add(status);
-        row.add(priority);
-        row.add(taskName);
-        row.add(lastModificationDate);
         row.add(actualOwner);
+        row.add(deploymentId);
+        row.add(taskName);
+        row.add(priority);
+        row.add(processId);
+        row.add(processInstanceId);
+        row.add(status);
+        row.add(lastModificationDate);
+
         List<Object> planningEntityRow = new ArrayList<>();
         row.add(planningEntityRow);
         if (assignedUser != null || taskIndex != null) {
@@ -74,7 +75,6 @@ public class TaskAssigningTaskDataRawQueryMapper extends AbstractTaskAssigningQu
             planningEntityRow.add(taskIndex);
             planningEntityRow.add(published != null && published == 1);
         }
-        row.add(planningEntityRow);
         if (readPotentialOwners()) {
             //make room for the potential owners.
             row.add(new ArrayList<>());

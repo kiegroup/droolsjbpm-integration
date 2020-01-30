@@ -18,7 +18,6 @@ package org.kie.server.services.taskassigning.runtime;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,155 +28,82 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.task.commands.CompositeCommand;
-import org.jbpm.services.task.commands.DelegateTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.commands.TaskContext;
 import org.kie.api.runtime.Context;
-import org.kie.api.task.model.OrganizationalEntity;
-import org.kie.api.task.model.Task;
-import org.kie.api.task.model.User;
-import org.kie.internal.task.api.TaskPersistenceContext;
+import org.kie.api.task.model.Status;
+import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.api.model.taskassigning.TaskData;
-import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.taskassigning.runtime.command.DelegateAndSaveCommand;
+import org.kie.server.services.taskassigning.runtime.command.DeletePlanningItemCommand;
+import org.kie.server.services.taskassigning.runtime.command.PlanningCommand;
+import org.kie.server.services.taskassigning.runtime.command.PlanningException;
+import org.kie.server.services.taskassigning.runtime.command.SavePlanningItemCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.kie.server.api.model.taskassigning.TaskStatus.InProgress;
-import static org.kie.server.api.model.taskassigning.TaskStatus.Ready;
-import static org.kie.server.api.model.taskassigning.TaskStatus.Reserved;
-import static org.kie.server.api.model.taskassigning.TaskStatus.Suspended;
+import static org.kie.api.task.model.Status.InProgress;
+import static org.kie.api.task.model.Status.Ready;
+import static org.kie.api.task.model.Status.Reserved;
+import static org.kie.api.task.model.Status.Suspended;
+import static org.kie.server.api.model.taskassigning.util.StatusConverter.convertFromString;
+import static org.kie.server.api.model.taskassigning.util.StatusConverter.convertToStringList;
 
 public class TaskAssigningRuntimeServiceBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskAssigningRuntimeServiceBase.class);
 
-    private static final String TASK_MODIFIED_ERROR_MSG_1 = "Task: %s was modified by an external action since the last executed plan," +
+    private static final int INTERNAL_QUERY_PAGE_SIZE = 3000;
+
+    static final String TASK_MODIFIED_ERROR_MSG_1 = "Task: %s was modified by an external action since the last executed plan," +
             " actualOwner is %s but the last assignedUser is %s";
 
-    private static final String TASK_MODIFIED_ERROR_MSG_2 = "Task: %s was modified by an external action since the last executed plan," +
+    static final String TASK_MODIFIED_ERROR_MSG_2 = "Task: %s was modified by an external action since the last executed plan," +
             " actualOwner is %s but the expected is %s";
 
-    private static final String TASK_MODIFIED_ERROR_MSG_3 = "Task: %s was modified by an external action since the last executed plan," +
+    static final String TASK_MODIFIED_ERROR_MSG_3 = "Task: %s was modified by an external action since the last executed plan," +
             " and is no longer in one of the expected status %s";
 
-    private static final String TASK_MODIFIED_ERROR_MSG_4 = "Task: %s was modified by an external action since the last executed plan," +
-            " current status is %s but the expected should be in %s";
+    static final String UNEXPECTED_ERROR_DURING_PLAN_CALCULATION = "An unexpected error was produced during plan calculation: %s";
 
+    static final String UNEXPECTED_ERROR_DURING_PLAN_EXECUTION = "An unexpected error was produced during plan execution on containerId: %s, message: %s";
+
+    static final String SERVER_NOT_READY_ERROR = "Current server is not ready to serve requests";
+
+    private KieServerImpl kieServer;
+    private KieServerRegistry registry;
     private UserTaskService userTaskService;
     private TaskAssigningRuntimeServiceQueryHelper queryHelper;
 
-    public TaskAssigningRuntimeServiceBase(UserTaskService userTaskService, QueryService queryService) {
+    public TaskAssigningRuntimeServiceBase(KieServerImpl kieServer, KieServerRegistry registry, UserTaskService userTaskService, QueryService queryService) {
+        this.kieServer = kieServer;
+        this.registry = registry;
         this.userTaskService = userTaskService;
-        this.queryHelper = new TaskAssigningRuntimeServiceQueryHelper(userTaskService, queryService);
+        this.queryHelper = createQueryHelper(registry, userTaskService, queryService);
     }
 
     public List<TaskData> executeFindTasksQuery(Map<String, Object> params) {
+        checkServerStatus();
         return queryHelper.executeFindTasksQuery(params);
     }
 
     public ExecutePlanningResult executePlanning(PlanningItemList planningItemList, String userId) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-
-        final Map<String, List<PlanningCommand>> commandsByContainer = new HashMap<>();
-        final Map<Long, TaskData> taskDataById = prepareTaskDataForExecutePlanning();
-
-        stopWatch.stop();
-        LOGGER.debug("Time to prepareTaskDataForExecutePlanning: " + stopWatch.toString());
-
+        checkServerStatus();
+        Map<String, List<PlanningCommand>> commandsByContainer;
         try {
-            for (PlanningItem planningItem : planningItemList.getItems()) {
-                final TaskData taskData = taskDataById.remove(planningItem.getTaskId());
-                if (taskData == null) {
-                    // Un-common case, task is no longer in one of the managed status. It was probably assigned, started,
-                    // and completed in middle.
-                    // Proposal A) rollbacks this change since the solution is being updated at this moment
-                    // and a new plan will arrive soon.
-                    throw new PlanningException(String.format(TASK_MODIFIED_ERROR_MSG_3,
-                                                              planningItem.getPlanningTask().getTaskId(),
-                                                              Arrays.toString(new String[]{Ready, Reserved, InProgress, Suspended})),
-                                                planningItem.getContainerId(),
-                                                ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
-                }
-
-                final String actualOwner = taskData.getActualOwner();
-                final PlanningTask actualPlanningTask = taskData.getPlanningTask();
-                final String taskStatus = taskData.getStatus();
-                boolean delegateAndSave = false;
-
-                if (isNotEmpty(actualOwner) &&
-                        actualPlanningTask != null &&
-                        actualOwner.equals(actualPlanningTask.getAssignedUser()) &&
-                        actualPlanningTask.equals(planningItem.getPlanningTask())) {
-                    continue;
-                }
-
-                switch (taskStatus) {
-                    case Ready:
-                        delegateAndSave = true;
-                        break;
-
-                    case Reserved:
-                        if (actualPlanningTask == null) {
-                            delegateAndSave = true;
-                        } else if (!actualOwner.equals(actualPlanningTask.getAssignedUser()) && !actualOwner.equals(planningItem.getPlanningTask().getAssignedUser())) {
-                            // the task was manually reassigned from the task list "in the middle" and we are not updating to
-                            // current user, so it's not the last update that is coming.
-                            // Proposal A) rollbacks this change since the solution is being updated at this moment
-                            // and a new plan will arrive soon.
-                            throw new PlanningException(String.format(TASK_MODIFIED_ERROR_MSG_1,
-                                                                      planningItem.getPlanningTask().getTaskId(),
-                                                                      actualOwner,
-                                                                      actualPlanningTask.getAssignedUser()),
-                                                        planningItem.getContainerId(),
-                                                        ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
-                        } else {
-                            delegateAndSave = true;
-                        }
-                        break;
-
-                    case InProgress:
-                    case Suspended:
-                        if (actualOwner == null || !actualOwner.equals(planningItem.getPlanningTask().getAssignedUser())) {
-                            // task changed in "in the middle" and we are not updating to current user, so it's not the last
-                            // update that is coming.
-                            // Proposal A) rollbacks this change since the solution is being updated at this moment
-                            // and a new plan will arrive soon.
-                            throw new PlanningException(String.format(TASK_MODIFIED_ERROR_MSG_2,
-                                                                      planningItem.getPlanningTask().getTaskId(),
-                                                                      actualOwner,
-                                                                      planningItem.getPlanningTask().getAssignedUser()),
-                                                        planningItem.getContainerId(),
-                                                        ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
-                        } else {
-                            // task might have been created, assigned and started/suspended completely out of the task
-                            // or the planning data might have changed. Just update the planning data.
-                            delegateAndSave = false;
-                        }
-                        break;
-                }
-
-                PlanningCommand command;
-                if (delegateAndSave) {
-                    command = new DelegateAndSaveCommand(planningItem, userId);
-                } else {
-                    command = new SavePlanningItemCommand(planningItem);
-                }
-                commandsByContainer.computeIfAbsent(planningItem.getContainerId(), k -> new ArrayList<>()).add(command);
-            }
-
-            for (TaskData taskData : taskDataById.values()) {
-                if ((taskData.getStatus().equals(Ready) || taskData.getStatus().equals(Reserved) || taskData.getStatus().equals(Suspended)) && taskData.getPlanningTask() != null) {
-                    commandsByContainer.computeIfAbsent(taskData.getContainerId(), k -> new ArrayList<>()).add(new DeletePlanningItemCommand(taskData.getTaskId()));
-                }
-            }
+            commandsByContainer = calculatePlanningCommands(planningItemList, userId);
         } catch (PlanningException e) {
-            LOGGER.debug("An error was produced during plan execution calculation, containerId: {}, error code: {}, message: {}",
+            LOGGER.debug("An error was produced during plan calculation, containerId: {}, error code: {}, message: {}",
                          e.getContainerId(), e.getCode(), e.getMessage());
             return ExecutePlanningResult.builder()
                     .error(e.getCode())
@@ -185,13 +111,15 @@ public class TaskAssigningRuntimeServiceBase {
                     .containerId(e.getContainerId())
                     .build();
         } catch (Exception e) {
-            final String msg = String.format("An unexpected was produced during plan execution calculation: %s", e.getMessage());
+            final String msg = String.format(UNEXPECTED_ERROR_DURING_PLAN_CALCULATION, e.getMessage());
             LOGGER.error(msg, e);
             return ExecutePlanningResult.builder()
                     .error(ExecutePlanningResult.ErrorCode.UNEXPECTED_ERROR)
                     .errorMessage(msg)
                     .build();
         }
+        stopWatch.stop();
+        LOGGER.debug("Time to calculate the planning commands: {}", stopWatch.toString());
 
         stopWatch.reset();
         stopWatch.start();
@@ -207,7 +135,7 @@ public class TaskAssigningRuntimeServiceBase {
                         .containerId(e.getContainerId())
                         .build();
             } catch (Exception e) {
-                final String msg = String.format("An unexpected was produced during plan execution on containerId: %s, message: %s", entry.getKey(), e.getMessage());
+                final String msg = String.format(UNEXPECTED_ERROR_DURING_PLAN_EXECUTION, entry.getKey(), e.getMessage());
                 LOGGER.error(msg, e);
                 return ExecutePlanningResult.builder()
                         .error(ExecutePlanningResult.ErrorCode.UNEXPECTED_ERROR)
@@ -217,35 +145,102 @@ public class TaskAssigningRuntimeServiceBase {
             }
         }
         stopWatch.stop();
-        LOGGER.debug("Time for executing the planning with planning items: " + planningItemList.getItems().size() + "  ->  " + stopWatch.toString());
+        LOGGER.debug("Time for executing the planning with planning items: {}  ->  {}", planningItemList.getItems().size(), stopWatch.toString());
         return ExecutePlanningResult.builder().build();
     }
 
-    public static class PlanningException extends RuntimeException {
+    private Map<String, List<PlanningCommand>> calculatePlanningCommands(PlanningItemList planningItemList, String userId) {
+        final Map<String, List<PlanningCommand>> commandsByContainer = new HashMap<>();
+        final Map<Long, TaskData> taskDataById = prepareTaskDataForExecutePlanning();
+        for (PlanningItem planningItem : planningItemList.getItems()) {
+            final TaskData taskData = taskDataById.remove(planningItem.getTaskId());
+            if (taskData == null) {
+                // Un-common case, task is no longer in one of the managed status. It was probably assigned, started,
+                // and completed in middle.
+                // Proposal A) rollbacks this change since the solution is being updated at this moment
+                // and a new plan will arrive soon.
+                throw new PlanningException(String.format(TASK_MODIFIED_ERROR_MSG_3,
+                                                          planningItem.getPlanningTask().getTaskId(),
+                                                          Arrays.toString(new Status[]{Ready, Reserved, InProgress, Suspended})),
+                                            planningItem.getContainerId(),
+                                            ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
+            }
 
-        private final String containerId;
-        private final ExecutePlanningResult.ErrorCode code;
+            final String actualOwner = taskData.getActualOwner();
+            final PlanningTask actualPlanningTask = taskData.getPlanningTask();
+            final Status taskStatus = convertFromString(taskData.getStatus());
 
-        public PlanningException(String message, String containerId, ExecutePlanningResult.ErrorCode code) {
-            super(message);
-            this.containerId = containerId;
-            this.code = code;
+            if (isNotEmpty(actualOwner) &&
+                    actualPlanningTask != null &&
+                    actualOwner.equals(actualPlanningTask.getAssignedUser()) &&
+                    actualPlanningTask.equals(planningItem.getPlanningTask())) {
+                continue;
+            }
+
+            switch (taskStatus) {
+                case Ready:
+                    addCommand(commandsByContainer, planningItem.getContainerId(), new DelegateAndSaveCommand(planningItem, userId));
+                    break;
+
+                case Reserved:
+                    if (actualPlanningTask != null && !actualOwner.equals(actualPlanningTask.getAssignedUser()) && !actualOwner.equals(planningItem.getPlanningTask().getAssignedUser())) {
+                        // the task was manually reassigned from the task list "in the middle" and we are not updating to
+                        // current user, so it's not the last update that is coming.
+                        // Proposal A) rollbacks this change since the solution is being updated at this moment
+                        // and a new plan will arrive soon.
+                        throw new PlanningException(String.format(TASK_MODIFIED_ERROR_MSG_1,
+                                                                  planningItem.getPlanningTask().getTaskId(),
+                                                                  actualOwner,
+                                                                  actualPlanningTask.getAssignedUser()),
+                                                    planningItem.getContainerId(),
+                                                    ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
+                    } else {
+                        addCommand(commandsByContainer, planningItem.getContainerId(), new DelegateAndSaveCommand(planningItem, userId));
+                    }
+                    break;
+
+                case InProgress:
+                case Suspended:
+                    if (actualOwner == null || !actualOwner.equals(planningItem.getPlanningTask().getAssignedUser())) {
+                        // task changed in "in the middle" and we are not updating to current user, so it's not the last
+                        // update that is coming.
+                        // Proposal A) rollbacks this change since the solution is being updated at this moment
+                        // and a new plan will arrive soon.
+                        throw new PlanningException(String.format(TASK_MODIFIED_ERROR_MSG_2,
+                                                                  planningItem.getPlanningTask().getTaskId(),
+                                                                  actualOwner,
+                                                                  planningItem.getPlanningTask().getAssignedUser()),
+                                                    planningItem.getContainerId(),
+                                                    ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
+                    } else {
+                        // task might have been created, assigned and started/suspended completely out of the task
+                        // or the planning data might have changed. Just update the planning data.
+                        addCommand(commandsByContainer, planningItem.getContainerId(), new SavePlanningItemCommand(planningItem));
+                    }
+                    break;
+                default:
+                    // sonar required, no more cases are expected for this switch by construction.
+                    throw new IndexOutOfBoundsException("Value: " + taskData.getStatus() + " is out of range in current switch");
+            }
         }
-
-        public ExecutePlanningResult.ErrorCode getCode() {
-            return code;
+        for (TaskData taskData : taskDataById.values()) {
+            final Status status = convertFromString(taskData.getStatus());
+            if ((status == Ready || status == Reserved || status == Suspended) && taskData.getPlanningTask() != null) {
+                commandsByContainer.computeIfAbsent(taskData.getContainerId(), k -> new ArrayList<>()).add(new DeletePlanningItemCommand(taskData.getTaskId()));
+            }
         }
+        return commandsByContainer;
+    }
 
-        public String getContainerId() {
-            return containerId;
-        }
+    TaskAssigningRuntimeServiceQueryHelper createQueryHelper(KieServerRegistry registry, UserTaskService userTaskService, QueryService queryService) {
+        return new TaskAssigningRuntimeServiceQueryHelper(registry, userTaskService, queryService);
     }
 
     private Map<Long, TaskData> prepareTaskDataForExecutePlanning() {
         //optimized reading, only taskId, taskStatus, actualOwner, deploymentId, and the PlanningTask is needed.
         List<TaskData> result = queryHelper.readTasksDataSummary(0,
-                                                                 Arrays.asList(Ready, Reserved, InProgress, Suspended),
-                                                                 3);
+                                                                 convertToStringList(Ready, Reserved, InProgress, Suspended),
+                                                                 INTERNAL_QUERY_PAGE_SIZE);
         return result.stream().collect(Collectors.toMap(TaskData::getTaskId, Function.identity()));
     }
 
@@ -254,6 +249,7 @@ public class TaskAssigningRuntimeServiceBase {
         List<DelegateAndSaveCommand> delegations = new ArrayList<>();
         List<SavePlanningItemCommand> saves = new ArrayList<>();
         List<DeletePlanningItemCommand> deletes = new ArrayList<>();
+        validateContainer(containerId);
         for (PlanningCommand command : commands) {
             if (command instanceof DelegateAndSaveCommand) {
                 delegations.add((DelegateAndSaveCommand) command);
@@ -279,6 +275,13 @@ public class TaskAssigningRuntimeServiceBase {
         LOGGER.debug("Planning commands execution for container: {} finished successfully", containerId);
     }
 
+    private void validateContainer(String containerId) {
+        KieContainerInstanceImpl container = registry.getContainer(containerId);
+        if (container == null || (container.getStatus() != KieContainerStatus.STARTED && container.getStatus() != KieContainerStatus.DEACTIVATED)) {
+            throw new KieServicesException("Container " + containerId + " is not available to serve requests");
+        }
+    }
+
     private void bulkDelegate(String containerId, List<DelegateAndSaveCommand> delegations) {
         LOGGER.debug("Executing bulk delegation for container: {}", containerId);
         for (DelegateAndSaveCommand command : delegations) {
@@ -287,118 +290,13 @@ public class TaskAssigningRuntimeServiceBase {
         LOGGER.debug("Bulk delegation for container: {} finished successfully", containerId);
     }
 
-    private abstract static class PlanningCommand extends TaskCommand {
-
-        protected PlanningItem planningItem;
-        protected TaskContext taskContext;
-        protected TaskPersistenceContext persistenceContext;
-
-        public PlanningCommand(PlanningItem planningItem) {
-            this.planningItem = planningItem;
-        }
-
-        @Override
-        public Object execute(Context context) {
-            taskContext = (TaskContext) context;
-            persistenceContext = taskContext.getPersistenceContext();
-            return null;
-        }
+    private void addCommand(Map<String, List<PlanningCommand>> commandsByContainer, String containerId, PlanningCommand command) {
+        commandsByContainer.computeIfAbsent(containerId, k -> new ArrayList<>()).add(command);
     }
 
-    private static class SavePlanningItemCommand extends PlanningCommand {
-
-        public SavePlanningItemCommand(PlanningItem planningItem) {
-            super(planningItem);
-        }
-
-        @Override
-        public Object execute(Context context) {
-            super.execute(context);
-            persistenceContext.merge(new PlanningTaskImpl(planningItem.getTaskId(),
-                                                          planningItem.getPlanningTask().getAssignedUser(),
-                                                          planningItem.getPlanningTask().getIndex(),
-                                                          planningItem.getPlanningTask().isPublished(),
-                                                          new Date()));
-            return null;
-        }
-    }
-
-    private static class DeletePlanningItemCommand extends PlanningCommand {
-
-        private long itemId;
-
-        public DeletePlanningItemCommand(long itemId) {
-            super(null);
-            this.itemId = itemId;
-        }
-
-        @Override
-        public Object execute(Context context) {
-            super.execute(context);
-            PlanningTaskImpl instance = persistenceContext.find(PlanningTaskImpl.class, itemId);
-            if (instance != null) {
-                persistenceContext.remove(instance);
-            }
-            return null;
-        }
-    }
-
-    private static class DelegateAndSaveCommand extends PlanningCommand {
-
-        public DelegateAndSaveCommand(PlanningItem planningItem, String userId) {
-            super(planningItem);
-            this.userId = userId;
-        }
-
-        @Override
-        public Void execute(Context context) {
-            final TaskContext taskContext = (TaskContext) context;
-            final Task task = taskContext.getPersistenceContext().findTask(planningItem.getTaskId());
-            final org.kie.api.task.model.TaskData taskData = task.getTaskData();
-            String status = taskData.getStatus().name();
-            if (!(Ready.equals(status) || Reserved.equals(status))) {
-                throw new PlanningException(String.format(TASK_MODIFIED_ERROR_MSG_4,
-                                                          planningItem.getTaskId(),
-                                                          status,
-                                                          Arrays.toString(new String[]{Ready, Reserved})),
-                                            planningItem.getContainerId(),
-                                            ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
-            }
-
-            // the by default jBPM task delegation adds the delegated user as a potential owner of the task, but this is
-            // something we don't from the task assigning perspective. So by now we ensure that the tasks assigning
-            // api doesn't add it.
-            // If provided, the bulk delegation should skipp this automatic adding. (https://issues.redhat.com/browse/JBPM-8924)
-            final OrganizationalEntity existingPotentialOwner = findPotentialOwner(task, planningItem.getPlanningTask().getAssignedUser());
-
-            // perform the delegation
-            DelegateTaskCommand delegateTaskCommand = new DelegateTaskCommand(planningItem.getTaskId(), getUserId(), planningItem.getPlanningTask().getAssignedUser());
-            delegateTaskCommand.execute(context);
-
-            if (existingPotentialOwner == null) {
-                // we remove it.
-                OrganizationalEntity addedPotentialOwner = findPotentialOwner(task, planningItem.getPlanningTask().getAssignedUser());
-                if (addedPotentialOwner != null) {
-                    task.getPeopleAssignments().getPotentialOwners().remove(addedPotentialOwner);
-                }
-            }
-
-            TaskPersistenceContext persistenceContext = taskContext.getPersistenceContext();
-            persistenceContext.merge(new PlanningTaskImpl(planningItem.getTaskId(),
-                                                          planningItem.getPlanningTask().getAssignedUser(),
-                                                          planningItem.getPlanningTask().getIndex(),
-                                                          planningItem.getPlanningTask().isPublished(),
-                                                          new Date()));
-            return null;
-        }
-
-        private static OrganizationalEntity findPotentialOwner(Task task, String potentialOwnerId) {
-            if (task.getPeopleAssignments() != null && task.getPeopleAssignments().getPotentialOwners() != null) {
-                return task.getPeopleAssignments().getPotentialOwners().stream()
-                        .filter(organizationalEntity -> organizationalEntity.getId().equals(potentialOwnerId) && organizationalEntity instanceof User)
-                        .findFirst().orElse(null);
-            }
-            return null;
+    private void checkServerStatus() {
+        if (!kieServer.isKieServerReady()) {
+            throw new KieServicesException(SERVER_NOT_READY_ERROR);
         }
     }
 }

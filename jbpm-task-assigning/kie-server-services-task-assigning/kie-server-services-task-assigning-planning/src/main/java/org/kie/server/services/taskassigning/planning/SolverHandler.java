@@ -20,12 +20,14 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
 import org.kie.server.services.api.KieServerRegistry;
 import org.optaplanner.core.api.solver.event.BestSolutionChangedEvent;
+import org.optaplanner.core.api.solver.event.SolverEventListener;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,11 @@ public class SolverHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverHandler.class);
 
+    private static final String TARGET_USER_ID = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, null, value -> value);
+    private static final int PUBLISH_WINDOW_SIZE = readSystemProperty(JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, 2, Integer::parseInt);
+    private static final long SYNC_INTERVAL = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, 5000L, Long::parseLong);
+    private static final long EXECUTOR_TERMINATION_TIMEOUT = 5;
+
     private final SolverDef solverDef;
     private final KieServerRegistry registry;
     private final TaskAssigningRuntimeDelegate delegate;
@@ -62,9 +69,6 @@ public class SolverHandler {
     private SolverHandlerContext context;
     private SolutionSynchronizer solutionSynchronizer;
     private SolutionProcessor solutionProcessor;
-    private final String targetUserId = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, null, value -> value);
-    private static final int publishWindowSize = readSystemProperty(JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, 2, Integer::parseInt);
-    private static final long syncInterval = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, 5000L, Long::parseLong);
 
     public SolverHandler(final SolverDef solverDef,
                          final KieServerRegistry registry,
@@ -85,12 +89,11 @@ public class SolverHandler {
     }
 
     public void start() {
-        solverExecutor = new SolverExecutor(solverDef, registry, this::onBestSolutionChange);
-        solutionSynchronizer = new SolutionSynchronizer(solverExecutor, delegate, userSystemService,
-                                                        syncInterval, context, this::onUpdateSolution);
-
-        solutionProcessor = new SolutionProcessor(delegate, this::onSolutionProcessed, targetUserId,
-                                                  publishWindowSize);
+        solverExecutor = createSolverExecutor(solverDef, registry, this::onBestSolutionChange);
+        solutionSynchronizer = createSolutionSynchronizer(solverExecutor, delegate, userSystemService,
+                                                          SYNC_INTERVAL, context, this::onUpdateSolution);
+        solutionProcessor = createSolutionProcessor(delegate, this::onSolutionProcessed, TARGET_USER_ID,
+                                                    PUBLISH_WINDOW_SIZE);
         executorService.execute(solverExecutor); //is started/stopped on demand by the SolutionSynchronizer.
         executorService.execute(solutionSynchronizer);
         executorService.execute(solutionProcessor);
@@ -104,7 +107,7 @@ public class SolverHandler {
 
         executorService.shutdown();
         try {
-            executorService.awaitTermination(5, TimeUnit.SECONDS);
+            executorService.awaitTermination(EXECUTOR_TERMINATION_TIMEOUT, TimeUnit.SECONDS);
             LOGGER.debug("ExecutorService was successfully shutted down.");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -113,10 +116,32 @@ public class SolverHandler {
         }
     }
 
+    SolverExecutor createSolverExecutor(SolverDef solverDef,
+                                        KieServerRegistry registry,
+                                        SolverEventListener<TaskAssigningSolution> listener) {
+        return new SolverExecutor(solverDef, registry, listener);
+    }
+
+    SolutionSynchronizer createSolutionSynchronizer(SolverExecutor solverExecutor,
+                                                    TaskAssigningRuntimeDelegate delegate,
+                                                    UserSystemService userSystemService,
+                                                    long synchInterval,
+                                                    SolverHandlerContext context,
+                                                    Consumer<SolutionSynchronizer.Result> resultConsumer) {
+        return new SolutionSynchronizer(solverExecutor, delegate, userSystemService, synchInterval, context, resultConsumer);
+    }
+
+    SolutionProcessor createSolutionProcessor(TaskAssigningRuntimeDelegate delegate,
+                                              Consumer<SolutionProcessor.Result> resultConsumer,
+                                              String targetUserId,
+                                              int publishWindowSize) {
+        return new SolutionProcessor(delegate, resultConsumer, targetUserId, publishWindowSize);
+    }
+
     private void addProblemFactChanges(List<ProblemFactChange<TaskAssigningSolution>> changes) {
         checkNotNull("changes", changes);
         if (!solverExecutor.isStarted()) {
-            LOGGER.info("SolverExecutor has not been started. Changes will be discarded", changes);
+            LOGGER.info("SolverExecutor has not been started. Changes will be discarded {}", changes);
             return;
         }
         if (!changes.isEmpty()) {
@@ -131,9 +156,9 @@ public class SolverHandler {
      * @param event event produced by the solver.
      */
     private void onBestSolutionChange(BestSolutionChangedEvent<TaskAssigningSolution> event) {
-        LOGGER.debug("onBestSolutionChange: isEveryProblemFactChangeProcessed: " + event.isEveryProblemFactChangeProcessed() +
-                             ", currentChangeSetId: " + context.getCurrentChangeSetId() +
-                             ", isCurrentChangeSetProcssed: " + context.isProcessedChangeSet(context.getCurrentChangeSetId()));
+        LOGGER.debug("onBestSolutionChange: isEveryProblemFactChangeProcessed: {}, currentChangeSetId: {}, isCurrentChangeSetProcessed: {}",
+                     event.isEveryProblemFactChangeProcessed(), context.getCurrentChangeSetId(), context.isProcessedChangeSet(context.getCurrentChangeSetId()));
+
         if (event.isEveryProblemFactChangeProcessed() &&
                 event.getNewBestSolution().getScore().isSolutionInitialized() &&
                 !context.isProcessedChangeSet(context.getCurrentChangeSetId())) {

@@ -29,6 +29,7 @@ import org.kie.server.services.taskassigning.core.model.solver.realtime.AssignTa
 import org.kie.server.services.taskassigning.core.model.solver.realtime.ReleaseTaskProblemFactChange;
 import org.kie.server.services.taskassigning.core.model.solver.realtime.RemoveTaskProblemFactChange;
 import org.kie.server.services.taskassigning.core.model.solver.realtime.TaskPropertyChangeProblemFactChange;
+import org.kie.server.services.taskassigning.planning.util.IndexedElement;
 import org.slf4j.Logger;
 
 public class TraceHelper {
@@ -41,7 +42,7 @@ public class TraceHelper {
 
     static void traceProgrammedChanges(Logger logger, List<RemoveTaskProblemFactChange> removedTasksChanges,
                                        List<ReleaseTaskProblemFactChange> releasedTasksChanges,
-                                       Map<String, List<SolutionBuilder.IndexedElement<AssignTaskProblemFactChange>>> changesByUserId,
+                                       Map<String, List<IndexedElement<AssignTaskProblemFactChange>>> changesByUserId,
                                        List<TaskPropertyChangeProblemFactChange> propertyChanges,
                                        List<AddTaskProblemFactChange> newTaskChanges) {
 

@@ -31,10 +31,17 @@ public class SolverBuilder {
 
     private KieServerRegistry registry;
 
+    public static class SolverBuilderException extends RuntimeException {
+
+        public SolverBuilderException(String message) {
+            super(message);
+        }
+    }
+
     private SolverBuilder() {
     }
 
-    public static SolverBuilder builder() {
+    public static SolverBuilder create() {
         return new SolverBuilder();
     }
 
@@ -64,13 +71,12 @@ public class SolverBuilder {
     private Solver<TaskAssigningSolution> buildFromContainer() {
         final KieContainerInstanceImpl containerInstance = registry.getContainer(solverDef.getContainerId());
         if (containerInstance == null) {
-            //TODO use another better suited exception.
-            throw new RuntimeException("Container " + solverDef.getContainerId() + " was not found un current registry." +
-                                               " No solvers can be created for this container");
+            throw new SolverBuilderException("Container " + solverDef.getContainerId() + " was not found un current registry." +
+                                                     " No solvers can be created for this container");
         }
         if (containerInstance.getStatus() != KieContainerStatus.STARTED) {
-            throw new RuntimeException("Container " + solverDef.getContainerId() + " must be in " + KieContainerStatus.STARTED +
-                                               " status for creating solvers, but current status is: " + containerInstance.getStatus());
+            throw new SolverBuilderException("Container " + solverDef.getContainerId() + " must be in " + KieContainerStatus.STARTED +
+                                                     " status for creating solvers, but current status is: " + containerInstance.getStatus());
         }
         final SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.createFromKieContainerXmlResource(containerInstance.getKieContainer(),
                                                                                                                    solverDef.getSolverConfigResource());
