@@ -6,12 +6,12 @@ public enum ExecModelMode {
 
     YES,
     NO,
-    WITHDRL,
+    YES_WITHDRL,
     WITHMVEL,
     WITHDRL_MVEL;
 
     public static boolean shouldGenerateModel(String s) {
-        return asList(YES, WITHDRL, WITHMVEL, WITHDRL_MVEL).contains(valueOf(s.toUpperCase()));
+        return asList(YES, YES_WITHDRL, WITHMVEL, WITHDRL_MVEL).contains(valueOf(s.toUpperCase()));
     }
 
     public static boolean shouldValidateMVEL(String s) {
