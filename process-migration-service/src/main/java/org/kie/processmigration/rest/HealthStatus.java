@@ -26,7 +26,7 @@ import org.eclipse.microprofile.health.Readiness;
 @Readiness
 @Liveness
 @ApplicationScoped
-public class HealthStatusResource implements HealthCheck {
+public class HealthStatus implements HealthCheck {
 
     private static final HealthCheckResponse UP = HealthCheckResponse.named("service").up().build();
 
