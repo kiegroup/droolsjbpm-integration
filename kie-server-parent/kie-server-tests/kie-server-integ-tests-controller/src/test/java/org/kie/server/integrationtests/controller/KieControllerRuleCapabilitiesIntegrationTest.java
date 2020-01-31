@@ -69,8 +69,7 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
         KieServerDeployer.cleanAllRepositories();
     }
 
-    @Test(timeout = 240000) //RHPAM-479
-    @Ignore("DROOLS-4938")
+    @Test //RHPAM-479
     public void testScanNow() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
 
@@ -85,7 +84,6 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
 
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar101");
         controllerClient.scanNow(container);
-
         KieServerSynchronization.waitForContainerWithReleaseId(client,
                                                                RELEASE_ID_101);
         checkKieContainerResource(RELEASE_ID_101,
