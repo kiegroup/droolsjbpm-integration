@@ -16,22 +16,22 @@
 
 package org.kie.processmigration.rest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.enterprise.context.ApplicationScoped;
 
-import org.kie.processmigration.model.Health;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Liveness;
+import org.eclipse.microprofile.health.Readiness;
 
-@Path("/health")
-@Produces(MediaType.APPLICATION_JSON)
-public class HealthStatusResource {
+@Readiness
+@Liveness
+@ApplicationScoped
+public class HealthStatus implements HealthCheck {
 
-    private static final Response UP = Response.ok(Health.UP).build();
+    private static final HealthCheckResponse UP = HealthCheckResponse.named("service").up().build();
 
-    @GET
-    public Response getUpStatus() {
+    @Override
+    public HealthCheckResponse call() {
         return UP;
     }
 }
