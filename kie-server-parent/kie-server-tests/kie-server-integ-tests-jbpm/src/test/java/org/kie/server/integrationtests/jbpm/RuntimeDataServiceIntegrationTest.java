@@ -89,7 +89,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
-        assertEquals(16, definitions.size());
+        assertEquals(17, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -111,7 +111,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20, QueryServicesClient.SORT_BY_NAME, false);
         assertNotNull(definitions);
 
-        assertEquals(16, definitions.size());
+        assertEquals(17, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -180,7 +180,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20);
         assertNotNull(definitions);
 
-        Assertions.assertThat(definitions).hasSize(16);
+        Assertions.assertThat(definitions).hasSize(17);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -206,7 +206,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        Assertions.assertThat(definitions).hasSize(16);
+        Assertions.assertThat(definitions).hasSize(17);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 

@@ -74,7 +74,8 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_USERTASK_DOUBLE_GROUP = "query-project.usertask-double-group";
     protected static final String PROCESS_ID_USERTASK_WITH_SLA = "definition-project.UserTaskWithSLA";
     protected static final String PROCESS_ID_USERTASK_WITH_SLA_ON_TASK = "definition-project.UserTaskWithSLAOnTask";
-
+    protected static final String PROCESS_ID_USERTASK_WITH_ROLLBACK = "UserTaskWithRollback";
+    
     protected static final long SERVICE_TIMEOUT = 30000;
     protected static final long TIMEOUT_BETWEEN_CALLS = 200;
     protected static final long BAD_TASK_ID = 123456l;

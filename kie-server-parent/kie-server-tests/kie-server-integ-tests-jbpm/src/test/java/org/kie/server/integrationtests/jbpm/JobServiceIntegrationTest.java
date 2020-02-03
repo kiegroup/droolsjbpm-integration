@@ -32,8 +32,10 @@ import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 
@@ -53,6 +55,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     protected static final String PRINT_OUT_COMMAND = "org.jbpm.executor.commands.PrintOutCommand";
     protected static final String LOG_CLEANUP_COMMAND = "org.jbpm.executor.commands.LogCleanupCommand";
     protected static final String CUSTOM_COMMAND = "org.jbpm.data.CustomCommand";
+    protected static final String PROCESS_AUTO_ACK_ERROR_COMMAND = "org.jbpm.executor.commands.error.ProcessAutoAckErrorCommand";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -606,5 +609,108 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(result);
         assertEquals(1 + currentNumberOfDone, result.size());
 
+    }
+    
+    @Test
+    public void testRunProcessAutoAckCommandRainyScenario() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_WITH_ROLLBACK);
+        assertNotNull(processInstanceId);
+        
+        try {
+            completeTaskAndGenerateError();
+        
+            runProcessAutoAckErrorCommand();
+
+            ExecutionErrorInstance error = getErrorByProcessId(processInstanceId);
+            //should not ack the job as it's in progress (did not finish)
+            assertFalse(error.isAcknowledged());
+            assertNull(error.getAcknowledgedAt());
+            assertNull(error.getAcknowledgedBy());
+            
+            //ack error for cleaning up
+            processAdminClient.acknowledgeError(CONTAINER_ID, error.getErrorId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    @Test
+    public void testRunProcessAutoAckCommandSunnyScenario() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_WITH_ROLLBACK);
+        assertNotNull(processInstanceId);
+        
+        completeTaskAndGenerateError();
+        
+        completeTaskWithoutError();
+        
+        runProcessAutoAckErrorCommand();
+
+        ExecutionErrorInstance error = getErrorByProcessId(processInstanceId);
+        // since task was completed auto ack should work
+        assertTrue(error.isAcknowledged());
+        assertNotNull(error.getAcknowledgedAt());
+        assertNotNull(error.getAcknowledgedBy());
+    }
+
+    private void completeTaskAndGenerateError() {
+        Long taskId = getTaskIdAssignedAsOwner(USER_YODA);
+
+        // startTask and completeTask task
+        taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+
+        Map<String, Object> taskOutcome = new HashMap<>();
+        taskOutcome.put("output1", "rollback");
+
+        try {
+            taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, taskOutcome);
+            fail("Complete task should fail due to broken script");
+        } catch (Exception e) {
+            // expected
+        }
+    }
+
+    private Long getTaskIdAssignedAsOwner(String user) {
+        List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(user, 0, 10);
+        assertNotNull(taskList);
+        assertEquals(1, taskList.size());
+
+        Long taskId = taskList.get(0).getId();
+        return taskId;
+    }
+    
+    private void completeTaskWithoutError() {
+        Long taskId = getTaskIdAssignedAsOwner(USER_YODA);
+        
+        Map<String, Object> taskOutcome = new HashMap<>();
+        taskOutcome.put("output1", "ok");
+
+        taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, taskOutcome);
+    }
+
+    private ExecutionErrorInstance getErrorByProcessId(Long processInstanceId) {
+        List<ExecutionErrorInstance> errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, true, 0, 10);
+        assertEquals(1, errors.size());
+        
+        ExecutionErrorInstance error = errors.get(0);
+        assertNotNull(error);
+        return error;
+    }
+
+    private void runProcessAutoAckErrorCommand() throws Exception {
+        Map<String, Object> data = new HashMap<>();
+        data.put("SingleRun", "true");
+        data.put("EmfName", "org.jbpm.domain");
+        
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(PROCESS_AUTO_ACK_ERROR_COMMAND);
+        jobRequestInstance.setData(data);
+
+        Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+        assertNotNull(jobId);
+        
+        RequestInfoInstance jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+        assertNotNull(jobRequest);
+        
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
     }
 }
