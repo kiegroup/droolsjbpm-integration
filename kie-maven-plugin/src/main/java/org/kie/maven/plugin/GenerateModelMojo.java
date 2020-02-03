@@ -47,6 +47,8 @@ import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 
+import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
+
 @Mojo(name = "generateModel",
         requiresDependencyResolution = ResolutionScope.NONE,
         requiresProject = true,
@@ -81,7 +83,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (ExecModelMode.shouldGenerateModel(generateModel)) {
+        if (ExecModelMode.shouldGenerateModel(generateModel) && isModelCompilerInClassPath(project.getDependencies())) {
             generateModel();
         }
     }
