@@ -173,7 +173,7 @@ The H2 JDBC driver is included by default. However, users will want to use diffe
 have to provide a `-Dthorntail.classpath` parameter with the path to the JDBC driver.
 
 ```bash
-$ java -jar -Dthorntail.classpath=./mariadb-java-client-2.4.2.jar -jar target/process-migration-thorntail.jar -s./mariadb-config.yml
+$ java -Dthorntail.classpath=./mariadb-java-client-2.4.2.jar -jar target/process-migration-thorntail.jar -s./mariadb-config.yml
 ...
 19-07-19 11:00:00,566 INFO  [org.wildfly.swarm.datasources] (main) THORN1003: Auto-detected JDBC driver for h2
 2019-07-19 11:00:00,572 INFO  [org.wildfly.swarm.datasources] (main) THORN1003: Auto-detected JDBC driver for mariadb

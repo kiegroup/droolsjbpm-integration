@@ -16,6 +16,7 @@
 
 package org.kie.processmigration.it;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +27,10 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
@@ -45,6 +50,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.appformer.maven.integration.MavenRepository;
+import org.codehaus.plexus.util.StringOutputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -74,6 +80,7 @@ public class ProcessMigrationIntegrationTest {
     private static final String SOURCE_CONTAINER_ID = "test_1.0.0";
     private static final String TARGET_CONTAINER_ID = "test_2.0.0";
     private static final String PIM_ENDPOINT = System.getProperty("pim.endpoint");
+    private static final String PIM_REST_ENDPOINT = System.getProperty("pim.rest.endpoint");
 
     private static String CONTAINER_ID = "test";
     private static String PROCESS_ID = "test.myprocess";
@@ -96,10 +103,26 @@ public class ProcessMigrationIntegrationTest {
     }
 
     @Test
-    public void testHealthCheck() throws IOException {
-        HttpGet get = new HttpGet(PIM_ENDPOINT + "/health");
-        HttpResponse response = client.execute(get);
+    public void testLivenessCheck() throws IOException {
+        HttpGet get = new HttpGet(PIM_ENDPOINT + "/health/live");
+        assertHealthCheck(client.execute(get));
+    }
+
+    @Test
+    public void testReadinessCheck() throws IOException {
+        HttpGet get = new HttpGet(PIM_ENDPOINT + "/health/ready");
+        assertHealthCheck(client.execute(get));
+    }
+
+    private void assertHealthCheck(HttpResponse response) throws IOException {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatusLine().getStatusCode());
+        OutputStream os = new ByteArrayOutputStream();
+        InputStream is = response.getEntity().getContent();
+        JsonArray checks = Json.createReader(is).readObject().getJsonArray("checks");
+        assertEquals(1, checks.size());
+        JsonObject serviceCheck = checks.getJsonObject(0);
+        assertEquals("service", serviceCheck.getString("name"));
+        assertEquals("UP", serviceCheck.getString("status"));
     }
 
     @Test
@@ -160,7 +183,7 @@ public class ProcessMigrationIntegrationTest {
     }
 
     private HttpPost preparePost(String path) {
-        HttpPost post = new HttpPost(PIM_ENDPOINT + path);
+        HttpPost post = new HttpPost(PIM_REST_ENDPOINT + path);
         post.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
         post.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         return post;
