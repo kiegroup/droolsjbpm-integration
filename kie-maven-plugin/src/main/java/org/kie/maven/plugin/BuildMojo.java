@@ -58,7 +58,9 @@ import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message;
 
+import static org.kie.maven.plugin.DroolsExecModelConsistency.shouldGenerateModel;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
+import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
 /**
  * This goal builds the Drools files belonging to the kproject.
@@ -104,7 +106,10 @@ public class BuildMojo extends AbstractKieMojo {
     private String generateModel;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if(!ExecModelMode.shouldGenerateModel(generateModel) && isModelCompilerInClassPath(project.getDependencies())) {
+        // BuildMojo is executed when GenerateModelMojo isn't and vice-versa
+        if (!shouldGenerateModel(modelParameterEnabled(generateModel),
+                                 isModelCompilerInClassPath(project.getDependencies()),
+                                 getLog())) {
             buildDrl();
         }
     }
