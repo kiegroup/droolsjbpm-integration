@@ -14,7 +14,7 @@ public enum ExecModelMode {
     WITHMVEL,
     WITHDRL_MVEL;
 
-    public static boolean shouldGenerateModel(String s) {
+    public static boolean modelParameterEnabled(String s) {
         return asList(YES, YES_WITHDRL, WITHMVEL, WITHDRL_MVEL).contains(valueOf(s.toUpperCase()));
     }
 

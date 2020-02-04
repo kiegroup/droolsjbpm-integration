@@ -34,9 +34,7 @@ import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceWithConfigurationImpl;
 
-import static org.kie.maven.plugin.DroolsExecModelConsistency.shouldGenerateModel;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
-import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
 @Mojo(name = "generateDMNModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -61,9 +59,10 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (shouldGenerateModel(DMNModelMode.modelParameterEnabled(generateDMNModel),
-                                isModelCompilerInClassPath(project.getDependencies()),
-                                getLog())) {
+        boolean DMNmodelParameterEnabled = DMNModelMode.modelParameterEnabled(generateDMNModel);
+        boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
+
+        if (DMNmodelParameterEnabled && modelCompilerInClassPath) {
             generateDMNModel();
         }
     }

@@ -58,7 +58,6 @@ import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message;
 
-import static org.kie.maven.plugin.DroolsExecModelConsistency.shouldGenerateModel;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
 import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
@@ -107,9 +106,17 @@ public class BuildMojo extends AbstractKieMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         // BuildMojo is executed when GenerateModelMojo isn't and vice-versa
-        if (!shouldGenerateModel(modelParameterEnabled(generateModel),
-                                 isModelCompilerInClassPath(project.getDependencies()),
-                                 getLog())) {
+        boolean modelParameterEnabled = modelParameterEnabled(generateModel);
+        boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
+
+        if (!(modelParameterEnabled && modelCompilerInClassPath)) {
+
+            if (!modelCompilerInClassPath) {
+                getLog().warn("You're trying to use Drools with the executable model without providing it on the classpath \n" +
+                                      "You need the dependency to compile the generated files, therefore the executable model generation is disabled \n" +
+                                      "Add the drools-model-compiler artifact to the pom.xml to enable the executable model");
+            }
+
             buildDrl();
         }
     }

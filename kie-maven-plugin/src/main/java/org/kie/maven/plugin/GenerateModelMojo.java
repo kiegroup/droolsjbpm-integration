@@ -47,7 +47,6 @@ import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 
-import static org.kie.maven.plugin.DroolsExecModelConsistency.*;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
 import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
@@ -86,9 +85,9 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
-        if (shouldGenerateModel(modelParameterEnabled(generateModel),
-                                isModelCompilerInClassPath(project.getDependencies()),
-                                getLog())) {
+        boolean modelParameterEnabled = modelParameterEnabled(generateModel);
+        boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
+        if (modelParameterEnabled && modelCompilerInClassPath) {
             generateModel();
         }
     }
