@@ -127,11 +127,13 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
                                   RELEASE_ID);
 
         controllerClient.startScanner(container,
-                                      1000L);
+                                      5000L);
+        // If WebSockets are used then there may be delay between request to start scanner sent to controller and scanner status in Kie server
+        KieServerSynchronization.waitForContainerWithScannerStatus(client, KieScannerStatus.STARTED);
 
         RuleConfig containerConfig = (RuleConfig) controllerClient.getContainerInfo(serverTemplate.getId(), CONTAINER_ID).getConfigs().get(Capability.RULE);
         Assertions.assertThat(containerConfig.getScannerStatus()).isEqualTo(KieScannerStatus.STARTED);
-        Assertions.assertThat(containerConfig.getPollInterval()).isEqualTo(1000L);
+        Assertions.assertThat(containerConfig.getPollInterval()).isEqualTo(5000L);
 
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar101");
 
@@ -142,6 +144,8 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
 
         containerConfig = (RuleConfig) controllerClient.getContainerInfo(serverTemplate.getId(), CONTAINER_ID).getConfigs().get(Capability.RULE);
         Assertions.assertThat(containerConfig.getScannerStatus()).isEqualTo(KieScannerStatus.STOPPED);
+
+        KieServerSynchronization.waitForContainerWithScannerStatus(client, KieScannerStatus.STOPPED);
     }
 
     @Test
