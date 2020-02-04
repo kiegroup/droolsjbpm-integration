@@ -18,14 +18,17 @@ package org.kie.server.controller.api.model.spec;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.kie.server.api.model.KieServerMode;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
@@ -37,13 +40,16 @@ public class ServerTemplate extends ServerTemplateKey {
     @XmlElement(name = "container-specs")
     private Collection<ContainerSpec> containersSpec = new ArrayList<ContainerSpec>();
     @XmlElement(name = "server-config")
-    private Map<Capability, ServerConfig> configs = new HashMap<Capability, ServerConfig>();
+    private Map<Capability, ServerConfig> configs = new EnumMap<>(Capability.class);
     @XmlElement(name = "server-instances")
     private Collection<ServerInstanceKey> serverInstances = new ArrayList<ServerInstanceKey>();
     @XmlElement(name="capabilities")
     private List<String> capabilities = new ArrayList<String>();
     @XmlElement(name="mode")
     private KieServerMode mode;
+
+    @XmlTransient
+    private final Object lock = new Object();
 
     public ServerTemplate() {
     }
@@ -76,9 +82,9 @@ public class ServerTemplate extends ServerTemplateKey {
 
     public Map<Capability, ServerConfig> getConfigs() {
         if (configs == null) {
-            configs = new HashMap<Capability, ServerConfig>();
+            configs = new EnumMap<>(Capability.class);
         }
-        return new HashMap<Capability, ServerConfig>( configs );
+        return new EnumMap<>(configs);
     }
 
     public Collection<ContainerSpec> getContainersSpec() {
@@ -176,13 +182,8 @@ public class ServerTemplate extends ServerTemplateKey {
         if (serverInstances == null) {
             return;
         }
-        Iterator<ServerInstanceKey> iterator = serverInstances.iterator();
-
-        while(iterator.hasNext()) {
-            ServerInstanceKey serverInstanceKey = iterator.next();
-            if (serverInstanceId.equals(serverInstanceKey.getServerInstanceId())) {
-                iterator.remove();
-            }
+        synchronized (lock) {
+            serverInstances.removeIf((ServerInstanceKey key) -> key.getServerInstanceId().equals(serverInstanceId));
         }
     }
 
@@ -240,5 +241,17 @@ public class ServerTemplate extends ServerTemplateKey {
         int result = super.hashCode();
         result = 31 * result + (capabilities != null ? capabilities.hashCode() : 0);
         return result;
+    }
+
+    public ServerTemplate cloneServerTemplate() {
+        synchronized (lock) {
+            ServerTemplate serverTemplate = new ServerTemplate(this.getId(), this.getName(), new ArrayList<>(capabilities),
+                                                               getConfigs(), Collections.EMPTY_LIST, new ArrayList<ServerInstanceKey>(serverInstances));
+            containersSpec.forEach(c -> serverTemplate.addContainerSpec(new ContainerSpec(c.getId(), c.getContainerName(), c.getServerTemplateKey(), c.getReleasedId(), c.getStatus(), new EnumMap<>(c.getConfigs()))));
+
+            serverTemplate.setMode(mode);
+
+            return serverTemplate;
+        }
     }
 }

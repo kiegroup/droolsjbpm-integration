@@ -212,9 +212,10 @@ public class ControllerUtils {
                 break;
             }
         }
-
+        if (entity instanceof ServerTemplate) {
+            return marshaller.marshall(((ServerTemplate) entity).cloneServerTemplate());
+        }
         return marshaller.marshall(entity);
-
     }
 
     public static String getUser() {

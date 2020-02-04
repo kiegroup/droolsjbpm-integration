@@ -15,7 +15,7 @@
 
 package org.kie.server.controller.api.model.spec;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,7 +33,7 @@ public class ContainerSpec extends ContainerSpecKey  {
     @XmlElement(name = "release-id")
     private ReleaseId releasedId;
     @XmlElement(name = "configuration")
-    private Map<Capability, ContainerConfig> configs = new HashMap<>();
+    private Map<Capability, ContainerConfig> configs = new EnumMap<>(Capability.class);
     @XmlElement(name = "status")
     private KieContainerStatus status = KieContainerStatus.STOPPED;
 
@@ -58,7 +58,7 @@ public class ContainerSpec extends ContainerSpecKey  {
 
     public Map<Capability, ContainerConfig> getConfigs() {
         if (configs == null) {
-            configs = new HashMap<>();
+            configs = new EnumMap<>(Capability.class);
         }
         return configs;
     }
