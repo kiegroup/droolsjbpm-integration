@@ -41,8 +41,8 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
-import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.core.impl.KnowledgeBaseImpl;
+import org.drools.modelcompiler.ExecutableModelProject;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -97,7 +97,7 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
             kfs.write("src/main/resources/rule.drl", rule);
         }
 
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll(DrlProject.class);
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll(ExecutableModelProject.class);
 
         List<Message> errors = kieBuilder.getResults().getMessages(Message.Level.ERROR);
         if (!errors.isEmpty()) {
