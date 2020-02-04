@@ -110,13 +110,6 @@ public class BuildMojo extends AbstractKieMojo {
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
 
         if (!(modelParameterEnabled && modelCompilerInClassPath)) {
-
-            if (!modelCompilerInClassPath) {
-                getLog().warn("You're trying to use Drools with the executable model without providing it on the classpath \n" +
-                                      "You need the dependency to compile the generated files, therefore the executable model generation is disabled \n" +
-                                      "Add the drools-model-compiler artifact to the pom.xml to enable the executable model");
-            }
-
             buildDrl();
         }
     }
