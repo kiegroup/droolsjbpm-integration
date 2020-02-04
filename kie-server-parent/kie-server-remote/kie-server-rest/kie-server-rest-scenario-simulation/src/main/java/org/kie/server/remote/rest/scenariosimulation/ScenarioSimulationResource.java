@@ -14,6 +14,7 @@
  */
 package org.kie.server.remote.rest.scenariosimulation;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -60,6 +61,7 @@ public class ScenarioSimulationResource {
             response = ServiceResponse.class, code = 200)
     @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Container not found"), @ApiResponse(code = 400, message = "Malformed test scenario file")})
     @POST
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response executeSimulation(@Context HttpHeaders headers,
                                       @ApiParam(value = "Container id", required = true) @PathParam(CONTAINER_ID) String containerId,
