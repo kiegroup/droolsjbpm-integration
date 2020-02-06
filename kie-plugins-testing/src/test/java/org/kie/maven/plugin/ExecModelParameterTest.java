@@ -53,7 +53,6 @@ public class ExecModelParameterTest extends KieMavenPluginBaseIntegrationTest {
                          new String[]{"-Dorg.kie.version=" + getProjectVersion()},
                          "clean", "install");
         KieModule kieModule = fireRule(ARTIFACT_ID_WITH_EXEC_MODEL, KBASE_NAME_WITH_EXEC_MODEL);
-        System.out.println(kieModule.getClass().getCanonicalName());
         assertTrue(kieModule instanceof CanonicalKieModule);
     }
 
