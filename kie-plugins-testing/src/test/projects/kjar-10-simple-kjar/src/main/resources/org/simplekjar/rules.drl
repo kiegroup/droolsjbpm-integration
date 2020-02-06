@@ -13,9 +13,14 @@
  * limitations under the License.
 */
 
-package simple
+package org.simplekjar
 
-rule R1 when
-   Object()
+import java.util.*
+
+rule "example"
+when
+    $o: Object()
 then
+    System.out.println("Hello world");
 end
+
