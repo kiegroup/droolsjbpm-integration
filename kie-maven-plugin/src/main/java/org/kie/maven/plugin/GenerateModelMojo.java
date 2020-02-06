@@ -89,10 +89,9 @@ public class GenerateModelMojo extends AbstractKieMojo {
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
         if (modelParameterEnabled && modelCompilerInClassPath) {
             generateModel();
-        } else if (modelParameterEnabled && !modelCompilerInClassPath) {
-            getLog().warn("You're trying to use Drools with the executable model without providing it on the classpath \n" +
-                                  "You need the dependency to compile the generated files, therefore the executable model generation is disabled \n" +
-                                  "Add the drools-model-compiler artifact to the pom.xml to enable the executable model");
+        } else if (modelParameterEnabled) { // !modelCompilerInClassPath
+            getLog().warn("You're trying to build rule assets in a project from an executable rule model, but you did not provide the required dependency on the project classpath.\n" +
+                                  "To enable executable rule models for your project, add the `drools-model-compiler` dependency in the `pom.xml` file of your project.\n");
         }
 
     }
