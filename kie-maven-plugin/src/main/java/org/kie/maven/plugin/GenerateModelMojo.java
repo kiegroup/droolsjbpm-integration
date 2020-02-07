@@ -47,6 +47,9 @@ import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 
+import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
+import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
+
 @Mojo(name = "generateModel",
         requiresDependencyResolution = ResolutionScope.NONE,
         requiresProject = true,
@@ -81,9 +84,16 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (ExecModelMode.shouldGenerateModel(generateModel)) {
+        // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
+        boolean modelParameterEnabled = modelParameterEnabled(generateModel);
+        boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
+        if (modelParameterEnabled && modelCompilerInClassPath) {
             generateModel();
+        } else if (modelParameterEnabled) { // !modelCompilerInClassPath
+            getLog().warn("You're trying to build rule assets in a project from an executable rule model, but you did not provide the required dependency on the project classpath.\n" +
+                                  "To enable executable rule models for your project, add the `drools-model-compiler` dependency in the `pom.xml` file of your project.\n");
         }
+
     }
 
     private void generateModel() throws MojoExecutionException {

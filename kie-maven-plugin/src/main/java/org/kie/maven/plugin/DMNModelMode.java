@@ -7,7 +7,7 @@ public enum DMNModelMode {
     YES,
     NO;
 
-    public static boolean shouldGenerateDMNModel(String s) {
+    public static boolean modelParameterEnabled(String s) {
         return asList(YES).contains(valueOf(s.toUpperCase()));
     }
 }
