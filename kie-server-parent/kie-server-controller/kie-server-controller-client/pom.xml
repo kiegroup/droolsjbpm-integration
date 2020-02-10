@@ -6,7 +6,7 @@
   <parent>
     <artifactId>kie-server-controller</artifactId>
     <groupId>org.kie.server</groupId>
-    <version>7.33.0-SNAPSHOT</version>
+    <version>7.33.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-controller-client</artifactId>
