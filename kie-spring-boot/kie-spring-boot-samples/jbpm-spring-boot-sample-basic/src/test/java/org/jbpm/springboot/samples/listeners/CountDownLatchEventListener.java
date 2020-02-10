@@ -19,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.kie.api.event.process.DefaultProcessEventListener;
 import org.kie.api.event.process.ProcessCompletedEvent;
+import org.kie.api.event.process.ProcessNodeLeftEvent;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,12 +27,18 @@ public class CountDownLatchEventListener extends DefaultProcessEventListener {
 
     private String expectedProcessId;
     private CountDownLatch latch;
+    private String expectedNodeName;
     
     private String executingThread;
     
     public void configure(String processId, int threads) {
         this.expectedProcessId = processId;
         this.latch = new CountDownLatch(threads);
+    }
+    
+    public void configureNode(String processId, String nodeName, int threads) {
+        configure(processId, threads);
+        this.expectedNodeName = nodeName;
     }
     
     public CountDownLatch getCountDown() {
@@ -45,6 +52,15 @@ public class CountDownLatchEventListener extends DefaultProcessEventListener {
     @Override
     public void afterProcessCompleted(ProcessCompletedEvent event) {
         if (this.latch != null && event.getProcessInstance().getProcessId().equals(expectedProcessId)) {
+            this.executingThread = Thread.currentThread().getName();
+            this.latch.countDown();
+        }
+    }
+    
+    @Override
+    public void afterNodeLeft(ProcessNodeLeftEvent processNodeLeftEvent) {
+        if (this.latch != null && expectedNodeName !=null && 
+            expectedNodeName.equals(processNodeLeftEvent.getNodeInstance().getNodeName())) {
             this.executingThread = Thread.currentThread().getName();
             this.latch.countDown();
         }
