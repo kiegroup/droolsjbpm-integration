@@ -43,6 +43,6 @@ public class KieControllerSwaggerIntegrationTest extends KieControllerManagement
         assertNotNull(response.getEntity());
         String html = response.readEntity(String.class);
         
-        assertThat(Jsoup.parse(html).title()).isEqualTo("Controller Documentation");
+        assertThat(Jsoup.parse(html).title()).isIn("Controller Documentation", "Business Central Documentation");
      }
 }
