@@ -17,7 +17,7 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Swagger web resources</web-resource-name>
-      <url-pattern>/rest/swagger.json</url-pattern>
+      <url-pattern>/rest/swagger.json/*</url-pattern>
       <url-pattern>/docs/*</url-pattern>
       <http-method>GET</http-method>
     </web-resource-collection>
