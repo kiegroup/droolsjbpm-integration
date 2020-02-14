@@ -1059,7 +1059,7 @@
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>ee7</kie.server.classifier>
-        <cargo.container.id>websphere85x</cargo.container.id>
+        <cargo.container.id>websphere9x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
         <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
         <!-- Enable integration tests and Cargo when running with application server. -->
