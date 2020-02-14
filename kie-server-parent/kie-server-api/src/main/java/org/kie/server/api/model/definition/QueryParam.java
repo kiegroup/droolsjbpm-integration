@@ -71,9 +71,10 @@ public class QueryParam {
     @Override
     public String toString() {
         return "QueryParam{" +
-                "column='" + column + '\'' +
-                ", operator='" + operator + '\'' +
+               ((column != null) ? "column='" + column + "\'," : "") +
+                " operator='" + operator + '\'' +
                 ", value=" + value +
                 '}';
     }
+
 }
