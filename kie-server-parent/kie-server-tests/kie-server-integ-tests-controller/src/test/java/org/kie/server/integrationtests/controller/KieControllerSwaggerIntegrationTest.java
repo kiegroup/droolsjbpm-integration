@@ -17,6 +17,8 @@ package org.kie.server.integrationtests.controller;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -26,23 +28,47 @@ import org.jsoup.Jsoup;
 import org.junit.Test;
 import org.kie.server.integrationtests.config.TestConfig;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class KieControllerSwaggerIntegrationTest extends KieControllerManagementBaseTest {
 
+    Client httpClient = ClientBuilder.newClient();
+    
     @Test
     public void testSwaggerDocs() throws Exception {
-        Client httpClient = ClientBuilder.newClient();
-        
-        String docsUri = TestConfig.getControllerHttpUrl() + "/../../docs/";
-        WebTarget clientRequest = httpClient.target(docsUri);
-        Response response = clientRequest.request().get();
-        
-        assertEquals(200, response.getStatus());
-        assertNotNull(response.getEntity());
-        String html = response.readEntity(String.class);
+        String html = invokeGet(getContextRoot()+"docs/");
         
         assertThat(Jsoup.parse(html).title()).isIn("Controller Documentation", "Business Central Documentation");
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSwaggerJson() throws Exception {
+        String responseStr = invokeGet(getContextRoot()+"rest/swagger.json");
+        
+        ObjectMapper om = new ObjectMapper();
+        HashMap<String, Object> hm = (HashMap<String, Object>) om.readValue(responseStr, HashMap.class);
+        assertEquals("2.0", hm.get("swagger"));
      }
+
+    protected String getContextRoot() {
+        //Navigate to parent path twice to get context root
+        String url = TestConfig.getControllerHttpUrl();
+        int pos = url.length();
+        for (int i = 0; i < 2; i++) {
+            pos = url.lastIndexOf('/', pos - 1);
+        }
+        return url.substring(0, pos + 1);
+    }
+    
+    protected String invokeGet(String docsUri) {
+        WebTarget clientRequest = httpClient.target(docsUri);
+        Response response = clientRequest.request().get();
+
+        assertEquals(200, response.getStatus());
+        assertNotNull(response.getEntity());
+        return response.readEntity(String.class);
+    }
 }
