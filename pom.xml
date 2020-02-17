@@ -171,7 +171,7 @@
     <profile>
       <id>run-code-coverage</id>
       <properties>
-        <jacoco.excludes></jacoco.excludes>
+        <jacoco.excludes>*Lexer</jacoco.excludes>
         <jacoco.agent.line>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${version.jacoco.plugin}/org.jacoco.agent-${version.jacoco.plugin}-runtime.jar=destfile=${jacoco.exec.file},append=true,excludes=${jacoco.excludes}</jacoco.agent.line>
         <surefire.argLine>
           -Dfile.encoding=${project.build.sourceEncoding}
