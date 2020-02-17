@@ -27,9 +27,9 @@ import org.drools.compiler.kie.builder.impl.AbstractKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.core.io.impl.ByteArrayResource;
+import org.drools.core.io.internal.InternalResource;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
-import org.kie.api.io.Resource;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.wiring.BundleWiring;
@@ -57,7 +57,7 @@ public class OsgiKieModule extends AbstractKieModule {
     }
 
     @Override
-    public Resource getResource( String fileName ) {
+    public InternalResource getResource( String fileName ) {
         return new ByteArrayResource( getBytes(fileName) );
     }
 
