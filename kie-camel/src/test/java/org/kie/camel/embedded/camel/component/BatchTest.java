@@ -43,6 +43,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.drools.core.common.InternalFactHandle;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.util.StringUtils;
+import org.drools.modelcompiler.ExecutableModelProject;
 import org.jbpm.process.core.context.variable.VariableScope;
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.junit.After;
@@ -248,7 +249,7 @@ public abstract class BatchTest extends CamelTestSupport {
 
         kfs.write(resource);
 
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll(ExecutableModelProject.class);
 
         List<Message> errors = kieBuilder.getResults().getMessages(Message.Level.ERROR);
         if (!errors.isEmpty()) {
@@ -268,7 +269,7 @@ public abstract class BatchTest extends CamelTestSupport {
 
         kfs.write(resource);
 
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll(ExecutableModelProject.class);
 
         List<Message> errors = kieBuilder.getResults().getMessages(Message.Level.ERROR);
         if (!errors.isEmpty()) {
