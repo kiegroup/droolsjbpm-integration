@@ -247,7 +247,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
                     .map(currentCapability -> getCompatibleServerTemplateCapability(currentCapability))
                     .collect(Collectors.toList());
 
-            if (!Objects.equals(expectedCababilities, convertedCurrentCapabilities)) {
+            if (!convertedCurrentCapabilities.containsAll(expectedCababilities)) {
                 serverSetup.getMessages().add(new Message(Severity.ERROR, "Expected capabilities were " + serverTemplate.getCapabilities()));
                 List<String> missingCapabilities = expectedCababilities;
                 missingCapabilities.removeAll(convertedCurrentCapabilities);
