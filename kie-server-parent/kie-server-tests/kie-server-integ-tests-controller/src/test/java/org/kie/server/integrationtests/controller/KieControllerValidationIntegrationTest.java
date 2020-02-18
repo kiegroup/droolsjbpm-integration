@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.controller;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -82,6 +83,54 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         };
         registry = new KieServerRegistryImpl();
         registry.registerStateRepository(dummyKieServerStateRepository);
+    }
+
+    @Test
+    public void testBadRegisteredJBPM9031() throws Exception {
+        final String SERVER_TEMPLATE_ID = "test.mode.bad";
+        final String SERVER_NAME = "server-name";
+        KieServerEnvironment.setServerId(SERVER_TEMPLATE_ID);
+
+        ServerTemplate serverTemplate = buildServerTemplate(SERVER_TEMPLATE_ID,
+                                                            SERVER_NAME,
+                                                            null,
+                                                            KieServerMode.DEVELOPMENT,
+                                                            Collections.singletonList(Capability.PROCESS.name()));
+        controllerClient.saveServerTemplate(serverTemplate);
+
+        ServerTemplateList instanceList = controllerClient.listServerTemplates();
+        assertEquals(1, instanceList.getServerTemplates().length);
+
+        // Register kie server in controller.
+        KieServerInfo kieServerInfo = new KieServerInfo(SERVER_TEMPLATE_ID, "1.0.0");
+        kieServerInfo.setLocation("http://127.0.0.1:20000");
+        kieServerInfo.setMode(KieServerMode.PRODUCTION);
+        kieServerInfo.setName(SERVER_NAME);
+        kieServerInfo.setCapabilities(Arrays.asList(KieServerConstants.CAPABILITY_BRM, KieServerConstants.CAPABILITY_BPM, KieServerConstants.CAPABILITY_BRP));
+
+        KieServerRegistry registry = new KieServerRegistryImpl();
+
+        registry.registerStateRepository(dummyKieServerStateRepository);
+        KieServerController controller = new DefaultRestControllerImpl(registry);
+        KieServerSetup setup = controller.connect(kieServerInfo);
+        Assert.assertTrue(setup.hasNoErrors());
+
+        // Check that kie server is registered.
+        ServerInstanceKeyList list = controllerClient.getServerInstances(SERVER_TEMPLATE_ID);
+
+        // Sometimes the controller healthcheck deletes server instance sooner than we retrieve it back, in such case register the instance again
+        if (list == null || list.getServerInstanceKeys() == null || list.getServerInstanceKeys().length == 0) {
+            setup = controller.connect(kieServerInfo);
+            Assert.assertTrue(setup.hasNoErrors());
+            list = controllerClient.getServerInstances(SERVER_TEMPLATE_ID);
+        }
+
+        assertNotNull(list.getServerInstanceKeys());
+        assertEquals(1, list.getServerInstanceKeys().length);
+
+        // clear up
+        controller.disconnect(kieServerInfo);
+        controllerClient.deleteServerTemplate(SERVER_TEMPLATE_ID);
     }
 
     @Test
