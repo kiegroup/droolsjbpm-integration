@@ -18,15 +18,16 @@ package org.kie.server.integrationtests.shared;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.cli.MavenCli;
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.MavenRepository;
 import org.appformer.maven.integration.embedder.MavenProjectLoader;
@@ -61,14 +62,9 @@ public class KieServerDeployer {
     }
 
     public static void buildAndDeployMavenProject(String basedir) {
-        // need to backup (and later restore) the current class loader, because the Maven/Plexus does some classloader
-        // magic which then results in CNFE in RestEasy client
         // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
         // remote repo
         logger.debug("Building and deploying Maven project from basedir '{}'.", basedir);
-        ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
-        System.setProperty("maven.multiModuleProjectDirectory", basedir); // required by MavenCli 3.3.0+
-        MavenCli cli = new MavenCli();
         List<String> mvnArgs;
         if (TestConfig.isLocalServer()) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
@@ -76,9 +72,9 @@ public class KieServerDeployer {
 
             // wrapping explicitly in ArrayList as we may need to update the list later (and Arrays.toList() returns
             // just read-only list)
-            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "clean", "install"));
+            mvnArgs = new ArrayList<>(Arrays.asList("mvn", "--quiet", "clean", "install"));
         } else {
-            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-e", "clean", "deploy"));
+            mvnArgs = new ArrayList<>(Arrays.asList("mvn", "--quiet", "-e", "clean", "deploy"));
         }
 
         // use custom settings.xml file, if one specified
@@ -87,13 +83,15 @@ public class KieServerDeployer {
             mvnArgs.add("-s");
             mvnArgs.add(kjarsBuildSettingsXml);
         }
-        int mvnRunResult = cli.doMain(mvnArgs.toArray(new String[mvnArgs.size()]), basedir, System.out, System.err);
 
-        Thread.currentThread().setContextClassLoader(classLoaderBak);
+        // Execute the Maven build using installed Maven binary
+        try (ProcessExecutor executor = new ProcessExecutor()) {
+            String command = mvnArgs.stream().collect(Collectors.joining(" "));
+            boolean executionSuccessful = executor.executeProcessCommand(command, Paths.get(basedir));
 
-        if (mvnRunResult != 0) {
-            throw new RuntimeException("Error while building Maven project from basedir " + basedir +
-                    ". Return code=" + mvnRunResult);
+            if (!executionSuccessful) {
+                throw new RuntimeException("Error while building Maven project from basedir " + basedir);
+            }
         }
         logger.debug("Maven project successfully built and deployed!");
     }
