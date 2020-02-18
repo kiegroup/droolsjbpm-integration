@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "tsk-assig-exec-planning-result")
-public class ExecutePlanningResult {
+@XmlRootElement(name = "task-assigning-planning-execution-result")
+public class PlanningExecutionResult {
 
     public enum ErrorCode {
         TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR,
@@ -73,7 +73,7 @@ public class ExecutePlanningResult {
 
     public static class Builder {
 
-        private ExecutePlanningResult result = new ExecutePlanningResult();
+        private PlanningExecutionResult result = new PlanningExecutionResult();
 
         private Builder() {
         }
@@ -93,7 +93,7 @@ public class ExecutePlanningResult {
             return this;
         }
 
-        public ExecutePlanningResult build() {
+        public PlanningExecutionResult build() {
             return result;
         }
     }

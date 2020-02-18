@@ -20,13 +20,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
@@ -129,14 +130,25 @@ public class SolverHandlerTest {
         verifyDestroyCommonActions();
     }
 
-    @Test
+    @Test(timeout = 5000)
     public void destroyWithTerminationError() throws Exception {
-        prepareStart();
-        when(executorService.awaitTermination(anyInt(), any())).thenThrow(new InterruptedException("Test Generated Error"));
-        handler.destroy();
+        // ensure this code is executed on a separate thread since a Thread.currentThread().interrupt(); is produced
+        // in this use case when we emulate the executorService.awaitTermination throwing an Exception, otherwise
+        // the interruption is caused on the JUnit execution thread "very bad thing".
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            try {
+                prepareStart();
+                when(executorService.awaitTermination(anyInt(), any())).thenThrow(new InterruptedException("Test Generated Error"));
+                handler.destroy();
 
-        verifyDestroyCommonActions();
-        verify(executorService).shutdownNow();
+                verifyDestroyCommonActions();
+                verify(executorService).shutdownNow();
+            } catch (Exception e) {
+                //will never happen, see verifyDestroyCommonActions executorService is a mock..
+            }
+        }).get();
+        executor.shutdown();
     }
 
     @Test
@@ -178,14 +190,14 @@ public class SolverHandlerTest {
 
     @Test
     public void onSolutionProcessed() {
-        SolutionProcessor.Result result = new SolutionProcessor.Result(ExecutePlanningResult.builder().build());
+        SolutionProcessor.Result result = new SolutionProcessor.Result(PlanningExecutionResult.builder().build());
         onSolutionProcessedSuccessful(result);
     }
 
     @Test
     public void onSolutionProcessedWithRecoverableError() {
-        SolutionProcessor.Result result = new SolutionProcessor.Result(ExecutePlanningResult.builder()
-                                                                               .error(ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR)
+        SolutionProcessor.Result result = new SolutionProcessor.Result(PlanningExecutionResult.builder()
+                                                                               .error(PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR)
                                                                                .build());
         onSolutionProcessedSuccessful(result);
     }
@@ -198,8 +210,8 @@ public class SolverHandlerTest {
 
     @Test
     public void onSolutionProcessedWithUnRecoverableError() {
-        SolutionProcessor.Result result = new SolutionProcessor.Result(ExecutePlanningResult.builder()
-                                                                               .error(ExecutePlanningResult.ErrorCode.UNEXPECTED_ERROR)
+        SolutionProcessor.Result result = new SolutionProcessor.Result(PlanningExecutionResult.builder()
+                                                                               .error(PlanningExecutionResult.ErrorCode.UNEXPECTED_ERROR)
                                                                                .build());
         onSolutionProcessedWithError(result);
     }

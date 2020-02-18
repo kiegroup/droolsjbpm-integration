@@ -16,7 +16,7 @@
 
 package org.kie.server.services.taskassigning.runtime.command;
 
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 
 /**
  * Helper class intended to be used by the TaskAssigningRuntimeServiceBase and planning execution.
@@ -24,15 +24,15 @@ import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
 public class PlanningException extends RuntimeException {
 
     private final String containerId;
-    private final ExecutePlanningResult.ErrorCode code;
+    private final PlanningExecutionResult.ErrorCode code;
 
-    public PlanningException(String message, String containerId, ExecutePlanningResult.ErrorCode code) {
+    public PlanningException(String message, String containerId, PlanningExecutionResult.ErrorCode code) {
         super(message);
         this.containerId = containerId;
         this.code = code;
     }
 
-    public ExecutePlanningResult.ErrorCode getCode() {
+    public PlanningExecutionResult.ErrorCode getCode() {
         return code;
     }
 

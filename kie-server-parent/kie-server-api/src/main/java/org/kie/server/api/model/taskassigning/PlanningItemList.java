@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.kie.server.api.model.ItemList;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "tsk-assig-task-planning-item-list")
+@XmlRootElement(name = "task-assigning-planning-item-list")
 public class PlanningItemList implements ItemList<PlanningItem> {
 
     @XmlElement(name = "planningItems")

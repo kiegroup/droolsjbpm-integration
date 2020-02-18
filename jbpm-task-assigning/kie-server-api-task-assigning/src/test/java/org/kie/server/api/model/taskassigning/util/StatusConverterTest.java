@@ -25,8 +25,6 @@ import org.junit.Test;
 import org.kie.api.task.model.Status;
 
 import static org.junit.Assert.assertEquals;
-import static org.kie.api.task.model.Status.Completed;
-import static org.kie.api.task.model.Status.Ready;
 
 public class StatusConverterTest {
 

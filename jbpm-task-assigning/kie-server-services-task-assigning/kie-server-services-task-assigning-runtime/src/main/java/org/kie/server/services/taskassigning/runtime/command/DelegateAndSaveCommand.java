@@ -27,7 +27,7 @@ import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.User;
 import org.kie.internal.task.api.TaskPersistenceContext;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
 
@@ -59,7 +59,7 @@ public class DelegateAndSaveCommand extends PlanningCommand {
                                                       status,
                                                       Arrays.toString(new Status[]{Ready, Reserved})),
                                         planningItem.getContainerId(),
-                                        ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
+                                        PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
         }
 
         // the by default jBPM task delegation adds the delegated user as a potential owner of the task, but this is

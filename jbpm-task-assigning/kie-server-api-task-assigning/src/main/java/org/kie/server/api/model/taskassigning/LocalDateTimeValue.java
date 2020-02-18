@@ -17,6 +17,7 @@
 package org.kie.server.api.model.taskassigning;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -46,5 +47,22 @@ public class LocalDateTimeValue {
         LocalDateTimeValue result = new LocalDateTimeValue();
         result.setValue(value);
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof LocalDateTimeValue)) {
+            return false;
+        }
+        LocalDateTimeValue that = (LocalDateTimeValue) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

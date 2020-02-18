@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE;
@@ -411,11 +412,12 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         String url = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL, "http://localhost:8080/kie-server/services/rest/server", value -> value);
         String user = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER, "wbadmin", value -> value);
         String pwd = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD, null, value -> value);
-        this.runtimeClient = createRuntimeClient(url, user, pwd);
+        long timeout = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT, 90000L, Long::parseLong);
+        this.runtimeClient = createRuntimeClient(url, user, pwd, timeout);
     }
 
-    TaskAssigningRuntimeClient createRuntimeClient(String url, String user, String pwd) {
-        return TaskAssigningRuntimeClientFactory.newRuntimeClient(url, user, pwd);
+    TaskAssigningRuntimeClient createRuntimeClient(String url, String user, String pwd, long timeout) {
+        return TaskAssigningRuntimeClientFactory.newRuntimeClient(url, user, pwd, timeout);
     }
 
     private void validateContainerRequiredParams(KieContainerResource resource) throws TaskAssigningValidationException {

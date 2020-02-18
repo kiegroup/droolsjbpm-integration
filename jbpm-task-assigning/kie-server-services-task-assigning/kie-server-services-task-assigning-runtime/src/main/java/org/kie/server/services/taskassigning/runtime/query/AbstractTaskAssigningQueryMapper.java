@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.runtime.query;
 
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import org.dashbuilder.dataset.DataSet;
 import org.jbpm.kie.services.impl.query.mapper.AbstractQueryMapper;
 import org.jbpm.services.api.query.QueryResultMapper;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public abstract class AbstractTaskAssigningQueryMapper<T> extends AbstractQueryMapper<T> implements QueryResultMapper<List<T>> {
@@ -139,21 +140,14 @@ public abstract class AbstractTaskAssigningQueryMapper<T> extends AbstractQueryM
         final Integer priority = getColumnIntValue(dataSetResult, TASK_QUERY_COLUMN.PRIORITY.columnName(), index);
         final String taskName = getColumnStringValue(dataSetResult, TASK_QUERY_COLUMN.TASK_NAME.columnName(), index);
         final Date lastModificationDate = getColumnDateValue(dataSetResult, TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName(), index);
-
-        String actualOwner = getColumnStringValue(dataSetResult, TASK_QUERY_COLUMN.ACTUAL_OWNER.columnName(), index);
-        if (isEmpty(actualOwner)) {
-            actualOwner = null;
-        }
+        final String actualOwner = defaultIfEmpty(getColumnStringValue(dataSetResult, TASK_QUERY_COLUMN.ACTUAL_OWNER.columnName(), index), null);
 
         final Long ptTaskId = getColumnLongValue(dataSetResult, TASK_QUERY_COLUMN.PLANNING_TASK_TASK_ID.columnName(), index);
         String assignedUser = null;
         Integer taskIndex = null;
         Integer published = null;
         if (ptTaskId != null) {
-            assignedUser = getColumnStringValue(dataSetResult, TASK_QUERY_COLUMN.PLANNING_TASK_ASSIGNED_USER.columnName(), index);
-            if (isEmpty(assignedUser)) {
-                assignedUser = null;
-            }
+            assignedUser = defaultIfEmpty(getColumnStringValue(dataSetResult, TASK_QUERY_COLUMN.PLANNING_TASK_ASSIGNED_USER.columnName(), index), null);
             taskIndex = getColumnIntValue(dataSetResult, TASK_QUERY_COLUMN.PLANNING_TASK_INDEX.columnName(), index);
             published = getColumnIntValue(dataSetResult, TASK_QUERY_COLUMN.PLANNING_TASK_PUBLISHED.columnName(), index);
         }
@@ -210,6 +204,6 @@ public abstract class AbstractTaskAssigningQueryMapper<T> extends AbstractQueryM
         if (value instanceof LocalDateTime) {
             return (LocalDateTime) value;
         }
-        throw new RuntimeException(String.format("Unexpected type %s for toLocalDateTime conversion.", value.getClass()));
+        throw new DateTimeException(String.format("Unexpected type %s for toLocalDateTime conversion.", value.getClass()));
     }
 }

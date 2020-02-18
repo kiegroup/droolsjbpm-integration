@@ -332,13 +332,13 @@ public class SolutionBuilderTest {
         List<Task> user1Tasks = extractTasks(user1, (task) -> true);
         assertEquals(4L, user1Tasks.size(), 0);
 
-        assertExpetedTaskAtPosition(taskData2.getTaskId(), 0, true, user1Tasks);
-        assertExpetedTaskAtPosition(taskData3.getTaskId(), 1, true, user1Tasks);
-        assertExpetedTaskAtPosition(taskData4.getTaskId(), 2, true, user1Tasks);
-        assertExpetedTaskAtPosition(taskData1.getTaskId(), 3, false, user1Tasks);
+        assertExpectedTaskAtPosition(taskData2.getTaskId(), 0, true, user1Tasks);
+        assertExpectedTaskAtPosition(taskData3.getTaskId(), 1, true, user1Tasks);
+        assertExpectedTaskAtPosition(taskData4.getTaskId(), 2, true, user1Tasks);
+        assertExpectedTaskAtPosition(taskData1.getTaskId(), 3, false, user1Tasks);
     }
 
-    void assertExpetedTaskAtPosition(long taskId, int position, boolean pinned, List<Task> tasks) {
+    void assertExpectedTaskAtPosition(long taskId, int position, boolean pinned, List<Task> tasks) {
         assertEquals("Task: " + taskId + " is expected at position 0", taskId, tasks.get(position).getId(), 0);
         assertEquals("Task: " + taskId + " with pinned = " + pinned + " is expected at position 0", pinned, tasks.get(position).isPinned());
     }

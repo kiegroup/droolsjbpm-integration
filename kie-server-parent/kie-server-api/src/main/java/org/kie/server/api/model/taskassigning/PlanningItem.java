@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Defines the information for executing a planning into the jBPM engine.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "tsk-assig-planning-item")
+@XmlRootElement(name = "task-assigning-planning-item")
 public class PlanningItem {
 
     @XmlElement(name = "container-id")

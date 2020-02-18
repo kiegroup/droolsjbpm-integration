@@ -42,8 +42,8 @@ public class TaskUtilTest {
     private static final int PRIORITY = 2;
     private static final String STATUS = "Ready";
     private static final Map<String, Object> INPUT_DATA = new HashMap<>();
-    private static final OrganizationalEntity OE_1 = OrganizationalEntity.builder().type(UserType.User).name("OE1").build();
-    private static final OrganizationalEntity OE_2 = OrganizationalEntity.builder().type(UserType.Group).name("OE2").build();
+    private static final OrganizationalEntity OE_1 = OrganizationalEntity.builder().type(UserType.USER).name("OE1").build();
+    private static final OrganizationalEntity OE_2 = OrganizationalEntity.builder().type(UserType.GROUP).name("OE2").build();
 
     @Test
     public void fromTaskData() {

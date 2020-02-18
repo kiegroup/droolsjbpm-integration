@@ -29,7 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.api.model.taskassigning.TaskDataList;
@@ -80,7 +80,7 @@ public class TaskAssigningRuntimeResource {
             final PlanningItemList planningItemList = marshallerHelper.unmarshal(payload,
                                                                                  contentType,
                                                                                  PlanningItemList.class);
-            final ExecutePlanningResult result = runtimeServiceBase.executePlanning(planningItemList, userId);
+            final PlanningExecutionResult result = runtimeServiceBase.executePlanning(planningItemList, userId);
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
         } catch (Exception e) {
             LOGGER.error("Unexpected error executing planning {}", e.getMessage(), e);

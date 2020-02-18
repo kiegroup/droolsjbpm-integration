@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.services.taskassigning.core.model.Task;
@@ -83,6 +83,8 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
     @Mock
     private List<ProblemFactChange<TaskAssigningSolution>> emptyChanges;
 
+    private CountDownLatch queryExecutionsCountDown;
+
     @Override
     protected SolutionSynchronizer createRunnableBase() {
         return new SolutionSynchronizerMock(solverExecutor, delegate, userSystemService,
@@ -90,14 +92,13 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
     @SuppressWarnings("unchecked")
     public void initSolverExecutor() throws Exception {
         CompletableFuture future = startRunnableBase();
 
         List<User> userList = mockUserList();
         List<TaskAssigningRuntimeDelegate.FindTasksResult> results = mockQueryExecutions(LocalDateTime.now());
+        queryExecutionsCountDown = new CountDownLatch(results.size());
         prepareQueryExecutions(results);
 
         when(emptySolution.getTaskList()).thenReturn(Collections.emptyList());
@@ -107,21 +108,19 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
         runnableBase.initSolverExecutor();
 
-        // give some time for the executions to happen.
-        Thread.sleep(1000);
+        // wait for the query executions to happen
+        queryExecutionsCountDown.await();
 
         verify(delegate, times(results.size())).findTasks(anyList(), eq(null), anyObject());
         verify(solverExecutor).start(solutionCaptor.capture());
         assertEquals(generatedSolution, solutionCaptor.getValue());
 
         runnableBase.destroy();
-        assertTrue(runnableBase.isDestroyed());
         future.get();
+        assertTrue(runnableBase.isDestroyed());
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
     @SuppressWarnings("unchecked")
     public void synchronizeSolution() throws Exception {
         CompletableFuture future = startRunnableBase();
@@ -130,6 +129,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         List<User> userList = mockUserList();
         LocalDateTime startTime = LocalDateTime.now();
         List<TaskAssigningRuntimeDelegate.FindTasksResult> results = mockQueryExecutions(startTime);
+        queryExecutionsCountDown = new CountDownLatch(results.size());
         prepareQueryExecutions(results);
 
         when(generatedChanges.isEmpty()).thenReturn(false);
@@ -139,7 +139,8 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
         runnableBase.synchronizeSolution(solution, startTime);
 
-        Thread.sleep(1000);
+        // wait for the query executions to happen
+        queryExecutionsCountDown.await();
 
         //execution0: initial query execution was ok, but result0 has no results.
         verify(delegate).findTasks(anyList(), eq(startTime.withNano(0)), anyObject());
@@ -158,9 +159,8 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         assertEquals(generatedChanges, resultCaptor.getValue().getChanges());
 
         runnableBase.destroy();
-        assertTrue(runnableBase.isDestroyed());
-
         future.get();
+        assertTrue(runnableBase.isDestroyed());
     }
 
     /**
@@ -232,6 +232,20 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         @Override
         protected TaskAssigningSolution buildSolution(List<TaskData> taskDataList, List<User> externalUsers) {
             return taskDataList.isEmpty() ? emptySolution : generatedSolution;
+        }
+
+        @Override
+        Action doInitSolverExecutor() {
+            Action result = super.doInitSolverExecutor();
+            queryExecutionsCountDown.countDown();
+            return result;
+        }
+
+        @Override
+        Action doSynchronizeSolution() {
+            Action result = super.doSynchronizeSolution();
+            queryExecutionsCountDown.countDown();
+            return result;
         }
     }
 }

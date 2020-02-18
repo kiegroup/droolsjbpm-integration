@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
 import org.kie.server.api.model.taskassigning.PlanningTask;
@@ -113,13 +113,13 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.singletonList(planningItem));
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
 
         String errorMessage = String.format(TASK_MODIFIED_ERROR_MSG_3,
                                             planningItem.getPlanningTask().getTaskId(),
                                             Arrays.toString(new Status[]{Ready, Reserved, InProgress, Suspended}));
         assertHasError(result,
-                       ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR,
+                       PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR,
                        errorMessage,
                        CONTAINER_ID);
     }
@@ -132,7 +132,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.singletonList(planningItem));
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
         verify(userTaskService).execute(eq(CONTAINER_ID), planningCommandCaptor.capture());
 
         assertDelegateAndSaveCommand(planningCommandCaptor.getAllValues(), 0, USER_ID, planningItem);
@@ -147,7 +147,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.singletonList(planningItem));
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
         verify(userTaskService).execute(eq(CONTAINER_ID), planningCommandCaptor.capture());
 
         assertDelegateAndSaveCommand(planningCommandCaptor.getAllValues(), 0, USER_ID, planningItem);
@@ -163,7 +163,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.singletonList(planningItem));
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
         verify(userTaskService).execute(eq(CONTAINER_ID), planningCommandCaptor.capture());
 
         assertDelegateAndSaveCommand(planningCommandCaptor.getAllValues(), 0, USER_ID, planningItem);
@@ -179,7 +179,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.singletonList(planningItem));
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
         verify(userTaskService, never()).execute(eq(CONTAINER_ID), any());
 
         String errorMessage = String.format(TASK_MODIFIED_ERROR_MSG_1,
@@ -187,7 +187,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
                                             PREVIOUS_ASSIGNED_USER_ID_CHANGED,
                                             PREVIOUS_ASSIGNED_USER_ID);
         assertHasError(result,
-                       ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR,
+                       PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR,
                        errorMessage,
                        CONTAINER_ID);
     }
@@ -230,8 +230,8 @@ public class TaskAssigningRuntimeServiceBaseTest {
     @Test
     public void unexpectedErrorDuringPlanCalculation() {
         when(queryHelper.readTasksDataSummary(anyInt(), any(), anyInt())).thenThrow(new RuntimeException(ERROR_MESSAGE));
-        ExecutePlanningResult result = serviceBase.executePlanning(new PlanningItemList(Collections.emptyList()), USER_ID);
-        assertHasError(result, ExecutePlanningResult.ErrorCode.UNEXPECTED_ERROR, String.format(UNEXPECTED_ERROR_DURING_PLAN_CALCULATION, ERROR_MESSAGE), null);
+        PlanningExecutionResult result = serviceBase.executePlanning(new PlanningItemList(Collections.emptyList()), USER_ID);
+        assertHasError(result, PlanningExecutionResult.ErrorCode.UNEXPECTED_ERROR, String.format(UNEXPECTED_ERROR_DURING_PLAN_CALCULATION, ERROR_MESSAGE), null);
     }
 
     @Test
@@ -243,8 +243,8 @@ public class TaskAssigningRuntimeServiceBaseTest {
 
         prepareExecution(taskDataList, CONTAINER_ID);
         when(userTaskService.execute(eq(CONTAINER_ID), any())).thenThrow(new RuntimeException(ERROR_MESSAGE));
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
-        assertHasError(result, ExecutePlanningResult.ErrorCode.UNEXPECTED_ERROR, String.format(UNEXPECTED_ERROR_DURING_PLAN_EXECUTION, CONTAINER_ID, ERROR_MESSAGE), CONTAINER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        assertHasError(result, PlanningExecutionResult.ErrorCode.UNEXPECTED_ERROR, String.format(UNEXPECTED_ERROR_DURING_PLAN_EXECUTION, CONTAINER_ID, ERROR_MESSAGE), CONTAINER_ID);
     }
 
     @Test
@@ -267,7 +267,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.singletonList(planningItem));
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
         verify(userTaskService, never()).execute(eq(CONTAINER_ID), any());
 
         String errorMessage = String.format(TASK_MODIFIED_ERROR_MSG_2,
@@ -276,7 +276,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
                                             ASSIGNED_USER_ID);
 
         assertHasError(result,
-                       ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR,
+                       PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR,
                        errorMessage,
                        CONTAINER_ID);
     }
@@ -288,7 +288,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.singletonList(planningItem));
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
         verify(userTaskService).execute(eq(CONTAINER_ID), planningCommandCaptor.capture());
 
         CompositeCommand compositeCommand = (CompositeCommand) planningCommandCaptor.getValue();
@@ -302,7 +302,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
         PlanningItemList planningItemList = new PlanningItemList(Collections.emptyList());
 
         prepareExecution(taskDataList, CONTAINER_ID);
-        ExecutePlanningResult result = serviceBase.executePlanning(planningItemList, USER_ID);
+        PlanningExecutionResult result = serviceBase.executePlanning(planningItemList, USER_ID);
         verify(userTaskService).execute(eq(CONTAINER_ID), planningCommandCaptor.capture());
 
         CompositeCommand compositeCommand = (CompositeCommand) planningCommandCaptor.getValue();
@@ -310,13 +310,13 @@ public class TaskAssigningRuntimeServiceBaseTest {
         assertNoError(result);
     }
 
-    private void assertHasError(ExecutePlanningResult result, ExecutePlanningResult.ErrorCode error, String message, String containerId) {
+    private void assertHasError(PlanningExecutionResult result, PlanningExecutionResult.ErrorCode error, String message, String containerId) {
         assertEquals(error, result.getError());
         assertEquals(message, result.getErrorMessage());
         assertEquals(containerId, result.getContainerId());
     }
 
-    private void assertNoError(ExecutePlanningResult result) {
+    private void assertNoError(PlanningExecutionResult result) {
         assertFalse(result.hasError());
     }
 

@@ -16,7 +16,7 @@
 
 package org.kie.server.client.helper;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.kie.server.client.KieServicesConfiguration;
@@ -34,8 +34,7 @@ public class TaskAssigningRuntimeServicesClientBuilder implements KieServicesCli
 
     @Override
     public Map<Class<?>, Object> build(KieServicesConfiguration configuration, ClassLoader classLoader) {
-        final Map<Class<?>, Object> services = new HashMap<>();
-        services.put(TaskAssigningRuntimeClient.class, new TaskAssigningRuntimeClientImpl(configuration, classLoader));
-        return services;
+        return Collections.singletonMap(TaskAssigningRuntimeClient.class,
+                                        new TaskAssigningRuntimeClientImpl(configuration, classLoader));
     }
 }

@@ -160,10 +160,11 @@ public class SolutionSynchronizer extends RunnableBase {
                 LOGGER.error("Solution Synchronizer was interrupted.", e);
             }
         }
+        super.destroy();
         LOGGER.debug("Solution Synchronizer finished");
     }
 
-    private Action doInitSolverExecutor() {
+    Action doInitSolverExecutor() {
         Action nextAction = null;
         try {
             LOGGER.debug("Solution Synchronizer will recover the solution from the jBPM runtime for starting the solver.");
@@ -196,7 +197,7 @@ public class SolutionSynchronizer extends RunnableBase {
         return nextAction;
     }
 
-    private Action doSynchronizeSolution() {
+    Action doSynchronizeSolution() {
         Action nextAction = null;
         try {
             if (solverExecutor.isStarted()) {

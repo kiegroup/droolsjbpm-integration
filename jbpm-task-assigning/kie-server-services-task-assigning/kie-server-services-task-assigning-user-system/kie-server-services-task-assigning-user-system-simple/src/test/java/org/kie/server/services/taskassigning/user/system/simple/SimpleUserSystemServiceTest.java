@@ -63,8 +63,9 @@ public class SimpleUserSystemServiceTest {
     }
 
     @Test
-    public void start() {
-        userSystem.start();
+    public void startSuccess() {
+        Assertions.assertThatCode(() -> userSystem.start())
+                .doesNotThrowAnyException();
     }
 
     @Test

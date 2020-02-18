@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.LocalDateTimeValue;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
 import org.kie.server.api.model.taskassigning.TaskDataList;
@@ -53,14 +53,14 @@ public class TaskAssigningRuntimeClientImpl extends AbstractKieServicesClientImp
     }
 
     @Override
-    public ExecutePlanningResult executePlanning(PlanningItemList planningItemList, String userId) {
+    public PlanningExecutionResult executePlanning(PlanningItemList planningItemList, String userId) {
         if (config.isRest()) {
             final String uri = TASK_ASSIGNING_RUNTIME_URI + "/" + TASK_ASSIGNING_EXECUTE_PLANNING_URI + "?user=" + userId;
             return makeHttpPostRequestAndCreateCustomResponse(RestURI.build(loadBalancer.getUrl(),
                                                                             uri,
                                                                             Collections.emptyMap()),
                                                               planningItemList,
-                                                              ExecutePlanningResult.class);
+                                                              PlanningExecutionResult.class);
         } else {
             throw new KieServicesException("JMS protocol is not implemented for this service.");
         }
@@ -81,6 +81,12 @@ public class TaskAssigningRuntimeClientImpl extends AbstractKieServicesClientImp
         return executeFindTasksQuery(params);
     }
 
+    @Override
+    public TaskDataList findTasks(Long fromTaskId, List<String> status, LocalDateTime fromLastModificationDate,
+                                  Integer page, Integer pageSize) {
+        return findTasks(fromTaskId, status, fromLastModificationDate, page, pageSize, TaskInputVariablesReadMode.DONT_READ);
+    }
+
     private TaskDataList executeFindTasksQuery(Map<String, Object> params) {
         if (config.isRest()) {
             final String uri = TASK_ASSIGNING_RUNTIME_URI + "/" + TASK_ASSIGNING_QUERIES_TASK_DATA_URI;
@@ -92,6 +98,11 @@ public class TaskAssigningRuntimeClientImpl extends AbstractKieServicesClientImp
         } else {
             throw new KieServicesException("JMS protocol is not implemented for this service.");
         }
+    }
+
+    // intended for facilitating testing.
+    public KieServicesConfiguration getConfig() {
+        return super.config;
     }
 
     static class TaskQueryParamsBuilder {

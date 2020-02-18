@@ -16,8 +16,6 @@
 
 package org.kie.server.services.taskassigning.planning.test.model;
 
-import org.kie.server.services.taskassigning.planning.AbstractUserSystemService;
-
 /**
  * Test class for the UserSystemServiceLoaderTest
  */

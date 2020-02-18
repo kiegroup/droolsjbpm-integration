@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.api.model.taskassigning.TaskDataList;
@@ -76,7 +76,7 @@ public class TaskAssigningRuntimeResourceTest {
         PlanningItemList planningItemList = new PlanningItemList();
         String payload = marshaller.marshall(planningItemList);
 
-        ExecutePlanningResult expectedResult = ExecutePlanningResult.builder().build();
+        PlanningExecutionResult expectedResult = PlanningExecutionResult.builder().build();
         when(runtimeServiceBase.executePlanning(eq(planningItemList), eq(USER_ID))).thenReturn(expectedResult);
 
         String rawResult = resource.executePlanning(httpHeaders, USER_ID, payload).getEntity().toString();

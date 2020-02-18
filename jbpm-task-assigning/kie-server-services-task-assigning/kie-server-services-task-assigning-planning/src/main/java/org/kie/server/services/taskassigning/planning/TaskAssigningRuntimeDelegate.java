@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.kie.api.task.model.Status;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
 import org.kie.server.api.model.taskassigning.TaskData;
@@ -66,7 +66,7 @@ public class TaskAssigningRuntimeDelegate {
         return new FindTasksResult(result.getQueryTime(), result.getTasks());
     }
 
-    public ExecutePlanningResult executePlanning(List<PlanningItem> planningItems, String userId) {
+    public PlanningExecutionResult executePlanning(List<PlanningItem> planningItems, String userId) {
         return runtimeClient.executePlanning(new PlanningItemList(planningItems), userId);
     }
 }

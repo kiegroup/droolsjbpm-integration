@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.server.services.taskassigning.planning;
+package org.kie.server.services.taskassigning.planning.test.model;
 
 import java.util.List;
 

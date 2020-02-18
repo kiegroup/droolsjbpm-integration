@@ -58,8 +58,8 @@ public class UserUtilTest {
         when(externalUser.getGroups()).thenReturn(externalGroups);
 
         User user = UserUtil.fromExternalUser(externalUser);
-        assertEquals(user.getId(), USER_ID.hashCode(), 0);
-        assertEquals(user.getEntityId(), USER_ID);
+        assertEquals(USER_ID.hashCode(), user.getId(), 0);
+        assertEquals(USER_ID, user.getEntityId());
 
         assertEquals(user.getGroups().size(), externalGroups.size());
         assertContains(GROUP1_ID, user.getGroups());

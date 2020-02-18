@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.kie.internal.jaxb.LocalDateTimeXmlAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "tsk-assig-task-data")
+@XmlRootElement(name = "task-assigning-task-data")
 public class TaskData {
 
     @XmlElement(name = "task-id")

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class SolutionProcessor extends RunnableBase {
 
         private Exception exception;
 
-        private ExecutePlanningResult executeResult;
+        private PlanningExecutionResult executionResult;
 
         private Result() {
 
@@ -64,8 +64,8 @@ public class SolutionProcessor extends RunnableBase {
             this.exception = exception;
         }
 
-        public Result(ExecutePlanningResult executeResult) {
-            this.executeResult = executeResult;
+        public Result(PlanningExecutionResult executionResult) {
+            this.executionResult = executionResult;
         }
 
         public boolean hasException() {
@@ -76,8 +76,8 @@ public class SolutionProcessor extends RunnableBase {
             return exception;
         }
 
-        public ExecutePlanningResult getExecuteResult() {
-            return executeResult;
+        public PlanningExecutionResult getExecutionResult() {
+            return executionResult;
         }
     }
 
@@ -151,6 +151,7 @@ public class SolutionProcessor extends RunnableBase {
                 LOGGER.error("Solution Processor was interrupted", e);
             }
         }
+        super.destroy();
         LOGGER.debug("Solution Processor finished");
     }
 
@@ -164,7 +165,7 @@ public class SolutionProcessor extends RunnableBase {
 
         Result result;
         try {
-            ExecutePlanningResult executeResult = delegate.executePlanning(publishedTasks, targetUserId);
+            PlanningExecutionResult executeResult = delegate.executePlanning(publishedTasks, targetUserId);
             result = new Result(executeResult);
         } catch (Exception e) {
             LOGGER.error("An error was produced during solution processing, planning execution failed.", e);

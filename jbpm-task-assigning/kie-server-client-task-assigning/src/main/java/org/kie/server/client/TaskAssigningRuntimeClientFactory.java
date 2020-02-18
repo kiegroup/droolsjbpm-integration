@@ -40,12 +40,13 @@ public class TaskAssigningRuntimeClientFactory {
 
     static KieServicesClient createKieServicesClient(final String endpoint,
                                                      final String login,
-                                                     final String password) {
+                                                     final String password,
+                                                     final long timeout) {
 
         final KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(endpoint, login, password);
-        configuration.setTimeout(90000);
+        configuration.setTimeout(timeout);
         configuration.setCapabilities(Arrays.asList(CAPABILITY_BPM, CAPABILITY_TASK_ASSIGNING_RUNTIME));
-        configuration.setMarshallingFormat(MarshallingFormat.JSON);
+        configuration.setMarshallingFormat(MarshallingFormat.XSTREAM);
         Set<Class<?>> extraClasses = new HashSet<>();
         //JAXB and JSON required.
         extraClasses.add(LocalDateTimeValue.class);
@@ -55,8 +56,9 @@ public class TaskAssigningRuntimeClientFactory {
 
     public static TaskAssigningRuntimeClient newRuntimeClient(final String endpoint,
                                                               final String login,
-                                                              final String password) {
-        KieServicesClient servicesClient = createKieServicesClient(endpoint, login, password);
+                                                              final String password,
+                                                              final long timeout) {
+        KieServicesClient servicesClient = createKieServicesClient(endpoint, login, password, timeout);
         return servicesClient.getServicesClient(TaskAssigningRuntimeClient.class);
     }
 }

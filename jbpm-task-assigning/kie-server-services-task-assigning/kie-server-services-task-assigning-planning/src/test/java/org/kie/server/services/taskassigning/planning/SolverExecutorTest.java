@@ -19,11 +19,12 @@ package org.kie.server.services.taskassigning.planning;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
+import org.junit.After;
 import org.junit.Test;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
@@ -37,10 +38,10 @@ import org.optaplanner.core.api.solver.event.SolverEventListener;
 import org.optaplanner.core.impl.score.director.ScoreDirectorFactory;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
@@ -65,20 +66,21 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
     @Mock
     private BestSolutionChangedEvent<TaskAssigningSolution> event;
 
+    private CountDownLatch startFinished = new CountDownLatch(1);
+
     @Override
     protected SolverExecutor createRunnableBase() {
         solver = spy(new SolverMock());
-        return new SolverExecutorMock(solverDef, registry, eventListener);
+        return spy(new SolverExecutorMock(solverDef, registry, eventListener));
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
     public void start() throws Exception {
         CompletableFuture future = startRunnableBase();
         runnableBase.start(solution);
-        // give some time for the start method to execute.
-        Thread.sleep(1000);
+
+        // wait for the start initialization to finish
+        startFinished.await();
 
         assertTrue(runnableBase.isStarted());
 
@@ -88,99 +90,90 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
 
         runnableBase.destroy();
         future.get();
+        assertTrue(runnableBase.isDestroyed());
     }
 
-    @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
-    public void startWithFailure() throws Exception {
-        CompletableFuture future = startRunnableBase();
+    @Test
+    public void startWithFailure() {
         runnableBase.start(solution);
         Assertions.assertThatThrownBy(() -> runnableBase.start(solution))
                 .hasMessage("SolverExecutor start method can only be invoked when the status is STOPPED");
-
-        runnableBase.destroy();
-        future.get();
     }
 
-    @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
-    public void startWithBuildFailure() throws Exception {
-        CompletableFuture future = startRunnableBase();
+    @Test
+    public void startWithBuildFailure() {
         RuntimeException error = new RuntimeException("An error was produced...!");
-        ((SolverExecutorMock) runnableBase).setBuildError(error);
+        doThrow(error).when(runnableBase).buildSolver(solverDef, registry);
         Assertions.assertThatThrownBy(() -> runnableBase.start(solution))
                 .hasMessage(error.getMessage());
 
         assertTrue(runnableBase.isStopped());
-        runnableBase.destroy();
-        future.get();
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
-    public void stop() throws Exception {
+    public void stopWithSolverStarted() throws Exception {
         CompletableFuture future = startRunnableBase();
-        // give some time for the start method to execute.
         runnableBase.start(solution);
-        Thread.sleep(1000);
+        // wait for the start initialization to finish
+        startFinished.await();
+
         assertTrue(runnableBase.isStarted());
+
+        verify(solver).addEventListener(eventListenerCaptor.capture());
+        eventListenerCaptor.getValue().bestSolutionChanged(event);
+        verify(eventListener).bestSolutionChanged(event);
 
         runnableBase.stop();
-        assertFalse(runnableBase.isStopped());
-        // give some time for the stop method to execute.
-        Thread.sleep(1000);
-        assertTrue(runnableBase.isStopped());
-
-        runnableBase.start(solution);
-        // give some time for the start method to execute.
-        Thread.sleep(1000);
-        assertTrue(runnableBase.isStarted());
-
-        verify(solver, times(2)).addEventListener(eventListenerCaptor.capture());
-        eventListenerCaptor.getAllValues().get(0).bestSolutionChanged(event);
-        eventListenerCaptor.getAllValues().get(1).bestSolutionChanged(event);
-        verify(eventListener, times(2)).bestSolutionChanged(event);
 
         runnableBase.destroy();
         future.get();
+        assertTrue(runnableBase.isDestroyed());
+        verify(solver).terminateEarly();
+    }
+
+    @Test
+    public void stopWithSolverNotStarted() {
+        runnableBase.stop();
+        runnableBase.destroy();
+        assertTrue(runnableBase.isDestroyed());
+        verify(solver, never()).terminateEarly();
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
     public void addProblemFactChanges() throws Exception {
         CompletableFuture future = startRunnableBase();
         runnableBase.start(solution);
-        // give some time for the start method to execute.
-        Thread.sleep(1000);
+
+        // wait for the start initialization to finish
+        startFinished.await();
+
         List<ProblemFactChange<TaskAssigningSolution>> changes = Collections.emptyList();
         runnableBase.addProblemFactChanges(changes);
         verify(solver).addProblemFactChanges(changes);
 
         runnableBase.destroy();
         future.get();
+        assertTrue(runnableBase.isDestroyed());
     }
 
-    @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
-    public void addProblemFactChangesWithFailure() throws Exception {
-        CompletableFuture future = startRunnableBase();
+    @Test
+    public void addProblemFactChangesWithFailure() {
         List<ProblemFactChange<TaskAssigningSolution>> changes = Collections.emptyList();
-
         Assertions.assertThatThrownBy(() -> runnableBase.addProblemFactChanges(changes))
                 .hasMessage("SolverExecutor has not been started. Be sure it's started and not stopped or destroyed prior to executing this method");
+    }
 
-        runnableBase.destroy();
-        future.get();
+    @After
+    public void cleanUp() {
+        disposeSolver();
+    }
+
+    private void disposeSolver() {
+        //ensure the emulated solver dies in cases where we the solver termination wasn't explicitly executed as part of test.
+        ((SolverMock) solver).dispose();
     }
 
     private class SolverExecutorMock extends SolverExecutor {
-
-        private RuntimeException buildError;
 
         public SolverExecutorMock(SolverDef solverDef,
                                   KieServerRegistry registry,
@@ -188,15 +181,8 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
             super(solverDef, registry, eventListener);
         }
 
-        public void setBuildError(RuntimeException buildError) {
-            this.buildError = buildError;
-        }
-
         @Override
         protected Solver<TaskAssigningSolution> buildSolver(SolverDef solverDef, KieServerRegistry registry) {
-            if (buildError != null) {
-                throw buildError;
-            }
             return solver;
         }
     }
@@ -206,14 +192,17 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
         private final Semaphore finishSolverWork = new Semaphore(0);
         private CompletableFuture action;
 
+        public void dispose() {
+            finishSolverWork.release();
+        }
+
         @Override
         public TaskAssigningSolution solve(TaskAssigningSolution problem) {
+            startFinished.countDown();
             action = CompletableFuture.runAsync(() -> {
                 try {
                     // emulate a solver working in demon mode.
                     finishSolverWork.acquire();
-                    // emulate some time to finish
-                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     LOGGER.debug(e.getMessage());

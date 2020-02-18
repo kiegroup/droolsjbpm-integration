@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "tsk-assig-planning-task")
+@XmlRootElement(name = "task-assigning-planning-task")
 public class PlanningTask {
 
     @XmlElement(name = "task-id")

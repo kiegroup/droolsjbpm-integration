@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
@@ -34,6 +36,7 @@ import static org.kie.server.services.taskassigning.planning.TestUtil.initialize
 import static org.kie.server.services.taskassigning.planning.TestUtil.mockUser;
 import static org.kie.server.services.taskassigning.planning.util.UserUtil.extractTasks;
 
+@RunWith(Parameterized.class)
 public class PlanningBuilderTest {
 
     private static final int USER1_TOTAL_TASKS = 5;
@@ -58,42 +61,16 @@ public class PlanningBuilderTest {
 
     private long ids = 0;
 
-    @Test
-    public void buildForPublishWindowSize0() {
-        build(0);
+    @Parameterized.Parameter
+    public int publishWindowSize;
+
+    @Parameterized.Parameters(name = "publishForWindowSize({0})")
+    public static Object[] data() {
+        return new Object[]{0, 1, 2, 3, 4, 5, 6};
     }
 
     @Test
-    public void buildForPublishWindowSize1() {
-        build(1);
-    }
-
-    @Test
-    public void buildForPublishWindowSize2() {
-        build(2);
-    }
-
-    @Test
-    public void buildForPublishWindowSize3() {
-        build(3);
-    }
-
-    @Test
-    public void buildForPublishWindowSize4() {
-        build(4);
-    }
-
-    @Test
-    public void buildForPublishWindowSize5() {
-        build(5);
-    }
-
-    @Test
-    public void buildForPublishWindowSize6() {
-        build(6);
-    }
-
-    private void build(int publishWindowSize) {
+    public void build() {
         List<Task> user1Tasks = mockTasks(USER1_TOTAL_TASKS, USER1_PINNED_TASKS, "container1", 1L);
         User user1 = mockUser(1, user1Tasks);
 

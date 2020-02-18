@@ -31,7 +31,7 @@ import org.kie.internal.jaxb.LocalDateTimeXmlAdapter;
 import org.kie.server.api.model.ItemList;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "tsk-assig-task-data-list")
+@XmlRootElement(name = "task-assigning-task-data-list")
 public class TaskDataList implements ItemList<TaskData> {
 
     @XmlElement(name = "dataItems")

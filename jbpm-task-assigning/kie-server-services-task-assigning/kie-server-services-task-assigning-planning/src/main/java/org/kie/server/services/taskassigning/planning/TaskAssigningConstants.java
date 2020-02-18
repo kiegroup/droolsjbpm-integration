@@ -34,6 +34,11 @@ public class TaskAssigningConstants {
     public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD = "org.kie.server.taskAssigning.processRuntime.pwd";
 
     /**
+     * Property for configuring the connection timeout when interacting with the jBPM runtime.
+     */
+    public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT = "org.kie.server.taskAssigning.processRuntime.timeout";
+
+    /**
      * Property for configuring a user identifier for using as the "on behalf of" user when interacting with the jBPM runtime.
      */
     public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER = "org.kie.server.taskAssigning.processRuntime.targetUser";

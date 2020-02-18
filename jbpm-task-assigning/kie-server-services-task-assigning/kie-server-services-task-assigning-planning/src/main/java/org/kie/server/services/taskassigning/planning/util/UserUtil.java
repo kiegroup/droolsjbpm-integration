@@ -43,7 +43,7 @@ public class UserUtil {
     }
 
     public static boolean isUser(String userType) {
-        return UserType.User.equals(userType);
+        return UserType.USER.equals(userType);
     }
 
     public static List<Task> extractTasks(User user, Predicate<Task> predicate) {

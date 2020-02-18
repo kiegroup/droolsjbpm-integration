@@ -19,7 +19,6 @@ package org.kie.server.services.taskassigning.planning;
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -35,7 +34,7 @@ public abstract class RunnableBaseTest<T extends RunnableBase> {
 
     protected static final long TEST_TIMEOUT = 5000;
 
-    T runnableBase;
+    protected T runnableBase;
 
     @Before
     public void setUp() {
@@ -49,15 +48,11 @@ public abstract class RunnableBaseTest<T extends RunnableBase> {
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    //TODO, In fix process. Temporary commented due to an issue probably related with JUnit.
-    @Ignore
-    public void gracefulDie() throws Exception {
-        Thread t = new Thread(runnableBase);
-        t.start();
+    public void destroy() throws Exception {
+        CompletableFuture future = startRunnableBase();
         assertTrue(runnableBase.isAlive());
-        Thread.sleep(500);
-        t.interrupt();
-        Thread.sleep(500);
+        runnableBase.destroy();
+        future.get();
         assertTrue(runnableBase.isDestroyed());
     }
 }

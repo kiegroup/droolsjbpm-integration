@@ -71,17 +71,17 @@ public class SolverExecutor extends RunnableBase {
     public void start(final TaskAssigningSolution solution) {
         checkNotNull("solution", solution);
         if (!status.compareAndSet(STOPPED, STARTING)) {
-            throw new IllegalStateException("SolverExecutor start method can only be invoked when the status is STOPPED");
+            throw new SolverExecutorException("SolverExecutor start method can only be invoked when the status is STOPPED");
         }
         this.solution = solution;
         try {
             this.solver = buildSolver(solverDef, registry);
         } catch (Exception e) {
             status.set(STOPPED);
-            throw new RuntimeException(e.getMessage(), e);
+            throw new SolverExecutorException(e.getMessage(), e);
         }
 
-        solver.addEventListener((event) -> {
+        solver.addEventListener(event -> {
             if (isAlive() && isStarted()) {
                 eventListener.bestSolutionChanged(event);
             }
@@ -145,7 +145,7 @@ public class SolverExecutor extends RunnableBase {
         if (isStarted()) {
             solver.addProblemFactChanges(changes);
         } else {
-            throw new RuntimeException("SolverExecutor has not been started. Be sure it's started and not stopped or destroyed prior to executing this method");
+            throw new SolverExecutorException("SolverExecutor has not been started. Be sure it's started and not stopped or destroyed prior to executing this method");
         }
     }
 
@@ -171,6 +171,18 @@ public class SolverExecutor extends RunnableBase {
                 LOGGER.error("SolverExecutor was interrupted.", e);
             }
         }
+        super.destroy();
         LOGGER.debug("SolverExecutor finished.");
+    }
+
+    public static class SolverExecutorException extends RuntimeException {
+
+        public SolverExecutorException(String message) {
+            super(message);
+        }
+
+        public SolverExecutorException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

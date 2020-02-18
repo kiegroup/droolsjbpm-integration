@@ -47,7 +47,7 @@ public class TaskUtil {
                 }
             });
         }
-        //TODO expermiental for the demo
+        //TODO experimental for the demo
         if (taskData.getInputData() != null) {
             Object skill = taskData.getInputData().get("skills");
             if (skill != null) {

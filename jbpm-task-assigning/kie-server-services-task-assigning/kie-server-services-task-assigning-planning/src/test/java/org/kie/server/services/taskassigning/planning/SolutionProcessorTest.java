@@ -19,16 +19,14 @@ package org.kie.server.services.taskassigning.planning;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import java.util.concurrent.CountDownLatch;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.client.TaskAssigningRuntimeClient;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 
 import static org.junit.Assert.assertEquals;
@@ -36,9 +34,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class SolutionProcessorTest extends RunnableBaseTest<SolutionProcessor> {
 
@@ -51,21 +49,25 @@ public class SolutionProcessorTest extends RunnableBaseTest<SolutionProcessor> {
     private TaskAssigningRuntimeClient runtimeClient;
 
     @Mock
-    private Consumer<SolutionProcessor.Result> resultConsumer;
+    private PlanningExecutionResult result;
 
-    @Mock
-    private ExecutePlanningResult result;
-
-    @Captor
-    private ArgumentCaptor<SolutionProcessor.Result> resultCaptor;
+    private SolutionProcessor.Result capturedResult;
 
     @Mock
     private List<PlanningItem> generatedPlan;
 
+    private CountDownLatch processingFinished = new CountDownLatch(1);
+
     @Override
     protected SolutionProcessor createRunnableBase() {
-        delegate = spy(new TaskAssigningRuntimeDelegateMock(runtimeClient));
-        SolutionProcessor processor = spy(new SolutionProcessor(delegate, resultConsumer, TARGET_USER_ID, PUBLISH_WINDOW_SIZE));
+        delegate = spy(new TaskAssigningRuntimeDelegate(runtimeClient));
+        SolutionProcessor processor = spy(new SolutionProcessor(delegate,
+                                                                result -> {
+                                                                    SolutionProcessorTest.this.capturedResult = result;
+                                                                    // emulate the processing finalization.
+                                                                    processingFinished.countDown();
+                                                                },
+                                                                TARGET_USER_ID, PUBLISH_WINDOW_SIZE));
         doReturn(generatedPlan).when(processor).buildPlanning(any(), anyInt());
         return processor;
     }
@@ -73,77 +75,55 @@ public class SolutionProcessorTest extends RunnableBaseTest<SolutionProcessor> {
     @Test(timeout = TEST_TIMEOUT)
     public void process() throws Exception {
         CompletableFuture future = startRunnableBase();
+
+        doReturn(result).when(delegate).executePlanning(generatedPlan, TARGET_USER_ID);
+
+        TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
+        runnableBase.process(solution);
+
+        // wait until the processing has finished
+        processingFinished.await();
+
+        verify(delegate).executePlanning(generatedPlan, TARGET_USER_ID);
+        assertEquals(result, capturedResult.getExecutionResult());
+
+        runnableBase.destroy();
+        future.get();
+        assertTrue(runnableBase.isDestroyed());
+    }
+
+    @Test
+    public void isProcessing() {
         TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
         runnableBase.process(solution);
         assertTrue(runnableBase.isProcessing());
-
-        // wait while the processing is occurring.
-        while (runnableBase.isProcessing()) {
-            Thread.sleep(100);
-        }
-
-        verify(delegate).executePlanning(generatedPlan, TARGET_USER_ID);
-        verify(resultConsumer).accept(resultCaptor.capture());
-        assertEquals(result, resultCaptor.getValue().getExecuteResult());
-
-        runnableBase.destroy();
-        assertTrue(runnableBase.isDestroyed());
-        future.get();
     }
 
-    @Test(timeout = TEST_TIMEOUT)
-    public void processWithFailure() throws Exception {
-        CompletableFuture future = startRunnableBase();
+    @Test
+    public void processWithInvalidStatusFailure() {
         TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
         runnableBase.process(solution);
         Assertions.assertThatThrownBy(() -> runnableBase.process(solution))
                 .hasMessage("SolutionProcessor process method can only be invoked when the status is STOPPED");
-
-        runnableBase.destroy();
-        assertTrue(runnableBase.isDestroyed());
-        future.get();
     }
 
     @Test(timeout = TEST_TIMEOUT)
     public void processWithDelegateError() throws Exception {
         CompletableFuture future = startRunnableBase();
+
         TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
 
         RuntimeException generatedError = new RuntimeException("Emulate a service invocation error.");
-        when(delegate.executePlanning(generatedPlan, TARGET_USER_ID)).thenThrow(generatedError);
+        doThrow(generatedError).when(delegate).executePlanning(generatedPlan, TARGET_USER_ID);
 
         runnableBase.process(solution);
 
-        // wait while the processing is occurring.
-        while (runnableBase.isProcessing()) {
-            Thread.sleep(100);
-        }
+        // wait until the processing has finished
+        processingFinished.await();
 
-        verify(resultConsumer).accept(resultCaptor.capture());
-        assertTrue(resultCaptor.getValue().hasException());
-        assertEquals(generatedError, resultCaptor.getValue().getException());
-
+        assertEquals(generatedError, capturedResult.getException());
         runnableBase.destroy();
-        assertTrue(runnableBase.isDestroyed());
         future.get();
-    }
-
-    private class TaskAssigningRuntimeDelegateMock extends TaskAssigningRuntimeDelegate {
-
-        public TaskAssigningRuntimeDelegateMock(TaskAssigningRuntimeClient runtimeClient) {
-            super(runtimeClient);
-        }
-
-        @Override
-        public ExecutePlanningResult executePlanning(List<PlanningItem> planningItems, String userId) {
-            try {
-                // emulate some time to finish
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                LOGGER.debug(e.getMessage());
-            }
-            return result;
-        }
+        assertTrue(runnableBase.isDestroyed());
     }
 }

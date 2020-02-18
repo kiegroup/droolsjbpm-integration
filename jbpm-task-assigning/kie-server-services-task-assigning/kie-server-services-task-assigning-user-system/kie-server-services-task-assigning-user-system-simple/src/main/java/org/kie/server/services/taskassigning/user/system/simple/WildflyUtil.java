@@ -34,7 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.kie.server.services.taskassigning.user.system.api.Group;
 import org.kie.server.services.taskassigning.user.system.api.User;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class WildflyUtil {
 
@@ -65,31 +65,28 @@ public class WildflyUtil {
                 .collect(Collectors.toList());
         for (String line : lines) {
             String[] lineSplit = line.split("=");
-            if (lineSplit.length == 0) {
-                continue;
-            }
-            String userLogin = lineSplit[0].trim();
-            if (isEmpty(userLogin)) {
-                continue;
-            }
-            Set<Group> userGroups = new HashSet<>();
-            if (lineSplit.length > 1) {
-                String encodedGroups = lineSplit[1].trim();
-                String[] userGroupsSplit = encodedGroups.split(",");
-                for (String groupNameRaw : userGroupsSplit) {
-                    String groupName = groupNameRaw.trim();
-                    if (isEmpty(groupName)) {
-                        continue;
+            if (lineSplit.length > 0) {
+                String userLogin = lineSplit[0].trim();
+                if (isNotEmpty(userLogin)) {
+                    Set<Group> userGroups = new HashSet<>();
+                    if (lineSplit.length > 1) {
+                        String encodedGroups = lineSplit[1].trim();
+                        String[] userGroupsSplit = encodedGroups.split(",");
+                        for (String groupNameRaw : userGroupsSplit) {
+                            String groupName = groupNameRaw.trim();
+                            if (isNotEmpty(groupName)) {
+                                Group group = groupMap.computeIfAbsent(groupName, GroupImpl::new);
+                                if (!groups.contains(group)) {
+                                    groups.add(group);
+                                }
+                                userGroups.add(group);
+                            }
+                        }
                     }
-                    Group group = groupMap.computeIfAbsent(groupName, GroupImpl::new);
-                    if (!groups.contains(group)) {
-                        groups.add(group);
-                    }
-                    userGroups.add(group);
+                    User user = new UserImpl(userLogin, userGroups);
+                    users.add(user);
                 }
             }
-            User user = new UserImpl(userLogin, userGroups);
-            users.add(user);
         }
         return new UserGroupInfo(users, groups);
     }

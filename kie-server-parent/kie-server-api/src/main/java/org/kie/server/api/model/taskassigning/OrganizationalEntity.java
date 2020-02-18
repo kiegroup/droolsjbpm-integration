@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "tsk-assig-oe")
+@XmlRootElement(name = "task-assigning-organizational-entity")
 public class OrganizationalEntity {
 
     @XmlElement(name = "name")

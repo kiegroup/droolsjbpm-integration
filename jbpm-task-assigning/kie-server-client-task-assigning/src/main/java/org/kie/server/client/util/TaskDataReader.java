@@ -25,6 +25,10 @@ import org.kie.server.api.model.taskassigning.TaskDataList;
 import org.kie.server.api.model.taskassigning.TaskInputVariablesReadMode;
 import org.kie.server.client.TaskAssigningRuntimeClient;
 
+/**
+ * Helper class for reading all the elements returned by the {@link TaskAssigningRuntimeClient#findTasks} methods.
+ * This class manages the required pagination for getting all the results.
+ */
 public class TaskDataReader {
 
     private TaskAssigningRuntimeClient runtimeClient;
@@ -35,9 +39,9 @@ public class TaskDataReader {
 
     public static class Result {
 
-        LocalDateTime queryTime;
+        private LocalDateTime queryTime;
 
-        List<TaskData> tasks;
+        private List<TaskData> tasks;
 
         private Result(LocalDateTime queryTime, List<TaskData> tasks) {
             this.queryTime = queryTime;
@@ -57,6 +61,21 @@ public class TaskDataReader {
         return new TaskDataReader(runtimeClient);
     }
 
+    /**
+     * Executes the {@link TaskAssigningRuntimeClient#findTasks(Long, List, LocalDateTime, Integer, Integer, TaskInputVariablesReadMode)}
+     * method and return all the results. The paging reading is managed internally by this method.
+     * <p>
+     * @param fromTaskId filters the tasks with taskId >= fromTaskId. If null no filtering is applied.
+     * @param status filters the tasks that are in one of the following status. If null or the empty list no filtering
+     * is applied.
+     * @param fromLastModificationDate filters the tasks with lastModificationDate >= fromLastModificationDate. If null
+     * no filtering is applied.
+     * @param pageSize sets the pageSize for the paged reading.
+     * @param taskInputVariablesReadMode establishes the tasks input variables reading mode.
+     * @return a list of TaskData with the jBPM tasks that met the filtering conditions. The potential owners of the task
+     * is properly loaded with all the elements. The task inputs data is loaded accordingly with the selected taskInputVariablesReadMode.
+     * @see TaskInputVariablesReadMode
+     */
     public Result readTasks(long fromTaskId, List<String> status, LocalDateTime fromLastModificationDate,
                             int pageSize, TaskInputVariablesReadMode taskInputVariablesReadMode) {
         final List<TaskData> result = new ArrayList<>();
@@ -84,14 +103,26 @@ public class TaskDataReader {
                     nextPageSize = pageSize;
                     result.addAll(partialResult);
                 } else {
+                    // the lastItem determines if the query returned all the potential owners for it,
+                    // or it might be the case when some of them fall out of the pageSize.
                     if (lastItem.getTaskId().equals(partialResult.get(0).getTaskId())) {
-                        if (partialResult.get(0).getPotentialOwners().size() < nextPageSize) {
+                        if (partialResult.get(0).getPotentialOwners().isEmpty()) {
+                            // no potential owners, check if a taskId+1 exists prior to exit.
+                            result.add(partialResult.get(0));
+                            lastItem = null;
+                            taskId++;
+                            nextPageSize = pageSize;
+                        } else if (partialResult.get(0).getPotentialOwners().size() < nextPageSize) {
+                            // the potential owners fits the page margins, we can exit.
                             result.add(partialResult.get(0));
                             finished = true;
                         } else {
+                            // there might exists more potential owners and in the worst case we loaded only one element
+                            // in last page. increase the page size to ensure we can fetch all.
                             nextPageSize = nextPageSize * 2;
                         }
                     } else {
+                        // last item might have been disappeared from result since last query, retry.
                         lastItem = partialResult.get(0);
                         taskId = lastItem.getTaskId();
                         nextPageSize = pageSize;
@@ -100,5 +131,22 @@ public class TaskDataReader {
             }
         }
         return new Result(queryTime, result);
+    }
+
+    /**
+     * Executes the {@link TaskAssigningRuntimeClient#findTasks(Long, List, LocalDateTime, Integer, Integer, TaskInputVariablesReadMode)}
+     * method and return all the results. The paging reading is managed internally by this method.
+     * <p>
+     * @param fromTaskId filters the tasks with taskId >= fromTaskId. If null no filtering is applied.
+     * @param status filters the tasks that are in one of the following status. If null or the empty list no filtering
+     * is applied.
+     * @param fromLastModificationDate filters the tasks with lastModificationDate >= fromLastModificationDate. If null
+     * no filtering is applied.
+     * @param pageSize sets the pageSize for the paged reading.
+     * @return a list of TaskData with the jBPM tasks that met the filtering conditions. The potential owners of the task
+     * is properly loaded with all the elements. No task inputs data is loaded by this method.
+     */
+    public Result readTasks(long fromTaskId, List<String> status, LocalDateTime fromLastModificationDate, int pageSize) {
+        return readTasks(fromTaskId, status, fromLastModificationDate, pageSize, TaskInputVariablesReadMode.DONT_READ);
     }
 }

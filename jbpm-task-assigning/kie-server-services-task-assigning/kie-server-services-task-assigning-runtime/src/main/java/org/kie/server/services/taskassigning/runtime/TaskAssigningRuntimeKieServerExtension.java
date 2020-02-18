@@ -17,6 +17,7 @@
 package org.kie.server.services.taskassigning.runtime;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -211,7 +212,7 @@ public class TaskAssigningRuntimeKieServerExtension implements KieServerExtensio
         return messages;
     }
 
-    private void registerQueries() throws Exception {
+    private void registerQueries() throws IOException {
         try (InputStream stream = this.getClass().getResourceAsStream(TASK_ASSIGNING_QUERY_DEFINITIONS_RESOURCE)) {
             if (stream == null) {
                 throw new FileNotFoundException(QUERIES_RESOURCE_NOT_FOUND);

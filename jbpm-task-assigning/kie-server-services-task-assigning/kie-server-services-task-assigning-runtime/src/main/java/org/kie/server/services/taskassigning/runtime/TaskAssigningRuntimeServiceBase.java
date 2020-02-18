@@ -33,7 +33,7 @@ import org.kie.api.runtime.Context;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.api.model.taskassigning.PlanningItemList;
 import org.kie.server.api.model.taskassigning.PlanningTask;
@@ -63,14 +63,13 @@ public class TaskAssigningRuntimeServiceBase {
 
     private static final int INTERNAL_QUERY_PAGE_SIZE = 3000;
 
-    static final String TASK_MODIFIED_ERROR_MSG_1 = "Task: %s was modified by an external action since the last executed plan," +
-            " actualOwner is %s but the last assignedUser is %s";
+    static final String TASK_MODIFIED_ERROR_MSG = "Task: %s was modified by an external action since the last executed plan";
 
-    static final String TASK_MODIFIED_ERROR_MSG_2 = "Task: %s was modified by an external action since the last executed plan," +
-            " actualOwner is %s but the expected is %s";
+    static final String TASK_MODIFIED_ERROR_MSG_1 = TASK_MODIFIED_ERROR_MSG + " actualOwner is %s but the last assignedUser is %s";
 
-    static final String TASK_MODIFIED_ERROR_MSG_3 = "Task: %s was modified by an external action since the last executed plan," +
-            " and is no longer in one of the expected status %s";
+    static final String TASK_MODIFIED_ERROR_MSG_2 = TASK_MODIFIED_ERROR_MSG + " actualOwner is %s but the expected is %s";
+
+    static final String TASK_MODIFIED_ERROR_MSG_3 = TASK_MODIFIED_ERROR_MSG + " and is no longer in one of the expected status %s";
 
     static final String UNEXPECTED_ERROR_DURING_PLAN_CALCULATION = "An unexpected error was produced during plan calculation: %s";
 
@@ -95,7 +94,7 @@ public class TaskAssigningRuntimeServiceBase {
         return queryHelper.executeFindTasksQuery(params);
     }
 
-    public ExecutePlanningResult executePlanning(PlanningItemList planningItemList, String userId) {
+    public PlanningExecutionResult executePlanning(PlanningItemList planningItemList, String userId) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         checkServerStatus();
@@ -105,7 +104,7 @@ public class TaskAssigningRuntimeServiceBase {
         } catch (PlanningException e) {
             LOGGER.debug("An error was produced during plan calculation, containerId: {}, error code: {}, message: {}",
                          e.getContainerId(), e.getCode(), e.getMessage());
-            return ExecutePlanningResult.builder()
+            return PlanningExecutionResult.builder()
                     .error(e.getCode())
                     .errorMessage(e.getMessage())
                     .containerId(e.getContainerId())
@@ -113,13 +112,13 @@ public class TaskAssigningRuntimeServiceBase {
         } catch (Exception e) {
             final String msg = String.format(UNEXPECTED_ERROR_DURING_PLAN_CALCULATION, e.getMessage());
             LOGGER.error(msg, e);
-            return ExecutePlanningResult.builder()
-                    .error(ExecutePlanningResult.ErrorCode.UNEXPECTED_ERROR)
+            return PlanningExecutionResult.builder()
+                    .error(PlanningExecutionResult.ErrorCode.UNEXPECTED_ERROR)
                     .errorMessage(msg)
                     .build();
         }
         stopWatch.stop();
-        LOGGER.debug("Time to calculate the planning commands: {}", stopWatch.toString());
+        LOGGER.debug("Time to calculate the planning commands: {}", stopWatch);
 
         stopWatch.reset();
         stopWatch.start();
@@ -129,7 +128,7 @@ public class TaskAssigningRuntimeServiceBase {
             } catch (PlanningException e) {
                 LOGGER.debug("An error was produced during plan execution on containerId: {}, error code: {}, message: {}",
                              entry.getKey(), e.getCode(), e.getMessage());
-                return ExecutePlanningResult.builder()
+                return PlanningExecutionResult.builder()
                         .error(e.getCode())
                         .errorMessage(e.getMessage())
                         .containerId(e.getContainerId())
@@ -137,16 +136,16 @@ public class TaskAssigningRuntimeServiceBase {
             } catch (Exception e) {
                 final String msg = String.format(UNEXPECTED_ERROR_DURING_PLAN_EXECUTION, entry.getKey(), e.getMessage());
                 LOGGER.error(msg, e);
-                return ExecutePlanningResult.builder()
-                        .error(ExecutePlanningResult.ErrorCode.UNEXPECTED_ERROR)
+                return PlanningExecutionResult.builder()
+                        .error(PlanningExecutionResult.ErrorCode.UNEXPECTED_ERROR)
                         .errorMessage(msg)
                         .containerId(entry.getKey())
                         .build();
             }
         }
         stopWatch.stop();
-        LOGGER.debug("Time for executing the planning with planning items: {}  ->  {}", planningItemList.getItems().size(), stopWatch.toString());
-        return ExecutePlanningResult.builder().build();
+        LOGGER.debug("Time for executing the planning with planning items: {}  ->  {}", planningItemList.getItems().size(), stopWatch);
+        return PlanningExecutionResult.builder().build();
     }
 
     private Map<String, List<PlanningCommand>> calculatePlanningCommands(PlanningItemList planningItemList, String userId) {
@@ -163,7 +162,7 @@ public class TaskAssigningRuntimeServiceBase {
                                                           planningItem.getPlanningTask().getTaskId(),
                                                           Arrays.toString(new Status[]{Ready, Reserved, InProgress, Suspended})),
                                             planningItem.getContainerId(),
-                                            ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
+                                            PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
             }
 
             final String actualOwner = taskData.getActualOwner();
@@ -193,7 +192,7 @@ public class TaskAssigningRuntimeServiceBase {
                                                                   actualOwner,
                                                                   actualPlanningTask.getAssignedUser()),
                                                     planningItem.getContainerId(),
-                                                    ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
+                                                    PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
                     } else {
                         addCommand(commandsByContainer, planningItem.getContainerId(), new DelegateAndSaveCommand(planningItem, userId));
                     }
@@ -211,7 +210,7 @@ public class TaskAssigningRuntimeServiceBase {
                                                                   actualOwner,
                                                                   planningItem.getPlanningTask().getAssignedUser()),
                                                     planningItem.getContainerId(),
-                                                    ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
+                                                    PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR);
                     } else {
                         // task might have been created, assigned and started/suspended completely out of the task
                         // or the planning data might have changed. Just update the planning data.

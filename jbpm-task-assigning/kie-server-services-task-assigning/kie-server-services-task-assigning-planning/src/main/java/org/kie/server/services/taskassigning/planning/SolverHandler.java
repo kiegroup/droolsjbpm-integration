@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
-import org.kie.server.api.model.taskassigning.ExecutePlanningResult;
+import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.services.api.KieServerRegistry;
 import org.optaplanner.core.api.solver.event.BestSolutionChangedEvent;
 import org.optaplanner.core.api.solver.event.SolverEventListener;
@@ -181,17 +181,17 @@ public class SolverHandler {
     private void onSolutionProcessed(SolutionProcessor.Result result) {
         lock.lock();
         try {
-            if (result.hasException() || (result.getExecuteResult().hasError() && !isRecoverableError(result.getExecuteResult().getError()))) {
+            if (result.hasException() || (result.getExecutionResult().hasError() && !isRecoverableError(result.getExecutionResult().getError()))) {
                 LOGGER.error("An error was produced during the solution processing. The solver will be restarted with"
-                                     + " a recovered solution from the jBPM runtime.", result.hasException() ? result.getException() : result.getExecuteResult().getError());
+                                     + " a recovered solution from the jBPM runtime.", result.hasException() ? result.getException() : result.getExecutionResult().getError());
                 solverExecutor.stop();
                 context.clearProcessedChangeSet();
                 solutionSynchronizer.initSolverExecutor();
                 currentSolution = null;
             } else {
-                if (result.getExecuteResult().hasError()) {
+                if (result.getExecutionResult().hasError()) {
                     LOGGER.debug("A recoverable error was produced during solution processing. errorCode: {}, message: {} " +
-                                         "Solution will be properly updated on next refresh", result.getExecuteResult().getError(), result.getExecuteResult().getErrorMessage());
+                                         "Solution will be properly updated on next refresh", result.getExecutionResult().getError(), result.getExecutionResult().getErrorMessage());
                 }
                 solutionSynchronizer.synchronizeSolution(currentSolution, context.getLastModificationDate());
             }
@@ -214,7 +214,7 @@ public class SolverHandler {
         }
     }
 
-    private boolean isRecoverableError(ExecutePlanningResult.ErrorCode errorCode) {
-        return errorCode == ExecutePlanningResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR;
+    private boolean isRecoverableError(PlanningExecutionResult.ErrorCode errorCode) {
+        return errorCode == PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR;
     }
 }
