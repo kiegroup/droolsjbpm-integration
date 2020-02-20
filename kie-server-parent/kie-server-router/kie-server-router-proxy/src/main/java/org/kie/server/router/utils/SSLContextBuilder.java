@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
 import org.jboss.logging.Logger;
@@ -52,6 +54,23 @@ public class SSLContextBuilder {
     public SSLContextBuilder setKeyAlias(String keystoreKeyAlias) {
         this.keyAlias = keystoreKeyAlias;
         return this;
+    }
+
+    public SSLContext buildTrustore() {
+        try (FileInputStream fis = new FileInputStream(keystorePath)) {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            char[] trustStorePassword = keystorePassword.toCharArray();
+            trustStore.load(fis, trustStorePassword);
+            SSLContext context = SSLContext.getInstance("TLSv1.2");
+            TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            factory.init(trustStore);
+            TrustManager[] managers = factory.getTrustManagers();
+            context.init(null, managers, null);
+            SSLContext.setDefault(context);
+            return SSLContext.getDefault();
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public SSLContext build() {

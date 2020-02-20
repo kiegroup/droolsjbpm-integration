@@ -29,6 +29,7 @@ public class SSLContextBuilderTest {
     private static final String KEYSTORE_ALIAS_TWO = "jason";
 
     private static final String KEYSTORE_PATH = SSLContextBuilder.class.getClassLoader().getResource("keystores/router.keystore").getFile();
+    private static final String TRUSTSTORE_PATH = SSLContextBuilder.class.getClassLoader().getResource("keystores/router.truststore").getFile();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -82,6 +83,32 @@ public class SSLContextBuilderTest {
                     .setKeyStorePassword("bla")
                     .setKeyAlias(KEYSTORE_ALIAS_ONE)
                     .build();
+            // should fail
+            fail("Exception not thrown");
+        } catch (RuntimeException e) {
+            assertTrue(e.getCause() instanceof IOException);
+        }
+    }
+
+    @Test
+    public void testBuildTruststore() {
+        try {
+            SSLContextBuilder.builder()
+                    .setKeyStorePath(TRUSTSTORE_PATH)
+                    .setKeyStorePassword("mykeystorepass")
+                    .buildTrustore();
+        } catch (RuntimeException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testBuildTruststoreWithIncorrectPassword() {
+        try {
+            SSLContextBuilder.builder()
+                    .setKeyStorePath(TRUSTSTORE_PATH)
+                    .setKeyStorePassword("space_invaders")
+                    .buildTrustore();
             // should fail
             fail("Exception not thrown");
         } catch (RuntimeException e) {
