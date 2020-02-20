@@ -11,21 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.router.proxy;
 
-import java.net.SocketException;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.nio.channels.UnresolvedAddressException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
+import io.undertow.protocols.ssl.UndertowXnioSsl;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
 import io.undertow.server.handlers.proxy.ProxyCallback;
@@ -37,6 +27,20 @@ import org.kie.server.router.ConfigurationListener;
 import org.kie.server.router.handlers.AdminHttpHandler;
 import org.kie.server.router.spi.ContainerResolver;
 import org.kie.server.router.spi.RestrictionPolicy;
+import org.kie.server.router.utils.SSLContextBuilder;
+import org.xnio.ssl.XnioSsl;
+
+import javax.net.ssl.SSLContext;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.UnknownHostException;
+import java.nio.channels.UnresolvedAddressException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class KieServerProxyClient implements ProxyClient, ConfigurationListener {
 
@@ -52,6 +56,9 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
 
     private Configuration configuration;
     private AdminHttpHandler adminHandler;
+
+    private String userProvidedTruststore = System.getProperty("javax.net.ssl.trustStore", "");
+    private String userProvidedTruststorePassword = System.getProperty("javax.net.ssl.trustStorePassword", "");
 
     public KieServerProxyClient(Configuration configuration, AdminHttpHandler adminHandler) {
         this.configuration = configuration;
@@ -83,10 +90,22 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
             client = new CaptureHostLoadBalancingProxyClient();
             containerClients.put(containerId, client);
         }
-        client.addHost(serverURI);
+
+        if (!userProvidedTruststore.isEmpty() && !userProvidedTruststorePassword.isEmpty()) {
+            try {
+                SSLContext context = SSLContextBuilder.builder().setKeyStorePath(userProvidedTruststore)
+                        .setKeyStorePassword(userProvidedTruststorePassword).buildTrustore();
+                XnioSsl ssl = new UndertowXnioSsl(null, null, context);
+                client.addHost(serverURI, ssl);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            client.addHost(serverURI);
+        }
     }
 
-   public synchronized void removeContainer(String containerId, URI serverURI) {
+    public synchronized void removeContainer(String containerId, URI serverURI) {
 
         LoadBalancingProxyClient client = containerClients.get(containerId);
         if (client == null) {
