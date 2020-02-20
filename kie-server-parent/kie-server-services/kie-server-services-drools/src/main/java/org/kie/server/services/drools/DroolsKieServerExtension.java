@@ -200,7 +200,8 @@ public class DroolsKieServerExtension implements KieServerExtension {
         if( classToAdd.isInterface()
                 || classToAdd.isAnnotation()
                 || classToAdd.isLocalClass()
-                || classToAdd.isMemberClass() ) {
+                || classToAdd.isMemberClass()
+                || classToAdd.isSynthetic() ) {
             return;
         }
 
