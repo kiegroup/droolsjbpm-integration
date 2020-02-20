@@ -23,13 +23,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.core.util.FileManager;
+import org.drools.modelcompiler.ExecutableModelProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -99,7 +98,8 @@ public class AbstractRemoteIntegrationTest extends AbstractKieCamelIntegrationTe
                                          KJAR_TEST_PACKAGE_PATH + DMN_FUNCTION_DEFINITION, kfs);
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs);
-        List<Message> messageList = kieBuilder.buildAll(DrlProject.class).getResults().getMessages();
+        List<Message> messageList = kieBuilder.buildAll(ExecutableModelProject.class).getResults().getMessages();
+
         Assertions.assertThat(messageList).isEmpty();
         InternalKieModule kJar1 = (InternalKieModule) kieBuilder.getKieModule();
 
