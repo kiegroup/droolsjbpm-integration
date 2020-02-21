@@ -15,6 +15,7 @@
 
 package org.kie.server.controller.api.model.spec;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class ContainerSpec extends ContainerSpecKey  {
     @XmlElement(name = "release-id")
     private ReleaseId releasedId;
     @XmlElement(name = "configuration")
-    private Map<Capability, ContainerConfig> configs = new HashMap<>();
+    private Map<Capability, ContainerConfig> configs = new EnumMap<>(Capability.class);
     @XmlElement(name = "status")
     private KieContainerStatus status = KieContainerStatus.STOPPED;
 
@@ -42,6 +43,13 @@ public class ContainerSpec extends ContainerSpecKey  {
     }
 
     public ContainerSpec() {
+    }
+
+    public ContainerSpec(ContainerSpec other) {
+        super(other.getId(), other.getContainerName(), other.getServerTemplateKey());
+        this.releasedId = other.releasedId;
+        this.status = other.status;
+        this.configs = other.getConfigs().isEmpty() ? new EnumMap<>(Capability.class) : new EnumMap<>(other.getConfigs());
     }
 
     public ContainerSpec( final String id,
@@ -119,4 +127,5 @@ public class ContainerSpec extends ContainerSpecKey  {
                 ", status=" + status +
                 "} " + super.toString();
     }
+
 }

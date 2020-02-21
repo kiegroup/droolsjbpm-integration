@@ -22,14 +22,22 @@ import java.util.UUID;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.controller.api.model.spec.*;
+import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerConfig;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ProcessConfig;
+import org.kie.server.controller.api.model.spec.RuleConfig;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.ServerTemplateKeyList;
 import org.kie.server.controller.api.service.RuleCapabilitiesService;
 import org.kie.server.controller.api.service.RuntimeManagementService;
 import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.impl.KieServerInstanceManager;
-import org.kie.server.controller.api.model.runtime.Container;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractServiceImplTest {
 
@@ -77,6 +85,7 @@ public abstract class AbstractServiceImplTest {
         containerSpec.setConfigs(configs);
 
         specManagementService.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        serverTemplate = specManagementService.getServerTemplate(serverTemplate.getId());
 
         container = new Container();
         container.setServerInstanceId(serverTemplate.getId());
