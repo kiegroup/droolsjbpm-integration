@@ -375,6 +375,35 @@ function getDocumentData(inputId) {
 
 }
 
+function getDocumentCollectionData(inputId) {
+	var documents = [];
+	$.each($('#' + inputId).find("a[data-field=document]"), function(index, element) {
+		var doc = $(element).data('document');
+		if(doc === undefined) {
+			var name = $(element).attr('data-name');
+			var content = $(element).attr('data-bytes');
+			doc = {
+					'lastModified' : new Date(),
+					'name' : name,
+					'content' : content,
+					'attributes' : {
+						'_UPDATED_' : 'false'
+					}
+			};
+		}
+		documents.push(doc);
+	});
+	
+	var documentColection = {
+		'org.jbpm.document.service.impl.DocumentCollectionImpl' : {
+			'documents' : documents 
+		}
+	};
+	
+	return documentColection;
+
+}
+
 function getDateFormated(id) {
 	var d = new Date(document.getElementById(id).value);
 	
