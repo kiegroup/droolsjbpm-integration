@@ -18,6 +18,9 @@ package org.kie.server.integrationtests.shared;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,9 +28,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.MavenRepository;
 import org.appformer.maven.integration.embedder.MavenProjectLoader;
@@ -58,23 +63,25 @@ public class KieServerDeployer {
     private static boolean commonParentDeployed = false;
 
     public static void buildAndDeployMavenProjectFromResource(String resourcePath) {
-        buildAndDeployMavenProject(KieServerDeployer.class.getResource(resourcePath).getFile());
+        buildAndDeployMavenProject(KieServerDeployer.class.getResource(resourcePath));
     }
 
-    public static void buildAndDeployMavenProject(String basedir) {
+    public static void buildAndDeployMavenProject(URL basedir) {
         // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
         // remote repo
         logger.debug("Building and deploying Maven project from basedir '{}'.", basedir);
-        List<String> mvnArgs;
+        String mavenBinary = getMavenBinaryPathFromMavenHomeProperty().orElse("mvn");
+        List<String> mvnArgs = new ArrayList<>(Collections.singletonList(mavenBinary));
+
         if (TestConfig.isLocalServer()) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
             // if the repo does not exist.
 
             // wrapping explicitly in ArrayList as we may need to update the list later (and Arrays.toList() returns
             // just read-only list)
-            mvnArgs = new ArrayList<>(Arrays.asList("mvn", "--quiet", "clean", "install"));
+            mvnArgs.addAll(Arrays.asList("--quiet", "clean", "install"));
         } else {
-            mvnArgs = new ArrayList<>(Arrays.asList("mvn", "--quiet", "-e", "clean", "deploy"));
+            mvnArgs.addAll(Arrays.asList("--quiet", "-e", "clean", "deploy"));
         }
 
         // use custom settings.xml file, if one specified
@@ -87,13 +94,37 @@ public class KieServerDeployer {
         // Execute the Maven build using installed Maven binary
         try (ProcessExecutor executor = new ProcessExecutor()) {
             String command = mvnArgs.stream().collect(Collectors.joining(" "));
-            boolean executionSuccessful = executor.executeProcessCommand(command, Paths.get(basedir));
+            boolean executionSuccessful = executor.executeProcessCommand(command, Paths.get(basedir.toURI()));
 
             if (!executionSuccessful) {
                 throw new RuntimeException("Error while building Maven project from basedir " + basedir);
             }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Cannot retrieve URI from " + basedir, e);
         }
         logger.debug("Maven project successfully built and deployed!");
+    }
+
+    private static Optional<String> getMavenBinaryPathFromMavenHomeProperty() {
+        String mavenHome = System.getProperty("maven.home");
+
+        if (mavenHome == null || mavenHome.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Path mavenBinaryPath = Paths.get(mavenHome, "bin", getMavenBinaryFileName());
+        if (mavenBinaryPath.toFile().isFile()) {
+            return Optional.of(mavenBinaryPath.toString());
+        }
+
+        return Optional.empty();
+    }
+
+    private static String getMavenBinaryFileName() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return "mvn.cmd";
+        }
+        return "mvn";
     }
 
     public static void buildAndDeployCommonMavenParent() {
