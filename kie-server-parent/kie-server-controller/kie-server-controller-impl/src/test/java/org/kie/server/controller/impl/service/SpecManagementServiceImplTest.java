@@ -34,7 +34,16 @@ import org.kie.server.controller.api.KieServerControllerIllegalArgumentException
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.*;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerConfig;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ContainerSpecList;
+import org.kie.server.controller.api.model.spec.ProcessConfig;
+import org.kie.server.controller.api.model.spec.RuleConfig;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.ServerTemplateKeyList;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerInstanceManager;
@@ -43,9 +52,21 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
@@ -424,7 +445,7 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         assertNotNull(container.getConfigs());
         assertEquals(containerSpec.getConfigs().size(), container.getConfigs().size());
 
-        ContainerConfig ruleConfigCurrent2 = containerSpec.getConfigs().get(Capability.RULE);
+        ContainerConfig ruleConfigCurrent2 = container.getConfigs().get(Capability.RULE);
         assertNotNull(ruleConfigCurrent2);
         assertTrue(ruleConfigCurrent2 instanceof org.kie.server.controller.api.model.spec.RuleConfig);
         assertEquals(((org.kie.server.controller.api.model.spec.RuleConfig) containerConfig).getPollInterval(), ((org.kie.server.controller.api.model.spec.RuleConfig) ruleConfigCurrent2).getPollInterval());

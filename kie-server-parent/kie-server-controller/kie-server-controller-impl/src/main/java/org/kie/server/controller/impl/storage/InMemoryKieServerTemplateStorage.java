@@ -16,19 +16,25 @@
 package org.kie.server.controller.impl.storage;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 
 public class InMemoryKieServerTemplateStorage implements KieServerTemplateStorage {
 
     private static InMemoryKieServerTemplateStorage INSTANCE = new InMemoryKieServerTemplateStorage();
 
-    private Map<String, ServerTemplate> store = new ConcurrentHashMap<String, ServerTemplate>();
+    private Map<String, ServerTemplate> store = new HashMap<String, ServerTemplate>();
     private Map<String, org.kie.server.controller.api.model.spec.ServerTemplateKey> storeKeys = new ConcurrentHashMap<String, org.kie.server.controller.api.model.spec.ServerTemplateKey>();
 
     protected InMemoryKieServerTemplateStorage() {
@@ -54,17 +60,44 @@ public class InMemoryKieServerTemplateStorage implements KieServerTemplateStorag
 
     @Override
     public List<ServerTemplate> load() {
-        return new ArrayList<ServerTemplate>(store.values());
+        synchronized (store) {
+            return store.values().stream().map(this::cloneServerTemplate).collect(Collectors.toList());
+        }
     }
 
     @Override
     public ServerTemplate load(String identifier) {
-        return store.get(identifier);
+        synchronized (store) {
+            return cloneServerTemplate(store.get(identifier));
+        }
     }
 
     @Override
     public boolean exists(String identifier) {
-        return store.containsKey(identifier);
+        synchronized (store) {
+            return store.containsKey(identifier);
+        }
+    }
+
+    private ServerTemplate cloneServerTemplate(ServerTemplate current) {
+
+        if (current == null) {
+            return null;
+        }
+
+        List<ContainerSpec> specs = current.getContainersSpec().stream().map(ContainerSpec::new).collect(Collectors.toList());
+
+        ServerTemplate serverTemplate = new ServerTemplate(current.getId(),
+                                                           current.getName(),
+                                                           new ArrayList<>(current.getCapabilities()),
+                                                           current.getConfigs().isEmpty() ? new EnumMap<>(Capability.class) : new EnumMap<>(current.getConfigs()),
+                                                           specs,
+                                                           new ArrayList<ServerInstanceKey>(current.getServerInstanceKeys()));
+
+        serverTemplate.setMode(current.getMode());
+
+        return serverTemplate;
+
     }
 
     @Override
