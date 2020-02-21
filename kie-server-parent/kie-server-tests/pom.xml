@@ -361,6 +361,7 @@
                   <jms.skip>${jms.skip}</jms.skip>
                   <kie.server.testing.server.local.repo.dir>${kie.server.testing.server.local.repo.dir}</kie.server.testing.server.local.repo.dir>
                   <kie.server.testing.remote.repo.dir>${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.dir>
+                  <maven.home>${maven.home}</maven.home>
                 </systemPropertyVariables>
               </configuration>
             </execution>
