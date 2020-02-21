@@ -36,6 +36,7 @@ public class LayoutItem {
     private Number max;
     private Number step;
     private Number precision;
+
     private boolean required;
     private boolean readOnly;
 
