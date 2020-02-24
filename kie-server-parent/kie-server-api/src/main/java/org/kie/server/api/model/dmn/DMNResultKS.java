@@ -18,6 +18,7 @@ package org.kie.server.api.model.dmn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,6 +46,7 @@ import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.DMNMessage.Severity;
+import org.kie.dmn.api.core.DMNMetadata;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 
@@ -160,6 +162,7 @@ public class DMNResultKS implements DMNResult {
 
         private Map<String, Object> ctx = new HashMap<>();
         private Deque<ScopeReference> stack = new LinkedList<>();
+        private DMNMetadata metadata = new DMNMetadataImpl();
 
         private MapBackedDMNContext() {
             // intentional
@@ -171,9 +174,16 @@ public class DMNResultKS implements DMNResult {
             return result;
         }
 
+        static MapBackedDMNContext of(Map<String, Object> ctx, Map<String, Object> metadataAttributes) {
+            MapBackedDMNContext result = new MapBackedDMNContext();
+            result.ctx = ctx;
+            result.metadata = new DMNMetadataImpl(metadataAttributes);
+            return result;
+        }
+
         @Override
         public DMNContext clone() {
-            return of(this.ctx);
+            return of(this.ctx, this.metadata.getAttributes());
         }
 
         @Override
@@ -224,6 +234,11 @@ public class DMNResultKS implements DMNResult {
             return getCurrentEntries().containsKey(name);
         }
 
+        @Override
+        public DMNMetadata getMetadata() {
+            return metadata;
+        }
+
         public static class ScopeReference {
 
             private final String name;
@@ -249,6 +264,33 @@ public class DMNResultKS implements DMNResult {
                 return ref;
             }
         }
+
+        public static class DMNMetadataImpl implements DMNMetadata {
+            private Map<String, Object> attributes = new HashMap<>();
+
+            public DMNMetadataImpl() {
+            }
+
+            public DMNMetadataImpl(Map<String, Object> attributes) {
+                this.attributes.putAll(attributes);
+            }
+
+            @Override
+            public void setAttribute(String name, Object value) {
+                attributes.put(name, value);
+            }
+
+            @Override
+            public Object getAttribute(String name) {
+                return attributes.get(name);
+            }
+
+            @Override
+            public Map<String, Object> getAttributes() {
+                return Collections.unmodifiableMap(attributes);
+            }
+        }
+
     }
 
     @Override
