@@ -69,17 +69,12 @@ public class ValidateDMNMojo extends AbstractKieMojo {
     private String validateDMN;
     private List<Validation> actualFlags = new ArrayList<>();
 
+    private List<Path> resourcesPaths;
     private DMNValidator validator;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        try {
-            for (String p : validateDMN.split(",")) {
-                actualFlags.add(Validation.valueOf(p));
-            }
-        } catch (IllegalArgumentException e) {
-            // do nothing.
-        }
+        actualFlags.addAll(computeFlagsFromCSVString(validateDMN));
         // for this phase, keep only the following flags (the rest requires the BuildMojo).
         actualFlags.retainAll(Arrays.asList(Validation.VALIDATE_SCHEMA, Validation.VALIDATE_MODEL));
         if (actualFlags.isEmpty()) {
@@ -87,7 +82,78 @@ public class ValidateDMNMojo extends AbstractKieMojo {
             return;
         }
 
-        List<Path> resourcesPaths = resources.stream().map(r -> new File(r.getDirectory()).toPath()).collect(Collectors.toList());
+        resourcesPaths = resources.stream().map(r -> new File(r.getDirectory()).toPath()).collect(Collectors.toList());
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("resourcesPaths: " + resourcesPaths.stream().map(Path::toString).collect(Collectors.joining(",\n")));
+        }
+
+        List<Path> dmnModelPaths = computeDmnModelPaths();
+        if (dmnModelPaths.isEmpty()) {
+            getLog().info("No DMN Models found.");
+            return;
+        }
+
+        getLog().info("Initializing DMNValidator...");
+        initializeDMNValidator();
+        getLog().info("DMNValidator initialized.");
+
+        dmnModelPaths.forEach(x -> getLog().info("Will validate DMN model: " + x.toString()));
+        List<DMNMessage> validation = validator.validateUsing(actualFlags.toArray(new Validation[]{}))
+                                               .theseModels(dmnModelPaths.stream().map(Path::toFile).collect(Collectors.toList()).toArray(new File[]{}));
+        logValidationMessages(validation);
+        if (validation.stream().anyMatch(m -> m.getLevel() == Level.ERROR)) {
+            throw new MojoFailureException("There are DMN Validation Error(s).");
+        }
+    }
+
+    private void logValidationMessages(List<DMNMessage> validation) {
+        for (DMNMessage msg : validation) {
+            Consumer<CharSequence> logFn = null;
+            switch (msg.getLevel()) {
+                case ERROR:
+                    logFn = getLog()::error;
+                    break;
+                case WARNING:
+                    logFn = getLog()::warn;
+                    break;
+                case INFO:
+                default:
+                    logFn = getLog()::info;
+                    break;
+            }
+            StringBuilder sb = new StringBuilder();
+            if (msg.getSourceReference() instanceof DMNModelInstrumentedBase) {
+                DMNModelInstrumentedBase ib = (DMNModelInstrumentedBase) msg.getSourceReference();
+                while (ib.getParent() != null) {
+                    ib = ib.getParent();
+                }
+                if (ib instanceof Definitions) {
+                    sb.append(((Definitions) ib).getName() + ": ");
+                }
+            }
+            sb.append(msg.getText());
+            logFn.accept(sb.toString());
+        }
+    }
+
+    public List<Validation> computeFlagsFromCSVString(String csvString) {
+        List<Validation> flags = new ArrayList<>();
+        boolean resetFlag = false;
+        for (String p : csvString.split(",")) {
+            try {
+                flags.add(Validation.valueOf(p));
+            } catch (IllegalArgumentException e) {
+                getLog().info("validateDMN configured with flag: '" + p + "' determines this Mojo will not be executed (reset all flags).");
+                resetFlag = true;
+            }
+        }
+        if (resetFlag) {
+            flags.clear();
+        }
+        return flags;
+    }
+
+    private List<Path> computeDmnModelPaths() throws MojoExecutionException {
         List<Path> dmnModelPaths = new ArrayList<>();
         for (Path p : resourcesPaths) {
             getLog().info("Looking for DMN models in path: " + p);
@@ -98,13 +164,10 @@ public class ValidateDMNMojo extends AbstractKieMojo {
                 throw new MojoExecutionException("Failed executing ValidateDMNMojo", e);
             }
         }
+        return dmnModelPaths;
+    }
 
-        if (dmnModelPaths.isEmpty()) {
-            getLog().info("No DMN Models found.");
-            return;
-        }
-
-        getLog().info("Initializing DMNValidator...");
+    private void initializeDMNValidator() throws MojoExecutionException {
         ClassLoader classLoader = ClassLoaderUtil.findDefaultClassLoader();
         ChainedProperties chainedProperties = ChainedProperties.getChainedProperties(classLoader);
         List<KieModuleModel> kieModules = new ArrayList<>();
@@ -136,41 +199,6 @@ public class ValidateDMNMojo extends AbstractKieMojo {
             throw new MojoExecutionException("Failed DMNValidator initialization.", e);
         }
         validator = DMNValidatorFactory.newValidator(dmnProfiles);
-        getLog().info("DMNValidator initialized.");
-
-        dmnModelPaths.forEach(x -> getLog().info("Will validate DMN model: " + x.toString()));
-        List<DMNMessage> validation = validator.validateUsing(actualFlags.toArray(new Validation[]{}))
-                                               .theseModels(dmnModelPaths.stream().map(Path::toFile).collect(Collectors.toList()).toArray(new File[]{}));
-        for (DMNMessage msg : validation) {
-            Consumer<CharSequence> logFn = null;
-            switch (msg.getLevel()) {
-                case ERROR:
-                    logFn = getLog()::error;
-                    break;
-                case WARNING:
-                    logFn = getLog()::warn;
-                    break;
-                case INFO:
-                default:
-                    logFn = getLog()::info;
-                    break;
-            }
-            StringBuilder sb = new StringBuilder();
-            if (msg.getSourceReference() instanceof DMNModelInstrumentedBase) {
-                DMNModelInstrumentedBase ib = (DMNModelInstrumentedBase) msg.getSourceReference();
-                while (ib.getParent() != null) {
-                    ib = ib.getParent();
-                }
-                if (ib instanceof Definitions) {
-                    sb.append(((Definitions) ib).getName() + ": ");
-                }
-            }
-            sb.append(msg.getText());
-            logFn.accept(sb.toString());
-        }
-        if (validation.stream().anyMatch(m -> m.getLevel() == Level.ERROR)) {
-            throw new MojoFailureException("There are DMN Validation Error(s).");
-        }
     }
 }
 
