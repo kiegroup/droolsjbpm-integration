@@ -121,13 +121,12 @@ import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
+import org.kie.server.services.jbpm.jpa.PersistenceUnitExtensionsLoader;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoLoader;
 import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_RUNTIME_EXT_DISABLED;
 
 public class JbpmKieServerExtension implements KieServerExtension {
 
@@ -770,9 +769,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 // in case setting URL to jar file location only fails, fallback to complete URL
                 ((PersistenceUnitInfoImpl) info).setPersistenceUnitRootUrl(root);
             }
-            checkAndAddTaskAssigningEntities(info);
             // Need to explicitly set jtaDataSource here, its value is fetched in Hibernate logger before configuration
             ((PersistenceUnitInfoImpl) info).setJtaDataSource(properties.get("javax.persistence.jtaDataSource"));
+            getPersistenceUnitExtensionLoaders(this.getClass().getClassLoader()).stream()
+                    .filter(PersistenceUnitExtensionsLoader::isEnabled)
+                    .forEach(extensionsLoader -> extensionsLoader.loadExtensions(info));
             List<PersistenceProvider> persistenceProviders = PersistenceProviderResolverHolder.getPersistenceProviderResolver().getPersistenceProviders();
             PersistenceProvider selectedProvider = null;
             if (persistenceProviders != null) {
@@ -784,41 +785,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 }
             }
 
-            return selectedProvider.createContainerEntityManagerFactory(info, properties);
+            return createEntityManagerFactory(properties, info, selectedProvider);
         } catch (Exception e) {
             throw new RuntimeException("Unable to create EntityManagerFactory due to " + e.getMessage(), e);
         }
     }
 
-    private void checkAndAddTaskAssigningEntities(PersistenceUnitInfo info) {
-        if ("false".equals(System.getProperty(KIE_TASK_ASSIGNING_RUNTIME_EXT_DISABLED))) {
-            logger.debug("Adding the task assigning entities to the current jBPM persistent unit info.");
-            Class planningTask = null;
-            try {
-                planningTask = Class.forName("org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl");
-            } catch (ClassNotFoundException e) {
-                logger.error("PlanningTask implementation for the task assigning api was not found. " +
-                                     "Please check that the task assigning runtime jars were properly packaged.", e);
-            }
-
-            if (planningTask != null) {
-                final String classResource = "/" + planningTask.getName().replaceAll("[.]", "/") + ".class";
-                final URL classURL = planningTask.getClassLoader().getResource(classResource);
-                if (classURL != null) {
-                    info.getManagedClassNames().add(planningTask.getName());
-                    final String classJarLocation = classURL.toExternalForm().split("!")[0].replace(classResource, "");
-                    try {
-                        info.getJarFileUrls().add(new URL(classJarLocation));
-                    } catch (Exception e) {
-                        // in case setting URL to jar file location only fails, fallback to complete URL
-                        info.getJarFileUrls().add(classURL);
-                    }
-                    logger.debug("Task assigning entities where successfully added.");
-                } else {
-                    logger.error("Unexpected error, it was not possible to get resource for: {}", classResource);
-                }
-            }
-        }
+    protected EntityManagerFactory createEntityManagerFactory(Map<String, String> properties, PersistenceUnitInfo info, PersistenceProvider selectedProvider) {
+        return selectedProvider.createContainerEntityManagerFactory(info, properties);
     }
 
     protected void loadAndRegisterQueryDefinitions(InputStream qdStream, org.kie.server.api.marshalling.Marshaller marshaller, String containerId) throws IOException {
@@ -888,5 +862,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
 
         return messages;
+    }
+
+    private static List<PersistenceUnitExtensionsLoader> getPersistenceUnitExtensionLoaders(ClassLoader classLoader) {
+        final List<PersistenceUnitExtensionsLoader> result = new ArrayList<>();
+        final ServiceLoader<PersistenceUnitExtensionsLoader> availableLoaders = ServiceLoader.load(PersistenceUnitExtensionsLoader.class, classLoader);
+        for (PersistenceUnitExtensionsLoader loader : availableLoaders) {
+            result.add(loader);
+        }
+        return result;
     }
 }

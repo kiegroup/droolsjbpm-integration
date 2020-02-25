@@ -17,6 +17,7 @@
 package org.kie.server.services.taskassigning.core.model.solver.realtime;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.server.services.taskassigning.core.model.Task;
@@ -25,6 +26,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,10 +48,55 @@ public class TaskPropertyChangeProblemFactChangeTest {
     @Mock
     private Task task;
 
-    @Test
-    public void doChange() {
+    private TaskPropertyChangeProblemFactChange change;
+
+    @Before
+    public void setUp() {
         when(scoreDirector.lookUpWorkingObjectOrReturnNull(task)).thenReturn(workingTask);
-        TaskPropertyChangeProblemFactChange change = new TaskPropertyChangeProblemFactChange(task);
+        change = new TaskPropertyChangeProblemFactChange(task);
+    }
+
+    @Test
+    public void getStatus() {
+        change.setStatus(NEW_STATUS);
+        assertEquals(NEW_STATUS, change.getStatus());
+    }
+
+    @Test
+    public void getPriority() {
+        change.setPriority(NEW_PRIORITY);
+        assertEquals(NEW_PRIORITY, change.getPriority());
+    }
+
+    @Test
+    public void getTask() {
+        assertEquals(task, change.getTask());
+    }
+
+    @Test
+    public void doChangeOnlyPriority() {
+        change.setPriority(NEW_PRIORITY);
+        change.doChange(scoreDirector);
+        verify(scoreDirector, times(1)).beforeProblemPropertyChanged(workingTask);
+        verify(scoreDirector, times(1)).afterProblemPropertyChanged(workingTask);
+        verify(workingTask).setPriority(NEW_PRIORITY);
+        verify(workingTask, never()).setStatus(NEW_STATUS);
+        verify(scoreDirector).triggerVariableListeners();
+    }
+
+    @Test
+    public void doChangeOnlyStatus() {
+        change.setStatus(NEW_STATUS);
+        change.doChange(scoreDirector);
+        verify(scoreDirector, times(1)).beforeProblemPropertyChanged(workingTask);
+        verify(scoreDirector, times(1)).afterProblemPropertyChanged(workingTask);
+        verify(workingTask).setStatus(NEW_STATUS);
+        verify(workingTask, never()).setPriority(NEW_PRIORITY);
+        verify(scoreDirector).triggerVariableListeners();
+    }
+
+    @Test
+    public void doChangeStatusAndPriority() {
         change.setPriority(NEW_PRIORITY);
         change.setStatus(NEW_STATUS);
         change.doChange(scoreDirector);

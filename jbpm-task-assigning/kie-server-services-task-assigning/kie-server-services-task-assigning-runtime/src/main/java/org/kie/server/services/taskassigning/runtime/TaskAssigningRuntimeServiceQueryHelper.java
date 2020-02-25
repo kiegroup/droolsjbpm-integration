@@ -77,46 +77,11 @@ public class TaskAssigningRuntimeServiceQueryHelper {
     }
 
     public List<TaskData> executeFindTasksQuery(Map<String, Object> params) {
-        Long fromTaskId = null;
-        if (params.get(FROM_TASK_ID) instanceof Number) {
-            fromTaskId = ((Number) params.get(FROM_TASK_ID)).longValue();
-        }
-        Long toTaskId = null;
-        if (params.get(TO_TASK_ID) instanceof Number) {
-            toTaskId = ((Number) params.get(TO_TASK_ID)).longValue();
-        }
-        List<String> status = (List<String>) params.get(STATUS);
-        LocalDateTime fromLastModificationDate = null;
-        if (params.containsKey(FROM_LAST_MODIFICATION_DATE)) {
-            if (params.get(FROM_LAST_MODIFICATION_DATE) instanceof LocalDateTimeValue) {
-                fromLastModificationDate = ((LocalDateTimeValue) params.get(FROM_LAST_MODIFICATION_DATE)).getValue();
-            } else {
-                fromLastModificationDate = (LocalDateTime) params.get(FROM_LAST_MODIFICATION_DATE);
-            }
-        }
+        List<QueryParam> queryParams = buildQueryParams(params);
         Integer page = params.containsKey(PAGE) ? (Integer) params.get(PAGE) : 0;
         Integer pageSize = params.containsKey(PAGE_SIZE) ? (Integer) params.get(PAGE_SIZE) : 10;
         String loadVariablesMode = (String) params.get(TASK_INPUT_VARIABLES_MODE);
-
         QueryContext queryContext = new QueryContext(page * pageSize, pageSize, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), true);
-        List<QueryParam> queryParams = new ArrayList<>();
-
-        if (fromTaskId != null) {
-            queryParams.add(QueryParam.greaterOrEqualTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), fromTaskId));
-        }
-
-        if (toTaskId != null) {
-            queryParams.add(QueryParam.lowerOrEqualTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), toTaskId));
-        }
-
-        if (fromLastModificationDate != null) {
-            Date lastModificationDateValue = Date.from(fromLastModificationDate.atZone(ZoneId.systemDefault()).toInstant());
-            queryParams.add(QueryParam.greaterOrEqualTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName(), lastModificationDateValue));
-        }
-
-        if (status != null && !status.isEmpty()) {
-            queryParams.add(QueryParam.equalsTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.STATUS.columnName(), status.toArray(new String[0])));
-        }
 
         AbstractTaskAssigningQueryMapper<TaskData> resultMapper = (AbstractTaskAssigningQueryMapper<TaskData>) QueryMapperRegistry.get()
                 .mapperFor(TaskAssigningTaskDataQueryMapper.NAME, null);
@@ -163,16 +128,10 @@ public class TaskAssigningRuntimeServiceQueryHelper {
 
     private List<TaskData> executeOptimizedFindTasksDataSummaryQuery(Long fromTaskId, List<String> status, int page, int pageSize) {
         QueryContext queryContext = new QueryContext(page * pageSize, pageSize, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), true);
-        List<QueryParam> queryParams = new ArrayList<>();
-
-        if (fromTaskId != null) {
-            queryParams.add(QueryParam.greaterOrEqualTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), fromTaskId));
-        }
-
-        if (status != null && !status.isEmpty()) {
-            queryParams.add(QueryParam.equalsTo(STATUS, status.toArray(new String[0])));
-        }
-
+        Map<String, Object> params = new HashMap<>();
+        params.put(FROM_TASK_ID, fromTaskId);
+        params.put(STATUS, status);
+        List<QueryParam> queryParams = buildQueryParams(params);
         AbstractTaskAssigningQueryMapper<TaskData> resultMapper = (AbstractTaskAssigningQueryMapper<TaskData>) QueryMapperRegistry.get()
                 .mapperFor(TaskAssigningTaskDataSummaryQueryMapper.NAME, null);
 
@@ -199,5 +158,38 @@ public class TaskAssigningRuntimeServiceQueryHelper {
     <T> T executeQuery(QueryService queryService,
                        String queryName, QueryResultMapper<T> resultMapper, QueryContext queryContext, QueryParam[] params) {
         return queryService.query(queryName, resultMapper, queryContext, params);
+    }
+
+    List<QueryParam> buildQueryParams(Map<String, Object> params) {
+        List<QueryParam> queryParams = new ArrayList<>();
+        if (params.get(FROM_TASK_ID) instanceof Number) {
+            Long fromTaskId = ((Number) params.get(FROM_TASK_ID)).longValue();
+            queryParams.add(QueryParam.greaterOrEqualTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), fromTaskId));
+        }
+
+        if (params.get(TO_TASK_ID) instanceof Number) {
+            Long toTaskId = ((Number) params.get(TO_TASK_ID)).longValue();
+            queryParams.add(QueryParam.lowerOrEqualTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), toTaskId));
+        }
+
+        if (params.containsKey(FROM_LAST_MODIFICATION_DATE)) {
+            LocalDateTime fromLastModificationDate;
+            if (params.get(FROM_LAST_MODIFICATION_DATE) instanceof LocalDateTimeValue) {
+                fromLastModificationDate = ((LocalDateTimeValue) params.get(FROM_LAST_MODIFICATION_DATE)).getValue();
+            } else {
+                fromLastModificationDate = (LocalDateTime) params.get(FROM_LAST_MODIFICATION_DATE);
+            }
+            if (fromLastModificationDate != null) {
+                Date lastModificationDateValue = Date.from(fromLastModificationDate.atZone(ZoneId.systemDefault()).toInstant());
+                queryParams.add(QueryParam.greaterOrEqualTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName(), lastModificationDateValue));
+            }
+        }
+
+        List<String> status = (List<String>) params.get(STATUS);
+        if (status != null && !status.isEmpty()) {
+            queryParams.add(QueryParam.equalsTo(AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.STATUS.columnName(), status.toArray(new String[0])));
+        }
+
+        return queryParams;
     }
 }

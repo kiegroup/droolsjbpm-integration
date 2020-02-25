@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
 import org.mockito.Mock;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,9 +36,16 @@ public class DeletePlanningItemCommandTest extends AbstractPlanningCommandTest<D
     }
 
     @Test
-    public void execute() {
+    public void executeWithExistingItem() {
         when(persistenceContext.find(PlanningTaskImpl.class, TASK_ID)).thenReturn(planningTask);
         command.execute(taskContext);
         verify(persistenceContext).remove(planningTask);
+    }
+
+    @Test
+    public void executeWithNonExistingItem() {
+        when(persistenceContext.find(PlanningTaskImpl.class, TASK_ID)).thenReturn(null);
+        command.execute(taskContext);
+        verify(persistenceContext, never()).remove(any());
     }
 }

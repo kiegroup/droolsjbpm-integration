@@ -36,6 +36,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.kie.api.task.model.Status.Completed;
 import static org.kie.api.task.model.Status.Created;
@@ -87,13 +88,27 @@ public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<Dele
     }
 
     @Test
-    public void executeReadyTask() {
-        executeWithValidStatus(Ready);
+    public void executeReadyTaskWhenPotentialOwnerAlreadyBelongsToTask() {
+        executeWithValidStatus(Ready, true);
+        assertPotentialOwnerIsPresent();
     }
 
     @Test
-    public void executeReservedTask() {
-        executeWithValidStatus(Reserved);
+    public void executeReservedTaskWhenPotentialOwnerAlreadyBelongsToTask() {
+        executeWithValidStatus(Reserved, true);
+        assertPotentialOwnerIsPresent();
+    }
+
+    @Test
+    public void executeReadyTaskWhenPotentialOwnerNotBelongsToTask() {
+        executeWithValidStatus(Ready, false);
+        assertPotentialOwnerIsNotPresent();
+    }
+
+    @Test
+    public void executeReservedTaskWhenPotentialOwnerNotBelongsToTask() {
+        executeWithValidStatus(Reserved, false);
+        assertPotentialOwnerIsNotPresent();
     }
 
     @Test
@@ -103,8 +118,8 @@ public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<Dele
         invalidStatuses.forEach(this::executeWithInvalidStatus);
     }
 
-    private void executeWithValidStatus(Status status) {
-        prepareExecution(status);
+    private void executeWithValidStatus(Status status, boolean potentialOwnerAlreadyBelongs) {
+        prepareExecution(status, potentialOwnerAlreadyBelongs);
         command.execute(taskContext);
 
         verify(delegateTaskCommand).execute(taskContext);
@@ -113,31 +128,43 @@ public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<Dele
         assertEquals(ASSIGNED_USER, planningTaskCaptor.getValue().getAssignedUser());
         assertEquals(INDEX, planningTaskCaptor.getValue().getIndex(), 0);
         assertEquals(PUBLISHED, planningTaskCaptor.getValue().isPublished());
-        assertTrue(potentialOwners.isEmpty());
     }
 
     private void executeWithInvalidStatus(Status status) {
-        prepareExecution(status);
+        prepareExecution(status, false);
         Assertions.assertThatThrownBy(() -> command.execute(taskContext)).hasMessage(String.format(TASK_MODIFIED_ERROR_MSG,
                                                                                                    TASK_ID,
                                                                                                    status,
                                                                                                    Arrays.toString(new Status[]{Ready, Reserved})));
     }
 
-    private void prepareExecution(Status status) {
+    private void prepareExecution(Status status, boolean potentialOwnerAlreadyBelongs) {
         when(task.getTaskData()).thenReturn(taskData);
         when(taskData.getStatus()).thenReturn(status);
         when(task.getPeopleAssignments()).thenReturn(peopleAssignments);
         when(peopleAssignments.getPotentialOwners()).thenReturn(potentialOwners);
+        if (potentialOwnerAlreadyBelongs) {
+            potentialOwners.add(organizationalEntity);
+        }
         when(persistenceContext.findTask(TASK_ID)).thenReturn(task);
         when(organizationalEntity.getId()).thenReturn(ASSIGNED_USER);
         delegateTaskCommand = spy(new DelegateTaskCommand() {
             @Override
             public Void execute(Context context) {
-                potentialOwners.add(organizationalEntity);
+                if (!potentialOwners.contains(organizationalEntity)) {
+                    potentialOwners.add(organizationalEntity);
+                }
                 return null;
             }
         });
         when(command.createDelegateCommand(TASK_ID, USER_ID, ASSIGNED_USER)).thenReturn(delegateTaskCommand);
+    }
+
+    private void assertPotentialOwnerIsPresent() {
+        assertTrue(potentialOwners.contains(organizationalEntity));
+    }
+
+    private void assertPotentialOwnerIsNotPresent() {
+        assertFalse(potentialOwners.contains(organizationalEntity));
     }
 }

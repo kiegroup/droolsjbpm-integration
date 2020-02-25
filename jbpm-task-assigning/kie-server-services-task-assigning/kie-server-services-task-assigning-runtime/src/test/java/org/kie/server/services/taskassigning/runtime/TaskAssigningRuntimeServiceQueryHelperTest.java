@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.query.QueryService;
@@ -34,6 +35,7 @@ import org.junit.runner.RunWith;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.taskassigning.LocalDateTimeValue;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.api.model.taskassigning.TaskInputVariablesReadMode;
@@ -48,7 +50,9 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.kie.server.api.model.taskassigning.QueryParamName.FROM_LAST_MODIFICATION_DATE;
@@ -178,6 +182,76 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
     }
 
     @Test
+    public void executeFindTaskQueryContainerNoAvailableFailure() {
+        Map<String, Object> params = prepareQuery(TaskInputVariablesReadMode.READ_FOR_ALL);
+        when(registry.getContainer(CONTAINER_ID)).thenReturn(null);
+        assertThatThrownBy(() -> helper.executeFindTasksQuery(params)).hasMessage("Container " + CONTAINER_ID + " is not available to serve requests");
+    }
+
+    @Test
+    public void buildQueryParamsWithFromTaskId() {
+        buildQueryParamsWithParam(FROM_TASK_ID, FROM_TASK_ID_VALUE, Collections.singletonList(FROM_TASK_ID_VALUE), AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), GREATER_OR_EQUALS_TO);
+    }
+
+    @Test
+    public void buildQueryParamsWithoutFromTaskId() {
+        buildQueryParamsWithoutParam(FROM_TASK_ID, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName());
+    }
+
+    @Test
+    public void buildQueryParamsWithToTaskId() {
+        buildQueryParamsWithParam(TO_TASK_ID, TO_TASK_ID_VALUE, Collections.singletonList(TO_TASK_ID_VALUE), AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), LOWER_OR_EQUALS_TO);
+    }
+
+    @Test
+    public void buildQueryParamsWithoutToTaskId() {
+        buildQueryParamsWithoutParam(TO_TASK_ID, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName());
+    }
+
+    @Test
+    public void buildQueryParamsWithStatus() {
+        buildQueryParamsWithParam(STATUS, STATUS_VALUE, STATUS_VALUE, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.STATUS.columnName(), EQUALS_TO);
+    }
+
+    @Test
+    public void buildQueryParamsWithStatusEmpty() {
+        Map<String, Object> params = Collections.singletonMap(STATUS, Collections.emptyList());
+        List<QueryParam> result = helper.buildQueryParams(params);
+        assertNotContainsParam(result.toArray(new QueryParam[0]), AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.STATUS.columnName());
+    }
+
+    @Test
+    public void buildQueryParamsWithoutStatus() {
+        buildQueryParamsWithoutParam(STATUS, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.STATUS.columnName());
+    }
+
+    @Test
+    public void buildQueryParamsWithFromLasModificationDate() {
+        buildQueryParamsWithParam(FROM_LAST_MODIFICATION_DATE, FROM_LAST_MODIFICATION_VALUE, Collections.singletonList(Date.from(FROM_LAST_MODIFICATION_VALUE.atZone(ZoneId.systemDefault()).toInstant())), AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName(), GREATER_OR_EQUALS_TO);
+    }
+
+    @Test
+    public void buildQueryParamsWithFromLasModificationDate2() {
+        buildQueryParamsWithParam(FROM_LAST_MODIFICATION_DATE, LocalDateTimeValue.from(FROM_LAST_MODIFICATION_VALUE), Collections.singletonList(Date.from(FROM_LAST_MODIFICATION_VALUE.atZone(ZoneId.systemDefault()).toInstant())), AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName(), GREATER_OR_EQUALS_TO);
+    }
+
+    @Test
+    public void buildQueryParamsWithoutFromLastModificationDate() {
+        buildQueryParamsWithoutParam(FROM_LAST_MODIFICATION_DATE, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName());
+    }
+
+    private <T, E> void buildQueryParamsWithParam(String paramName, T value, E expectedValue, String expectedColumnName, String expectedOperation) {
+        Map<String, Object> params = Collections.singletonMap(paramName, value);
+        List<QueryParam> result = helper.buildQueryParams(params);
+        assertContainsParam(result.toArray(new QueryParam[0]), expectedColumnName, expectedOperation, expectedValue, 0);
+    }
+
+    private void buildQueryParamsWithoutParam(String paramName, String columnName) {
+        List<QueryParam> result = helper.buildQueryParams(Collections.singletonMap(paramName, null));
+        assertNotContainsParam(result.toArray(new QueryParam[0]), columnName);
+    }
+
+    @Test
     public void readTaskDataSummary() {
         List<TaskData> invocation0 = mockTasks();
         List<TaskData> invocation1 = Arrays.asList(mockTaskData(4L), mockTaskData(5L));
@@ -221,9 +295,9 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
     private void verifyQueryWasExecuted() {
         verify(helper).executeQuery(eq(queryService), anyString(), any(TaskAssigningTaskDataQueryMapper.class), contextCaptor.capture(), paramsCaptor.capture());
         QueryParam[] queryParams = paramsCaptor.getValue();
-        assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), GREATER_OR_EQUALS_TO, FROM_TASK_ID_VALUE, 0);
-        assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), LOWER_OR_EQUALS_TO, TO_TASK_ID_VALUE, 1);
-        assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName(), GREATER_OR_EQUALS_TO, Date.from(FROM_LAST_MODIFICATION_VALUE.atZone(ZoneId.systemDefault()).toInstant()), 2);
+        assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), GREATER_OR_EQUALS_TO, Collections.singletonList(FROM_TASK_ID_VALUE), 0);
+        assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), LOWER_OR_EQUALS_TO, Collections.singletonList(TO_TASK_ID_VALUE), 1);
+        assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.LAST_MODIFICATION_DATE.columnName(), GREATER_OR_EQUALS_TO, Collections.singletonList(Date.from(FROM_LAST_MODIFICATION_VALUE.atZone(ZoneId.systemDefault()).toInstant())), 2);
         assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.STATUS.columnName(), EQUALS_TO, STATUS_VALUE, 3);
 
         QueryContext context = contextCaptor.getValue();
@@ -236,6 +310,12 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
     private void assertContainsParam(QueryParam[] params, String columnName, String operation, Object value, int index) {
         QueryParam param = params[index];
         assertEquals(columnName, param.getColumn());
+        assertEquals(operation, param.getOperator());
+        assertEquals(value, param.getValue());
+    }
+
+    private void assertNotContainsParam(QueryParam[] params, String columnName) {
+        assertFalse(Stream.of(params).anyMatch(param -> param.getColumn().equals(columnName)));
     }
 
     private List<TaskData> mockTasks() {
