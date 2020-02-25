@@ -158,32 +158,41 @@ public class DMNResultKS implements DMNResult {
         return MapBackedDMNContext.of(dmnContext);
     }
 
-    private static class MapBackedDMNContext implements DMNContext {
+    static class MapBackedDMNContext implements DMNContext {
 
-        private Map<String, Object> ctx = new HashMap<>();
         private Deque<ScopeReference> stack = new LinkedList<>();
-        private DMNMetadata metadata = new DMNMetadataImpl();
+        private Map<String, Object> ctx;
+        private DMNMetadata metadata;
 
         private MapBackedDMNContext() {
             // intentional
+            ctx = new HashMap<>();
+            metadata = new DMNMetadataImpl();
         }
 
-        static MapBackedDMNContext of(Map<String, Object> ctx) {
-            MapBackedDMNContext result = new MapBackedDMNContext();
-            result.ctx = ctx;
-            return result;
+        private MapBackedDMNContext(Map<String, Object> ctx) {
+            // intentional
+            this.ctx = new HashMap<>(ctx);
+            this.metadata = new DMNMetadataImpl();
         }
 
-        static MapBackedDMNContext of(Map<String, Object> ctx, Map<String, Object> metadataAttributes) {
-            MapBackedDMNContext result = new MapBackedDMNContext();
-            result.ctx = ctx;
-            result.metadata = new DMNMetadataImpl(metadataAttributes);
-            return result;
+        private MapBackedDMNContext(Map<String, Object> ctx, Map<String, Object> metadata) {
+            // intentional
+            this.ctx = new HashMap<>(ctx);
+            this.metadata = new DMNMetadataImpl(metadata);
+        }
+
+        public static MapBackedDMNContext of(Map<String, Object> ctx) {
+            return new MapBackedDMNContext(ctx);
+        }
+
+        public static MapBackedDMNContext of(Map<String, Object> ctx, Map<String, Object> metadata) {
+            return new MapBackedDMNContext(ctx, metadata);
         }
 
         @Override
         public DMNContext clone() {
-            return of(this.ctx, this.metadata.getAttributes());
+            return of(this.ctx, this.metadata.getAll());
         }
 
         @Override
@@ -239,7 +248,7 @@ public class DMNResultKS implements DMNResult {
             return metadata;
         }
 
-        public static class ScopeReference {
+        private static class ScopeReference {
 
             private final String name;
             private final String namespace;
@@ -263,32 +272,39 @@ public class DMNResultKS implements DMNResult {
             public Map<String, Object> getRef() {
                 return ref;
             }
+
         }
 
-        public static class DMNMetadataImpl implements DMNMetadata {
-            private Map<String, Object> attributes = new HashMap<>();
+        private static class DMNMetadataImpl implements DMNMetadata {
+            private Map<String, Object> entries = new HashMap<>();
 
             public DMNMetadataImpl() {
             }
 
-            public DMNMetadataImpl(Map<String, Object> attributes) {
-                this.attributes.putAll(attributes);
+            public DMNMetadataImpl(Map<String, Object> entries) {
+                this.entries.putAll(entries);
             }
 
             @Override
-            public void setAttribute(String name, Object value) {
-                attributes.put(name, value);
+            public Object set(String name, Object value) {
+                return entries.put(name, value);
             }
 
             @Override
-            public Object getAttribute(String name) {
-                return attributes.get(name);
+            public Object get(String name) {
+                return entries.get(name);
             }
 
             @Override
-            public Map<String, Object> getAttributes() {
-                return Collections.unmodifiableMap(attributes);
+            public Map<String, Object> getAll() {
+                return Collections.unmodifiableMap(entries);
             }
+
+            @Override
+            public boolean isDefined(String name) {
+                return entries.containsKey(name);
+            }
+
         }
 
     }
