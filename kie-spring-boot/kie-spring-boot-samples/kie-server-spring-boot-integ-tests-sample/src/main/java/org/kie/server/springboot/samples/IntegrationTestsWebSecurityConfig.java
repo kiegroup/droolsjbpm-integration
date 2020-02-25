@@ -38,6 +38,7 @@ public class IntegrationTestsWebSecurityConfig extends WebSecurityConfigurerAdap
         http
         .csrf().disable()
         .authorizeRequests().antMatchers("/**/server/readycheck").permitAll() // Allow health check without authentication
+        .regexMatchers(".*swagger.json", ".*swagger-ui.js", ".*/css/.*css", ".*/lib/.*js", ".*/images/.*png").permitAll() //Allow also Swagger elements
         .anyRequest().authenticated()
         .and()
         .httpBasic();
