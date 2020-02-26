@@ -18,7 +18,6 @@ package org.kie.server.services.taskassigning.planning;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.services.taskassigning.core.model.Task;
@@ -34,7 +33,7 @@ import org.slf4j.Logger;
 
 public class TraceHelper {
 
-    private static final Function<String, String> BREAK = (s) -> System.lineSeparator() + s;
+    private static final String NEW_LINE = System.lineSeparator();
     private static final String TASK_WITH_NAME_FORMAT = " -> ({}, {})";
 
     private TraceHelper() {
@@ -46,24 +45,24 @@ public class TraceHelper {
                                        List<TaskPropertyChangeProblemFactChange> propertyChanges,
                                        List<AddTaskProblemFactChange> newTaskChanges) {
 
-        logger.trace(BREAK.apply("*** Removed tasks ***"));
+        logger.trace("{}*** Removed tasks ***", NEW_LINE);
         logger.trace("Total tasks removed from solution is {}", removedTasksChanges.size());
         removedTasksChanges.forEach(change -> logger.trace(TASK_WITH_NAME_FORMAT, change.getTask().getId(), change.getTask().getName()));
         logger.trace("*** End of Removed tasks ***");
 
-        logger.trace(BREAK.apply("*** Released tasks ***"));
+        logger.trace("{}*** Released tasks ***", NEW_LINE);
         logger.trace("Total tasks released from solution is {}", releasedTasksChanges.size());
         releasedTasksChanges.forEach(change -> logger.trace(TASK_WITH_NAME_FORMAT, change.getTask().getId(), change.getTask().getName()));
         logger.trace("*** End of Released tasks ***");
 
-        logger.trace(BREAK.apply("*** Changes per user ***"));
+        logger.trace("{}*** Changes per user ***", NEW_LINE);
         logger.trace("Total users with programmed changes is {}", changesByUserId.size());
         changesByUserId.forEach((key, userChanges) -> {
             if (userChanges != null) {
                 userChanges.forEach(change -> {
-                    logger.trace(BREAK.apply("  AssignTaskToUserChanges for user: {}"), key);
-
-                    logger.trace(BREAK.apply("   -> taskId: {}, pinned: {}, index: {}, status: {}"),
+                    logger.trace("{}  AssignTaskToUserChanges for user: {}", NEW_LINE, key);
+                    logger.trace("{}   -> taskId: {}, pinned: {}, index: {}, status: {}",
+                                 NEW_LINE,
                                  change.getElement().getTask().getId(),
                                  change.isPinned(),
                                  change.getIndex(),
@@ -74,7 +73,7 @@ public class TraceHelper {
         });
         logger.trace("*** End of Changes per user ***");
 
-        logger.trace(BREAK.apply("*** Property changes ***"));
+        logger.trace("{}*** Property changes ***", NEW_LINE);
         logger.trace("Total tasks with property changes is {}", propertyChanges.size());
 
         propertyChanges.forEach(change -> {
@@ -89,14 +88,14 @@ public class TraceHelper {
         });
         logger.trace("*** End of Property changes ***");
 
-        logger.trace(BREAK.apply("*** New tasks ***"));
+        logger.trace("{}*** New tasks ***", NEW_LINE);
         logger.trace("Total new tasks added to solution is {}", newTaskChanges.size());
         newTaskChanges.forEach(change -> logger.trace(TASK_WITH_NAME_FORMAT, change.getTask().getId(), change.getTask().getName()));
         logger.trace("*** End of New tasks ***");
     }
 
     static void traceSolution(Logger logger, TaskAssigningSolution solution) {
-        logger.trace(BREAK.apply("*** Start of solution trace, with users = {} and tasks = {} ***"), solution.getUserList().size(), solution.getTaskList().size());
+        logger.trace("{}*** Start of solution trace, with users = {} and tasks = {} ***", NEW_LINE, solution.getUserList().size(), solution.getTaskList().size());
         for (User user : solution.getUserList()) {
             Task nextTask = user.getNextTask();
             while (nextTask != null) {
@@ -114,7 +113,7 @@ public class TraceHelper {
     }
 
     static void tracePublishedTasks(Logger logger, List<PlanningItem> publishedTasks) {
-        logger.trace(BREAK.apply("*** Start of published tasks trace with {} published tasks ***"), publishedTasks.size());
+        logger.trace("{}*** Start of published tasks trace with {} published tasks ***", NEW_LINE, publishedTasks.size());
         publishedTasks.forEach(item -> logger.trace("{} -> {}, index: {}, published: {}",
                                                     item.getPlanningTask().getAssignedUser(),
                                                     item.getTaskId(),

@@ -18,6 +18,9 @@ package org.kie.server.services.taskassigning.planning;
 
 public class TaskAssigningConstants {
 
+    private TaskAssigningConstants() {
+    }
+
     /**
      * Property for configuring the rest endpoint url of the kie-server with the jBPM runtime.
      */

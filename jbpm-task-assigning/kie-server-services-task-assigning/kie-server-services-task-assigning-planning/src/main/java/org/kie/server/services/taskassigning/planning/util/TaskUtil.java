@@ -19,7 +19,6 @@ package org.kie.server.services.taskassigning.planning.util;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.services.taskassigning.core.model.Group;
 import org.kie.server.services.taskassigning.core.model.Task;
-import org.kie.server.services.taskassigning.core.model.TypedLabel;
 import org.kie.server.services.taskassigning.core.model.User;
 
 import static org.kie.server.services.taskassigning.planning.util.UserUtil.isUser;
@@ -46,13 +45,6 @@ public class TaskUtil {
                     task.getPotentialOwners().add(new Group(potentialOwner.getName().hashCode(), potentialOwner.getName()));
                 }
             });
-        }
-        //TODO experimental for the demo
-        if (taskData.getInputData() != null) {
-            Object skill = taskData.getInputData().get("skills");
-            if (skill != null) {
-                task.getTypedLabels().add(TypedLabel.newSkill(skill.toString()));
-            }
         }
         return task;
     }

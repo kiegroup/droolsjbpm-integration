@@ -16,12 +16,9 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.services.taskassigning.core.model.solver.StartAndEndTimeUpdatingVariableListener;
@@ -362,23 +359,5 @@ public class Task extends TaskOrUser {
             return true;
         }
         return TaskHelper.isPotentialOwner(this, getUser());
-    }
-
-    //TODO, this is for the demo only
-    public boolean hasAllTheSkills() {
-        if (typedLabels == null) {
-            return true;
-        }
-
-        TypedLabel skill = typedLabels.stream().filter(TypedLabel::isSkill).findFirst().orElse(null);
-        if (skill == null || skill.getValue() == null) {
-            return true;
-        }
-
-        List<String> userSkills = new ArrayList<>();
-        if (user.getTypedLabels() != null) {
-            userSkills = user.getTypedLabels().stream().filter(TypedLabel::isSkill).map(TypedLabel::getValue).collect(Collectors.toList());
-        }
-        return !userSkills.isEmpty() && userSkills.contains(skill.getValue());
     }
 }

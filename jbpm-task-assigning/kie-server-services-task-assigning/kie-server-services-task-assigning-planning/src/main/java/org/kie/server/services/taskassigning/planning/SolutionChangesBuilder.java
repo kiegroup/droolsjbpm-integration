@@ -172,11 +172,9 @@ public class SolutionChangesBuilder {
                 // if Suspended:
                 //        the task was created, eventually assigned and started, suspended etc. completely outside of
                 //        the planner.
-                //        if (taskData.getActualOwner() == null) {
-                //            do nothing, the task was assigned to nobody. So it was necessary in Ready status
-                //            prior Suspension.
-                //            It'll be added to the solution if it comes into Ready or Reserved status in a later moment.
-                //        }
+                //        In cases where taskData.getActualOwner() is null do nothing, the task was assigned to nobody.
+                //        So it was necessary in Ready status prior Suspension. It'll be added to the solution if it
+                //        comes into Ready or Reserved status in a later moment.
 
                 if (taskData.getActualOwner() != null) {
                     newTask = fromTaskData(taskData);
