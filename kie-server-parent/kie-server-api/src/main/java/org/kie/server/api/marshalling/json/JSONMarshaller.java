@@ -83,6 +83,7 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.type.JaxbByteArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -774,6 +775,11 @@ public class JSONMarshaller implements Marshaller {
                     } catch (Exception e) {
 
                     }
+                } else if (result.containsKey("cond-operator")) {
+                    String column = (String) result.get("cond-column");
+                    String op = (String) result.get("cond-operator");
+                    List condValues = (List) result.get("cond-values");
+                    return new QueryParam(column, op, condValues);
                 }
                 return result;
             }

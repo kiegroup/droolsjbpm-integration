@@ -15,18 +15,6 @@
 
 package org.kie.server.services.jbpm;
 
-import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
-import static org.kie.server.services.jbpm.ConvertUtils.convertQueryDefinition;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceWithVarsList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinitionList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceListPO;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +47,18 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convertQueryDefinition;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinitionList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceListPO;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
 
 public class QueryDataServiceBase {
 
@@ -166,7 +166,8 @@ public class QueryDataServiceBase {
                 params = new QueryParam[filterSpec.getParameters().length];
                 int index = 0;
                 for (org.kie.server.api.model.definition.QueryParam param : filterSpec.getParameters()) {
-                    params[index] = new QueryParam(param.getColumn(), param.getOperator(), param.getValue());
+                    List<?> values = toJbpmQueryParam(param.getValue());
+                    params[index] = new QueryParam(param.getColumn(), param.getOperator(), values);
                     index++;
                 }
             }
@@ -188,6 +189,23 @@ public class QueryDataServiceBase {
         logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
 
         return transform(result, resultMapper);
+    }
+
+    private List<Object> toJbpmQueryParam(List<?> parameters) {
+        if (parameters == null) {
+            return null;
+        }
+        List<Object> data = new ArrayList<>();
+        for (Object param : parameters) {
+            if (param instanceof org.kie.server.api.model.definition.QueryParam) {
+                org.kie.server.api.model.definition.QueryParam subParam = (org.kie.server.api.model.definition.QueryParam) param;
+                List<?> values = toJbpmQueryParam(subParam.getValue());
+                data.add(new QueryParam(subParam.getColumn(), subParam.getOperator(), values));
+            } else {
+                data.add(param);
+            }
+        }
+        return data;
     }
 
     public Object queryFilteredWithBuilder(String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {

@@ -35,6 +35,7 @@ import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -45,8 +46,15 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
+import static org.kie.server.api.util.QueryParamFactory.equalsTo;
+import static org.kie.server.api.util.QueryParamFactory.or;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -1011,6 +1019,36 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             processClient.abortProcessInstance(CONTAINER_ID, pid);
             queryClient.unregisterQuery(query.getName());
         }
+
+    }
+
+    @Test
+    public void testQueryDataServiceUsingComplexCustomQueryBuilderFilterSpecWithOrderByClause() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+        final QueryDefinition query = getProcessInstanceWithVariablesQueryDefinition();
+        try {
+
+            queryClient.registerQuery(query);
+
+            QueryParam expression = or(equalsTo("PROCESSINSTANCEID", processInstanceIds.get(0)), equalsTo("PROCESSINSTANCEID", processInstanceIds.get(1)));
+            QueryFilterSpec filterSpec = QueryFilterSpec.builder()
+                                                        .where(expression)
+                                                        .get();
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_WITH_VARS, filterSpec, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
 
     }
 
