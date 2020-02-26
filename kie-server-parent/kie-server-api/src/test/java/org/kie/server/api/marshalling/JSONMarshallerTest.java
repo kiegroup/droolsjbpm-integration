@@ -23,8 +23,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -36,6 +38,7 @@ import org.junit.Test;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.marshalling.objects.DateObjectUnannotated;
+import org.kie.server.api.model.definition.QueryParam;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -198,5 +201,16 @@ public class JSONMarshallerTest {
         assertNotNull(dateObjectString);
 
         assertTrue(dateObjectString.startsWith(expectedString));
+    }
+
+    @Test
+    public void testMarshallQueryParam() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JSON, getClass().getClassLoader());
+        QueryParam subParam = new QueryParam("col2", "EQUALS_TO", Collections.singletonList("XXX"));
+
+        QueryParam param = new QueryParam("hola", "OR", Collections.singletonList(subParam));
+        String converted = marshaller.marshall(param);
+        QueryParam param2 = marshaller.unmarshall(converted, QueryParam.class);
+        assertTrue(param2.getValue().get(0) instanceof QueryParam);
     }
 }

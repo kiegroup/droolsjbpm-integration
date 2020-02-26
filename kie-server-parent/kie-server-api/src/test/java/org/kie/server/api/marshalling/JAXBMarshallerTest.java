@@ -21,14 +21,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
 import org.kie.server.api.marshalling.objects.DateObject;
+import org.kie.server.api.model.definition.QueryParam;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JAXBMarshallerTest {
 
@@ -79,5 +82,16 @@ public class JAXBMarshallerTest {
         assertEquals(LocalDateTime.of(2017, 1, 1, 10, 10, 10), dateObject.getLocalDateTime());
         assertEquals(LocalTime.of(10, 10, 10), dateObject.getLocalTime());
         assertEquals(OffsetDateTime.of(LocalDateTime.of(2017, 1, 1, 10, 10, 10), ZoneOffset.ofHours(1)), dateObject.getOffsetDateTime());
+    }
+
+    @Test
+    public void testMarshallQueryParam() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JAXB, getClass().getClassLoader());
+        QueryParam subParam = new QueryParam("col2", "EQUALS_TO", Collections.singletonList("XXX"));
+
+        QueryParam param = new QueryParam("hola", "OR", Collections.singletonList(subParam));
+        String converted = marshaller.marshall(param);
+        QueryParam param2 = marshaller.unmarshall(converted, QueryParam.class);
+        assertTrue(param2.getValue().get(0) instanceof QueryParam);
     }
 }
