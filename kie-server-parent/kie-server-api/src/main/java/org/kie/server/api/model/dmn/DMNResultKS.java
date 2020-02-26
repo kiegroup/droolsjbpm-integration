@@ -192,7 +192,7 @@ public class DMNResultKS implements DMNResult {
 
         @Override
         public DMNContext clone() {
-            return of(this.ctx, this.metadata.getAll());
+            return of(this.ctx, this.metadata.asMap());
         }
 
         @Override
@@ -296,13 +296,8 @@ public class DMNResultKS implements DMNResult {
             }
 
             @Override
-            public Map<String, Object> getAll() {
+            public Map<String, Object> asMap() {
                 return Collections.unmodifiableMap(entries);
-            }
-
-            @Override
-            public boolean isDefined(String name) {
-                return entries.containsKey(name);
             }
 
         }

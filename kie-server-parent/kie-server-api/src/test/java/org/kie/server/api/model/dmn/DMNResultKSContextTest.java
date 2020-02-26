@@ -258,12 +258,12 @@ public class DMNResultKSContextTest{
 
             @Override
             public Map<String, Object> getAll() {
-                return metadata.getAll();
+                return metadata.asMap();
             }
 
             @Override
             public boolean isDefined(String name) {
-                return metadata.isDefined(name);
+                return metadata.get(name) != null;
             }
         };
     }
