@@ -167,19 +167,19 @@ public class DMNResultKS implements DMNResult {
         private MapBackedDMNContext() {
             // intentional
             ctx = new HashMap<>();
-            metadata = new DMNMetadataImpl();
+            metadata = new Metadata();
         }
 
         private MapBackedDMNContext(Map<String, Object> ctx) {
             // intentional
-            this.ctx = new HashMap<>(ctx);
-            this.metadata = new DMNMetadataImpl();
+            this.ctx = ctx;
+            this.metadata = new Metadata();
         }
 
         private MapBackedDMNContext(Map<String, Object> ctx, Map<String, Object> metadata) {
             // intentional
-            this.ctx = new HashMap<>(ctx);
-            this.metadata = new DMNMetadataImpl(metadata);
+            this.ctx = ctx;
+            this.metadata = new Metadata(metadata);
         }
 
         public static MapBackedDMNContext of(Map<String, Object> ctx) {
@@ -192,7 +192,7 @@ public class DMNResultKS implements DMNResult {
 
         @Override
         public DMNContext clone() {
-            return of(this.ctx, this.metadata.asMap());
+            return of(new HashMap<>(this.ctx), new HashMap<>(this.metadata.asMap()));
         }
 
         @Override
@@ -248,6 +248,33 @@ public class DMNResultKS implements DMNResult {
             return metadata;
         }
 
+        private static class Metadata implements DMNMetadata {
+            private Map<String, Object> entries;
+
+            public Metadata() {
+                this.entries = new HashMap<>();
+            }
+
+            public Metadata(Map<String, Object> entries) {
+                this.entries = entries;
+            }
+
+            @Override
+            public Object set(String name, Object value) {
+                return entries.put(name, value);
+            }
+
+            @Override
+            public Object get(String name) {
+                return entries.get(name);
+            }
+
+            @Override
+            public Map<String, Object> asMap() {
+                return Collections.unmodifiableMap(entries);
+            }
+        }
+
         private static class ScopeReference {
 
             private final String name;
@@ -272,36 +299,7 @@ public class DMNResultKS implements DMNResult {
             public Map<String, Object> getRef() {
                 return ref;
             }
-
         }
-
-        private static class DMNMetadataImpl implements DMNMetadata {
-            private Map<String, Object> entries = new HashMap<>();
-
-            public DMNMetadataImpl() {
-            }
-
-            public DMNMetadataImpl(Map<String, Object> entries) {
-                this.entries.putAll(entries);
-            }
-
-            @Override
-            public Object set(String name, Object value) {
-                return entries.put(name, value);
-            }
-
-            @Override
-            public Object get(String name) {
-                return entries.get(name);
-            }
-
-            @Override
-            public Map<String, Object> asMap() {
-                return Collections.unmodifiableMap(entries);
-            }
-
-        }
-
     }
 
     @Override
