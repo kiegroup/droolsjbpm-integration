@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.server</groupId>
+    <artifactId>jbpm-task-assigning</artifactId>
+    <version>7.34.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-server-services-task-assigning</artifactId>
+  <packaging>pom</packaging>
+
+  <name>KIE :: Execution Server :: Services :: Task Assigning</name>
+  <description>KIE Execution Server Services Task Assigning</description>
+
+  <modules>
+    <module>kie-server-services-task-assigning-core</module>
+    <module>kie-server-services-task-assigning-user-system</module>
+    <module>kie-server-services-task-assigning-runtime</module>
+    <module>kie-server-services-task-assigning-planning</module>
+  </modules>
+
+</project>

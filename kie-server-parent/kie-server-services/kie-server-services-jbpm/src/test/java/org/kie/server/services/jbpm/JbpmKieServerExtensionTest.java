@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.spi.PersistenceUnitInfo;
+
 import org.apache.commons.io.IOUtils;
 import org.appformer.maven.support.DependencyFilter;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
@@ -64,6 +67,7 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerRegistryImpl;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
+import org.kie.server.services.jbpm.jpa.PersistenceUnitExtensionsLoaderMock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -78,8 +82,10 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -116,6 +122,9 @@ public class JbpmKieServerExtensionTest {
     @Mock
     private KieServerInfo kieServerInfo;
 
+    @Captor
+    private ArgumentCaptor<PersistenceUnitInfo> persistenceUnitInfoCaptor;
+
     private KieServerMode mode;
 
     private List<ProcessInstanceDesc> activeProcessInstances = new ArrayList<>();
@@ -149,13 +158,13 @@ public class JbpmKieServerExtensionTest {
 
         when(kieServer.getInfo()).thenReturn(new ServiceResponse<KieServerInfo>(KieServiceResponse.ResponseType.SUCCESS, "", kieServerInfo));
 
-        extension = new JbpmKieServerExtension() {
+        extension = spy(new JbpmKieServerExtension() {
             {
                 this.deploymentService = JbpmKieServerExtensionTest.this.deploymentService;
                 this.runtimeDataService = JbpmKieServerExtensionTest.this.runtimeDataService;
                 this.kieServer = JbpmKieServerExtensionTest.this.kieServer;
             }
-        };
+        });
 
         when(deploymentService.isDeployed(anyString())).thenAnswer((Answer<Boolean>) invocation -> deployed);
         doAnswer(invocation -> {
@@ -345,7 +354,35 @@ public class JbpmKieServerExtensionTest {
         testPrepareContainerUpdate(KieServerMode.DEVELOPMENT, VERSION, false);
     }
 
+    @Test
+    public void testBuildEntityManagerFactoryWithPersistenceUnitExtensionsLoaderEnabled() {
+        testBuildEntityManagerFactoryWithPersistenceUnitExtensionsLoader(true);
+    }
 
+    @Test
+    public void testBuildEntityManagerFactoryWithPersistenceUnitExtensionsLoaderDisabled() {
+        testBuildEntityManagerFactoryWithPersistenceUnitExtensionsLoader(false);
+    }
+
+    private void testBuildEntityManagerFactoryWithPersistenceUnitExtensionsLoader(boolean enabled) {
+        Map<String, String> properties = new HashMap<>();
+        System.setProperty(PersistenceUnitExtensionsLoaderMock.ENABLED_PROPERTY, Boolean.toString(enabled));
+        EntityManagerFactory emf = mock(EntityManagerFactory.class);
+        doReturn(emf).when(extension).createEntityManagerFactory(any(), any(), any());
+
+        extension.build(properties);
+        verify(extension).createEntityManagerFactory(any(), persistenceUnitInfoCaptor.capture(), any());
+        if (enabled) {
+            assertTrue(persistenceUnitInfoCaptor.getValue().getManagedClassNames().contains(PersistenceUnitExtensionsLoaderMock.ENTITY_MOCK));
+        } else {
+            assertFalse(persistenceUnitInfoCaptor.getValue().getManagedClassNames().contains(PersistenceUnitExtensionsLoaderMock.ENTITY_MOCK));
+        }
+    }
+
+    @After
+    public void cleanUp() {
+        System.clearProperty(PersistenceUnitExtensionsLoaderMock.ENABLED_PROPERTY);
+    }
 
     private void testPrepareContainerUpdate(KieServerMode mode, String version, boolean cleanup) throws IOException {
         this.mode = mode;

@@ -1,0 +1,72 @@
+/*
+ * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.kie.server.services.taskassigning.planning;
+
+import java.time.LocalDateTime;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class SolverHandlerContextTest {
+
+    private SolverHandlerContext context;
+
+    @Before
+    public void setUp() {
+        context = new SolverHandlerContext();
+    }
+
+    @Test
+    public void currentChangeSetId() {
+        context.setCurrentChangeSetId(2);
+        assertEquals(2, context.getCurrentChangeSetId());
+    }
+
+    @Test
+    public void nextChangeSetId() {
+        for (int i = 1; i < 10; i++) {
+            assertEquals(i, context.nextChangeSetId());
+        }
+    }
+
+    @Test
+    public void isProcessedChangeSet() {
+        context.setProcessedChangeSet(5);
+        for (int i = 0; i <= 5; i++) {
+            assertTrue(context.isProcessedChangeSet(i));
+        }
+    }
+
+    @Test
+    public void clearProcessedChangeSet() {
+        context.setProcessedChangeSet(5);
+        assertTrue(context.isProcessedChangeSet(5));
+        context.clearProcessedChangeSet();
+        assertFalse(context.isProcessedChangeSet(5));
+    }
+
+    @Test
+    public void lastModificationDate() {
+        LocalDateTime time = LocalDateTime.now();
+        context.setLastModificationDate(time);
+        assertEquals(time, context.getLastModificationDate());
+    }
+}

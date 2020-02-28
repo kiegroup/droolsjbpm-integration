@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Test file with the only purpose of creating a solver for the SolverBuilderTest.java. Don't modify this file unless
+  you made the proper adjustments in the corresponding test if any.
+  note: this file is not intended for creating a solver to work with.
+-->
+
+<solver>
+
+  <solutionClass>org.kie.server.services.taskassigning.core.model.TaskAssigningSolution</solutionClass>
+  <entityClass>org.kie.server.services.taskassigning.core.model.TaskOrUser</entityClass>
+  <entityClass>org.kie.server.services.taskassigning.core.model.Task</entityClass>
+
+  <daemon>true</daemon>
+
+  <scoreDirectorFactory>
+    <scoreDrl>org/kie/server/services/taskassigning/planning/test/model/SolverBuilderTestRules.drl</scoreDrl>
+  </scoreDirectorFactory>
+
+</solver>

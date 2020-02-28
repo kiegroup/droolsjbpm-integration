@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Test file with the only purpose of creating a solver for the SolverBuilderTest.java. Don't modify this file unless
+  you made the proper adjustments in the corresponding test if any.
+  note: this file is not intended for creating a solver to work with.
+-->
+
+<kmodule xmlns="http://www.drools.org/xsd/kmodule"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <kbase name="testKBase" packages="org.kie.server.services.taskassigning.planning.test.model">
+    <ksession name="testKSession"/>
+  </kbase>
+</kmodule>

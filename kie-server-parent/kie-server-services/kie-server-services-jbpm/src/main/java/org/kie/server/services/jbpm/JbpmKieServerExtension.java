@@ -121,6 +121,7 @@ import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
+import org.kie.server.services.jbpm.jpa.PersistenceUnitExtensionsLoader;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoLoader;
 import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
@@ -770,6 +771,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
             }
             // Need to explicitly set jtaDataSource here, its value is fetched in Hibernate logger before configuration
             ((PersistenceUnitInfoImpl) info).setJtaDataSource(properties.get("javax.persistence.jtaDataSource"));
+            getPersistenceUnitExtensionLoaders(this.getClass().getClassLoader()).stream()
+                    .filter(PersistenceUnitExtensionsLoader::isEnabled)
+                    .forEach(extensionsLoader -> extensionsLoader.loadExtensions(info));
             List<PersistenceProvider> persistenceProviders = PersistenceProviderResolverHolder.getPersistenceProviderResolver().getPersistenceProviders();
             PersistenceProvider selectedProvider = null;
             if (persistenceProviders != null) {
@@ -781,10 +785,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 }
             }
 
-            return selectedProvider.createContainerEntityManagerFactory(info, properties);
+            return createEntityManagerFactory(properties, info, selectedProvider);
         } catch (Exception e) {
             throw new RuntimeException("Unable to create EntityManagerFactory due to " + e.getMessage(), e);
         }
+    }
+
+    protected EntityManagerFactory createEntityManagerFactory(Map<String, String> properties, PersistenceUnitInfo info, PersistenceProvider selectedProvider) {
+        return selectedProvider.createContainerEntityManagerFactory(info, properties);
     }
 
     protected void loadAndRegisterQueryDefinitions(InputStream qdStream, org.kie.server.api.marshalling.Marshaller marshaller, String containerId) throws IOException {
@@ -854,5 +862,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
 
         return messages;
+    }
+
+    private static List<PersistenceUnitExtensionsLoader> getPersistenceUnitExtensionLoaders(ClassLoader classLoader) {
+        final List<PersistenceUnitExtensionsLoader> result = new ArrayList<>();
+        final ServiceLoader<PersistenceUnitExtensionsLoader> availableLoaders = ServiceLoader.load(PersistenceUnitExtensionsLoader.class, classLoader);
+        for (PersistenceUnitExtensionsLoader loader : availableLoaders) {
+            result.add(loader);
+        }
+        return result;
     }
 }
