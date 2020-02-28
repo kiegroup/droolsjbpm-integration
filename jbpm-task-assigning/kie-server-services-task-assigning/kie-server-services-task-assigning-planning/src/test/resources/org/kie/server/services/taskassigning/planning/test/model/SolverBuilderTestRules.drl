@@ -1,0 +1,15 @@
+//  Test file with the only purpose of creating a solver for the SolverBuilderTest.java. Don't modify this file unless
+//  you made the proper adjustments in the corresponding test if any.
+//  note: this file is not intended for creating a solver to work with.
+
+package org.kie.server.services.taskassigning.planning.test.model;
+dialect "java"
+
+import org.optaplanner.core.api.score.buildin.bendable.BendableScoreHolder;
+
+import org.kie.server.services.taskassigning.core.model.ModelConstants;
+import org.kie.server.services.taskassigning.core.model.Task;
+import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
+import org.kie.server.services.taskassigning.core.model.solver.PriorityHelper
+
+global BendableScoreHolder scoreHolder;
