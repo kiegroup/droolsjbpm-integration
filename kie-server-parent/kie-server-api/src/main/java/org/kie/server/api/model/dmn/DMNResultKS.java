@@ -18,6 +18,7 @@ package org.kie.server.api.model.dmn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,6 +46,7 @@ import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.DMNMessage.Severity;
+import org.kie.dmn.api.core.DMNMetadata;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 
@@ -156,24 +158,41 @@ public class DMNResultKS implements DMNResult {
         return MapBackedDMNContext.of(dmnContext);
     }
 
-    private static class MapBackedDMNContext implements DMNContext {
+    static class MapBackedDMNContext implements DMNContext {
 
-        private Map<String, Object> ctx = new HashMap<>();
         private Deque<ScopeReference> stack = new LinkedList<>();
+        private Map<String, Object> ctx;
+        private DMNMetadata metadata;
 
         private MapBackedDMNContext() {
             // intentional
+            ctx = new HashMap<>();
+            metadata = new Metadata();
         }
 
-        static MapBackedDMNContext of(Map<String, Object> ctx) {
-            MapBackedDMNContext result = new MapBackedDMNContext();
-            result.ctx = ctx;
-            return result;
+        private MapBackedDMNContext(Map<String, Object> ctx) {
+            // intentional
+            this.ctx = ctx;
+            this.metadata = new Metadata();
+        }
+
+        private MapBackedDMNContext(Map<String, Object> ctx, Map<String, Object> metadata) {
+            // intentional
+            this.ctx = ctx;
+            this.metadata = new Metadata(metadata);
+        }
+
+        public static MapBackedDMNContext of(Map<String, Object> ctx) {
+            return new MapBackedDMNContext(ctx);
+        }
+
+        public static MapBackedDMNContext of(Map<String, Object> ctx, Map<String, Object> metadata) {
+            return new MapBackedDMNContext(ctx, metadata);
         }
 
         @Override
         public DMNContext clone() {
-            return of(this.ctx);
+            return of(new HashMap<>(this.ctx), new HashMap<>(this.metadata.asMap()));
         }
 
         @Override
@@ -224,7 +243,39 @@ public class DMNResultKS implements DMNResult {
             return getCurrentEntries().containsKey(name);
         }
 
-        public static class ScopeReference {
+        @Override
+        public DMNMetadata getMetadata() {
+            return metadata;
+        }
+
+        private static class Metadata implements DMNMetadata {
+            private Map<String, Object> entries;
+
+            public Metadata() {
+                this.entries = new HashMap<>();
+            }
+
+            public Metadata(Map<String, Object> entries) {
+                this.entries = entries;
+            }
+
+            @Override
+            public Object set(String name, Object value) {
+                return entries.put(name, value);
+            }
+
+            @Override
+            public Object get(String name) {
+                return entries.get(name);
+            }
+
+            @Override
+            public Map<String, Object> asMap() {
+                return Collections.unmodifiableMap(entries);
+            }
+        }
+
+        private static class ScopeReference {
 
             private final String name;
             private final String namespace;
