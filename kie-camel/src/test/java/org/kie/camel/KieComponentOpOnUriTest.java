@@ -26,6 +26,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Test;
 import org.kie.dmn.api.core.DMNContext;
+import org.kie.dmn.api.core.DMNMetadata;
 import org.kie.dmn.api.core.DMNResult;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -59,6 +60,11 @@ public class KieComponentOpOnUriTest extends BaseKieComponentTest {
 
             @Override
             public boolean isDefined( String s ) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public DMNMetadata getMetadata() {
                 throw new UnsupportedOperationException();
             }
 
