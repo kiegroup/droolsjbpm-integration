@@ -26,6 +26,7 @@
     <module>kie-server-services-prometheus</module>
     <module>kie-server-services-openshift</module>
     <module>kie-server-services-scenario-simulation</module>
+    <module>kie-server-services-task-assigning</module>
   </modules>
 
 </project>
