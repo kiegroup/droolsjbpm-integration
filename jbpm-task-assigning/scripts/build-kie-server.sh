@@ -7,7 +7,7 @@
 # Configure the following variables with your development directories.
 
 # 0) snapshot we are working with
-VERSION=7.34.0-SNAPSHOT
+VERSION=7.35.0-SNAPSHOT
 
 # 1) local task assigning project dir.
 PROJECT_DIR=/home/wmedvede/development/projects/droolsjbpm/droolsjbpm-integration/jbpm-task-assigning
