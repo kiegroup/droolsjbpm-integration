@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.34.0-SNAPSHOT</version>
+    <version>7.35.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie.server</groupId>
@@ -55,32 +55,32 @@
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-services-task-assigning-core</artifactId>
-        <version>7.34.0-SNAPSHOT</version>
+        <version>7.35.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-services-task-assigning-user-system-api</artifactId>
-        <version>7.34.0-SNAPSHOT</version>
+        <version>7.35.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-services-task-assigning-user-system-simple</artifactId>
-        <version>7.34.0-SNAPSHOT</version>
+        <version>7.35.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-api-task-assigning</artifactId>
-        <version>7.34.0-SNAPSHOT</version>
+        <version>7.35.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-client-task-assigning</artifactId>
-        <version>7.34.0-SNAPSHOT</version>
+        <version>7.35.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-services-task-assigning-runtime</artifactId>
-        <version>7.34.0-SNAPSHOT</version>
+        <version>7.35.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
