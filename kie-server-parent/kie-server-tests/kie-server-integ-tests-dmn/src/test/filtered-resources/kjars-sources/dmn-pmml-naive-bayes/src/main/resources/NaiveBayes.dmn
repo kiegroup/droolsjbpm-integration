@@ -23,7 +23,7 @@
       <dmn:formalParameter id="_sepallength2" name="Sepal.Length" typeRef="Any"/>
       <dmn:formalParameter id="_sepalwidth2" name="Sepal.Width" typeRef="Any"/>
       <dmn:formalParameter id="_petallength2" name="Petal.Length" typeRef="Any"/>
-      <dmn:formalParameter id="_sepalwidth2" name="Petal.Width" typeRef="Any"/>
+      <dmn:formalParameter id="_petalwidth2" name="Petal.Width" typeRef="Any"/>
       <dmn:context>
         <dmn:contextEntry>
           <dmn:variable name="document" typeRef="string"/>
