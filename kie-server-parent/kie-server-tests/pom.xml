@@ -867,6 +867,12 @@
           <artifactId>wildfly-jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
+          <exclusions>
+            <exclusion>
+                <groupId>jakarta.json</groupId>
+                <artifactId>jakarta.json-api</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
         <dependency>
           <groupId>io.netty</groupId>
