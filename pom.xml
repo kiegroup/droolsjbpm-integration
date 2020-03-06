@@ -80,6 +80,7 @@
     <module>process-migration-service</module>
     <module>jbpm-task-assigning</module>
     <module>optaplanner-workbench-models</module>
+    <module>drools-ha</module>
   </modules>
 
   <dependencyManagement>
