@@ -57,7 +57,7 @@ public class ModelConstants {
                                                             Collections.unmodifiableMap(new HashMap<>()),
                                                             false,
                                                             Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(PLANNING_USER))),
-                                                            Collections.unmodifiableSet(new HashSet<>()));
+                                                            Collections.unmodifiableMap(new HashMap<>()));
 
     /**
      * This task was introduced for dealing with situations where all tasks are pinned and avoid falling into
@@ -72,7 +72,7 @@ public class ModelConstants {
                                                                         Collections.unmodifiableMap(new HashMap<>()),
                                                                         false,
                                                                         Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(PLANNING_USER))),
-                                                                        Collections.unmodifiableSet(new HashSet<>()));
+                                                                        Collections.unmodifiableMap(new HashMap<>()));
 
     public static final Predicate<Task> IS_NOT_DUMMY = task -> !DUMMY_TASK.getId().equals(task.getId()) && !DUMMY_TASK_PLANNER_241.getId().equals(task.getId());
 }

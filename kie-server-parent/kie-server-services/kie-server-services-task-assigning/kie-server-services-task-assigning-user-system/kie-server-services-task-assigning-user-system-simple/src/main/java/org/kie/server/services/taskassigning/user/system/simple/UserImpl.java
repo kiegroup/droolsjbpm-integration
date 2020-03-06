@@ -16,8 +16,6 @@
 
 package org.kie.server.services.taskassigning.user.system.simple;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,19 +28,10 @@ public class UserImpl implements User {
     private Set<Group> groups;
     private Map<String, Object> attributes;
 
-    public UserImpl(String id) {
-        this(id, new HashSet<>(), new HashMap<>());
-    }
-
     public UserImpl(String id, Set<Group> groups, Map<String, Object> attributes) {
         this.id = id;
         this.groups = groups;
         this.attributes = attributes;
-    }
-
-    public UserImpl(String id, Set<Group> groups) {
-        this.id = id;
-        this.groups = groups;
     }
 
     @Override

@@ -27,9 +27,9 @@ public class ImmutableTask extends Task {
 
     ImmutableTask(long id, long processInstanceId, String processId, String containerId, String name,
                   int priority, Map<String, Object> inputData, boolean pinned,
-                  Set<OrganizationalEntity> potentialOwners, Set<TypedLabel> typedLabels) {
+                  Set<OrganizationalEntity> potentialOwners, Map<String, Set<Object>> labelValues) {
         super(id, processInstanceId, processId, containerId, name, priority, inputData, pinned, potentialOwners,
-              typedLabels);
+              labelValues);
     }
 
     @Override
@@ -73,8 +73,13 @@ public class ImmutableTask extends Task {
     }
 
     @Override
-    public void setTypedLabels(Set<TypedLabel> typedLabels) {
-        throwImmutableException("typedLabels");
+    public void setLabelValues(String labelName, Set<Object> values) {
+        throwImmutableException("labelValues");
+    }
+
+    @Override
+    public void setLabelValues(Map<String, Set<Object>> labelValues) {
+        throwImmutableException("labelValues");
     }
 
     private void throwImmutableException(String filedName) {
