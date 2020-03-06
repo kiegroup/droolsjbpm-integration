@@ -27,7 +27,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +38,9 @@ import static org.junit.Assert.assertNotNull;
 
 public class SwaggerIntegrationTest {
 
+    private static Logger logger = LoggerFactory.getLogger(SwaggerIntegrationTest.class);
     private static Client httpClient;
+    private String responseStr;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -53,16 +57,27 @@ public class SwaggerIntegrationTest {
 
     @Test
     public void testSwaggerDocs() throws Exception {
-        String html = invokeGet(getContextRoot()+"docs/");
+        Response response = invokeGet(getContextRoot(3)+"docs/");
         
-        assertThat(Jsoup.parse(html).title()).isEqualTo("Execution Server Documentation");
+        if (response.getStatus()!=200) {
+            //Springboot Swagger Docs is located in other URL
+            response = invokeGet(getContextRoot(1)+"api-docs?url="+getContextRoot(1)+"swagger.json");
+        }
+
+        assertResponse(response);
+        responseStr = response.readEntity(String.class);
+        response.close();
+        assertThat(Jsoup.parse(responseStr).title()).isIn("Execution Server Documentation", "Swagger UI");
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void testSwaggerJson() throws Exception {
-        String responseStr = invokeGet(getContextRoot()+"services/rest/server/swagger.json");
-        
+        Response response = invokeGet(TestConfig.getKieServerHttpUrl()+"/swagger.json");
+        assertResponse(response);
+        responseStr = response.readEntity(String.class);
+        response.close();
+
         ObjectMapper om = new ObjectMapper();
         HashMap<String, Object> hm = (HashMap<String, Object>) om.readValue(responseStr, HashMap.class);
         assertNotNull(hm.get("swagger"));
@@ -70,22 +85,25 @@ public class SwaggerIntegrationTest {
         assertEquals("KIE Server", ((HashMap<String, Object>) hm.get("info")).get("title"));
      }
 
-    protected String getContextRoot() {
-        //Navigate to parent path 3 times to get context root
+    protected String getContextRoot(int foldersUp) {
+        //Navigate to parent path N folders up to get context root
         String url = TestConfig.getKieServerHttpUrl();
         int pos = url.length();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < foldersUp; i++) {
             pos = url.lastIndexOf('/', pos - 1);
         }
         return url.substring(0, pos + 1);
     }
 
-    protected String invokeGet(String docsUri) {
+    protected Response invokeGet(String docsUri) {
+        logger.debug("[GET] " + docsUri);
         WebTarget clientRequest = httpClient.target(docsUri);
-        Response response = clientRequest.request().get();
+        return clientRequest.request().get();
+    }
 
+    private void assertResponse(Response response) {
+        assertNotNull(response);
         assertEquals(200, response.getStatus());
         assertNotNull(response.getEntity());
-        return response.readEntity(String.class);
     }
 }

@@ -39,6 +39,22 @@
     <module>kie-server-spring-boot-integ-tests-sample</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+     <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
+        <version>${version.org.apache.cxf}</version>
+      </dependency>
+      <!-- Notice that higher versions like 1.5.20 contain a bug (No message body writer has been found) so downgraded to 1.5.15 -->
+      <dependency>
+        <groupId>io.swagger</groupId>
+        <artifactId>swagger-jaxrs</artifactId>
+        <version>1.5.15</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <build>
     <plugins>
       <plugin>
