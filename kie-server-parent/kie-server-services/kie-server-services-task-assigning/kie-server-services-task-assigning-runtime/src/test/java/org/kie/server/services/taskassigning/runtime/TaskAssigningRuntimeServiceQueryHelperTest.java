@@ -42,7 +42,7 @@ import org.kie.server.api.model.taskassigning.TaskInputVariablesReadMode;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.taskassigning.runtime.query.AbstractTaskAssigningQueryMapper;
-import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataQueryMapper;
+import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataWithPotentialOwnersQueryMapper;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -271,7 +271,7 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
                         return Collections.emptyList();
                 }
             }
-        }).when(helper).executeQuery(eq(queryService), anyString(), any(TaskAssigningTaskDataQueryMapper.class), any(), any());
+        }).when(helper).executeQuery(eq(queryService), anyString(), any(TaskAssigningTaskDataWithPotentialOwnersQueryMapper.class), any(), any());
         List<TaskData> result = helper.readTasksDataSummary(0, Collections.emptyList(), 10);
         assertEquals(TASK1_ID, result.get(0).getTaskId(), 0);
         assertEquals(TASK2_ID, result.get(1).getTaskId(), 0);
@@ -285,7 +285,7 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
         Map<String, Object> params = mockQueryParams(readMode);
         List<TaskData> taskDataList = mockTasks();
         doReturn(taskDataList).when(helper)
-                .executeQuery(eq(queryService), anyString(), any(TaskAssigningTaskDataQueryMapper.class), any(), any());
+                .executeQuery(eq(queryService), anyString(), any(TaskAssigningTaskDataWithPotentialOwnersQueryMapper.class), any(), any());
         KieContainerInstanceImpl container = mock(KieContainerInstanceImpl.class);
         when(container.getStatus()).thenReturn(KieContainerStatus.STARTED);
         when(registry.getContainer(CONTAINER_ID)).thenReturn(container);
@@ -293,7 +293,7 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
     }
 
     private void verifyQueryWasExecuted() {
-        verify(helper).executeQuery(eq(queryService), anyString(), any(TaskAssigningTaskDataQueryMapper.class), contextCaptor.capture(), paramsCaptor.capture());
+        verify(helper).executeQuery(eq(queryService), anyString(), any(TaskAssigningTaskDataWithPotentialOwnersQueryMapper.class), contextCaptor.capture(), paramsCaptor.capture());
         QueryParam[] queryParams = paramsCaptor.getValue();
         assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), GREATER_OR_EQUALS_TO, Collections.singletonList(FROM_TASK_ID_VALUE), 0);
         assertContainsParam(queryParams, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), LOWER_OR_EQUALS_TO, Collections.singletonList(TO_TASK_ID_VALUE), 1);

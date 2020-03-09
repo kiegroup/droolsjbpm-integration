@@ -18,18 +18,16 @@ package org.kie.server.services.taskassigning.runtime.query;
 
 import java.util.List;
 
-import org.kie.server.api.model.taskassigning.TaskData;
-
-public class TaskAssigningTaskDataQueryMapperTest extends TaskAssigningTaskDataWithPotentialOwnersQueryMapperTest {
+public class TaskAssigningTaskDataRawQueryMapperTest extends TaskAssigningTaskDataWithPotentialOwnersRawQueryMapperTest {
 
     @Override
-    protected TaskAssigningTaskDataWithPotentialOwnersQueryMapper createQueryMapper() {
-        return TaskAssigningTaskDataQueryMapper.get();
+    protected TaskAssigningTaskDataWithPotentialOwnersRawQueryMapper createQueryMapper() {
+        return TaskAssigningTaskDataRawQueryMapper.get();
     }
 
     @Override
     protected String getExpectedName() {
-        return TaskAssigningTaskDataQueryMapper.NAME;
+        return TaskAssigningTaskDataRawQueryMapper.NAME;
     }
 
     @Override
@@ -39,9 +37,9 @@ public class TaskAssigningTaskDataQueryMapperTest extends TaskAssigningTaskDataW
 
     @Override
     protected void verifyResult(List<?> result) {
-        List<TaskData> taskDataResult = (List<TaskData>) result;
-        assertTask1IsPresent(taskDataResult, 0, false);
-        assertTask2IsPresent(taskDataResult, 1, false);
-        assertTask3IsPresent(taskDataResult, 2, false);
+        List<List<Object>> rawResult = (List<List<Object>>) result;
+        assertTask1IsPresent(rawResult, 0, false);
+        assertTask2IsPresent(rawResult, 1, false);
+        assertTask3IsPresent(rawResult, 2, false);
     }
 }

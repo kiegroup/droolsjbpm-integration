@@ -43,7 +43,7 @@ import org.kie.server.api.model.taskassigning.util.StatusConverter;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.taskassigning.runtime.query.AbstractTaskAssigningQueryMapper;
-import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataQueryMapper;
+import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataWithPotentialOwnersQueryMapper;
 import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataSummaryQueryMapper;
 
 import static org.apache.commons.lang3.ClassUtils.isPrimitiveWrapper;
@@ -84,7 +84,7 @@ public class TaskAssigningRuntimeServiceQueryHelper {
         QueryContext queryContext = new QueryContext(page * pageSize, pageSize, AbstractTaskAssigningQueryMapper.TASK_QUERY_COLUMN.TASK_ID.columnName(), true);
 
         AbstractTaskAssigningQueryMapper<TaskData> resultMapper = (AbstractTaskAssigningQueryMapper<TaskData>) QueryMapperRegistry.get()
-                .mapperFor(TaskAssigningTaskDataQueryMapper.NAME, null);
+                .mapperFor(TaskAssigningTaskDataWithPotentialOwnersQueryMapper.NAME, null);
 
         List<TaskData> result = executeQuery(queryService, TASK_ASSIGNING_TASKS_WITH_POTENTIAL_OWNERS_AND_PLANNING_TASK,
                                              resultMapper, queryContext, queryParams.toArray(new QueryParam[0]));

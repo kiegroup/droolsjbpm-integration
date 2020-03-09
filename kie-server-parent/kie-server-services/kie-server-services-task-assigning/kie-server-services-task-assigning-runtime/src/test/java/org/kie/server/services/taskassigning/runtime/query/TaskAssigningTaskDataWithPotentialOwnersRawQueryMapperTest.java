@@ -23,32 +23,43 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Test;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 
 import static org.junit.Assert.assertEquals;
 
-public class TaskAssigningDataRawQueryMapperTest extends AbstractTaskAssigningDataQueryMapperTest<TaskAssigningTaskDataRawQueryMapper> {
+public class TaskAssigningTaskDataWithPotentialOwnersRawQueryMapperTest extends AbstractTaskAssigningDataQueryMapperTest<TaskAssigningTaskDataWithPotentialOwnersRawQueryMapper> {
 
     @Override
-    protected TaskAssigningTaskDataRawQueryMapper createQueryMapper() {
-        return TaskAssigningTaskDataRawQueryMapper.get();
+    protected TaskAssigningTaskDataWithPotentialOwnersRawQueryMapper createQueryMapper() {
+        return TaskAssigningTaskDataWithPotentialOwnersRawQueryMapper.get();
     }
 
     @Override
     protected String getExpectedName() {
-        return TaskAssigningTaskDataRawQueryMapper.NAME;
+        return TaskAssigningTaskDataWithPotentialOwnersRawQueryMapper.NAME;
+    }
+
+    @Override
+    protected boolean readPotentialOwnersExpectedValue() {
+        return true;
+    }
+
+    @Test
+    public void getType() {
+        assertEquals(List.class, queryMapper.getType());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     protected void verifyResult(List<?> result) {
         List<List<Object>> rawResult = (List<List<Object>>) result;
-        assertTask1IsPresent(rawResult, 0);
-        assertTask2IsPresent(rawResult, 1);
-        assertTask3IsPresent(rawResult, 2);
+        assertTask1IsPresent(rawResult, 0, true);
+        assertTask2IsPresent(rawResult, 1, true);
+        assertTask3IsPresent(rawResult, 2, true);
     }
 
-    private void assertTask1IsPresent(List<List<Object>> rawResult, int index) {
+    protected void assertTask1IsPresent(List<List<Object>> rawResult, int index, boolean withPotentialOwners) {
         assertTaskIsPresent(rawResult, index, TASK1_ID, TASK1_CREATED_ON, TASK1_ACTUAL_OWNER, TASK1_DEPLOYMENT_ID,
                             TASK1_NAME, TASK1_PRIORITY, TASK1_PROCESS_ID, TASK1_PROCESS_INSTANCE_ID, TASK1_STATUS, TASK1_LAST_MODIFICATION_DATE,
                             PlanningTask.builder()
@@ -57,11 +68,12 @@ public class TaskAssigningDataRawQueryMapperTest extends AbstractTaskAssigningDa
                                     .assignedUser(TASK1_PLANNING_TASK_ASSIGNED_USER)
                                     .index(TASK1_PLANNING_TASK_INDEX)
                                     .build(),
-                            Arrays.asList(Pair.of(TASK1_PO_1_ID, TASK1_PO_1_TYPE),
-                                          Pair.of(TASK1_PO_2_ID, TASK1_PO_2_TYPE)));
+                            withPotentialOwners ?
+                                    Arrays.asList(Pair.of(TASK1_PO_1_ID, TASK1_PO_1_TYPE),
+                                                  Pair.of(TASK1_PO_2_ID, TASK1_PO_2_TYPE)) : null);
     }
 
-    private void assertTask2IsPresent(List<List<Object>> rawResult, int index) {
+    protected void assertTask2IsPresent(List<List<Object>> rawResult, int index, boolean withPotentialOwners) {
         assertTaskIsPresent(rawResult, index, TASK2_ID, TASK2_CREATED_ON, TASK2_ACTUAL_OWNER, TASK2_DEPLOYMENT_ID,
                             TASK2_NAME, TASK2_PRIORITY, TASK2_PROCESS_ID, TASK2_PROCESS_INSTANCE_ID, TASK2_STATUS, TASK2_LAST_MODIFICATION_DATE,
                             PlanningTask.builder()
@@ -70,15 +82,17 @@ public class TaskAssigningDataRawQueryMapperTest extends AbstractTaskAssigningDa
                                     .assignedUser(TASK2_PLANNING_TASK_ASSIGNED_USER)
                                     .index(TASK2_PLANNING_TASK_INDEX)
                                     .build(),
-                            Collections.emptyList());
+                            withPotentialOwners ?
+                                    Collections.emptyList() : null);
     }
 
-    private void assertTask3IsPresent(List<List<Object>> rawResult, int index) {
+    protected void assertTask3IsPresent(List<List<Object>> rawResult, int index, boolean withPotentialOwners) {
         assertTaskIsPresent(rawResult, index, TASK3_ID, TASK3_CREATED_ON, TASK3_ACTUAL_OWNER, TASK3_DEPLOYMENT_ID,
                             TASK3_NAME, TASK3_PRIORITY, TASK3_PROCESS_ID, TASK3_PROCESS_INSTANCE_ID, TASK3_STATUS, TASK3_LAST_MODIFICATION_DATE,
                             null,
-                            Arrays.asList(Pair.of(TASK3_PO_1_ID, TASK3_PO_1_TYPE),
-                                          Pair.of(TASK3_PO_2_ID, TASK3_PO_2_TYPE)));
+                            withPotentialOwners ?
+                                    Arrays.asList(Pair.of(TASK3_PO_1_ID, TASK3_PO_1_TYPE),
+                                                  Pair.of(TASK3_PO_2_ID, TASK3_PO_2_TYPE)) : null);
     }
 
     private void assertTaskIsPresent(List<List<Object>> rawDataList, int index, Long taskId, Date createdOn, String actualOwner,
@@ -105,11 +119,13 @@ public class TaskAssigningDataRawQueryMapperTest extends AbstractTaskAssigningDa
             planningTaskRow.add(planningTask.getIndex());
             planningTaskRow.add(planningTask.getPublished());
         }
-        List<List<Object>> potentialOwnersRow = new ArrayList<>();
-        expectedRow.add(potentialOwnersRow);
-        potentialOwners.forEach(potentialOwner -> {
-            potentialOwnersRow.add(Arrays.asList(potentialOwner.getLeft(), potentialOwner.getRight()));
-        });
+        if (potentialOwners != null) {
+            List<List<Object>> potentialOwnersRow = new ArrayList<>();
+            expectedRow.add(potentialOwnersRow);
+            potentialOwners.forEach(potentialOwner -> {
+                potentialOwnersRow.add(Arrays.asList(potentialOwner.getLeft(), potentialOwner.getRight()));
+            });
+        }
         assertEquals(expectedRow, rawDataList.get(index));
     }
 }

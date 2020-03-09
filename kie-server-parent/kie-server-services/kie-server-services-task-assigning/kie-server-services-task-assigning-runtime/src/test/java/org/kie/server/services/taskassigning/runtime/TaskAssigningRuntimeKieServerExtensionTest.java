@@ -34,7 +34,7 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
-import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataQueryMapper;
+import org.kie.server.services.taskassigning.runtime.query.TaskAssigningTaskDataWithPotentialOwnersQueryMapper;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -123,7 +123,7 @@ public class TaskAssigningRuntimeKieServerExtensionTest {
         prepareExtension();
         extension.init(kieServer, registry);
         assertTrue(extension.isInitialized());
-        verify(queryService, times(3)).replaceQuery(any());
+        verify(queryService, times(4)).replaceQuery(any());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class TaskAssigningRuntimeKieServerExtensionTest {
     public void healthCheckWithFailure() {
         prepareExtension();
         doThrow(new RuntimeException(ERROR_MESSAGE))
-                .when(queryService).query(anyString(), any(TaskAssigningTaskDataQueryMapper.class), any(QueryContext.class), any(QueryParam[].class));
+                .when(queryService).query(anyString(), any(TaskAssigningTaskDataWithPotentialOwnersQueryMapper.class), any(QueryContext.class), any(QueryParam[].class));
         extension.init(kieServer, registry);
         List<Message> messages = extension.healthCheck(true);
         assertEquals(1, messages.size());

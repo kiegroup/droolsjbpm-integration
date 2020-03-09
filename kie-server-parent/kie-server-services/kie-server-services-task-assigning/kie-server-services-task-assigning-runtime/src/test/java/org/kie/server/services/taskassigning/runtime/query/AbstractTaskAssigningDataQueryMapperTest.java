@@ -112,6 +112,8 @@ public abstract class AbstractTaskAssigningDataQueryMapperTest<T extends Abstrac
 
     protected abstract String getExpectedName();
 
+    protected abstract boolean readPotentialOwnersExpectedValue();
+
     @Test
     public void map() {
         List<List<Object>> rawValues = createTestValues();
@@ -127,20 +129,25 @@ public abstract class AbstractTaskAssigningDataQueryMapperTest<T extends Abstrac
 
     @Test
     public void toLocalDateTimeNull() {
-        assertNull(null, TaskAssigningTaskDataQueryMapper.toLocalDateTime(null));
+        assertNull(null, TaskAssigningTaskDataWithPotentialOwnersQueryMapper.toLocalDateTime(null));
     }
 
     @Test
     public void toLocalDateTimeFromDate() {
         Date date = new Date();
         LocalDateTime expectedValue = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        assertEquals(expectedValue, TaskAssigningTaskDataQueryMapper.toLocalDateTime(date));
+        assertEquals(expectedValue, TaskAssigningTaskDataWithPotentialOwnersQueryMapper.toLocalDateTime(date));
     }
 
     @Test
     public void toLocalDateTimeFromLocalDateTime() {
         LocalDateTime value = LocalDateTime.now();
-        assertEquals(value, TaskAssigningTaskDataQueryMapper.toLocalDateTime(value));
+        assertEquals(value, TaskAssigningTaskDataWithPotentialOwnersQueryMapper.toLocalDateTime(value));
+    }
+
+    @Test
+    public void readPotentialOwners() {
+        assertEquals(readPotentialOwnersExpectedValue(), queryMapper.readPotentialOwners());
     }
 
     protected List<List<Object>> createTestValues() {

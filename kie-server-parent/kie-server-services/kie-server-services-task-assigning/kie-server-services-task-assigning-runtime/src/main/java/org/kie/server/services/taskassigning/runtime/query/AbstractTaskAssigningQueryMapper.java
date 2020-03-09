@@ -62,7 +62,7 @@ public abstract class AbstractTaskAssigningQueryMapper<T> extends AbstractQueryM
         /**
          * A String with the task name. Is never null.
          */
-        TASK_NAME("TASKNAME"),
+        TASK_NAME("NAME"),
 
         /**
          * An Integer with the task priority. Is never null.

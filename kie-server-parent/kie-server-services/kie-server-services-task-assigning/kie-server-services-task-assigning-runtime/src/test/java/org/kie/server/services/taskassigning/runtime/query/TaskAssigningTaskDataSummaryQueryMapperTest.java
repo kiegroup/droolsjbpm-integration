@@ -22,7 +22,7 @@ import java.util.List;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.api.model.taskassigning.TaskData;
 
-public class TaskAssigningTaskDataSummaryQueryMapperTest extends TaskAssigningTaskDataQueryMapperTest {
+public class TaskAssigningTaskDataSummaryQueryMapperTest extends TaskAssigningTaskDataWithPotentialOwnersQueryMapperTest {
 
     @Override
     protected TaskAssigningTaskDataSummaryQueryMapper createQueryMapper() {
@@ -35,7 +35,12 @@ public class TaskAssigningTaskDataSummaryQueryMapperTest extends TaskAssigningTa
     }
 
     @Override
-    protected void assertTask1IsPresent(List<TaskData> result, int index) {
+    protected boolean readPotentialOwnersExpectedValue() {
+        return false;
+    }
+
+    @Override
+    protected void assertTask1IsPresent(List<TaskData> result, int index, boolean withPotentialOwners) {
         assertTaskIsPresent(result, index,
                             TASK1_ID,
                             TASK1_ACTUAL_OWNER,
@@ -50,7 +55,7 @@ public class TaskAssigningTaskDataSummaryQueryMapperTest extends TaskAssigningTa
     }
 
     @Override
-    protected void assertTask2IsPresent(List<TaskData> result, int index) {
+    protected void assertTask2IsPresent(List<TaskData> result, int index, boolean withPotentialOwners) {
         assertTaskIsPresent(result, index,
                             TASK2_ID,
                             TASK2_ACTUAL_OWNER,
@@ -65,7 +70,7 @@ public class TaskAssigningTaskDataSummaryQueryMapperTest extends TaskAssigningTa
     }
 
     @Override
-    protected void assertTask3IsPresent(List<TaskData> result, int index) {
+    protected void assertTask3IsPresent(List<TaskData> result, int index, boolean withPotentialOwners) {
         assertTaskIsPresent(result, index,
                             TASK3_ID,
                             TASK3_ACTUAL_OWNER,
