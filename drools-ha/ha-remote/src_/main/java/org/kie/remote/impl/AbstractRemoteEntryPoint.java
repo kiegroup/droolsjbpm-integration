@@ -16,7 +16,6 @@
 
 package org.kie.remote.impl;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -62,7 +61,7 @@ public abstract class AbstractRemoteEntryPoint implements RemoteWorkingMemory {
     }
 
     @Override
-    public CompletableFuture<Collection> getObjects(String namedQuery, String objectName, Serializable... params) {
+    public CompletableFuture<Collection> getObjects(String namedQuery, String objectName, Object... params) {
         ListObjectsCommand command = new ListObjectsCommandNamedQuery(entryPoint, namedQuery, objectName, params);
         return executeCommand(command);
     }

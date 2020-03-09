@@ -16,7 +16,6 @@
 
 package org.kie.remote;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
@@ -53,7 +52,7 @@ public interface RemoteWorkingMemory {
      * @@param params for the rule
      * @@return CompletableFuture of Collection<? extends Object> to read all facts from the current session that are accepted by the given <code>ObjectFilter</code>.
      */
-    CompletableFuture<Collection> getObjects(String namedQuery, String objectName, Serializable... params);
+    CompletableFuture<Collection> getObjects(String namedQuery, String objectName, Object... params);
 
     /**
      * @return a completable future with Long to read the total number of facts currently in this entry point
