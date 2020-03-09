@@ -117,6 +117,13 @@
         <scope>compile</scope>
       </dependency>
 
+      <!-- fabric8 -->
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client</artifactId>
+        <version>${version.k8s.client}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.powermock</groupId>
         <artifactId>powermock-module-junit4</artifactId>
