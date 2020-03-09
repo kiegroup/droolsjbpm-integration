@@ -729,7 +729,7 @@ public class JSONMarshaller implements Marshaller {
                 if (jp.nextToken() != JsonToken.FIELD_NAME) { // single entry; but we want modifiable
                     LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(4);
                     result.put(field1, value1);
-                    return result;
+                    return wrapCustomObject(result);
                 }
                 String field2 = jp.getText();
                 jp.nextToken();
@@ -738,7 +738,7 @@ public class JSONMarshaller implements Marshaller {
                     LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(4);
                     result.put(field1, value1);
                     result.put(field2, value2);
-                    return result;
+                    return wrapCustomObject(result);
                 }
 
                 // And then the general case; default map size is 16
@@ -781,10 +781,20 @@ public class JSONMarshaller implements Marshaller {
                     List condValues = (List) result.get("cond-values");
                     return new QueryParam(column, op, condValues);
                 }
-                return result;
+
+                return wrapCustomObject(result);
             }
         }
 
+        public Object wrapCustomObject(Map<String, Object> result) {
+            if (result.containsKey("cond-operator")) {
+                String column = (String) result.get("cond-column");
+                String op = (String) result.get("cond-operator");
+                List condValues = (List) result.get("cond-values");
+                return new QueryParam(column, op, condValues);
+            }
+            return result;
+        }
         private Object[] toArray(Object element) {
             if (element != null) {
 
