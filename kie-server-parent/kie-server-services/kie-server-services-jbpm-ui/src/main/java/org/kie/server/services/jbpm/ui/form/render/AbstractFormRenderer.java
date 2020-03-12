@@ -29,9 +29,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.jbpm.casemgmt.api.model.CaseDefinition;
 import org.jbpm.casemgmt.api.model.CaseRole;
 import org.jbpm.services.api.model.ProcessDefinition;
@@ -45,10 +49,6 @@ import org.kie.server.services.jbpm.ui.form.render.model.LayoutRow;
 import org.kie.server.services.jbpm.ui.form.render.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import freemarker.cache.StringTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 
 public abstract class AbstractFormRenderer implements FormRenderer {
     
@@ -293,16 +293,23 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             List<String> scriptDataList) {
         FormLayout layout = form.getLayout();
         
+
         if (form.getModel().getClassName() != null && wrapJson) {
-            jsonTemplate                
-                .append("'")
-                .append(form.getModel().getName())
-                .append("' : ")
-                .append("{")
-                .append("'")
-                .append(form.getModel().getClassName())                
-                .append("' : ")
-                .append("{");
+            Optional<FormField> fieldForm = topLevelForm.getFields().stream()
+                                                        .filter(e -> e.getNestedForm() != null && e.getNestedForm().equals(form.getId()))
+                                                        .findAny();
+            jsonTemplate.append("'");
+            if (fieldForm.isPresent()) {
+                jsonTemplate.append(fieldForm.get().getBinding());
+            } else {
+                jsonTemplate.append(form.getModel().getName());
+            }
+            jsonTemplate.append("' : ")
+                        .append("{")
+                        .append("'")
+                        .append(form.getModel().getClassName())
+                        .append("' : ")
+                        .append("{");
         }
         
         

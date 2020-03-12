@@ -16,6 +16,8 @@
 
 package org.kie.server.api.marshalling;
 
+import java.io.File;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -23,20 +25,28 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.assertj.core.util.Arrays;
+import org.assertj.core.util.Files;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.junit.After;
 import org.junit.Test;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.marshalling.objects.DateObjectUnannotated;
+import org.kie.server.api.model.definition.QueryParam;
 
+import static org.hamcrest.CoreMatchers.everyItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -199,4 +209,26 @@ public class JSONMarshallerTest {
 
         assertTrue(dateObjectString.startsWith(expectedString));
     }
+
+    @Test
+    public void testMarshallQueryParam() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JSON, getClass().getClassLoader());
+        QueryParam subParam = new QueryParam("col2", "EQUALS_TO", Collections.singletonList("XXX"));
+
+        QueryParam param = new QueryParam("hola", "OR", Collections.singletonList(subParam));
+        String converted = marshaller.marshall(param);
+        QueryParam param2 = marshaller.unmarshall(converted, QueryParam.class);
+        assertTrue(param2.getValue().get(0) instanceof QueryParam);
+    }
+
+    @Test
+    public void testParam() throws Exception {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JSON, getClass().getClassLoader());
+        URL url = Thread.currentThread().getContextClassLoader().getResource("marshaller.json");
+        String input = Files.contentOf(new File(url.toURI()), "UTF-8");
+        QueryParam[] params = marshaller.unmarshall(input, QueryParam[].class);
+        assertEquals(1, params.length);
+        assertThat(Arrays.asList(params), everyItem(instanceOf(QueryParam.class)));
+    }
+
 }

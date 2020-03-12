@@ -13,6 +13,8 @@
  * limitations under the License.
 */
 
+package kbase1;
+
 import org.kie.server.testing.Person;
 
 rule "Set lastname for john"

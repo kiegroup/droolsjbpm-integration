@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.32.0-SNAPSHOT</version>
+    <version>7.35.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-policy</artifactId>
@@ -386,6 +386,7 @@
                       <argument>-Dspring.config.location=${project.build.testOutputDirectory}/application.properties</argument>
                       <argument>-Dkie.maven.settings.custom=${kie.server.server.deployment.settings.xml}</argument>
                       <argument>-Dorg.kie.server.persistence.ds=${org.kie.server.persistence.ds}</argument>
+                      <argument>-Dorg.kie.server.mode=${org.kie.server.mode.production}</argument>
                       <!-- Policy based configuration -->
                       <argument>-Dorg.kie.server.policy.activate=${org.kie.server.policy.activate}</argument>
                       <argument>-Dpolicy.klo.interval=${policy.klo.interval}</argument>

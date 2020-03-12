@@ -3,14 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+  <!-- TODO all this project pom.xml setup is temporal until the definitive location (must probably in the kie-server-parent
+        module) is defined -->
+
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.32.0-SNAPSHOT</version>
+    <version>7.35.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.jbpm</groupId>
+  <groupId>org.kie.server</groupId>
   <artifactId>jbpm-task-assigning</artifactId>
   <packaging>pom</packaging>
 
@@ -22,6 +25,13 @@
       <dependency>
         <groupId>org.kie.soup</groupId>
         <artifactId>kie-soup-bom</artifactId>
+        <version>${version.org.kie}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-bom</artifactId>
         <version>${version.org.kie}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -40,10 +50,45 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
+      <!-- TODO same here, this modules declaration will finally go in the proper kie-server-bom etc. -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-task-assigning-core</artifactId>
+        <version>7.35.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-task-assigning-user-system-api</artifactId>
+        <version>7.35.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-task-assigning-user-system-simple</artifactId>
+        <version>7.35.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-api-task-assigning</artifactId>
+        <version>7.35.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-client-task-assigning</artifactId>
+        <version>7.35.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-task-assigning-runtime</artifactId>
+        <version>7.35.0-SNAPSHOT</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
-    <module>jbpm-task-assigning-core</module>
+    <module>kie-server-api-task-assigning</module>
+    <module>kie-server-client-task-assigning</module>
+    <module>kie-server-rest-task-assigning-runtime</module>
+    <module>kie-server-services-task-assigning</module>
   </modules>
 </project>

@@ -23,33 +23,6 @@ import java.util.Random;
 
 public class CloudBalancingGenerator {
 
-    private static class Price {
-
-        private int hardwareValue;
-        private String description;
-        private int cost;
-
-        private Price(int hardwareValue,
-                      String description,
-                      int cost) {
-            this.hardwareValue = hardwareValue;
-            this.description = description;
-            this.cost = cost;
-        }
-
-        public int getHardwareValue() {
-            return hardwareValue;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public int getCost() {
-            return cost;
-        }
-    }
-
     private static final Price[] CPU_POWER_PRICES = { // in gigahertz
             new Price(3,
                       "single core 3ghz",

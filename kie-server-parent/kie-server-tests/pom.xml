@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.32.0-SNAPSHOT</version>
+    <version>7.35.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -50,6 +50,8 @@
     <maven.jdbc.driver.jar/>
     <!-- Set to true if you want to skip JMS tests even for containers with available JMS. -->
     <jms.skip>false</jms.skip>
+    <!-- Property for configuring Maven mirror in Kie server settings.xml. Used to speed up test execution by using cache server. Empty by default. -->
+    <maven.settings.mirror/>
 
     <!-- Kie server datasource configuration. -->
     <!--  <org.kie.server.persistence.ds/> Defined in container profiles.-->
@@ -69,7 +71,11 @@
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
          referencing the zip from local filesystem). -->
-    <eap7.download.url>valid-url-for-eap-7-needs-to-be-specified-here-or-via-cmd-line</eap7.download.url>
+    <eap7.download.url>http://valid-url-for-eap-7-needs-to-be-specified-here-or-via-cmd-line.com</eap7.download.url>
+
+    <!-- Integration tests and Cargo are skipped by default. They are activated when specific container profile is used. -->
+    <skipITs>true</skipITs>
+    <cargo.maven.skip>true</cargo.maven.skip>
   </properties>
 
   <modules>
@@ -84,7 +90,8 @@
     <module>kie-server-integ-tests-router</module>
     <module>kie-server-integ-tests-case-id-generator</module>
     <module>kie-server-integ-tests-dmn</module>
-    <module>kie-server-integ-tests-custom-extension</module>    
+    <module>kie-server-integ-tests-scenario-simulation</module>
+    <module>kie-server-integ-tests-custom-extension</module>
   </modules>
 
   <dependencyManagement>
@@ -354,6 +361,7 @@
                   <jms.skip>${jms.skip}</jms.skip>
                   <kie.server.testing.server.local.repo.dir>${kie.server.testing.server.local.repo.dir}</kie.server.testing.server.local.repo.dir>
                   <kie.server.testing.remote.repo.dir>${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.dir>
+                  <maven.home>${maven.home}</maven.home>
                 </systemPropertyVariables>
               </configuration>
             </execution>
@@ -571,6 +579,9 @@
         <kie.server.war.path>${org.kie.server:kie-server:war:webc}</kie.server.war.path>
         <cargo.container.id>tomcat9x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -638,7 +649,7 @@
                 </container>
                 <configuration>
                   <properties>
-                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx2048m</cargo.jvmargs>
                     <cargo.tomcat.valve.jaas>
                       className=org.kie.integration.tomcat.JACCValve
                     </cargo.tomcat.valve.jaas>
@@ -738,6 +749,9 @@
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly14x</cargo.container.id>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -769,7 +783,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx2048m</cargo.jvmargs>
                     <cargo.resource.resource.mail>
                        cargo.resource.name=mail/Session|
                        cargo.resource.type=javax.mail.Session|
@@ -839,6 +853,9 @@
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <!-- eap7 is basically wildfly14; until there is a EAP 7 specific containerId, 'wildfly14x' should work just fine -->
         <cargo.container.id>wildfly14x</cargo.container.id>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -862,7 +879,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx2048m</cargo.jvmargs>
                     <cargo.resource.resource.mail>
                        cargo.resource.name=mail/Session|
                        cargo.resource.type=javax.mail.Session|
@@ -923,6 +940,9 @@
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
         <kie.server.classifier>ee7</kie.server.classifier>
         <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -958,7 +978,7 @@
                 <configuration>
                   <type>standalone</type>
                   <properties>
-                    <cargo.jvmargs>-Xmx1024m -Dkie.server.jms.queues.response=jms/KIE.SERVER.RESPONSE</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx2048m -Dkie.server.jms.queues.response=jms/KIE.SERVER.RESPONSE</cargo.jvmargs>
                     <!-- CFs -->
                     <cargo.resource.resource.jms.cf.request>
                       cargo.resource.name=jms/cf/KIE.SERVER.REQUEST|
@@ -1040,9 +1060,12 @@
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>ee7</kie.server.classifier>
-        <cargo.container.id>websphere85x</cargo.container.id>
+        <cargo.container.id>websphere9x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
         <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
+        <!-- Enable integration tests and Cargo when running with application server. -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>false</cargo.maven.skip>
       </properties>
       <build>
         <pluginManagement>
@@ -1184,6 +1207,7 @@
         <kieserver.swagger.enabled>false</kieserver.swagger.enabled>
         <jbpm.executor.enabled>false</jbpm.executor.enabled>
         <kieserver.prometheus.enabled>false</kieserver.prometheus.enabled>
+        <kieserver.scenariosimulation.enabled>false</kieserver.scenariosimulation.enabled>
         <!-- Springboot GAV -->
         <springboot.app.group.id>org.kie</springboot.app.group.id>
         <springboot.app.artifact.id>kie-server-spring-boot-integ-tests-sample</springboot.app.artifact.id>
@@ -1195,6 +1219,8 @@
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
         <!-- Disable stacktrace inclusion by default -->
         <org.kie.server.stacktrace.included>false</org.kie.server.stacktrace.included>
+        <!-- Enable integration tests when running with application server, Cargo is still disabled. -->
+        <skipITs>false</skipITs>
       </properties>
       <build>
         <pluginManagement>
@@ -1224,14 +1250,6 @@
                   </configuration>
                 </execution>
               </executions>
-            </plugin>
-            <plugin>
-              <!-- Turn off cargo completely as we don't need it -->
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <skip>true</skip>
-              </configuration>
             </plugin>
             <plugin>
               <groupId>com.bazaarvoice.maven.plugins</groupId>
@@ -1285,34 +1303,15 @@
     <profile>
       <id>custom-container</id>
       <activation>
-        <!-- The tests are not executed unless specific container profile is used. Disable cargo by default. -->
-        <activeByDefault>true</activeByDefault>
         <property>
           <name>custom-container</name>
         </property>
       </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>start-container</id>
-                <phase>none</phase>
-                <goals/>
-                <!-- do nothing, container is not managed by cargo -->
-              </execution>
-              <execution>
-                <id>stop-container</id>
-                <phase>none</phase>
-                <goals/>
-                <!-- do nothing, container is not managed by cargo -->
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
+      <properties>
+        <!-- Enable integration tests when running with application server, disable Cargo as it is needed to trigger application server profile while keeping Cargo disabled (due to JMS dependencies and such). -->
+        <skipITs>false</skipITs>
+        <cargo.maven.skip>true</cargo.maven.skip>
+      </properties>
     </profile>
     <profile>
       <!-- Run just smoke tests to check basic functionality. -->
@@ -1352,25 +1351,6 @@
       </build>
     </profile>
     <profile>
-      <!-- Integration tests are skipped by default. They are activated when specific container profile is used. -->
-      <id>skipITs-by-default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <skipITs>true</skipITs>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
       <!-- Full downstream build disables active profiles because of ghprbGhRepository property, which means Cargo would stay enabled.
            This profile disables Cargo when full downstream build is run (its invocation contains -DskipTests property). -->
       <id>skipCargoInFDB</id>
@@ -1381,6 +1361,25 @@
       </activation>
       <properties>
         <cargo.maven.skip>true</cargo.maven.skip>
+      </properties>
+    </profile>
+    <profile>
+      <!-- In case Nexus cache server is defined as environment variable NEXUS_CACHE_URL then use it in Kie server settings.xml. -->
+      <id>nexus-cache-server</id>
+      <activation>
+        <property>
+          <name>env.NEXUS_CACHE_URL</name>
+        </property>
+      </activation>
+      <properties>
+        <maven.settings.mirror><![CDATA[
+   <mirrors>
+     <mirror>
+       <id>mirror-central</id>
+       <mirrorOf>external:*,!remote-testing-repo</mirrorOf>
+       <url>${env.NEXUS_CACHE_URL}</url>
+     </mirror>
+   </mirrors>]]></maven.settings.mirror>
       </properties>
     </profile>
   </profiles>

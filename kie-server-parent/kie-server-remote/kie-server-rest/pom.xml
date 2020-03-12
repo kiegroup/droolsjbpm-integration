@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-remote</artifactId>
-    <version>7.32.0-SNAPSHOT</version>
+    <version>7.35.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-rest</artifactId>
@@ -24,6 +24,7 @@
     <module>kie-server-rest-dmn</module>
     <module>kie-server-rest-swagger</module>
     <module>kie-server-rest-prometheus</module>
+    <module>kie-server-rest-scenario-simulation</module>
   </modules>
 
 </project>

@@ -30,4 +30,7 @@ public final class KieServerControllerConstants {
     public static final String KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED =
             "org.kie.server.controller.openshift.global.discovery.enabled";
 
+    public static final String KIE_CONTROLLER_OPENSHIFT_ENABLED =
+            "org.kie.server.controller.openshift.enabled";
+
 }

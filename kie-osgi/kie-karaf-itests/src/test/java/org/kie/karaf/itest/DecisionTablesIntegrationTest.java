@@ -21,8 +21,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.KieServices;
-import org.kie.api.io.KieResources;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -30,7 +28,8 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -38,9 +37,6 @@ public class DecisionTablesIntegrationTest extends AbstractKarafIntegrationTest 
 
     private static final String SIMPLE_XLS = "/decisiontables/data/MultiSheetDST.xls";
     private static final String SIMPLE_TEMPLATE = "/decisiontables/templates/test_template1.drl";
-
-    private final KieServices ks = KieServices.Factory.get();
-    private final KieResources kieResources = ks.getResources();
 
     private ClassLoader origTCCL;
 

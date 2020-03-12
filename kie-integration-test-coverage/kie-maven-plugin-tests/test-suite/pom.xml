@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.drools.testcoverage</groupId>
     <artifactId>kie-maven-plugin-tests-parent</artifactId>
-    <version>7.32.0-SNAPSHOT</version>
+    <version>7.35.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,6 +18,14 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-canonical-model</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>

@@ -39,10 +39,14 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerExecutor;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
-import org.mockito.InOrder;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class WebSocketKieControllerNotificationIntegrationTest extends KieServerBaseIntegrationTest {
 
@@ -59,7 +63,6 @@ public class WebSocketKieControllerNotificationIntegrationTest extends KieServer
 
     @BeforeClass
     public static void initialize() throws Exception {
-        KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/stateless-session-kjar");
     }
 

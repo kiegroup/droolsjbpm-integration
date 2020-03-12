@@ -16,9 +16,6 @@
 
 package org.kie.karaf.itest.pmml;
 
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
-
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -39,6 +36,9 @@ import org.kie.karaf.itest.AbstractKarafIntegrationTest;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
+
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 abstract public class AbstractPmmlIntegrationTest extends AbstractKarafIntegrationTest {
 
@@ -110,7 +110,7 @@ abstract public class AbstractPmmlIntegrationTest extends AbstractKarafIntegrati
     /**
      * Test loading a PMML model and fire rules once. 
      */
-    protected void testExecute1() throws Exception {
+    public void testExecute1() throws Exception {
         final KieSession session = newSession(builder -> {
             builder.add(new ClassPathResource(PMML, AbstractPmmlIntegrationTest.class.getClassLoader()), ResourceType.PMML);
         });

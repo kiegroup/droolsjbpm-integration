@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" name="org.jboss.qa.brms.bre.functional" xmlns="http://drools.org/drools-5.2"
+<package xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" name="AllResourceTypes" xmlns="http://drools.org/drools-5.2"
          xs:schemaLocation="http://drools.org/drools-5.2 drools.org/drools-5.2.xsd">
 
   <rule name="simple_rule">

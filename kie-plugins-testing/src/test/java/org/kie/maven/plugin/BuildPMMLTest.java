@@ -43,10 +43,10 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
     private static final String GAV_VERSION = "1.0.0.Final";
 
     private static final String KIE_SESSION_NAME = "PMML.session";
-    private static final String KIE_PACKAGE_WITH_PMML = "org.kie.scorecards.example.SampleScore";
+    private static final String KIE_PACKAGE_WITH_PMML = "PMMLResources.SampleScore";
 
     private static final String PMML_FILE_NAME = "PMMLResources/simple-pmml.pmml";
-    private static final String EXAMPLE_PMML_CLASS = "org/kie/scorecards/example/SampleScore/OverallScore.class";
+    private static final String EXAMPLE_PMML_CLASS = "PMMLResources/SampleScore/OverallScore.class";
 
     public BuildPMMLTest(MavenRuntime.MavenRuntimeBuilder builder) {
         super(builder);
@@ -54,12 +54,12 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
     @Test
     public void testCleanInstallWithPMML() throws Exception {
-        buildKJarProject(PROJECT_NAME, "clean", "install");
+        buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
     }
 
     @Test
     public void testUseBuildKjarWithPMML() throws Exception {
-        buildKJarProject(PROJECT_NAME, "clean", "install");
+        buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
 
         final KieServices kieServices = KieServices.Factory.get();
         final ReleaseId releaseId = kieServices.newReleaseId(GAV_GROUP_ID, GAV_ARTIFACT_ID, GAV_VERSION);
@@ -77,7 +77,7 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
     @Test
     public void testContentKjarWithPMML() throws Exception {
-        final MavenExecutionResult result = buildKJarProject(PROJECT_NAME, "clean", "install");
+        final MavenExecutionResult result = buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
 
         final File basedir = result.getBasedir();
         final File kjarFile = new File(basedir, "target/" + GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");

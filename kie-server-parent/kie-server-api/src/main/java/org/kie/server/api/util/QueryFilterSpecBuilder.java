@@ -17,7 +17,6 @@
 package org.kie.server.api.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,87 +48,88 @@ public class QueryFilterSpecBuilder {
         return this;
     }
 
-    public QueryFilterSpecBuilder isNull(String column) {
-        parameters.add(new QueryParam(column, "IS_NULL", null));
-
-        return this;
-    }
-
-    public QueryFilterSpecBuilder isNotNull(String column) {
-        parameters.add(new QueryParam(column, "NOT_NULL", null));
-
-        return this;
-    }
-
-    public QueryFilterSpecBuilder equalsTo(String column, Comparable<?>... values) {
-        parameters.add(new QueryParam(column, "EQUALS_TO", Arrays.asList(values)));
-
-        return this;
-    }
-
-    public QueryFilterSpecBuilder notEqualsTo(String column, Comparable<?>... values) {
-        parameters.add(new QueryParam(column, "NOT_EQUALS_TO", Arrays.asList(values)));
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public QueryFilterSpecBuilder likeTo(String column, boolean caseSensitive, Comparable<?> value) {
-        parameters.add(new QueryParam(column, "LIKE_TO", Arrays.asList(value, caseSensitive)));
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public QueryFilterSpecBuilder greaterThan(String column, Comparable<?> value) {
-        parameters.add(new QueryParam(column, "GREATER_THAN", Arrays.asList(value)));
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public QueryFilterSpecBuilder greaterOrEqualTo(String column, Comparable<?> value) {
-        parameters.add(new QueryParam(column, "GREATER_OR_EQUALS_TO", Arrays.asList(value)));
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public QueryFilterSpecBuilder lowerThan(String column, Comparable<?> value) {
-        parameters.add(new QueryParam(column, "LOWER_THAN", Arrays.asList(value)));
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public QueryFilterSpecBuilder lowerOrEqualTo(String column, Comparable<?> value) {
-        parameters.add(new QueryParam(column, "LOWER_OR_EQUALS_TO", Arrays.asList(value)));
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public QueryFilterSpecBuilder between(String column, Comparable<?> start, Comparable<?> end) {
-        parameters.add(new QueryParam(column, "BETWEEN", Arrays.asList(start, end)));
-
-        return this;
-    }
-
-    public QueryFilterSpecBuilder in(String column, List<?> values) {
-        parameters.add(new QueryParam(column, "IN", values));
-
-        return this;
-    }
-
-    public QueryFilterSpecBuilder notIn(String column, List<?> values) {
-        parameters.add(new QueryParam(column, "NOT_IN", values));
-
-        return this;
-    }
-
     public QueryFilterSpecBuilder addColumnMapping(String column, String type) {
         columnMapping.put(column, type);
 
         return this;
     }
+
+    public QueryFilterSpecBuilder where(QueryParam param) {
+        parameters.add(param);
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder isNull(String column) {
+        parameters.add(QueryParamFactory.isNull(column));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder isNotNull(String column) {
+        parameters.add(QueryParamFactory.isNotNull(column));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder equalsTo(String column, Comparable<?>... values) {
+        parameters.add(QueryParamFactory.equalsTo(column, values));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder notEqualsTo(String column, Comparable<?>... values) {
+        parameters.add(QueryParamFactory.notEqualsTo(column, values));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder likeTo(String column, boolean caseSensitive, Comparable<?> value) {
+        parameters.add(QueryParamFactory.likeTo(column, caseSensitive, value));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder greaterThan(String column, Comparable<?> value) {
+        parameters.add(QueryParamFactory.greaterThan(column, value));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder greaterOrEqualTo(String column, Comparable<?> value) {
+        parameters.add(QueryParamFactory.greaterOrEqualsTo(column, value));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder lowerThan(String column, Comparable<?> value) {
+        parameters.add(QueryParamFactory.lowerThan(column, value));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder lowerOrEqualTo(String column, Comparable<?> value) {
+        parameters.add(QueryParamFactory.lowerOrEqualsTo(column, value));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder between(String column, Comparable<?> start, Comparable<?> end) {
+        parameters.add(QueryParamFactory.between(column, start, end));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder in(String column, List<?> values) {
+        parameters.add(QueryParamFactory.in(column, values));
+
+        return this;
+    }
+
+    public QueryFilterSpecBuilder notIn(String column, List<?> values) {
+        parameters.add(QueryParamFactory.notIn(column, values));
+
+        return this;
+    }
+
 }

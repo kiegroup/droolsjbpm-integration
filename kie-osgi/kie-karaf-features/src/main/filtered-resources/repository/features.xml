@@ -15,7 +15,7 @@
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
     <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
-    <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${karaf.version.org.eclipse.jdt.core.compiler}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt.core.compiler}</bundle>
+    <bundle>wrap:mvn:org.eclipse.jdt/ecj/${karaf.version.org.eclipse.jdt}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt}</bundle>
     <bundle>wrap:mvn:org.codehaus.janino/janino/${karaf.version.org.codehaus.janino}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${karaf.version.org.codehaus.janino}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
     <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>

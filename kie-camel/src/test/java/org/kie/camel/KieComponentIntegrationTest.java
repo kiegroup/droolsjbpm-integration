@@ -26,6 +26,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Test;
 import org.kie.dmn.api.core.DMNContext;
+import org.kie.dmn.api.core.DMNMetadata;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -147,6 +148,11 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
 
             @Override
             public boolean isDefined( String s ) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public DMNMetadata getMetadata() {
                 throw new UnsupportedOperationException();
             }
 

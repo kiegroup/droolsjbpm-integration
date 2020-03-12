@@ -26,6 +26,7 @@ All KIE server extensions are disabled by default so you need to enabled them ex
 ```
 kieserver.drools.enabled=true
 kieserver.dmn.enabled=true
+kieserver.scenariosimulation.enabled=true
 ```
 
 Additional configuration properties that might be relevant (depending on application needs) can be found at https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties

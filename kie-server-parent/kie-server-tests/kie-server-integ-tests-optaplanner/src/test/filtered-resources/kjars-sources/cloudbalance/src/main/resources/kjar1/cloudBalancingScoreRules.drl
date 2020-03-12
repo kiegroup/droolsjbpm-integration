@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+package kjar1;
+
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 
 import org.kie.server.testing.CloudBalance;

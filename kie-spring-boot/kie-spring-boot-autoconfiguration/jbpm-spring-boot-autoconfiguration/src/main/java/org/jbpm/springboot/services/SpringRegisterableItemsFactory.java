@@ -105,8 +105,7 @@ public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFact
         
         return listeners;
     }
-    
-    
+
     /*
      * Helper methods
      */

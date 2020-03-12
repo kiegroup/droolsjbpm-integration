@@ -28,14 +28,20 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <org.kie.version>1.0.0.Final</org.kie.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-core</artifactId>
-      <version>${drools.version}</version>
+      <version>${org.kie.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+      <version>${org.kie.version}</version>
     </dependency>
   </dependencies>
 
@@ -44,7 +50,7 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
-        <version>${it-plugin.version}</version>
+        <version>${org.kie.version}</version>
         <extensions>true</extensions>
       </plugin>
     </plugins>

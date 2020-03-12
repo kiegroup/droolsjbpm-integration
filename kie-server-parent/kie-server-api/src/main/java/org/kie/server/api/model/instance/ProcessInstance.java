@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance")
+@Aggregatable(false)
 public class ProcessInstance {
 
     @XmlElement(name = "process-instance-id")

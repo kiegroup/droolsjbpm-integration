@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.32.0-SNAPSHOT</version>
+    <version>7.35.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-all</artifactId>
@@ -17,6 +17,7 @@
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
     <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
+    <org.kie.scenariosimulation.server.ext.disabled>false</org.kie.scenariosimulation.server.ext.disabled>
   </properties>
 
   <dependencies>
@@ -266,6 +267,7 @@
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
+              <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
           </configuration>
@@ -297,6 +299,7 @@
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
+              <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <!-- For JMS executor tests. -->
               <org.kie.executor.jms>true</org.kie.executor.jms>
               <!-- For including complete stack trace in the response -->
@@ -374,6 +377,11 @@
         </dependency>
         <dependency>
           <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-scenario-simulation</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
           <artifactId>kie-server-rest-common</artifactId>
           <scope>test</scope>
         </dependency>
@@ -390,6 +398,11 @@
         <dependency>
           <groupId>org.kie.server</groupId>
           <artifactId>kie-server-rest-prometheus</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-scenario-simulation</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -433,6 +446,7 @@
         <kieserver.jbpmui.enabled>true</kieserver.jbpmui.enabled>
         <kieserver.casemgmt.enabled>true</kieserver.casemgmt.enabled>
         <kieserver.prometheus.enabled>true</kieserver.prometheus.enabled>
+        <kieserver.scenariosimulation.enabled>true</kieserver.scenariosimulation.enabled>
         <jbpm.executor.disabled>true</jbpm.executor.disabled>
         <!-- For including complete stack trace in the response -->
         <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>

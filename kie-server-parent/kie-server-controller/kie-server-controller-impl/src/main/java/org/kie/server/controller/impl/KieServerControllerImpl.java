@@ -11,15 +11,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -28,7 +31,9 @@ import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
+import org.kie.server.controller.api.KieServerControllerConstants;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.events.ServerInstanceConnected;
@@ -52,7 +57,6 @@ import org.kie.server.controller.impl.service.LoggingNotificationService;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public abstract class KieServerControllerImpl implements KieServerController {
 
@@ -82,6 +86,9 @@ public abstract class KieServerControllerImpl implements KieServerController {
             serverInstanceKey = ModelFactory.newServerInstanceKey(serverInfo.getServerId(), serverInfo.getLocation());
         }
         if (serverTemplate != null) {
+            if (!checkValidServerInstance(serverTemplate, serverInfo, serverSetup)) {
+                return serverSetup;
+            }
             logger.debug("Server id {} know to the controller, checking if given server exists", serverInfo.getServerId());
 
             if (!serverTemplate.hasServerInstance(serverInfo.getLocation())) {
@@ -150,11 +157,11 @@ public abstract class KieServerControllerImpl implements KieServerController {
                 containers.add(containerResource);
 
                 containerList.add(new Container(containerSpec.getId(),
-                        containerSpec.getContainerName(),
-                        serverInstanceKey,
-                        new ArrayList<Message>(),
-                        containerSpec.getReleasedId(),
-                        serverInstanceKey.getUrl()+"/containers/"+containerSpec.getId()));
+                                                containerSpec.getContainerName(),
+                                                serverInstanceKey,
+                                                new ArrayList<Message>(),
+                                                containerSpec.getReleasedId(),
+                                                serverInstanceKey.getUrl() + "/containers/" + containerSpec.getId()));
             }
             serverSetup.setContainers(containers);
 
@@ -181,14 +188,12 @@ public abstract class KieServerControllerImpl implements KieServerController {
             serverTemplate.setId(serverInfo.getServerId());
             serverTemplate.setName(serverInfo.getName());
             List<String> capabilities = new ArrayList<String>();
-            if (serverInfo.getCapabilities().contains(KieServerConstants.CAPABILITY_BRM)) {
-                capabilities.add(Capability.RULE.toString());
-            }
-            if (serverInfo.getCapabilities().contains(KieServerConstants.CAPABILITY_BPM)) {
-                capabilities.add(Capability.PROCESS.toString());
-            }
-            if (serverInfo.getCapabilities().contains(KieServerConstants.CAPABILITY_BRP)) {
-                capabilities.add(Capability.PLANNING.toString());
+            if (serverInfo.getCapabilities() != null) {
+                for (final String serverCapability : serverInfo.getCapabilities()) {
+                    if (getCompatibleServerTemplateCapability(serverCapability) != null) {
+                        capabilities.add(getCompatibleServerTemplateCapability(serverCapability));
+                    }
+                }
             }
             serverTemplate.setCapabilities(capabilities);
 
@@ -213,9 +218,47 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
         serverInstance.setContainers(containerList);
 
-
         notifyOnConnect(serverInstance);
         return serverSetup;
+    }
+
+    private boolean isOpenShiftSupported() {
+        return "true".equals(System.getProperty(KieServerControllerConstants.KIE_CONTROLLER_OPENSHIFT_ENABLED, "false"));
+    }
+    
+    private boolean checkValidServerInstance(ServerTemplate serverTemplate, KieServerInfo serverInfo, KieServerSetup serverSetup) {
+        // No need for OpenShift enhanced BC/WB and KieServer
+        if (isOpenShiftSupported()) {
+            return serverSetup.hasNoErrors();
+        }
+        // if there is no mode we go to the next step
+        if (serverTemplate.getMode() != null && !serverInfo.getMode().equals(serverTemplate.getMode())) {
+            serverSetup.getMessages().add(new Message(Severity.ERROR, "Expected mode was " + serverTemplate.getMode()));
+            logger.warn("Server id {} mode expected {} but it was {}", serverInfo.getServerId(), serverTemplate.getMode(), serverInfo.getMode());
+        }
+
+        // not required capabilities so any server is ok
+        if (serverTemplate.getCapabilities() != null && !serverTemplate.getCapabilities().isEmpty()) {
+            List<String> currentCapabilities = serverInfo.getCapabilities() != null ? serverInfo.getCapabilities() : Collections.emptyList();
+            List<String> expectedCababilities = new ArrayList<>(serverTemplate.getCapabilities());
+
+            List<String> convertedCurrentCapabilities = currentCapabilities.stream()
+                    .filter(currentCapability -> getCompatibleServerTemplateCapability(currentCapability) != null)
+                    .map(currentCapability -> getCompatibleServerTemplateCapability(currentCapability))
+                    .collect(Collectors.toList());
+
+            if (!convertedCurrentCapabilities.containsAll(expectedCababilities)) {
+                serverSetup.getMessages().add(new Message(Severity.ERROR, "Expected capabilities were " + serverTemplate.getCapabilities()));
+                List<String> missingCapabilities = expectedCababilities;
+                missingCapabilities.removeAll(convertedCurrentCapabilities);
+                logger.warn("Server id {} capabilities expected {} but there was missing {}",
+                            serverInfo.getServerId(),
+                            serverTemplate.getCapabilities(),
+                            missingCapabilities);
+            }
+        }
+
+        return serverSetup.hasNoErrors();
     }
 
     @Override
@@ -244,13 +287,13 @@ public abstract class KieServerControllerImpl implements KieServerController {
         notificationService.notify(new ServerInstanceUpdated(serverInstance));
         notificationService.notify(new ServerInstanceConnected(serverInstance));
     }
-    
+
     protected void notifyOnDisconnect(ServerInstanceKey serverInstanceKey, ServerTemplate serverTemplate) {
         notificationService.notify(new ServerInstanceDeleted(serverInstanceKey.getServerInstanceId()));
         notificationService.notify(new ServerTemplateUpdated(serverTemplate));
         notificationService.notify(new ServerInstanceDisconnected(serverInstanceKey.getServerInstanceId()));
     }
-    
+
     public KieServerTemplateStorage getTemplateStorage() {
         return templateStorage;
     }
@@ -258,7 +301,6 @@ public abstract class KieServerControllerImpl implements KieServerController {
     public void setTemplateStorage(KieServerTemplateStorage templateStorage) {
         this.templateStorage = templateStorage;
     }
-
 
     public NotificationService getNotificationService() {
         return notificationService;
@@ -268,4 +310,18 @@ public abstract class KieServerControllerImpl implements KieServerController {
         this.notificationService = notificationService;
     }
 
+    private static String getCompatibleServerTemplateCapability(final String serverInstanceCapability) {
+
+        if (Objects.equals(KieServerConstants.CAPABILITY_BRM, serverInstanceCapability)) {
+            return Capability.RULE.toString();
+        }
+        if (Objects.equals(KieServerConstants.CAPABILITY_BPM, serverInstanceCapability)) {
+            return Capability.PROCESS.toString();
+        }
+        if (Objects.equals(KieServerConstants.CAPABILITY_BRP, serverInstanceCapability)) {
+            return Capability.PLANNING.toString();
+        }
+
+        return null;
+    }
 }

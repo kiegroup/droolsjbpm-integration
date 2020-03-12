@@ -18,15 +18,21 @@ package org.kie.server.integrationtests.shared;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.cli.MavenCli;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.MavenRepository;
 import org.appformer.maven.integration.embedder.MavenProjectLoader;
@@ -57,28 +63,25 @@ public class KieServerDeployer {
     private static boolean commonParentDeployed = false;
 
     public static void buildAndDeployMavenProjectFromResource(String resourcePath) {
-        buildAndDeployMavenProject(KieServerDeployer.class.getResource(resourcePath).getFile());
+        buildAndDeployMavenProject(KieServerDeployer.class.getResource(resourcePath));
     }
 
-    public static void buildAndDeployMavenProject(String basedir) {
-        // need to backup (and later restore) the current class loader, because the Maven/Plexus does some classloader
-        // magic which then results in CNFE in RestEasy client
+    public static void buildAndDeployMavenProject(URL basedir) {
         // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
         // remote repo
         logger.debug("Building and deploying Maven project from basedir '{}'.", basedir);
-        ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
-        System.setProperty("maven.multiModuleProjectDirectory", basedir); // required by MavenCli 3.3.0+
-        MavenCli cli = new MavenCli();
-        List<String> mvnArgs;
+        String mavenBinary = getMavenBinaryPathFromMavenHomeProperty().orElse("mvn");
+        List<String> mvnArgs = new ArrayList<>(Collections.singletonList(mavenBinary));
+
         if (TestConfig.isLocalServer()) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
             // if the repo does not exist.
 
             // wrapping explicitly in ArrayList as we may need to update the list later (and Arrays.toList() returns
             // just read-only list)
-            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "clean", "install"));
+            mvnArgs.addAll(Arrays.asList("--quiet", "clean", "install"));
         } else {
-            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-e", "clean", "deploy"));
+            mvnArgs.addAll(Arrays.asList("--quiet", "-e", "clean", "deploy"));
         }
 
         // use custom settings.xml file, if one specified
@@ -87,15 +90,41 @@ public class KieServerDeployer {
             mvnArgs.add("-s");
             mvnArgs.add(kjarsBuildSettingsXml);
         }
-        int mvnRunResult = cli.doMain(mvnArgs.toArray(new String[mvnArgs.size()]), basedir, System.out, System.err);
 
-        Thread.currentThread().setContextClassLoader(classLoaderBak);
+        // Execute the Maven build using installed Maven binary
+        try (ProcessExecutor executor = new ProcessExecutor()) {
+            String command = mvnArgs.stream().collect(Collectors.joining(" "));
+            boolean executionSuccessful = executor.executeProcessCommand(command, Paths.get(basedir.toURI()));
 
-        if (mvnRunResult != 0) {
-            throw new RuntimeException("Error while building Maven project from basedir " + basedir +
-                    ". Return code=" + mvnRunResult);
+            if (!executionSuccessful) {
+                throw new RuntimeException("Error while building Maven project from basedir " + basedir);
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Cannot retrieve URI from " + basedir, e);
         }
         logger.debug("Maven project successfully built and deployed!");
+    }
+
+    private static Optional<String> getMavenBinaryPathFromMavenHomeProperty() {
+        String mavenHome = System.getProperty("maven.home");
+
+        if (mavenHome == null || mavenHome.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Path mavenBinaryPath = Paths.get(mavenHome, "bin", getMavenBinaryFileName());
+        if (mavenBinaryPath.toFile().isFile()) {
+            return Optional.of(mavenBinaryPath.toString());
+        }
+
+        return Optional.empty();
+    }
+
+    private static String getMavenBinaryFileName() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return "mvn.cmd";
+        }
+        return "mvn";
     }
 
     public static void buildAndDeployCommonMavenParent() {
@@ -172,15 +201,19 @@ public class KieServerDeployer {
         MavenSettings.reinitSettings();
     }
 
-    public static void cleanAllRepositories() throws IOException {
-        File kieServerRemoteRepoDir = new File(TestConfig.getKieServerRemoteRepoDir());
-        File kieServerLocalRepoDir = new File(TestConfig.getKieServerLocalRepoDir());
+    public static void cleanAllRepositories() {
+        cleanDirectory(TestConfig.getKieServerRemoteRepoDir());
+        cleanDirectory(TestConfig.getKieServerLocalRepoDir());
+    }
 
-        FileUtils.deleteDirectory(kieServerRemoteRepoDir);
-        FileUtils.deleteDirectory(kieServerLocalRepoDir);
-
-        kieServerRemoteRepoDir.mkdir();
-        kieServerLocalRepoDir.mkdir();
+    private static void cleanDirectory(String directoryPath) {
+        File directory = new File(directoryPath);
+        try {
+            FileUtils.deleteDirectory(directory);
+            directory.mkdir();
+        } catch (IOException e) {
+            logger.error("Cannot delete directory" + directory, e);
+        }
     }
 
     public static MavenRepository getRepository() {

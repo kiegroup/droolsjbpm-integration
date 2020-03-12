@@ -15,15 +15,6 @@
 
 package org.kie.osgi.compiler;
 
-import org.drools.compiler.kie.builder.impl.AbstractKieModule;
-import org.drools.compiler.kproject.ReleaseIdImpl;
-import org.drools.compiler.kproject.models.KieModuleModelImpl;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.builder.model.KieModuleModel;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.wiring.BundleWiring;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +22,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+
+import org.drools.compiler.kie.builder.impl.AbstractKieModule;
+import org.drools.compiler.kproject.ReleaseIdImpl;
+import org.drools.compiler.kproject.models.KieModuleModelImpl;
+import org.drools.core.io.impl.ByteArrayResource;
+import org.drools.core.io.internal.InternalResource;
+import org.kie.api.builder.ReleaseId;
+import org.kie.api.builder.model.KieModuleModel;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.wiring.BundleWiring;
 
 import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 
@@ -52,6 +54,11 @@ public class OsgiKieModule extends AbstractKieModule {
     @Override
     public byte[] getBytes() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public InternalResource getResource( String fileName ) {
+        return new ByteArrayResource( getBytes(fileName) );
     }
 
     @Override

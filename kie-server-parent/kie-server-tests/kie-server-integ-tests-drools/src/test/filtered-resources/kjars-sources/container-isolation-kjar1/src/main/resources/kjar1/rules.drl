@@ -13,6 +13,8 @@
  * limitations under the License.
 */
 
+package kjar1;
+
 import org.kie.server.testing.Person;
 
 rule "Update person's id"

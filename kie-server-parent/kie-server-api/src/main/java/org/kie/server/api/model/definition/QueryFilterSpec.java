@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.util.QueryFilterSpecBuilder;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "query-filter-spec")
@@ -42,6 +43,10 @@ public class QueryFilterSpec {
     private Map<String, String> columnMapping;
     @XmlElement(name = "order-by-clause")
     private String orderByClause;
+
+    public static QueryFilterSpecBuilder builder() {
+        return new QueryFilterSpecBuilder();
+    }
 
     public QueryFilterSpec() {
     }

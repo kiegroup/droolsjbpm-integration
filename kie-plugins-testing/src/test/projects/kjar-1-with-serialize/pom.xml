@@ -10,13 +10,17 @@
 
   <packaging>kjar</packaging>
 
+  <properties>
+    <org.kie.version>1.0.0.Final</org.kie.version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.drools</groupId>
         <artifactId>drools-bom</artifactId>
         <!-- Version of Drools deps and kie-maven-plugin will always be the same, so we can reuse the property -->
-        <version>${it-plugin.version}</version>
+        <version>${org.kie.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -24,6 +28,11 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
@@ -46,7 +55,7 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
-        <version>${it-plugin.version}</version>
+        <version>${org.kie.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>

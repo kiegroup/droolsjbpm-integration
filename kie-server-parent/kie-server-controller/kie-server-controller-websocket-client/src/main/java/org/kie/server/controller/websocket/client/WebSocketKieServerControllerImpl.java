@@ -99,7 +99,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                             client.sendTextWithInternalHandler(serialize(serverInfo), new KieServerSetupMessageHandler(context, waitLatch, kieServerSetup));
     
                             boolean received = waitLatch.await(10, TimeUnit.SECONDS);
-                            if (received && kieServerSetup.getContainers() != null) {
+                            if (received && kieServerSetup.getContainers() != null && kieServerSetup.hasNoErrors()) {
                                 // once there is non null list let's return it
                                 return kieServerSetup;
                             }
@@ -114,7 +114,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                         logger.info("Kie Server points to non Web Socket controller '{}', using default REST mechanism", controllerUrl);
                         
                         KieServerSetup kieServerSetup = restController.connectToSingleController(serverInfo, config, controllerUrl);
-                        if (kieServerSetup != null) {
+                        if (kieServerSetup != null && kieServerSetup.hasNoErrors()) {
                             return kieServerSetup;
                         }
                     }

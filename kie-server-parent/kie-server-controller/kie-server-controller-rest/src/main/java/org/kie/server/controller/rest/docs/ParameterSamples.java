@@ -242,7 +242,7 @@ public class ParameterSamples {
             "  \"container-id\" : \"evaluation_1.0.0-SNAPSHOT\",\n" +
             "  \"container-name\" : \"evaluation\",\n" +
             "  \"server-template-key\" : null,\n" +
-            "  \"release-id\" : {\"\n" +
+            "  \"release-id\" : {\n" +
             "    \"group-id\" : \"evaluation\",\n" +
             "    \"artifact-id\" : \"evaluation\",\n" +
             "    \"version\" : \"1.0.0-SNAPSHOT\"\n" +

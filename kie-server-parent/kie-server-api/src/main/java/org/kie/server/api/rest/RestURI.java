@@ -231,7 +231,10 @@ public class RestURI {
 
     // DMN URI
     public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";
-    
+
+    // Scenario Simulation URI
+    public static final String SCENARIO_SIMULATION_URI = "containers/{" + CONTAINER_ID + "}/scesim";
+
     // document related
     public static final String DOCUMENT_INSTANCE_GET_URI = "{" + DOCUMENT_ID + "}";
     public static final String DOCUMENT_INSTANCE_CONTENT_GET_URI = "{" + DOCUMENT_ID + "}/content";

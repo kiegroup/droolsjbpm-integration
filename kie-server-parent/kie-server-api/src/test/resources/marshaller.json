@@ -1,0 +1,47 @@
+{
+	"cond-operator": "AND",
+	"cond-values": [
+		{
+			"cond-operator": "OR",
+			"cond-values": [
+				{
+					"cond-column": "ACTUALOWNER",
+					"cond-operator": "IS_NULL",
+					"cond-values": [
+						"null"
+					]
+				},
+				{
+					"cond-column": "ACTUALOWNER",
+					"cond-operator": "EQUALS_TO",
+					"cond-values": [
+						"XXX"
+					]
+				}
+			]
+		},
+		{
+			"cond-column": "PROCESSID",
+			"cond-operator": "EQUALS_TO",
+			"cond-values": [
+				"XXX"
+			]
+		},
+		{
+			"cond-column": "POTOWNER",
+			"cond-operator": "EQUALS_TO",
+			"cond-values": [
+				"XXX"
+			]
+		},
+		{
+			"cond-column": "STATUS",
+			"cond-operator": "IN",
+			"cond-values": [
+				"Ready",
+				"Reserved",
+				"InProgress"
+			]
+		}
+	]
+}
