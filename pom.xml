@@ -78,7 +78,6 @@
     <module>kie-spring-boot</module>
     <module>camel-container-tests</module>
     <module>process-migration-service</module>
-    <module>jbpm-task-assigning</module>
     <module>optaplanner-workbench-models</module>
   </modules>
 
