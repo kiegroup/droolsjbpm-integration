@@ -25,6 +25,7 @@
     <module>kie-server-rest-swagger</module>
     <module>kie-server-rest-prometheus</module>
     <module>kie-server-rest-scenario-simulation</module>
+    <module>kie-server-rest-task-assigning-runtime</module>
   </modules>
 
 </project>

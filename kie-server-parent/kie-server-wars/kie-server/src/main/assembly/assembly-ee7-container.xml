@@ -70,6 +70,13 @@
         <include>org.kie.server:kie-server-controller-websocket-client</include>
         <include>org.kie.server:kie-server-controller-websocket-common</include>
 
+        <include>kie-server-services-task-assigning-core</include>
+        <include>kie-server-services-task-assigning-planning</include>
+        <include>kie-server-services-task-assigning-runtime</include>
+        <include>kie-server-services-task-assigning-user-system-api</include>
+        <include>kie-server-services-task-assigning-user-system-simple</include>
+        <include>kie-server-rest-task-assigning-runtime</include>
+
         <include>org.jbpm:jbpm-services-ejb-timer</include>
         
         <include>org.slf4j:slf4j-jdk14</include>

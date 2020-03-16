@@ -5,4 +5,5 @@ org.kie.server.client.helper.OptaplannerServicesClientBuilder
 org.kie.server.client.helper.CaseServicesClientBuilder
 org.kie.server.client.helper.DMNServicesClientBuilder
 org.kie.server.client.helper.ScenarioSimulationServicesClientBuilder
+org.kie.server.client.helper.TaskAssigningRuntimeServicesClientBuilder
 
