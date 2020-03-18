@@ -22,11 +22,10 @@ import com.codahale.metrics.Timer;
 public class LoadSuite implements ITestSuite {
     
     protected static final Logger log = LoggerFactory.getLogger(LoadSuite.class);
-    public static final String TEST_PACKAGE = "org.jbpm.test.performance.scenario.load";
 
     protected int iterations;
     protected IRunType run;
-    
+
     public LoadSuite() {
         TestConfig tc = TestConfig.getInstance();
         iterations = tc.getIterations();
@@ -37,7 +36,7 @@ public class LoadSuite implements ITestSuite {
     public void start() throws Exception {
         TestConfig tc = TestConfig.getInstance();
         Executor exec = Executor.getInstance();
-        Set<Class<? extends IPerfTest>> scenarios = exec.getScenarios(TEST_PACKAGE);
+        Set<Class<? extends IPerfTest>> scenarios = exec.getScenarios(tc.getTestPackage());
         if (scenarios.size() == 1) {
             
             IPerfTest scenario = scenarios.iterator().next().newInstance();

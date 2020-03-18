@@ -19,8 +19,6 @@ import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.Timer;
 
 public class SoakSuite implements ITestSuite {
-    
-    public static final String TEST_PACKAGE = "org.jbpm.test.performance.scenario.soak";
 
     protected int iterations;
     protected int expectedRate;
@@ -36,7 +34,7 @@ public class SoakSuite implements ITestSuite {
     public void start() throws Exception {
         TestConfig tc = TestConfig.getInstance();
         Executor exec = Executor.getInstance();
-        Set<Class<? extends IPerfTest>> scenarios = exec.getScenarios(TEST_PACKAGE);
+        Set<Class<? extends IPerfTest>> scenarios = exec.getScenarios(tc.getTestPackage());
         List<IPerfTest> scenarioInstances = new ArrayList<IPerfTest>();
         for (Class<? extends IPerfTest> c : scenarios) {
             IPerfTest scenario = c.newInstance();
