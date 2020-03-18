@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 
 public class TestConfig {
 
+    // keeping for backward compatibility
+    private static final String DEFAULT_TEST_PACKAGE = "org.jbpm.test.performance.scenario.load";
+
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
     protected static TestConfig tc;
@@ -23,6 +26,7 @@ public class TestConfig {
     protected String suite;
     protected String scenario;
     protected String startScriptLocation;
+    private String testPackage;
 
     protected String databaseName;
 
@@ -81,6 +85,9 @@ public class TestConfig {
             startScriptLocation = "./run.sh";
         }
         properties.put("startScriptLocation", startScriptLocation);
+
+        testPackage = System.getProperty("org.kie.perf.suite.test-package", DEFAULT_TEST_PACKAGE);
+        properties.put("org.kie.perf.suite.test-package", testPackage);
 
         runType = RunType.valueOf(System.getProperty("runType").toUpperCase());
         duration = Integer.valueOf(System.getProperty("duration"));
@@ -192,6 +199,10 @@ public class TestConfig {
 
     public String getStartScriptLocation() {
         return startScriptLocation;
+    }
+
+    public String getTestPackage() {
+        return testPackage;
     }
 
     public String getDatabaseName() {
