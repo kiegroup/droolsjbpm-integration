@@ -1501,6 +1501,41 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     }
     
     @Test
+    public void testAllowedUserTaskUpdateOutputVariable(){
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            Map<String, Object> outputData = new HashMap<>();
+            outputData.put("string_", "my custom data");
+            outputData.put("person_", createPersonInstance(USER_MARY));
+            
+            taskClient.saveTaskContent(CONTAINER_ID, taskSummary.getId(), outputData);
+            
+            // retrieve started task
+            TaskInstance taskInstance = taskClient.getTaskInstance(CONTAINER_ID, taskSummary.getId(), true, true, false);
+
+            Object personVar = taskInstance.getOutputData().get("person_");
+            assertNotNull(personVar);
+            assertEquals(USER_MARY, KieServerReflections.valueOf(personVar, "name"));
+
+            String stringVar = (String) taskInstance.getOutputData().get("string_");
+            assertNotNull(personVar);
+            assertEquals("my custom data", stringVar);
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    @Test
     public void testStartAndStopWithWrongContainerId() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
