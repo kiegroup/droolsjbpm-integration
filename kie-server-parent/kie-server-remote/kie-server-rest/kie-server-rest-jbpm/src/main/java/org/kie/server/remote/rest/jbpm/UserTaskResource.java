@@ -15,6 +15,48 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.TaskNotFoundException;
+import org.jbpm.services.task.exception.PermissionDeniedException;
+import org.kie.server.api.model.instance.TaskAttachment;
+import org.kie.server.api.model.instance.TaskAttachmentList;
+import org.kie.server.api.model.instance.TaskComment;
+import org.kie.server.api.model.instance.TaskCommentList;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
+import org.kie.server.services.jbpm.UserTaskServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ACTIVATE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENTS_GET_URI;
@@ -56,13 +98,13 @@ import static org.kie.server.api.rest.RestURI.TASK_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.BOOLEAN_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.BOOLEAN_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DATE_JSON;
@@ -88,49 +130,6 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_JSON
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
-
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.TaskNotFoundException;
-import org.jbpm.services.task.exception.PermissionDeniedException;
-import org.kie.server.api.model.instance.TaskAttachment;
-import org.kie.server.api.model.instance.TaskAttachmentList;
-import org.kie.server.api.model.instance.TaskComment;
-import org.kie.server.api.model.instance.TaskCommentList;
-import org.kie.server.api.model.instance.TaskEventInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.RuntimeDataServiceBase;
-import org.kie.server.services.jbpm.UserTaskServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Task instances")
 @Path("server/" + TASK_URI)
@@ -697,9 +696,10 @@ public class UserTaskResource {
         }
     }
 
-    @ApiOperation(value="Adds output data to a specified task instance and returns the ID of the new output content.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @ApiOperation(value = "Adds output data to a specified task instance and returns the ID of the new output content.", response = Void.class, code = 201)
+    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"),
+                           @ApiResponse(code = 403, message = "User is not allowed to perform the operation"),
+                           @ApiResponse(code = 404, message = "Task with given id not found")})
     @PUT
     @Path(TASK_INSTANCE_OUTPUT_DATA_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -721,6 +721,8 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(errorMessage(e, MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId)), v, conversationIdHeader);
+        } catch (PermissionDeniedException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
