@@ -67,6 +67,10 @@ public final class QueryParamFactory {
         return new QueryParam(column, "BETWEEN", Arrays.asList(start, end));
     }
 
+    public static QueryParam in(String column, Object... values) {
+        return new QueryParam(column, "IN", Arrays.asList(values));
+    }
+
     public static QueryParam in(String column, List<?> values) {
         return new QueryParam(column, "IN", values);
     }
@@ -85,6 +89,10 @@ public final class QueryParamFactory {
 
     public static QueryParam not(QueryParam param) {
         return new QueryParam(null, "NOT", Collections.singletonList(param));
+    }
+
+    public static List<QueryParam> list(QueryParam... params) {
+        return Arrays.asList(params);
     }
 
 }

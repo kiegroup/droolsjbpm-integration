@@ -40,10 +40,12 @@ import org.dashbuilder.dataset.def.SQLDataSetDef;
 import org.drools.core.impl.EnvironmentFactory;
 import org.drools.persistence.api.TransactionManager;
 import org.drools.persistence.api.TransactionManagerFactory;
+import org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
 import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
+import org.jbpm.casemgmt.impl.AdvanceCaseRuntimeDataServiceImpl;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
 import org.jbpm.casemgmt.impl.CaseServiceImpl;
@@ -52,6 +54,7 @@ import org.jbpm.casemgmt.impl.event.CaseConfigurationDeploymentListener;
 import org.jbpm.casemgmt.impl.generator.TableCaseIdGenerator;
 import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.executor.impl.event.ExecutorEventSupportImpl;
+import org.jbpm.kie.services.impl.AdvanceRuntimeDataServiceImpl;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -64,6 +67,7 @@ import org.jbpm.kie.services.impl.admin.UserTaskAdminServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.kie.services.impl.query.QueryServiceImpl;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
+import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
@@ -390,6 +394,32 @@ public class JBPMAutoConfiguration {
         return runtimeDataService;
     }
     
+    @Bean
+    @ConditionalOnMissingBean(name = "advanceRuntimeDataService")
+    public AdvanceRuntimeDataService advanceRuntimeDataService(EntityManagerFactory entityManagerFactory,
+                                                               TransactionalCommandService transactionalCommandService) {
+
+        // build runtime data service
+        AdvanceRuntimeDataServiceImpl runtimeDataService = new AdvanceRuntimeDataServiceImpl();
+        runtimeDataService.setCommandService(transactionalCommandService);
+        runtimeDataService.setEmf(entityManagerFactory);
+
+        return runtimeDataService;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(name = "advanceCaseRuntimeDataService")
+    public AdvanceCaseRuntimeDataService advanceCaseRuntimeDataService(EntityManagerFactory entityManagerFactory,
+                                                                   TransactionalCommandService transactionalCommandService) {
+
+        // build runtime data service
+        AdvanceCaseRuntimeDataServiceImpl runtimeDataService = new AdvanceCaseRuntimeDataServiceImpl();
+        runtimeDataService.setCommandService(transactionalCommandService);
+        runtimeDataService.setEmf(entityManagerFactory);
+
+        return runtimeDataService;
+    }
+
     @Bean
     @ConditionalOnMissingBean(name = "processService")
     public ProcessService processService(RuntimeDataService runtimeDataService, DeploymentService deploymentService) {

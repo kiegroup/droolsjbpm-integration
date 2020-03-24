@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.model.AdHocFragment;
 import org.jbpm.casemgmt.api.model.CaseDefinition;
@@ -28,6 +29,7 @@ import org.jbpm.casemgmt.api.model.instance.CaseMilestoneInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseStageInstance;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
@@ -37,12 +39,15 @@ import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceCustomVarsList;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseMilestoneList;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.cases.CaseUserTaskWithVariablesList;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -50,22 +55,27 @@ import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static org.kie.server.services.casemgmt.ConvertUtils.convertToServiceApiQueryParam;
 
 public class CaseManagementRuntimeDataServiceBase {
 
     private CaseRuntimeDataService caseRuntimeDataService;
     private KieServerRegistry context;
     private IdentityProvider identityProvider;
+    private MarshallerHelper marshallerHelper;
 
     private boolean bypassAuthUser = false;
+    private AdvanceCaseRuntimeDataService advanceCaseRuntimeDataService;
 
-    public CaseManagementRuntimeDataServiceBase(CaseRuntimeDataService caseRuntimeDataService, KieServerRegistry context) {
+    public CaseManagementRuntimeDataServiceBase(CaseRuntimeDataService caseRuntimeDataService, AdvanceCaseRuntimeDataService advanceCaseRuntimeDataService, KieServerRegistry context) {
         this.caseRuntimeDataService = caseRuntimeDataService;
         this.identityProvider = context.getIdentityProvider();
         this.context = context;
-
+        this.marshallerHelper = new MarshallerHelper(context);
+        this.advanceCaseRuntimeDataService = advanceCaseRuntimeDataService;
         this.bypassAuthUser = Boolean.parseBoolean(context.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
     }
 
@@ -437,5 +447,27 @@ public class CaseManagementRuntimeDataServiceBase {
         }
 
         return actualSort;
+    }
+
+    public CaseInstanceCustomVarsList queryCasesByVariables(String payload, String payloadType, QueryContext queryContext) {
+        SearchQueryFilterSpec filter = new SearchQueryFilterSpec();
+        if (payload != null) {
+            filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
+        }
+        return ConvertUtils.convertToCaseInstanceCustomVarsList(advanceCaseRuntimeDataService.queryCaseByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                                   convertToServiceApiQueryParam(filter.getCaseVariablesQueryParams()),
+                                                                                                                   queryContext));
+    }
+
+    public CaseUserTaskWithVariablesList queryUserTasksByVariables(String payload, String payloadType, QueryContext queryContext) {
+        SearchQueryFilterSpec filter = new SearchQueryFilterSpec();
+        if (payload != null) {
+            filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
+        }
+        return ConvertUtils.convertToCaseUserTaskWithVariablesList(advanceCaseRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                                           convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                                           convertToServiceApiQueryParam(filter.getCaseVariablesQueryParams()),
+                                                                                                                           filter.getOwners(),
+                                                                                                                           queryContext));
     }
 }

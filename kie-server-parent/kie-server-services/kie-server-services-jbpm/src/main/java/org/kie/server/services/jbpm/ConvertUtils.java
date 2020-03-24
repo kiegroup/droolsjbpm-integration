@@ -27,8 +27,8 @@ import org.jbpm.services.api.model.ProcessInstanceCustomDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
-import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceWithPotOwnerDesc;
+import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
 import org.jbpm.services.api.model.VariableDesc;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
@@ -40,12 +40,15 @@ import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
+import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
 import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariables;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariablesList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummaryList;
@@ -53,6 +56,8 @@ import org.kie.server.api.model.instance.TaskWithProcessDescription;
 import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
+
+import static java.util.stream.Collectors.toList;
 
 public class ConvertUtils {
 
@@ -536,6 +541,51 @@ public class ConvertUtils {
         }
 
         return new QueryDefinitionList(instances);
+    }
+
+    public static ProcessInstanceCustomVarsList convertToProcessInstanceCustomVarsList(List<ProcessInstanceWithVarsDesc> data) {
+        List<ProcessInstanceCustomVars> processInstances = new ArrayList<>();
+        for (ProcessInstanceWithVarsDesc proc : data) {
+            ProcessInstanceCustomVars tmp = new ProcessInstanceCustomVars();
+            tmp.setId(proc.getId());
+            tmp.setVariables(proc.getVariables());
+            tmp.setProcessId(proc.getProcessId());
+            tmp.setCorrelationKey(proc.getCorrelationKey());
+            tmp.setContainerId(proc.getDeploymentId());
+            tmp.setProcessName(proc.getProcessName());
+            tmp.setProcessVersion(proc.getProcessVersion());
+            tmp.setDate(proc.getDataTimeStamp());
+            tmp.setInitiator(proc.getInitiator());
+            tmp.setState(proc.getState());
+            processInstances.add(tmp);
+        }
+        ProcessInstanceCustomVarsList result = new ProcessInstanceCustomVarsList();
+        result.setProcessInstances(processInstances.stream().toArray(ProcessInstanceCustomVars[]::new));
+        return result;
+    }
+
+    public static ProcessInstanceUserTaskWithVariablesList convertToUserTaskWithVariablesList(List<UserTaskInstanceWithPotOwnerDesc> queryUserTasksByVariables) {
+        List<ProcessInstanceUserTaskWithVariables> data = new ArrayList<>();
+        for (UserTaskInstanceWithPotOwnerDesc desc : queryUserTasksByVariables) {
+            ProcessInstanceUserTaskWithVariables var = new ProcessInstanceUserTaskWithVariables();
+            var.setId(desc.getTaskId());
+            var.setName(desc.getName());
+            var.setCorrelationKey(desc.getCorrelationKey());
+            var.setActualOwner(desc.getActualOwner());
+            var.setProcessDefinitionId(desc.getProcessId());
+            var.setPotentialOwners(desc.getPotentialOwners());
+            var.setProcessInstanceId(desc.getProcessInstanceId());
+            var.setProcessVariables(desc.getProcessVariables());
+            var.setInputVariables(desc.getInputdata());
+            data.add(var);
+        }
+        ProcessInstanceUserTaskWithVariablesList result = new ProcessInstanceUserTaskWithVariablesList();
+        result.setUserTaskWithVariables(data.parallelStream().toArray(ProcessInstanceUserTaskWithVariables[]::new));
+        return result;
+    }
+
+    public static List<org.jbpm.services.api.query.model.QueryParam> convertToServiceApiQueryParam(List<QueryParam> param) {
+        return param.stream().map(e -> new org.jbpm.services.api.query.model.QueryParam(e.getColumn(), e.getOperator(), e.getValue())).collect(toList());
     }
 
     public static String nullEmpty(String value) {
