@@ -15,6 +15,50 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.kie.internal.process.CorrelationKey;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.api.model.ItemList;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryDefinitionList;
+import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariables;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariablesList;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.TaskWithProcessDescription;
+import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.rest.RestURI;
+import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.QueryServicesClient;
+
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
 import static org.kie.server.api.rest.RestURI.CREATE_QUERY_DEF_POST_URI;
@@ -47,46 +91,6 @@ import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_VAR_INSTANCE_ID_G
 import static org.kie.server.api.rest.RestURI.VAR_NAME;
 import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 import static org.kie.server.api.rest.RestURI.build;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.kie.internal.process.CorrelationKey;
-import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.DescriptorCommand;
-import org.kie.server.api.model.ItemList;
-import org.kie.server.api.model.KieServerCommand;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.Wrapped;
-import org.kie.server.api.model.admin.ExecutionErrorInstance;
-import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
-import org.kie.server.api.model.definition.ProcessDefinition;
-import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
-import org.kie.server.api.model.definition.QueryDefinition;
-import org.kie.server.api.model.definition.QueryDefinitionList;
-import org.kie.server.api.model.definition.QueryFilterSpec;
-import org.kie.server.api.model.definition.TaskQueryFilterSpec;
-import org.kie.server.api.model.instance.NodeInstance;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
-import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskInstanceList;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.api.model.instance.TaskWithProcessDescription;
-import org.kie.server.api.model.instance.TaskWithProcessDescriptionList;
-import org.kie.server.api.model.instance.VariableInstance;
-import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.QueryServicesClient;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class QueryServicesClientImpl extends AbstractKieServicesClientImpl implements QueryServicesClient {
@@ -1181,6 +1185,30 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
         } else {
             return Object.class;
         }
+    }
+
+    @Override
+    public List<ProcessInstanceCustomVars> queryProcessesByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize) {
+        if (config.isRest()) {
+            String queryString = getPagingQueryString("", page, pageSize);
+            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + RestURI.VARIABLES_PROCESSES_URI + queryString, Collections.emptyMap()), spec,
+                                                              ProcessInstanceCustomVarsList.class).getItems();
+        } else {
+            throw new UnsupportedOperationException("JMS Not supported for this operation");
+        }
+
+    }
+
+    @Override
+    public List<ProcessInstanceUserTaskWithVariables> queryUserTaskByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize) {
+        if (config.isRest()) {
+            String queryString = getPagingQueryString("", page, pageSize);
+            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + RestURI.VARIABLES_TASKS_PROCESSES_URI + queryString, Collections.emptyMap()), spec,
+                                                              ProcessInstanceUserTaskWithVariablesList.class).getItems();
+        } else {
+            throw new UnsupportedOperationException("JMS Not supported for this operation");
+        }
+
     }
 
 }

@@ -121,6 +121,7 @@ import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseFileDataItem;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceCustomVarsList;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 import org.kie.server.api.model.cases.CaseMilestone;
@@ -131,6 +132,7 @@ import org.kie.server.api.model.cases.CaseRoleAssignmentList;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.cases.CaseUserTaskWithVariablesList;
 import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
@@ -139,6 +141,7 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.definition.TimerDefinition;
 import org.kie.server.api.model.dmn.DMNContextKS;
@@ -162,6 +165,7 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
 import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariablesList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
 import org.kie.server.api.model.instance.ScoreWrapper;
@@ -206,204 +210,208 @@ public class JaxbMarshaller implements Marshaller {
 
     static {
         KIE_SERVER_JAXB_CLASSES = new Class<?>[]{
-                CallContainerCommand.class,
-                CommandScript.class,
-                CreateContainerCommand.class,
-                DisposeContainerCommand.class,
-                ListContainersCommand.class,
-                GetContainerInfoCommand.class,
-                GetScannerInfoCommand.class,
-                GetServerInfoCommand.class,
-                UpdateScannerCommand.class,
-                GetReleaseIdCommand.class,
-                UpdateReleaseIdCommand.class,
-                DescriptorCommand.class,
-                GetServerStateCommand.class,
+                                                 CallContainerCommand.class,
+                                                 CommandScript.class,
+                                                 CreateContainerCommand.class,
+                                                 DisposeContainerCommand.class,
+                                                 ListContainersCommand.class,
+                                                 GetContainerInfoCommand.class,
+                                                 GetScannerInfoCommand.class,
+                                                 GetServerInfoCommand.class,
+                                                 UpdateScannerCommand.class,
+                                                 GetReleaseIdCommand.class,
+                                                 UpdateReleaseIdCommand.class,
+                                                 DescriptorCommand.class,
+                                                 GetServerStateCommand.class,
 
-                KieContainerResource.class,
-                KieContainerResourceList.class,
-                KieContainerStatus.class,
-                KieServerInfo.class,
-                ReleaseId.class,
-                ServiceResponse.class,
-                ServiceResponsesList.class,
-                KieServerStateInfo.class,
+                                                 KieContainerResource.class,
+                                                 KieContainerResourceList.class,
+                                                 KieContainerStatus.class,
+                                                 KieServerInfo.class,
+                                                 ReleaseId.class,
+                                                 ServiceResponse.class,
+                                                 ServiceResponsesList.class,
+                                                 KieServerStateInfo.class,
 
-                ReleaseIdFilter.class,
-                KieContainerStatusFilter.class,
-                KieContainerResourceFilter.class,
+                                                 ReleaseIdFilter.class,
+                                                 KieContainerStatusFilter.class,
+                                                 KieContainerResourceFilter.class,
 
-                BatchExecutionCommandImpl.class,
-                ExecutionResultImpl.class,
-                DefaultFactHandle.class,
-                DeleteCommand.class,
-                GetVariableCommand.class,
-                GetFactCountCommand.class,
-                SetGlobalCommand.class,
-                UpdateCommand.class,
-                ClearAgendaCommand.class,
-                FireAllRulesCommand.class,
-                DisposeCommand.class,
-                GetIdCommand.class,
-                GetGlobalCommand.class,
-                InsertObjectCommand.class,
-                ClearAgendaGroupCommand.class,
-                FlatQueryResults.class,
-                AgendaGroupSetFocusCommand.class,
-                ClearRuleFlowGroupCommand.class,
-                ClearActivationGroupCommand.class,
-                GetFactHandlesCommand.class,
-                GetSessionTimeCommand.class,
-                AdvanceSessionTimeCommand.class,
+                                                 BatchExecutionCommandImpl.class,
+                                                 ExecutionResultImpl.class,
+                                                 DefaultFactHandle.class,
+                                                 DeleteCommand.class,
+                                                 GetVariableCommand.class,
+                                                 GetFactCountCommand.class,
+                                                 SetGlobalCommand.class,
+                                                 UpdateCommand.class,
+                                                 ClearAgendaCommand.class,
+                                                 FireAllRulesCommand.class,
+                                                 DisposeCommand.class,
+                                                 GetIdCommand.class,
+                                                 GetGlobalCommand.class,
+                                                 InsertObjectCommand.class,
+                                                 ClearAgendaGroupCommand.class,
+                                                 FlatQueryResults.class,
+                                                 AgendaGroupSetFocusCommand.class,
+                                                 ClearRuleFlowGroupCommand.class,
+                                                 ClearActivationGroupCommand.class,
+                                                 GetFactHandlesCommand.class,
+                                                 GetSessionTimeCommand.class,
+                                                 AdvanceSessionTimeCommand.class,
 
-                KieServerConfig.class,
-                KieServerConfigItem.class,
+                                                 KieServerConfig.class,
+                                                 KieServerConfigItem.class,
 
-                JaxbList.class,
-                JaxbMap.class,
-                JaxbDate.class,
-                JaxbByteArray.class,
+                                                 JaxbList.class,
+                                                 JaxbMap.class,
+                                                 JaxbDate.class,
+                                                 JaxbByteArray.class,
 
-                JaxbByteArray.class,
+                                                 JaxbByteArray.class,
 
-                ProcessDefinition.class,
-                ProcessDefinitionList.class,
+                                                 ProcessDefinition.class,
+                                                 ProcessDefinitionList.class,
 
-                NodeDefinition.class,
-                TimerDefinition.class,
+                                                 NodeDefinition.class,
+                                                 TimerDefinition.class,
 
-                ProcessInstance.class,
-                ProcessInstanceList.class,
-                ProcessInstanceCustomVars.class,
-                ProcessInstanceCustomVarsList.class,
+                                                 ProcessInstance.class,
+                                                 ProcessInstanceList.class,
+                                                 ProcessInstanceCustomVars.class,
+                                                 ProcessInstanceCustomVarsList.class,
 
-                NodeInstance.class,
-                NodeInstanceList.class,
+                                                 NodeInstance.class,
+                                                 NodeInstanceList.class,
 
-                VariableInstance.class,
-                VariableInstanceList.class,
+                                                 VariableInstance.class,
+                                                 VariableInstanceList.class,
 
-                TaskInstance.class,
-                TaskInstanceList.class,
-                TaskSummary.class,
-                TaskSummaryList.class,
-                TaskWithProcessDescription.class,
-                TaskWithProcessDescriptionList.class,
+                                                 TaskInstance.class,
+                                                 TaskInstanceList.class,
+                                                 TaskSummary.class,
+                                                 TaskSummaryList.class,
+                                                 TaskWithProcessDescription.class,
+                                                 TaskWithProcessDescriptionList.class,
 
-                TaskEventInstance.class,
-                TaskEventInstanceList.class,
+                                                 TaskEventInstance.class,
+                                                 TaskEventInstanceList.class,
 
-                TaskComment.class,
-                TaskCommentList.class,
-                TaskAttachment.class,
-                TaskAttachmentList.class,
+                                                 TaskComment.class,
+                                                 TaskCommentList.class,
+                                                 TaskAttachment.class,
+                                                 TaskAttachmentList.class,
 
-                WorkItemImpl.class,
-                WorkItemInstance.class,
-                WorkItemInstanceList.class,
+                                                 WorkItemImpl.class,
+                                                 WorkItemInstance.class,
+                                                 WorkItemInstanceList.class,
 
-                RequestInfoInstance.class,
-                RequestInfoInstanceList.class,
-                ErrorInfoInstance.class,
-                ErrorInfoInstanceList.class,
-                JobRequestInstance.class,
+                                                 RequestInfoInstance.class,
+                                                 RequestInfoInstanceList.class,
+                                                 ErrorInfoInstance.class,
+                                                 ErrorInfoInstanceList.class,
+                                                 JobRequestInstance.class,
 
-                DocumentInstance.class,
-                DocumentInstanceList.class,
+                                                 DocumentInstance.class,
+                                                 DocumentInstanceList.class,
 
-                QueryDefinition.class,
-                QueryDefinitionList.class,
-                QueryFilterSpec.class,
-                QueryParam.class,
+                                                 QueryDefinition.class,
+                                                 QueryDefinitionList.class,
+                                                 QueryFilterSpec.class,
+                                                 QueryParam.class,
 
-                ProcessInstanceQueryFilterSpec.class,
-                TaskQueryFilterSpec.class,
+                                                 ProcessInstanceQueryFilterSpec.class,
+                                                 TaskQueryFilterSpec.class,
 
-                ArrayList.class,
+                                                 ArrayList.class,
 
-                // OptaPlanner
-                SolverInstance.class,
-                SolverInstanceList.class,
-                Message.class,
-                ScoreWrapper.class,
+                                                 // OptaPlanner
+                                                 SolverInstance.class,
+                                                 SolverInstanceList.class,
+                                                 Message.class,
+                                                 ScoreWrapper.class,
 
-                // Optaplanner commands
-                CreateSolverCommand.class,
-                DisposeSolverCommand.class,
-                GetSolverWithBestSolutionCommand.class,
-                GetSolversCommand.class,
-                GetSolverCommand.class,
-                SolvePlanningProblemCommand.class,
-                TerminateSolverEarlyCommand.class,
-                AddProblemFactChangeCommand.class,
-                AddProblemFactChangesCommand.class,
-                IsEveryProblemFactChangeProcessedCommand.class,
+                                                 // Optaplanner commands
+                                                 CreateSolverCommand.class,
+                                                 DisposeSolverCommand.class,
+                                                 GetSolverWithBestSolutionCommand.class,
+                                                 GetSolversCommand.class,
+                                                 GetSolverCommand.class,
+                                                 SolvePlanningProblemCommand.class,
+                                                 TerminateSolverEarlyCommand.class,
+                                                 AddProblemFactChangeCommand.class,
+                                                 AddProblemFactChangesCommand.class,
+                                                 IsEveryProblemFactChangeProcessedCommand.class,
 
-                // admin section
-                MigrationReportInstance.class,
-                MigrationReportInstanceList.class,
-                ProcessNode.class,
-                ProcessNodeList.class,
-                TimerInstance.class,
-                TimerInstanceList.class,
-                EmailNotification.class,
-                OrgEntities.class,
-                TaskNotification.class,
-                TaskNotificationList.class,
-                TaskReassignment.class,
-                TaskReassignmentList.class,
-                ExecutionErrorInstance.class,
-                ExecutionErrorInstanceList.class,
+                                                 // admin section
+                                                 MigrationReportInstance.class,
+                                                 MigrationReportInstanceList.class,
+                                                 ProcessNode.class,
+                                                 ProcessNodeList.class,
+                                                 TimerInstance.class,
+                                                 TimerInstanceList.class,
+                                                 EmailNotification.class,
+                                                 OrgEntities.class,
+                                                 TaskNotification.class,
+                                                 TaskNotificationList.class,
+                                                 TaskReassignment.class,
+                                                 TaskReassignmentList.class,
+                                                 ExecutionErrorInstance.class,
+                                                 ExecutionErrorInstanceList.class,
 
-                // case management
-                CaseMilestone.class,
-                CaseMilestoneList.class,
-                CaseInstance.class,
-                CaseInstanceList.class,
-                CaseFile.class,
-                CaseStage.class,
-                CaseStageList.class,
-                CaseAdHocFragment.class,
-                CaseAdHocFragmentList.class,
-                CaseComment.class,
-                CaseCommentList.class,
-                CaseRoleAssignment.class,
-                CaseRoleAssignmentList.class,
-                CaseDefinition.class,
-                CaseDefinitionList.class,
-                CaseMilestoneDefinition.class,
-                CaseStageDefinition.class,
-                CaseFileDataItem.class,
-                CaseFileDataItemList.class,
-                CaseMigrationReportInstance.class,
+                                                 // case management
+                                                 CaseMilestone.class,
+                                                 CaseMilestoneList.class,
+                                                 CaseInstance.class,
+                                                 CaseInstanceList.class,
+                                                 CaseFile.class,
+                                                 CaseStage.class,
+                                                 CaseStageList.class,
+                                                 CaseAdHocFragment.class,
+                                                 CaseAdHocFragmentList.class,
+                                                 CaseComment.class,
+                                                 CaseCommentList.class,
+                                                 CaseRoleAssignment.class,
+                                                 CaseRoleAssignmentList.class,
+                                                 CaseDefinition.class,
+                                                 CaseDefinitionList.class,
+                                                 CaseMilestoneDefinition.class,
+                                                 CaseStageDefinition.class,
+                                                 CaseFileDataItem.class,
+                                                 CaseFileDataItemList.class,
+                                                 CaseMigrationReportInstance.class,
 
-                // Kie DMN
-                DMNContextKS.class,
-                DMNResultKS.class,
-                DMNNodeStub.class,
-                DMNMessageKS.class,
-                DMNDecisionResultKS.class,
-                DMNModelInfoList.class,
-                DMNModelInfo.class,
-                DMNDecisionInfo.class,
-                DMNInputDataInfo.class,
-                DMNItemDefinitionInfo.class,
+                                                 // Kie DMN
+                                                 DMNContextKS.class,
+                                                 DMNResultKS.class,
+                                                 DMNNodeStub.class,
+                                                 DMNMessageKS.class,
+                                                 DMNDecisionResultKS.class,
+                                                 DMNModelInfoList.class,
+                                                 DMNModelInfo.class,
+                                                 DMNDecisionInfo.class,
+                                                 DMNInputDataInfo.class,
+                                                 DMNItemDefinitionInfo.class,
 
-                // Kie PMML
-                PMML4Result.class,
-                IntegerFieldOutput.class,
-                DoubleFieldOutput.class,
-                StringFieldOutput.class,
-                ScoreCard.class,
+                                                 // Kie PMML
+                                                 PMML4Result.class,
+                                                 IntegerFieldOutput.class,
+                                                 DoubleFieldOutput.class,
+                                                 StringFieldOutput.class,
+                                                 ScoreCard.class,
 
-                //TaskAssigning
-                PlanningExecutionResult.class,
-                OrganizationalEntity.class,
-                PlanningItem.class,
-                PlanningItemList.class,
-                PlanningTask.class,
-                TaskDataList.class,
-                TaskData.class
+                                                 //TaskAssigning
+                                                 PlanningExecutionResult.class,
+                                                 OrganizationalEntity.class,
+                                                 PlanningItem.class,
+                                                 PlanningItemList.class,
+                                                 PlanningTask.class,
+                                                 TaskDataList.class,
+                                                 TaskData.class,
+                                                 SearchQueryFilterSpec.class,
+                                                 ProcessInstanceUserTaskWithVariablesList.class,
+                                                 CaseUserTaskWithVariablesList.class,
+                                                 CaseInstanceCustomVarsList.class
         };
     }
 

@@ -30,7 +30,7 @@ import org.kie.server.api.model.ItemList;
 @XmlRootElement(name = "process-instance-custom-list")
 public class ProcessInstanceCustomVarsList implements ItemList<ProcessInstanceCustomVars> {
 
-    @XmlElement(name = "process-instance-custom")
+    @XmlElement(name = "process-instance-vars")
     private ProcessInstanceCustomVars[] processInstances;
 
     public ProcessInstanceCustomVarsList() {
@@ -59,4 +59,10 @@ public class ProcessInstanceCustomVarsList implements ItemList<ProcessInstanceCu
         }
         return Arrays.asList(processInstances);
     }
+
+    @Override
+    public String toString() {
+        return "ProcessInstanceCustomVarsList [processInstances=" + Arrays.toString(processInstances) + "]";
+    }
+
 }

@@ -17,6 +17,7 @@
 package org.kie.server.springboot.autoconfiguration.jbpm.extensions;
 
 import org.jbpm.kie.services.impl.FormManagerService;
+import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
@@ -48,6 +49,7 @@ public class SpringBootJBPMKieServerExtension extends JbpmKieServerExtension {
                                             ProcessService processService,
                                             UserTaskService userTaskService,
                                             RuntimeDataService runtimeDataService,
+                                            AdvanceRuntimeDataService advanceRuntimeDataService,
                                             FormManagerService formManagerService,
 
                                             ProcessInstanceMigrationService processInstanceMigrationService,
@@ -62,6 +64,7 @@ public class SpringBootJBPMKieServerExtension extends JbpmKieServerExtension {
         this.processService = processService;
         this.userTaskService = userTaskService;
         this.runtimeDataService = runtimeDataService;
+        this.advanceRuntimeDataService = advanceRuntimeDataService;
         this.formManagerService = formManagerService;
 
         this.processInstanceMigrationService = processInstanceMigrationService;
@@ -82,7 +85,8 @@ public class SpringBootJBPMKieServerExtension extends JbpmKieServerExtension {
         
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService, context),
                                                                                  new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
-                                                                                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context),
+                                                                                 new RuntimeDataServiceBase(runtimeDataService, advanceRuntimeDataService, context), new ExecutorServiceBase(executorService, context),
+                                                                                 new QueryDataServiceBase(queryService, context),
                                                                                  new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
                                                                                  new UserTaskAdminServiceBase(userTaskAdminService, context));
     }

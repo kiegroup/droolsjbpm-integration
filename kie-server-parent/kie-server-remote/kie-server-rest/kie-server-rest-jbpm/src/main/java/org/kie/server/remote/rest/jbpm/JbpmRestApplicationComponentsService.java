@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
@@ -66,6 +67,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         ProcessInstanceAdminService processInstanceAdminService = null;
         UserTaskAdminService userTaskAdminService = null;
         KieServerRegistry context = null;
+        AdvanceRuntimeDataService advanceRuntimeDataService = null;
 
         for( Object object : services ) {
             // in case given service is null (meaning was not configured) continue with next one
@@ -102,6 +104,9 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
+            } else if (AdvanceRuntimeDataService.class.isAssignableFrom(object.getClass())) {
+                advanceRuntimeDataService = (AdvanceRuntimeDataService) object;
+                continue;
             }
         }
 
@@ -109,7 +114,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         DefinitionServiceBase definitionServiceBase = new DefinitionServiceBase(definitionService, context);
         ProcessServiceBase processServiceBase = new ProcessServiceBase(processService, definitionService, runtimeDataService, context);
         UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
-        RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);
+        RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, advanceRuntimeDataService, context);
         ExecutorServiceBase executorServiceBase = new ExecutorServiceBase(executorService, context);
         QueryDataServiceBase queryDataServiceBase = new QueryDataServiceBase(queryService, context);
         DocumentServiceBase documentServiceBase = new DocumentServiceBase(context);

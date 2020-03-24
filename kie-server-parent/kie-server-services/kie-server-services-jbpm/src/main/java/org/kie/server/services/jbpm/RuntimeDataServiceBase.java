@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.TaskNotFoundException;
@@ -31,6 +32,7 @@ import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.VariableDesc;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.KieInternalServices;
@@ -42,9 +44,12 @@ import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariablesList;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -52,15 +57,33 @@ import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.jbpm.ConvertUtils.*;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
+import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
+import static org.kie.server.services.jbpm.ConvertUtils.buildTaskStatuses;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcess;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToServiceApiQueryParam;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTask;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToUserTaskWithVariablesList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToVariablesList;
+import static org.kie.server.services.jbpm.ConvertUtils.nullEmpty;
 
 public class RuntimeDataServiceBase {
 
     public static final Logger logger = LoggerFactory.getLogger(RuntimeDataServiceBase.class);
 
+    private AdvanceRuntimeDataService advanceRuntimeDataService;
     private RuntimeDataService runtimeDataService;
     private IdentityProvider identityProvider;
     private KieServerRegistry context;
@@ -69,11 +92,14 @@ public class RuntimeDataServiceBase {
 
     private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
-    public RuntimeDataServiceBase(RuntimeDataService delegate, KieServerRegistry context) {
+    private MarshallerHelper marshallerHelper;
+
+    public RuntimeDataServiceBase(RuntimeDataService delegate, AdvanceRuntimeDataService advanceRuntimeDataService, KieServerRegistry context) {
         this.runtimeDataService = delegate;
+        this.advanceRuntimeDataService = advanceRuntimeDataService;
         this.identityProvider = context.getIdentityProvider();
         this.context = context;
-
+        this.marshallerHelper = new MarshallerHelper(context);
         this.bypassAuthUser = Boolean.parseBoolean(context.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
     }
 
@@ -583,6 +609,29 @@ public class RuntimeDataServiceBase {
 
         return taskSummaryList;
     }
+
+    public ProcessInstanceCustomVarsList queryProcessesByVariables(String payload, String payloadType, QueryContext queryContext) {
+        SearchQueryFilterSpec filter = new SearchQueryFilterSpec();
+        if (payload != null) {
+            filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
+        }
+        return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                        convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                        queryContext));
+    }
+
+    public ProcessInstanceUserTaskWithVariablesList queryUserTasksByVariables(String payload, String payloadType, QueryContext queryContext) {
+        SearchQueryFilterSpec filter = new SearchQueryFilterSpec();
+        if (payload != null) {
+            filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
+        }
+        return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                      convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                      convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                      filter.getOwners(),
+                                                                                                      queryContext));
+    }
+
 
 
 }

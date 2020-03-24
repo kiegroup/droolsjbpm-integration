@@ -15,9 +15,6 @@
 
 package org.kie.server.services.casemgmt;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +35,8 @@ import org.jbpm.services.api.admin.MigrationReport;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
+import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
+import org.jbpm.services.api.model.UserTaskInstanceWithPotOwnerDesc;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
@@ -49,16 +48,24 @@ import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseComment;
 import org.kie.server.api.model.cases.CaseFileDataItem;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
+import org.kie.server.api.model.cases.CaseInstanceCustomVars;
+import org.kie.server.api.model.cases.CaseInstanceCustomVarsList;
 import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseMilestoneDefinition;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageDefinition;
+import org.kie.server.api.model.cases.CaseUserTaskWithVariables;
+import org.kie.server.api.model.cases.CaseUserTaskWithVariablesList;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class ConvertUtils {
 
@@ -454,5 +461,55 @@ public class ConvertUtils {
             }
         }
         return reports;
+    }
+
+    public static CaseUserTaskWithVariablesList convertToCaseUserTaskWithVariablesList(List<UserTaskInstanceWithPotOwnerDesc> queryUserTasksByVariables) {
+        List<CaseUserTaskWithVariables> data = new ArrayList<>();
+        for (UserTaskInstanceWithPotOwnerDesc desc : queryUserTasksByVariables) {
+            CaseUserTaskWithVariables var = new CaseUserTaskWithVariables();
+            var.setId(desc.getTaskId());
+            var.setName(desc.getName());
+            var.setProcessInstanceId(desc.getProcessInstanceId());
+            var.setCorrelationKey(desc.getCorrelationKey());
+            var.setActualOwner(desc.getActualOwner());
+            var.setCaseDefinitionId(desc.getProcessId());
+            var.setPotentialOwners(desc.getPotentialOwners());
+            var.setCaseId(desc.getCorrelationKey());
+            var.setProcessVariables(desc.getProcessVariables());
+            var.setInputVariables(desc.getInputdata());
+            var.setCaseVariables(desc.getExtraData());
+            data.add(var);
+        }
+
+        CaseUserTaskWithVariablesList result = new CaseUserTaskWithVariablesList();
+        result.setCaseUserTaskWithVariables(data.stream().toArray(CaseUserTaskWithVariables[]::new));
+        return result;
+    }
+
+    public static CaseInstanceCustomVarsList convertToCaseInstanceCustomVarsList(List<ProcessInstanceWithVarsDesc> queryCaseByVariables) {
+        List<CaseInstanceCustomVars> processInstances = new ArrayList<>();
+        for (ProcessInstanceWithVarsDesc proc : queryCaseByVariables) {
+            CaseInstanceCustomVars tmp = new CaseInstanceCustomVars();
+            tmp.setProcessInstanceId(proc.getId());
+            tmp.setProcessName(proc.getProcessName());
+            tmp.setProcessVersion(proc.getProcessVersion());
+            tmp.setCaseId(proc.getCorrelationKey());
+            tmp.setCaseDefinitionId(proc.getProcessId());
+            tmp.setCorrelationKey(proc.getCorrelationKey());
+            tmp.setProcessVariables(proc.getVariables());
+            tmp.setCaseVariables(proc.getExtraData());
+            tmp.setInitiator(proc.getInitiator());
+            tmp.setState(proc.getState());
+            tmp.setContainerId(proc.getDeploymentId());
+            processInstances.add(tmp);
+        }
+
+        CaseInstanceCustomVarsList result = new CaseInstanceCustomVarsList();
+        result.setCaseInstances(processInstances.stream().toArray(CaseInstanceCustomVars[]::new));
+        return result;
+    }
+
+    public static List<org.jbpm.services.api.query.model.QueryParam> convertToServiceApiQueryParam(List<QueryParam> param) {
+        return param.stream().map(e -> new org.jbpm.services.api.query.model.QueryParam(e.getColumn(), e.getOperator(), e.getValue())).collect(toList());
     }
 }

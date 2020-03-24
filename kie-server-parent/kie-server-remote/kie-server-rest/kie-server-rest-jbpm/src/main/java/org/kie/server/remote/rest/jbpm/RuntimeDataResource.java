@@ -15,6 +15,53 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import java.text.MessageFormat;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.TaskNotFoundException;
+import org.kie.api.runtime.query.QueryContext;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariablesList;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.rest.RestURI;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_INSTANCE_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI;
@@ -46,10 +93,11 @@ import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_INSTANCE_ID_GET_U
 import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEF_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
@@ -67,48 +115,6 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINIT
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM;
-
-import java.text.MessageFormat;
-import java.util.List;
-
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.TaskNotFoundException;
-import org.kie.server.api.model.definition.ProcessDefinition;
-import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.instance.NodeInstance;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.TaskEventInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.RuntimeDataServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Process queries")
 @Path("server/" + QUERY_URI)
@@ -756,6 +762,53 @@ public class RuntimeDataResource {
             TaskSummaryList result = runtimeDataServiceBase.getTasksByVariables(userId, variableName, variableValue, status, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
+
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
+        }
+    }
+
+    @POST
+    @Path(RestURI.VARIABLES_PROCESSES_URI)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response queryProcessesByVariables(@Context HttpHeaders headers, String payload,
+                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Variant v = getVariant(headers);
+        try {
+            String type = getContentType(headers);
+            ProcessInstanceCustomVarsList processVariableSummaryList = runtimeDataServiceBase.queryProcessesByVariables(payload, type, new QueryContext(page * pageSize, pageSize));
+            logger.debug("Returning result of process instance search: {}", processVariableSummaryList);
+
+            return createCorrectVariant(processVariableSummaryList, headers, Response.Status.OK, conversationIdHeader);
+
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
+        }
+
+    }
+
+    @POST
+    @Path(RestURI.VARIABLES_TASKS_PROCESSES_URI)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response queryUserTasksByVariables(@Context HttpHeaders headers, String payload,
+                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Variant v = getVariant(headers);
+        try {
+            String type = getContentType(headers);
+            ProcessInstanceUserTaskWithVariablesList taskVariableSummaryList = runtimeDataServiceBase.queryUserTasksByVariables(payload, type, new QueryContext(page * pageSize, pageSize));
+            logger.debug("Returning result of process tasks search: {}", taskVariableSummaryList);
+
+            return createCorrectVariant(taskVariableSummaryList, headers, Response.Status.OK, conversationIdHeader);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);

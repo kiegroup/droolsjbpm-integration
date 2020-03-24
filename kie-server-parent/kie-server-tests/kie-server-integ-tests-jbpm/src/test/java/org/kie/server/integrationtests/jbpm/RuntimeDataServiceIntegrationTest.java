@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.jbpm.services.api.TaskNotFoundException;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -34,27 +35,40 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.internal.task.api.model.TaskEvent;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariables;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeFalse;
-
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEPLOYMENT_ID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.kie.server.api.util.QueryParamFactory.equalsTo;
+import static org.kie.server.api.util.QueryParamFactory.in;
+import static org.kie.server.api.util.QueryParamFactory.list;
 
 
 
@@ -1778,11 +1792,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     }
 
+
     @Test
-    public void testFindTasksWithNameFilter() throws Exception {
+    public void testFindTasksWithNameFilter() {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
+
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
 
@@ -1812,7 +1828,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskClient.findTaskEvents(-9999l, 0, 10);
             fail("KieServicesException should be thrown when task not found");
         } catch (KieServicesException e) {
-            if(configuration.isRest()) {
+            if (configuration.isRest()) {
                 KieServerAssert.assertResultContainsString(e.getMessage(), "Could not find task instance with id \"" + invalidId + "\"");
                 KieServicesHttpException httpEx = (KieServicesHttpException) e;
                 assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
@@ -1821,6 +1837,45 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             }
         } catch (TaskNotFoundException tnfe) {
             assertTrue(tnfe.getMessage().contains("No task found with id " + invalidId));
+        }
+    }
+
+    @Test
+    public void testQueryProcessesByVariables() throws Exception {
+        Assume.assumeTrue(configuration.isRest());
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, "First%", null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, "First%", null, 0, 10, "Status", false);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            SearchQueryFilterSpec spec = new SearchQueryFilterSpec();
+            spec.setAttributesQueryParams(list(equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
+            List<ProcessInstanceCustomVars> listProcesses = queryClient.queryProcessesByVariables(spec, 0, 2);
+            assertNotNull(listProcesses);
+            listProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
+
+            spec = new SearchQueryFilterSpec();
+            spec.setAttributesQueryParams(list(in(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
+            List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+            assertNotNull(listTasks);
+            listTasks.stream().forEach(e -> assertEquals(PROCESS_ID_USERTASK, e.getProcessDefinitionId()));
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
 

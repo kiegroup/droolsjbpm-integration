@@ -20,10 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.admin.TaskNotification;
 import org.jbpm.services.api.admin.TaskReassignment;
 import org.jbpm.services.api.admin.UserTaskAdminService;
@@ -40,14 +37,15 @@ import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.TaskNotificationList;
 import org.kie.server.api.model.admin.TaskReassignmentList;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
-import static org.kie.server.services.jbpm.ConvertUtils.*;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
 
 public class UserTaskAdminServiceBase {
 

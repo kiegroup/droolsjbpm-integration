@@ -15,13 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm.cases;
 
-import static org.assertj.core.api.Assertions.entry;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,20 +24,35 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
-
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceCustomVars;
 import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.cases.CaseUserTaskWithVariables;
+import org.kie.server.api.model.definition.QueryParam;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CaseServicesClient;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
+
+import static org.assertj.core.api.Assertions.entry;
+import static org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService.CASE_ATTR_CORRELATION_KEY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
+import static org.kie.server.api.util.QueryParamFactory.equalsTo;
+import static org.kie.server.api.util.QueryParamFactory.likeTo;
+import static org.kie.server.api.util.QueryParamFactory.list;
 
 public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -727,6 +735,54 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
         Assertions.assertThat(caseData).containsOnly(entry("car", "fiat"));
+    }
+
+    @Test
+    public void testQueryByVariable() {
+        Assume.assumeTrue(configuration.isRest());
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
+
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
+
+        caseClient.closeCaseInstance(CONTAINER_ID, caseId, "work done at the moment");
+
+        CaseInstance closed = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        Assertions.assertThat(closed.getCaseStatus()).isEqualTo(2);
+        Assertions.assertThat(closed.getCompletionMessage()).isEqualTo("work done at the moment");
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("additionalComment", "reopening the case");
+        caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID, data);
+
+        caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
+
+        Object additionalComment = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "additionalComment");
+        Assertions.assertThat(additionalComment).isNotNull();
+        Assertions.assertThat(additionalComment).isEqualTo("reopening the case");
+
+        List<QueryParam> attrs = list(equalsTo(CASE_ATTR_CORRELATION_KEY, caseId));
+        SearchQueryFilterSpec filter = new SearchQueryFilterSpec();
+        filter.setAttributesQueryParams(attrs);
+        List<CaseInstanceCustomVars> caseInstanceCustomVarsList = caseClient.queryCasesByVariables(filter, 0, 2);
+        assertNotNull(caseInstanceCustomVarsList);
+        Assertions.assertThat(caseInstanceCustomVarsList).hasSize(2);
+
+        attrs = list(likeTo(CASE_ATTR_CORRELATION_KEY, false, CLAIM_CASE_ID_PREFIX + "%"));
+        filter = new SearchQueryFilterSpec();
+        filter.setAttributesQueryParams(attrs);
+        caseInstanceCustomVarsList = caseClient.queryCasesByVariables(filter, 0, 2);
+        assertNotNull(caseInstanceCustomVarsList);
+        caseInstanceCustomVarsList.stream().forEach(e -> assertTrue(e.getCaseId().startsWith(CLAIM_CASE_ID_PREFIX)));
+
+        List<CaseUserTaskWithVariables> caseUserTaskWithVariablesList = caseClient.queryUserTaskByVariables(new SearchQueryFilterSpec(), 0, 2);
+        assertNotNull(caseUserTaskWithVariablesList);
+        Assertions.assertThat(caseUserTaskWithVariablesList.size()).isGreaterThan(0);
     }
 
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {

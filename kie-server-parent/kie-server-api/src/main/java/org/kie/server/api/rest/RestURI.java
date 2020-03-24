@@ -325,6 +325,11 @@ public class RestURI {
     public static final String CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI = "{" + CONTAINER_ID + "}/processes";
     public static final String ADMIN_CASE_ALL_INSTANCES_GET_URI = "cases/instances";
 
+    public static final String VARIABLES_CASES_URI = "variables/cases";
+    public static final String VARIABLES_PROCESSES_URI = "variables/processes";
+    public static final String VARIABLES_TASKS_CASES_URI = "variables/cases/tasks";
+    public static final String VARIABLES_TASKS_PROCESSES_URI = "variables/processes/tasks";
+
     // static files 
     public static final String STATIC_BY_TYPE_GET_URI = "{type}/{file}";
     public static final String STATIC_RENDERER_BY_TYPE_GET_URI = "{provider}/{type}/{file}";
