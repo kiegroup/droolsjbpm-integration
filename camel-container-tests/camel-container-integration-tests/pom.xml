@@ -124,8 +124,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration combine.children="append">
-          <systemProperties>
+        <configuration>
+          <systemProperties combine.children="append">
             <org.apache.cxf.stax.allowInsecureParser>1</org.apache.cxf.stax.allowInsecureParser>
           </systemProperties>
         </configuration>
