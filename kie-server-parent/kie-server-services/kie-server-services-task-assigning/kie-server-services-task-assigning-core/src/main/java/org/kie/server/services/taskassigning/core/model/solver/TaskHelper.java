@@ -80,7 +80,7 @@ public class TaskHelper {
      * @return the number of elements in the intersection between the task.getLabelValues("labelName") and the
      * user.getLabelValues("labelName") sets.
      */
-    public static int matchingLabels(Task task, User user, String labelName) {
+    public static int countMatchingLabels(Task task, User user, String labelName) {
         final Set<Object> taskLabelValues = task.getLabelValues(labelName);
         if (taskLabelValues == null || taskLabelValues.isEmpty()) {
             return 0;
@@ -89,7 +89,7 @@ public class TaskHelper {
         if (userLabelValues == null) {
             return 0;
         }
-        return userLabelValues.stream().mapToInt(labelValue -> taskLabelValues.contains(labelValue) ? 1 : 0).sum();
+        return Math.toIntExact(userLabelValues.stream().filter(taskLabelValues::contains).count());
     }
 
     /**

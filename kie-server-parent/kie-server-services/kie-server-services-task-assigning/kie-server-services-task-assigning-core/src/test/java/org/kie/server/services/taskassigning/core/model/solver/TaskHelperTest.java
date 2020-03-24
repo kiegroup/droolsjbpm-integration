@@ -145,7 +145,7 @@ public class TaskHelperTest {
     public void matchingLabels() {
         Task task = mockTask(taskLabelName, taskLabelValues);
         User user = mockUser(userLabelName, userLabelValues);
-        assertThat(TaskHelper.matchingLabels(task, user, taskLabelName)).isEqualTo(matchingLabelsResult);
+        assertThat(TaskHelper.countMatchingLabels(task, user, taskLabelName)).isEqualTo(matchingLabelsResult);
     }
 
     @Test

@@ -16,7 +16,7 @@
 
 package org.kie.server.services.taskassigning.planning.data;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public abstract class AbstractStringListValueAttributeMapValueExtractor<M extend
     @Override
     protected Set<Object> extractFromAttribute(Object attributeValue) {
         if (attributeValue == null) {
-            return new HashSet<>();
+            return Collections.emptySet();
         } else {
             final String[] valueSplit = attributeValue.toString().split(separator);
             return Stream.of(valueSplit)

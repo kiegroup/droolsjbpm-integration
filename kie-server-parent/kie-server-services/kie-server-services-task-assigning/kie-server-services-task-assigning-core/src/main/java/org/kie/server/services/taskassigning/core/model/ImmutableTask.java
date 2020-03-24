@@ -77,11 +77,6 @@ public class ImmutableTask extends Task {
         throwImmutableException("labelValues");
     }
 
-    @Override
-    public void setLabelValues(Map<String, Set<Object>> labelValues) {
-        throwImmutableException("labelValues");
-    }
-
     private void throwImmutableException(String filedName) {
         throw new UnsupportedOperationException("Task: " + getName() + " don't accept modifications of field: " + filedName);
     }

@@ -20,7 +20,7 @@ import java.util.Set;
 
 /**
  * Defines the contract for being able to extract a Set of values from an Object instance of T at processing time and
- * declaring to which label the extracted Set must be associated to.
+ * declaring to which label the extracted Set must be associated.
  */
 public interface LabelValueExtractor<T> {
 

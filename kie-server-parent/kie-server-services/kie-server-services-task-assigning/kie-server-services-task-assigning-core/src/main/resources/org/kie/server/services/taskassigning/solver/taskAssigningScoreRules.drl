@@ -79,7 +79,7 @@ rule "Desired Affinities"
     when
         $task : Task(user != null)
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, 2, TaskHelper.matchingLabels($task, $task.getUser(), DefaultLabels.AFFINITIES.name()));
+        scoreHolder.addSoftConstraintMatch(kcontext, 2, TaskHelper.countMatchingLabels($task, $task.getUser(), DefaultLabels.AFFINITIES.name()));
 end
 
 rule "Minimize makespan (starting with the latest ending user first)"

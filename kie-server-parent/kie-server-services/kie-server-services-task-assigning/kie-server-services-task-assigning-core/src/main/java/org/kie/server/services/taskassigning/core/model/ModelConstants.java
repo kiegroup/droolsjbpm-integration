@@ -17,7 +17,6 @@
 package org.kie.server.services.taskassigning.core.model;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.Predicate;
 
@@ -54,10 +53,10 @@ public class ModelConstants {
                                                             "dummy-container",
                                                             "dummy-task",
                                                             10,
-                                                            Collections.unmodifiableMap(new HashMap<>()),
+                                                            Collections.emptyMap(),
                                                             false,
                                                             Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(PLANNING_USER))),
-                                                            Collections.unmodifiableMap(new HashMap<>()));
+                                                            Collections.emptyMap());
 
     /**
      * This task was introduced for dealing with situations where all tasks are pinned and avoid falling into
@@ -69,10 +68,10 @@ public class ModelConstants {
                                                                         "dummy-container",
                                                                         "dummy-task-planner-241",
                                                                         10,
-                                                                        Collections.unmodifiableMap(new HashMap<>()),
+                                                                        Collections.emptyMap(),
                                                                         false,
                                                                         Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(PLANNING_USER))),
-                                                                        Collections.unmodifiableMap(new HashMap<>()));
+                                                                        Collections.emptyMap());
 
     public static final Predicate<Task> IS_NOT_DUMMY = task -> !DUMMY_TASK.getId().equals(task.getId()) && !DUMMY_TASK_PLANNER_241.getId().equals(task.getId());
 }

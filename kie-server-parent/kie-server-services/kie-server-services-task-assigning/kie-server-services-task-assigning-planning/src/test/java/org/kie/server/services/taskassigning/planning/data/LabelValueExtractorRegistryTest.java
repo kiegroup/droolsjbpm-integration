@@ -50,7 +50,7 @@ public class LabelValueExtractorRegistryTest {
         LabelValueExtractorRegistry registry = LabelValueExtractorRegistry.getInstance();
         assertLabelExtractorsLoaded(TaskData.class, registry, DefaultLabels.AFFINITIES.name(), DefaultTaskDataAffinitiesValueExtractor.class);
         assertLabelExtractorsLoaded(TaskData.class, registry, DefaultLabels.SKILLS.name(), DefaultTaskDataSkillsValueExtractor.class);
-        assertLabelExtractorsLoaded(TaskData.class, registry, TestTaskDataLabelValueExtractor1.TEST_LABEL, TestTaskDataLabelValueExtractor2.class);
+        assertLabelExtractorsLoaded(TaskData.class, registry, TestTaskDataLabelValueExtractor.TEST_LABEL, TestTaskDataLabelValueExtractorOverride.class);
         assertLabelExtractorsLoaded(User.class, registry, DefaultLabels.AFFINITIES.name(), DefaultUserAffinitiesValueExtractor.class);
         assertLabelExtractorsLoaded(User.class, registry, DefaultLabels.SKILLS.name(), DefaultUserSkillsValueExtractor.class);
     }
@@ -90,14 +90,14 @@ public class LabelValueExtractorRegistryTest {
         Map<String, Object> inputData = new HashMap<>();
         inputData.put(SKILLS_ATTRIBUTE, null);
         inputData.put(AFFINITIES_ATTRIBUTE, SOME_VALUE);
-        inputData.put(TestTaskDataLabelValueExtractor1.TEST_LABEL, SOME_VALUE);
+        inputData.put(TestTaskDataLabelValueExtractor.TEST_LABEL, SOME_VALUE);
         TaskData taskData = TaskData.builder().inputData(inputData).build();
         Map<String, Set<Object>> result = new HashMap<>();
         BiConsumer<String, Set<Object>> consumer = result::put;
         LabelValueExtractorRegistry.getInstance().applyLabelValueExtractors(TaskData.class, taskData, consumer);
         assertThat(result.get(DefaultLabels.SKILLS.name())).isEqualTo(Collections.EMPTY_SET);
         assertThat(result.get(DefaultLabels.AFFINITIES.name())).isEqualTo(new HashSet<>(Collections.singleton(SOME_VALUE)));
-        assertThat(result.get(TestTaskDataLabelValueExtractor1.TEST_LABEL)).isEqualTo(new HashSet<>(Collections.singleton(TestTaskDataLabelValueExtractor2.EXAMPLE_LABEL_VALUE2)));
+        assertThat(result.get(TestTaskDataLabelValueExtractor.TEST_LABEL)).isEqualTo(new HashSet<>(Collections.singleton(TestTaskDataLabelValueExtractorOverride.EXAMPLE_LABEL_VALUE2)));
     }
 
     private <T> void assertLabelExtractorsLoaded(Class<T> sourceType,

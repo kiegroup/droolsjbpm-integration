@@ -275,10 +275,6 @@ public class Task extends TaskOrUser {
         return labelValues;
     }
 
-    public void setLabelValues(Map<String, Set<Object>> labelValues) {
-        this.labelValues = labelValues;
-    }
-
     public Set<Object> getLabelValues(String labelName) {
         return labelValues.get(labelName);
     }

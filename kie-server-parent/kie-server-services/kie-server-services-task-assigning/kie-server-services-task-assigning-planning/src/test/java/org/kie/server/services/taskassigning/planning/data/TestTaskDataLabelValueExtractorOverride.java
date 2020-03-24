@@ -25,13 +25,13 @@ import org.kie.server.api.model.taskassigning.TaskData;
 /**
  * Example value extractor for the LabelValueExtractorRegistryTest.
  */
-public class TestTaskDataLabelValueExtractor2 extends AbstractLabelValueExtractor<TaskData> {
+public class TestTaskDataLabelValueExtractorOverride extends AbstractLabelValueExtractor<TaskData> {
 
     public static final String EXAMPLE_LABEL_VALUE2 = "EXAMPLE_LABEL_VALUE2";
 
-    public TestTaskDataLabelValueExtractor2() {
-        // give priority 2 to this extractor and override the TestTaskDataLabelValueExtractor1 by intention.
-        super(TaskData.class, TestTaskDataLabelValueExtractor1.TEST_LABEL, 2);
+    public TestTaskDataLabelValueExtractorOverride() {
+        // give priority 2 to this extractor and override the TestTaskDataLabelValueExtractor by intention.
+        super(TaskData.class, TestTaskDataLabelValueExtractor.TEST_LABEL, 2);
     }
 
     @Override

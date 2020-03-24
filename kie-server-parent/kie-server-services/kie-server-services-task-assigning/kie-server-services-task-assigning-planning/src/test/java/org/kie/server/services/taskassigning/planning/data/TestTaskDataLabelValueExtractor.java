@@ -25,12 +25,12 @@ import org.kie.server.api.model.taskassigning.TaskData;
 /**
  * Example value extractor for the LabelValueExtractorRegistryTest.
  */
-public class TestTaskDataLabelValueExtractor1 extends AbstractLabelValueExtractor<TaskData> {
+public class TestTaskDataLabelValueExtractor extends AbstractLabelValueExtractor<TaskData> {
 
     public static final String TEST_LABEL = "TEST_LABEL";
     public static final String EXAMPLE_LABEL_VALUE1 = "EXAMPLE_LABEL_VALUE1";
 
-    public TestTaskDataLabelValueExtractor1() {
+    public TestTaskDataLabelValueExtractor() {
         super(TaskData.class, TEST_LABEL, 1);
     }
 

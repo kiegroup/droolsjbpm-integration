@@ -18,6 +18,7 @@ package org.kie.server.services.taskassigning.user.system.simple;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,15 +28,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.kie.server.services.taskassigning.user.system.api.Group;
 import org.kie.server.services.taskassigning.user.system.api.User;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * Utility class for loading users definition from a file using the Wildfly roles.properties definition file format.
@@ -105,7 +107,7 @@ public class SimpleUserSystemServiceHelper {
 
         for (ElementLine line : lines) {
             Set<Group> userGroups = new HashSet<>();
-            User user = new UserImpl(line.elementId, userGroups, new HashMap<>());
+            User user = new UserImpl(line.getElementId(), userGroups, new HashMap<>());
             line.values.forEach(groupName -> {
                 Group group = groupMap.computeIfAbsent(groupName, GroupImpl::new);
                 userGroups.add(group);
@@ -139,18 +141,15 @@ public class SimpleUserSystemServiceHelper {
     private static class ElementLine {
 
         private String elementId;
-        private List<String> values = new ArrayList<>();
+        private List<String> values;
 
-        public ElementLine(String elementId) {
+        public ElementLine(String elementId, List<String> values) {
             this.elementId = elementId;
+            this.values = values;
         }
 
         public String getElementId() {
             return elementId;
-        }
-
-        public void addValue(String value) {
-            values.add(value);
         }
 
         public List<String> getValues() {
@@ -171,41 +170,26 @@ public class SimpleUserSystemServiceHelper {
     }
 
     private static List<ElementLine> readLines(InputStream input) throws IOException {
-        final List<String> rawLines = IOUtils.readLines(input, StandardCharsets.UTF_8).stream()
-                .map(String::trim)
-                .filter(StringUtils::isNotEmpty)
-                .filter(line -> !line.startsWith("#"))
+        final Properties properties = new Properties();
+        properties.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+        return properties.entrySet().stream()
+                .map(entry -> Pair.of(trim(entry.getKey().toString()), trim(entry.getValue().toString())))
+                .filter(pair -> isNotEmpty(pair.getKey()))
+                .map(pair -> new ElementLine(pair.getKey(), readLine(pair.getValue())))
                 .collect(Collectors.toList());
-        final List<ElementLine> lines = new ArrayList<>();
-        for (String rawLine : rawLines) {
-            final String[] rawLineSplit = rawLine.split("=");
-            ElementLine line = readLine(rawLineSplit);
-            if (line != null) {
-                lines.add(line);
-            }
-        }
-        return lines;
     }
 
-    private static ElementLine readLine(String[] rawLineSplit) {
-        if (rawLineSplit == null || rawLineSplit.length == 0) {
-            return null;
-        }
-        String elementId = rawLineSplit[0].trim();
-        if (isNotEmpty(elementId)) {
-            ElementLine line = new ElementLine(elementId);
-            if (rawLineSplit.length > 1) {
-                String encodedValues = rawLineSplit[1].trim();
-                String[] valuesSplit = encodedValues.split(",");
-                for (String rawValue : valuesSplit) {
-                    String value = rawValue.trim();
-                    if (isNotEmpty(value)) {
-                        line.addValue(value);
-                    }
+    private static List<String> readLine(String encodedValues) {
+        final List<String> values = new ArrayList<>();
+        if (encodedValues != null) {
+            final String[] valuesSplit = encodedValues.split(",");
+            for (String rawValue : valuesSplit) {
+                String value = rawValue.trim();
+                if (isNotEmpty(value)) {
+                    values.add(value);
                 }
             }
-            return line;
         }
-        return null;
+        return values;
     }
 }
