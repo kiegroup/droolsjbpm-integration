@@ -38,6 +38,8 @@ import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseFileDataItem;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceCustomVars;
+import org.kie.server.api.model.cases.CaseInstanceCustomVarsList;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseMilestoneList;
@@ -45,14 +47,18 @@ import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseRoleAssignmentList;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.cases.CaseUserTaskWithVariables;
+import org.kie.server.api.model.cases.CaseUserTaskWithVariablesList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.rest.RestURI;
 import org.kie.server.client.CaseServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 
@@ -1614,5 +1620,31 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             return "";
         }
         return value;
+    }
+
+    @Override
+    public List<CaseInstanceCustomVars> queryCasesByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize) {
+        if (config.isRest()) {
+            String queryString = getPagingQueryString("", page, pageSize);
+            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), RestURI.CASE_QUERY_URI + "/" + RestURI.VARIABLES_CASES_URI + queryString, Collections.emptyMap()),
+                                                                spec,
+                                                              CaseInstanceCustomVarsList.class).getItems();
+        } else {
+            throw new RuntimeException("JMS is not supported");
+        }
+
+    }
+
+    @Override
+    public List<CaseUserTaskWithVariables> queryUserTaskByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize) {
+        if (config.isRest()) {
+            String queryString = getPagingQueryString("", page, pageSize);
+            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), RestURI.CASE_QUERY_URI + "/" + RestURI.VARIABLES_TASKS_CASES_URI + queryString, Collections.emptyMap()),
+                                                                spec,
+                                                              CaseUserTaskWithVariablesList.class).getItems();
+        } else {
+            throw new RuntimeException("JMS is not supported");
+        }
+
     }
 }

@@ -16,6 +16,7 @@
 
 package org.kie.server.springboot.autoconfiguration.jbpm.extensions;
 
+import org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
 import org.jbpm.casemgmt.api.admin.CaseInstanceMigrationService;
@@ -33,16 +34,18 @@ public class SpringBootCaseKieServerExtension extends CaseKieServerExtension {
     
     public SpringBootCaseKieServerExtension(CaseService caseService,
                                             CaseRuntimeDataService caseRuntimeDataService,
+                                            AdvanceCaseRuntimeDataService advanceCaseRuntimeDataService,
                                             CaseInstanceMigrationService caseInstanceMigrationService) {
         this.caseService = caseService;
         this.caseRuntimeDataService = caseRuntimeDataService;
+        this.advanceCaseRuntimeDataService = advanceCaseRuntimeDataService;
         this.caseInstanceMigrationService = caseInstanceMigrationService;
     }
 
     @Override
     protected void configureServices(KieServerImpl kieServer, KieServerRegistry registry) {
         this.caseManagementServiceBase = new CaseManagementServiceBase(caseService, caseRuntimeDataService, registry);
-        this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, registry);
+        this.caseManagementRuntimeDataService = new CaseManagementRuntimeDataServiceBase(caseRuntimeDataService, advanceCaseRuntimeDataService, registry);
         this.caseAdminServiceBase = new CaseAdminServiceBase(caseInstanceMigrationService, registry);
         
     }

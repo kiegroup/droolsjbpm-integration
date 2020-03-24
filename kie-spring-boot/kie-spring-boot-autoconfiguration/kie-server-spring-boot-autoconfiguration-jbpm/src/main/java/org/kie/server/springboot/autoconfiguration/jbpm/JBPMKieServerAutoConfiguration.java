@@ -19,6 +19,7 @@ package org.kie.server.springboot.autoconfiguration.jbpm;
 import java.util.Optional;
 
 import org.jbpm.kie.services.impl.FormManagerService;
+import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
@@ -57,6 +58,7 @@ public class JBPMKieServerAutoConfiguration {
     private ProcessService processService;
     private UserTaskService userTaskService;
     private RuntimeDataService runtimeDataService;
+    private AdvanceRuntimeDataService advanceRuntimeDataService;
     private FormManagerService formManagerService;
 
     private ProcessInstanceMigrationService processInstanceMigrationService;
@@ -73,6 +75,7 @@ public class JBPMKieServerAutoConfiguration {
                                           ProcessService processService,
                                           UserTaskService userTaskService,
                                           RuntimeDataService runtimeDataService,
+                                          AdvanceRuntimeDataService advanceRuntimeDataService,
                                           FormManagerService formManagerService,
 
                                           ProcessInstanceMigrationService processInstanceMigrationService,
@@ -87,6 +90,7 @@ public class JBPMKieServerAutoConfiguration {
         this.processService = processService;
         this.userTaskService = userTaskService;
         this.runtimeDataService = runtimeDataService;
+        this.advanceRuntimeDataService = advanceRuntimeDataService;
         this.formManagerService = formManagerService;
 
         this.processInstanceMigrationService = processInstanceMigrationService;
@@ -104,7 +108,8 @@ public class JBPMKieServerAutoConfiguration {
     @ConditionalOnProperty(name = "kieserver.jbpm.enabled")
     public KieServerExtension jbpmServerExtension() {
 
-        return new SpringBootJBPMKieServerExtension(deploymentService, definitionService, processService, userTaskService, runtimeDataService, formManagerService, processInstanceMigrationService,
+        return new SpringBootJBPMKieServerExtension(deploymentService, definitionService, processService, userTaskService, 
+                                                    runtimeDataService, advanceRuntimeDataService, formManagerService, processInstanceMigrationService,
                                                     processInstanceAdminService, userTaskAdminService, executorService, queryService);
 
     }

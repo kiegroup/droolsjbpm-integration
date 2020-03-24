@@ -23,9 +23,12 @@ import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariables;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.jms.ResponseHandler;
@@ -150,4 +153,8 @@ public interface QueryServicesClient {
     List<TaskInstance> findHumanTasksWithFilters(String queryName, TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
     
     void setResponseHandler(ResponseHandler responseHandler);
+
+    List<ProcessInstanceCustomVars> queryProcessesByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize);
+
+    List<ProcessInstanceUserTaskWithVariables> queryUserTaskByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize);
 }

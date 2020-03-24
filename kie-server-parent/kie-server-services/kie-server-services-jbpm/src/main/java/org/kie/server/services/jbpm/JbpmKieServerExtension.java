@@ -51,6 +51,7 @@ import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.executor.impl.ExecutorImpl;
 import org.jbpm.executor.impl.ExecutorServiceImpl;
 import org.jbpm.kie.services.impl.AbstractDeploymentService;
+import org.jbpm.kie.services.impl.AdvanceRuntimeDataServiceImpl;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -69,6 +70,7 @@ import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManagerUtil;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorMerger;
 import org.jbpm.runtime.manager.impl.identity.UserDataServiceProvider;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
+import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
@@ -157,6 +159,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     protected ProcessInstanceMigrationService processInstanceMigrationService;
     protected ProcessInstanceAdminService processInstanceAdminService;
     protected UserTaskAdminService userTaskAdminService;
+    protected AdvanceRuntimeDataService advanceRuntimeDataService;
 
     protected ExecutorService executorService;
 
@@ -205,6 +208,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         services.add(processInstanceMigrationService);
         services.add(processInstanceAdminService);
         services.add(userTaskAdminService);
+        services.add(advanceRuntimeDataService);
 
         registerDefaultQueryDefinitions();
         initialized = true;
@@ -324,10 +328,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((UserTaskAdminServiceImpl) this.userTaskAdminService).setIdentityProvider(context.getIdentityProvider());
         ((UserTaskAdminServiceImpl) this.userTaskAdminService).setCommandService(new TransactionalCommandService(emf));
 
-        this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService, context),
-                                                                                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
-                                                                                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context),
-                                                                                 new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
+        this.advanceRuntimeDataService = new AdvanceRuntimeDataServiceImpl();
+        ((AdvanceRuntimeDataServiceImpl) this.advanceRuntimeDataService).setEmf(emf);
+        ((AdvanceRuntimeDataServiceImpl) this.advanceRuntimeDataService).setCommandService(new TransactionalCommandService(emf));
+
+        this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService,
+                                                                                 new DefinitionServiceBase(definitionService, context),
+                                                                                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context),
+                                                                                 new UserTaskServiceBase(userTaskService, context),
+                                                                                 new RuntimeDataServiceBase(runtimeDataService, advanceRuntimeDataService, context),
+                                                                                 new ExecutorServiceBase(executorService, context),
+                                                                                 new QueryDataServiceBase(queryService, context),
+                                                                                 new DocumentServiceBase(context),
+                                                                                 new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
                                                                                  new UserTaskAdminServiceBase(userTaskAdminService, context));
     }
 
@@ -579,19 +592,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
                 = ServiceLoader.load(KieServerApplicationComponentsService.class);
         List<Object> appComponentsList = new ArrayList<Object>();
-        Object[] services = {
-                deploymentService,
-                definitionService,
-                processService,
-                userTaskService,
-                runtimeDataService,
-                executorService,
-                formManagerService,
-                queryService,
-                processInstanceMigrationService,
-                processInstanceAdminService,
-                userTaskAdminService,
-                context
+        Object[] services = {deploymentService,
+                             definitionService,
+                             processService,
+                             userTaskService,
+                             runtimeDataService,
+                             executorService,
+                             formManagerService,
+                             queryService,
+                             processInstanceMigrationService,
+                             processInstanceAdminService,
+                             userTaskAdminService,
+                             context,
+                             advanceRuntimeDataService
         };
         for (KieServerApplicationComponentsService appComponentsService : appComponentsServices) {
             appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
