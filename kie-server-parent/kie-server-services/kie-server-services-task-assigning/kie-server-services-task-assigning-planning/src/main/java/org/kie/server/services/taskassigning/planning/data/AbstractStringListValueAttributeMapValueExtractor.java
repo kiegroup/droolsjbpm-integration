@@ -24,7 +24,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class AbstractStringListValueAttributeMapValueExtractor<M extends Map<String, ?>, T> extends AbstractAttributeMapValueLabelValueExtractor<M, T> {
+public abstract class AbstractStringListValueAttributeMapValueExtractor<M extends Map<String, ?>, T>
+        extends AbstractAttributeMapValueLabelValueExtractor<M, T> {
 
     public static final String COMMA_SEPARATOR = ",";
 
@@ -37,11 +38,10 @@ public abstract class AbstractStringListValueAttributeMapValueExtractor<M extend
 
     @Override
     protected Set<Object> extractFromAttribute(Object attributeValue) {
-        final String value = attributeValue != null ? attributeValue.toString() : null;
-        if (value == null) {
+        if (attributeValue == null) {
             return new HashSet<>();
         } else {
-            final String[] valueSplit = value.split(separator);
+            final String[] valueSplit = attributeValue.toString().split(separator);
             return Stream.of(valueSplit)
                     .map(StringUtils::trim)
                     .filter(StringUtils::isNotEmpty)

@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(Parameterized.class)
 public abstract class AbstractLabelValueExtractorTest<T, E extends AbstractLabelValueExtractor<T>> {
 
-    public static final String CUSTOM_NAME = "CUSTPM_NAME";
+    public static final String CUSTOM_NAME = "CUSTOM_NAME";
     public static final String VALUE1 = "VALUE1";
     public static final String VALUE2 = "VALUE2";
 

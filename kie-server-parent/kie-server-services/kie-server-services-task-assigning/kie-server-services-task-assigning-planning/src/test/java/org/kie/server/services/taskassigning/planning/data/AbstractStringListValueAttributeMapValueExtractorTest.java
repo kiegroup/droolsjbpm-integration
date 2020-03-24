@@ -28,7 +28,8 @@ import org.kie.server.services.taskassigning.user.system.api.User;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public abstract class AbstractStringListValueAttributeMapValueExtractorTest<M extends Map<String, ?>, T, E extends AbstractAttributeMapValueLabelValueExtractor<M, T>> extends AbstractAttributeMapValueLabelValueExtractorTest<M, T, E> {
+public abstract class AbstractStringListValueAttributeMapValueExtractorTest<M extends Map<String, ?>, T, E extends AbstractAttributeMapValueLabelValueExtractor<M, T>>
+        extends AbstractAttributeMapValueLabelValueExtractorTest<M, T, E> {
 
     protected static TaskData mockTaskData(String attributeName, String value) {
         Map<String, Object> inputData = new HashMap<>();

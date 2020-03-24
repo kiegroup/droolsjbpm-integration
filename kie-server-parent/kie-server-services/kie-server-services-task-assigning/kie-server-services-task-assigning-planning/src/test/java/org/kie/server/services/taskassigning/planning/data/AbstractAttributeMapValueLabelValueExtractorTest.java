@@ -22,7 +22,8 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public abstract class AbstractAttributeMapValueLabelValueExtractorTest<M extends Map<String, ?>, T, E extends AbstractAttributeMapValueLabelValueExtractor<M, T>> extends AbstractLabelValueExtractorTest<T, E> {
+public abstract class AbstractAttributeMapValueLabelValueExtractorTest<M extends Map<String, ?>, T, E extends AbstractAttributeMapValueLabelValueExtractor<M, T>>
+        extends AbstractLabelValueExtractorTest<T, E> {
 
     protected abstract String getExpectedAttributeName();
 
