@@ -41,6 +41,7 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
+import org.kie.server.services.taskassigning.planning.data.LabelValueExtractorRegistry;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.optaplanner.core.api.solver.Solver;
 import org.slf4j.Logger;
@@ -318,6 +319,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                 registerMessage(Severity.ERROR, msg);
                 return false;
             }
+            registerExtractors(container);
         }
 
         try {
@@ -337,6 +339,10 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                 .registry(registry)
                 .solverDef(solverDef)
                 .build();
+    }
+
+    void registerExtractors(KieContainerInstanceImpl container) {
+        LabelValueExtractorRegistry.getInstance().registerExtractors(container.getKieContainer().getClassLoader());
     }
 
     private void validateAndSetUserSystemServiceConfiguration() throws TaskAssigningValidationException {
@@ -373,6 +379,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                 return false;
             }
             classLoader = container.getKieContainer().getClassLoader();
+            registerExtractors(container);
         } else {
             LOGGER.debug("User system service {} will be loaded from application class loader", userSystemName);
             classLoader = this.getClass().getClassLoader();

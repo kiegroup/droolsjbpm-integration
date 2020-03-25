@@ -53,6 +53,49 @@ public class TaskHelper {
                 .anyMatch(group -> acceptedGroupIds.contains(group.getEntityId()));
     }
 
+    /**
+     * Calculates if a given user has all the label values that are declared for the task in the label with name labelName.
+     * @param task a task instance for the evaluation.
+     * @param user a user instance for the evaluation.
+     * @param labelName name of the label for the calculation.
+     * @return true if the user.getLabelValues("labelName") set "contains" the task.getLabelValues("labelName") set,
+     * false in any other case.
+     */
+    public static boolean hasAllLabels(Task task, User user, String labelName) {
+        final Set<Object> taskLabelValues = task.getLabelValues(labelName);
+        if (taskLabelValues == null || taskLabelValues.isEmpty()) {
+            return true;
+        }
+
+        final Set<Object> userLabelValues = user.getLabelValues(labelName);
+        return userLabelValues != null && userLabelValues.containsAll(taskLabelValues);
+    }
+
+    /**
+     * Calculates the number labels in the user label value set that are contained in the task label value set for the
+     * label labelName.
+     * @param task a task instance for the calculation.
+     * @param user a task instance for the calculation.
+     * @param labelName name of the label for the calculation.
+     * @return the number of elements in the intersection between the task.getLabelValues("labelName") and the
+     * user.getLabelValues("labelName") sets.
+     */
+    public static int countMatchingLabels(Task task, User user, String labelName) {
+        final Set<Object> taskLabelValues = task.getLabelValues(labelName);
+        if (taskLabelValues == null || taskLabelValues.isEmpty()) {
+            return 0;
+        }
+        final Set<Object> userLabelValues = user.getLabelValues(labelName);
+        if (userLabelValues == null) {
+            return 0;
+        }
+        return Math.toIntExact(userLabelValues.stream().filter(taskLabelValues::contains).count());
+    }
+
+    /**
+     * @param taskOrUser a TaskOrUser instance for the evaluation.
+     * @return a list with the tasks linked to the taskOrUser.
+     */
     public static List<Task> extractTaskList(TaskOrUser taskOrUser) {
         List<Task> result = new ArrayList<>();
         Task task = taskOrUser.getNextTask();

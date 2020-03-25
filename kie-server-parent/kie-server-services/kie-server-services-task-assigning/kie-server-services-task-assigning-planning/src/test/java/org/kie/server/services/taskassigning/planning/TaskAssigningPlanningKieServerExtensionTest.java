@@ -136,13 +136,17 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     private KieContainerInstanceImpl solverContainer;
 
     @Mock
+    private InternalKieContainer internalSolverKieContainer;
+
+    private ClassLoader internalSolverKieContainerClassLoader;
+
+    @Mock
     private KieContainerInstanceImpl userSystemContainer;
 
     @Mock
-    private InternalKieContainer internalKieContainer;
+    private InternalKieContainer internalUserSystemKieContainer;
 
-    @Mock
-    private ClassLoader internalKieContainerClassLoader;
+    private ClassLoader internalUserSystemKieContainerClassLoader;
 
     @Mock
     private ServiceResponse<KieContainerResource> containerResponse;
@@ -152,6 +156,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
     @Before
     public void setUp() {
+        internalUserSystemKieContainerClassLoader = getClass().getClassLoader();
+        internalSolverKieContainerClassLoader = getClass().getClassLoader();
         extension = spy(new TaskAssigningPlanningKieServerExtension());
         when(kieServer.healthCheck(anyBoolean())).thenReturn(new ArrayList<>());
         doReturn(taskAssigningService).when(extension).createTaskAssigningService();
@@ -299,6 +305,11 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     }
 
     @Test
+    public void toStringTest() {
+        assertEquals(EXTENSION_NAME + " KIE Server extension", extension.toString());
+    }
+
+    @Test
     public void serverStartedSuccessful() {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
         enableExtension();
@@ -327,6 +338,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         when(solverContainer.getStatus()).thenReturn(KieContainerStatus.STARTED);
 
         initAndStartServerSuccessful();
+        verify(extension).registerExtractors(solverContainer);
     }
 
     @Test
@@ -336,6 +348,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         prepareExistingContainerButNeedsActivationSuccessful(SOLVER_CONTAINER_ID, solverContainer);
 
         initAndStartServerSuccessful();
+        verify(extension).registerExtractors(solverContainer);
     }
 
     @Test
@@ -347,6 +360,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         extension.serverStarted();
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(ACTIVATE_CONTAINER_ERROR, SOLVER_CONTAINER_ID, ERROR_MESSAGE)), 2, 0, true);
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(PLANNER_CONTAINER_NOT_AVAILABLE, SOLVER_CONTAINER_ID)), 2, 1, true);
+        verify(extension, never()).registerExtractors(solverContainer);
     }
 
     @Test
@@ -356,6 +370,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         prepareContainerNotExistingButCreatedSuccessful(SOLVER_CONTAINER_ID, solverContainer);
 
         initAndStartServerSuccessful();
+        verify(extension).registerExtractors(solverContainer);
     }
 
     @Test
@@ -367,6 +382,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         extension.serverStarted();
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(CREATE_CONTAINER_ERROR, SOLVER_CONTAINER_ID, ERROR_MESSAGE)), 2, 0, true);
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(PLANNER_CONTAINER_NOT_AVAILABLE, SOLVER_CONTAINER_ID)), 2, 1, true);
+        verify(extension, never()).registerExtractors(solverContainer);
     }
 
     @Test
@@ -376,6 +392,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         when(userSystemContainer.getStatus()).thenReturn(KieContainerStatus.STARTED);
 
         initAndStartServerSuccessful();
+        verify(extension).registerExtractors(userSystemContainer);
     }
 
     @Test
@@ -384,6 +401,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         prepareExistingContainerButNeedsActivationSuccessful(USER_SYSTEM_CONTAINER_ID, userSystemContainer);
 
         initAndStartServerSuccessful();
+        verify(extension).registerExtractors(userSystemContainer);
     }
 
     @Test
@@ -394,6 +412,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         extension.serverStarted();
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(ACTIVATE_CONTAINER_ERROR, USER_SYSTEM_CONTAINER_ID, ERROR_MESSAGE)), 2, 0, true);
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(USER_SYSTEM_CONTAINER_NOT_AVAILABLE, USER_SYSTEM_CONTAINER_ID)), 2, 1, true);
+        verify(extension, never()).registerExtractors(userSystemContainer);
     }
 
     @Test
@@ -402,6 +421,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         prepareContainerNotExistingButCreatedSuccessful(USER_SYSTEM_CONTAINER_ID, userSystemContainer);
 
         initAndStartServerSuccessful();
+        verify(extension).registerExtractors(userSystemContainer);
     }
 
     @Test
@@ -412,6 +432,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         extension.serverStarted();
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(CREATE_CONTAINER_ERROR, USER_SYSTEM_CONTAINER_ID, ERROR_MESSAGE)), 2, 0, true);
         assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(USER_SYSTEM_CONTAINER_NOT_AVAILABLE, USER_SYSTEM_CONTAINER_ID)), 2, 1, true);
+        verify(extension, never()).registerExtractors(userSystemContainer);
     }
 
     @Test
@@ -450,6 +471,12 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     }
 
     @Test
+    public void destroyWhenNotInitialized() {
+        extension.destroy(kieServer, registry);
+        verify(taskAssigningService, never()).destroy();
+    }
+
+    @Test
     public void healthCheck() {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
         enableExtension();
@@ -461,6 +488,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     private void prepareServerStartWithSolverContainerConfig() {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
         enableExtension();
+        when(solverContainer.getKieContainer()).thenReturn(internalSolverKieContainer);
+        when(internalSolverKieContainer.getClassLoader()).thenReturn(internalSolverKieContainerClassLoader);
         prepareSolverContainerProperties();
         doReturn(userSystemService).when(extension).lookupUserSystem(eq(USER_SYSTEM_NAME), any());
     }
@@ -468,8 +497,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     private void prepareServerStartWithUserSystemContainerConfig() {
         prepareUserContainerProperties();
         enableExtension();
-        when(userSystemContainer.getKieContainer()).thenReturn(internalKieContainer);
-        when(internalKieContainer.getClassLoader()).thenReturn(internalKieContainerClassLoader);
+        when(userSystemContainer.getKieContainer()).thenReturn(internalUserSystemKieContainer);
+        when(internalUserSystemKieContainer.getClassLoader()).thenReturn(internalUserSystemKieContainerClassLoader);
         doReturn(userSystemService).when(extension).lookupUserSystem(eq(USER_SYSTEM_NAME), any());
         doReturn(solver).when(extension).createSolver(eq(registry), any());
     }

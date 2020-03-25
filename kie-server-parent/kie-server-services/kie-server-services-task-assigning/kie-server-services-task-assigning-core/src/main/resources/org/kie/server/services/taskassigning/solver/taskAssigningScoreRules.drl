@@ -19,10 +19,12 @@ dialect "java"
 
 import org.optaplanner.core.api.score.buildin.bendable.BendableScoreHolder;
 
+import org.kie.server.services.taskassigning.core.model.DefaultLabels;
 import org.kie.server.services.taskassigning.core.model.ModelConstants;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
-import org.kie.server.services.taskassigning.core.model.solver.PriorityHelper
+import org.kie.server.services.taskassigning.core.model.solver.PriorityHelper;
+import org.kie.server.services.taskassigning.core.model.solver.TaskHelper;
 
 global BendableScoreHolder scoreHolder;
 
@@ -30,22 +32,21 @@ global BendableScoreHolder scoreHolder;
 // Hard constraints
 // ############################################################################
 
-// A task can only be assigned to one of it's potential owners.
+// A task can only be assigned to one of it's potential owners or to the PlanningUser
 rule "Required Potential Owner"
     when
-        Task(user != null, !acceptsAssignedUser)
+        $task : Task(user != null, !ModelConstants.IS_PLANNING_USER.test(user.getEntityId()), !TaskHelper.isPotentialOwner($task, user))
     then
         scoreHolder.addHardConstraintMatch(kcontext, 0, -1);
 end
 
-/*
-rule "Skill"
+// A task with defined skills can only be assigned to users that has all the of them or to the PlanningUser
+rule "Required Skills"
     when
-        Task(user != null, !hasAllTheSkills)
+        $task : Task(user != null, !ModelConstants.IS_PLANNING_USER.test(user.getEntityId()), !TaskHelper.hasAllLabels($task, user, DefaultLabels.SKILLS.name()))
     then
         scoreHolder.addHardConstraintMatch(kcontext, 1, -1);
 end
-*/
 
 // ############################################################################
 // Soft constraints
@@ -60,7 +61,7 @@ end
 // to a different jBPM user by using the jBPM tasks lists administration, etc.
 rule "PlanningUser assignment"
     when
-        Task(user != null && ModelConstants.IS_PLANNING_USER.test(user.getEntityId()))
+        Task(user != null, ModelConstants.IS_PLANNING_USER.test(user.getEntityId()))
     then
         // a penalization is added each time the PLANNING_USER is assigned.
         scoreHolder.addSoftConstraintMatch(kcontext, 0, -1);
@@ -73,24 +74,32 @@ rule "High level priority"
         scoreHolder.addSoftConstraintMatch(kcontext, 1, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
 end
 
+// When a task has defined affinities consider assigning users that match the most of them as possible.
+rule "Desired Affinities"
+    when
+        $task : Task(user != null)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, 2, TaskHelper.countMatchingLabels($task, $task.getUser(), DefaultLabels.AFFINITIES.name()));
+end
+
 rule "Minimize makespan (starting with the latest ending user first)"
     when
         Task(user != null, nextTask == null, $endTimeInMinutes : endTimeInMinutes)
     then
         // Fairness and load balancing trick (see docs): squared to assure correctness in corner cases
-        scoreHolder.addSoftConstraintMatch(kcontext, 2, - ($endTimeInMinutes * $endTimeInMinutes));
+        scoreHolder.addSoftConstraintMatch(kcontext, 3, - ($endTimeInMinutes * $endTimeInMinutes));
 end
 
 rule "Medium level priority"
     when
         $task : Task(user != null, PriorityHelper.isMediumLevel(priority))
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, 3, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
+        scoreHolder.addSoftConstraintMatch(kcontext, 4, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
 end
 
 rule "Low level priority"
     when
         $task : Task(user != null, PriorityHelper.isLowLevel(priority))
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, 4, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
+        scoreHolder.addSoftConstraintMatch(kcontext, 5, PriorityHelper.calculateWeightedPenalty($task.getPriority(), $task.getEndTimeInMinutes()));
 end
