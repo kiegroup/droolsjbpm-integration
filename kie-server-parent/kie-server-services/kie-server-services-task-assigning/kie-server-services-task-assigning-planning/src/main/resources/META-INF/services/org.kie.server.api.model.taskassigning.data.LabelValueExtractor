@@ -1,0 +1,4 @@
+org.kie.server.services.taskassigning.planning.data.DefaultTaskDataAffinitiesValueExtractor
+org.kie.server.services.taskassigning.planning.data.DefaultTaskDataSkillsValueExtractor
+org.kie.server.services.taskassigning.planning.data.DefaultUserAffinitiesValueExtractor
+org.kie.server.services.taskassigning.planning.data.DefaultUserSkillsValueExtractor

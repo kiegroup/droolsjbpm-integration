@@ -16,6 +16,8 @@
 
 package org.kie.server.services.taskassigning.planning.util;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,9 +33,13 @@ import org.kie.server.services.taskassigning.core.model.User;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.kie.server.services.taskassigning.core.model.DefaultLabels.AFFINITIES;
+import static org.kie.server.services.taskassigning.core.model.DefaultLabels.SKILLS;
 
 public class TaskUtilTest {
 
+    private static final String SKILLS_ATTRIBUTE = "skills";
+    private static final String AFFINITIES_ATTRIBUTE = "affinities";
     private static final long TASK_ID = 0L;
     private static final long PROCESS_INSTANCE_ID = 1L;
     private static final String PROCESS_ID = "PROCESS_ID";
@@ -44,9 +50,26 @@ public class TaskUtilTest {
     private static final Map<String, Object> INPUT_DATA = new HashMap<>();
     private static final OrganizationalEntity OE_1 = OrganizationalEntity.builder().type(UserType.USER).name("OE1").build();
     private static final OrganizationalEntity OE_2 = OrganizationalEntity.builder().type(UserType.GROUP).name("OE2").build();
+    private static final String SKILL1 = "skill1";
+    private static final String SKILL2 = "skill2";
+    private static final String SKILL3 = "skill3";
+    private static final String AFFINITY1 = "affinity1";
+    private static final String AFFINITY2 = "affinity2";
 
     @Test
     public void fromTaskData() {
+        fromTaskData(INPUT_DATA, Collections.emptySet(), Collections.emptySet());
+    }
+
+    @Test
+    public void fromTaskDataWithSkillsAndAffinities() {
+        Map<String, Object> inputData = new HashMap<>();
+        inputData.put(SKILLS_ATTRIBUTE, String.format("%s,  %s,%s", SKILL2, SKILL1, SKILL3));
+        inputData.put(AFFINITIES_ATTRIBUTE, String.format("  %s,  %s", AFFINITY2, AFFINITY1));
+        fromTaskData(inputData, new HashSet<>(Arrays.asList(SKILL3, SKILL2, SKILL1)), new HashSet<>(Arrays.asList(AFFINITY1, AFFINITY2)));
+    }
+
+    private void fromTaskData(Map<String, Object> inputData, Set<Object> expectedSkills, Set<Object> expectedAffinities) {
         Set<OrganizationalEntity> potentialOwners = new HashSet<>();
         potentialOwners.add(OE_1);
         potentialOwners.add(OE_2);
@@ -59,7 +82,7 @@ public class TaskUtilTest {
                 .name(NAME)
                 .priority(PRIORITY)
                 .status(STATUS)
-                .inputData(INPUT_DATA)
+                .inputData(inputData)
                 .potentialOwners(potentialOwners)
                 .build();
 
@@ -71,7 +94,7 @@ public class TaskUtilTest {
         assertEquals(NAME, task.getName());
         assertEquals(PRIORITY, task.getPriority(), 0);
         assertEquals(STATUS, task.getStatus());
-        assertEquals(INPUT_DATA, task.getInputData());
+        assertEquals(inputData, task.getInputData());
         assertEquals(potentialOwners.size(), task.getPotentialOwners().size(), 2);
         User user = task.getPotentialOwners().stream()
                 .filter(u -> OE_1.getName().equals(u.getEntityId()) && u.isUser())
@@ -83,5 +106,7 @@ public class TaskUtilTest {
                 .map(g -> (Group) g)
                 .findFirst().orElse(null);
         assertNotNull(group);
+        assertEquals(expectedSkills, task.getLabelValues(SKILLS.name()));
+        assertEquals(expectedAffinities, task.getLabelValues(AFFINITIES.name()));
     }
 }

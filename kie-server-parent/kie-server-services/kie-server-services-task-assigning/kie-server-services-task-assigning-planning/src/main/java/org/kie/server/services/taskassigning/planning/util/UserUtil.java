@@ -26,6 +26,7 @@ import org.kie.server.api.model.taskassigning.UserType;
 import org.kie.server.services.taskassigning.core.model.Group;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.User;
+import org.kie.server.services.taskassigning.planning.data.LabelValueExtractorRegistry;
 
 public class UserUtil {
 
@@ -39,6 +40,9 @@ public class UserUtil {
         if (externalUser.getGroups() != null) {
             externalUser.getGroups().forEach(externalGroup -> groups.add(new Group(externalGroup.getId().hashCode(), externalGroup.getId())));
         }
+        LabelValueExtractorRegistry.getInstance()
+                .applyLabelValueExtractors(org.kie.server.services.taskassigning.user.system.api.User.class,
+                                           externalUser, user::setLabelValues);
         return user;
     }
 

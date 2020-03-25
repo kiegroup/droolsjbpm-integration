@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +24,6 @@ import java.util.Set;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.services.taskassigning.core.model.solver.StartAndEndTimeUpdatingVariableListener;
 import org.kie.server.services.taskassigning.core.model.solver.TaskDifficultyComparator;
-import org.kie.server.services.taskassigning.core.model.solver.TaskHelper;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.entity.PlanningPin;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
@@ -31,8 +31,6 @@ import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
-
-import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 
 /**
  * Task is the only planning entity that will be changed during the problem solving, and we have only one
@@ -111,7 +109,7 @@ public class Task extends TaskOrUser {
     private boolean pinned;
 
     private Set<OrganizationalEntity> potentialOwners = new HashSet<>();
-    private Set<TypedLabel> typedLabels = new HashSet<>();
+    private Map<String, Set<Object>> labelValues = new HashMap<>();
 
     /**
      * Planning variable: changes during planning, between score calculations.
@@ -185,7 +183,7 @@ public class Task extends TaskOrUser {
                    Map<String, Object> inputData,
                    boolean pinned,
                    Set<OrganizationalEntity> potentialOwners,
-                   Set<TypedLabel> typedLabels) {
+                   Map<String, Set<Object>> labelValues) {
         super(id);
         this.processInstanceId = processInstanceId;
         this.processId = processId;
@@ -195,7 +193,7 @@ public class Task extends TaskOrUser {
         this.inputData = inputData;
         this.pinned = pinned;
         this.potentialOwners = potentialOwners;
-        this.typedLabels = typedLabels;
+        this.labelValues = labelValues;
     }
 
     public long getProcessInstanceId() {
@@ -273,15 +271,16 @@ public class Task extends TaskOrUser {
         this.potentialOwners = potentialOwners;
     }
 
-    /**
-     * @return the set of labels for this task.
-     */
-    public Set<TypedLabel> getTypedLabels() {
-        return typedLabels;
+    public Map<String, Set<Object>> getLabelValues() {
+        return labelValues;
     }
 
-    public void setTypedLabels(Set<TypedLabel> typedLabels) {
-        this.typedLabels = typedLabels;
+    public Set<Object> getLabelValues(String labelName) {
+        return labelValues.get(labelName);
+    }
+
+    public void setLabelValues(String labelName, Set<Object> values) {
+        labelValues.put(labelName, values);
     }
 
     public TaskOrUser getPreviousTaskOrUser() {
@@ -335,29 +334,12 @@ public class Task extends TaskOrUser {
                 ", status ='" + status + '\'' +
                 ", pinned=" + pinned +
                 ", potentialOwners=" + potentialOwners +
-                ", typedLabels=" + typedLabels +
+                ", labelValues=" + labelValues +
                 ", previousTaskOrUser=" + previousTaskOrUser +
                 ", user=" + user +
                 ", startTimeInMinutes=" + startTimeInMinutes +
                 ", durationInMinutes=" + durationInMinutes +
                 ", endTimeInMinutes=" + endTimeInMinutes +
                 '}';
-    }
-
-    // ************************************************************************
-    // Complex methods
-    // ************************************************************************
-
-    /**
-     * Indicates if the currently assigned user can execute this task. If this is the case, the user is a potential
-     * owner of the task.
-     * @return true the assigned user can execute this task, false in any other case.
-     */
-    public boolean acceptsAssignedUser() {
-        if (PLANNING_USER.getEntityId().equals(getUser().getEntityId())) {
-            //planning user belongs to all the groups by definition.
-            return true;
-        }
-        return TaskHelper.isPotentialOwner(this, getUser());
     }
 }

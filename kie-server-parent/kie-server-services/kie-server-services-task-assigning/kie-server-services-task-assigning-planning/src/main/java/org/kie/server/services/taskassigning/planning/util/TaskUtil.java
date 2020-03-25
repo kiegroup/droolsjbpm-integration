@@ -20,6 +20,7 @@ import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.services.taskassigning.core.model.Group;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.User;
+import org.kie.server.services.taskassigning.planning.data.LabelValueExtractorRegistry;
 
 import static org.kie.server.services.taskassigning.planning.util.UserUtil.isUser;
 
@@ -46,6 +47,7 @@ public class TaskUtil {
                 }
             });
         }
+        LabelValueExtractorRegistry.getInstance().applyLabelValueExtractors(TaskData.class, taskData, task::setLabelValues);
         return task;
     }
 }

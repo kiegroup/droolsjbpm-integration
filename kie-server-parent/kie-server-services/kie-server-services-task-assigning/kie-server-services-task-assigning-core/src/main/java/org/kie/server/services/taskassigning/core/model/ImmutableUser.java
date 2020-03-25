@@ -16,7 +16,6 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class ImmutableUser extends User {
@@ -27,8 +26,6 @@ public class ImmutableUser extends User {
 
     ImmutableUser(long id, String entityId) {
         super(id, entityId);
-        super.setGroups(new HashSet<>());
-        super.setTypedLabels(new HashSet<>());
     }
 
     @Override
@@ -42,7 +39,7 @@ public class ImmutableUser extends User {
     }
 
     @Override
-    public void setTypedLabels(Set<TypedLabel> typedLabels) {
+    public void setLabelValues(String labelName, Set<Object> values) {
         throwImmutableException();
     }
 

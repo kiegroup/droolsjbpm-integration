@@ -16,7 +16,9 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -26,7 +28,7 @@ public class User extends TaskOrUser implements OrganizationalEntity {
 
     private String entityId;
     private Set<Group> groups = new HashSet<>();
-    private Set<TypedLabel> typedLabels = new HashSet<>();
+    private Map<String, Set<Object>> labelValues = new HashMap<>();
 
     public User() {
     }
@@ -53,12 +55,16 @@ public class User extends TaskOrUser implements OrganizationalEntity {
         this.groups = groups;
     }
 
-    public Set<TypedLabel> getTypedLabels() {
-        return typedLabels;
+    public Map<String, Set<Object>> getLabelValues() {
+        return labelValues;
     }
 
-    public void setTypedLabels(Set<TypedLabel> typedLabels) {
-        this.typedLabels = typedLabels;
+    public Set<Object> getLabelValues(String labelName) {
+        return labelValues.get(labelName);
+    }
+
+    public void setLabelValues(String labelName, Set<Object> values) {
+        labelValues.put(labelName, values);
     }
 
     @Override
@@ -82,7 +88,7 @@ public class User extends TaskOrUser implements OrganizationalEntity {
                 "id=" + id +
                 ", entityId='" + entityId + '\'' +
                 ", groups=" + groups +
-                ", typedLabels=" + typedLabels +
+                ", labelValues=" + labelValues +
                 '}';
     }
 }

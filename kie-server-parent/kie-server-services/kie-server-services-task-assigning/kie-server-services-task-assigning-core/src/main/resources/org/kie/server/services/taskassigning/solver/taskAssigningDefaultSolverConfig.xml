@@ -11,4 +11,8 @@
     <scoreDrl>org/kie/server/services/taskassigning/solver/taskAssigningScoreRules.drl</scoreDrl>
   </scoreDirectorFactory>
 
+  <termination>
+    <unimprovedSpentLimit>PT2M</unimprovedSpentLimit>
+  </termination>
+
 </solver>
