@@ -18,10 +18,12 @@ package org.kie.server.controller.api.model.spec;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -37,7 +39,7 @@ public class ServerTemplate extends ServerTemplateKey {
     @XmlElement(name = "container-specs")
     private Collection<ContainerSpec> containersSpec = new ArrayList<ContainerSpec>();
     @XmlElement(name = "server-config")
-    private Map<Capability, ServerConfig> configs = new HashMap<Capability, ServerConfig>();
+    private Map<Capability, ServerConfig> configs = new EnumMap<>(Capability.class);
     @XmlElement(name = "server-instances")
     private Collection<ServerInstanceKey> serverInstances = new ArrayList<ServerInstanceKey>();
     @XmlElement(name="capabilities")

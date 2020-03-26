@@ -1,0 +1,399 @@
+<TaTaskAssignmentSolution id="1">
+  <id>0</id>
+  <userList id="2">
+    <TaUser id="3">
+      <id>0</id>
+      <entityId>Amy</entityId>
+      <groups class="linked-hash-set" id="4">
+        <TaGroup id="5">
+          <id>3</id>
+          <entityId>Sales</entityId>
+        </TaGroup>
+        <TaGroup id="6">
+          <id>4</id>
+          <entityId>Legal</entityId>
+        </TaGroup>
+      </groups>
+      <labelValues id="7"/>
+    </TaUser>
+    <TaUser id="8">
+      <id>1</id>
+      <entityId>Beth</entityId>
+      <groups class="linked-hash-set" id="9"/>
+      <labelValues id="10"/>
+    </TaUser>
+    <TaUser id="11">
+      <id>2</id>
+      <entityId>Chad</entityId>
+      <groups class="linked-hash-set" id="12">
+        <TaGroup id="13">
+          <id>6</id>
+          <entityId>Manager</entityId>
+        </TaGroup>
+        <TaGroup id="14">
+          <id>7</id>
+          <entityId>Developer</entityId>
+        </TaGroup>
+      </groups>
+      <labelValues id="15"/>
+    </TaUser>
+    <TaUser id="16">
+      <id>3</id>
+      <entityId>Dan</entityId>
+      <groups class="linked-hash-set" id="17">
+        <TaGroup reference="5"/>
+        <TaGroup reference="6"/>
+      </groups>
+      <labelValues id="18"/>
+    </TaUser>
+    <TaUser id="19">
+      <id>4</id>
+      <entityId>Elsa</entityId>
+      <groups class="linked-hash-set" id="20">
+        <TaGroup id="21">
+          <id>0</id>
+          <entityId>HR</entityId>
+        </TaGroup>
+        <TaGroup id="22">
+          <id>1</id>
+          <entityId>IT</entityId>
+        </TaGroup>
+      </groups>
+      <labelValues id="23"/>
+    </TaUser>
+    <TaUser id="24">
+      <id>5</id>
+      <entityId>Flo</entityId>
+      <groups class="linked-hash-set" id="25">
+        <TaGroup reference="13"/>
+        <TaGroup reference="14"/>
+      </groups>
+      <labelValues id="26"/>
+    </TaUser>
+    <TaUser id="27">
+      <id>6</id>
+      <entityId>Gus</entityId>
+      <groups class="linked-hash-set" id="28">
+        <TaGroup reference="22"/>
+      </groups>
+      <labelValues id="29"/>
+    </TaUser>
+    <TaUser id="30">
+      <id>7</id>
+      <entityId>Hugo</entityId>
+      <groups class="linked-hash-set" id="31">
+        <TaGroup reference="6"/>
+      </groups>
+      <labelValues id="32"/>
+    </TaUser>
+  </userList>
+  <taskList id="33">
+    <TaTask id="34">
+      <id>0</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_0</name>
+      <priority>10</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="35">
+        <TaUser reference="24"/>
+      </potentialOwners>
+      <labelValues id="36"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="37">
+      <id>1</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_1</name>
+      <priority>1</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="38"/>
+      <labelValues id="39"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="40">
+      <id>2</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_2</name>
+      <priority>8</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="41">
+        <TaUser reference="19"/>
+      </potentialOwners>
+      <labelValues id="42"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="43">
+      <id>3</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_3</name>
+      <priority>4</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="44">
+        <TaUser reference="11"/>
+      </potentialOwners>
+      <labelValues id="45"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="46">
+      <id>4</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_4</name>
+      <priority>4</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="47">
+        <TaGroup reference="6"/>
+        <TaGroup id="48">
+          <id>5</id>
+          <entityId>Marketing</entityId>
+        </TaGroup>
+      </potentialOwners>
+      <labelValues id="49"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="50">
+      <id>5</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_5</name>
+      <priority>4</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="51">
+        <TaGroup reference="21"/>
+        <TaGroup reference="22"/>
+      </potentialOwners>
+      <labelValues id="52"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="53">
+      <id>6</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_6</name>
+      <priority>1</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="54">
+        <TaGroup reference="6"/>
+      </potentialOwners>
+      <labelValues id="55"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="56">
+      <id>7</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_7</name>
+      <priority>2</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="57">
+        <TaGroup id="58">
+          <id>9</id>
+          <entityId>Support</entityId>
+        </TaGroup>
+      </potentialOwners>
+      <labelValues id="59"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="60">
+      <id>8</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_8</name>
+      <priority>2</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="61">
+        <TaGroup reference="48"/>
+        <TaUser reference="16"/>
+      </potentialOwners>
+      <labelValues id="62"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="63">
+      <id>9</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_9</name>
+      <priority>6</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="64">
+        <TaGroup reference="22"/>
+        <TaUser reference="24"/>
+      </potentialOwners>
+      <labelValues id="65"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="66">
+      <id>10</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_10</name>
+      <priority>4</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="67">
+        <TaGroup reference="5"/>
+        <TaUser reference="8"/>
+      </potentialOwners>
+      <labelValues id="68"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="69">
+      <id>11</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_11</name>
+      <priority>1</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="70">
+        <TaGroup id="71">
+          <id>2</id>
+          <entityId>PM</entityId>
+        </TaGroup>
+        <TaGroup reference="5"/>
+      </potentialOwners>
+      <labelValues id="72"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="73">
+      <id>12</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_12</name>
+      <priority>4</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="74"/>
+      <labelValues id="75"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="76">
+      <id>13</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_13</name>
+      <priority>0</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="77">
+        <TaUser reference="27"/>
+      </potentialOwners>
+      <labelValues id="78"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="79">
+      <id>14</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_14</name>
+      <priority>4</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="80">
+        <TaGroup reference="22"/>
+        <TaGroup reference="71"/>
+      </potentialOwners>
+      <labelValues id="81"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="82">
+      <id>15</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_15</name>
+      <priority>4</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="83">
+        <TaGroup reference="13"/>
+        <TaUser reference="8"/>
+      </potentialOwners>
+      <labelValues id="84"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="85">
+      <id>16</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_16</name>
+      <priority>5</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="86">
+        <TaGroup reference="14"/>
+      </potentialOwners>
+      <labelValues id="87"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="88">
+      <id>17</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_17</name>
+      <priority>10</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="89">
+        <TaGroup reference="14"/>
+        <TaGroup id="90">
+          <id>8</id>
+          <entityId>Accounting</entityId>
+        </TaGroup>
+      </potentialOwners>
+      <labelValues id="91"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="92">
+      <id>18</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_18</name>
+      <priority>5</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="93">
+        <TaGroup reference="21"/>
+      </potentialOwners>
+      <labelValues id="94"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="95">
+      <id>19</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_19</name>
+      <priority>1</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="96"/>
+      <labelValues id="97"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="98">
+      <id>20</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_20</name>
+      <priority>9</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="99">
+        <TaGroup reference="21"/>
+      </potentialOwners>
+      <labelValues id="100"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="101">
+      <id>21</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_21</name>
+      <priority>10</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="102">
+        <TaGroup reference="22"/>
+        <TaUser reference="8"/>
+      </potentialOwners>
+      <labelValues id="103"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="104">
+      <id>22</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_22</name>
+      <priority>8</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="105">
+        <TaGroup reference="13"/>
+        <TaGroup reference="14"/>
+        <TaUser reference="24"/>
+      </potentialOwners>
+      <labelValues id="106"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+    <TaTask id="107">
+      <id>23</id>
+      <processInstanceId>0</processInstanceId>
+      <name>Task_23</name>
+      <priority>7</priority>
+      <pinned>false</pinned>
+      <potentialOwners class="linked-hash-set" id="108">
+        <TaGroup reference="13"/>
+        <TaGroup reference="14"/>
+      </potentialOwners>
+      <labelValues id="109"/>
+      <durationInMinutes>1</durationInMinutes>
+    </TaTask>
+  </taskList>
+</TaTaskAssignmentSolution>

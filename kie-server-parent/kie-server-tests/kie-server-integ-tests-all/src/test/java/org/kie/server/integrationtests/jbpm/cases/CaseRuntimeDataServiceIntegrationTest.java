@@ -14,19 +14,6 @@
  */
 package org.kie.server.integrationtests.jbpm.cases;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,6 +54,19 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -368,18 +368,20 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(2, caseInstance.getMilestones().size());
 
         CaseMilestone milestone = caseInstance.getMilestones().get(0);
+        assertNotNull(milestone.getIdentifier());
+        assertEquals("Milestone2", milestone.getName());
+        assertEquals("Available", milestone.getStatus());
+        assertNull(milestone.getAchievedAt());
+        assertFalse(milestone.isAchieved());
+
+        milestone = caseInstance.getMilestones().get(1);
         assertEquals("2", milestone.getIdentifier());
         assertEquals("Milestone1", milestone.getName());
         assertEquals("Completed", milestone.getStatus());
         assertNotNull(milestone.getAchievedAt());
         assertTrue(milestone.isAchieved());
 
-        milestone = caseInstance.getMilestones().get(1);
-        assertNotNull(milestone.getIdentifier());
-        assertEquals("Milestone2", milestone.getName());
-        assertEquals("Available", milestone.getStatus());
-        assertNull(milestone.getAchievedAt());
-        assertFalse(milestone.isAchieved());
+
     }
 
     @Test

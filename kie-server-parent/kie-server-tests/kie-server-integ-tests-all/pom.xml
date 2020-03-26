@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.35.0-SNAPSHOT</version>
+    <version>7.36.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-all</artifactId>
@@ -447,6 +447,7 @@
         <kieserver.casemgmt.enabled>true</kieserver.casemgmt.enabled>
         <kieserver.prometheus.enabled>true</kieserver.prometheus.enabled>
         <kieserver.scenariosimulation.enabled>true</kieserver.scenariosimulation.enabled>
+        <kieserver.swagger.enabled>true</kieserver.swagger.enabled>
         <jbpm.executor.disabled>true</jbpm.executor.disabled>
         <!-- For including complete stack trace in the response -->
         <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
