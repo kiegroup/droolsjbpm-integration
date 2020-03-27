@@ -41,28 +41,28 @@
       <dependency>
         <groupId>org.drools</groupId>
         <artifactId>ha-remote</artifactId>
-        <version>${project.version}</version>
+        <version>${version.org.kie}</version>
       </dependency>
       <dependency>
         <groupId>org.drools</groupId>
         <artifactId>ha-core</artifactId>
-        <version>${project.version}</version>
+        <version>${version.org.kie}</version>
       </dependency>
       <dependency>
         <groupId>org.drools</groupId>
         <artifactId>ha-core-infra</artifactId>
-        <version>${project.version}</version>
+        <version>${version.org.kie}</version>
       </dependency>
       <!-- drools -->
       <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
-        <version>${project.version}</version>
+        <version>${version.org.kie}</version>
       </dependency>
       <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-ci</artifactId>
-        <version>${project.version}</version>
+        <version>${version.org.kie}</version>
         <exclusions>
           <exclusion>
             <groupId>aopalliance</groupId>
