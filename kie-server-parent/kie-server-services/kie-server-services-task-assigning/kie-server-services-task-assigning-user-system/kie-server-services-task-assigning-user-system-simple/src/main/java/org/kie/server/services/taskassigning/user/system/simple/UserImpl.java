@@ -45,11 +45,6 @@ public class UserImpl implements User {
     }
 
     @Override
-    public boolean isActive() {
-        return true;
-    }
-
-    @Override
     public Map<String, Object> getAttributes() {
         return attributes;
     }

@@ -27,8 +27,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class User extends TaskOrUser implements OrganizationalEntity {
 
     private String entityId;
+    private boolean enabled;
     private Set<Group> groups = new HashSet<>();
     private Map<String, Set<Object>> labelValues = new HashMap<>();
+    private Map<String, Object> attributes;
 
     public User() {
     }
@@ -36,6 +38,12 @@ public class User extends TaskOrUser implements OrganizationalEntity {
     public User(long id, String entityId) {
         super(id);
         this.entityId = entityId;
+    }
+
+    public User(long id, String entityId, boolean enabled) {
+        super(id);
+        this.entityId = entityId;
+        this.enabled = enabled;
     }
 
     @Override
@@ -55,16 +63,36 @@ public class User extends TaskOrUser implements OrganizationalEntity {
         this.groups = groups;
     }
 
-    public Map<String, Set<Object>> getLabelValues() {
-        return labelValues;
-    }
-
     public Set<Object> getLabelValues(String labelName) {
         return labelValues.get(labelName);
     }
 
     public void setLabelValues(String labelName, Set<Object> values) {
         labelValues.put(labelName, values);
+    }
+
+    public Map<String, Set<Object>> getAllLabelValues() {
+        return labelValues;
+    }
+
+    public void setAllLabelValues(Map<String, Set<Object>> labelValues) {
+        this.labelValues = labelValues;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
@@ -86,9 +114,11 @@ public class User extends TaskOrUser implements OrganizationalEntity {
     public String toString() {
         return "User{" +
                 "id=" + id +
+                ", enabled='" + enabled + '\'' +
                 ", entityId='" + entityId + '\'' +
                 ", groups=" + groups +
                 ", labelValues=" + labelValues +
+                ", attributes=" + attributes +
                 '}';
     }
 }

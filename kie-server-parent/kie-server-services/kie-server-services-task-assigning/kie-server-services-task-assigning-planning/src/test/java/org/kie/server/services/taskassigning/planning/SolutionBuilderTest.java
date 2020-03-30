@@ -42,10 +42,9 @@ import static org.kie.api.task.model.Status.Suspended;
 import static org.kie.server.api.model.taskassigning.util.StatusConverter.convertToString;
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.DUMMY_TASK;
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER_ID;
+import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.extractTasks;
 import static org.kie.server.services.taskassigning.planning.TestUtil.assertContains;
-import static org.kie.server.services.taskassigning.planning.TestUtil.assertNotContains;
 import static org.kie.server.services.taskassigning.planning.TestUtil.mockExternalUser;
-import static org.kie.server.services.taskassigning.planning.util.UserUtil.extractTasks;
 
 public class SolutionBuilderTest {
 
@@ -74,11 +73,11 @@ public class SolutionBuilderTest {
                 .withContext(context)
                 .build();
 
-        assertContains(USER1, solution.getUserList());
-        assertNotContains(USER2, solution.getUserList()); //externalUser2 is disabled.
-        assertContains(USER3, solution.getUserList());
+        assertContains(USER1, 1, solution.getUserList());
+        assertContains(USER2, 1, solution.getUserList());
+        assertContains(USER3, 1, solution.getUserList());
         assertContains(PLANNING_USER_ID, solution.getUserList()); //is always added.
-        assertEquals(3, solution.getUserList().size(), 0);
+        assertEquals(4, solution.getUserList().size(), 0);
     }
 
     @Test
@@ -386,12 +385,13 @@ public class SolutionBuilderTest {
 
     private List<org.kie.server.services.taskassigning.user.system.api.User> buildExternalUsers() {
         org.kie.server.services.taskassigning.user.system.api.User externalUser1 =
-                mockExternalUser(USER1, true, Collections.emptySet());
+                mockExternalUser(USER1, Collections.emptySet());
         org.kie.server.services.taskassigning.user.system.api.User externalUser2 =
-                mockExternalUser(USER2, false, Collections.emptySet());
+                mockExternalUser(USER2, Collections.emptySet());
         org.kie.server.services.taskassigning.user.system.api.User externalUser3 =
-                mockExternalUser(USER3, true, Collections.emptySet());
-        return Arrays.asList(externalUser1, externalUser2, externalUser3);
+                mockExternalUser(USER3, Collections.emptySet());
+        return Arrays.asList(externalUser1, externalUser2, externalUser3, externalUser2,
+                             externalUser3, externalUser1, externalUser1, externalUser3, externalUser3, externalUser2);
     }
 
     private TaskData mockTaskData(Long taskId, Status status) {

@@ -32,9 +32,9 @@ import org.kie.server.services.taskassigning.core.model.User;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER_ID;
+import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.extractTasks;
 import static org.kie.server.services.taskassigning.planning.TestUtil.initializeUser;
 import static org.kie.server.services.taskassigning.planning.TestUtil.mockUser;
-import static org.kie.server.services.taskassigning.planning.util.UserUtil.extractTasks;
 
 @RunWith(Parameterized.class)
 public class PlanningBuilderTest {

@@ -30,7 +30,7 @@ import org.kie.server.services.taskassigning.core.model.User;
 
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_NOT_DUMMY;
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS_PLANNING_USER;
-import static org.kie.server.services.taskassigning.planning.util.UserUtil.extractTasks;
+import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.extractTasks;
 
 public class PlanningBuilder {
 
