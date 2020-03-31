@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -7,7 +8,7 @@
     <artifactId>drools-ha</artifactId>
     <version>7.36.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.kie</groupId>
+
   <artifactId>ha-core-infra</artifactId>
   <name>Drools :: High Availability :: HA-Core-Infra</name>
 
