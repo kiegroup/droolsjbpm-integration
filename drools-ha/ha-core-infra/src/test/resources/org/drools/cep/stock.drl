@@ -1,0 +1,25 @@
+package org.drools.cep
+
+import org.kie.hacep.sample.kjar.StockTickEvent
+import org.kie.hacep.sample.kjar.Result
+import org.kie.remote.DroolsExecutor
+import java.util.UUID
+
+rule StockAverage when
+  $r : Result($name : stockName)
+  accumulate ( StockTickEvent( company == $name, $p : price ), $avg : average( $p ) )
+then
+  System.out.println("Average price for " + $name + " is " + $avg);
+  $r.setValue($avg);
+end
+
+rule StockLog when
+  $stock:StockTickEvent()
+then
+    $stock.setProcessed(true);
+    DroolsExecutor.getInstance().execute( () -> {
+        String id = UUID.randomUUID().toString();
+        System.out.println("Price for " + $stock.getCompany() + " is " + $stock.getPrice() + " id:" + id);
+        return id;
+    });
+end
