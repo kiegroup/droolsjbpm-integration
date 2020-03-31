@@ -9,6 +9,7 @@
     <version>7.36.0-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.drools</groupId>
   <artifactId>ha-core-infra</artifactId>
   <name>Drools :: High Availability :: HA-Core-Infra</name>
 
