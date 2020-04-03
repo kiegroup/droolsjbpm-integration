@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -38,6 +39,8 @@ import javax.ws.rs.core.Response;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.jms.JMSConstants;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -46,8 +49,6 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.jms.ResponseHandler;
 import org.kie.server.common.rest.KieServerHttpRequest;
@@ -654,7 +655,7 @@ public abstract class AbstractKieServicesClientImpl {
     }
 
     protected String getUserQueryStr(String userId) {
-        if (BYPASS_AUTH_USER) {
+        if (BYPASS_AUTH_USER && userId != null) {
             return "?user=" + userId;
         }
 
