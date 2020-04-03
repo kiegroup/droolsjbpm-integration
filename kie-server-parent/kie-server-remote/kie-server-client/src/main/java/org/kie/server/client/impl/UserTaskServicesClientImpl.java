@@ -41,7 +41,61 @@ import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.UserTaskServicesClient;
 
-import static org.kie.server.api.rest.RestURI.*;
+import static org.kie.server.api.rest.RestURI.ATTACHMENT_ID;
+import static org.kie.server.api.rest.RestURI.COMMENT_ID;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CONTENT_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
+import static org.kie.server.api.rest.RestURI.QUERY_URI;
+import static org.kie.server.api.rest.RestURI.TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASKS_ASSIGN_POT_OWNERS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASKS_BY_VAR_NAME_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASKS_EVENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASKS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASKS_OWNED_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_BY_PROCESS_INST_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_BY_WORK_ITEM_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ACTIVATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_ADD_POST_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CLAIM_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_ADD_POST_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMPLETE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CONTENT_DATA_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_DELEGATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_DESCRIPTION_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EVENTS_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EXIT_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EXPIRATION_DATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_FAIL_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_FORWARD_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_INPUT_DATA_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_NAME_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_NOMINATE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_OUTPUT_DATA_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_OUTPUT_DATA_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_PRIORITY_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_RELEASE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_RESUME_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_SKIPABLE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_SKIP_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_START_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_STOP_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_SUSPEND_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_URI;
+import static org.kie.server.api.rest.RestURI.VAR_NAME;
+import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
+import static org.kie.server.api.rest.RestURI.build;
 
 public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl implements UserTaskServicesClient {
 
@@ -382,15 +436,19 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
     @Override
     public Long saveTaskContent(String containerId, Long taskId, Map<String, Object> values) {
+        return saveTaskContent(containerId, taskId, null, values);
+    }
+
+    @Override
+    public Long saveTaskContent(String containerId, Long taskId, String userId, Map<String, Object> values) {
         Object contentId = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            contentId = makeHttpPutRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_OUTPUT_DATA_PUT_URI, valuesMap),
-                    values, Object.class, getHeaders(null));
+            contentId = makeHttpPutRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_OUTPUT_DATA_PUT_URI, valuesMap) + getUserQueryStr(userId),
+                                                                  values, Object.class, getHeaders(null));
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)

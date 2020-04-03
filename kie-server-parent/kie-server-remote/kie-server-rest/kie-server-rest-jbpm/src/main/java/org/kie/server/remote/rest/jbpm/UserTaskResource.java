@@ -707,6 +707,7 @@ public class UserTaskResource {
     public Response saveContent(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the task instance that data should be saved into", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
+                                @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "output data to be saved as Map ", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
                     @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
@@ -715,7 +716,7 @@ public class UserTaskResource {
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
-            String response = userTaskServiceBase.saveContent(containerId, taskId, payload, type);
+            String response = userTaskServiceBase.saveContent(containerId, userId, taskId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);

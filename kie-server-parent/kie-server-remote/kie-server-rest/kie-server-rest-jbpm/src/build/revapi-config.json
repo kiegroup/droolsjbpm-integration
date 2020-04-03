@@ -1,50 +1,120 @@
 {
-  "filters": {
-    "revapi": {
-      "java": {
-        "_comment": "Only classes with javax.ws.rs annotations are included since we want to check only REST API.",
-        "filter": {
-          "packages": {
-            "comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
-            "regex": true,
-            "include": [
-              "org\\.kie\\.server\\.remote\\.rest\\.jbpm.*"
-            ],
-            "exclude": [
-              "org\\.kie\\.server\\.remote\\.rest\\.jbpm\\.resources"
-            ]
-          },
-          "classes": {
-            "_comment": "Classes are excluded, not included, so new classes in future are discovered by revapi.",
-            "regex": false,
-            "exclude": [
-              "org.kie.server.remote.rest.jbpm.JbpmRestApplicationComponentsService"
-            ]
-          }
+    "filters": {
+        "revapi": {
+            "java": {
+                "_comment": "Only classes with javax.ws.rs annotations are included since we want to check only REST API.",
+                "filter": {
+                    "packages": {
+                        "comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
+                        "regex": true,
+                        "include": [
+                            "org\\.kie\\.server\\.remote\\.rest\\.jbpm.*"
+                        ],
+                        "exclude": [
+                            "org\\.kie\\.server\\.remote\\.rest\\.jbpm\\.resources"
+                        ]
+                    },
+                    "classes": {
+                        "_comment": "Classes are excluded, not included, so new classes in future are discovered by revapi.",
+                        "regex": false,
+                        "exclude": [
+                            "org.kie.server.remote.rest.jbpm.JbpmRestApplicationComponentsService"
+                        ]
+                    }
+                }
+            }
         }
-      }
-    }
-  },
-  "ignores": {
-    "revapi": {
-      "_comment": "Changes between 7.33.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": [
-       {
-         "code": "java.annotation.attributeValueChanged",
-         "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
-         "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
-         "annotationType": "io.swagger.annotations.ApiResponses",
-         "annotation": "@io.swagger.annotations.ApiResponses({@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User is not allowed to perform the operation\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Task with given id not found\")})",
-         "attribute": "value",
-         "oldValue": "{@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Task with given id not found\")}",
-         "newValue": "{@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User is not allowed to perform the operation\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Task with given id not found\")}",
-         "package": "org.kie.server.remote.rest.jbpm",
-         "classSimpleName": "UserTaskResource",
-         "methodName": "saveContent",
-         "elementKind": "method",
-         "justification": "new Swagger ApiResponse annotation for not allowed operations"
+    },
+    "ignores": {
+        "revapi": {
+            "_comment": "Changes between 7.33.0.Final and the current branch. These changes are desired and thus ignored.",
+            "ignore": [
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===, java.lang.String)",
+                    "annotationType": "io.swagger.annotations.ApiParam",
+                    "annotation": "@io.swagger.annotations.ApiParam(value = \"optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled\", required = false)",
+                    "attribute": "value",
+                    "oldValue": "\"output data to be saved as Map \"",
+                    "newValue": "\"optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled\"",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "UserTaskResource",
+                    "methodName": "saveContent",
+                    "parameterIndex": "3",
+                    "elementKind": "parameter",
+                    "justification": "added user param"
+                },
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===, java.lang.String)",
+                    "annotationType": "io.swagger.annotations.ApiParam",
+                    "annotation": "@io.swagger.annotations.ApiParam(value = \"optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled\", required = false)",
+                    "attribute": "required",
+                    "oldValue": "true",
+                    "newValue": "false",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "UserTaskResource",
+                    "methodName": "saveContent",
+                    "parameterIndex": "3",
+                    "elementKind": "parameter",
+                    "justification": "added user param"
+                },
+                {
+                    "code": "java.annotation.attributeRemoved",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===, java.lang.String)",
+                    "annotationType": "io.swagger.annotations.ApiParam",
+                    "annotation": "@io.swagger.annotations.ApiParam(value = \"optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled\", required = false)",
+                    "attribute": "examples",
+                    "value": "@io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n    \"age\": 25,\n    \"person\": {\n        \"Person\": {\n            \"name\": \"john\"\n        }\n    }\n}\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<map-type>\n    <entries>\n        <entry>\n            <key>age<\/key>\n            <value xsi:type=\"xs:int\" xmlns:xs=\"http:\/\/www.w3.org\/2001\/XMLSchema\"\n                    xmlns:xsi=\"http:\/\/www.w3.org\/2001\/XMLSchema-instance\">25<\/value>\n        <\/entry>\n        <entry>\n            <key>person<\/key>\n            <value xsi:type=\"person\" xmlns:xsi=\"http:\/\/www.w3.org\/2001\/XMLSchema-instance\">\n                <name>john<\/name>\n            <\/value>\n        <\/entry>\n    <\/entries>\n<\/map-type>\")})",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "UserTaskResource",
+                    "methodName": "saveContent",
+                    "parameterIndex": "3",
+                    "elementKind": "parameter",
+                    "justification": "added user param"
+                },
+                {
+                    "code": "java.annotation.added",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, ===java.lang.String===, java.lang.String)",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"user\")",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "UserTaskResource",
+                    "methodName": "saveContent",
+                    "parameterIndex": "3",
+                    "elementKind": "parameter",
+                    "justification": "added user param"
+                },
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
+                    "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
+                    "annotationType": "io.swagger.annotations.ApiResponses",
+                    "annotation": "@io.swagger.annotations.ApiResponses({@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User is not allowed to perform the operation\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Task with given id not found\")})",
+                    "attribute": "value",
+                    "oldValue": "{@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Task with given id not found\")}",
+                    "newValue": "{@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User is not allowed to perform the operation\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Task with given id not found\")}",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "UserTaskResource",
+                    "methodName": "saveContent",
+                    "elementKind": "method",
+                    "justification": "added new uri user id parameter"
+                },
+                {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
+                    "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::saveContent(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "UserTaskResource",
+                    "methodName": "saveContent",
+                    "elementKind": "method",
+                    "justification": "added user param"
+                }
+            ]
         }
-      ]
     }
-  }
 }

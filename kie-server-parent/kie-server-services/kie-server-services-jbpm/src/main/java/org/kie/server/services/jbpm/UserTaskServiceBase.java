@@ -37,10 +37,8 @@ import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskCommentList;
 import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
 import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -258,12 +256,17 @@ public class UserTaskServiceBase {
     }
 
     public String saveContent(String containerId, Number taskId, String payload, String marshallingType) {
+        return saveContent(containerId, null, taskId, payload, marshallingType);
+    }
+
+    public String saveContent(String containerId, String userId, Number taskId, String payload, String marshallingType) {
+        userId = getUser(userId);
         containerId = context.getContainerId(containerId, new ByTaskIdContainerLocator(taskId.longValue()));
         logger.debug("About to unmarshal task content parameters from payload: '{}'", payload);
         Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
 
         logger.debug("About to set content of a task with id '{}' with data {}", taskId, parameters);
-        Long contentId = userTaskService.saveContent(containerId, taskId.longValue(), parameters);
+        Long contentId = userTaskService.saveContentFromUser(taskId.longValue(), userId, parameters);
 
         String response = marshallerHelper.marshal(containerId, marshallingType, contentId);
 

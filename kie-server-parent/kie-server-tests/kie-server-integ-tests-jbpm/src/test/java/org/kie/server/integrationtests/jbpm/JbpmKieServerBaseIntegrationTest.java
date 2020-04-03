@@ -85,9 +85,11 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected QueryServicesClient queryClient;
     protected JobServicesClient jobServicesClient;
     protected DocumentServicesClient documentClient;
+
     // admin clients
     protected ProcessAdminServicesClient processAdminClient;
     protected UserTaskAdminServicesClient userTaskAdminClient;
+
 
     @Before
     public void cleanup() {

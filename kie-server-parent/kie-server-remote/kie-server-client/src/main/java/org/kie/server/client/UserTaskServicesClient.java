@@ -73,6 +73,8 @@ public interface UserTaskServicesClient {
 
     Long saveTaskContent(String containerId, Long taskId, Map<String, Object> values);
 
+    Long saveTaskContent(String containerId, Long id, String userId, Map<String, Object> content);
+
     Map<String, Object> getTaskOutputContentByTaskId(String containerId, Long taskId);
 
     Map<String, Object> getTaskInputContentByTaskId(String containerId, Long taskId);
@@ -165,4 +167,5 @@ public interface UserTaskServicesClient {
     List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     void setResponseHandler(ResponseHandler responseHandler);
+
 }
