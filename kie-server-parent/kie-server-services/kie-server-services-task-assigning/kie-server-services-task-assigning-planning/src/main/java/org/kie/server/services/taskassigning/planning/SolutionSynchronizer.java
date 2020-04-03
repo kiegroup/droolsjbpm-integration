@@ -23,6 +23,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.api.model.taskassigning.TaskInputVariablesReadMode;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
@@ -202,16 +203,24 @@ public class SolutionSynchronizer extends RunnableBase {
         try {
             if (solverExecutor.isStarted()) {
                 LOGGER.debug("Synchronizing solution status from the jBPM runtime.");
-                final List<TaskData> updatedTaskDataList = loadTasksForUpdate(fromLastModificationDate);
+                final Pair<List<TaskData>, LocalDateTime> result = loadTasksForUpdate(fromLastModificationDate);
+                final List<TaskData> updatedTaskDataList = result.getLeft();
                 LOGGER.debug("Status was read successful.");
                 if (isAlive()) {
                     final List<ProblemFactChange<TaskAssigningSolution>> changes = buildChanges(solution, updatedTaskDataList);
+                    context.setPreviousQueryTime(fromLastModificationDate);
+                    LocalDateTime nextQueryTime = trimMillis(result.getRight());
+                    LocalDateTime lastQueryTime = context.peekLastQueryTime();
+                    if (!context.hasMinimalDistance(lastQueryTime, nextQueryTime)) {
+                        nextQueryTime = lastQueryTime;
+                    }
+                    context.addNextQueryTime(nextQueryTime);
                     if (!changes.isEmpty()) {
                         LOGGER.debug("Current solution will be updated with {} changes from last synchronization", changes.size());
                         resultConsumer.accept(new Result(changes));
                     } else {
                         LOGGER.debug("There are no changes to apply from last synchronization.");
-                        fromLastModificationDate = context.getLastModificationDate();
+                        fromLastModificationDate = context.pollNextQueryTime();
                         nextAction = Action.SYNCHRONIZE_SOLUTION;
                     }
                 }
@@ -240,7 +249,14 @@ public class SolutionSynchronizer extends RunnableBase {
                                                                                                      Suspended),
                                                                                        null,
                                                                                        TaskInputVariablesReadMode.READ_FOR_ALL);
-        context.setLastModificationDate(result.getQueryTime());
+
+        final LocalDateTime nextQueryTime = trimMillis(result.getQueryTime());
+        final LocalDateTime adjustedFirstQueryTime = nextQueryTime != null ? nextQueryTime.minusHours(1) : null;
+        context.setPreviousQueryTime(adjustedFirstQueryTime);
+        context.resetQueryTimes(adjustedFirstQueryTime);
+        context.pollLastQueryTime();
+        context.addNextQueryTime(nextQueryTime);
+        context.clearTaskChangeTimes();
         final List<TaskData> taskDataList = result.getTasks();
         LOGGER.debug("{} tasks where loaded for solution recovery, with result.queryTime: {}", taskDataList.size(), result.getQueryTime());
         final List<User> externalUsers = userSystemService.findAllUsers();
@@ -251,19 +267,22 @@ public class SolutionSynchronizer extends RunnableBase {
         return SolutionBuilder.create()
                 .withTasks(taskDataList)
                 .withUsers(externalUsers)
+                .withContext(context)
                 .build();
     }
 
-    private List<TaskData> loadTasksForUpdate(LocalDateTime fromLastModificationDate) {
+    private Pair<List<TaskData>, LocalDateTime> loadTasksForUpdate(LocalDateTime fromLastModificationDate) {
+        final TaskAssigningRuntimeDelegate.FindTasksResult result = delegate.findTasks(null,
+                                                                                       fromLastModificationDate,
+                                                                                       TaskInputVariablesReadMode.READ_FOR_ACTIVE_TASKS_WITH_NO_PLANNING_ENTITY);
+        LOGGER.debug("Total modifications found: {} since fromLastModificationDate: {}, with result.queryTime: {}",
+                     result.getTasks().size(), fromLastModificationDate, result.getQueryTime());
+        return Pair.of(result.getTasks(), result.getQueryTime());
+    }
+
+    private static LocalDateTime trimMillis(LocalDateTime localDateTime) {
         // trim to 0 milliseconds to avoid falling into https://issues.redhat.com/browse/JBPM-8970 (but note that
         // the trimming is still good to avoid any other potential date or timestamp DBMS dependent issue)
-        LocalDateTime fromLastModificationDateRounded = fromLastModificationDate.withNano(0);
-        final TaskAssigningRuntimeDelegate.FindTasksResult result = delegate.findTasks(null,
-                                                                                       fromLastModificationDateRounded,
-                                                                                       TaskInputVariablesReadMode.READ_FOR_ACTIVE_TASKS_WITH_NO_PLANNING_ENTITY);
-        context.setLastModificationDate(result.getQueryTime());
-        LOGGER.debug("Total modifications found: {} since fromLastModificationDate: {}, with result.queryTime: {}",
-                     result.getTasks().size(), fromLastModificationDateRounded, result.getQueryTime());
-        return result.getTasks();
+        return localDateTime != null ? localDateTime.withNano(0) : null;
     }
 }

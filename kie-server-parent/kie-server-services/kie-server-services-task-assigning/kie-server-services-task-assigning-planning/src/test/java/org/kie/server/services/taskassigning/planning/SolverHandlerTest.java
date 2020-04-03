@@ -42,6 +42,7 @@ import org.optaplanner.core.api.solver.event.BestSolutionChangedEvent;
 import org.optaplanner.core.api.solver.event.SolverEventListener;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
@@ -106,8 +107,17 @@ public class SolverHandlerTest {
     @Captor
     private ArgumentCaptor<SolverHandlerContext> contextCaptor;
 
+    private LocalDateTime previousQueryTime;
+
+    private LocalDateTime nextQueryTime;
+
+    private LocalDateTime lastQueryTime;
+
     @Before
     public void setUp() {
+        previousQueryTime = LocalDateTime.now();
+        nextQueryTime = previousQueryTime.plusMinutes(2);
+        lastQueryTime = nextQueryTime.plusMinutes(2);
         this.handler = spy(new SolverHandler(solverDef, registry, delegate, userSystemService, executorService));
         doReturn(solverExecutor).when(handler).createSolverExecutor(eq(solverDef), eq(registry), any());
         doReturn(solutionSynchronizer).when(handler).createSolutionSynchronizer(eq(solverExecutor), eq(delegate), eq(userSystemService), anyInt(), any(), any());
@@ -191,7 +201,7 @@ public class SolverHandlerTest {
     @Test
     public void onSolutionProcessed() {
         SolutionProcessor.Result result = new SolutionProcessor.Result(PlanningExecutionResult.builder().build());
-        onSolutionProcessedSuccessful(result);
+        onSolutionProcessedSuccessful(result, false);
     }
 
     @Test
@@ -199,7 +209,7 @@ public class SolverHandlerTest {
         SolutionProcessor.Result result = new SolutionProcessor.Result(PlanningExecutionResult.builder()
                                                                                .error(PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR)
                                                                                .build());
-        onSolutionProcessedSuccessful(result);
+        onSolutionProcessedSuccessful(result, true);
     }
 
     @Test
@@ -277,10 +287,17 @@ public class SolverHandlerTest {
         assertFalse(context.isProcessedChangeSet(changeSet));
     }
 
-    private void onSolutionProcessedSuccessful(SolutionProcessor.Result result) {
+    private void onSolutionProcessedSuccessful(SolutionProcessor.Result result, boolean withRecoverableError) {
         TaskAssigningSolution solution = prepareStartAndASolutionProduced();
         processorConsumerCaptor.getValue().accept(result);
-        verify(solutionSynchronizer).synchronizeSolution(eq(solution), eq(contextCaptor.getValue().getLastModificationDate()));
+        SolverHandlerContext context = contextCaptor.getValue();
+        if (withRecoverableError) {
+            verify(solutionSynchronizer).synchronizeSolution(eq(solution), eq(previousQueryTime));
+            assertEquals(nextQueryTime, context.peekLastQueryTime());
+        } else {
+            verify(solutionSynchronizer).synchronizeSolution(eq(solution), eq(nextQueryTime));
+            assertEquals(lastQueryTime, context.peekLastQueryTime());
+        }
     }
 
     private void onSolutionProcessedWithError(SolutionProcessor.Result result) {
@@ -306,7 +323,9 @@ public class SolverHandlerTest {
         SolverHandlerContext context = contextCaptor.getValue();
         long changeSet = context.nextChangeSetId();
         context.setCurrentChangeSetId(changeSet);
-        context.setLastModificationDate(LocalDateTime.now());
+        context.setPreviousQueryTime(previousQueryTime);
+        context.addNextQueryTime(nextQueryTime);
+        context.addNextQueryTime(lastQueryTime);
 
         listenerCaptor.getValue().bestSolutionChanged(event);
         return event.getNewBestSolution();
