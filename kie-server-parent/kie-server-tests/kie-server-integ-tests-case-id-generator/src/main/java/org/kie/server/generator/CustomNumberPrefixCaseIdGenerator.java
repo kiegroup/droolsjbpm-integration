@@ -2,7 +2,6 @@ package org.kie.server.generator;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
@@ -14,7 +13,7 @@ public class CustomNumberPrefixCaseIdGenerator implements CaseIdGenerator {
 
     private static final String CUSTOM_PREFIX = "01234";
 
-    private static ConcurrentMap<String, AtomicLong> caseIdMap = new ConcurrentHashMap<>();
+    private static Map<String, AtomicLong> caseIdMap = new ConcurrentHashMap<>();
 
     @Override
     public String generate(String prefix, Map<String, Object> optionalParameters) throws CasePrefixNotFoundException {
@@ -33,12 +32,16 @@ public class CustomNumberPrefixCaseIdGenerator implements CaseIdGenerator {
     }
 
     @Override
-    public void register(String prefix) {
-        caseIdMap.putIfAbsent(prefix, new AtomicLong(0L));
+    public void unregister(String prefix) {
+        caseIdMap.remove(prefix);
     }
 
     @Override
-    public void unregister(String prefix) {
-        caseIdMap.remove(prefix);
+    public void register(String deploymentId, String prefix) {
+        if (caseIdMap.containsKey(prefix)) {
+            return;
+        }
+        caseIdMap.put(prefix, new AtomicLong(0));
+
     }
 }
