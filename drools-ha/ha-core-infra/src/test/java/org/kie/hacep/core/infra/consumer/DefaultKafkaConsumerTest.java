@@ -32,11 +32,12 @@ import org.kie.hacep.util.ConsumerUtilsCore;
 import org.kie.remote.impl.producer.Producer;
 import org.kie.remote.message.ControlMessage;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultKafkaConsumerTest {
@@ -56,7 +57,7 @@ public class DefaultKafkaConsumerTest {
   @Mock
   protected SnapshotOnDemandUtils snapshotOnDemandUtils;
 
-  private DefaultKafkaConsumer consumer;
+  private DefaultKafkaConsumer spy;
 
   @Before
   public void initTest() {
@@ -67,34 +68,50 @@ public class DefaultKafkaConsumerTest {
     when(consumerUtilsCore.getLastEvent(envConfig.getControlTopicName(), envConfig.getPollTimeout())).thenReturn(lastControlMessage);
     when(defaultSessionSnapShooter.getLastSnapshotTime()).thenReturn(LocalDateTime.now());
     when(handler.initializeKieSessionFromSnapshotOnDemand(any(EnvConfig.class), any(SnapshotInfos.class))).thenReturn(Boolean.TRUE);
-    consumer = new DefaultKafkaConsumer(EnvConfig.getDefaultEnvConfig(), producer, primaryConsumer, secondaryConsumer, consumerUtilsCore, defaultSessionSnapShooter, snapshotOnDemandUtils, handler);
+
+    spy = Mockito.spy(new DefaultKafkaConsumer(){
+      @Override
+      public void getOrCreateKafkaConsumer() {
+        this.kafkaConsumer = primaryConsumer;
+      }
+
+      @Override
+      public void getOrCreateKafkaSecondaryConsumer() {
+        this.kafkaSecondaryConsumer = secondaryConsumer;
+      }
+    });
+    spy.setupForTest(envConfig, producer, consumerUtilsCore, defaultSessionSnapShooter, snapshotOnDemandUtils, handler);
   }
 
   @Test
-  public void UpdateStatusBecomingLeaderAtStartupTest(){
-    InfraCallbackStatus status = consumer.updateStatus(State.BECOMING_LEADER);
-    assertFalse(status.isEnableConsumerAndStartLoop());// nothing happens
-    assertFalse(status.isUpdateOnRunningConsumer());// isn't on running consumer
-    assertFalse(status.isAskAndProcessSnapshotOnDemandResult()); // no snapshot enabled
-    assertEquals(status.getPreviousState(), State.REPLICA); // every instance starts as a replica
+  public void updateStatusBecomingLeaderAtStartupTest(){
+    spy.updateStatus(State.BECOMING_LEADER);
+    verify(spy).updateStatus(State.BECOMING_LEADER);
+    verify(spy, never()).updateOnRunningConsumer(State.BECOMING_LEADER);
+    verify(spy, never()).askAndProcessSnapshotOnDemand(any(SnapshotInfos.class));
+    verify(spy, never()).enableConsumeAndStartLoop(State.BECOMING_LEADER);
+   }
+
+  @Test
+  public void updateStatusLeaderAtStartupTest(){
+    spy.updateStatus(State.LEADER);
+    verify(spy).updateStatus(State.LEADER);
+    verify(spy, never()).updateOnRunningConsumer(State.LEADER);
+    verify(spy, never()).askAndProcessSnapshotOnDemand(any(SnapshotInfos.class));
+    verify(spy, times(1)).enableConsumeAndStartLoop(State.LEADER);
+    verify(spy, times(1)).setLastProcessedKey();
+    verify(spy, times(1)).assignAndStartConsume();
   }
 
   @Test
-  public void UpdateStatusLeaderAtStartupTest(){
-    InfraCallbackStatus status = consumer.updateStatus(State.LEADER);
-    assertTrue(status.isEnableConsumerAndStartLoop()); // it ask to start
-    assertFalse(status.isUpdateOnRunningConsumer()); // isn't on running consumer
-    assertFalse(status.isAskAndProcessSnapshotOnDemandResult()); // no snapshot enabled
-    assertEquals(status.getPreviousState(), State.REPLICA);
-  }
-
-  @Test
-  public void UpdateStatusReplicaAtStartupTest(){
-    InfraCallbackStatus status = consumer.updateStatus(State.REPLICA);
-    assertTrue(status.isEnableConsumerAndStartLoop());
-    assertFalse(status.isUpdateOnRunningConsumer());
-    assertTrue(status.isAskAndProcessSnapshotOnDemandResult());
-    assertEquals(status.getPreviousState(), State.REPLICA);
+  public void updateStatusReplicaAtStartupTest(){
+    spy.updateStatus(State.REPLICA);
+    verify(spy).updateStatus(State.REPLICA);
+    verify(spy, never()).updateOnRunningConsumer(State.REPLICA);
+    verify(spy, times(1)).askAndProcessSnapshotOnDemand(any(SnapshotInfos.class));
+    verify(spy, times(1)).enableConsumeAndStartLoop(State.REPLICA);
+    verify(spy, times(1)).setLastProcessedKey();
+    verify(spy, times(1)).assignAndStartConsume();
   }
 
 }

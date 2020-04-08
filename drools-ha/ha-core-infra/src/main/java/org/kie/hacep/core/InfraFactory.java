@@ -57,7 +57,7 @@ public class InfraFactory {
 
     public static EventConsumer getEventConsumer(EnvConfig config) {
         return config.isLocal() ? new LocalConsumer(config) : new DefaultKafkaConsumer(config,
-                                                                                       getProducer(false));
+                                                                                       getProducer(false), snapshotOnDemandUtils);
     }
 
     public static SessionSnapshooter getSnapshooter(EnvConfig envConfig) {

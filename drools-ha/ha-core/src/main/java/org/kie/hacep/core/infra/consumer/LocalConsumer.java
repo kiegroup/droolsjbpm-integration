@@ -62,13 +62,12 @@ public class LocalConsumer implements EventConsumer {
     }
 
     @Override
-    public synchronized InfraCallbackStatus updateStatus(State state) {
+    public synchronized void updateStatus(State state) {
         this.currentState = state;
         if (state == State.REPLICA) {
             DroolsExecutor.setAsReplica();
         } else {
             DroolsExecutor.setAsLeader();
         }
-        return new InfraCallbackStatus(state, false,false, false);
     }
 }

@@ -15,9 +15,7 @@
  */
 package org.kie.hacep.core.infra.election;
 
-import org.kie.hacep.core.infra.consumer.InfraCallbackStatus;
-
 public interface LeadershipCallback {
 
-    InfraCallbackStatus updateStatus(State state);
+    void updateStatus(State state);
 }

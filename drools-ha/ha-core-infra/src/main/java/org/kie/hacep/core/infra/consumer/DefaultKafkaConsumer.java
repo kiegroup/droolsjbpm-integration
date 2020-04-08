@@ -39,7 +39,6 @@ import org.kie.hacep.core.infra.SnapshotInfos;
 import org.kie.hacep.core.infra.election.State;
 import org.kie.hacep.core.infra.utils.ConsumerUtilsCoreImpl;
 import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtils;
-import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtilsImpl;
 import org.kie.hacep.util.ConsumerUtilsCore;
 import org.kie.hacep.util.PrinterUtil;
 import org.kie.remote.DroolsExecutor;
@@ -60,8 +59,8 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     public static final String PRIMARY_CONSUMER = "PrimaryConsumer";
     private Logger logger = LoggerFactory.getLogger(DefaultKafkaConsumer.class);
     private Map<TopicPartition, OffsetAndMetadata> offsetsEvents = new HashMap<>();
-    private Consumer<String, T> kafkaConsumer;
-    private Consumer<String, T> kafkaSecondaryConsumer;
+    protected Consumer<String, T> kafkaConsumer;
+    protected Consumer<String, T> kafkaSecondaryConsumer;
     private DroolsConsumerHandler consumerHandler;
     private volatile String processingKey = "";
     private volatile long processingKeyOffset;
@@ -84,7 +83,9 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     private ConsumerUtilsCore consumerUtilsCore;
     private SnapshotOnDemandUtils snapshotOnDemandUtils;
 
-    public DefaultKafkaConsumer(EnvConfig config, Producer producer) {
+    public DefaultKafkaConsumer(){}
+
+    public DefaultKafkaConsumer(EnvConfig config, Producer producer, SnapshotOnDemandUtils snapshotOnDemandUtils) {
         this.envConfig = config;
         if (this.envConfig.isSkipOnDemandSnapshot()) {
             counter = new AtomicInteger(0);
@@ -95,30 +96,41 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
         }
         this.producer = producer;
         this.consumerUtilsCore = new ConsumerUtilsCoreImpl();
-        this.snapshotOnDemandUtils = new SnapshotOnDemandUtilsImpl();
+        this.snapshotOnDemandUtils = snapshotOnDemandUtils;
     }
 
     //For test
-    DefaultKafkaConsumer(EnvConfig config, Producer producer, Consumer <String, T>primaryConsumer,Consumer<String, T> secondaryConsumer,
-                         ConsumerUtilsCore consumerUtilsCore,
-                         DefaultSessionSnapShooter defaultSessionSnapShooter,
-                         SnapshotOnDemandUtils snapshotOnDemandUtils, DroolsConsumerHandler consumerHandler) {
-        this(config, producer);
-        kafkaConsumer = primaryConsumer;
-        kafkaSecondaryConsumer = secondaryConsumer;
+    void setupForTest(EnvConfig config, Producer producer,
+                      ConsumerUtilsCore consumerUtilsCore,
+                      DefaultSessionSnapShooter defaultSessionSnapShooter,
+                      SnapshotOnDemandUtils snapshotOnDemandUtils, DroolsConsumerHandler consumerHandler){
+        this.envConfig = config;
+        this.producer = producer;
         this.consumerUtilsCore = consumerUtilsCore;
         this.snapShooter = defaultSessionSnapShooter;
         this.snapshotOnDemandUtils = snapshotOnDemandUtils;
         this.consumerHandler = consumerHandler;
+        getOrCreateKafkaConsumer();
+        getOrCreateKafkaSecondaryConsumer();
+    }
+
+    public void getOrCreateKafkaConsumer(){
+        this.kafkaConsumer = new KafkaConsumer<>(Config.getConsumerConfig(PRIMARY_CONSUMER));
+    }
+
+    public void getOrCreateKafkaSecondaryConsumer(){
+        if (currentState.equals(State.REPLICA)) {
+            this.kafkaSecondaryConsumer = new KafkaConsumer<>(Config.getConsumerConfig(SECONDARY_CONSUMER));
+        } else {
+            this.kafkaSecondaryConsumer = null;
+        }
     }
 
     public void initConsumer(ConsumerHandler consumerHandler) {
         this.consumerHandler = (DroolsConsumerHandler) consumerHandler;
         this.snapShooter = (DefaultSessionSnapShooter) InfraFactory.getSnapshooter(envConfig);
-        this.kafkaConsumer = new KafkaConsumer<>(Config.getConsumerConfig(PRIMARY_CONSUMER));
-        if (currentState.equals(State.REPLICA) && kafkaSecondaryConsumer == null) {
-            this.kafkaSecondaryConsumer = new KafkaConsumer<>(Config.getConsumerConfig(SECONDARY_CONSUMER));
-        }
+        getOrCreateKafkaConsumer();
+        getOrCreateKafkaSecondaryConsumer();
     }
 
     protected void restartConsumer() {
@@ -126,12 +138,8 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
             logger.info("Restart Consumers");
         }
         snapshotInfos = snapShooter.deserialize();//is still useful ?
-        kafkaConsumer = new KafkaConsumer<>(Config.getConsumerConfig(PRIMARY_CONSUMER));
-        if (currentState.equals(State.REPLICA)) {
-            kafkaSecondaryConsumer = new KafkaConsumer<>(Config.getConsumerConfig(SECONDARY_CONSUMER));
-        } else {
-            kafkaSecondaryConsumer = null;
-        }
+        getOrCreateKafkaConsumer();
+        getOrCreateKafkaSecondaryConsumer();
         assign();
     }
 
@@ -147,17 +155,12 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     }
 
     @Override
-    public InfraCallbackStatus updateStatus(State state) {
-        State previousState = currentState;
+    public void updateStatus(State state) {
         boolean changedState = !state.equals(currentState);
-        boolean completedSnapshotOnDemand = false;
-        boolean updateOnRunningConsumer = false;
-        boolean enableConsumerAndStartLoop = false;
         if (currentState == null || changedState) {
             currentState = state;
         }
         if (started && changedState && !currentState.equals(State.BECOMING_LEADER)) {
-            updateOnRunningConsumer = true;
             updateOnRunningConsumer(state);
         } else if(!started) {
             if (state.equals(State.REPLICA) && !envConfig.isSkipOnDemandSnapshot() && !askedSnapshotOnDemand) {
@@ -165,22 +168,19 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
                     if (logger.isInfoEnabled()) {
                         logger.info("askAndProcessSnapshotOnDemand:");
                     }
-                completedSnapshotOnDemand = askAndProcessSnapshotOnDemand(snapshotOnDemandUtils.askASnapshotOnDemand(envConfig, snapShooter, producer));
+                    boolean completedSnapshotOnDemand = askAndProcessSnapshotOnDemand(snapshotOnDemandUtils.askASnapshotOnDemand(envConfig, snapShooter, producer));
                     if (logger.isInfoEnabled()) {
                         logger.info("askAndProcessSnapshotOnDemand completed:{}", completedSnapshotOnDemand);
                     }
-
             }
             //State.BECOMING_LEADER won't start the pod
             if (state.equals(State.LEADER) || state.equals(State.REPLICA)) {
                 if (logger.isInfoEnabled()) {
                     logger.info("enableConsumeAndStartLoop:{}", state);
                 }
-                enableConsumerAndStartLoop = true;
                 enableConsumeAndStartLoop(state);
             }
         }
-        return new InfraCallbackStatus(previousState, completedSnapshotOnDemand, updateOnRunningConsumer, enableConsumerAndStartLoop);
     }
 
 
@@ -296,7 +296,6 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     }
 
     protected void updateOnRunningConsumer(State state) {
-        logger.info("updateOnRunning Consumer");
         if (state.equals(State.LEADER)) {
             DroolsExecutor.setAsLeader();
             restart(state);
@@ -318,9 +317,7 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
             DroolsExecutor.setAsLeader();
         } else if (state.equals(State.REPLICA)) {
             currentState = State.REPLICA;
-            if(kafkaSecondaryConsumer == null) {
-                kafkaSecondaryConsumer = new KafkaConsumer<>(Config.getConsumerConfig(SECONDARY_CONSUMER));
-            }
+            getOrCreateKafkaSecondaryConsumer();
             DroolsExecutor.setAsReplica();
         }
         setLastProcessedKey();
