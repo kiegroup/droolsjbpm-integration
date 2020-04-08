@@ -76,12 +76,12 @@ public class DefaultKafkaConsumerTest {
         this.snapShooter = defaultSessionSnapShooterMock;
         this.snapshotOnDemandUtils = snapshotOnDemandUtilsMock;
         this.consumerHandler = handlerMock;
-        createKafkaConsumer();
+        initKafkaConsumer();
         updateKafkaSecondaryConsumer();
       }
 
       @Override
-      public void createKafkaConsumer() {
+      public void initKafkaConsumer() {
         this.kafkaConsumer = primaryConsumerMock;
       }
 

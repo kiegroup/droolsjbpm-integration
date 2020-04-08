@@ -99,7 +99,7 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
         this.snapshotOnDemandUtils = snapshotOnDemandUtils;
     }
 
-    public void createKafkaConsumer(){
+    public void initKafkaConsumer(){
         this.kafkaConsumer = new KafkaConsumer<>(Config.getConsumerConfig(PRIMARY_CONSUMER));
     }
 
@@ -114,7 +114,7 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     public void initConsumer(ConsumerHandler consumerHandler) {
         this.consumerHandler = (DroolsConsumerHandler) consumerHandler;
         this.snapShooter = (DefaultSessionSnapShooter) InfraFactory.getSnapshooter(envConfig);
-        createKafkaConsumer();
+        initKafkaConsumer();
         updateKafkaSecondaryConsumer();
     }
 
@@ -123,7 +123,7 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
             logger.info("Restart Consumers");
         }
         snapshotInfos = snapShooter.deserialize();//is still useful ?
-        createKafkaConsumer();
+        initKafkaConsumer();
         updateKafkaSecondaryConsumer();
         assign();
     }
