@@ -18,7 +18,6 @@ package org.kie.hacep.core.infra.consumer;
 import java.time.LocalDateTime;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,62 +42,72 @@ import static org.mockito.Mockito.verify;
 public class DefaultKafkaConsumerTest {
 
   @Mock
-  protected Producer producer;
+  protected Producer mockProducer;
   @Mock
-  protected DroolsConsumerHandler handler;
+  protected DroolsConsumerHandler handlerMock;
   @Mock
-  protected KafkaConsumer primaryConsumer;
+  protected KafkaConsumer primaryConsumerMock;
   @Mock
-  protected KafkaConsumer secondaryConsumer;
+  protected KafkaConsumer secondaryConsumerMock;
   @Mock
-  protected ConsumerUtilsCore consumerUtilsCore;
+  protected ConsumerUtilsCore consumerUtilsCoreMock;
   @Mock
-  protected DefaultSessionSnapShooter defaultSessionSnapShooter;
+  protected DefaultSessionSnapShooter defaultSessionSnapShooterMock;
   @Mock
-  protected SnapshotOnDemandUtils snapshotOnDemandUtils;
+  protected SnapshotOnDemandUtils snapshotOnDemandUtilsMock;
 
   private DefaultKafkaConsumer spy;
 
   @Before
   public void initTest() {
-    EnvConfig envConfig = EnvConfig.getDefaultEnvConfig();
+    EnvConfig envConfigTest = EnvConfig.getDefaultEnvConfig();
     ControlMessage lastControlMessage = new ControlMessage();
     lastControlMessage.setId("1");
     lastControlMessage.setOffset(1l);
-    when(consumerUtilsCore.getLastEvent(envConfig.getControlTopicName(), envConfig.getPollTimeout())).thenReturn(lastControlMessage);
-    when(defaultSessionSnapShooter.getLastSnapshotTime()).thenReturn(LocalDateTime.now());
-    when(handler.initializeKieSessionFromSnapshotOnDemand(any(EnvConfig.class), any(SnapshotInfos.class))).thenReturn(Boolean.TRUE);
+    when(consumerUtilsCoreMock.getLastEvent(envConfigTest.getControlTopicName(), envConfigTest.getPollTimeout())).thenReturn(lastControlMessage);
+    when(defaultSessionSnapShooterMock.getLastSnapshotTime()).thenReturn(LocalDateTime.now());
+    when(handlerMock.initializeKieSessionFromSnapshotOnDemand(any(EnvConfig.class), any(SnapshotInfos.class))).thenReturn(Boolean.TRUE);
 
     spy = Mockito.spy(new DefaultKafkaConsumer(){
-      @Override
-      public void getOrCreateKafkaConsumer() {
-        this.kafkaConsumer = primaryConsumer;
+      {
+        this.envConfig = envConfigTest;
+        this.producer = mockProducer;
+        this.consumerUtilsCore = consumerUtilsCoreMock;
+        this.snapShooter = defaultSessionSnapShooterMock;
+        this.snapshotOnDemandUtils = snapshotOnDemandUtilsMock;
+        this.consumerHandler = handlerMock;
+        createKafkaConsumer();
+        updateKafkaSecondaryConsumer();
       }
 
       @Override
-      public void getOrCreateKafkaSecondaryConsumer() {
-        this.kafkaSecondaryConsumer = secondaryConsumer;
+      public void createKafkaConsumer() {
+        this.kafkaConsumer = primaryConsumerMock;
+      }
+
+      @Override
+      public void updateKafkaSecondaryConsumer() {
+        this.kafkaSecondaryConsumer = secondaryConsumerMock;
       }
     });
-    spy.setupForTest(envConfig, producer, consumerUtilsCore, defaultSessionSnapShooter, snapshotOnDemandUtils, handler);
   }
 
   @Test
   public void updateStatusBecomingLeaderAtStartupTest(){
     spy.updateStatus(State.BECOMING_LEADER);
     verify(spy).updateStatus(State.BECOMING_LEADER);
-    verify(spy, never()).updateOnRunningConsumer(State.BECOMING_LEADER);
+    verify(spy, never()).updateOnRunningConsumer(any(State.class));
     verify(spy, never()).askAndProcessSnapshotOnDemand(any(SnapshotInfos.class));
-    verify(spy, never()).enableConsumeAndStartLoop(State.BECOMING_LEADER);
+    verify(spy, never()).enableConsumeAndStartLoop(any(State.class));
    }
 
   @Test
   public void updateStatusLeaderAtStartupTest(){
     spy.updateStatus(State.LEADER);
     verify(spy).updateStatus(State.LEADER);
-    verify(spy, never()).updateOnRunningConsumer(State.LEADER);
+    verify(spy, never()).updateOnRunningConsumer(any(State.class));
     verify(spy, never()).askAndProcessSnapshotOnDemand(any(SnapshotInfos.class));
-    verify(spy, times(1)).enableConsumeAndStartLoop(State.LEADER);
+    verify(spy, times(1)).enableConsumeAndStartLoop(eq(State.LEADER));
     verify(spy, times(1)).setLastProcessedKey();
     verify(spy, times(1)).assignAndStartConsume();
   }
@@ -107,9 +116,9 @@ public class DefaultKafkaConsumerTest {
   public void updateStatusReplicaAtStartupTest(){
     spy.updateStatus(State.REPLICA);
     verify(spy).updateStatus(State.REPLICA);
-    verify(spy, never()).updateOnRunningConsumer(State.REPLICA);
+    verify(spy, never()).updateOnRunningConsumer(any(State.class));
     verify(spy, times(1)).askAndProcessSnapshotOnDemand(any(SnapshotInfos.class));
-    verify(spy, times(1)).enableConsumeAndStartLoop(State.REPLICA);
+    verify(spy, times(1)).enableConsumeAndStartLoop(eq(State.REPLICA));
     verify(spy, times(1)).setLastProcessedKey();
     verify(spy, times(1)).assignAndStartConsume();
   }

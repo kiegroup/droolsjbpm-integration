@@ -61,7 +61,7 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     private Map<TopicPartition, OffsetAndMetadata> offsetsEvents = new HashMap<>();
     protected Consumer<String, T> kafkaConsumer;
     protected Consumer<String, T> kafkaSecondaryConsumer;
-    private DroolsConsumerHandler consumerHandler;
+    protected DroolsConsumerHandler consumerHandler;
     private volatile String processingKey = "";
     private volatile long processingKeyOffset;
     private volatile long lastProcessedControlOffset;
@@ -75,13 +75,13 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     private List<ConsumerRecord<String, T>> controlBuffer;
     private AtomicInteger counter;
     private SnapshotInfos snapshotInfos;
-    private DefaultSessionSnapShooter snapShooter;
-    private EnvConfig envConfig;
+    protected DefaultSessionSnapShooter snapShooter;
+    protected EnvConfig envConfig;
     private Logger loggerForTest;
     private volatile boolean askedSnapshotOnDemand;
-    private Producer producer;
-    private ConsumerUtilsCore consumerUtilsCore;
-    private SnapshotOnDemandUtils snapshotOnDemandUtils;
+    protected Producer producer;
+    protected ConsumerUtilsCore consumerUtilsCore;
+    protected SnapshotOnDemandUtils snapshotOnDemandUtils;
 
     public DefaultKafkaConsumer(){}
 
@@ -99,26 +99,11 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
         this.snapshotOnDemandUtils = snapshotOnDemandUtils;
     }
 
-    //For test
-    void setupForTest(EnvConfig config, Producer producer,
-                      ConsumerUtilsCore consumerUtilsCore,
-                      DefaultSessionSnapShooter defaultSessionSnapShooter,
-                      SnapshotOnDemandUtils snapshotOnDemandUtils, DroolsConsumerHandler consumerHandler){
-        this.envConfig = config;
-        this.producer = producer;
-        this.consumerUtilsCore = consumerUtilsCore;
-        this.snapShooter = defaultSessionSnapShooter;
-        this.snapshotOnDemandUtils = snapshotOnDemandUtils;
-        this.consumerHandler = consumerHandler;
-        getOrCreateKafkaConsumer();
-        getOrCreateKafkaSecondaryConsumer();
-    }
-
-    public void getOrCreateKafkaConsumer(){
+    public void createKafkaConsumer(){
         this.kafkaConsumer = new KafkaConsumer<>(Config.getConsumerConfig(PRIMARY_CONSUMER));
     }
 
-    public void getOrCreateKafkaSecondaryConsumer(){
+    public void updateKafkaSecondaryConsumer(){
         if (currentState.equals(State.REPLICA)) {
             this.kafkaSecondaryConsumer = new KafkaConsumer<>(Config.getConsumerConfig(SECONDARY_CONSUMER));
         } else {
@@ -129,8 +114,8 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
     public void initConsumer(ConsumerHandler consumerHandler) {
         this.consumerHandler = (DroolsConsumerHandler) consumerHandler;
         this.snapShooter = (DefaultSessionSnapShooter) InfraFactory.getSnapshooter(envConfig);
-        getOrCreateKafkaConsumer();
-        getOrCreateKafkaSecondaryConsumer();
+        createKafkaConsumer();
+        updateKafkaSecondaryConsumer();
     }
 
     protected void restartConsumer() {
@@ -138,8 +123,8 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
             logger.info("Restart Consumers");
         }
         snapshotInfos = snapShooter.deserialize();//is still useful ?
-        getOrCreateKafkaConsumer();
-        getOrCreateKafkaSecondaryConsumer();
+        createKafkaConsumer();
+        updateKafkaSecondaryConsumer();
         assign();
     }
 
@@ -317,7 +302,7 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
             DroolsExecutor.setAsLeader();
         } else if (state.equals(State.REPLICA)) {
             currentState = State.REPLICA;
-            getOrCreateKafkaSecondaryConsumer();
+            updateKafkaSecondaryConsumer();
             DroolsExecutor.setAsReplica();
         }
         setLastProcessedKey();
