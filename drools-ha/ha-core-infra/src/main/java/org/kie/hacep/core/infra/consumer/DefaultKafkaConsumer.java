@@ -137,20 +137,28 @@ public class DefaultKafkaConsumer<T> implements EventConsumer {
         }
         if (started && changedState && !currentState.equals(State.BECOMING_LEADER)) {
             updateOnRunningConsumer(state);
-        } else if (!started && state.equals(State.REPLICA) && !envConfig.isSkipOnDemandSnapshot() && !askedSnapshotOnDemand) {
-            boolean completed = askAndProcessSnapshotOnDemand(SnapshotOnDemandUtilsImpl.askASnapshotOnDemand(envConfig, snapShooter, producer));
-            if (logger.isInfoEnabled()) {
-                logger.info("askAndProcessSnapshotOnDemand completed:{}", completed);
+        } else if(!started) {
+            if (state.equals(State.REPLICA) && !envConfig.isSkipOnDemandSnapshot() && !askedSnapshotOnDemand) {
+                    //ask and wait a snapshot before start
+                    if (logger.isInfoEnabled()) {
+                        logger.info("askAndProcessSnapshotOnDemand:");
+                    }
+                    boolean completed = askAndProcessSnapshotOnDemand(SnapshotOnDemandUtilsImpl.askASnapshotOnDemand(envConfig, snapShooter, producer));
+                    if (logger.isInfoEnabled()) {
+                        logger.info("askAndProcessSnapshotOnDemand completed:{}", completed);
+                    }
+
             }
-        }
-        //State.BECOMING_LEADER won't start the pod
-        if (state.equals(State.LEADER) || state.equals(State.REPLICA)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("enableConsumeAndStartLoop:{}", state);
+            //State.BECOMING_LEADER won't start the pod
+            if (state.equals(State.LEADER) || state.equals(State.REPLICA)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("enableConsumeAndStartLoop:{}", state);
+                }
+                enableConsumeAndStartLoop(state);
             }
-            enableConsumeAndStartLoop(state);
         }
     }
+
 
     protected boolean askAndProcessSnapshotOnDemand(SnapshotInfos snapshotInfos) {
         askedSnapshotOnDemand = true;
