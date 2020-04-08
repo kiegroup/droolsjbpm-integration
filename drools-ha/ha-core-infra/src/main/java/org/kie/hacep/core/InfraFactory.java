@@ -36,6 +36,8 @@ import org.kie.hacep.core.infra.consumer.EventConsumer;
 import org.kie.hacep.core.infra.consumer.ItemToProcess;
 import org.kie.hacep.core.infra.consumer.LocalConsumer;
 import org.kie.hacep.core.infra.utils.ConsumerUtilsCoreImpl;
+import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtils;
+import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtilsImpl;
 import org.kie.remote.RemoteKieSession;
 import org.kie.remote.RemoteStreamingKieSession;
 import org.kie.remote.impl.RemoteKieSessionImpl;
@@ -47,7 +49,10 @@ import org.kie.remote.impl.producer.Producer;
 
 public class InfraFactory {
 
+    private static SnapshotOnDemandUtils snapshotOnDemandUtils = new SnapshotOnDemandUtilsImpl();
+
     private InfraFactory() {
+
     }
 
     public static EventConsumer getEventConsumer(EnvConfig config) {
@@ -56,7 +61,7 @@ public class InfraFactory {
     }
 
     public static SessionSnapshooter getSnapshooter(EnvConfig envConfig) {
-        return new DefaultSessionSnapShooter(envConfig);
+        return new DefaultSessionSnapShooter(envConfig, snapshotOnDemandUtils);
     }
 
     public static ConsumerHandler getConsumerHandler(Producer producer,

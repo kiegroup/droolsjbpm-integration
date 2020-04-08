@@ -19,6 +19,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.Test;
 import org.kie.hacep.EnvConfig;
 import org.kie.hacep.core.InfraFactory;
+import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtils;
 import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtilsImpl;
 import org.kie.remote.impl.producer.Producer;
 
@@ -28,21 +29,23 @@ public class SnapshotOnDemandUtilsTest {
 
     @Test(expected = org.apache.kafka.common.KafkaException.class)
     public void askAKafkaConsumerWithoutServerUpTest(){
+        SnapshotOnDemandUtils snapshotOnDemandUtils = new SnapshotOnDemandUtilsImpl();
         EnvConfig config = EnvConfig.getDefaultEnvConfig();
         config.local(false);
         config.underTest(false);
-        KafkaConsumer consumer = SnapshotOnDemandUtilsImpl.getConfiguredSnapshotConsumer(config);
+        KafkaConsumer consumer = snapshotOnDemandUtils.getConfiguredSnapshotConsumer(config);
         assertNull(consumer);
     }
 
     @Test(expected = org.apache.kafka.common.KafkaException.class)
     public void askASnapshotWithoutServerUpTest(){
+        SnapshotOnDemandUtils snapshotOnDemandUtils = new SnapshotOnDemandUtilsImpl();
         EnvConfig config = EnvConfig.getDefaultEnvConfig();
         config.local(false);
         config.underTest(false);
-        SessionSnapshooter sessionSnapshooter = new DefaultSessionSnapShooter(config);
+        SessionSnapshooter sessionSnapshooter = new DefaultSessionSnapShooter(config, snapshotOnDemandUtils);
         Producer producer = InfraFactory.getProducer(config.isLocal());
-        SnapshotInfos infos = SnapshotOnDemandUtilsImpl.askASnapshotOnDemand(config, sessionSnapshooter, producer );
+        SnapshotInfos infos = snapshotOnDemandUtils.askASnapshotOnDemand(config, sessionSnapshooter, producer );
         assertNull(infos);
     }
 }

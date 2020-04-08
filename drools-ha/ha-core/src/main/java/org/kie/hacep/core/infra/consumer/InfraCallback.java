@@ -27,7 +27,7 @@ public class InfraCallback implements LeadershipCallback {
     }
 
     @Override
-    public void updateStatus(State state) {
-        consumer.updateStatus(state);
+    public InfraCallbackStatus updateStatus(State state) {
+        return consumer.updateStatus(state);
     }
 }

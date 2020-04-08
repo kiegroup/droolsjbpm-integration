@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 20120 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.hacep.core.infra.election;
+package org.kie.hacep.core.infra.utils;
 
-import org.kie.hacep.core.infra.consumer.InfraCallbackStatus;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.kie.hacep.EnvConfig;
+import org.kie.hacep.core.infra.SessionSnapshooter;
+import org.kie.hacep.core.infra.SnapshotInfos;
+import org.kie.remote.impl.producer.Producer;
 
-public interface LeadershipCallback {
+public interface SnapshotOnDemandUtils {
 
-    InfraCallbackStatus updateStatus(State state);
+  SnapshotInfos askASnapshotOnDemand(EnvConfig config, SessionSnapshooter snapshooter, Producer producer);
+
+  KafkaConsumer getConfiguredSnapshotConsumer(EnvConfig envConfig);
 }
