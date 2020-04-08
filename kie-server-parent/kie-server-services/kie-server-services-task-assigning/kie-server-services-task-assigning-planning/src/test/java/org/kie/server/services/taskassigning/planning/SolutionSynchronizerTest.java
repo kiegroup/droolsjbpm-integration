@@ -156,37 +156,38 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         // wait for the query executions to happen
         queryExecutionsCountDown.await();
 
-        // initial setup queryTimes -> [startTime]
-        // execution0:
-        //    execute query with lastModification = startTime
-        //    execution was ok, but result0 has no results.
-        //    nextQueryTime = startTime since minimum distance with result0.getQueryTime() is not met -> queryTimes -> [startTime, startTime]
-        // execution1:
-        //     execute query with lastModification = startTime
-        //     execution is ok, but result1 has no values.
-        //     nextQueryTime = result1.getQueryTime() since minimum distance with startTime is met -> [startTime, result1.getQueryTime()]
-        // execution2:
-        //     execute query with lastModification = startTime
-        //     execution is ok, but result2 has no values.
-        //     nextQueryTime = result1.getQueryTime() since minimum distance with result2.getQueryTime() is not met -> [result1.getQueryTime(), result1.getQueryTime()]
-        // execution3:
-        //     execute query with lastModification = result1.getQueryTime()
-        //     execution fails.
-        //     a retry is produced. -> [result1.getQueryTime(), result1.getQueryTime()]
-        // execution4:
-        //     execute query with lastModification = result1.getQueryTime()
-        //     execution fails.
-        //     a retry is produced. -> [result1.getQueryTime(), result1.getQueryTime()]
-        // execution5:
-        //     execute query with lastModification = result1.getQueryTime()
-        //     execution is ok, but result5 has no values
-        //     nextQueryTime = result5.getQueryTime() since minimum distance with result1.getQueryTime() is met -> [result1.getQueryTime(), result5.getQueryTime()]
-        // execution6:
-        //     execute query with lastModification = result1.getQueryTime()
-        //     execution is ok, and result6 has values!
-        //     nextQueryTime = result6.getQueryTime() since minimum distance is met -> [result5.getQueryTime(), result6.getQueryTime()]
-        //     End of loop since results are produced.
-
+        /*
+        initial setup queryTimes -> [startTime]
+        execution0:
+            execute query with lastModification = startTime
+            execution was ok, but result0 has no results.
+            nextQueryTime = startTime since minimum distance with result0.getQueryTime() is not met -> queryTimes -> [startTime, startTime]
+        execution1:
+            execute query with lastModification = startTime
+            execution is ok, but result1 has no values.
+            nextQueryTime = result1.getQueryTime() since minimum distance with startTime is met -> [startTime, result1.getQueryTime()]
+        execution2:
+            execute query with lastModification = startTime
+            execution is ok, but result2 has no values.
+            nextQueryTime = result1.getQueryTime() since minimum distance with result2.getQueryTime() is not met -> [result1.getQueryTime(), result1.getQueryTime()]
+        execution3:
+            execute query with lastModification = result1.getQueryTime()
+            execution fails.
+            a retry is produced. -> [result1.getQueryTime(), result1.getQueryTime()]
+        execution4:
+            execute query with lastModification = result1.getQueryTime()
+            execution fails.
+            a retry is produced. -> [result1.getQueryTime(), result1.getQueryTime()]
+        execution5:
+            execute query with lastModification = result1.getQueryTime()
+            execution is ok, but result5 has no values
+            nextQueryTime = result5.getQueryTime() since minimum distance with result1.getQueryTime() is met -> [result1.getQueryTime(), result5.getQueryTime()]
+        execution6:
+            execute query with lastModification = result1.getQueryTime()
+            execution is ok, and result6 has values!
+            nextQueryTime = result6.getQueryTime() since minimum distance is met -> [result5.getQueryTime(), result6.getQueryTime()]
+            End of loop since results are produced.
+        */
         verify(delegate, times(3)).findTasks(anyList(), eq(startTime), anyObject());
         verify(delegate, times(4)).findTasks(anyList(), eq(results.get(1).getQueryTime()), anyObject());
         assertEquals(results.get(5).getQueryTime(), context.pollNextQueryTime());

@@ -18,11 +18,9 @@ package org.kie.server.services.taskassigning.planning;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -92,11 +90,11 @@ public class SolverHandlerContext {
      */
     public void clearTaskChangeTimes(LocalDateTime untilLocalDateTime) {
         if (untilLocalDateTime != null) {
-            final List<Long> removableChanges = taskChangeTimes.entrySet().stream()
+            taskChangeTimes.entrySet().stream()
                     .filter(entry -> untilLocalDateTime.compareTo(entry.getValue()) > 0)
                     .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-            removableChanges.forEach(removableChange -> taskChangeTimes.remove(removableChange));
+                    .collect(Collectors.toList())
+                    .forEach(removableChange -> taskChangeTimes.remove(removableChange));
         }
     }
 
