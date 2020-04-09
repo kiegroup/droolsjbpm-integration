@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_INTERVAL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_QUERIES_MINIMUM_DISTANCE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_QUERIES_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.util.PropertyUtil.readSystemProperty;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
@@ -51,6 +54,9 @@ public class SolverHandler {
     private static final String TARGET_USER_ID = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, null, value -> value);
     private static final int PUBLISH_WINDOW_SIZE = readSystemProperty(JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, 2, Integer::parseInt);
     private static final long SYNC_INTERVAL = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, 5000L, Long::parseLong);
+    private static final int SYNC_QUERIES_WINDOW_SIZE = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_QUERIES_WINDOW_SIZE, 2, Integer::parseInt);
+    private static final long SYNC_QUERIES_MINIMUM_DISTANCE = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_QUERIES_MINIMUM_DISTANCE, 2000, Integer::parseInt);
+
     private static final long EXECUTOR_TERMINATION_TIMEOUT = 5;
 
     private final SolverDef solverDef;
@@ -85,7 +91,7 @@ public class SolverHandler {
         this.delegate = delegate;
         this.userSystemService = userSystemService;
         this.executorService = executorService;
-        this.context = new SolverHandlerContext();
+        this.context = new SolverHandlerContext(SYNC_QUERIES_WINDOW_SIZE, SYNC_QUERIES_MINIMUM_DISTANCE);
     }
 
     public void start() {
@@ -189,11 +195,17 @@ public class SolverHandler {
                 solutionSynchronizer.initSolverExecutor();
                 currentSolution = null;
             } else {
+                LocalDateTime fromLastModificationDate;
                 if (result.getExecutionResult().hasError()) {
                     LOGGER.debug("A recoverable error was produced during solution processing. errorCode: {}, message: {} " +
                                          "Solution will be properly updated on next refresh", result.getExecutionResult().getError(), result.getExecutionResult().getErrorMessage());
+                    fromLastModificationDate = context.getPreviousQueryTime();
+                    context.pollLastQueryTime();
+                } else {
+                    fromLastModificationDate = context.pollNextQueryTime();
+                    context.clearTaskChangeTimes(context.getPreviousQueryTime());
                 }
-                solutionSynchronizer.synchronizeSolution(currentSolution, context.getLastModificationDate());
+                solutionSynchronizer.synchronizeSolution(currentSolution, fromLastModificationDate);
             }
         } finally {
             lock.unlock();

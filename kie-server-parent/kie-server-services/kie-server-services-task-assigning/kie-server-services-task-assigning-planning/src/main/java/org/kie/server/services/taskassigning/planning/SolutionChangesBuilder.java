@@ -111,8 +111,12 @@ public class SolutionChangesBuilder {
         final List<TaskPropertyChangeProblemFactChange> propertyChanges = new ArrayList<>();
         final Map<String, List<IndexedElement<AssignTaskProblemFactChange>>> changesByUserId = new HashMap<>();
 
+        final List<TaskData> filteredTaskDataList = taskDataList.stream()
+                .filter(taskData -> !context.isProcessedTaskChange(taskData.getTaskId(), taskData.getLastModificationDate()))
+                .collect(Collectors.toList());
+
         Task task;
-        for (TaskData taskData : taskDataList) {
+        for (TaskData taskData : filteredTaskDataList) {
             task = taskById.remove(taskData.getTaskId());
             if (task == null) {
                 addNewTaskChanges(taskData, usersById, newTaskChanges, changesByUserId);
@@ -145,6 +149,7 @@ public class SolutionChangesBuilder {
         if (!totalChanges.isEmpty()) {
             totalChanges.add(0, scoreDirector -> context.setCurrentChangeSetId(context.nextChangeSetId()));
         }
+        filteredTaskDataList.forEach(taskData -> context.setTaskChangeTime(taskData.getTaskId(), taskData.getLastModificationDate()));
         return totalChanges;
     }
 

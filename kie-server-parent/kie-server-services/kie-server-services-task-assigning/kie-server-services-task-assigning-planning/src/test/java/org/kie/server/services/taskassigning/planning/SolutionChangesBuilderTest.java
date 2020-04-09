@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import org.junit.runner.RunWith;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.api.model.taskassigning.TaskData;
+import org.kie.server.services.taskassigning.core.model.ModelConstants;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.User;
@@ -44,6 +46,7 @@ import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.kie.api.task.model.Status.Completed;
 import static org.kie.api.task.model.Status.Exited;
 import static org.kie.api.task.model.Status.Failed;
@@ -85,7 +88,7 @@ public class SolutionChangesBuilderTest {
 
     @Before
     public void setUp() {
-        context = new SolverHandlerContext();
+        context = new SolverHandlerContext(2, 2000);
     }
 
     @Test
@@ -104,6 +107,7 @@ public class SolutionChangesBuilderTest {
         AddTaskProblemFactChange expected = new AddTaskProblemFactChange(fromTaskData(taskData));
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, expected);
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     @Test
@@ -167,6 +171,7 @@ public class SolutionChangesBuilderTest {
 
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, new ReleaseTaskProblemFactChange(task));
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     @Test
@@ -299,6 +304,7 @@ public class SolutionChangesBuilderTest {
 
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, new TaskPropertyChangeProblemFactChange(task));
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     @Test
@@ -326,6 +332,34 @@ public class SolutionChangesBuilderTest {
         addRemoveTaskInSinkStatus(Obsolete);
     }
 
+    @Test
+    public void discardDuplicatedChanges() {
+        TaskData taskData1 = mockTaskData(1, NAME, Ready, null);
+        TaskData taskData2 = mockTaskData(2, NAME, InProgress, null);
+        TaskData taskData3 = mockTaskData(3, NAME, Completed, null);
+        TaskData taskData4 = mockTaskData(4, NAME, Suspended, null);
+        Task task1 = mockTask(taskData1.getTaskId());
+        Task task2 = mockTask(taskData2.getTaskId());
+        Task task3 = mockTask(taskData3.getTaskId());
+        Task task4 = mockTask(taskData4.getTaskId());
+
+        List<TaskData> taskDataList = mockTaskDataList(taskData1, taskData2, taskData3, taskData4);
+        TaskAssigningSolution solution = mockSolution(Arrays.asList(task1, task2, task3, task4), Collections.emptyList());
+
+        taskDataList.forEach(taskData -> context.setTaskChangeTime(taskData.getTaskId(), taskData.getLastModificationDate()));
+
+        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+                .withSolution(solution)
+                .withTasks(taskDataList)
+                .withUserSystem(userSystemService)
+                .withContext(context)
+                .build();
+
+        assertEquals(2, result.size());
+        assertChangeIsTheChangeSetId(result, 0);
+        assertChangeIsTheDummyTaskAssigned(result, ModelConstants.DUMMY_TASK_PLANNER_241, 1);
+    }
+
     private void addRemoveTaskInSinkStatus(Status sinkStatus) {
         TaskData taskData = mockTaskData(TASK_ID, NAME, sinkStatus, ACTUAL_OWNER_ENTITY_ID);
         User actualOwner = mockUser(ACTUAL_OWNER_ID, ACTUAL_OWNER_ENTITY_ID);
@@ -345,6 +379,7 @@ public class SolutionChangesBuilderTest {
         RemoveTaskProblemFactChange change = new RemoveTaskProblemFactChange(task);
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, change);
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private void addNewReservedOrInProgressOrSuspendedTaskChangeWithActualOwnerInSolution(Status status) {
@@ -381,6 +416,7 @@ public class SolutionChangesBuilderTest {
         AssignTaskProblemFactChange expected = new AssignTaskProblemFactChange(fromTaskData(taskData), mockUser(USER_ID, USER_ENTITY_ID), true);
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, expected);
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private void addRemoveReservedOrInProgressOrSuspendedTaskChangeWhenActualOwnerNotPresent(Status status) {
@@ -398,6 +434,7 @@ public class SolutionChangesBuilderTest {
 
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, new RemoveTaskProblemFactChange(task));
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private void addReassignReservedOrInProgressOrSuspendedTaskWhenItWasManuallyReassignedWithActualOwnerInSolution(Status status) {
@@ -428,6 +465,7 @@ public class SolutionChangesBuilderTest {
 
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, new AssignTaskProblemFactChange(task, mockUser(ACTUAL_OWNER_ID, ACTUAL_OWNER_ENTITY_ID), true));
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private void addReassignReservedOrInProgressOrSuspendedTaskWhenItWasManuallyReassignedWithActualOwnerInExternalSystem(Status status) {
@@ -470,6 +508,7 @@ public class SolutionChangesBuilderTest {
 
         assertChangeIsTheChangeSetId(result, 0);
         assertChange(result, 1, new AssignTaskProblemFactChange(task, mockUser(ACTUAL_OWNER_ID, ACTUAL_OWNER_ENTITY_ID), true));
+        assertTaskChangeRegistered(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private void addPinReservedOrInProgressOrSuspendedTaskWhenPublishedAndNotYetPinnedWithActualOwnerInExternalSystem(Status status) {
@@ -512,6 +551,12 @@ public class SolutionChangesBuilderTest {
         assertEquals(currentChangeSetId + 1, context.getCurrentChangeSetId(), index);
     }
 
+    private void assertChangeIsTheDummyTaskAssigned(List<ProblemFactChange<TaskAssigningSolution>> result, Task dummyTask, int index) {
+        assertTrue(result.get(index) instanceof AssignTaskProblemFactChange);
+        AssignTaskProblemFactChange change = (AssignTaskProblemFactChange) result.get(index);
+        assertEquals(dummyTask, change.getTask());
+    }
+
     private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, TaskPropertyChangeProblemFactChange expected) {
         TaskPropertyChangeProblemFactChange change = (TaskPropertyChangeProblemFactChange) result.get(index);
         assertTaskEquals(expected.getTask(), change.getTask());
@@ -521,6 +566,10 @@ public class SolutionChangesBuilderTest {
         if (expected.getPriority() != null) {
             assertEquals(expected.getPriority(), change.getPriority(), 0);
         }
+    }
+
+    private void assertTaskChangeRegistered(long taskId, LocalDateTime lastModificationDate) {
+        context.isProcessedTaskChange(taskId, lastModificationDate);
     }
 
     private TaskData mockTaskData(long taskId, String name, Status status, String actualOwner) {
@@ -533,6 +582,7 @@ public class SolutionChangesBuilderTest {
                 .priority(PRIORITY)
                 .status(convertToString(status))
                 .actualOwner(actualOwner)
+                .lastModificationDate(LocalDateTime.now())
                 .inputData(INPUT_DATA)
                 .build();
     }
@@ -560,5 +610,9 @@ public class SolutionChangesBuilderTest {
 
     private List<TaskData> mockTaskDataList(TaskData... tasks) {
         return Arrays.asList(tasks);
+    }
+
+    private Task mockTask(long taskId) {
+        return new Task(taskId, "Task_" + taskId, 0);
     }
 }

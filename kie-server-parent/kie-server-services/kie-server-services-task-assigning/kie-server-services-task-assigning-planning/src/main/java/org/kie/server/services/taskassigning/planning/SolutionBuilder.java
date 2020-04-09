@@ -53,6 +53,7 @@ public class SolutionBuilder {
 
     private List<TaskData> taskDataList;
     private List<org.kie.server.services.taskassigning.user.system.api.User> externalUsers;
+    private SolverHandlerContext context;
 
     private SolutionBuilder() {
     }
@@ -71,6 +72,11 @@ public class SolutionBuilder {
         return this;
     }
 
+    public SolutionBuilder withContext(SolverHandlerContext context) {
+        this.context = context;
+        return this;
+    }
+
     public TaskAssigningSolution build() {
         final List<Task> tasks = new ArrayList<>();
         final Map<String, List<IndexedElement<Task>>> assignedTasksByUserId = new HashMap<>();
@@ -81,6 +87,7 @@ public class SolutionBuilder {
         usersById.put(PLANNING_USER.getEntityId(), PLANNING_USER);
 
         taskDataList.forEach(taskData -> {
+            context.setTaskChangeTime(taskData.getTaskId(), taskData.getLastModificationDate());
             final Task task = fromTaskData(taskData);
             final Status status = convertFromString(task.getStatus());
             switch (status) {
