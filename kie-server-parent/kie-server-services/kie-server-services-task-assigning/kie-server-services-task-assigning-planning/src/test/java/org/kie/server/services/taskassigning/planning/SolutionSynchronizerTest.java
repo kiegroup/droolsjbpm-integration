@@ -52,6 +52,8 @@ import static org.mockito.Mockito.when;
 public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchronizer> {
 
     private static final long SYNCH_INTERVAL = 2;
+    private static final int QUERY_TIMES_SIZE = 2;
+    private static final long QUERY_MINIMUM_DISTANCE = 2000;
 
     @Mock
     private SolverExecutor solverExecutor;
@@ -85,19 +87,24 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
     private CountDownLatch queryExecutionsCountDown;
 
+    private SolverHandlerContext context;
+
     @Override
     protected SolutionSynchronizer createRunnableBase() {
+        context = new SolverHandlerContext(QUERY_TIMES_SIZE, QUERY_MINIMUM_DISTANCE);
         return new SolutionSynchronizerMock(solverExecutor, delegate, userSystemService,
-                                            SYNCH_INTERVAL, new SolverHandlerContext(), resultConsumer);
+                                            SYNCH_INTERVAL, context, resultConsumer);
     }
 
     @Test(timeout = TEST_TIMEOUT)
     @SuppressWarnings("unchecked")
     public void initSolverExecutor() throws Exception {
         CompletableFuture future = startRunnableBase();
+        LocalDateTime firstQueryTime = LocalDateTime.now();
 
         List<User> userList = mockUserList();
-        List<TaskAssigningRuntimeDelegate.FindTasksResult> results = mockQueryExecutions(LocalDateTime.now());
+        List<TaskAssigningRuntimeDelegate.FindTasksResult> results = mockQueryExecutions(firstQueryTime);
+        LocalDateTime firstSuccessfulQueryTime = results.get(results.size() - 1).getQueryTime();
         queryExecutionsCountDown = new CountDownLatch(results.size());
         prepareQueryExecutions(results);
 
@@ -114,6 +121,12 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         verify(delegate, times(results.size())).findTasks(anyList(), eq(null), anyObject());
         verify(solverExecutor).start(solutionCaptor.capture());
         assertEquals(generatedSolution, solutionCaptor.getValue());
+        LocalDateTime initializationQueryTime = firstSuccessfulQueryTime.withNano(0).minusHours(1);
+        for (int i = 0; i < QUERY_TIMES_SIZE - 1; i++) {
+            assertEquals(initializationQueryTime, context.pollNextQueryTime());
+        }
+        assertEquals(initializationQueryTime, context.getPreviousQueryTime());
+        assertEquals(firstSuccessfulQueryTime.withNano(0), context.peekLastQueryTime());
 
         runnableBase.destroy();
         future.get();
@@ -127,7 +140,8 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
         TaskAssigningSolution solution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
         List<User> userList = mockUserList();
-        LocalDateTime startTime = LocalDateTime.now();
+        context.resetQueryTimes(LocalDateTime.now().withNano(0));
+        LocalDateTime startTime = context.pollNextQueryTime();
         List<TaskAssigningRuntimeDelegate.FindTasksResult> results = mockQueryExecutions(startTime);
         queryExecutionsCountDown = new CountDownLatch(results.size());
         prepareQueryExecutions(results);
@@ -142,17 +156,42 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         // wait for the query executions to happen
         queryExecutionsCountDown.await();
 
-        //execution0: initial query execution was ok, but result0 has no results.
-        verify(delegate).findTasks(anyList(), eq(startTime.withNano(0)), anyObject());
-        //execution1: next retry is with result0.queryTime, but result1 hs no results.
-        verify(delegate).findTasks(anyList(), eq(results.get(0).getQueryTime().withNano(0)), anyObject());
-        //execution2: next retry is with result1.queryTime, but result2 has no results.
-        verify(delegate).findTasks(anyList(), eq(results.get(1).getQueryTime().withNano(0)), anyObject());
-        //execution3: next retry is with result2.queryTime. but execution3 and execution4 failed.
-        verify(delegate, times(3)).findTasks(anyList(), eq(results.get(2).getQueryTime().withNano(0)), anyObject());
-        //execution5: executed ok., but result5 has no results. next retry is with result5.queryTime
-        verify(delegate).findTasks(anyList(), eq(results.get(5).getQueryTime().withNano(0)), anyObject());
-        //result6, executed ok and produced changes.
+        /*
+        initial setup queryTimes -> [startTime]
+        execution0:
+            execute query with lastModification = startTime
+            execution was ok, but result0 has no results.
+            nextQueryTime = startTime since minimum distance with result0.getQueryTime() is not met -> queryTimes -> [startTime, startTime]
+        execution1:
+            execute query with lastModification = startTime
+            execution is ok, but result1 has no values.
+            nextQueryTime = result1.getQueryTime() since minimum distance with startTime is met -> [startTime, result1.getQueryTime()]
+        execution2:
+            execute query with lastModification = startTime
+            execution is ok, but result2 has no values.
+            nextQueryTime = result1.getQueryTime() since minimum distance with result2.getQueryTime() is not met -> [result1.getQueryTime(), result1.getQueryTime()]
+        execution3:
+            execute query with lastModification = result1.getQueryTime()
+            execution fails.
+            a retry is produced. -> [result1.getQueryTime(), result1.getQueryTime()]
+        execution4:
+            execute query with lastModification = result1.getQueryTime()
+            execution fails.
+            a retry is produced. -> [result1.getQueryTime(), result1.getQueryTime()]
+        execution5:
+            execute query with lastModification = result1.getQueryTime()
+            execution is ok, but result5 has no values
+            nextQueryTime = result5.getQueryTime() since minimum distance with result1.getQueryTime() is met -> [result1.getQueryTime(), result5.getQueryTime()]
+        execution6:
+            execute query with lastModification = result1.getQueryTime()
+            execution is ok, and result6 has values!
+            nextQueryTime = result6.getQueryTime() since minimum distance is met -> [result5.getQueryTime(), result6.getQueryTime()]
+            End of loop since results are produced.
+        */
+        verify(delegate, times(3)).findTasks(anyList(), eq(startTime), anyObject());
+        verify(delegate, times(4)).findTasks(anyList(), eq(results.get(1).getQueryTime()), anyObject());
+        assertEquals(results.get(5).getQueryTime(), context.pollNextQueryTime());
+        assertEquals(results.get(6).getQueryTime(), context.pollNextQueryTime());
 
         verify(delegate, times(results.size())).findTasks(anyList(), anyObject(), anyObject());
         verify(resultConsumer).accept(resultCaptor.capture());
@@ -176,13 +215,13 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
      */
     private List<TaskAssigningRuntimeDelegate.FindTasksResult> mockQueryExecutions(LocalDateTime startTime) {
         List<TaskData> taskDataList = mockTaskDataList();
-        TaskAssigningRuntimeDelegate.FindTasksResult result0 = mockFindTaskResult(startTime.plus(1, ChronoUnit.SECONDS), new ArrayList<>());
-        TaskAssigningRuntimeDelegate.FindTasksResult result1 = mockFindTaskResult(startTime.plus(2, ChronoUnit.SECONDS), new ArrayList<>());
-        TaskAssigningRuntimeDelegate.FindTasksResult result2 = mockFindTaskResult(startTime.plus(3, ChronoUnit.SECONDS), new ArrayList<>());
+        TaskAssigningRuntimeDelegate.FindTasksResult result0 = mockFindTaskResult(startTime.plus(QUERY_MINIMUM_DISTANCE / 2, ChronoUnit.MILLIS), new ArrayList<>());
+        TaskAssigningRuntimeDelegate.FindTasksResult result1 = mockFindTaskResult(startTime.plus(QUERY_MINIMUM_DISTANCE + QUERY_MINIMUM_DISTANCE / 2, ChronoUnit.MILLIS), new ArrayList<>());
+        TaskAssigningRuntimeDelegate.FindTasksResult result2 = mockFindTaskResult(startTime.plus(QUERY_MINIMUM_DISTANCE * 2, ChronoUnit.MILLIS), new ArrayList<>());
         TaskAssigningRuntimeDelegate.FindTasksResult resultFailure3 = null;
         TaskAssigningRuntimeDelegate.FindTasksResult resultFailure4 = null;
-        TaskAssigningRuntimeDelegate.FindTasksResult result5 = mockFindTaskResult(startTime.plus(4, ChronoUnit.SECONDS), new ArrayList<>());
-        TaskAssigningRuntimeDelegate.FindTasksResult result6 = mockFindTaskResult(startTime.plus(5, ChronoUnit.SECONDS), taskDataList);
+        TaskAssigningRuntimeDelegate.FindTasksResult result5 = mockFindTaskResult(startTime.plus(QUERY_MINIMUM_DISTANCE * 5, ChronoUnit.SECONDS), new ArrayList<>());
+        TaskAssigningRuntimeDelegate.FindTasksResult result6 = mockFindTaskResult(startTime.plus(QUERY_MINIMUM_DISTANCE * 8, ChronoUnit.SECONDS), taskDataList);
         return Arrays.asList(result0, result1, result2, resultFailure3, resultFailure4, result5, result6);
     }
 

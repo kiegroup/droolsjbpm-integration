@@ -16,10 +16,12 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.taskassigning.PlanningTask;
@@ -32,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import static org.junit.Assert.assertTrue;
 import static org.kie.api.task.model.Status.InProgress;
 import static org.kie.api.task.model.Status.Ready;
 import static org.kie.api.task.model.Status.Reserved;
@@ -55,12 +58,20 @@ public class SolutionBuilderTest {
     // user not present in the external users
     private static final String USER_NOT_PRESENT = "USER_NOT_PRESENT";
 
+    private SolverHandlerContext context;
+
+    @Before
+    public void setUp() {
+        context = new SolverHandlerContext(2, 2000);
+    }
+
     @Test
     public void buildAndCheckUsersWhereAdded() {
         List<org.kie.server.services.taskassigning.user.system.api.User> externalUsers = buildExternalUsers();
         TaskAssigningSolution solution = SolutionBuilder.create()
                 .withTasks(Collections.emptyList())
                 .withUsers(externalUsers)
+                .withContext(context)
                 .build();
 
         assertContains(USER1, solution.getUserList());
@@ -75,6 +86,7 @@ public class SolutionBuilderTest {
         TaskAssigningSolution solution = SolutionBuilder.create()
                 .withTasks(Collections.emptyList())
                 .withUsers(Collections.emptyList())
+                .withContext(context)
                 .build();
         assertEquals(1, solution.getTaskList().size());
         assertEquals(DUMMY_TASK, solution.getTaskList().get(0));
@@ -87,6 +99,7 @@ public class SolutionBuilderTest {
         TaskAssigningSolution solution = SolutionBuilder.create()
                 .withTasks(Collections.singletonList(taskData))
                 .withUsers(externalUsers)
+                .withContext(context)
                 .build();
         assertEquals(2, solution.getTaskList().size());
         assertContainsNotAssignedTask(taskData, solution);
@@ -319,9 +332,11 @@ public class SolutionBuilderTest {
         taskData4.setPlanningTask(planningTask4);
 
         List<org.kie.server.services.taskassigning.user.system.api.User> externalUsers = buildExternalUsers();
+        List<TaskData> taskDataList = Arrays.asList(taskData4, taskData1, taskData3, taskData2);
         TaskAssigningSolution solution = SolutionBuilder.create()
-                .withTasks(Arrays.asList(taskData4, taskData1, taskData3, taskData2))
+                .withTasks(taskDataList)
                 .withUsers(externalUsers)
+                .withContext(context)
                 .build();
 
         assertEquals(5, solution.getTaskList().size());
@@ -336,9 +351,10 @@ public class SolutionBuilderTest {
         assertExpectedTaskAtPosition(taskData3.getTaskId(), 1, true, user1Tasks);
         assertExpectedTaskAtPosition(taskData4.getTaskId(), 2, true, user1Tasks);
         assertExpectedTaskAtPosition(taskData1.getTaskId(), 3, false, user1Tasks);
+        taskDataList.forEach(taskData -> assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate()));
     }
 
-    void assertExpectedTaskAtPosition(long taskId, int position, boolean pinned, List<Task> tasks) {
+    private void assertExpectedTaskAtPosition(long taskId, int position, boolean pinned, List<Task> tasks) {
         assertEquals("Task: " + taskId + " is expected at position 0", taskId, tasks.get(position).getId(), 0);
         assertEquals("Task: " + taskId + " with pinned = " + pinned + " is expected at position 0", pinned, tasks.get(position).isPinned());
     }
@@ -348,9 +364,11 @@ public class SolutionBuilderTest {
         TaskAssigningSolution solution = SolutionBuilder.create()
                 .withTasks(Collections.singletonList(taskData))
                 .withUsers(externalUsers)
+                .withContext(context)
                 .build();
         assertEquals(2, solution.getTaskList().size());
         assertContainsAssignedTask(taskData, taskData.getActualOwner(), pinned, solution);
+        assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private void buildAndCheckTaskWithPlanningTaskWasProcessedCorrect(TaskData taskData, PlanningTask planningTask, String owner, boolean pinned) {
@@ -359,9 +377,11 @@ public class SolutionBuilderTest {
         TaskAssigningSolution solution = SolutionBuilder.create()
                 .withTasks(Collections.singletonList(taskData))
                 .withUsers(externalUsers)
+                .withContext(context)
                 .build();
         assertEquals(2, solution.getTaskList().size());
         assertContainsAssignedTask(taskData, owner, pinned, solution);
+        assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private List<org.kie.server.services.taskassigning.user.system.api.User> buildExternalUsers() {
@@ -385,6 +405,7 @@ public class SolutionBuilderTest {
         taskData.setStatus(convertToString(status));
         taskData.setPriority(0);
         taskData.setProcessInstanceId(1L);
+        taskData.setLastModificationDate(LocalDateTime.now());
         return taskData;
     }
 
@@ -394,6 +415,7 @@ public class SolutionBuilderTest {
                 .findFirst().orElse(null);
         assertNotNull("Task: " + taskData.getTaskId() + " must be present in the solution.", task);
         assertNull("Task: " + taskData.getTaskId() + " must not be assigned to any user", task.getUser());
+        assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
     private void assertContainsAssignedTask(TaskData taskData, String userId, boolean pinned, TaskAssigningSolution solution) {
@@ -408,5 +430,9 @@ public class SolutionBuilderTest {
         assertNotNull("Task: " + taskData.getTaskId() + " must be assigned to user: " + userId + " but has no assigned user.", task.getUser());
         assertEquals("Task: " + taskData.getTaskId() + " must be assigned to user: " + userId, userId, task.getUser().getEntityId());
         assertEquals("Task: " + taskData.getTaskId() + " must have pinned = " + pinned, pinned, task.isPinned());
+    }
+
+    private void assertTaskChangeWasProcessed(long taskId, LocalDateTime changeTime) {
+        assertTrue("change: " + changeTime + " must have been processed for task: " + taskId, context.isProcessedTaskChange(taskId, changeTime));
     }
 }

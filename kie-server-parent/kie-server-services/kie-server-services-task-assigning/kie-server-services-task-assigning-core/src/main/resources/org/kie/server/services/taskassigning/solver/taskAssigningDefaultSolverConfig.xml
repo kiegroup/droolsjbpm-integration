@@ -11,8 +11,13 @@
     <scoreDrl>org/kie/server/services/taskassigning/solver/taskAssigningScoreRules.drl</scoreDrl>
   </scoreDirectorFactory>
 
-  <termination>
-    <unimprovedSpentLimit>PT2M</unimprovedSpentLimit>
-  </termination>
+  <constructionHeuristic/>
+
+  <localSearch>
+    <termination>
+      <!-- NOTE: please keep this termination period inside the localSearch configuration. -->
+      <unimprovedSpentLimit>PT2M</unimprovedSpentLimit>
+    </termination>
+  </localSearch>
 
 </solver>
