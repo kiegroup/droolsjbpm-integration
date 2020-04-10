@@ -36,7 +36,6 @@ import org.kie.hacep.consumer.KieContainerUtils;
 import org.kie.hacep.core.KieSessionContext;
 import org.kie.hacep.core.infra.message.SnapshotMessage;
 import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtils;
-import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtilsImpl;
 import org.kie.remote.impl.producer.EventProducer;
 import org.kie.remote.impl.producer.Producer;
 import org.kie.remote.util.SerializationUtil;
