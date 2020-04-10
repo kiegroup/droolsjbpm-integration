@@ -48,13 +48,14 @@ import org.kie.remote.util.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SnapshotOnDemandUtilsImpl {
+public class SnapshotOnDemandUtilsImpl implements SnapshotOnDemandUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SnapshotOnDemandUtilsImpl.class);
 
-    private SnapshotOnDemandUtilsImpl() { }
-
-    public static SnapshotInfos askASnapshotOnDemand(EnvConfig config, SessionSnapshooter snapshooter, Producer producer) {
+    @Override
+    public SnapshotInfos askASnapshotOnDemand(EnvConfig config,
+                                              SessionSnapshooter snapshooter,
+                                              Producer producer) {
         LocalDateTime infosTime = snapshooter.getLastSnapshotTime();
         LocalDateTime limitAge = LocalDateTime.now().minusSeconds(config.getMaxSnapshotAge());
         if (infosTime != null && limitAge.isBefore(infosTime)) { //included in the max age
@@ -70,7 +71,7 @@ public class SnapshotOnDemandUtilsImpl {
         }
     }
 
-    private static SnapshotInfos buildNewSnapshotOnDemand(EnvConfig envConfig, LocalDateTime limitAge, Producer producer) {
+    private SnapshotInfos buildNewSnapshotOnDemand(EnvConfig envConfig, LocalDateTime limitAge, Producer producer) {
         SnapshotMessage snapshotMsg = askAndReadSnapshotOnDemand(envConfig, limitAge, producer);
         KieSession kSession = null;
         KieContainer kieContainer = null;
@@ -92,7 +93,7 @@ public class SnapshotOnDemandUtilsImpl {
                                  snapshotMsg.getKjarGAV());
     }
 
-    private static SnapshotMessage askAndReadSnapshotOnDemand(EnvConfig envConfig,
+    private SnapshotMessage askAndReadSnapshotOnDemand(EnvConfig envConfig,
                                                               LocalDateTime limitAge,
                                                               Producer producer) {
         Properties props = Config.getProducerConfig("SnapshotOnDemandUtils.askASnapshotOnDemand");
@@ -134,7 +135,8 @@ public class SnapshotOnDemandUtilsImpl {
         return msg;
     }
 
-    public static KafkaConsumer getConfiguredSnapshotConsumer(EnvConfig envConfig) {
+    @Override
+    public KafkaConsumer getConfiguredSnapshotConsumer(EnvConfig envConfig) {
         KafkaConsumer<String, byte[]> consumer = new KafkaConsumer(Config.getSnapshotConsumerConfig());
         List<PartitionInfo> partitionsInfo = consumer.partitionsFor(envConfig.getSnapshotTopicName());
         Collection<TopicPartition> partitionCollection = new ArrayList<>();

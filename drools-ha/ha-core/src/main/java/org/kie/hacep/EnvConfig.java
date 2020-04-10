@@ -275,5 +275,31 @@ public final class EnvConfig {
         return kJarGAV;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("EnvConfig{");
+        sb.append("namespace='").append(namespace).append('\'');
+        sb.append(", eventsTopicName='").append(eventsTopicName).append('\'');
+        sb.append(", controlTopicName='").append(controlTopicName).append('\'');
+        sb.append(", snapshotTopicName='").append(snapshotTopicName).append('\'');
+        sb.append(", kieSessionInfosTopicName='").append(kieSessionInfosTopicName).append('\'');
+        sb.append(", printerType='").append(printerType).append('\'');
+        sb.append(", iterationBetweenSnapshot=").append(iterationBetweenSnapshot);
+        sb.append(", pollTimeout=").append(pollTimeout);
+        sb.append(", pollSnapshotTimeout=").append(pollSnapshotTimeout);
+        sb.append(", maxSnapshotRequestAttempts=").append(maxSnapshotRequestAttempts);
+        sb.append(", skipOnDemanSnapshot=").append(skipOnDemanSnapshot);
+        sb.append(", maxSnapshotAge=").append(maxSnapshotAge);
+        sb.append(", test=").append(test);
+        sb.append(", local=").append(local);
+        sb.append(", pollUnit=").append(pollUnit);
+        sb.append(", pollUnitSnapshot=").append(pollUnitSnapshot);
+        sb.append(", pollDuration=").append(pollDuration);
+        sb.append(", pollSnapshotDuration=").append(pollSnapshotDuration);
+        sb.append(", updatableKJar=").append(updatableKJar);
+        sb.append(", kJarGAV='").append(kJarGAV).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }
 
