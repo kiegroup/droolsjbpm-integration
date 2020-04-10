@@ -35,7 +35,7 @@ import org.kie.hacep.EnvConfig;
 import org.kie.hacep.consumer.KieContainerUtils;
 import org.kie.hacep.core.KieSessionContext;
 import org.kie.hacep.core.infra.message.SnapshotMessage;
-import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtilsImpl;
+import org.kie.hacep.core.infra.utils.SnapshotOnDemandUtils;
 import org.kie.remote.impl.producer.EventProducer;
 import org.kie.remote.impl.producer.Producer;
 import org.kie.remote.util.SerializationUtil;
@@ -46,11 +46,13 @@ public class DefaultSessionSnapShooter implements SessionSnapshooter {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultSessionSnapShooter.class);
     private EnvConfig envConfig;
+    private SnapshotOnDemandUtils snapshotOnDemandUtils;
 
     public static final String KEY = "LAST-SNAPSHOT";
 
-    public DefaultSessionSnapShooter(EnvConfig envConfig) {
+    public DefaultSessionSnapShooter(EnvConfig envConfig, SnapshotOnDemandUtils snapshotOnDemandUtils) {
         this.envConfig = envConfig;
+        this.snapshotOnDemandUtils = snapshotOnDemandUtils;
     }
 
     public void serialize(KieSessionContext kieSessionContext, String lastInsertedEventkey, long lastInsertedEventOffset) {
@@ -81,7 +83,7 @@ public class DefaultSessionSnapShooter implements SessionSnapshooter {
     public SnapshotInfos deserialize() {
         KieServices srv = KieServices.get();
         if (srv != null) {
-            KafkaConsumer<String, byte[]> consumer = SnapshotOnDemandUtilsImpl.getConfiguredSnapshotConsumer(envConfig);
+            KafkaConsumer<String, byte[]> consumer = snapshotOnDemandUtils.getConfiguredSnapshotConsumer(envConfig);
             ConsumerRecords<String, byte[]> records = consumer.poll(envConfig.getPollSnapshotDuration());
             byte[] bytes = null;
             for (ConsumerRecord record : records) {
@@ -121,7 +123,7 @@ public class DefaultSessionSnapShooter implements SessionSnapshooter {
 
     @Override
     public LocalDateTime getLastSnapshotTime() {
-        KafkaConsumer<String, byte[]> consumer = SnapshotOnDemandUtilsImpl.getConfiguredSnapshotConsumer(envConfig);
+        KafkaConsumer<String, byte[]> consumer = snapshotOnDemandUtils.getConfiguredSnapshotConsumer(envConfig);
         ConsumerRecords<String, byte[]> records = consumer.poll(envConfig.getPollSnapshotDuration());
         byte[] bytes = null;
         for (ConsumerRecord record : records) {
