@@ -68,7 +68,7 @@ public class UserTaskServiceBase {
     }
 
     protected String getUser(String queryParamUser) {
-        if (bypassAuthUser) {
+        if (bypassAuthUser && queryParamUser != null) {
             return queryParamUser;
         }
 
