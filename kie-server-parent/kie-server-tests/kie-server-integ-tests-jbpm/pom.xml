@@ -268,6 +268,7 @@
           <configuration>
             <systemPropertyVariables>
               <!-- Values are supplied by specific profiles -->
+              <org.kie.server.bypass.auth.user>true</org.kie.server.bypass.auth.user>
               <cargo.container.id>${cargo.container.id}</cargo.container.id>
               <cargo.servlet.port>${container.port}</cargo.servlet.port>
               <kie.server.context>${kie.server.context}</kie.server.context>
@@ -326,6 +327,7 @@
         <configuration>
           <container>
             <systemProperties>
+              <org.kie.server.bypass.auth.user>true</org.kie.server.bypass.auth.user>
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>

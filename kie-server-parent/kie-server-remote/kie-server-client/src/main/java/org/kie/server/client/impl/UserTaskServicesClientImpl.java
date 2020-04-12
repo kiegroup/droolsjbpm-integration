@@ -451,8 +451,14 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                                                                   values, Object.class, getHeaders(null));
 
         } else {
+            Object []params = null;
+            if(userId != null) {
+                params = new Object[]{containerId, userId, taskId};
+            } else {
+                params = new Object[]{containerId, taskId};
+            }
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "UserTaskService", "saveContent", serialize(values), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            new DescriptorCommand("UserTaskService", "saveContent", serialize(values), marshaller.getFormat().getType(), params)));
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);

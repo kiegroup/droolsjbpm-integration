@@ -15,8 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +31,8 @@ import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RollingUpdateUserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -64,7 +64,7 @@ public class RollingUpdateUserTaskServiceIntegrationTest extends JbpmKieServerBa
             ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, pid);
             assertThat(processInstance).isNotNull();
 
-            List<TaskSummary> taskList = taskClient.findTasksAssignedAsBusinessAdministrator(USER_YODA, 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             assertThat(taskList).hasSize(1);
 
             TaskSummary taskSummary = taskList.get(0);
