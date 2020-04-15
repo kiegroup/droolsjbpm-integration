@@ -115,13 +115,10 @@ public class SolverHandlerTest {
 
     private LocalDateTime nextQueryTime;
 
-    private LocalDateTime lastQueryTime;
-
     @Before
     public void setUp() {
         previousQueryTime = LocalDateTime.now();
         nextQueryTime = previousQueryTime.plusMinutes(2);
-        lastQueryTime = nextQueryTime.plusMinutes(2);
         this.handler = spy(new SolverHandler(solverDef, registry, delegate, userSystemService, executorService));
         doReturn(solverExecutor).when(handler).createSolverExecutor(eq(solverDef), eq(registry), any());
         doReturn(solutionSynchronizer).when(handler).createSolutionSynchronizer(eq(solverExecutor), eq(delegate), eq(userSystemService), any(), any(), any(), any());
@@ -295,12 +292,11 @@ public class SolverHandlerTest {
         TaskAssigningSolution solution = prepareStartAndASolutionProduced();
         processorConsumerCaptor.getValue().accept(result);
         SolverHandlerContext context = contextCaptor.getValue();
+        assertEquals(nextQueryTime, context.getNextQueryTime());
         if (withRecoverableError) {
             verify(solutionSynchronizer).synchronizeSolution(eq(solution), eq(previousQueryTime));
-            assertEquals(nextQueryTime, context.peekLastQueryTime());
         } else {
             verify(solutionSynchronizer).synchronizeSolution(eq(solution), eq(nextQueryTime));
-            assertEquals(lastQueryTime, context.peekLastQueryTime());
         }
     }
 
@@ -331,9 +327,7 @@ public class SolverHandlerTest {
         long changeSet = context.nextChangeSetId();
         context.setCurrentChangeSetId(changeSet);
         context.setPreviousQueryTime(previousQueryTime);
-        context.addNextQueryTime(nextQueryTime);
-        context.addNextQueryTime(lastQueryTime);
-
+        context.setNextQueryTime(nextQueryTime);
         listenerCaptor.getValue().bestSolutionChanged(event);
         return event.getNewBestSolution();
     }
