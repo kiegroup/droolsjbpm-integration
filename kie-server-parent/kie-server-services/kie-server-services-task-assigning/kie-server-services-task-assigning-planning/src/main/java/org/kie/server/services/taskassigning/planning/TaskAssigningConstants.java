@@ -65,14 +65,9 @@ public class TaskAssigningConstants {
     public static final String JBPM_TASK_ASSIGNING_SYNC_INTERVAL = "org.kie.server.taskAssigning.solutionSyncInterval";
 
     /**
-     * Property for configuring the solution synchronization queries windows to consider.
-     */
-    public static final String JBPM_TASK_ASSIGNING_SYNC_QUERIES_WINDOW_SIZE = "org.kie.server.taskAssigning.solutionSyncQueriesWindowSize";
-
-    /**
      * Property for configuring the safety minimal query distance in milliseconds.
      */
-    public static final String JBPM_TASK_ASSIGNING_SYNC_QUERIES_MINIMUM_DISTANCE = "org.kie.server.taskAssigning.solutionSyncQueriesMinimumDistance";
+    public static final String JBPM_TASK_ASSIGNING_SYNC_QUERIES_SHIFT = "org.kie.server.taskAssigning.solutionSyncQueriesShift";
 
     /**
      * Property for configuring the users information synchronization period.

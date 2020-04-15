@@ -219,18 +219,14 @@ public class SolutionSynchronizer extends RunnableBase {
                 if (isAlive()) {
                     final List<ProblemFactChange<TaskAssigningSolution>> changes = buildChanges(solution, tasksUpdateResult, usersUpdateResult);
                     context.setPreviousQueryTime(fromLastModificationDate);
-                    LocalDateTime nextQueryTime = trimMillis(tasksUpdateResult.getRight());
-                    LocalDateTime lastQueryTime = context.peekLastQueryTime();
-                    if (!context.hasMinimalDistance(lastQueryTime, nextQueryTime)) {
-                        nextQueryTime = lastQueryTime;
-                    }
-                    context.addNextQueryTime(nextQueryTime);
+                    LocalDateTime nextQueryTime = context.shiftQueryTime(trimMillis(tasksUpdateResult.getRight()));
+                    context.setNextQueryTime(nextQueryTime);
                     if (!changes.isEmpty()) {
                         LOGGER.debug("Current solution will be updated with {} changes from last synchronization", changes.size());
                         resultConsumer.accept(new Result(changes));
                     } else {
                         LOGGER.debug("There are no changes to apply from last synchronization.");
-                        fromLastModificationDate = context.pollNextQueryTime();
+                        fromLastModificationDate = nextQueryTime;
                         nextAction = Action.SYNCHRONIZE_SOLUTION;
                     }
                 }
@@ -304,12 +300,10 @@ public class SolutionSynchronizer extends RunnableBase {
                                                                                        null,
                                                                                        TaskInputVariablesReadMode.READ_FOR_ALL);
 
-        final LocalDateTime nextQueryTime = trimMillis(result.getQueryTime());
-        final LocalDateTime adjustedFirstQueryTime = nextQueryTime != null ? nextQueryTime.minusHours(1) : null;
+        final LocalDateTime nextQueryTime = context.shiftQueryTime(trimMillis(result.getQueryTime()));
+        final LocalDateTime adjustedFirstQueryTime = context.shiftQueryTime(nextQueryTime);
         context.setPreviousQueryTime(adjustedFirstQueryTime);
-        context.resetQueryTimes(adjustedFirstQueryTime);
-        context.pollLastQueryTime();
-        context.addNextQueryTime(nextQueryTime);
+        context.setNextQueryTime(nextQueryTime);
         context.clearTaskChangeTimes();
         final List<TaskData> taskDataList = result.getTasks();
         LOGGER.debug("{} tasks where loaded for solution recovery, with result.queryTime: {}", taskDataList.size(), result.getQueryTime());

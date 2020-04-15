@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -33,14 +34,13 @@ public class SolverHandlerContextTest {
     private static final long TASK_ID2 = 2;
     private static final long TASK_ID3 = 3;
     private static final long TASK_ID4 = 4;
-    private static final int QUERY_TIMES_SIZE = 2;
-    private static final long QUERY_MINIM_DISTANCE = 2000;
+    private static final Duration QUERY_SHIFT = Duration.parse("PT2S");
 
     private SolverHandlerContext context;
 
     @Before
     public void setUp() {
-        context = new SolverHandlerContext(QUERY_TIMES_SIZE, QUERY_MINIM_DISTANCE);
+        context = new SolverHandlerContext(QUERY_SHIFT);
     }
 
     @Test
@@ -77,6 +77,13 @@ public class SolverHandlerContextTest {
         LocalDateTime queryTime = LocalDateTime.now();
         context.setPreviousQueryTime(queryTime);
         assertThat(queryTime).isEqualTo(context.getPreviousQueryTime());
+    }
+
+    @Test
+    public void getNextQueryTime() {
+        LocalDateTime queryTime = LocalDateTime.now();
+        context.setNextQueryTime(queryTime);
+        assertThat(queryTime).isEqualTo(context.getNextQueryTime());
     }
 
     @Test
@@ -133,62 +140,14 @@ public class SolverHandlerContextTest {
     }
 
     @Test
-    public void resetQueryTimes() {
-        LocalDateTime value = LocalDateTime.now();
-        context.resetQueryTimes(value);
-        for (int i = 0; i < QUERY_TIMES_SIZE; i++) {
-            assertThat(context.pollNextQueryTime()).isEqualTo(value);
-        }
-        assertThat(context.pollNextQueryTime()).isNull();
-        assertThat(context.pollLastQueryTime()).isNull();
+    public void shiftQueryTime() {
+        LocalDateTime queryTime = LocalDateTime.now();
+        LocalDateTime result = context.shiftQueryTime(queryTime);
+        assertThat(result).isEqualTo(queryTime.minus(QUERY_SHIFT.toMillis(), ChronoUnit.MILLIS));
     }
 
     @Test
-    public void pollNextQueryTime() {
-        LocalDateTime value = LocalDateTime.now();
-        LocalDateTime nextQueryTime = LocalDateTime.now();
-        context.resetQueryTimes(value);
-        context.addNextQueryTime(nextQueryTime);
-        for (int i = 0; i < QUERY_TIMES_SIZE; i++) {
-            assertThat(context.pollNextQueryTime()).isEqualTo(value);
-        }
-        assertThat(context.pollNextQueryTime()).isEqualTo(nextQueryTime);
-    }
-
-    @Test
-    public void pollLastQueryTime() {
-        LocalDateTime nextQueryTime = LocalDateTime.now();
-        context.addNextQueryTime(nextQueryTime);
-        assertThat(context.pollLastQueryTime()).isEqualTo(nextQueryTime);
-    }
-
-    @Test
-    public void peekLastQueryTime() {
-        LocalDateTime value1 = LocalDateTime.now();
-        LocalDateTime value2 = LocalDateTime.now();
-        context.addNextQueryTime(value1);
-        context.addNextQueryTime(value2);
-        assertThat(context.peekLastQueryTime()).isEqualTo(value2);
-        assertThat(context.pollLastQueryTime()).isEqualTo(value2);
-        assertThat(context.peekLastQueryTime()).isEqualTo(value1);
-        assertThat(context.pollLastQueryTime()).isEqualTo(value1);
-    }
-
-    @Test
-    public void hasMinimalDistanceTrue() {
-        LocalDateTime previousQueryTime = LocalDateTime.now();
-        LocalDateTime nextQueryTime = previousQueryTime.plus(QUERY_MINIM_DISTANCE + 1, ChronoUnit.MILLIS);
-        assertThat(context.hasMinimalDistance(previousQueryTime, nextQueryTime)).isTrue();
-        assertThat(context.hasMinimalDistance(null, nextQueryTime)).isTrue();
-        assertThat(context.hasMinimalDistance(null, null)).isTrue();
-    }
-
-    @Test
-    public void hasMinimalDistanceFalse() {
-        LocalDateTime previousQueryTime = LocalDateTime.now();
-        LocalDateTime nextQueryTime = previousQueryTime.plus(QUERY_MINIM_DISTANCE, ChronoUnit.MILLIS);
-        assertThat(context.hasMinimalDistance(previousQueryTime, nextQueryTime)).isFalse();
-        nextQueryTime = previousQueryTime.plus(QUERY_MINIM_DISTANCE - 1, ChronoUnit.MILLIS);
-        assertThat(context.hasMinimalDistance(previousQueryTime, nextQueryTime)).isFalse();
+    public void shiftQueryTimeNull() {
+        assertThat(context.shiftQueryTime(null)).isNull();
     }
 }

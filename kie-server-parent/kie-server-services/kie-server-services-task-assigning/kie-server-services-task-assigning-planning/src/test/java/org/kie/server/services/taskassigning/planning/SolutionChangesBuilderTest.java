@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,7 +114,7 @@ public class SolutionChangesBuilderTest {
 
     @Before
     public void setUp() {
-        context = new SolverHandlerContext(2, 2000);
+        context = new SolverHandlerContext(Duration.parse("PT2H"));
     }
 
     @Test
