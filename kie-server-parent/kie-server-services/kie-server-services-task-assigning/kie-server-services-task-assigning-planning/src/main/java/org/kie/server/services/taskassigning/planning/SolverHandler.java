@@ -37,8 +37,7 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_INTERVAL;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_QUERIES_MINIMUM_DISTANCE;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_QUERIES_WINDOW_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_QUERIES_SHIFT;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.util.PropertyUtil.readSystemProperty;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
@@ -55,9 +54,8 @@ public class SolverHandler {
 
     private static final String TARGET_USER_ID = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, null, value -> value);
     private static final int PUBLISH_WINDOW_SIZE = readSystemProperty(JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, 2, Integer::parseInt);
-    private static final Duration SYNC_INTERVAL = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, Duration.parse("PT5S"), Duration::parse);
-    private static final int SYNC_QUERIES_WINDOW_SIZE = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_QUERIES_WINDOW_SIZE, 2, Integer::parseInt);
-    private static final long SYNC_QUERIES_MINIMUM_DISTANCE = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_QUERIES_MINIMUM_DISTANCE, 2000, Integer::parseInt);
+    private static final Duration SYNC_INTERVAL = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, Duration.parse("PT2S"), Duration::parse);
+    private static final Duration SYNC_QUERIES_SHIFT = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_QUERIES_SHIFT, Duration.parse("PT10M"), Duration::parse);
     private static final Duration USERS_SYNC_INTERVAL = readSystemProperty(JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL, Duration.parse("PT2H"), Duration::parse);
 
     private static final long EXECUTOR_TERMINATION_TIMEOUT = 5;
@@ -94,7 +92,7 @@ public class SolverHandler {
         this.delegate = delegate;
         this.userSystemService = userSystemService;
         this.executorService = executorService;
-        this.context = new SolverHandlerContext(SYNC_QUERIES_WINDOW_SIZE, SYNC_QUERIES_MINIMUM_DISTANCE);
+        this.context = new SolverHandlerContext(SYNC_QUERIES_SHIFT);
     }
 
     public void start() {
@@ -204,9 +202,8 @@ public class SolverHandler {
                     LOGGER.debug("A recoverable error was produced during solution processing. errorCode: {}, message: {} " +
                                          "Solution will be properly updated on next refresh", result.getExecutionResult().getError(), result.getExecutionResult().getErrorMessage());
                     fromLastModificationDate = context.getPreviousQueryTime();
-                    context.pollLastQueryTime();
                 } else {
-                    fromLastModificationDate = context.pollNextQueryTime();
+                    fromLastModificationDate = context.getNextQueryTime();
                     context.clearTaskChangeTimes(context.getPreviousQueryTime());
                 }
                 solutionSynchronizer.synchronizeSolution(currentSolution, fromLastModificationDate);

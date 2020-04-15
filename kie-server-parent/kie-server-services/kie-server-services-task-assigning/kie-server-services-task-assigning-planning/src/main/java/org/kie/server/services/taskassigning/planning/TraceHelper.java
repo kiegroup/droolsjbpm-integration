@@ -24,11 +24,16 @@ import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.User;
 import org.kie.server.services.taskassigning.core.model.solver.realtime.AddTaskProblemFactChange;
+import org.kie.server.services.taskassigning.core.model.solver.realtime.AddUserProblemFactChange;
 import org.kie.server.services.taskassigning.core.model.solver.realtime.AssignTaskProblemFactChange;
+import org.kie.server.services.taskassigning.core.model.solver.realtime.DisableUserProblemFactChange;
 import org.kie.server.services.taskassigning.core.model.solver.realtime.ReleaseTaskProblemFactChange;
 import org.kie.server.services.taskassigning.core.model.solver.realtime.RemoveTaskProblemFactChange;
+import org.kie.server.services.taskassigning.core.model.solver.realtime.RemoveUserProblemFactChange;
 import org.kie.server.services.taskassigning.core.model.solver.realtime.TaskPropertyChangeProblemFactChange;
+import org.kie.server.services.taskassigning.core.model.solver.realtime.UserPropertyChangeProblemFactChange;
 import org.kie.server.services.taskassigning.planning.util.IndexedElement;
+import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 
 public class TraceHelper {
@@ -43,23 +48,26 @@ public class TraceHelper {
                                        List<ReleaseTaskProblemFactChange> releasedTasksChanges,
                                        Map<String, List<IndexedElement<AssignTaskProblemFactChange>>> changesByUserId,
                                        List<TaskPropertyChangeProblemFactChange> propertyChanges,
-                                       List<AddTaskProblemFactChange> newTaskChanges) {
+                                       List<AddTaskProblemFactChange> newTaskChanges,
+                                       List<AddUserProblemFactChange> newUserChanges,
+                                       List<ProblemFactChange<TaskAssigningSolution>> userChanges,
+                                       List<RemoveUserProblemFactChange> removedUsersChanges) {
 
         logger.trace("{}*** Removed tasks ***", NEW_LINE);
         logger.trace("Total tasks removed from solution is {}", removedTasksChanges.size());
         removedTasksChanges.forEach(change -> logger.trace(TASK_WITH_NAME_FORMAT, change.getTask().getId(), change.getTask().getName()));
-        logger.trace("*** End of Removed tasks ***");
+        logger.trace("*** End of removed tasks ***");
 
         logger.trace("{}*** Released tasks ***", NEW_LINE);
         logger.trace("Total tasks released from solution is {}", releasedTasksChanges.size());
         releasedTasksChanges.forEach(change -> logger.trace(TASK_WITH_NAME_FORMAT, change.getTask().getId(), change.getTask().getName()));
-        logger.trace("*** End of Released tasks ***");
+        logger.trace("*** End of released tasks ***");
 
         logger.trace("{}*** Changes per user ***", NEW_LINE);
         logger.trace("Total users with programmed changes is {}", changesByUserId.size());
-        changesByUserId.forEach((key, userChanges) -> {
-            if (userChanges != null) {
-                userChanges.forEach(change -> {
+        changesByUserId.forEach((key, perUserChanges) -> {
+            if (perUserChanges != null) {
+                perUserChanges.forEach(change -> {
                     logger.trace("{}  AssignTaskToUserChanges for user: {}", NEW_LINE, key);
                     logger.trace("{}   -> taskId: {}, pinned: {}, index: {}, status: {}",
                                  NEW_LINE,
@@ -71,11 +79,10 @@ public class TraceHelper {
                 });
             }
         });
-        logger.trace("*** End of Changes per user ***");
+        logger.trace("*** End of changes per user ***");
 
         logger.trace("{}*** Property changes ***", NEW_LINE);
         logger.trace("Total tasks with property changes is {}", propertyChanges.size());
-
         propertyChanges.forEach(change -> {
             String changeDesc = "";
             if (change.getPriority() != null) {
@@ -86,12 +93,32 @@ public class TraceHelper {
             }
             logger.trace(TASK_WITH_NAME_FORMAT + " {}", change.getTask().getId(), change.getTask().getName(), changeDesc);
         });
-        logger.trace("*** End of Property changes ***");
+        logger.trace("*** End of property changes ***");
 
         logger.trace("{}*** New tasks ***", NEW_LINE);
         logger.trace("Total new tasks added to solution is {}", newTaskChanges.size());
         newTaskChanges.forEach(change -> logger.trace(TASK_WITH_NAME_FORMAT, change.getTask().getId(), change.getTask().getName()));
-        logger.trace("*** End of New tasks ***");
+        logger.trace("*** End of new tasks ***");
+
+        logger.trace("{}*** New users ***", NEW_LINE);
+        logger.trace("Total new users added to solution is {}", newUserChanges.size());
+        newUserChanges.forEach(change -> logger.trace(" -> {}", change.getUser()));
+        logger.trace("*** End of new users ***");
+
+        logger.trace("{}*** User changes ***", NEW_LINE);
+        logger.trace("Total users with changes is {}", userChanges.size());
+        userChanges.stream()
+                .filter(change -> change instanceof DisableUserProblemFactChange)
+                .forEach(change -> logger.trace(" -> disabled {}", ((DisableUserProblemFactChange) change).getUser()));
+        userChanges.stream()
+                .filter(change -> change instanceof UserPropertyChangeProblemFactChange)
+                .forEach(change -> logger.trace(" -> modified {}", ((UserPropertyChangeProblemFactChange) change).getUser()));
+        logger.trace("*** End of user changes ***");
+
+        logger.trace("{}*** Removed users ***", NEW_LINE);
+        logger.trace("Total users removed from solution is {}", removedUsersChanges.size());
+        removedUsersChanges.forEach(change -> logger.trace(" -> removed {}", change.getUser()));
+        logger.trace("*** End of removed users ***");
     }
 
     static void traceSolution(Logger logger, TaskAssigningSolution solution) {

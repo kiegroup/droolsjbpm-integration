@@ -169,7 +169,8 @@ public class SolutionChangesBuilder {
 
         if (LOGGER.isTraceEnabled()) {
             if (!totalChanges.isEmpty()) {
-                traceProgrammedChanges(LOGGER, removedTaskChanges, releasedTasksChanges, changesByUserId, propertyChanges, newTaskChanges);
+                traceProgrammedChanges(LOGGER, removedTaskChanges, releasedTasksChanges, changesByUserId,
+                                       propertyChanges, newTaskChanges, newUserChanges, userUpdateChanges, removableUserChanges);
             } else {
                 LOGGER.trace("No changes has been calculated.");
             }

@@ -16,11 +16,10 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Deque;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,15 +29,12 @@ public class SolverHandlerContext {
     private long currentChangeSetId;
     private long lastProcessedChangeSetId = -1;
     private LocalDateTime previousQueryTime;
+    private LocalDateTime nextQueryTime;
     private Map<Long, LocalDateTime> taskChangeTimes = new HashMap<>();
+    private Duration queryShift;
 
-    private Deque<LocalDateTime> queryTimes = new LinkedList<>();
-    private int queryTimesSize;
-    private long queryMinimumDistance;
-
-    public SolverHandlerContext(int queryTimesSize, long queryMinimumDistance) {
-        this.queryTimesSize = queryTimesSize;
-        this.queryMinimumDistance = queryMinimumDistance;
+    public SolverHandlerContext(Duration queryShift) {
+        this.queryShift = queryShift;
     }
 
     public long getCurrentChangeSetId() {
@@ -122,56 +118,27 @@ public class SolverHandlerContext {
     }
 
     /**
-     * Resets the registered query times by using a start value.
-     * @param startValue the start value for filling the initial query times.
+     * Gets the next query time to use.
+     * @return the query time.
      */
-    public void resetQueryTimes(LocalDateTime startValue) {
-        queryTimes.clear();
-        for (int i = 0; i < queryTimesSize; i++) {
-            queryTimes.add(startValue);
-        }
+    public LocalDateTime getNextQueryTime() {
+        return nextQueryTime;
     }
 
     /**
-     * Retrieves and removes the first available query time to process.
-     * @return the next available query time.
+     * Sets the next query time to use.
+     * @param nextQueryTime the query time to set.
      */
-    public LocalDateTime pollNextQueryTime() {
-        return queryTimes.pollFirst();
+    public void setNextQueryTime(LocalDateTime nextQueryTime) {
+        this.nextQueryTime = nextQueryTime;
     }
 
     /**
-     * Retrieves and removes the last available query time.
-     * @return the last available query time.
+     * Shifts a queryTime with the context configured queryShift.
+     * @param queryTime a query time to shift.
+     * @return the shifted query time or null if a null value is provided.
      */
-    public LocalDateTime pollLastQueryTime() {
-        return queryTimes.pollLast();
-    }
-
-    public LocalDateTime peekLastQueryTime() {
-        return queryTimes.peekLast();
-    }
-
-    /**
-     * Adds a new value to the available query times.
-     * @param nextQueryTime the value to add.
-     */
-    public void addNextQueryTime(LocalDateTime nextQueryTime) {
-        queryTimes.add(nextQueryTime);
-    }
-
-    /**
-     * Indicates if two query times has the minimum configured separation.
-     * @param lastQueryTime the previous query time for the calculation.
-     * @param nextQueryTime the next query time for the calculation.
-     * @return true if the distance between the query times is at least the expected one, false in any other case.
-     */
-    public boolean hasMinimalDistance(LocalDateTime lastQueryTime, LocalDateTime nextQueryTime) {
-        if (lastQueryTime == null || nextQueryTime == null) {
-            return true;
-        }
-        long lastQueryTimeMillis = lastQueryTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        long nextQueryTimeMillis = nextQueryTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        return nextQueryTimeMillis - lastQueryTimeMillis > queryMinimumDistance;
+    public LocalDateTime shiftQueryTime(LocalDateTime queryTime) {
+        return queryTime != null ? queryTime.minus(queryShift.toMillis(), ChronoUnit.MILLIS) : null;
     }
 }
