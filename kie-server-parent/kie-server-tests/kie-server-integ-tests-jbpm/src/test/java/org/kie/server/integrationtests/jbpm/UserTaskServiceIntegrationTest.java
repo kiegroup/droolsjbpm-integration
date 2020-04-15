@@ -566,7 +566,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             assertNotNull(taskInstance.getBusinessAdmins());
             assertEquals(2, taskInstance.getBusinessAdmins().size());
-            assertTrue(taskInstance.getBusinessAdmins().contains("Administrator"));
+            assertTrue(taskInstance.getBusinessAdmins().contains(USER_ADMINISTRATOR));
             assertTrue(taskInstance.getBusinessAdmins().contains("Administrators"));
 
             assertNotNull(taskInstance.getInputData());
