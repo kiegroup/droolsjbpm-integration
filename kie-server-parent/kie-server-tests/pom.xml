@@ -259,6 +259,7 @@
                 <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
                 <org.kie.server.persistence.dialect>${org.kie.server.persistence.dialect}</org.kie.server.persistence.dialect>
                 <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
+                <org.jbpm.ht.admin.user>administrator</org.jbpm.ht.admin.user>
               </systemProperties>
             </container>
             <deployables>
@@ -287,7 +288,7 @@
                   </roles>
                 </user>
                 <user>
-                  <name>Administrator</name>
+                  <name>administrator</name>
                   <password>usetheforce123@</password>
                   <roles>
                     <role>kie-server</role>
