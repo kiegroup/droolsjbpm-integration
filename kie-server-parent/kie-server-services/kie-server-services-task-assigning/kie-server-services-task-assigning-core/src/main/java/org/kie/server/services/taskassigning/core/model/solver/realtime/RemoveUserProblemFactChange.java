@@ -41,20 +41,21 @@ public class RemoveUserProblemFactChange implements ProblemFactChange<TaskAssign
     public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
         final TaskAssigningSolution workingSolution = scoreDirector.getWorkingSolution();
         final User workingUser = scoreDirector.lookUpWorkingObjectOrReturnNull(user);
-        if (workingUser != null) {
-            if (workingUser.isEnabled()) {
-                scoreDirector.beforeProblemPropertyChanged(workingUser);
-                workingUser.setEnabled(false);
-                scoreDirector.afterProblemPropertyChanged(workingUser);
-            }
-            releaseAllTasks(workingUser, scoreDirector);
-            // Shallow clone the user list so only workingSolution is affected, not bestSolution
-            workingSolution.setUserList(new ArrayList<>(workingSolution.getUserList()));
-            // remove the problem fact itself
-            scoreDirector.beforeProblemFactRemoved(workingUser);
-            workingSolution.getUserList().remove(workingUser);
-            scoreDirector.afterProblemFactRemoved(workingUser);
-            scoreDirector.triggerVariableListeners();
+        if (workingUser == null) {
+            return;
         }
+        if (workingUser.isEnabled()) {
+            scoreDirector.beforeProblemPropertyChanged(workingUser);
+            workingUser.setEnabled(false);
+            scoreDirector.afterProblemPropertyChanged(workingUser);
+        }
+        releaseAllTasks(workingUser, scoreDirector);
+        // Shallow clone the user list so only workingSolution is affected, not bestSolution
+        workingSolution.setUserList(new ArrayList<>(workingSolution.getUserList()));
+        // remove the problem fact itself
+        scoreDirector.beforeProblemFactRemoved(workingUser);
+        workingSolution.getUserList().remove(workingUser);
+        scoreDirector.afterProblemFactRemoved(workingUser);
+        scoreDirector.triggerVariableListeners();
     }
 }

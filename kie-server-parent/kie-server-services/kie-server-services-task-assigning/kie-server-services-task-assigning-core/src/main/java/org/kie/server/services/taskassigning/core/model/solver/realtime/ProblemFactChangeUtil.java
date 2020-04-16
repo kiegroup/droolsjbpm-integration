@@ -53,6 +53,15 @@ public class ProblemFactChangeUtil {
         releaseTasks(workingUser, false, scoreDirector);
     }
 
+    /**
+     * Release the tasks associated previously associated by OptaPlanner to a user.
+     * note: Optimizes the generated graph e.g. User <-> T1 <-> T2 <-> T3 <-> T4 navigation and structure changing
+     * by iterating in reverse order.
+     * @param workingUser a user instance previously populated by OptaPlanner.
+     * @param includePinnedTasks true if the pinned tasks must also be released, false if only non pinned tasks must
+     * be released.
+     * @param scoreDirector a scored director instance for notifying the changes.
+     */
     private static void releaseTasks(User workingUser, boolean includePinnedTasks, ScoreDirector<TaskAssigningSolution> scoreDirector) {
         final List<Task> tasks = extractTasks(workingUser, testedTask -> includePinnedTasks || !testedTask.isPinned());
         Task task;

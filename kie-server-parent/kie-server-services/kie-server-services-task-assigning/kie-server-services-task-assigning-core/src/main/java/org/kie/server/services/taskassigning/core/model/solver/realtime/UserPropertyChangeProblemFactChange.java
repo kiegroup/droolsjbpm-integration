@@ -71,15 +71,16 @@ public class UserPropertyChangeProblemFactChange implements ProblemFactChange<Ta
     @Override
     public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
         final User workingUser = scoreDirector.lookUpWorkingObjectOrReturnNull(user);
-        if (workingUser != null) {
-            scoreDirector.beforeProblemPropertyChanged(workingUser);
-            workingUser.setEnabled(enabled);
-            workingUser.setAllLabelValues(labelValues);
-            workingUser.setAttributes(attributes);
-            workingUser.setGroups(groups);
-            scoreDirector.afterProblemPropertyChanged(workingUser);
-            releaseNonPinnedTasks(workingUser, scoreDirector);
-            scoreDirector.triggerVariableListeners();
+        if (workingUser == null) {
+            return;
         }
+        scoreDirector.beforeProblemPropertyChanged(workingUser);
+        workingUser.setEnabled(enabled);
+        workingUser.setAllLabelValues(labelValues);
+        workingUser.setAttributes(attributes);
+        workingUser.setGroups(groups);
+        scoreDirector.afterProblemPropertyChanged(workingUser);
+        releaseNonPinnedTasks(workingUser, scoreDirector);
+        scoreDirector.triggerVariableListeners();
     }
 }

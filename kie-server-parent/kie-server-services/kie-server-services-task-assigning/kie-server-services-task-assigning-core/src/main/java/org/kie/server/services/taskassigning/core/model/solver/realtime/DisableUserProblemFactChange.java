@@ -38,12 +38,13 @@ public class DisableUserProblemFactChange implements ProblemFactChange<TaskAssig
     @Override
     public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
         final User workingUser = scoreDirector.lookUpWorkingObjectOrReturnNull(user);
-        if (workingUser != null) {
-            scoreDirector.beforeProblemPropertyChanged(workingUser);
-            workingUser.setEnabled(false);
-            scoreDirector.afterProblemPropertyChanged(workingUser);
-            releaseNonPinnedTasks(workingUser, scoreDirector);
-            scoreDirector.triggerVariableListeners();
+        if (workingUser == null) {
+            return;
         }
+        scoreDirector.beforeProblemPropertyChanged(workingUser);
+        workingUser.setEnabled(false);
+        scoreDirector.afterProblemPropertyChanged(workingUser);
+        releaseNonPinnedTasks(workingUser, scoreDirector);
+        scoreDirector.triggerVariableListeners();
     }
 }

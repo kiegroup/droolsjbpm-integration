@@ -301,26 +301,24 @@ public class SolutionChangesBuilder {
     private void addUserChanges(final Map<String, User> usersById,
                                 final List<AddUserProblemFactChange> newUserChanges,
                                 final List<ProblemFactChange<TaskAssigningSolution>> updateUserChanges) {
-
-        final List<User> updatedUserList = filterDuplicates(externalUserList)
+        final Set<String> updatedUserIds = new HashSet<>();
+        filterDuplicates(externalUserList)
                 .filter(externalUser -> !IS_PLANNING_USER.test(externalUser.getId()))
                 .map(UserUtil::fromExternalUser)
-                .collect(Collectors.toList());
-
-        final Set<String> updatedUserIds = new HashSet<>();
-        for (User user : updatedUserList) {
-            final User previousUser = usersById.get(user.getEntityId());
-            updatedUserIds.add(user.getEntityId());
-            if (previousUser == null) {
-                newUserChanges.add(new AddUserProblemFactChange(user));
-            } else if (!equalsByProperties(previousUser, user)) {
-                updateUserChanges.add(new UserPropertyChangeProblemFactChange(previousUser,
-                                                                              true,
-                                                                              user.getAttributes(),
-                                                                              user.getAllLabelValues(),
-                                                                              user.getGroups()));
-            }
-        }
+                .forEach(user -> {
+                             final User previousUser = usersById.get(user.getEntityId());
+                             updatedUserIds.add(user.getEntityId());
+                             if (previousUser == null) {
+                                 newUserChanges.add(new AddUserProblemFactChange(user));
+                             } else if (!equalsByProperties(previousUser, user)) {
+                                 updateUserChanges.add(new UserPropertyChangeProblemFactChange(previousUser,
+                                                                                               true,
+                                                                                               user.getAttributes(),
+                                                                                               user.getAllLabelValues(),
+                                                                                               user.getGroups()));
+                             }
+                         }
+                );
 
         usersById.values().stream()
                 .filter(user -> !IS_PLANNING_USER.test(user.getEntityId()))
