@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.36.0.Final</version>
+    <version>7.36.1.Final</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-router</artifactId>
