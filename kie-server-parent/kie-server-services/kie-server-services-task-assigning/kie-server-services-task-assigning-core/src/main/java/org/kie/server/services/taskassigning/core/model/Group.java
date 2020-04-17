@@ -16,6 +16,8 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
+import java.util.Objects;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("TaGroup")
@@ -51,5 +53,22 @@ public class Group extends AbstractPersistable implements OrganizationalEntity {
                 "id=" + id +
                 ", entityId='" + entityId + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Group)) {
+            return false;
+        }
+        Group group = (Group) o;
+        return Objects.equals(entityId, group.entityId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entityId);
     }
 }

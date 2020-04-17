@@ -3,6 +3,7 @@
   <userList id="2">
     <TaUser id="3">
       <id>0</id>
+      <enabled>true</enabled>
       <entityId>Amy</entityId>
       <groups class="linked-hash-set" id="4">
         <TaGroup id="5">
@@ -18,12 +19,14 @@
     </TaUser>
     <TaUser id="8">
       <id>1</id>
+      <enabled>true</enabled>
       <entityId>Beth</entityId>
       <groups class="linked-hash-set" id="9"/>
       <labelValues id="10"/>
     </TaUser>
     <TaUser id="11">
       <id>2</id>
+      <enabled>true</enabled>
       <entityId>Chad</entityId>
       <groups class="linked-hash-set" id="12">
         <TaGroup id="13">
@@ -39,6 +42,7 @@
     </TaUser>
     <TaUser id="16">
       <id>3</id>
+      <enabled>true</enabled>
       <entityId>Dan</entityId>
       <groups class="linked-hash-set" id="17">
         <TaGroup reference="5"/>
@@ -48,6 +52,7 @@
     </TaUser>
     <TaUser id="19">
       <id>4</id>
+      <enabled>true</enabled>
       <entityId>Elsa</entityId>
       <groups class="linked-hash-set" id="20">
         <TaGroup id="21">
@@ -63,6 +68,7 @@
     </TaUser>
     <TaUser id="24">
       <id>5</id>
+      <enabled>true</enabled>
       <entityId>Flo</entityId>
       <groups class="linked-hash-set" id="25">
         <TaGroup reference="13"/>
@@ -72,6 +78,7 @@
     </TaUser>
     <TaUser id="27">
       <id>6</id>
+      <enabled>true</enabled>
       <entityId>Gus</entityId>
       <groups class="linked-hash-set" id="28">
         <TaGroup reference="22"/>
@@ -80,6 +87,7 @@
     </TaUser>
     <TaUser id="30">
       <id>7</id>
+      <enabled>true</enabled>
       <entityId>Hugo</entityId>
       <groups class="linked-hash-set" id="31">
         <TaGroup reference="6"/>

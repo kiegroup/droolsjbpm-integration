@@ -16,6 +16,7 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ import static org.junit.Assert.assertTrue;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_INTERVAL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -67,7 +69,9 @@ public class SolverHandlerTest {
     // surefire configured system property
     private static final int PUBLISH_WINDOW_SIZE = Integer.valueOf(System.getProperty(JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, "2"));
     // surefire configured system property
-    private static final long SYNC_INTERVAL = Long.valueOf(System.getProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, "3000"));
+    private static final Duration SYNC_INTERVAL = Duration.parse(System.getProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, "PT3S"));
+    // surefire configured system property
+    private static final Duration USERS_SYNC_INTERVAL = Duration.parse(System.getProperty(JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL, "PT6H"));
 
     @Mock
     private SolverDef solverDef;
@@ -120,7 +124,7 @@ public class SolverHandlerTest {
         lastQueryTime = nextQueryTime.plusMinutes(2);
         this.handler = spy(new SolverHandler(solverDef, registry, delegate, userSystemService, executorService));
         doReturn(solverExecutor).when(handler).createSolverExecutor(eq(solverDef), eq(registry), any());
-        doReturn(solutionSynchronizer).when(handler).createSolutionSynchronizer(eq(solverExecutor), eq(delegate), eq(userSystemService), anyInt(), any(), any());
+        doReturn(solutionSynchronizer).when(handler).createSolutionSynchronizer(eq(solverExecutor), eq(delegate), eq(userSystemService), any(), any(), any(), any());
         doReturn(solutionProcessor).when(handler).createSolutionProcessor(eq(delegate), any(), eq(TARGET_USER), anyInt());
     }
 
@@ -312,8 +316,11 @@ public class SolverHandlerTest {
     private void prepareStart() {
         handler.start();
         verify(handler).createSolverExecutor(eq(solverDef), eq(registry), listenerCaptor.capture());
+
         verify(handler).createSolutionSynchronizer(eq(solverExecutor), eq(delegate), eq(userSystemService),
-                                                   eq(SYNC_INTERVAL), contextCaptor.capture(), synchronizerConsumerCaptor.capture());
+                                                   eq(SYNC_INTERVAL), eq(USERS_SYNC_INTERVAL), contextCaptor.capture(),
+                                                   synchronizerConsumerCaptor.capture());
+
         verify(handler).createSolutionProcessor(eq(delegate), processorConsumerCaptor.capture(), eq(TARGET_USER), eq(PUBLISH_WINDOW_SIZE));
     }
 

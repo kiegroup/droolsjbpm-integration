@@ -108,7 +108,6 @@ public class SimpleUserSystemServiceHelperTest {
                 .findFirst().orElse(null);
 
         assertNotNull("User: " + userId + " was not found", user);
-        assertTrue("User: " + userId + " is expected to be active", user.isActive());
         assertEquals("User:" + userId + " don't have the expected groups count", groupIds.size(), user.getGroups().size());
         for (String groupId : groupIds) {
             Group group = user.getGroups().stream()

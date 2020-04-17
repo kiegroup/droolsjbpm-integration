@@ -24,8 +24,8 @@ public class ImmutableUser extends User {
         //required by the FieldSolutionCloner
     }
 
-    ImmutableUser(long id, String entityId) {
-        super(id, entityId);
+    ImmutableUser(long id, String entityId, boolean enabled) {
+        super(id, entityId, enabled);
     }
 
     @Override

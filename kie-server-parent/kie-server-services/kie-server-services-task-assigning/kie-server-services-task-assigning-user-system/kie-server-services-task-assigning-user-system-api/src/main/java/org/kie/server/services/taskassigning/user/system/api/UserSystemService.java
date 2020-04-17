@@ -20,16 +20,34 @@ import java.util.List;
 
 public interface UserSystemService {
 
+    /**
+     * Invoked by the task assigning integration as part of the initialization procedure and before any other method
+     * is invoked.
+     */
     void start();
 
+    /**
+     * Invoked by the task assigning integration as part of the initialization procedure and after the start() method
+     * is invoked.
+     * @throws Exception if the test method failed.
+     */
     void test() throws Exception;
 
+    /***
+     * @return the name of the UserSystemService implementation.
+     */
     String getName();
 
+    /**
+     * @return the list of all users present in the external user system. This method is normally invoked each time
+     * the solver is initialized or when the users information is updated from the external user system.
+     */
     List<User> findAllUsers();
 
-    List<Group> findAllGroups();
-
+    /**
+     * Get the user information for a particular user.
+     * @param id user identifier for querying.
+     * @return the User corresponding to the given identifier, null if no user was found.
+     */
     User findUser(String id);
-
 }

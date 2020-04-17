@@ -103,7 +103,6 @@ public class SimpleUserSystemService implements UserSystemService {
         return userGroupInfo.getUsers();
     }
 
-    @Override
     public List<Group> findAllGroups() {
         return userGroupInfo.getGroups();
     }

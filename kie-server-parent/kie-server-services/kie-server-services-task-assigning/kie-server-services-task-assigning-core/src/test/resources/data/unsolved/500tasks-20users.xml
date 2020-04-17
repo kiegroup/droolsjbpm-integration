@@ -3,6 +3,7 @@
   <userList id="2">
     <TaUser id="3">
       <id>0</id>
+      <enabled>true</enabled>
       <entityId>Amy Cole</entityId>
       <groups class="linked-hash-set" id="4">
         <TaGroup id="5">
@@ -18,12 +19,14 @@
     </TaUser>
     <TaUser id="8">
       <id>1</id>
+      <enabled>true</enabled>
       <entityId>Beth Fox</entityId>
       <groups class="linked-hash-set" id="9"/>
       <labelValues id="10"/>
     </TaUser>
     <TaUser id="11">
       <id>2</id>
+      <enabled>true</enabled>
       <entityId>Chad Green</entityId>
       <groups class="linked-hash-set" id="12">
         <TaGroup id="13">
@@ -39,6 +42,7 @@
     </TaUser>
     <TaUser id="16">
       <id>3</id>
+      <enabled>true</enabled>
       <entityId>Dan Jones</entityId>
       <groups class="linked-hash-set" id="17">
         <TaGroup reference="5"/>
@@ -48,6 +52,7 @@
     </TaUser>
     <TaUser id="19">
       <id>4</id>
+      <enabled>true</enabled>
       <entityId>Elsa King</entityId>
       <groups class="linked-hash-set" id="20">
         <TaGroup id="21">
@@ -63,6 +68,7 @@
     </TaUser>
     <TaUser id="24">
       <id>5</id>
+      <enabled>true</enabled>
       <entityId>Flo Li</entityId>
       <groups class="linked-hash-set" id="25">
         <TaGroup reference="13"/>
@@ -72,6 +78,7 @@
     </TaUser>
     <TaUser id="27">
       <id>6</id>
+      <enabled>true</enabled>
       <entityId>Gus Poe</entityId>
       <groups class="linked-hash-set" id="28">
         <TaGroup reference="22"/>
@@ -80,6 +87,7 @@
     </TaUser>
     <TaUser id="30">
       <id>7</id>
+      <enabled>true</enabled>
       <entityId>Hugo Rye</entityId>
       <groups class="linked-hash-set" id="31">
         <TaGroup reference="6"/>
@@ -88,6 +96,7 @@
     </TaUser>
     <TaUser id="33">
       <id>8</id>
+      <enabled>true</enabled>
       <entityId>Ivy Smith</entityId>
       <groups class="linked-hash-set" id="34">
         <TaGroup reference="22"/>
@@ -100,12 +109,14 @@
     </TaUser>
     <TaUser id="37">
       <id>9</id>
+      <enabled>true</enabled>
       <entityId>Jay Watt</entityId>
       <groups class="linked-hash-set" id="38"/>
       <labelValues id="39"/>
     </TaUser>
     <TaUser id="40">
       <id>10</id>
+      <enabled>true</enabled>
       <entityId>Amy Fox</entityId>
       <groups class="linked-hash-set" id="41">
         <TaGroup reference="14"/>
@@ -114,12 +125,14 @@
     </TaUser>
     <TaUser id="43">
       <id>11</id>
+      <enabled>true</enabled>
       <entityId>Beth Green</entityId>
       <groups class="linked-hash-set" id="44"/>
       <labelValues id="45"/>
     </TaUser>
     <TaUser id="46">
       <id>12</id>
+      <enabled>true</enabled>
       <entityId>Chad Jones</entityId>
       <groups class="linked-hash-set" id="47">
         <TaGroup reference="6"/>
@@ -132,6 +145,7 @@
     </TaUser>
     <TaUser id="50">
       <id>13</id>
+      <enabled>true</enabled>
       <entityId>Dan King</entityId>
       <groups class="linked-hash-set" id="51">
         <TaGroup reference="48"/>
@@ -141,24 +155,28 @@
     </TaUser>
     <TaUser id="53">
       <id>14</id>
+      <enabled>true</enabled>
       <entityId>Elsa Li</entityId>
       <groups class="linked-hash-set" id="54"/>
       <labelValues id="55"/>
     </TaUser>
     <TaUser id="56">
       <id>15</id>
+      <enabled>true</enabled>
       <entityId>Flo Poe</entityId>
       <groups class="linked-hash-set" id="57"/>
       <labelValues id="58"/>
     </TaUser>
     <TaUser id="59">
       <id>16</id>
+      <enabled>true</enabled>
       <entityId>Gus Rye</entityId>
       <groups class="linked-hash-set" id="60"/>
       <labelValues id="61"/>
     </TaUser>
     <TaUser id="62">
       <id>17</id>
+      <enabled>true</enabled>
       <entityId>Hugo Smith</entityId>
       <groups class="linked-hash-set" id="63">
         <TaGroup reference="35"/>
@@ -168,12 +186,14 @@
     </TaUser>
     <TaUser id="65">
       <id>18</id>
+      <enabled>true</enabled>
       <entityId>Ivy Watt</entityId>
       <groups class="linked-hash-set" id="66"/>
       <labelValues id="67"/>
     </TaUser>
     <TaUser id="68">
       <id>19</id>
+      <enabled>true</enabled>
       <entityId>Jay Cole</entityId>
       <groups class="linked-hash-set" id="69">
         <TaGroup reference="48"/>
