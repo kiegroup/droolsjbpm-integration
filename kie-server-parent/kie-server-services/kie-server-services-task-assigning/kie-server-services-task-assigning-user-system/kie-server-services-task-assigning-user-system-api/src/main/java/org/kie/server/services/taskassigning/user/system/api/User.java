@@ -21,12 +21,9 @@ import java.util.Set;
 
 public interface User {
 
-    boolean isActive();
-
     String getId();
 
     Set<Group> getGroups();
 
     Map<String, Object> getAttributes();
-
 }

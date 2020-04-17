@@ -18,7 +18,6 @@ package org.kie.server.services.taskassigning.planning.test.model;
 
 import java.util.List;
 
-import org.kie.server.services.taskassigning.user.system.api.Group;
 import org.kie.server.services.taskassigning.user.system.api.User;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 
@@ -50,11 +49,6 @@ public abstract class AbstractUserSystemService implements UserSystemService {
 
     @Override
     public List<User> findAllUsers() {
-        return null;
-    }
-
-    @Override
-    public List<Group> findAllGroups() {
         return null;
     }
 

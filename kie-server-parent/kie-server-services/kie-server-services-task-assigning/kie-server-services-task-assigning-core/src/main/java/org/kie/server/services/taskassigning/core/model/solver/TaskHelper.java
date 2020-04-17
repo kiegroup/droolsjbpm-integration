@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.kie.server.services.taskassigning.core.model.OrganizationalEntity;
@@ -93,16 +94,38 @@ public class TaskHelper {
     }
 
     /**
+     * Gets the list of tasks linked to a TaskOrUser.
      * @param taskOrUser a TaskOrUser instance for the evaluation.
      * @return a list with the tasks linked to the taskOrUser.
      */
-    public static List<Task> extractTaskList(TaskOrUser taskOrUser) {
-        List<Task> result = new ArrayList<>();
-        Task task = taskOrUser.getNextTask();
-        while (task != null) {
-            result.add(task);
-            task = task.getNextTask();
+    public static List<Task> extractTasks(TaskOrUser taskOrUser) {
+        return extractTasks(taskOrUser, testedTask -> true);
+    }
+
+    /**
+     * Gets the list of tasks linked to a TaskOrUser.
+     * @param taskOrUser a TaskOrUser instance for the evaluation.
+     * @param predicate a predicate for filtering the tasks that will be included in the result.
+     * @return a list with the tasks linked to the taskOrUser that verifies the filtering predicate.
+     */
+    public static List<Task> extractTasks(TaskOrUser taskOrUser, Predicate<Task> predicate) {
+        final List<Task> result = new ArrayList<>();
+        Task nextTask = taskOrUser != null ? taskOrUser.getNextTask() : null;
+        while (nextTask != null) {
+            if (predicate.test(nextTask)) {
+                result.add(nextTask);
+            }
+            nextTask = nextTask.getNextTask();
         }
         return result;
+    }
+
+    /**
+     * Indicates if a user has pinned tasks.
+     * @param user a user instance to check.
+     * @return true if the user has pinned tasks false any other case.
+     */
+    public static boolean hasPinnedTasks(TaskOrUser user) {
+        return !extractTasks(user, Task::isPinned).isEmpty();
     }
 }

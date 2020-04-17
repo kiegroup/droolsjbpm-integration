@@ -43,6 +43,7 @@ import static org.kie.server.services.taskassigning.core.model.ModelConstants.IS
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 import static org.kie.server.services.taskassigning.planning.util.IndexedElement.addInOrder;
 import static org.kie.server.services.taskassigning.planning.util.TaskUtil.fromTaskData;
+import static org.kie.server.services.taskassigning.planning.util.UserUtil.filterDuplicates;
 
 /**
  * This class is intended for the restoring of a TaskAssigningSolution given a set of TaskData, a set of User and the
@@ -80,8 +81,8 @@ public class SolutionBuilder {
     public TaskAssigningSolution build() {
         final List<Task> tasks = new ArrayList<>();
         final Map<String, List<IndexedElement<Task>>> assignedTasksByUserId = new HashMap<>();
-        final Map<String, User> usersById = externalUsers.stream()
-                .filter(org.kie.server.services.taskassigning.user.system.api.User::isActive)
+        final Map<String, User> usersById = filterDuplicates(externalUsers)
+                .filter(externalUser -> !IS_PLANNING_USER.test(externalUser.getId()))
                 .map(UserUtil::fromExternalUser)
                 .collect(Collectors.toMap(User::getEntityId, Function.identity()));
         usersById.put(PLANNING_USER.getEntityId(), PLANNING_USER);

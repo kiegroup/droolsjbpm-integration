@@ -29,6 +29,7 @@ import org.kie.server.services.taskassigning.core.model.TaskOrUser;
 import org.kie.server.services.taskassigning.core.model.User;
 import org.kie.server.services.taskassigning.user.system.api.Group;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -57,13 +58,8 @@ public class TestUtil {
     }
 
     public static org.kie.server.services.taskassigning.user.system.api.User mockExternalUser(String userId,
-                                                                                              boolean isActive,
                                                                                               Set<Group> groups) {
         return new org.kie.server.services.taskassigning.user.system.api.User() {
-            @Override
-            public boolean isActive() {
-                return isActive;
-            }
 
             @Override
             public String getId() {
@@ -82,8 +78,8 @@ public class TestUtil {
         };
     }
 
-    public static org.kie.server.services.taskassigning.user.system.api.User mockExternalUser(String userId, boolean isActive) {
-        return mockExternalUser(userId, isActive, Collections.emptySet());
+    public static org.kie.server.services.taskassigning.user.system.api.User mockExternalUser(String userId) {
+        return mockExternalUser(userId, Collections.emptySet());
     }
 
     public static <T extends AbstractPersistable & OrganizationalEntity> void assertContains(String entityId, Collection<T> entities) {
@@ -92,6 +88,11 @@ public class TestUtil {
                               .filter(entity -> entityId.equals(entity.getEntityId()))
                               .filter(entity -> entityId.hashCode() == entity.getId())
                               .findFirst().orElse(null));
+    }
+
+    public static <T extends AbstractPersistable & OrganizationalEntity> void assertContains(String entityId, int times, Collection<T> entities) {
+        long currentTimes = entities.stream().filter(entity -> entityId.equals(entity.getEntityId())).count();
+        assertEquals("entityId: " + entityId + " is not present the expected times.", times, currentTimes);
     }
 
     public static <T extends AbstractPersistable & OrganizationalEntity> void assertNotContains(String entityId, Collection<T> entities) {

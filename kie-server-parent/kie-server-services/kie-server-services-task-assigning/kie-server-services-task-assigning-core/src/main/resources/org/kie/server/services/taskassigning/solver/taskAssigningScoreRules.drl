@@ -35,7 +35,7 @@ global BendableScoreHolder scoreHolder;
 // A task can only be assigned to one of it's potential owners or to the PlanningUser
 rule "Required Potential Owner"
     when
-        $task : Task(user != null, !ModelConstants.IS_PLANNING_USER.test(user.getEntityId()), !TaskHelper.isPotentialOwner($task, user))
+        $task : Task(user != null, (!user.isEnabled() || (!ModelConstants.IS_PLANNING_USER.test(user.getEntityId()) && !TaskHelper.isPotentialOwner($task, user))))
     then
         scoreHolder.addHardConstraintMatch(kcontext, 0, -1);
 end
@@ -43,7 +43,7 @@ end
 // A task with defined skills can only be assigned to users that has all the of them or to the PlanningUser
 rule "Required Skills"
     when
-        $task : Task(user != null, !ModelConstants.IS_PLANNING_USER.test(user.getEntityId()), !TaskHelper.hasAllLabels($task, user, DefaultLabels.SKILLS.name()))
+        $task : Task(user != null, (!user.isEnabled() || (!ModelConstants.IS_PLANNING_USER.test(user.getEntityId()) && !TaskHelper.hasAllLabels($task, user, DefaultLabels.SKILLS.name()))))
     then
         scoreHolder.addHardConstraintMatch(kcontext, 1, -1);
 end

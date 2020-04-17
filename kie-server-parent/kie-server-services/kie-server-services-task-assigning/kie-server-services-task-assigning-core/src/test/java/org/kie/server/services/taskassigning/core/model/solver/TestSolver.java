@@ -27,7 +27,7 @@ import org.optaplanner.core.api.solver.Solver;
 
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
-import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.extractTaskList;
+import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.extractTasks;
 import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.isPotentialOwner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -71,7 +71,7 @@ public class TestSolver extends AbstractTaskAssigningCoreTest {
     private void assertConstraints(TaskAssigningSolution solution) {
         int totalTasks = 0;
         for (User user : solution.getUserList()) {
-            List<Task> taskList = extractTaskList(user);
+            List<Task> taskList = extractTasks(user);
             totalTasks += taskList.size();
             taskList.forEach(task -> assertAssignment(user, task, solution.getUserList()));
         }

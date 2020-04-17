@@ -149,15 +149,44 @@ public class TaskHelperTest {
     }
 
     @Test
-    public void extractTaskList() {
+    public void extractTasks() {
+        TaskOrUser taskOrUser = buildTaskOrUser();
+        List<Task> result = TaskHelper.extractTasks(taskOrUser);
+        assertThat(result.size()).isEqualTo(4);
+        assertThat(result.get(0).getId()).isEqualTo(1);
+        assertThat(result.get(1).getId()).isEqualTo(2);
+        assertThat(result.get(2).getId()).isEqualTo(3);
+        assertThat(result.get(3).getId()).isEqualTo(4);
+    }
+
+    @Test
+    public void extractTasksFiltered() {
+        TaskOrUser taskOrUser = buildTaskOrUser();
+        List<Task> result = TaskHelper.extractTasks(taskOrUser, testedTask -> testedTask.getId() == 1 || testedTask.getId() == 4);
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getId()).isEqualTo(1);
+        assertThat(result.get(1).getId()).isEqualTo(4);
+    }
+
+    @Test
+    public void hasPinnedTasks() {
+        TaskOrUser taskOrUser = buildTaskOrUser();
+        assertThat(TaskHelper.hasPinnedTasks(taskOrUser)).isTrue();
+    }
+
+    private TaskOrUser buildTaskOrUser() {
         TaskOrUser taskOrUser = new Task();
-        Task task1 = new Task();
-        Task task2 = new Task();
-        Task task3 = new Task();
+        Task task1 = new Task(1, "Task1", 0);
+        Task task2 = new Task(2, "Task2", 0);
+        Task task3 = new Task(3, "Task3", 0);
+        task3.setPinned(true);
+        Task task4 = new Task(4, "Task4", 0);
+        task2.setPinned(true);
         taskOrUser.setNextTask(task1);
         task1.setNextTask(task2);
         task2.setNextTask(task3);
-        assertThat(TaskHelper.extractTaskList(taskOrUser)).isEqualTo(Arrays.asList(task1, task2, task3));
+        task3.setNextTask(task4);
+        return taskOrUser;
     }
 
     private static Task buildTask(List<OrganizationalEntity> potentialOwners) {
