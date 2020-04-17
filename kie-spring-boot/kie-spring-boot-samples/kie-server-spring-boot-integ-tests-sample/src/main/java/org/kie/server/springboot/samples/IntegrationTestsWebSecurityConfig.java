@@ -63,7 +63,7 @@ public class IntegrationTestsWebSecurityConfig extends WebSecurityConfigurerAdap
         // Configuration is the same as in the kie-server-tests module
         auth.inMemoryAuthentication().withUser("yoda").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest")
         .and()        
-        .withUser("Administrator").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "Administrators")
+        .withUser("administrator").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "Administrators")
         .and()        
         .withUser("john").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "engineering", "HR", "IT", "Accounting")
         .and()        
