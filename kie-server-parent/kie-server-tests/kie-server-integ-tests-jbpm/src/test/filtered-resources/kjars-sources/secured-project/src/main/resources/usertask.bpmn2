@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- origin at X=0.0 Y=0.0 -->
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmn20="http://www.omg.org/bpmn20" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools" xmlns:java="http://www.java.com/javaTypes" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="_u5JCEPpbEeSqMsMWx6c2wQ" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.4.3.Final-v20180418-1358-B1" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.omg.org/bpmn20" typeLanguage="http://www.java.com/javaTypes">
+  <bpmn2:itemDefinition id="_stringDataItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="_personDataItem" isCollection="false" structureRef="org.jbpm.data.Person"/>
+  <bpmn2:itemDefinition id="__44BE4412-91B0-4707-89DD-D45CECA36413__stringInputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__44BE4412-91B0-4707-89DD-D45CECA36413__personInputXItem" isCollection="false" structureRef="org.jbpm.data.Person"/>
+  <bpmn2:itemDefinition id="__44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputXItem" isCollection="false" structureRef="org.jbpm.data.Person"/>
+  <bpmn2:itemDefinition id="__87C563E0-EB8C-4184-BDB0-219E05780A0E_string2_InputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__87C563E0-EB8C-4184-BDB0-219E05780A0E_person2_InputXItem" isCollection="false" structureRef="org.jbpm.data.Person"/>
+  <bpmn2:itemDefinition id="ItemDefinition_34" isCollection="false" structureRef="Object"/>
+  <bpmn2:itemDefinition id="ItemDefinition_1" isCollection="false" structureRef="Object"/>
+  <bpmn2:process id="secured-project.usertask" drools:packageName="org.jbpm" drools:version="1.0" name="usertask" isExecutable="true">
+    <bpmn2:property id="stringData" itemSubjectRef="_stringDataItem" name="stringData"/>
+    <bpmn2:property id="personData" itemSubjectRef="_personDataItem" name="personData"/>
+    <bpmn2:startEvent id="processStartEvent" drools:selectable="true" color:background-color="#9acd32" color:border-color="#000000" color:color="#000000" name="start">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[start]]></drools:metaValue>
+        </drools:metaData>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>_7DD40B5F-AE51-4DEA-99E3-79E8B02542F4</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:userTask id="_44BE4412-91B0-4707-89DD-D45CECA36413" drools:selectable="true" drools:scriptFormat="http://www.java.com/java" color:background-color="#fafad2" color:border-color="#000000" color:color="#000000" name="human task">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[human task]]></drools:metaValue>
+        </drools:metaData>
+        <drools:onEntry-script scriptFormat="http://www.java.com/java"/>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>_7DD40B5F-AE51-4DEA-99E3-79E8B02542F4</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+      <bpmn2:ioSpecification id="_u5JCEfpbEeSqMsMWx6c2wQ">
+        <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413__stringInputX" drools:dtype="String" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413__stringInputXItem" name="_string"/>
+        <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413__personInputX" drools:dtype="org.jbpm.data.Person" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413__personInputXItem" name="_person"/>
+        <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413_SkippableInputX" name="Skippable"/>
+        <bpmn2:dataInput id="_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX" drools:dtype="String" name="CreatedBy"/>
+        <bpmn2:dataInput id="DataInput_34" itemSubjectRef="ItemDefinition_34" name="GroupId"/>
+        <bpmn2:dataInput id="DataInput_1" itemSubjectRef="ItemDefinition_1" name="TaskName"/>
+        <bpmn2:dataOutput id="_44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputX" drools:dtype="String" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputXItem" name="string_"/>
+        <bpmn2:dataOutput id="_44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputX" drools:dtype="org.jbpm.data.Person" itemSubjectRef="__44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputXItem" name="person_"/>
+        <bpmn2:inputSet id="_u5JCEvpbEeSqMsMWx6c2wQ">
+          <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413__stringInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413__personInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413_SkippableInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>DataInput_34</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>DataInput_1</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet id="_u5JpIPpbEeSqMsMWx6c2wQ">
+          <bpmn2:dataOutputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputX</bpmn2:dataOutputRefs>
+          <bpmn2:dataOutputRefs>_44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputX</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation id="_u5JpIfpbEeSqMsMWx6c2wQ">
+        <bpmn2:sourceRef>stringData</bpmn2:sourceRef>
+        <bpmn2:targetRef>_44BE4412-91B0-4707-89DD-D45CECA36413__stringInputX</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_u5JpIvpbEeSqMsMWx6c2wQ">
+        <bpmn2:sourceRef>personData</bpmn2:sourceRef>
+        <bpmn2:targetRef>_44BE4412-91B0-4707-89DD-D45CECA36413__personInputX</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_u5JpI_pbEeSqMsMWx6c2wQ">
+        <bpmn2:targetRef>_44BE4412-91B0-4707-89DD-D45CECA36413_SkippableInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_u5JpJPpbEeSqMsMWx6c2wQ">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_u5JpJfpbEeSqMsMWx6c2wQ">true</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_u5JpJvpbEeSqMsMWx6c2wQ_1">_44BE4412-91B0-4707-89DD-D45CECA36413_SkippableInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_u5JpI_pbEeSqMsMWx6c2wW">
+        <bpmn2:targetRef>_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_u5JpJPpbEeSqMsMWx6c2wW">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_u5JpJfpbEeSqMsMWx6c2wW">yoda</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_u5JpJvpbEeSqMsMWx6c2wQ">_44BE4412-91B0-4707-89DD-D45CECA36413_CreatedByInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="DataInputAssociation_1">
+        <bpmn2:targetRef>DataInput_34</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="DataInputAssociation_2">
+        <bpmn2:targetRef>DataInput_1</bpmn2:targetRef>
+        <bpmn2:assignment id="Assignment_2">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_7">human task</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="FormalExpression_5">DataInput_1</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataOutputAssociation id="_u5JpJ_pbEeSqMsMWx6c2wQ">
+        <bpmn2:sourceRef>_44BE4412-91B0-4707-89DD-D45CECA36413_string_OutputX</bpmn2:sourceRef>
+        <bpmn2:targetRef>stringData</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+      <bpmn2:dataOutputAssociation id="_u5JpKPpbEeSqMsMWx6c2wQ">
+        <bpmn2:sourceRef>_44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputX</bpmn2:sourceRef>
+        <bpmn2:targetRef>personData</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+      <bpmn2:potentialOwner id="PotentialOwner_1" name="Potential Owner 1">
+        <bpmn2:resourceAssignmentExpression id="ResourceAssignmentExpression_1">
+          <bpmn2:formalExpression id="FormalExpression_1">yoda</bpmn2:formalExpression>
+        </bpmn2:resourceAssignmentExpression>
+      </bpmn2:potentialOwner>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="_7DD40B5F-AE51-4DEA-99E3-79E8B02542F4" drools:selectable="true" color:background-color="#000000" color:border-color="#000000" color:color="#000000" sourceRef="processStartEvent" targetRef="_44BE4412-91B0-4707-89DD-D45CECA36413"/>
+    <bpmn2:endEvent id="_12205041-6185-4BC6-A152-CDC1569F1205" drools:selectable="true" color:background-color="#ff6347" color:border-color="#000000" color:color="#000000" name="">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[]]></drools:metaValue>
+        </drools:metaData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" drools:priority="1" sourceRef="_44BE4412-91B0-4707-89DD-D45CECA36413" targetRef="_12205041-6185-4BC6-A152-CDC1569F1205"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="_u5KQMvpbEeSqMsMWx6c2wQ">
+    <bpmndi:BPMNPlane id="_u5KQM_pbEeSqMsMWx6c2wQ" bpmnElement="secured-project.usertask">
+      <bpmndi:BPMNShape id="_u5KQNPpbEeSqMsMWx6c2wQ" bpmnElement="processStartEvent">
+        <dc:Bounds height="30.0" width="30.0" x="120.0" y="165.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1">
+          <dc:Bounds height="18.0" width="29.0" x="120.0" y="195.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_u5KQNfpbEeSqMsMWx6c2wQ" bpmnElement="_44BE4412-91B0-4707-89DD-D45CECA36413">
+        <dc:Bounds height="80.0" width="100.0" x="282.0" y="140.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2">
+          <dc:Bounds height="18.0" width="76.0" x="294.0" y="171.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_u5KQOfpbEeSqMsMWx6c2wQ" bpmnElement="_12205041-6185-4BC6-A152-CDC1569F1205">
+        <dc:Bounds height="28.0" width="28.0" x="485.0" y="166.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="_u5KQNvpbEeSqMsMWx6c2wQ" bpmnElement="_7DD40B5F-AE51-4DEA-99E3-79E8B02542F4" sourceElement="_u5KQNPpbEeSqMsMWx6c2wQ" targetElement="_u5KQNfpbEeSqMsMWx6c2wQ">
+        <di:waypoint xsi:type="dc:Point" x="150.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="216.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="282.0" y="180.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_5"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_u5KQNfpbEeSqMsMWx6c2wQ" targetElement="_u5KQOfpbEeSqMsMWx6c2wQ">
+        <di:waypoint xsi:type="dc:Point" x="382.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="433.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="485.0" y="180.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
