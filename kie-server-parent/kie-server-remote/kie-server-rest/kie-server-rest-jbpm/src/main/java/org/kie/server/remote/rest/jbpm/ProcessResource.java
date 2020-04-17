@@ -45,6 +45,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
@@ -156,7 +157,8 @@ public class ProcessResource  {
                     @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
                     @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
             @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process ID or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @POST
     @Path(START_PROCESS_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -169,12 +171,12 @@ public class ProcessResource  {
                                     @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
-
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        
         try {
             String response = processServiceBase.startProcess(containerId, processId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (DeploymentNotActiveException e) {
             return badRequest(
@@ -185,6 +187,8 @@ public class ProcessResource  {
         } catch (ProcessDefinitionNotFoundException e) {
             return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
@@ -198,7 +202,8 @@ public class ProcessResource  {
             @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
             @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
             @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process ID or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @POST
     @Path(START_PROCESS_WITH_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -212,12 +217,12 @@ public class ProcessResource  {
                     @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)}))  @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
         try {
             String response = processServiceBase.startProcessWithCorrelation(containerId, processId, correlationKey, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (DeploymentNotActiveException e) {
             return badRequest(
@@ -228,6 +233,8 @@ public class ProcessResource  {
         } catch (ProcessDefinitionNotFoundException e) {
             return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
@@ -238,7 +245,8 @@ public class ProcessResource  {
     @ApiOperation(value="Aborts a specified process instance in a specified KIE container.",
             response=Void.class, code=204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+                            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+                            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @DELETE
     @Path(ABORT_PROCESS_INST_DEL_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -257,6 +265,8 @@ public class ProcessResource  {
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -267,7 +277,8 @@ public class ProcessResource  {
     @ApiOperation(value="Aborts multiple specified process instances in a specified KIE container.",
             response=Void.class, code=204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @DELETE
     @Path(ABORT_PROCESS_INSTANCES_DEL_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -286,6 +297,8 @@ public class ProcessResource  {
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -295,7 +308,8 @@ public class ProcessResource  {
     @ApiOperation(value="Signals a specified process instance with a specified signal name and optional signal data.",
             response=Void.class, code=200)
             @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @POST
     @Path(SIGNAL_PROCESS_INST_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -321,6 +335,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -330,7 +346,8 @@ public class ProcessResource  {
     @ApiOperation(value="Signals multiple process instances with a specified signal name.",
             response=Void.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @POST
     @Path(SIGNAL_PROCESS_INSTANCES_PORT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -360,6 +377,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -369,7 +388,7 @@ public class ProcessResource  {
     @ApiOperation(value="Returns information about a specified process instance in a specified KIE container.",
             response=ProcessInstance.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
     @GET
@@ -402,7 +421,8 @@ public class ProcessResource  {
     @ApiOperation(value="Creates or updates a variable for a specified process instance.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @PUT
     @Path(PROCESS_INSTANCE_VAR_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -427,6 +447,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -436,7 +458,8 @@ public class ProcessResource  {
     @ApiOperation(value="Updates the values of one or more variable for a specified process instance. The request is a map in which the key is the variable name and the value is the new variable value.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @POST
     @Path(PROCESS_INSTANCE_VARS_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -459,6 +482,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -468,7 +493,8 @@ public class ProcessResource  {
     @ApiOperation(value="Returns the value of a specified variable in a specified process instance.",
             response=Object.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
             @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VAR_RESPONSE_JSON)}) )})
     @GET
@@ -494,6 +520,8 @@ public class ProcessResource  {
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -504,6 +532,7 @@ public class ProcessResource  {
             response=Map.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
             @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
     @GET
@@ -528,6 +557,8 @@ public class ProcessResource  {
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -539,6 +570,7 @@ public class ProcessResource  {
             response=String.class, responseContainer="List", code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
             @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON)})) })
     @GET
@@ -561,6 +593,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -571,7 +605,8 @@ public class ProcessResource  {
     @ApiOperation(value="Completes a specified work item for a specified process instance.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"), 
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset") })
     @PUT
     @Path(PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -597,6 +632,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -607,7 +644,8 @@ public class ProcessResource  {
     @ApiOperation(value="Aborts a specified work item for a specified process instance.",
             response=Void.class, code=201)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found") })
+            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @PUT
     @Path(PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -629,6 +667,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -639,6 +679,7 @@ public class ProcessResource  {
             response=WorkItemInstance.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"), 
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
             @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEM_RESPONSE_JSON)})) })
     @GET
@@ -663,6 +704,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         }  catch (WorkItemNotFoundException e) {
             return notFound(MessageFormat.format(WORK_ITEM_NOT_FOUND, workItemId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);
@@ -674,6 +717,7 @@ public class ProcessResource  {
             response=WorkItemInstanceList.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"), 
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
             @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEMS_RESPONSE_JSON)})) })
     @GET
@@ -695,6 +739,8 @@ public class ProcessResource  {
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(errorMessage(e), v, conversationIdHeader);

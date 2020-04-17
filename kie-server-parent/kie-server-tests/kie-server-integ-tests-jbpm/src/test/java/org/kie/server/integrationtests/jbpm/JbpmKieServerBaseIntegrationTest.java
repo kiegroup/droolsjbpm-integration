@@ -56,6 +56,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String CONTAINER_ID_ALIAS = "definition-project-alias";
     protected static final String BAD_CONTAINER_ID = "bad-definition-project";
     protected static final String CONTAINER_ID_USERTASK = "usertask-project";
+    protected static final String CONTAINER_ID_SECURED = "secured-project";
    
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
     protected static final String PROCESS_ID_USERTASK2 = "definition-project.usertask2";
@@ -78,6 +79,9 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_USERTASK_WITH_SLA_ON_TASK = "definition-project.UserTaskWithSLAOnTask";
     protected static final String PROCESS_ID_USERTASK_WITH_ROLLBACK = "UserTaskWithRollback";
     protected static final String PROCESS_ID_USERTASK_DIFF_POTUSERS = "usertask-project.usertask-diff-potusers";
+    protected static final String PROCESS_ID_USERTASK_SECURED = "secured-project.usertask";
+    protected static final String PROCESS_ID_SIGNAL_PROCESS_SECURED = "secured-project.signalprocess";
+    protected static final String PROCESS_ID_WORKITEM_SECURED = "secured-project.workitem";
     
     protected static final long SERVICE_TIMEOUT = 30000;
     protected static final long TIMEOUT_BETWEEN_CALLS = 200;
