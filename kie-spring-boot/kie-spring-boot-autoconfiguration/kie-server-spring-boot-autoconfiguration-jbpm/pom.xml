@@ -75,6 +75,14 @@
       <artifactId>kie-server-api</artifactId>
       <exclusions>
         <exclusion>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
         </exclusion>
