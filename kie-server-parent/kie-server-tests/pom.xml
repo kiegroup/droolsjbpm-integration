@@ -1220,6 +1220,8 @@
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.JEEOnly,org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
         <!-- Disable stacktrace inclusion by default -->
         <org.kie.server.stacktrace.included>false</org.kie.server.stacktrace.included>
+        <!-- Use default value (false) but kie-server-integ-tests-jbpm, overwritten to true -->
+        <org.kie.server.bypass.auth.user>false</org.kie.server.bypass.auth.user>
         <!-- Enable integration tests when running with application server, Cargo is still disabled. -->
         <skipITs>false</skipITs>
       </properties>
@@ -1281,6 +1283,7 @@
                       <argument>-Dorg.kie.server.mode=${org.kie.server.mode.production}</argument>
                       <argument>-Dorg.kie.server.stacktrace.included=${org.kie.server.stacktrace.included}</argument>
                       <argument>-Dorg.jbpm.ht.admin.user=administrator</argument>
+                      <argument>-Dorg.kie.server.bypass.auth.user=${org.kie.server.bypass.auth.user}</argument>
                       <argument>org.springframework.boot.loader.JarLauncher</argument>
                     </arguments>
                   </configuration>
