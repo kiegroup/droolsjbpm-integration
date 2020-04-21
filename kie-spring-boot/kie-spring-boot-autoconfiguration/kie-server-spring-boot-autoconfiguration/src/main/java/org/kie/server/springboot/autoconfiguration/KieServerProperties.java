@@ -96,6 +96,7 @@ public class KieServerProperties implements InitializingBean {
 
     public static class Swagger {
 
+        private String resourcePackage = null;
         private boolean enabled = false;
 
         public boolean isEnabled() {
@@ -104,6 +105,14 @@ public class KieServerProperties implements InitializingBean {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+
+        public String getResourcePackage() {
+            return resourcePackage;
+        }
+
+        public void setResourcePackage(String resourcePackage) {
+            this.resourcePackage = resourcePackage;
         }
     }
 

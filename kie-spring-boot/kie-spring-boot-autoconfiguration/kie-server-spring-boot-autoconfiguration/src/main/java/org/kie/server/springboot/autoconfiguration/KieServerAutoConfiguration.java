@@ -22,10 +22,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.spring.AbstractJaxrsClassesScanServer;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.KieServerConstants;
@@ -66,6 +69,8 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     private boolean jaxrsComponentScanEnabled;
     
     private SpringBootKieServerImpl kieServer;
+
+    private JAXRSServerFactoryBean serviceFactoryBean;
 
     public KieServerAutoConfiguration(KieServerProperties properties, Optional<IdentityProvider> identityProvider,
             @Value("${cxf.jaxrs.classes-scan:false}")boolean jaxrsComponentScanEnabled) {
@@ -125,6 +130,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
 
     @Override
     protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
+        this.serviceFactoryBean = factory;
         factory.setServiceBeans(endpoints);
         if (jaxrsComponentScanEnabled) {
             super.setJaxrsResources(factory);        
@@ -134,6 +140,11 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     @Bean    
     public Server jaxRsServer(KieServer server) {
         return super.createJaxRsServer();
+    }
+
+    public Set<String> getResources() {
+        List<ClassResourceInfo> resourceInfos = serviceFactoryBean.getServiceFactory().getClassResourceInfo();
+        return resourceInfos.stream().map(e -> e.getServiceClass().getPackage().getName()).collect(Collectors.toSet());
     }
 
     @Override
@@ -146,6 +157,12 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
                 method.invoke(feature, true);
                 Method setBasePathMethod = ReflectionUtils.findMethod(feature.getClass(), "setBasePath", String.class);
                 setBasePathMethod.invoke(feature, cxfPath);
+                Method setResourcePackage = ReflectionUtils.findMethod(feature.getClass(), "setResourcePackage", String.class);
+                String resourcePackage = properties.getSwagger().getResourcePackage();
+                if (resourcePackage == null) {
+                    resourcePackage = String.join(",", getResources());
+                }
+                setResourcePackage.invoke(feature, resourcePackage);
                 features.add(feature);
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IllegalArgumentException | InvocationTargetException e) {
                 logger.error("Swagger feature was enabled but cannot be created", e);
