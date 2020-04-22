@@ -452,14 +452,6 @@
         <!-- For including complete stack trace in the response -->
         <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.bazaarvoice.maven.plugins</groupId>
-            <artifactId>process-exec-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>
