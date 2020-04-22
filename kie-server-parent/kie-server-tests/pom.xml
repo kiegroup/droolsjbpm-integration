@@ -48,6 +48,9 @@
     <failsafe.excluded.groups/>
     <!-- Sybase driver leaks its Timestamp implementation. To correctly handle it we need to add driver as additional test classpath. -->
     <maven.jdbc.driver.jar/>
+    <!-- No policy activated by default but overwritten at kie-server-integ-tests-policy -->
+    <org.kie.server.policy.activate/>
+    <policy.klo.interval>0</policy.klo.interval>
     <!-- Set to true if you want to skip JMS tests even for containers with available JMS. -->
     <jms.skip>false</jms.skip>
     <!-- Property for configuring Maven mirror in Kie server settings.xml. Used to speed up test execution by using cache server. Empty by default. -->
@@ -1284,6 +1287,8 @@
                       <argument>-Dorg.kie.server.stacktrace.included=${org.kie.server.stacktrace.included}</argument>
                       <argument>-Dorg.jbpm.ht.admin.user=administrator</argument>
                       <argument>-Dorg.kie.server.bypass.auth.user=${org.kie.server.bypass.auth.user}</argument>
+                      <argument>-Dorg.kie.server.policy.activate=${org.kie.server.policy.activate}</argument>
+                      <argument>-Dpolicy.klo.interval=${policy.klo.interval}</argument>
                       <argument>org.springframework.boot.loader.JarLauncher</argument>
                     </arguments>
                   </configuration>
@@ -1300,6 +1305,12 @@
             </plugin>
           </plugins>
         </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>com.bazaarvoice.maven.plugins</groupId>
+            <artifactId>process-exec-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
       </build>
     </profile>
     <!-- This profile basically disables any cargo related execution. It can be used when the tests should run on
