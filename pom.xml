@@ -60,6 +60,7 @@
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
     <module>kie-server-parent</module>
+    <module>jbpm-process-svg</module>
     <module>kie-osgi</module>
     <module>kie-performance-kit</module>
     <module>kie-security</module>
