@@ -56,18 +56,12 @@
     <!-- The example can not be in the build because of the chicken-egg problem with depending on the plugin,
          that is about to be build in the same Maven reactor build -->
     <!--<module>kie-maven-plugin-example</module>-->
-    <module>drools-benchmark</module>
-    <!--<module>drools-simulator</module>-->
     <module>droolsjbpm-integration-examples</module>
-    <module>jbpm-simulation</module>
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
-    <module>drools-jboss-integration</module>
     <module>kie-server-parent</module>
-    <module>jbpm-process-svg</module>
     <module>kie-osgi</module>
     <module>kie-performance-kit</module>
-    <module>drools-android</module>
     <module>kie-security</module>
     <module>kie-camel</module>
     <module>kie-tomcat-integration</module>
