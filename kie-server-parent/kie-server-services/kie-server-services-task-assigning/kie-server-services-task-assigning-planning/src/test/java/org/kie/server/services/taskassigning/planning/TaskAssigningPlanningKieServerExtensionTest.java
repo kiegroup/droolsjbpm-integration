@@ -16,6 +16,8 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,11 +48,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.optaplanner.core.api.solver.Solver;
 
+import static org.drools.core.util.KeyStoreConstants.PROP_PWD_KS_PWD;
+import static org.drools.core.util.KeyStoreConstants.PROP_PWD_KS_URL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL;
@@ -70,10 +77,10 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanni
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.ACTIVATE_CONTAINER_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.CREATE_CONTAINER_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.HEALTH_CHECK_IS_ALIVE_MESSAGE;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.SOLVER_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_CONTAINER_NOT_AVAILABLE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.SOLVER_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.UNDESIRED_EXTENSIONS_RUNNING_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_CONTAINER_NOT_AVAILABLE;
@@ -101,6 +108,12 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     private static final String RUNTIME_USER = "RUNTIME_USER";
     private static final String RUNTIME_PWD = "RUNTIME_PWD";
     private static final String RUNTIME_TIMEOUT = "1234";
+
+    private static final String KEY_STORE_RESOURCE = "taskAssigningKeystore.jceks";
+    private static final String KEY_STORE_PASSWORD = "jBPMKeyStorePassword";
+    private static final String RUNTIME_ALIAS = "jBPMAlias";
+    private static final String RUNTIME_ALIAS_PWD = "jBPMKeyPassword";
+    private static final String RUNTIME_ALIAS_STORED_PWD = "kieserver1!";
 
     private static final String SOLVER_CONTAINER_ID = "SOLVER_CONTAINER_ID";
     private static final String SOLVER_CONTAINER_GROUP_ID = "SOLVER_CONTAINER_GROUP_ID";
@@ -217,14 +230,43 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
     @Test
     public void initRuntimeClient() {
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL, RUNTIME_URL);
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER, RUNTIME_USER);
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD, RUNTIME_PWD);
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT, RUNTIME_TIMEOUT);
+        prepareInitRuntimeClient();
         enableExtension();
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
         extension.init(kieServer, registry);
         verify(extension).createRuntimeClient(RUNTIME_URL, RUNTIME_USER, RUNTIME_PWD, Long.parseLong(RUNTIME_TIMEOUT));
+    }
+
+    @Test
+    public void initRuntimeClientWithKeyStore() throws URISyntaxException {
+        initRuntimeClientWithKeyStore(RUNTIME_ALIAS, RUNTIME_ALIAS_PWD, RUNTIME_ALIAS_STORED_PWD);
+    }
+
+    @Test
+    public void initRuntimeClientWithKeyStoreMissingAlias() throws URISyntaxException {
+        initRuntimeClientWithKeyStore("whateverAlias", RUNTIME_ALIAS_PWD, RUNTIME_PWD);
+    }
+
+    @Test
+    public void initRuntimeClientWithKeyStoreWrongAliasPwd() throws URISyntaxException {
+        initRuntimeClientWithKeyStore(RUNTIME_ALIAS, "whateverPassword", RUNTIME_PWD);
+    }
+
+    private void initRuntimeClientWithKeyStore(String alias, String aliasPwd, String expectedPwd) throws URISyntaxException {
+        prepareInitRuntimeClient();
+        URL keyStoreResourceURL = getClass().getClassLoader().getResource(KEY_STORE_RESOURCE);
+        if (keyStoreResourceURL == null) {
+            fail(KEY_STORE_RESOURCE + " was not found");
+        } else {
+            System.setProperty(PROP_PWD_KS_URL, keyStoreResourceURL.toURI().toString());
+            System.setProperty(PROP_PWD_KS_PWD, KEY_STORE_PASSWORD);
+            System.setProperty(JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, alias);
+            System.setProperty(JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD, aliasPwd);
+            enableExtension();
+            System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
+            extension.init(kieServer, registry);
+            verify(extension).createRuntimeClient(RUNTIME_URL, RUNTIME_USER, expectedPwd, Long.parseLong(RUNTIME_TIMEOUT));
+        }
     }
 
     @Test
@@ -483,6 +525,13 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         extension.init(kieServer, registry);
         List<Message> messages = extension.healthCheck(true);
         assertContainsMesssage(messages, Severity.INFO, HEALTH_CHECK_IS_ALIVE_MESSAGE, 0);
+    }
+
+    private void prepareInitRuntimeClient() {
+        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL, RUNTIME_URL);
+        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER, RUNTIME_USER);
+        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD, RUNTIME_PWD);
+        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT, RUNTIME_TIMEOUT);
     }
 
     private void prepareServerStartWithSolverContainerConfig() {
