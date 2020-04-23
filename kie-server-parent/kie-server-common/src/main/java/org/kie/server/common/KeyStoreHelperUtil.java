@@ -37,7 +37,7 @@ public class KeyStoreHelperUtil {
         return loadPasswordKey(PROP_PWD_CTRL_ALIAS, PROP_PWD_CTRL_PWD, defaultPassword);
     }
 
-    private static String loadPasswordKey(String pwdKeyAliasProperty, String pwdKeyPasswordProperty, String defaultPassword) {
+    public static String loadPasswordKey(String pwdKeyAliasProperty, String pwdKeyPasswordProperty, String defaultPassword) {
         String passwordKey;
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper();
         try {
