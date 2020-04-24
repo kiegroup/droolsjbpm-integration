@@ -178,7 +178,7 @@ public class SolutionSynchronizer extends RunnableBase {
             LOGGER.debug("Solution Synchronizer will recover the solution from the jBPM runtime for starting the solver.");
             if (!solverExecutor.isStopped()) {
                 LOGGER.debug("Previous solver instance has not yet finished, let's wait for it to stop." +
-                                     " Next attempt will be in {} milliseconds.", syncInterval.toMillis());
+                                     " Next attempt will be in a period of {}.", syncInterval);
                 nextAction = Action.INIT_SOLVER_EXECUTOR;
             } else {
                 final TaskAssigningSolution recoveredSolution = recoverSolution();
@@ -193,13 +193,15 @@ public class SolutionSynchronizer extends RunnableBase {
                     } else {
                         nextAction = Action.INIT_SOLVER_EXECUTOR;
                         LOGGER.debug("It looks like there are no tasks for recovering the solution at this moment." +
-                                             " Next attempt will be in {} milliseconds", syncInterval.toMillis());
+                                             " Next attempt will be in a period of {}.", syncInterval);
                     }
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("An error was produced during solution recovering." +
-                                 " Next attempt will be in " + syncInterval + " milliseconds", e);
+            final String msg = String.format("An error was produced during solution recovering." +
+                                                     " Next attempt will be in a period of %s, error: %s", syncInterval, e.getMessage());
+            LOGGER.warn(msg);
+            LOGGER.debug(msg, e);
             nextAction = Action.INIT_SOLVER_EXECUTOR;
         }
         return nextAction;
@@ -232,8 +234,10 @@ public class SolutionSynchronizer extends RunnableBase {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("An error was produced during solution status synchronization from the jBPM runtime." +
-                                 " Next attempt will be in " + syncInterval + " milliseconds", e);
+            final String msg = String.format("An error was produced during solution status synchronization from the jBPM runtime." +
+                                                     " Next attempt will be in a period of %s, error: %s", syncInterval, e.getMessage());
+            LOGGER.warn(msg);
+            LOGGER.debug(msg, e);
             nextAction = Action.SYNCHRONIZE_SOLUTION;
         }
         return nextAction;
@@ -244,13 +248,16 @@ public class SolutionSynchronizer extends RunnableBase {
             LOGGER.debug("Loading users information from the external UserSystemService");
             final List<User> userList = userSystemService.findAllUsers();
             final int userListSize = userList != null ? userList.size() : 0;
-            LOGGER.debug("Users information was loaded successful: {} users were returned from external system, next synchronization will be in {}",
+            LOGGER.debug("Users information was loaded successful: {} users were returned from external system, next synchronization will be in a period of {}",
                          userListSize, usersSyncInterval);
             nextUsersSyncTime = calculateNextUsersSyncTime();
             return Pair.of(true, userList);
         } catch (Exception e) {
-            LOGGER.debug("An error was produced during users information loading from the external UserSystem repository." +
-                                 " Tasks status will still be updated and users synchronization next attempt will be in {} milliseconds.", syncInterval, e);
+            final String msg = String.format("An error was produced during users information loading from the external UserSystem repository." +
+                                                     " Tasks status will still be updated and users synchronization next attempt will be in a period of %s, error: %s",
+                                             syncInterval, e.getMessage());
+            LOGGER.warn(msg);
+            LOGGER.debug(msg, e);
             return Pair.of(false, Collections.emptyList());
         }
     }
