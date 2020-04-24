@@ -569,8 +569,6 @@ public abstract class BatchTest extends CamelTestSupport {
 
         String outXml = execContent("testInsertElements.in.1");
 
-        assertXMLEqual(getContent("testInsertElements.expected.1"), outXml);
-
         ExecutionResults result = unmarshalOutXml(outXml, ExecutionResults.class);
 
         List list = (List)result.getValue("list1");
@@ -622,8 +620,6 @@ public abstract class BatchTest extends CamelTestSupport {
         list.add(ksession.getObject(((InternalFactHandle)factHandles.get(1))));
         assertTrue(list.contains(new Cheese("stilton", 35)));
         assertTrue(list.contains(new Cheese("stilton", 30)));
-
-        assertXMLEqual(getContent("testInsertElementsWithReturnObjects.expected.1", factHandles.get(0).toExternalForm(), factHandles.get(1).toExternalForm()), outXml);
     }
 
     @Test
@@ -816,8 +812,6 @@ public abstract class BatchTest extends CamelTestSupport {
         String outXml = execContent("testManualFireAllRules.in.1");
 
         ExecutionResults result = unmarshalOutXml(outXml, ExecutionResults.class);
-
-        assertXMLEqual(getContent("testManualFireAllRules.expected.1", ((FactHandle)result.getFactHandle("outBrie")).toExternalForm()), outXml);
 
         // brie should not have been added to the list
         List list = (List)result.getValue("list1");

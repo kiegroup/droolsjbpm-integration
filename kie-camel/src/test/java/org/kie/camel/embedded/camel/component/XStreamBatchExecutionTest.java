@@ -681,47 +681,6 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         Collection<? extends FactHandle> factHandles = ksession.getFactHandles();
 
-        String expectedXml = "";
-        expectedXml += "<execution-results>\n";
-        expectedXml += "  <result identifier='list'>\n";
-        expectedXml += "    <list>\n";
-        expectedXml += "      <org.kie.camel.embedded.camel.testdomain.Cheese>\n";
-        expectedXml += "        <type>stilton</type>\n";
-        expectedXml += "        <price>35</price>\n";
-        expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.embedded.camel.testdomain.Cheese>\n";
-        expectedXml += "      <org.kie.camel.embedded.camel.testdomain.Cheese>\n";
-        expectedXml += "        <type>stilton</type>\n";
-        expectedXml += "        <price>30</price>\n";
-        expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.embedded.camel.testdomain.Cheese>\n";
-        expectedXml += "    </list>\n";
-        expectedXml += "  </result>\n";
-
-        expectedXml += "  <result identifier=\"myfacts\">\n";
-        expectedXml += "  <list>\n";
-        expectedXml += "    <org.kie.camel.embedded.camel.testdomain.Cheese reference=\"../../../result/list/org.kie.camel.embedded.camel.testdomain.Cheese[2]\"/>\n";
-        expectedXml += "    <org.kie.camel.embedded.camel.testdomain.Cheese reference=\"../../../result/list/org.kie.camel.embedded.camel.testdomain.Cheese\"/>\n";
-        expectedXml += "  </list>\n";
-        expectedXml += "  </result>\n";
-        expectedXml += "  <fact-handles identifier=\"myfacts\">\n";
-        for (FactHandle factHandle : factHandles) {
-            if (((Cheese)ksession.getObject(factHandle)).getPrice() == 30) {
-                expectedXml += "  <fact-handle external-form=\"" + factHandle.toExternalForm() + "\"/>\n";
-            }
-        }
-
-        for (FactHandle factHandle : factHandles) {
-            if (((Cheese)ksession.getObject(factHandle)).getPrice() == 35) {
-                expectedXml += "  <fact-handle external-form=\"" + factHandle.toExternalForm() + "\"/>\n";
-            }
-        }
-        expectedXml += "  </fact-handles>\n";
-
-        expectedXml += "</execution-results>\n";
-
-        assertXMLEqual(expectedXml, outXml);
-
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
 
         List list = (List)result.getValue("list");

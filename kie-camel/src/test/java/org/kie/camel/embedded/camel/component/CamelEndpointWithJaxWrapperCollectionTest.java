@@ -18,6 +18,7 @@ package org.kie.camel.embedded.camel.component;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.naming.Context;
@@ -29,6 +30,7 @@ import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
+import org.assertj.core.api.Assertions;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
@@ -85,9 +87,10 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
         assertNotNull(resp);
 
         assertEquals(resp.size(), 2);
-        assertEquals("baunax", resp.get(0).getName());
-        assertEquals("Hadrian", resp.get(1).getName());
-
+        final List<String> expectedNames = new ArrayList<>();
+        expectedNames.add(resp.get(0).getName());
+        expectedNames.add(resp.get(1).getName());
+        Assertions.assertThat(expectedNames).contains("baunax", "Hadrian");
     }
 
     @Override
