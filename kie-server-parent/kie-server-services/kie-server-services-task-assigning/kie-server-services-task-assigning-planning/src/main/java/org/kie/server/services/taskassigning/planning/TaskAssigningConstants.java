@@ -44,7 +44,7 @@ public class TaskAssigningConstants {
 
     /**
      * Property for configuring the password for getting the key stored under the alias name
-     * JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD_ALIAS in cases where the kie-server key store is used.
+     * JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS in cases where the kie-server key store is used.
      */
     public static final String JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD = "kie.keystore.key.taskAssigning.processRuntime.pwd";
 
