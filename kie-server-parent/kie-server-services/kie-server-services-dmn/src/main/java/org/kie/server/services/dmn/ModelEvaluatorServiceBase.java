@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
-import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.KieRuntimeFactory;
 import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
@@ -50,7 +50,6 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
-import org.kie.server.services.prometheus.PrometheusMetrics;
 import org.kie.server.services.prometheus.PrometheusMetricsDMNListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,13 +69,11 @@ public class ModelEvaluatorServiceBase {
     public ServiceResponse<DMNModelInfoList> getModels(String containerId) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
-            KieSession kieSession = kContainer.getKieContainer().newKieSession();
-            DMNRuntime kieRuntime = kieSession.getKieRuntime(DMNRuntime.class);
+            DMNRuntime kieRuntime = KieRuntimeFactory.of(kContainer.getKieContainer().getKieBase()).get(DMNRuntime.class);
             
             List<DMNModel> models = kieRuntime.getModels();
             List<DMNModelInfo> result = models.stream().map(ModelEvaluatorServiceBase::modelToInfo).collect(Collectors.toList());
             
-            kieSession.dispose();
             return new ServiceResponse<DMNModelInfoList>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK models successfully retrieved from container '" + containerId + "'",
@@ -159,8 +156,7 @@ public class ModelEvaluatorServiceBase {
     public ServiceResponse<DMNResultKS> evaluateDecisions(String containerId, String contextPayload, String marshallingType) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
-            KieSession kieSession = kContainer.getKieContainer().newKieSession();
-            DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
+            DMNRuntime dmnRuntime = KieRuntimeFactory.of(kContainer.getKieContainer().getKieBase()).get(DMNRuntime.class);
 
             PrometheusKieServerExtension extension = (PrometheusKieServerExtension)context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
             if (extension != null) {
@@ -194,7 +190,6 @@ public class ModelEvaluatorServiceBase {
                                               evalCtx.getDecisionNames(),
                                               evaluationResult.result);
             
-            kieSession.dispose();
             return new ServiceResponse<DMNResultKS>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK from container '" + containerId + "'",
