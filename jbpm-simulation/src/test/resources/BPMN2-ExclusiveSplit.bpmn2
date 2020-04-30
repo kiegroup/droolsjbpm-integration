@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.jboss.org/drools" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="Definition" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.jboss.org/drools" typeLanguage="http://www.java.com/javaTypes">
+  <itemDefinition id="_xItem" structureRef="String" />
+  <itemDefinition id="_yItem" structureRef="String" />
+  <process id="com.sample.test" name="Test" isExecutable="true" processType="Private">
+    <property id="x" itemSubjectRef="_xItem"/>
+    <property id="y" itemSubjectRef="_yItem"/>
+    <endEvent id="_7" name="End">
+      <incoming>_6-_7</incoming>
+      <terminateEventDefinition id="TerminateEventDefinition_1"/>
+    </endEvent>
+    <startEvent id="_1" name="Start">
+      <outgoing>_1-_2</outgoing>
+    </startEvent>
+    <exclusiveGateway id="_2" name="Split" gatewayDirection="Diverging">
+      <incoming>_1-_2</incoming>
+      <outgoing>_2-_3</outgoing>
+      <outgoing>_2-_4</outgoing>
+    </exclusiveGateway>
+    <scriptTask id="_3" name="Script1">
+      <incoming>_2-_3</incoming>
+      <outgoing>_3-_5</outgoing>
+      <script>System.out.println(&quot;x=&quot; + x);</script>
+    </scriptTask>
+    <scriptTask id="_4" name="Script2">
+      <incoming>_2-_4</incoming>
+      <outgoing>_4-_5</outgoing>
+      <script>System.out.println(&quot;y=&quot; + y);</script>
+    </scriptTask>
+    <exclusiveGateway id="_5" name="Join" gatewayDirection="Converging">
+      <incoming>_3-_5</incoming>
+      <incoming>_4-_5</incoming>
+      <outgoing>_5-_6</outgoing>
+    </exclusiveGateway>
+    <task id="_6" tns:taskName="Email" name="Email">
+      <incoming>_5-_6</incoming>
+      <outgoing>_6-_7</outgoing>
+      <ioSpecification id="InputOutputSpecification_1">
+        <dataInput id="_6_BodyInput" name="Body"/>
+        <dataInput id="_6_SubjectInput" name="Subject"/>
+        <dataInput id="_6_ToInput" name="To"/>
+        <dataInput id="_6_FromInput" name="From"/>
+        <inputSet id="InputSet_1">
+          <dataInputRefs>_6_BodyInput</dataInputRefs>
+          <dataInputRefs>_6_SubjectInput</dataInputRefs>
+          <dataInputRefs>_6_ToInput</dataInputRefs>
+          <dataInputRefs>_6_FromInput</dataInputRefs>
+        </inputSet>
+        <outputSet id="OutputSet_1"/>
+      </ioSpecification>
+      <dataInputAssociation id="DataInputAssociation_1">
+        <targetRef>_6_BodyInput</targetRef>
+        <assignment id="Assignment_1">
+          <from xsi:type="tFormalExpression" id="FormalExpression_1">This is an urgent email #{x}</from>
+          <to xsi:type="tFormalExpression" id="FormalExpression_2">_6_BodyInput</to>
+        </assignment>
+      </dataInputAssociation>
+      <dataInputAssociation id="DataInputAssociation_2">
+        <targetRef>_6_SubjectInput</targetRef>
+        <assignment id="Assignment_2">
+          <from xsi:type="tFormalExpression" id="FormalExpression_3">Urgent email !</from>
+          <to xsi:type="tFormalExpression" id="FormalExpression_4">_6_SubjectInput</to>
+        </assignment>
+      </dataInputAssociation>
+      <dataInputAssociation id="DataInputAssociation_3">
+        <targetRef>_6_ToInput</targetRef>
+        <assignment id="Assignment_3">
+          <from xsi:type="tFormalExpression" id="FormalExpression_5">you@mail.com</from>
+          <to xsi:type="tFormalExpression" id="FormalExpression_6">_6_ToInput</to>
+        </assignment>
+      </dataInputAssociation>
+      <dataInputAssociation id="DataInputAssociation_4">
+        <targetRef>_6_FromInput</targetRef>
+        <assignment id="Assignment_4">
+          <from xsi:type="tFormalExpression" id="FormalExpression_7">me@mail.com</from>
+          <to xsi:type="tFormalExpression" id="FormalExpression_8">_6_FromInput</to>
+        </assignment>
+      </dataInputAssociation>
+    </task>
+    <sequenceFlow id="_1-_2" name="started" sourceRef="_1" targetRef="_2"/>
+    <sequenceFlow id="_2-_3" name="First" sourceRef="_2" targetRef="_3">
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_9">return x == &quot;First&quot;;</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="_2-_4" name="Second" sourceRef="_2" targetRef="_4">
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_10">return x == &quot;Second&quot;;</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="_3-_5" name="after first" sourceRef="_3" targetRef="_5"/>
+    <sequenceFlow id="_4-_5" name="after second" sourceRef="_4" targetRef="_5"/>
+    <sequenceFlow id="_5-_6" name="joined" sourceRef="_5" targetRef="_6"/>
+    <sequenceFlow id="_6-_7" name="emailed" sourceRef="_6" targetRef="_7"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_1" bpmnElement="com.sample.test">
+      <bpmndi:BPMNShape id="BPMNShape_StartEvent_1" bpmnElement="_1">
+        <dc:Bounds height="48.0" width="48.0" x="16.0" y="56.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_1" bpmnElement="_2" isMarkerVisible="true">
+        <dc:Bounds height="48.0" width="48.0" x="96.0" y="56.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ScriptTask_1" bpmnElement="_3">
+        <dc:Bounds height="48.0" width="80.0" x="177.0" y="16.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ScriptTask_2" bpmnElement="_4">
+        <dc:Bounds height="48.0" width="80.0" x="177.0" y="96.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_2" bpmnElement="_5" isMarkerVisible="true">
+        <dc:Bounds height="48.0" width="48.0" x="289.0" y="56.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_1" bpmnElement="_6">
+        <dc:Bounds height="48.0" width="100.0" x="370.0" y="56.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_1" bpmnElement="_7">
+        <dc:Bounds height="48.0" width="48.0" x="502.0" y="56.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="_1-_2" sourceElement="BPMNShape_StartEvent_1" targetElement="BPMNShape_ExclusiveGateway_1">
+        <di:waypoint xsi:type="dc:Point" x="64.0" y="80.0"/>
+        <di:waypoint xsi:type="dc:Point" x="96.0" y="80.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="_2-_3" sourceElement="BPMNShape_ExclusiveGateway_1" targetElement="BPMNShape_ScriptTask_1">
+        <di:waypoint xsi:type="dc:Point" x="120.0" y="56.0"/>
+        <di:waypoint xsi:type="dc:Point" x="120.0" y="40.0"/>
+        <di:waypoint xsi:type="dc:Point" x="177.0" y="40.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="_2-_4" sourceElement="BPMNShape_ExclusiveGateway_1" targetElement="BPMNShape_ScriptTask_2">
+        <di:waypoint xsi:type="dc:Point" x="120.0" y="105.0"/>
+        <di:waypoint xsi:type="dc:Point" x="120.0" y="120.0"/>
+        <di:waypoint xsi:type="dc:Point" x="177.0" y="120.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="_3-_5" sourceElement="BPMNShape_ScriptTask_1" targetElement="BPMNShape_ExclusiveGateway_2">
+        <di:waypoint xsi:type="dc:Point" x="257.0" y="40.0"/>
+        <di:waypoint xsi:type="dc:Point" x="313.0" y="40.0"/>
+        <di:waypoint xsi:type="dc:Point" x="313.0" y="56.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="_4-_5" sourceElement="BPMNShape_ScriptTask_2" targetElement="BPMNShape_ExclusiveGateway_2">
+        <di:waypoint xsi:type="dc:Point" x="257.0" y="120.0"/>
+        <di:waypoint xsi:type="dc:Point" x="314.0" y="119.0"/>
+        <di:waypoint xsi:type="dc:Point" x="313.0" y="105.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="_5-_6" sourceElement="BPMNShape_ExclusiveGateway_2" targetElement="BPMNShape_Task_1">
+        <di:waypoint xsi:type="dc:Point" x="338.0" y="80.0"/>
+        <di:waypoint xsi:type="dc:Point" x="370.0" y="80.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="_6-_7" sourceElement="BPMNShape_Task_1" targetElement="BPMNShape_EndEvent_1">
+        <di:waypoint xsi:type="dc:Point" x="470.0" y="80.0"/>
+        <di:waypoint xsi:type="dc:Point" x="502.0" y="80.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

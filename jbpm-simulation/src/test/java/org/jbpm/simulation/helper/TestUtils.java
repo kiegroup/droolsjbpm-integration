@@ -1,0 +1,208 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
+package org.jbpm.simulation.helper;
+
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.drools.core.impl.EnvironmentFactory;
+import org.drools.core.impl.KnowledgeBaseFactory;
+import org.eclipse.bpmn2.FlowElement;
+import org.jbpm.simulation.PathContext;
+import org.jbpm.simulation.impl.SimulationNodeInstanceFactoryRegistry;
+import org.json.JSONObject;
+import org.kie.api.KieBase;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieModule;
+import org.kie.api.builder.ReleaseId;
+import org.kie.api.builder.model.KieBaseModel;
+import org.kie.api.builder.model.KieModuleModel;
+import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.conf.EqualityBehaviorOption;
+import org.kie.api.conf.EventProcessingOption;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.conf.ClockTypeOption;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceFactory;
+
+public class TestUtils {
+
+    public static boolean matchExpected(List<PathContext> paths, List<String>... expectedIds) {
+        
+        for (PathContext context : paths) {
+            List<FlowElement> elements = removeDuplicates(context.getPathElements());
+            boolean match = false;
+            for (int i = 0; i < expectedIds.length; i++) {
+                List<String> expected = expectedIds[i];
+                
+                if (expected != null && elements.size() == expected.size()) {
+                    
+                    for (FlowElement fe : elements) {
+                        if (!expected.contains(fe.getId())) {
+                            System.err.println("Following element not matched: " + fe.getId() + " " + fe.getName());
+                            match = false;
+                            break;
+                        } 
+                        match = true;
+                    }
+                    if (match) {
+                        expectedIds[i] = null;
+                        break;
+                    }
+                }
+            }
+            
+            if (!match) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    public static void printOutPaths(List<PathContext> paths, String name) {
+        if (!"true".equalsIgnoreCase(System.getProperty("test.debug.off"))) {
+            System.out.println("###################" + name + "###################");
+            for (PathContext context : paths) {
+                System.out.println("PATH: " + context.getId());
+                System.out.println("AS TEXT:");
+                for (FlowElement fe : context.getPathElements()) {
+                    System.out.println(fe.getName() + "  - " + fe.eClass().getName());
+                }
+            }
+            System.out.println("#####################################################");
+        }
+    }
+    
+    public static void printOutPaths(List<PathContext> paths, JSONObject jsonPaths, String name) {
+        if (!"true".equalsIgnoreCase(System.getProperty("test.debug.off"))) {
+            System.out.println("###################" + name + "###################");
+            for (PathContext context : paths) {
+                System.out.println("$$$$$$$$ PATH: " + context.getId() + " " + context.getType());
+                System.out.println("$$$ AS TEXT:");
+                for (FlowElement fe : context.getPathElements()) {
+                    System.out.println(fe.getName() + "  - " + fe.eClass().getName());
+                }
+            }
+            if (jsonPaths != null) {
+                System.out.println("$$$ AS JSON:");
+                System.out.println(jsonPaths.toString());
+                System.out.println("$$$$$$$$");
+            }
+            System.out.println("#####################################################");
+        }
+    }
+    
+    public static KieSession createSession(String process) {
+        KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        
+        builder.add(ResourceFactory.newClassPathResource(process), ResourceType.BPMN2);
+        
+        KieBase kbase = builder.newKieBase();
+        KieSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        config.setOption(ClockTypeOption.get("pseudo") );
+        KieSession session = kbase.newKieSession(config, EnvironmentFactory.newEnvironment());
+        session.getEnvironment().set("NodeInstanceFactoryRegistry", SimulationNodeInstanceFactoryRegistry.getInstance());
+        
+        return session;
+    }
+    
+    public static List<FlowElement> removeDuplicates(Set<FlowElement> orig) {
+        
+        Set<String> uniqueIds = new HashSet<String>();
+        List<FlowElement> unique = new ArrayList<FlowElement>();
+        
+        for (FlowElement fElement : orig) {
+            if (!uniqueIds.contains(fElement.getId())) {
+                uniqueIds.add(fElement.getId());
+                unique.add(fElement);
+            }
+        }
+        System.out.println("Size of flow elements after removing duplicates " + unique.size());
+        return unique;
+    }
+    
+    public static ReleaseId createKJarWithMultipleResources(String id, String[] resourceFiles, ResourceType[] types) throws IOException {
+        KieServices ks = KieServices.Factory.get();
+        KieModuleModel kproj = ks.newKieModuleModel();
+        KieFileSystem kfs = ks.newKieFileSystem();
+
+        for (int i = 0; i < resourceFiles.length; i++) {            
+            Resource resource = ResourceFactory.newClassPathResource(resourceFiles[i]);
+            String res = readResourceContent(resource);
+            String type = types[i].getDefaultExtension();
+
+            kfs.write("src/main/resources/" + id.replaceAll("\\.", "/")
+                    + "/org/test/res" + i + "." + type, res);
+        }
+
+        KieBaseModel kBase1 = kproj.newKieBaseModel(id)
+                .setEqualsBehavior(EqualityBehaviorOption.EQUALITY)
+                .setEventProcessingMode(EventProcessingOption.STREAM);
+
+        KieSessionModel ksession1 = kBase1
+                .newKieSessionModel(id + ".KSession1")
+                .setType(KieSessionModel.KieSessionType.STATEFUL)
+                .setClockType(ClockTypeOption.get("pseudo"));
+
+        kfs.writeKModuleXML(kproj.toXML());
+
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        assertTrue(kieBuilder.getResults().getMessages().isEmpty());
+
+        KieModule kieModule = kieBuilder.getKieModule();
+        return kieModule.getReleaseId();
+    }
+    
+    protected static String readResourceContent(Resource resource) {
+        StringBuilder contents = new StringBuilder();
+        BufferedReader reader = null;
+ 
+        try {
+            reader = new BufferedReader(resource.getReader());
+            String text = null;
+ 
+            // repeat until all lines is read
+            while ((text = reader.readLine()) != null) {
+                contents.append(text);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return contents.toString();
+    }
+}
