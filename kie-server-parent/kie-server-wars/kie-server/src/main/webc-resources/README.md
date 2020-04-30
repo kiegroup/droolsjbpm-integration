@@ -40,6 +40,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     
     As a next step, configure a pooling data source, that relies on XA data source for creating new connections. 
     In the example, this data source is named “poolingXaDs”.
+    This can be created in either the TOMCAT_HOME/conf/server.xml file (in which case the database will be visible to all applications running in the Tomcat instance) or in the TOMCAT_HOME/conf/context.xml file.
     
     Edit TOMCAT_HOME/conf/server.xml and add following within GlobalNamingResources tags of the file (e.g. after the UserDatabase Resource definition):
     ```
@@ -77,7 +78,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     ```
   Note: some of the properties might not be applicable for your DB server, consult your JDBC driver documentation to find out which properties should be set.
 
-  Edit TOMCAT_HOME/conf/context.xml and add following within Context tags of the file:
+  Edit TOMCAT_HOME/conf/context.xml and add following within Context tags of the file (if you choose not to edit the server.xml file then replace the <ResourceLink> element with the <Resource> element shown above):
   ```
    <ResourceLink name="xads"
     	global="xads"
@@ -150,4 +151,4 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
 
     BasicXARecovery supports following parameters:
      - path to the properties file
-     - the number of connections defined in the properties file; this doesn't work until the fix for https://issues.jboss.org/browse/JBTM-3170 is incorporated into the release
+     - the number of connections defined in the properties file
