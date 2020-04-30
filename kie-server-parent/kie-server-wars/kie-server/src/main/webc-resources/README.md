@@ -40,7 +40,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     
     As a next step, configure a pooling data source, that relies on XA data source for creating new connections. 
     In the example, this data source is named “poolingXaDs”.
-    This can be created in either the TOMCAT_HOME/conf/server.xml file (in which case the database will be visible to all applications running in the Tomcat instance) or in the TOMCAT_HOME/conf/context.xml
+    This can be created in either the TOMCAT_HOME/conf/server.xml file (in which case the database will be visible to all applications running in the Tomcat instance) or in the TOMCAT_HOME/conf/context.xml file.
     
     Edit TOMCAT_HOME/conf/server.xml and add following within GlobalNamingResources tags of the file (e.g. after the UserDatabase Resource definition):
     ```
