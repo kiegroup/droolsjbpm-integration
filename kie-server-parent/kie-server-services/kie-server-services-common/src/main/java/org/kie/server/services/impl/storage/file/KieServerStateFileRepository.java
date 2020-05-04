@@ -32,7 +32,7 @@ import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.KieServerStateRepositoryUtils;
-import org.kie.soup.commons.xstream.XStreamUtils;
+import org.kie.soup.xstream.XStreamUtils;
 
 public class KieServerStateFileRepository implements KieServerStateRepository {
 

@@ -77,7 +77,7 @@ import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConvert
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.soup.commons.xstream.XStreamUtils.createNonTrustingXStream;
+import static org.kie.soup.xstream.XStreamUtils.createNonTrustingXStream;
 
 public class XStreamMarshaller implements Marshaller {
 
