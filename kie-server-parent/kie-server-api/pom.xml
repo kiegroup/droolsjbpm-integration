@@ -53,7 +53,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.soup</groupId>
-      <artifactId>kie-soup-commons</artifactId>
+      <artifactId>kie-soup-xstream</artifactId>
     </dependency>
 
     <!-- we need to find a way to remove the following 2 dependencies from this jar -->
