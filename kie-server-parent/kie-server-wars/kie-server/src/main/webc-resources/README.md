@@ -144,11 +144,11 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     Append to CATALINA_OPTS in setenv.sh|bat file following:
     
     - setenv.sh:
-    -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery\;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml
+    -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery\;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml\ \;1
     
     - setenv.bat:
-    -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml"
+    -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml" ";1
 
     BasicXARecovery supports following parameters:
      - path to the properties file
-     - the number of connections defined in the properties file
+     - the number of connections defined in the properties file (in this case 1)
