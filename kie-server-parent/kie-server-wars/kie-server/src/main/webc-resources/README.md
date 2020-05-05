@@ -6,29 +6,32 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
  2. Copy following libraries into TOMCAT_HOME/lib
    - javax.security.jacc:javax.security.jacc-api
    - org.kie:kie-tomcat-integration
-   - org.slf4j:artifactId=slf4j-api
-   - org.slf4j:artifactId=slf4j-jdk14
+   - org.slf4j:slf4j-api
+   - org.slf4j:slf4j-jdk14
    - org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec
    - org.jboss.integration:narayana-tomcat
    - org.jboss.narayana.jta:narayana-jta
    - org.jboss:jboss-transaction-spi
+   - org.jboss.logging:jboss-logging
 
- versions of these libraries will depend on the release, so best to check what versions are shipped with KIE
+ versions of these libraries will depend on the release, so best to check what versions are shipped with KIE. The parent POM containing the versions is located at https://github.com/kiegroup/droolsjbpm-build-bootstrap/blob/master/pom.xml - just select the appropriate branch for the version you're using
 
  3. Copy JDBC driver lib into TOMCAT_HOME/lib depending on the data base of your choice, as example H2 is used
 
  4. Configure users and roles in tomcat-users.xml (or different user repository if applicable)
- <tomcat-users>
-   <role rolename="admin"/>
-   <role rolename="PM"/>
-   <role rolename="HR"/>
-   <role rolename="analyst"/>
-   <role rolename="user"/>
-   <role rolename="kie-server"/>
+ ```
+    <tomcat-users>
+      <role rolename="admin"/>
+      <role rolename="PM"/>
+      <role rolename="HR"/>
+      <role rolename="analyst"/>
+      <role rolename="user"/>
+      <role rolename="kie-server"/>
 
-   <user username="testuser" password="testpwd" roles="admin,analyst,PM,HR,kie-server"/>
-   <user username="kieserver" password="kieserver1!" roles="kie-server"/>
- </tomcat-users>
+      <user username="testuser" password="testpwd" roles="admin,analyst,PM,HR,kie-server"/>
+      <user username="kieserver" password="kieserver1!" roles="kie-server"/>
+    </tomcat-users>
+```
 
  5. Configure data source for data base access by jBPM extension of KIE Server
            
@@ -37,39 +40,31 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     
     As a next step, configure a pooling data source, that relies on XA data source for creating new connections. 
     In the example, this data source is named “poolingXaDs”.
+    This can be created in either the TOMCAT_HOME/conf/server.xml file (in which case the database will be visible to all applications running in the Tomcat instance) or in the TOMCAT_HOME/conf/context.xml file.
     
-    Edit TOMCAT_HOME/conf/context.xml and add following within Context tags of the file:
-    ``` 
-    <Resource 
+    Edit TOMCAT_HOME/conf/server.xml and add following within GlobalNamingResources tags of the file (e.g. after the UserDatabase Resource definition):
+    ```
+	<Resource 
         auth="Container" 
-        databaseName="${datasource.dbName}" 
         description="XA Data Source" 
-        factory="org.apache.tomcat.jdbc.naming.GenericNamingResourcesFactory" loginTimeout="0" 
+        factory="org.apache.tomcat.jdbc.naming.GenericNamingResourcesFactory"
+		loginTimeout="0" 
         name="xads"
         uniqueName="xads" 
-        portNumber="${datasource.port}"
-        serverName="${datasource.hostname}" 
         testOnBorrow="false" 
+        driverType="4"
+
+        serverName="${datasource.hostname}" 
+        portNumber="${datasource.port}"
+        databaseName="${datasource.dbName}" 
         type="${datasource.class}" 
         url="${datasource.url}" 
         URL="${datasource.url}"
         user="${datasource.username}"
         password="${datasource.password}" 
-        driverType="4"
         schema="${datasource.schema}"
     />
-    
-    <Resource 
-        name="poolingXaDs"
-        uniqueName="poolingXaDs"
-        auth="Container" 
-        description="Pooling XA Data Source" factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory" testOnBorrow="true" 
-        transactionManager="TransactionManager" transactionSynchronizationRegistry="TransactionSynchronizationRegistry" type="javax.sql.XADataSource" 
-        username="${datasource.username}" 
-        password="${datasource.password}"
-        xaDataSource="xads"
-    />
-    ```
+	```
     Where:
     ```
     datasource.class - XADataSource class of JDBC driver
@@ -82,6 +77,24 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     datasource.schema - Database schema
     ```
   Note: some of the properties might not be applicable for your DB server, consult your JDBC driver documentation to find out which properties should be set.
+
+  Edit TOMCAT_HOME/conf/context.xml and add following within Context tags of the file (if you choose not to edit the server.xml file then replace the <ResourceLink> element with the <Resource> element shown above):
+  ```
+   <ResourceLink name="xads"
+    	global="xads"
+    	type="javax.sql.XADataSource"/>
+
+   <Resource 
+        name="poolingXaDs"
+        uniqueName="poolingXaDs"
+        auth="Container" 
+        description="Pooling XA Data Source" factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory" testOnBorrow="true" 
+        transactionManager="TransactionManager" transactionSynchronizationRegistry="TransactionSynchronizationRegistry" type="javax.sql.XADataSource" 
+        username="${datasource.username}" 
+        password="${datasource.password}"
+        xaDataSource="xads"
+    />
+  ```
     
   The data source is now available under java:comp/env/poolingXaDs JNDI name.
     
@@ -114,17 +127,20 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
 
  8. Configure XA Recovery
 
-    Create xa recovery file next to the context.xml with data base configuration with following content:
+    Create an xa recovery file next to the context.xml called for example xa-recovery-properties.xml with data base configuration with following content:
 
+```
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
     <properties>
         <entry key="DB_1_DatabaseUser">sa</entry>
         <entry key="DB_1_DatabasePassword">sa</entry>
         <entry key="DB_1_DatabaseDynamicClass"></entry>
-        <entry key="DB_1_DatabaseURL">java:comp/env/h2DataSource</entry>
+        <entry key="DB_1_DatabaseURL">java:xads</entry>
     </properties>
+```
 
+    This causes the recovery process to utilise the underlying data source defined in the GlobalNamingResources section of the server.xml file.
     Append to CATALINA_OPTS in setenv.sh|bat file following:
     
     - setenv.sh:
@@ -133,7 +149,6 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     - setenv.bat:
     -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml" ";1
 
-
     BasicXARecovery supports following parameters:
      - path to the properties file
-     - the number of connections defined in the properties file
+     - the number of connections defined in the properties file (in this case 1)
