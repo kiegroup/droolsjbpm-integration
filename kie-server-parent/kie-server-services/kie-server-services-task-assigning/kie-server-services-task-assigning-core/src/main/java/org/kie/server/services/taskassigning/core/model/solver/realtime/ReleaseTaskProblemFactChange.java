@@ -24,7 +24,7 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 
 import static org.kie.server.services.taskassigning.core.model.Task.PREVIOUS_TASK_OR_USER;
 
-public class ReleaseTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class ReleaseTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private Task task;
 
@@ -37,7 +37,7 @@ public class ReleaseTaskProblemFactChange implements ProblemFactChange<TaskAssig
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         Task workingTask = scoreDirector.lookUpWorkingObjectOrReturnNull(task);
         if (workingTask == null || workingTask.getPreviousTaskOrUser() == null) {
             // The task could have been removed in the middle by a previous change

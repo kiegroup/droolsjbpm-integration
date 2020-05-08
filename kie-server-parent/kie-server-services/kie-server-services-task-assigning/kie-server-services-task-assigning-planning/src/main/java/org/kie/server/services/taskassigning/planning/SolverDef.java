@@ -16,6 +16,8 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import org.kie.server.services.taskassigning.core.model.SolutionFactory;
+
 public class SolverDef {
 
     private String containerId;
@@ -24,6 +26,8 @@ public class SolverDef {
     private String version;
 
     private String solverConfigResource;
+    private String solutionFactoryName;
+    private SolutionFactory solutionFactory;
 
     public SolverDef(String solverConfigResource) {
         this.solverConfigResource = solverConfigResource;
@@ -33,12 +37,14 @@ public class SolverDef {
                      String groupId,
                      String artifactId,
                      String version,
-                     String solverConfigResource) {
+                     String solverConfigResource,
+                     String solutionFactoryName) {
         this.containerId = containerId;
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
         this.solverConfigResource = solverConfigResource;
+        this.solutionFactoryName = solutionFactoryName;
     }
 
     public String getContainerId() {
@@ -59,5 +65,17 @@ public class SolverDef {
 
     public String getSolverConfigResource() {
         return solverConfigResource;
+    }
+
+    public String getSolutionFactoryName() {
+        return solutionFactoryName;
+    }
+
+    public SolutionFactory getSolutionFactory() {
+        return solutionFactory;
+    }
+
+    public void setSolutionFactory(SolutionFactory solutionFactory) {
+        this.solutionFactory = solutionFactory;
     }
 }

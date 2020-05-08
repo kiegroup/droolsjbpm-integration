@@ -8,7 +8,7 @@
 
 <solver>
 
-  <solutionClass>org.kie.server.services.taskassigning.core.model.TaskAssigningSolution</solutionClass>
+  <solutionClass>org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution</solutionClass>
   <entityClass>org.kie.server.services.taskassigning.core.model.TaskOrUser</entityClass>
   <entityClass>org.kie.server.services.taskassigning.core.model.Task</entityClass>
 

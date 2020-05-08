@@ -85,7 +85,7 @@ public class RemoveTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
         removeTaskProblemFactChange(readTaskAssigningSolution(solutionResource), taskIds);
     }
 
-    private void removeTaskProblemFactChange(TaskAssigningSolution solution, List<Long> taskIds) throws Exception {
+    private void removeTaskProblemFactChange(TaskAssigningSolution<?> solution, List<Long> taskIds) throws Exception {
         List<ProgrammedProblemFactChange<RemoveTaskProblemFactChange>> programmedChanges = taskIds.stream()
                 .map(id -> findTaskOrCreate(solution, id))
                 .map(task -> new ProgrammedProblemFactChange<>(new RemoveTaskProblemFactChange(task)))
@@ -96,12 +96,12 @@ public class RemoveTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
         programmedChanges.forEach(change -> assertRemoveTaskProblemFactChangeWasProduced(change.getChange(), change.getSolutionAfterChange()));
 
         //finally the last solution must have the result of all the changes.
-        TaskAssigningSolution lastSolution = programmedChanges.get(programmedChanges.size() - 1).getSolutionAfterChange();
+        TaskAssigningSolution<?> lastSolution = programmedChanges.get(programmedChanges.size() - 1).getSolutionAfterChange();
         programmedChanges.forEach(change -> assertRemoveTaskProblemFactChangeWasProduced(change.getChange(), lastSolution));
     }
 
     private void removeTaskProblemFactChangeRandomSet(String solutionResource) throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
+        TaskAssigningSolution<?> solution = readTaskAssigningSolution(solutionResource);
         int taskCount = solution.getTaskList().size();
         int randomChanges = taskCount / 2 + random.nextInt(taskCount / 2);
         List<Long> taskIds = new ArrayList<>();
@@ -117,11 +117,11 @@ public class RemoveTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
      * @param change The change that was executed for producing the solution.
      * @param solution The produced solution.
      */
-    private void assertRemoveTaskProblemFactChangeWasProduced(RemoveTaskProblemFactChange change, TaskAssigningSolution solution) {
+    private void assertRemoveTaskProblemFactChangeWasProduced(RemoveTaskProblemFactChange change, TaskAssigningSolution<?> solution) {
         assertFalse(solution.getTaskList().stream().anyMatch(task -> Objects.equals(change.getTask().getId(), task.getId())));
     }
 
-    private static Task findTaskOrCreate(TaskAssigningSolution solution, long id) {
+    private static Task findTaskOrCreate(TaskAssigningSolution<?> solution, long id) {
         return solution.getTaskList().stream()
                 .filter(task -> Objects.equals(task.getId(), id))
                 .findFirst().orElse(new Task(id, "NonExisting_" + id, 1));

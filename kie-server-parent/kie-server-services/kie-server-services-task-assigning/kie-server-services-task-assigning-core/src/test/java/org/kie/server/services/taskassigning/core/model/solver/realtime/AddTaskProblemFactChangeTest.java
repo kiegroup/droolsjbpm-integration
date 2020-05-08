@@ -86,7 +86,7 @@ public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest 
 
     @Test
     public void addTaskProblemFactChangeTaskAlreadyExists() throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
+        TaskAssigningSolution<?> solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
         long taskId = 20; //randomly selected task.
         Task task = new Task(taskId, null, 1);
         Assertions.assertThatThrownBy(() -> executeSequentialChanges(solution,
@@ -95,7 +95,7 @@ public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest 
     }
 
     private void addTaskProblemFactChangeRandomSet(String solutionResource) throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
+        TaskAssigningSolution<?> solution = readTaskAssigningSolution(solutionResource);
         int taskCount = solution.getTaskList().size();
         int randomChanges = taskCount / 2 + random.nextInt(taskCount / 2);
         List<Long> taskIds = new ArrayList<>();
@@ -105,7 +105,7 @@ public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest 
         addTaskProblemFactChange(solution, taskIds);
     }
 
-    private void addTaskProblemFactChange(TaskAssigningSolution solution, List<Long> taskIds) throws Exception {
+    private void addTaskProblemFactChange(TaskAssigningSolution<?> solution, List<Long> taskIds) throws Exception {
         solution.getUserList().add(PLANNING_USER);
         List<ProgrammedProblemFactChange<AddTaskProblemFactChange>> programmedChanges = taskIds.stream()
                 .map(id -> new ProgrammedProblemFactChange<>(new AddTaskProblemFactChange(new Task(id, "NewTask_" + id, 1))))
@@ -116,7 +116,7 @@ public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest 
         programmedChanges.forEach(change -> assertAddTaskProblemFactChangeWasProduced(change.getChange(), change.getSolutionAfterChange()));
 
         //finally the last solution must have the result of all the changes.
-        TaskAssigningSolution lastSolution = programmedChanges.get(programmedChanges.size() - 1).getSolutionAfterChange();
+        TaskAssigningSolution<?> lastSolution = programmedChanges.get(programmedChanges.size() - 1).getSolutionAfterChange();
         programmedChanges.forEach(change -> assertAddTaskProblemFactChangeWasProduced(change.getChange(), lastSolution));
     }
 
@@ -124,7 +124,7 @@ public class AddTaskProblemFactChangeTest extends AbstractProblemFactChangeTest 
         addTaskProblemFactChange(readTaskAssigningSolution(solutionResource), taskIds);
     }
 
-    private void assertAddTaskProblemFactChangeWasProduced(AddTaskProblemFactChange change, TaskAssigningSolution solution) {
+    private void assertAddTaskProblemFactChangeWasProduced(AddTaskProblemFactChange change, TaskAssigningSolution<?> solution) {
         assertTrue(solution.getTaskList().stream().anyMatch(task -> Objects.equals(change.getTask().getId(), task.getId())));
     }
 }

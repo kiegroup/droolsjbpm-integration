@@ -28,7 +28,7 @@ import static org.kie.server.services.taskassigning.core.model.Task.PREVIOUS_TAS
  * Implements the removal of a Task from the working solution. If a task with the given identifier not exists it does
  * no action.
  */
-public class RemoveTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class RemoveTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private Task task;
 
@@ -41,8 +41,8 @@ public class RemoveTaskProblemFactChange implements ProblemFactChange<TaskAssign
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
-        TaskAssigningSolution solution = scoreDirector.getWorkingSolution();
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
+        TaskAssigningSolution<?> solution = scoreDirector.getWorkingSolution();
         Task workingTask = scoreDirector.lookUpWorkingObjectOrReturnNull(task);
         if (workingTask != null) {
             TaskOrUser previousTaskOrUser = workingTask.getPreviousTaskOrUser();

@@ -25,7 +25,7 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 
 import static org.kie.server.services.taskassigning.core.model.solver.realtime.ProblemFactChangeUtil.releaseAllTasks;
 
-public class RemoveUserProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class RemoveUserProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private User user;
 
@@ -38,8 +38,8 @@ public class RemoveUserProblemFactChange implements ProblemFactChange<TaskAssign
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
-        final TaskAssigningSolution workingSolution = scoreDirector.getWorkingSolution();
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
+        final TaskAssigningSolution<?> workingSolution = scoreDirector.getWorkingSolution();
         final User workingUser = scoreDirector.lookUpWorkingObjectOrReturnNull(user);
         if (workingUser == null) {
             return;

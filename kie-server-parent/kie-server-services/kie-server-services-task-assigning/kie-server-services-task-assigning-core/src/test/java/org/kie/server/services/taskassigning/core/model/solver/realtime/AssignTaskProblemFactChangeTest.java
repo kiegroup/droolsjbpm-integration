@@ -25,19 +25,19 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Test;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.TaskOrUser;
 import org.kie.server.services.taskassigning.core.model.User;
-import org.junit.Test;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_100TASKS_5USERS_SOLUTION;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_24TASKS_8USERS_SOLUTION;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_500TASKS_20USERS_SOLUTION;
 import static org.kie.server.services.taskassigning.core.TestDataSet.SET_OF_50TASKS_5USERS_SOLUTION;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER;
 
 public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTest {
@@ -48,18 +48,18 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
     private class WorkingSolutionAwareProblemFactChange
             extends AssignTaskProblemFactChange {
 
-        private Consumer<TaskAssigningSolution> solutionBeforeChangesConsumer;
+        private Consumer<TaskAssigningSolution<?>> solutionBeforeChangesConsumer;
 
         WorkingSolutionAwareProblemFactChange(Task task,
                                               User user,
-                                              Consumer<TaskAssigningSolution> solutionBeforeChangesConsumer) {
+                                              Consumer<TaskAssigningSolution<?>> solutionBeforeChangesConsumer) {
             super(task, user);
             this.solutionBeforeChangesConsumer = solutionBeforeChangesConsumer;
         }
 
         @Override
-        public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
-            TaskAssigningSolution solution = scoreDirector.getWorkingSolution();
+        public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
+            TaskAssigningSolution<?> solution = scoreDirector.getWorkingSolution();
             if (solutionBeforeChangesConsumer != null) {
                 solutionBeforeChangesConsumer.accept(solution);
             }
@@ -135,7 +135,7 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
 
     @Test
     public void assignTaskProblemFactChangeUserNotFound() throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
+        TaskAssigningSolution<?> solution = readTaskAssigningSolution(SET_OF_24TASKS_8USERS_SOLUTION.resource());
         Task task = solution.getTaskList().get(0);
         User user = new User(-12345, "Non Existing");
         Assertions.assertThatThrownBy(() -> executeSequentialChanges(solution, Collections.singletonList(new ProgrammedAssignTaskProblemFactChange(task, user))))
@@ -143,7 +143,7 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
     }
 
     private void assignTaskProblemFactChangeFixedChangeSet(String solutionResource) throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
+        TaskAssigningSolution<?> solution = readTaskAssigningSolution(solutionResource);
         solution.getUserList().add(PLANNING_USER);
 
         //prepare the list of changes to program
@@ -229,7 +229,7 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
     }
 
     private void assignTaskProblemFactChangeRandomChangeSet(String solutionResource) throws Exception {
-        TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
+        TaskAssigningSolution<?> solution = readTaskAssigningSolution(solutionResource);
         solution.getUserList().add(PLANNING_USER);
 
         int taskCount = solution.getTaskList().size();
@@ -249,11 +249,11 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
         assignTaskProblemFactChange(solution, solutionResource, RANDOM_TEST, programmedChanges);
     }
 
-    private void assignTaskProblemFactChange(TaskAssigningSolution solution,
+    private void assignTaskProblemFactChange(TaskAssigningSolution<?> solution,
                                              String solutionResource,
                                              String testType,
                                              List<ProgrammedAssignTaskProblemFactChange> programmedChanges) throws Exception {
-        TaskAssigningSolution initialSolution = executeSequentialChanges(solution, programmedChanges);
+        TaskAssigningSolution<?> initialSolution = executeSequentialChanges(solution, programmedChanges);
         if (writeTestFiles()) {
             writeProblemFactChangesTestFiles(initialSolution,
                                              solutionResource,
@@ -270,7 +270,7 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
         }
 
         //finally the last solution must have the result of all the changes.
-        TaskAssigningSolution lastSolution = programmedChanges.get(programmedChanges.size() - 1).getSolutionAfterChange();
+        TaskAssigningSolution<?> lastSolution = programmedChanges.get(programmedChanges.size() - 1).getSolutionAfterChange();
         Map<Long, AssignTaskProblemFactChange> summarizedChanges = new HashMap<>();
         programmedChanges.forEach(change -> {
             //if  task was changed multiple times record only the last change.
@@ -289,7 +289,7 @@ public class AssignTaskProblemFactChangeTest extends AbstractProblemFactChangeTe
      * @param change The change that was executed for producing the solution.
      * @param solution The produced solution.
      */
-    private void assertAssignTaskProblemFactChangeWasProduced(AssignTaskProblemFactChange change, TaskAssigningSolution solution) throws Exception {
+    private void assertAssignTaskProblemFactChangeWasProduced(AssignTaskProblemFactChange change, TaskAssigningSolution<?> solution) throws Exception {
         User internalUser = solution.getUserList().stream()
                 .filter(user -> Objects.equals(user.getId(), change.getUser().getId()))
                 .findFirst().orElseThrow(() -> new Exception("User: " + change.getUser() + " was not found in solution."));

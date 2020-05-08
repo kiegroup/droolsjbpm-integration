@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.kie.server.services.taskassigning.planning.test.model;
+package org.kie.server.services.taskassigning.core.util;
 
 /**
- * Test class for the UserSystemServiceLoaderTest
+ * Testing class for use in the NamedServiceLoaderTest.
  */
-public class UserSystemService1 extends AbstractUserSystemService {
+public class ExampleService2 implements ExampleService {
 
-    public static final String NAME = "UserSystemService1";
+    public static final String NAME = "ExampleService2";
 
-    public UserSystemService1() {
-        super(NAME);
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

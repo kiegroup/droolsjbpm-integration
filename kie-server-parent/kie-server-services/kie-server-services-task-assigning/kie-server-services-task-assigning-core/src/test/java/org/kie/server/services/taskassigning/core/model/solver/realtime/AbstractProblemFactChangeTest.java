@@ -36,9 +36,9 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
 
     final Random random = new Random();
 
-    protected class ProgrammedProblemFactChange<C extends ProblemFactChange<TaskAssigningSolution>> {
+    protected class ProgrammedProblemFactChange<C extends ProblemFactChange<TaskAssigningSolution<?>>> {
 
-        private TaskAssigningSolution solutionAfterChange;
+        private TaskAssigningSolution<?> solutionAfterChange;
 
         private C change;
 
@@ -49,11 +49,11 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
             this.change = change;
         }
 
-        public TaskAssigningSolution getSolutionAfterChange() {
+        public TaskAssigningSolution<?> getSolutionAfterChange() {
             return solutionAfterChange;
         }
 
-        public void setSolutionAfterChange(TaskAssigningSolution solutionAfterChange) {
+        public void setSolutionAfterChange(TaskAssigningSolution<?> solutionAfterChange) {
             this.solutionAfterChange = solutionAfterChange;
         }
 
@@ -66,12 +66,12 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
         }
     }
 
-    protected TaskAssigningSolution executeSequentialChanges(TaskAssigningSolution solution, List<? extends ProgrammedProblemFactChange> changes) throws Exception {
-        Solver<TaskAssigningSolution> solver = createDaemonSolver();
+    protected TaskAssigningSolution<?> executeSequentialChanges(TaskAssigningSolution<?> solution, List<? extends ProgrammedProblemFactChange> changes) throws Exception {
+        Solver<TaskAssigningSolution<?>> solver = createDaemonSolver();
 
         //store the first solution that was produced by the solver for knowing how things looked like at the very
         //beginning before any change was produced.
-        final TaskAssigningSolution[] initialSolution = {null};
+        final TaskAssigningSolution<?>[] initialSolution = {null};
         final AtomicBoolean changesInProgress = new AtomicBoolean(false);
 
         final Semaphore programNextChange = new Semaphore(0);
@@ -138,7 +138,7 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
         return initialSolution[0];
     }
 
-    protected <T extends ProgrammedProblemFactChange> void writeProblemFactChangesTestFiles(TaskAssigningSolution initialSolution,
+    protected <T extends ProgrammedProblemFactChange> void writeProblemFactChangesTestFiles(TaskAssigningSolution<?> initialSolution,
                                                                                             String solutionResource,
                                                                                             String filePrefix,
                                                                                             String testType,

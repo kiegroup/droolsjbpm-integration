@@ -16,28 +16,21 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
-import java.util.List;
+public class DefaultSolutionFactory implements SolutionFactory {
 
-import org.optaplanner.core.api.score.FeasibilityScore;
+    public static final String NAME = "DefaultSolutionFactory";
 
-/**
- * Defines the contract for a solution that can be manged by the task assigning integration.
- */
-public interface TaskAssigningSolution<S extends FeasibilityScore> {
+    public DefaultSolutionFactory() {
+        //SPI constructor.
+    }
 
-    Long getId();
+    @Override
+    public String getName() {
+        return NAME;
+    }
 
-    void setId(Long id);
-
-    List<User> getUserList();
-
-    void setUserList(List<User> userList);
-
-    List<Task> getTaskList();
-
-    void setTaskList(List<Task> taskList);
-
-    S getScore();
-
-    void setScore(S score);
+    @Override
+    public TaskAssigningSolution<?> newSolution() {
+        return new DefaultTaskAssigningSolution();
+    }
 }

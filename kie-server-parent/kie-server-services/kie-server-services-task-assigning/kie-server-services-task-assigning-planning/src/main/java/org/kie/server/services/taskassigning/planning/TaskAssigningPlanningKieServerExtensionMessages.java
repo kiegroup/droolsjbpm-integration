@@ -49,6 +49,9 @@ public class TaskAssigningPlanningKieServerExtensionMessages {
     static final String PLANNER_CONTAINER_NOT_AVAILABLE = "Planner container %s is not available." +
             " " + EXTENSION_WONT_OPERATE_PROPERLY_ERROR_PART;
 
+    static final String PLANNER_SOLVER_SOLUTION_FACTORY_NOT_FOUND = "SolutionFactory %s was not found." +
+            " " + EXTENSION_WONT_OPERATE_PROPERLY_ERROR_PART;
+
     static final String UNDESIRED_EXTENSIONS_RUNNING_ERROR = "It's was detected that the following extensions %s" +
             " are running in current server, but it's not recommended to run them on the same server instance as the " + EXTENSION_NAME + " sever.";
 

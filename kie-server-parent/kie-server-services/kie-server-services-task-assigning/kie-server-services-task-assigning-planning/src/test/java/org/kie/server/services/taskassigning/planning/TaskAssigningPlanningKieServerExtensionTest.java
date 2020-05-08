@@ -38,6 +38,8 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
+import org.kie.server.services.taskassigning.core.model.DefaultSolutionFactory;
+import org.kie.server.services.taskassigning.core.model.SolutionFactory;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.mockito.ArgumentCaptor;
@@ -66,6 +68,7 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_VERSION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_SOLUTION_FACTORY;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID;
@@ -79,6 +82,7 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanni
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.HEALTH_CHECK_IS_ALIVE_MESSAGE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_CONTAINER_NOT_AVAILABLE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_SOLUTION_FACTORY_NOT_FOUND;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.SOLVER_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.UNDESIRED_EXTENSIONS_RUNNING_ERROR;
@@ -119,6 +123,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     private static final String SOLVER_CONTAINER_GROUP_ID = "SOLVER_CONTAINER_GROUP_ID";
     private static final String SOLVER_CONTAINER_ARTIFACT_ID = "SOLVER_CONTAINER_ARTIFACT_ID";
     private static final String SOLVER_CONTAINER_VERSION = "SOLVER_CONTAINER_VERSION";
+    private static final String SOLUTION_FACTORY_NAME = "SOLUTION_FACTORY_NAME";
 
     private static final String USER_SYSTEM_NAME = "USER_SYSTEM_NAME";
     private static final String USER_SYSTEM_CONTAINER_ID = "USER_SYSTEM_CONTAINER_ID";
@@ -167,6 +172,12 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     @Mock
     private TaskAssigningService taskAssigningService;
 
+    @Mock
+    private SolutionFactory solutionFactory;
+
+    @Captor
+    private ArgumentCaptor<SolverDef> solverDefCaptor;
+
     @Before
     public void setUp() {
         internalUserSystemKieContainerClassLoader = getClass().getClassLoader();
@@ -189,6 +200,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         System.clearProperty(TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID);
         System.clearProperty(TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID);
         System.clearProperty(TASK_ASSIGNING_SOLVER_CONTAINER_VERSION);
+        System.clearProperty(TASK_ASSIGNING_SOLVER_SOLUTION_FACTORY);
         System.clearProperty(TASK_ASSIGNING_USER_SYSTEM_NAME);
 
         System.clearProperty(TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID);
@@ -359,6 +371,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         doReturn(solver).when(extension).createSolver(eq(registry), any());
 
         initAndStartServerSuccessful();
+        assertEquals(DefaultSolutionFactory.class, solverDefCaptor.getValue().getSolutionFactory().getClass());
     }
 
     @Test
@@ -381,6 +394,19 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
         initAndStartServerSuccessful();
         verify(extension).registerExtractors(solverContainer);
+        assertEquals(solutionFactory, solverDefCaptor.getValue().getSolutionFactory());
+    }
+
+    @Test
+    public void serverStartedWithSolverContainerExistingButSolverFactoryNotFound() {
+        prepareServerStartWithSolverContainerConfig();
+        doReturn(solver).when(extension).createSolver(eq(registry), any());
+        when(registry.getContainer(SOLVER_CONTAINER_ID)).thenReturn(solverContainer);
+        when(solverContainer.getStatus()).thenReturn(KieContainerStatus.STARTED);
+        doReturn(null).when(extension).lookupSolutionFactory(eq(SOLUTION_FACTORY_NAME), any());
+        extension.init(kieServer, registry);
+        extension.serverStarted();
+        assertKieServerMessageWasAdded(Severity.ERROR, addExtensionMessagePrefix(String.format(PLANNER_SOLVER_SOLUTION_FACTORY_NOT_FOUND, SOLUTION_FACTORY_NAME)), 1, 0, true);
     }
 
     @Test
@@ -536,11 +562,13 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
     private void prepareServerStartWithSolverContainerConfig() {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
+        System.setProperty(TASK_ASSIGNING_SOLVER_SOLUTION_FACTORY, SOLUTION_FACTORY_NAME);
         enableExtension();
         when(solverContainer.getKieContainer()).thenReturn(internalSolverKieContainer);
         when(internalSolverKieContainer.getClassLoader()).thenReturn(internalSolverKieContainerClassLoader);
         prepareSolverContainerProperties();
         doReturn(userSystemService).when(extension).lookupUserSystem(eq(USER_SYSTEM_NAME), any());
+        doReturn(solutionFactory).when(extension).lookupSolutionFactory(eq(SOLUTION_FACTORY_NAME), any());
     }
 
     private void prepareServerStartWithUserSystemContainerConfig() {
@@ -643,6 +671,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         verify(taskAssigningService).setDelegate(any());
         verify(taskAssigningService).setUserSystemService(userSystemService);
         verify(taskAssigningService).start(any(), eq(registry));
+        verify(extension).createSolver(eq(registry), solverDefCaptor.capture());
     }
 
     private void enableExtension() {

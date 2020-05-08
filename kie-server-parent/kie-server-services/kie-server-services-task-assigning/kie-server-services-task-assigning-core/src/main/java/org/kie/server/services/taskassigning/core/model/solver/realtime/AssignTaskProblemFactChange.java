@@ -41,7 +41,7 @@ import static org.kie.server.services.taskassigning.core.model.Task.PREVIOUS_TAS
  * be created and added to the working solution, while if the user is not found it'll be added to the solution
  * or an exception will be thrown depending on the addIfNotExists value.
  */
-public class AssignTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class AssignTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private Task task;
     private User user;
@@ -67,8 +67,8 @@ public class AssignTaskProblemFactChange implements ProblemFactChange<TaskAssign
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
-        TaskAssigningSolution solution = scoreDirector.getWorkingSolution();
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
+        TaskAssigningSolution<?> solution = scoreDirector.getWorkingSolution();
 
         User workingUser = scoreDirector.lookUpWorkingObjectOrReturnNull(user);
         if (workingUser == null) {

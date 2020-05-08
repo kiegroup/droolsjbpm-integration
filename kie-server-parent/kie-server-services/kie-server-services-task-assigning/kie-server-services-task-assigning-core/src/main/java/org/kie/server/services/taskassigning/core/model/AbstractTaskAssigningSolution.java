@@ -16,28 +16,19 @@
 
 package org.kie.server.services.taskassigning.core.model;
 
-import java.util.List;
-
 import org.optaplanner.core.api.score.FeasibilityScore;
 
 /**
- * Defines the contract for a solution that can be manged by the task assigning integration.
+ * Base class for the solution implementations that can be managed by the task assigning integration.
  */
-public interface TaskAssigningSolution<S extends FeasibilityScore> {
+public abstract class AbstractTaskAssigningSolution<S extends FeasibilityScore>
+        extends AbstractPersistable
+        implements TaskAssigningSolution<S> {
 
-    Long getId();
+    protected AbstractTaskAssigningSolution() {
+    }
 
-    void setId(Long id);
-
-    List<User> getUserList();
-
-    void setUserList(List<User> userList);
-
-    List<Task> getTaskList();
-
-    void setTaskList(List<Task> taskList);
-
-    S getScore();
-
-    void setScore(S score);
+    protected AbstractTaskAssigningSolution(long id) {
+        super(id);
+    }
 }

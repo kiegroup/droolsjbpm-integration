@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.OrganizationalEntity;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
@@ -47,31 +48,31 @@ public abstract class AbstractTaskAssigningCoreTest extends AbstractTaskAssignin
 
     protected SolverConfig createBaseConfig() {
         SolverConfig config = new SolverConfig();
-        config.setSolutionClass(TaskAssigningSolution.class);
+        config.setSolutionClass(DefaultTaskAssigningSolution.class);
         config.setEntityClassList(Arrays.asList(TaskOrUser.class, Task.class));
-        config.setScoreDirectorFactoryConfig(new ScoreDirectorFactoryConfig().withScoreDrls("org/kie/server/services/taskassigning/solver/taskAssigningScoreRules.drl"));
+        config.setScoreDirectorFactoryConfig(new ScoreDirectorFactoryConfig().withScoreDrls("org/kie/server/services/taskassigning/solver/taskAssigningDefaultScoreRules.drl"));
         return config;
     }
 
-    protected Solver<TaskAssigningSolution> createDaemonSolver() {
+    protected Solver<TaskAssigningSolution<?>> createDaemonSolver() {
         SolverConfig config = createBaseConfig();
         config.setDaemon(true);
-        SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.create(config);
+        SolverFactory<TaskAssigningSolution<?>> solverFactory = SolverFactory.create(config);
         return solverFactory.buildSolver();
     }
 
-    protected Solver<TaskAssigningSolution> createNonDaemonSolver(int stepCountLimit) {
+    protected Solver<TaskAssigningSolution<?>> createNonDaemonSolver(int stepCountLimit) {
         SolverConfig config = createBaseConfig();
         ConstructionHeuristicPhaseConfig constructionHeuristicPhaseConfig = new ConstructionHeuristicPhaseConfig();
         constructionHeuristicPhaseConfig.setConstructionHeuristicType(ConstructionHeuristicType.FIRST_FIT);
         LocalSearchPhaseConfig phaseConfig = new LocalSearchPhaseConfig();
         phaseConfig.setTerminationConfig(new TerminationConfig().withStepCountLimit(stepCountLimit));
         config.setPhaseConfigList(Arrays.asList(constructionHeuristicPhaseConfig, phaseConfig));
-        SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.create(config);
+        SolverFactory<TaskAssigningSolution<?>> solverFactory = SolverFactory.create(config);
         return solverFactory.buildSolver();
     }
 
-    protected TaskAssigningSolution readTaskAssigningSolution(String resource) throws IOException {
+    protected TaskAssigningSolution<?> readTaskAssigningSolution(String resource) throws IOException {
         int index = resource.lastIndexOf("/");
         String prefix = resource;
         if (index >= 0) {
@@ -80,7 +81,7 @@ public abstract class AbstractTaskAssigningCoreTest extends AbstractTaskAssignin
         File f = File.createTempFile(prefix, null);
         InputStream resourceAsStream = getClass().getResourceAsStream(resource);
         FileUtils.copyInputStreamToFile(resourceAsStream, f);
-        XStreamSolutionFileIO<TaskAssigningSolution> solutionFileIO = new XStreamSolutionFileIO<>(TaskAssigningSolution.class);
+        XStreamSolutionFileIO<DefaultTaskAssigningSolution> solutionFileIO = new XStreamSolutionFileIO<>(DefaultTaskAssigningSolution.class);
         return solutionFileIO.read(f);
     }
 
@@ -93,7 +94,7 @@ public abstract class AbstractTaskAssigningCoreTest extends AbstractTaskAssignin
         appendln(builder);
     }
 
-    public static void printSolution(TaskAssigningSolution solution, StringBuilder builder) {
+    public static void printSolution(TaskAssigningSolution<?> solution, StringBuilder builder) {
         solution.getUserList().forEach(taskOrUser -> {
             appendln(builder, "------------------------------------------");
             appendln(builder, printUser(taskOrUser));
@@ -112,7 +113,7 @@ public abstract class AbstractTaskAssigningCoreTest extends AbstractTaskAssignin
         });
     }
 
-    public static String printSolution(TaskAssigningSolution solution) {
+    public static String printSolution(TaskAssigningSolution<?> solution) {
         StringBuilder builder = new StringBuilder();
         printSolution(solution, builder);
         return builder.toString();

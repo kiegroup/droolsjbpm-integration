@@ -55,7 +55,7 @@ public class SolverBuilder {
         return this;
     }
 
-    public Solver<TaskAssigningSolution> build() {
+    public Solver<TaskAssigningSolution<?>> build() {
         if (isEmpty(solverDef.getContainerId())) {
             return buildFromResource();
         } else {
@@ -63,12 +63,12 @@ public class SolverBuilder {
         }
     }
 
-    private Solver<TaskAssigningSolution> buildFromResource() {
-        SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.createFromXmlResource(solverDef.getSolverConfigResource());
+    private Solver<TaskAssigningSolution<?>> buildFromResource() {
+        SolverFactory<TaskAssigningSolution<?>> solverFactory = SolverFactory.createFromXmlResource(solverDef.getSolverConfigResource());
         return solverFactory.buildSolver();
     }
 
-    private Solver<TaskAssigningSolution> buildFromContainer() {
+    private Solver<TaskAssigningSolution<?>> buildFromContainer() {
         final KieContainerInstanceImpl containerInstance = registry.getContainer(solverDef.getContainerId());
         if (containerInstance == null) {
             throw new SolverBuilderException("Container " + solverDef.getContainerId() + " was not found un current registry." +
@@ -78,7 +78,7 @@ public class SolverBuilder {
             throw new SolverBuilderException("Container " + solverDef.getContainerId() + " must be in " + KieContainerStatus.STARTED +
                                                      " status for creating solvers, but current status is: " + containerInstance.getStatus());
         }
-        final SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.createFromKieContainerXmlResource(containerInstance.getKieContainer(),
+        final SolverFactory<TaskAssigningSolution<?>> solverFactory = SolverFactory.createFromKieContainerXmlResource(containerInstance.getKieContainer(),
                                                                                                                    solverDef.getSolverConfigResource());
         return solverFactory.buildSolver();
     }

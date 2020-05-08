@@ -38,6 +38,7 @@ import org.optaplanner.core.api.solver.event.SolverEventListener;
 import org.optaplanner.core.impl.score.director.ScoreDirectorFactory;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -52,19 +53,19 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
     @Mock
     private KieServerRegistry registry;
 
-    private Solver<TaskAssigningSolution> solver;
+    private Solver<TaskAssigningSolution<?>> solver;
 
     @Mock
     private TaskAssigningSolution solution;
 
     @Mock
-    private SolverEventListener<TaskAssigningSolution> eventListener;
+    private SolverEventListener<TaskAssigningSolution<?>> eventListener;
 
     @Captor
-    private ArgumentCaptor<SolverEventListener<TaskAssigningSolution>> eventListenerCaptor;
+    private ArgumentCaptor<SolverEventListener<TaskAssigningSolution<?>>> eventListenerCaptor;
 
     @Mock
-    private BestSolutionChangedEvent<TaskAssigningSolution> event;
+    private BestSolutionChangedEvent<TaskAssigningSolution<?>> event;
 
     private CountDownLatch startFinished = new CountDownLatch(1);
 
@@ -147,7 +148,7 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
         // wait for the start initialization to finish
         startFinished.await();
 
-        List<ProblemFactChange<TaskAssigningSolution>> changes = Collections.emptyList();
+        List<ProblemFactChange<TaskAssigningSolution<?>>> changes = Collections.emptyList();
         runnableBase.addProblemFactChanges(changes);
         verify(solver).addProblemFactChanges(changes);
 
@@ -158,9 +159,14 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
 
     @Test
     public void addProblemFactChangesWithFailure() {
-        List<ProblemFactChange<TaskAssigningSolution>> changes = Collections.emptyList();
+        List<ProblemFactChange<TaskAssigningSolution<?>>> changes = Collections.emptyList();
         Assertions.assertThatThrownBy(() -> runnableBase.addProblemFactChanges(changes))
                 .hasMessage("SolverExecutor has not been started. Be sure it's started and not stopped or destroyed prior to executing this method");
+    }
+
+    @Test
+    public void getSolverDef() {
+        assertEquals(solverDef, runnableBase.getSolverDef());
     }
 
     @After
@@ -177,17 +183,17 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
 
         public SolverExecutorMock(SolverDef solverDef,
                                   KieServerRegistry registry,
-                                  SolverEventListener<TaskAssigningSolution> eventListener) {
+                                  SolverEventListener<TaskAssigningSolution<?>> eventListener) {
             super(solverDef, registry, eventListener);
         }
 
         @Override
-        protected Solver<TaskAssigningSolution> buildSolver(SolverDef solverDef, KieServerRegistry registry) {
+        protected Solver<TaskAssigningSolution<?>> buildSolver(SolverDef solverDef, KieServerRegistry registry) {
             return solver;
         }
     }
 
-    private class SolverMock implements Solver<TaskAssigningSolution> {
+    private class SolverMock implements Solver<TaskAssigningSolution<?>> {
 
         private final Semaphore finishSolverWork = new Semaphore(0);
         private CompletableFuture action;
@@ -197,7 +203,7 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
         }
 
         @Override
-        public TaskAssigningSolution solve(TaskAssigningSolution problem) {
+        public TaskAssigningSolution solve(TaskAssigningSolution<?> problem) {
             startFinished.countDown();
             action = CompletableFuture.runAsync(() -> {
                 try {
@@ -227,7 +233,7 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
         }
 
         @Override
-        public TaskAssigningSolution getBestSolution() {
+        public TaskAssigningSolution<?> getBestSolution() {
             return null;
         }
 
@@ -257,12 +263,12 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
         }
 
         @Override
-        public boolean addProblemFactChange(ProblemFactChange<TaskAssigningSolution> problemFactChange) {
+        public boolean addProblemFactChange(ProblemFactChange<TaskAssigningSolution<?>> problemFactChange) {
             return false;
         }
 
         @Override
-        public boolean addProblemFactChanges(List<ProblemFactChange<TaskAssigningSolution>> problemFactChanges) {
+        public boolean addProblemFactChanges(List<ProblemFactChange<TaskAssigningSolution<?>>> problemFactChanges) {
             return false;
         }
 
@@ -272,17 +278,17 @@ public class SolverExecutorTest extends RunnableBaseTest<SolverExecutor> {
         }
 
         @Override
-        public void addEventListener(SolverEventListener<TaskAssigningSolution> eventListener) {
+        public void addEventListener(SolverEventListener<TaskAssigningSolution<?>> eventListener) {
 
         }
 
         @Override
-        public void removeEventListener(SolverEventListener<TaskAssigningSolution> eventListener) {
+        public void removeEventListener(SolverEventListener<TaskAssigningSolution<?>> eventListener) {
 
         }
 
         @Override
-        public ScoreDirectorFactory<TaskAssigningSolution> getScoreDirectorFactory() {
+        public ScoreDirectorFactory<TaskAssigningSolution<?>> getScoreDirectorFactory() {
             return null;
         }
     }

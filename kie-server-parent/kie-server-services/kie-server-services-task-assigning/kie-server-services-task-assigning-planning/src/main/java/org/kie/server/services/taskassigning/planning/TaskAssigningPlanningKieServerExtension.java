@@ -40,7 +40,10 @@ import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
+import org.kie.server.services.taskassigning.core.model.DefaultSolutionFactory;
+import org.kie.server.services.taskassigning.core.model.SolutionFactory;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
+import org.kie.server.services.taskassigning.core.util.NamedServiceLoader;
 import org.kie.server.services.taskassigning.planning.data.LabelValueExtractorRegistry;
 import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.optaplanner.core.api.solver.Solver;
@@ -62,6 +65,7 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_VERSION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_SOLUTION_FACTORY;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID;
@@ -75,6 +79,7 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanni
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_CONTAINER_NOT_AVAILABLE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_NOT_CONFIGURED_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_SOLUTION_FACTORY_NOT_FOUND;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.SOLVER_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.UNDESIRED_EXTENSIONS_RUNNING_ERROR;
@@ -274,12 +279,14 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         final String artifactId = readSystemProperty(TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID, null, value -> value);
         final String version = readSystemProperty(TASK_ASSIGNING_SOLVER_CONTAINER_VERSION, null, value -> value);
         final String solverConfigResource = readSystemProperty(TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE, DEFAULT_SOLVER_CONFIG, value -> value);
+        final String solutionFactory = readSystemProperty(TASK_ASSIGNING_SOLVER_SOLUTION_FACTORY, DefaultSolutionFactory.NAME, value -> value);
 
         return new SolverDef(containerId,
                              groupId,
                              artifactId,
                              version,
-                             solverConfigResource);
+                             solverConfigResource,
+                             solutionFactory);
     }
 
     TaskAssigningService createTaskAssigningService() {
@@ -311,6 +318,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
     }
 
     private boolean initSolverRuntime() {
+        ClassLoader classLoader;
         if (!isEmpty(solverDef.getContainerId())) {
             KieContainerResource resource = new KieContainerResource(solverDef.getContainerId(),
                                                                      new ReleaseId(solverDef.getGroupId(),
@@ -324,7 +332,19 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                 return false;
             }
             registerExtractors(container);
+            classLoader = container.getKieContainer().getClassLoader();
+        } else {
+            classLoader = this.getClass().getClassLoader();
         }
+
+        SolutionFactory solutionFactory = lookupSolutionFactory(solverDef.getSolutionFactoryName(), classLoader);
+        if (solutionFactory == null) {
+            final String msg = String.format(PLANNER_SOLVER_SOLUTION_FACTORY_NOT_FOUND, solverDef.getSolutionFactoryName());
+            LOGGER.error(msg);
+            registerMessage(Severity.ERROR, msg);
+            return false;
+        }
+        solverDef.setSolutionFactory(solutionFactory);
 
         try {
             //early check that solver can be properly started.
@@ -338,7 +358,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         return true;
     }
 
-    Solver<TaskAssigningSolution> createSolver(KieServerRegistry registry, SolverDef solverDef) {
+    Solver<TaskAssigningSolution<?>> createSolver(KieServerRegistry registry, SolverDef solverDef) {
         return SolverBuilder.create()
                 .registry(registry)
                 .solverDef(solverDef)
@@ -415,8 +435,11 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
     }
 
     UserSystemService lookupUserSystem(String userSystemName, ClassLoader classLoader) {
-        final Map<String, UserSystemService> userServices = UserSystemServiceLoader.loadServices(classLoader);
-        return userServices.get(userSystemName);
+        return NamedServiceLoader.loadServices(UserSystemService.class, UserSystemService::getName, classLoader).get(userSystemName);
+    }
+
+    SolutionFactory lookupSolutionFactory(String solutionFactoryName, ClassLoader classLoader) {
+        return NamedServiceLoader.loadServices(SolutionFactory.class, SolutionFactory::getName, classLoader).get(solutionFactoryName);
     }
 
     private void initRuntimeClient() {

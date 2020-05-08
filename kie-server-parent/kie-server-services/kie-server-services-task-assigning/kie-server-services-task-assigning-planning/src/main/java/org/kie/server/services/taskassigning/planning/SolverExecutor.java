@@ -43,21 +43,25 @@ public class SolverExecutor extends RunnableBase {
 
     private SolverDef solverDef;
     private KieServerRegistry registry;
-    private Solver<TaskAssigningSolution> solver;
+    private Solver<TaskAssigningSolution<?>> solver;
     private TaskAssigningSolution solution;
-    private SolverEventListener<TaskAssigningSolution> eventListener;
+    private SolverEventListener<TaskAssigningSolution<?>> eventListener;
 
     private final Semaphore startPermit = new Semaphore(0);
 
     public SolverExecutor(final SolverDef solverDef,
                           final KieServerRegistry registry,
-                          final SolverEventListener<TaskAssigningSolution> eventListener) {
+                          final SolverEventListener<TaskAssigningSolution<?>> eventListener) {
         checkNotNull("solverDef", solverDef);
         checkNotNull("registry", registry);
         checkNotNull("eventListener", eventListener);
         this.solverDef = solverDef;
         this.registry = registry;
         this.eventListener = eventListener;
+    }
+
+    public SolverDef getSolverDef() {
+        return solverDef;
     }
 
     /**
@@ -68,7 +72,7 @@ public class SolverExecutor extends RunnableBase {
      * threads might try to start the same solver runner instance.
      * @param solution a valid solution for starting the solver with.
      */
-    public void start(final TaskAssigningSolution solution) {
+    public void start(final TaskAssigningSolution<?> solution) {
         checkNotNull("solution", solution);
         if (!status.compareAndSet(STOPPED, STARTING)) {
             throw new SolverExecutorException("SolverExecutor start method can only be invoked when the status is STOPPED");
@@ -89,7 +93,7 @@ public class SolverExecutor extends RunnableBase {
         startPermit.release();
     }
 
-    protected Solver<TaskAssigningSolution> buildSolver(SolverDef solverDef, KieServerRegistry registry) {
+    protected Solver<TaskAssigningSolution<?>> buildSolver(SolverDef solverDef, KieServerRegistry registry) {
         return SolverBuilder.create()
                 .solverDef(solverDef)
                 .registry(registry)
@@ -141,7 +145,7 @@ public class SolverExecutor extends RunnableBase {
      * call isStarted() method to verify.
      * @param changes a list of problem fact changes to program in current solver.
      */
-    public void addProblemFactChanges(final List<ProblemFactChange<TaskAssigningSolution>> changes) {
+    public void addProblemFactChanges(final List<ProblemFactChange<TaskAssigningSolution<?>>> changes) {
         if (isStarted()) {
             solver.addProblemFactChanges(changes);
         } else {

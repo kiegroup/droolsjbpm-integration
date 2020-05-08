@@ -23,6 +23,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.User;
@@ -35,6 +36,7 @@ import static org.kie.server.services.taskassigning.core.model.TestUtil.mockTask
 import static org.kie.server.services.taskassigning.core.model.TestUtil.mockUser;
 import static org.kie.server.services.taskassigning.core.model.solver.realtime.ProblemFactChangeUtilTest.assertTaskWasReleased;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,9 +54,9 @@ public class RemoveUserProblemFactChangeTest {
     private static final long TASK_ID4 = 4;
 
     @Mock
-    private ScoreDirector<TaskAssigningSolution> scoreDirector;
+    private ScoreDirector<TaskAssigningSolution<?>> scoreDirector;
 
-    private TaskAssigningSolution workingSolution;
+    private TaskAssigningSolution<?> workingSolution;
 
     private RemoveUserProblemFactChange change;
 
@@ -65,13 +67,13 @@ public class RemoveUserProblemFactChangeTest {
     @Before
     public void setUp() {
         user = new User(1, USER_ID_1);
-        workingSolution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
+        workingSolution = new DefaultTaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
         user2 = new User(2, USER_ID_2);
         user3 = new User(3, USER_ID_3);
         workingSolution.getUserList().add(user2);
         workingSolution.getUserList().add(user3);
 
-        when(scoreDirector.getWorkingSolution()).thenReturn(workingSolution);
+        doReturn(workingSolution).when(scoreDirector).getWorkingSolution();
         change = new RemoveUserProblemFactChange(user);
     }
 

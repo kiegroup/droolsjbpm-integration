@@ -68,7 +68,7 @@ public class SolutionChangesBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolutionChangesBuilder.class);
 
-    private TaskAssigningSolution solution;
+    private TaskAssigningSolution<?> solution;
 
     private List<TaskData> taskDataList;
 
@@ -113,7 +113,7 @@ public class SolutionChangesBuilder {
         return this;
     }
 
-    public List<ProblemFactChange<TaskAssigningSolution>> build() {
+    public List<ProblemFactChange<TaskAssigningSolution<?>>> build() {
         final Map<Long, Task> taskById = solution.getTaskList()
                 .stream()
                 .filter(IS_NOT_DUMMY)
@@ -130,7 +130,7 @@ public class SolutionChangesBuilder {
         final List<TaskPropertyChangeProblemFactChange> propertyChanges = new ArrayList<>();
         final Map<String, List<IndexedElement<AssignTaskProblemFactChange>>> changesByUserId = new HashMap<>();
         final List<AddUserProblemFactChange> newUserChanges = new ArrayList<>();
-        final List<ProblemFactChange<TaskAssigningSolution>> userUpdateChanges = new ArrayList<>();
+        final List<ProblemFactChange<TaskAssigningSolution<?>>> userUpdateChanges = new ArrayList<>();
         final List<RemoveUserProblemFactChange> removableUserChanges = new ArrayList<>();
 
         final List<TaskData> filteredTaskDataList = taskDataList.stream()
@@ -157,7 +157,7 @@ public class SolutionChangesBuilder {
             addRemovableUserChanges(changesByUserId, removableUserChanges);
         }
 
-        List<ProblemFactChange<TaskAssigningSolution>> totalChanges = new ArrayList<>();
+        List<ProblemFactChange<TaskAssigningSolution<?>>> totalChanges = new ArrayList<>();
         totalChanges.addAll(newUserChanges);
         totalChanges.addAll(removedTaskChanges);
         totalChanges.addAll(releasedTasksChanges);
@@ -301,7 +301,7 @@ public class SolutionChangesBuilder {
 
     private void addUserChanges(final Map<String, User> usersById,
                                 final List<AddUserProblemFactChange> newUserChanges,
-                                final List<ProblemFactChange<TaskAssigningSolution>> updateUserChanges) {
+                                final List<ProblemFactChange<TaskAssigningSolution<?>>> updateUserChanges) {
         final Set<String> updatedUserIds = new HashSet<>();
         filterDuplicates(externalUserList)
                 .filter(externalUser -> !IS_PLANNING_USER.test(externalUser.getId()))
@@ -377,7 +377,7 @@ public class SolutionChangesBuilder {
      * and will be removed as soon it's fixed. Note that workaround doesn't have a huge impact on the solution since
      * the dummy task is added only once and to the planning user.
      */
-    private void applyWorkaroundForPLANNER241(TaskAssigningSolution solution, List<ProblemFactChange<TaskAssigningSolution>> changes) {
+    private void applyWorkaroundForPLANNER241(TaskAssigningSolution<?> solution, List<ProblemFactChange<TaskAssigningSolution<?>>> changes) {
         boolean hasDummyTask241 = solution.getTaskList().stream().anyMatch(task -> DUMMY_TASK_PLANNER_241.getId().equals(task.getId()));
         if (!hasDummyTask241) {
             changes.add(new AssignTaskProblemFactChange(DUMMY_TASK_PLANNER_241, PLANNING_USER));

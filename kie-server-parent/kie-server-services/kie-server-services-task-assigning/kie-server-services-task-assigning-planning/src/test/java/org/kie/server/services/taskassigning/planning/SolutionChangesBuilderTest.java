@@ -35,6 +35,7 @@ import org.kie.api.task.model.Status;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.services.taskassigning.core.model.DefaultLabels;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.Group;
 import org.kie.server.services.taskassigning.core.model.ModelConstants;
 import org.kie.server.services.taskassigning.core.model.Task;
@@ -108,7 +109,7 @@ public class SolutionChangesBuilderTest {
     private UserSystemService userSystemService;
 
     @Mock
-    private ScoreDirector<TaskAssigningSolution> scoreDirector;
+    private ScoreDirector<TaskAssigningSolution<?>> scoreDirector;
 
     private SolverHandlerContext context;
 
@@ -123,7 +124,7 @@ public class SolutionChangesBuilderTest {
         List<TaskData> taskDataList = mockTaskDataList(taskData);
         TaskAssigningSolution solution = mockSolution(Collections.emptyList(), Collections.emptyList());
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(taskDataList)
                 .withUserSystem(userSystemService)
@@ -188,7 +189,7 @@ public class SolutionChangesBuilderTest {
         task.setStatus(convertToString(Reserved));
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(task), Collections.emptyList());
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(mockTaskDataList(taskData))
                 .withUserSystem(userSystemService)
@@ -317,7 +318,7 @@ public class SolutionChangesBuilderTest {
 
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(task), Collections.singletonList(actualOwner));
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(mockTaskDataList(taskData))
                 .withUserSystem(userSystemService)
@@ -374,7 +375,7 @@ public class SolutionChangesBuilderTest {
 
         taskDataList.forEach(taskData -> context.setTaskChangeTime(taskData.getTaskId(), taskData.getLastModificationDate()));
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(taskDataList)
                 .withUserSystem(userSystemService)
@@ -397,7 +398,7 @@ public class SolutionChangesBuilderTest {
                                                                                                                  newExternalUserRepeated2);
         TaskAssigningSolution solution = mockSolution(Collections.emptyList(), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(Collections.emptyList())
                 .withUserSystem(userSystemService)
@@ -451,7 +452,7 @@ public class SolutionChangesBuilderTest {
         List<org.kie.server.services.taskassigning.user.system.api.User> externalUserList = Collections.emptyList();
         TaskAssigningSolution solution = mockSolution(Collections.emptyList(), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(Collections.emptyList())
                 .withUserSystem(userSystemService)
@@ -470,7 +471,7 @@ public class SolutionChangesBuilderTest {
         userList.get(0).setEnabled(false);
         TaskAssigningSolution solution = mockSolution(Collections.emptyList(), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(Collections.emptyList())
                 .withUserSystem(userSystemService)
@@ -494,7 +495,7 @@ public class SolutionChangesBuilderTest {
         List<User> userList = mockUserList(user);
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(nonPinnedTask), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(Collections.emptyList())
                 .withUserSystem(userSystemService)
@@ -518,7 +519,7 @@ public class SolutionChangesBuilderTest {
         List<User> userList = mockUserList(user);
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(pinnedTask), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(Collections.emptyList())
                 .withUserSystem(userSystemService)
@@ -562,7 +563,7 @@ public class SolutionChangesBuilderTest {
                                                                                                                  newExternalUserRepeated2);
         TaskAssigningSolution solution = mockSolution(Collections.emptyList(), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(Collections.emptyList())
                 .withUserSystem(userSystemService)
@@ -599,7 +600,7 @@ public class SolutionChangesBuilderTest {
 
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(task), Collections.singletonList(actualOwner));
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(mockTaskDataList(taskData))
                 .withUserSystem(userSystemService)
@@ -636,7 +637,7 @@ public class SolutionChangesBuilderTest {
 
     private void addNewReservedOrInProgressOrSuspendedTaskChangeWithActualOwner(TaskAssigningSolution solution, TaskData taskData) {
         List<TaskData> taskDataList = mockTaskDataList(taskData);
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(taskDataList)
                 .withUserSystem(userSystemService)
@@ -655,7 +656,7 @@ public class SolutionChangesBuilderTest {
 
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(task), Collections.emptyList());
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(mockTaskDataList(taskData))
                 .withUserSystem(userSystemService)
@@ -686,7 +687,7 @@ public class SolutionChangesBuilderTest {
 
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(task), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(mockTaskDataList(taskData))
                 .withUserSystem(userSystemService)
@@ -729,7 +730,7 @@ public class SolutionChangesBuilderTest {
 
         TaskAssigningSolution solution = mockSolution(Collections.singletonList(task), userList);
 
-        List<ProblemFactChange<TaskAssigningSolution>> result = SolutionChangesBuilder.create()
+        List<ProblemFactChange<TaskAssigningSolution<?>>> result = SolutionChangesBuilder.create()
                 .withSolution(solution)
                 .withTasks(mockTaskDataList(taskData))
                 .withUserSystem(userSystemService)
@@ -754,66 +755,66 @@ public class SolutionChangesBuilderTest {
         verify(userSystemService).findUser(ACTUAL_OWNER_ENTITY_ID);
     }
 
-    private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, AddTaskProblemFactChange expected) {
+    private void assertChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, AddTaskProblemFactChange expected) {
         AddTaskProblemFactChange change = (AddTaskProblemFactChange) result.get(index);
         assertTaskEquals(expected.getTask(), change.getTask());
     }
 
-    private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, AssignTaskProblemFactChange expected) {
+    private void assertChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, AssignTaskProblemFactChange expected) {
         AssignTaskProblemFactChange change = (AssignTaskProblemFactChange) result.get(index);
         assertTaskEquals(expected.getTask(), change.getTask());
         assertUserEquals(expected.getUser(), change.getUser());
     }
 
-    private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, ReleaseTaskProblemFactChange expected) {
+    private void assertChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, ReleaseTaskProblemFactChange expected) {
         ReleaseTaskProblemFactChange change = (ReleaseTaskProblemFactChange) result.get(index);
         assertTaskEquals(expected.getTask(), change.getTask());
     }
 
-    private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, RemoveTaskProblemFactChange expected) {
+    private void assertChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, RemoveTaskProblemFactChange expected) {
         RemoveTaskProblemFactChange change = (RemoveTaskProblemFactChange) result.get(index);
         assertTaskEquals(expected.getTask(), change.getTask());
     }
 
-    private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, DisableUserProblemFactChange expected) {
+    private void assertChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, DisableUserProblemFactChange expected) {
         DisableUserProblemFactChange change = (DisableUserProblemFactChange) result.get(index);
         assertUserEquals(expected.getUser(), change.getUser());
     }
 
-    private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, RemoveUserProblemFactChange expected) {
+    private void assertChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, RemoveUserProblemFactChange expected) {
         RemoveUserProblemFactChange change = (RemoveUserProblemFactChange) result.get(index);
         assertUserEquals(expected.getUser(), change.getUser());
     }
 
-    private void assertOneChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, AddUserProblemFactChange expected) {
+    private void assertOneChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, AddUserProblemFactChange expected) {
         AddUserProblemFactChange change = (AddUserProblemFactChange) result.get(index);
         assertUserEquals(expected.getUser(), change.getUser());
         assertEquals(1, result.stream().filter(calculated -> calculated instanceof AddUserProblemFactChange).count());
     }
 
-    private void assertOneChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, UserPropertyChangeProblemFactChange expected) {
+    private void assertOneChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, UserPropertyChangeProblemFactChange expected) {
         UserPropertyChangeProblemFactChange change = (UserPropertyChangeProblemFactChange) result.get(index);
         assertUserEquals(expected.getUser(), change.getUser());
         assertEquals(1, result.stream().filter(calculated -> calculated instanceof UserPropertyChangeProblemFactChange).count());
     }
 
-    private <T> void assertNoChange(List<ProblemFactChange<TaskAssigningSolution>> result, Class<T> notExpected) {
+    private <T> void assertNoChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, Class<T> notExpected) {
         assertFalse(result.stream().anyMatch(change -> notExpected.equals(change.getClass())));
     }
 
-    private void assertChangeIsTheChangeSetId(List<ProblemFactChange<TaskAssigningSolution>> result, int index) {
+    private void assertChangeIsTheChangeSetId(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index) {
         long currentChangeSetId = context.getCurrentChangeSetId();
         result.get(index).doChange(scoreDirector);
         assertEquals(currentChangeSetId + 1, context.getCurrentChangeSetId(), index);
     }
 
-    private void assertChangeIsTheDummyTaskAssigned(List<ProblemFactChange<TaskAssigningSolution>> result, Task dummyTask, int index) {
+    private void assertChangeIsTheDummyTaskAssigned(List<ProblemFactChange<TaskAssigningSolution<?>>> result, Task dummyTask, int index) {
         assertTrue(result.get(index) instanceof AssignTaskProblemFactChange);
         AssignTaskProblemFactChange change = (AssignTaskProblemFactChange) result.get(index);
         assertEquals(dummyTask, change.getTask());
     }
 
-    private void assertChange(List<ProblemFactChange<TaskAssigningSolution>> result, int index, TaskPropertyChangeProblemFactChange expected) {
+    private void assertChange(List<ProblemFactChange<TaskAssigningSolution<?>>> result, int index, TaskPropertyChangeProblemFactChange expected) {
         TaskPropertyChangeProblemFactChange change = (TaskPropertyChangeProblemFactChange) result.get(index);
         assertTaskEquals(expected.getTask(), change.getTask());
         if (expected.getStatus() != null) {
@@ -888,7 +889,7 @@ public class SolutionChangesBuilderTest {
     }
 
     private TaskAssigningSolution mockSolution(List<Task> task, List<User> users) {
-        return new TaskAssigningSolution(1L, users, task);
+        return new DefaultTaskAssigningSolution(1L, users, task);
     }
 
     private List<TaskData> mockTaskDataList(TaskData... tasks) {

@@ -40,7 +40,7 @@ public class TaskPropertyChangeProblemFactChangeTest {
     private static final String NEW_STATUS = "InProgress";
 
     @Mock
-    private ScoreDirector<TaskAssigningSolution> scoreDirector;
+    private ScoreDirector<TaskAssigningSolution<?>> scoreDirector;
 
     @Mock
     private Task workingTask;

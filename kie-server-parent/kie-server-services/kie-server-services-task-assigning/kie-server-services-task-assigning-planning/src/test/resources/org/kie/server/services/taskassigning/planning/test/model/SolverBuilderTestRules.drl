@@ -9,7 +9,7 @@ import org.optaplanner.core.api.score.buildin.bendable.BendableScoreHolder;
 
 import org.kie.server.services.taskassigning.core.model.ModelConstants;
 import org.kie.server.services.taskassigning.core.model.Task;
-import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.solver.PriorityHelper
 
 global BendableScoreHolder scoreHolder;

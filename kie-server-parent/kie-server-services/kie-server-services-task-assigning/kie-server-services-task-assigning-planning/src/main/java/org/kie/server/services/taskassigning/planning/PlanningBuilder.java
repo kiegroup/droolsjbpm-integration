@@ -34,7 +34,7 @@ import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper
 
 public class PlanningBuilder {
 
-    private TaskAssigningSolution solution;
+    private TaskAssigningSolution<?> solution;
     private int publishWindowSize;
 
     private PlanningBuilder() {

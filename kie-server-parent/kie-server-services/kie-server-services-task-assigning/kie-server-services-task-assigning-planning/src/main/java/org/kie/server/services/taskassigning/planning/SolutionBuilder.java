@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.api.model.taskassigning.TaskData;
+import org.kie.server.services.taskassigning.core.model.SolutionFactory;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.TaskOrUser;
@@ -52,9 +53,11 @@ import static org.kie.server.services.taskassigning.planning.util.UserUtil.filte
  */
 public class SolutionBuilder {
 
+    private static long solutionIds = 0;
     private List<TaskData> taskDataList;
     private List<org.kie.server.services.taskassigning.user.system.api.User> externalUsers;
     private SolverHandlerContext context;
+    private SolutionFactory solutionFactory;
 
     private SolutionBuilder() {
     }
@@ -75,6 +78,11 @@ public class SolutionBuilder {
 
     public SolutionBuilder withContext(SolverHandlerContext context) {
         this.context = context;
+        return this;
+    }
+
+    public SolutionBuilder withSolutionFactory(SolutionFactory solutionFactory) {
+        this.solutionFactory = solutionFactory;
         return this;
     }
 
@@ -136,7 +144,11 @@ public class SolutionBuilder {
         //Add the DUMMY_TASK to avoid running into scenarios where the solution remains with no tasks.
         tasks.add(DUMMY_TASK);
         final List<User> users = new ArrayList<>(usersById.values());
-        return new TaskAssigningSolution(-1, users, tasks);
+        final TaskAssigningSolution<?> solution = solutionFactory.newSolution();
+        solution.setId(nextId());
+        solution.setUserList(users);
+        solution.setTaskList(tasks);
+        return solution;
     }
 
     /**
@@ -169,6 +181,10 @@ public class SolutionBuilder {
         task.setPinned(pinned);
         final List<IndexedElement<Task>> userAssignedTasks = tasksByUser.computeIfAbsent(actualOwner, key -> new ArrayList<>());
         addInOrder(userAssignedTasks, new IndexedElement<>(task, index, task.isPinned()));
+    }
+
+    private static long nextId() {
+        return solutionIds++;
     }
 }
 

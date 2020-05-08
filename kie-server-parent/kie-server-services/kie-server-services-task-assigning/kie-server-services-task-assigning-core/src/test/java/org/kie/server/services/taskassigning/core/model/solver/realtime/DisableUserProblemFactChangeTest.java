@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.User;
@@ -20,6 +21,7 @@ import static org.kie.server.services.taskassigning.core.model.TestUtil.mockUser
 import static org.kie.server.services.taskassigning.core.model.solver.realtime.ProblemFactChangeUtilTest.assertTaskWasNotReleased;
 import static org.kie.server.services.taskassigning.core.model.solver.realtime.ProblemFactChangeUtilTest.assertTaskWasReleased;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,9 +36,9 @@ public class DisableUserProblemFactChangeTest {
     private static final long TASK_ID4 = 4;
 
     @Mock
-    private ScoreDirector<TaskAssigningSolution> scoreDirector;
+    private ScoreDirector<TaskAssigningSolution<?>> scoreDirector;
 
-    private TaskAssigningSolution workingSolution;
+    private TaskAssigningSolution<?> workingSolution;
 
     private DisableUserProblemFactChange change;
 
@@ -45,8 +47,8 @@ public class DisableUserProblemFactChangeTest {
     @Before
     public void setUp() {
         user = new User(1, USER_ID);
-        workingSolution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
-        when(scoreDirector.getWorkingSolution()).thenReturn(workingSolution);
+        workingSolution = new DefaultTaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
+        doReturn(workingSolution).when(scoreDirector).getWorkingSolution();
         change = new DisableUserProblemFactChange(user);
     }
 

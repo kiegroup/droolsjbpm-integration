@@ -44,7 +44,7 @@ public class ReleaseTaskProblemFactChangeTest {
     private Task nextTask;
 
     @Mock
-    private ScoreDirector<TaskAssigningSolution> scoreDirector;
+    private ScoreDirector<TaskAssigningSolution<?>> scoreDirector;
 
     private ReleaseTaskProblemFactChange change;
 

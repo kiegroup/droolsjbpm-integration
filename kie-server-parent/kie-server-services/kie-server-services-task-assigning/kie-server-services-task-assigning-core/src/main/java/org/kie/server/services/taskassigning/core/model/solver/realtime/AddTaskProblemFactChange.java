@@ -25,7 +25,7 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 /**
  * Adds a Task to the working solution. If a task with the given identifier already exists an exception is thrown.
  */
-public class AddTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class AddTaskProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private Task task;
 
@@ -38,8 +38,8 @@ public class AddTaskProblemFactChange implements ProblemFactChange<TaskAssigning
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
-        TaskAssigningSolution solution = scoreDirector.getWorkingSolution();
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
+        TaskAssigningSolution<?> solution = scoreDirector.getWorkingSolution();
         Task workingTask = scoreDirector.lookUpWorkingObjectOrReturnNull(task);
         if (workingTask != null) {
             throw new TaskAssigningRuntimeException(String.format("A task with the given identifier id: %s already exists", task.getId()));

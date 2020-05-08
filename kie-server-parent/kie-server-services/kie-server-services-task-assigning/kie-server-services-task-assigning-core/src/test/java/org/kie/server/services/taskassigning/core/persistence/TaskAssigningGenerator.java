@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.Group;
 import org.kie.server.services.taskassigning.core.model.OrganizationalEntity;
 import org.kie.server.services.taskassigning.core.model.Task;
@@ -83,21 +84,21 @@ public class TaskAssigningGenerator extends LoggingMain {
 
     private static final StringDataGenerator userNameGenerator = StringDataGenerator.buildFullNames();
 
-    private final SolutionFileIO<TaskAssigningSolution> solutionFileIO;
+    private final SolutionFileIO<TaskAssigningSolution<?>> solutionFileIO;
     private final File outputDir;
 
     private Random random = new Random(37);
 
     private TaskAssigningGenerator() {
         System.setProperty(DATA_DIR_SYSTEM_PROPERTY, "kie-server-services-task-assigning-core/src/test/resources");
-        solutionFileIO = new XStreamSolutionFileIO<>(TaskAssigningSolution.class);
+        solutionFileIO = new XStreamSolutionFileIO<>(DefaultTaskAssigningSolution.class);
         outputDir = new File(CommonApp.determineDataDir("data"), "unsolved");
     }
 
     private void writeTaskAssigningSolution(int taskListSize, int userListSize) {
         String fileName = determineFileName(taskListSize, userListSize);
         File outputFile = new File(outputDir, fileName + ".xml");
-        TaskAssigningSolution solution = createTaskAssigningSolution(fileName, taskListSize, USER_GROUP_SIZE, userListSize);
+        TaskAssigningSolution<?> solution = createTaskAssigningSolution(fileName, taskListSize, USER_GROUP_SIZE, userListSize);
         solutionFileIO.write(solution, outputFile);
         logger.info("Saved: {}", outputFile);
     }
@@ -106,8 +107,8 @@ public class TaskAssigningGenerator extends LoggingMain {
         return taskListSize + "tasks-" + userListSize + "users";
     }
 
-    private TaskAssigningSolution createTaskAssigningSolution(String fileName, int taskListSize, int groupListSize, int userListSize) {
-        TaskAssigningSolution solution = new TaskAssigningSolution();
+    private TaskAssigningSolution<?> createTaskAssigningSolution(String fileName, int taskListSize, int groupListSize, int userListSize) {
+        DefaultTaskAssigningSolution solution = new DefaultTaskAssigningSolution();
         solution.setId(0L);
 
         List<Group> groupList = createGroupList(groupListSize);
@@ -140,7 +141,7 @@ public class TaskAssigningGenerator extends LoggingMain {
         return groupList;
     }
 
-    private void createUserList(TaskAssigningSolution solution, int userListSize, List<Group> groupList) {
+    private void createUserList(TaskAssigningSolution<?> solution, int userListSize, List<Group> groupList) {
         List<User> userList = new ArrayList<>(userListSize);
         userNameGenerator.predictMaximumSizeAndReset(userListSize);
         for (int i = 0; i < userListSize; i++) {
@@ -165,7 +166,7 @@ public class TaskAssigningGenerator extends LoggingMain {
         solution.setUserList(userList);
     }
 
-    private void createTaskList(TaskAssigningSolution solution, int taskListSize, List<Group> groupList) {
+    private void createTaskList(TaskAssigningSolution<?> solution, int taskListSize, List<Group> groupList) {
         List<User> userList = solution.getUserList();
         List<Task> taskList = new ArrayList<>(taskListSize);
 

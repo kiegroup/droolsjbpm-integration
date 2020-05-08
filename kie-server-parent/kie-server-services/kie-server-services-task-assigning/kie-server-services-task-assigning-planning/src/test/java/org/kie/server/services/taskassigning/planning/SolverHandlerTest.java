@@ -100,7 +100,7 @@ public class SolverHandlerTest {
     private SolutionProcessor solutionProcessor;
 
     @Captor
-    private ArgumentCaptor<SolverEventListener<TaskAssigningSolution>> listenerCaptor;
+    private ArgumentCaptor<SolverEventListener<TaskAssigningSolution<?>>> listenerCaptor;
 
     @Captor
     private ArgumentCaptor<Consumer<SolutionSynchronizer.Result>> synchronizerConsumerCaptor;
@@ -164,7 +164,7 @@ public class SolverHandlerTest {
 
     @Test
     public void onBestSolutionChange() {
-        BestSolutionChangedEvent<TaskAssigningSolution> event = mockEvent(true, true);
+        BestSolutionChangedEvent<TaskAssigningSolution<?>> event = mockEvent(true, true);
         prepareStart();
 
         SolverHandlerContext context = contextCaptor.getValue();
@@ -188,7 +188,7 @@ public class SolverHandlerTest {
     @Test
     public void onBestSolutionChangeWhenChangeSetAlreadyProcessed() {
         prepareStart();
-        BestSolutionChangedEvent<TaskAssigningSolution> event = mockEvent(true, true);
+        BestSolutionChangedEvent<TaskAssigningSolution<?>> event = mockEvent(true, true);
 
         SolverHandlerContext context = contextCaptor.getValue();
         long changeSet = context.nextChangeSetId();
@@ -230,7 +230,7 @@ public class SolverHandlerTest {
     @Test
     public void onUpdateSolution() {
         prepareStart();
-        List<ProblemFactChange<TaskAssigningSolution>> changes = new ArrayList<>();
+        List<ProblemFactChange<TaskAssigningSolution<?>>> changes = new ArrayList<>();
         changes.add(new TaskPropertyChangeProblemFactChange(new Task()));
 
         SolutionSynchronizer.Result result = new SolutionSynchronizer.Result(changes);
@@ -244,7 +244,7 @@ public class SolverHandlerTest {
     @Test
     public void onUpdateSolutionSolverNotStarted() {
         prepareStart();
-        List<ProblemFactChange<TaskAssigningSolution>> changes = new ArrayList<>();
+        List<ProblemFactChange<TaskAssigningSolution<?>>> changes = new ArrayList<>();
         changes.add(new TaskPropertyChangeProblemFactChange(new Task()));
 
         SolutionSynchronizer.Result result = new SolutionSynchronizer.Result(changes);
@@ -258,7 +258,7 @@ public class SolverHandlerTest {
     @Test
     public void onUpdateSolutionWithEmptyChanges() {
         prepareStart();
-        List<ProblemFactChange<TaskAssigningSolution>> changes = new ArrayList<>();
+        List<ProblemFactChange<TaskAssigningSolution<?>>> changes = new ArrayList<>();
 
         SolutionSynchronizer.Result result = new SolutionSynchronizer.Result(changes);
 
@@ -269,8 +269,8 @@ public class SolverHandlerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private BestSolutionChangedEvent<TaskAssigningSolution> mockEvent(boolean allChangesProcessed, boolean solutionInitialized) {
-        BestSolutionChangedEvent<TaskAssigningSolution> event = mock(BestSolutionChangedEvent.class);
+    private BestSolutionChangedEvent<TaskAssigningSolution<?>> mockEvent(boolean allChangesProcessed, boolean solutionInitialized) {
+        BestSolutionChangedEvent<TaskAssigningSolution<?>> event = mock(BestSolutionChangedEvent.class);
         when(event.isEveryProblemFactChangeProcessed()).thenReturn(allChangesProcessed);
         TaskAssigningSolution solution = mock(TaskAssigningSolution.class);
         BendableScore score = BendableScore.zero(1, 1).withInitScore(solutionInitialized ? 1 : -1);
@@ -279,7 +279,7 @@ public class SolverHandlerTest {
         return event;
     }
 
-    private void onBestSolutionChangeEventNotProcessed(BestSolutionChangedEvent<TaskAssigningSolution> event) {
+    private void onBestSolutionChangeEventNotProcessed(BestSolutionChangedEvent<TaskAssigningSolution<?>> event) {
         prepareStart();
         SolverHandlerContext context = contextCaptor.getValue();
         long changeSet = context.nextChangeSetId();
@@ -322,7 +322,7 @@ public class SolverHandlerTest {
 
     private TaskAssigningSolution prepareStartAndASolutionProduced() {
         prepareStart();
-        BestSolutionChangedEvent<TaskAssigningSolution> event = mockEvent(true, true);
+        BestSolutionChangedEvent<TaskAssigningSolution<?>> event = mockEvent(true, true);
         SolverHandlerContext context = contextCaptor.getValue();
         long changeSet = context.nextChangeSetId();
         context.setCurrentChangeSetId(changeSet);

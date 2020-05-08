@@ -14,30 +14,17 @@
  * limitations under the License.
  */
 
-package org.kie.server.services.taskassigning.core.model;
-
-import java.util.List;
-
-import org.optaplanner.core.api.score.FeasibilityScore;
+package org.kie.server.services.taskassigning.core.util;
 
 /**
- * Defines the contract for a solution that can be manged by the task assigning integration.
+ * Testing class for use in the NamedServiceLoaderTest.
  */
-public interface TaskAssigningSolution<S extends FeasibilityScore> {
+public class ExampleService1 implements ExampleService {
 
-    Long getId();
+    public static final String NAME = "ExampleService1";
 
-    void setId(Long id);
-
-    List<User> getUserList();
-
-    void setUserList(List<User> userList);
-
-    List<Task> getTaskList();
-
-    void setTaskList(List<Task> taskList);
-
-    S getScore();
-
-    void setScore(S score);
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

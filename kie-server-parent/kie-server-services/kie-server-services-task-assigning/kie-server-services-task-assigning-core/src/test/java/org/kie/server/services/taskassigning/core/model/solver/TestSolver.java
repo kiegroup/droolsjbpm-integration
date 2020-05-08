@@ -49,10 +49,10 @@ public class TestSolver extends AbstractTaskAssigningCoreTest {
      * and that some minimal constrains are met by de solution.
      */
     private void testSolverStartAndSolution(int stepCountLimit, String solutionResource) throws Exception {
-        Solver<TaskAssigningSolution> solver = createNonDaemonSolver(stepCountLimit);
-        TaskAssigningSolution solution = readTaskAssigningSolution(solutionResource);
+        Solver<TaskAssigningSolution<?>> solver = createNonDaemonSolver(stepCountLimit);
+        TaskAssigningSolution<?> solution = readTaskAssigningSolution(solutionResource);
         solution.getUserList().add(PLANNING_USER);
-        TaskAssigningSolution result = solver.solve(solution);
+        TaskAssigningSolution<?> result = solver.solve(solution);
         if (!result.getScore().isFeasible()) {
             fail(String.format("With current problem definition and stepCountLimit of %s it's expected " +
                                        "that a feasible solution has been produced.", stepCountLimit));
@@ -68,7 +68,7 @@ public class TestSolver extends AbstractTaskAssigningCoreTest {
      * 3) All tasks are assigned.
      * @param solution a solution.
      */
-    private void assertConstraints(TaskAssigningSolution solution) {
+    private void assertConstraints(TaskAssigningSolution<?> solution) {
         int totalTasks = 0;
         for (User user : solution.getUserList()) {
             List<Task> taskList = extractTasks(user);

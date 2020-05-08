@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 
 import org.junit.Test;
 import org.kie.server.api.model.taskassigning.TaskData;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.user.system.api.User;
@@ -83,10 +84,10 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
     private TaskAssigningSolution emptySolution;
 
     @Mock
-    private List<ProblemFactChange<TaskAssigningSolution>> generatedChanges;
+    private List<ProblemFactChange<TaskAssigningSolution<?>>> generatedChanges;
 
     @Mock
-    private List<ProblemFactChange<TaskAssigningSolution>> emptyChanges;
+    private List<ProblemFactChange<TaskAssigningSolution<?>>> emptyChanges;
 
     private boolean usersSyncTime;
 
@@ -221,7 +222,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
                                             List<List<User>> userQueryResults,
                                             int executionsCount) throws Exception {
 
-        TaskAssigningSolution solution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
+        TaskAssigningSolution solution = new DefaultTaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
         queryExecutionsCountDown = new CountDownLatch(executionsCount);
         prepareQueryExecutions(tasksQueryResults);
         prepareUserQueryExecutions(userQueryResults);
@@ -380,12 +381,12 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         }
 
         @Override
-        protected List<ProblemFactChange<TaskAssigningSolution>> buildChanges(TaskAssigningSolution solution, List<TaskData> updatedTaskDataList) {
+        protected List<ProblemFactChange<TaskAssigningSolution<?>>> buildChanges(TaskAssigningSolution<?> solution, List<TaskData> updatedTaskDataList) {
             return updatedTaskDataList.isEmpty() ? emptyChanges : generatedChanges;
         }
 
         @Override
-        protected List<ProblemFactChange<TaskAssigningSolution>> buildChanges(TaskAssigningSolution solution, List<TaskData> updatedTaskDataList, List<User> updatedUserList) {
+        protected List<ProblemFactChange<TaskAssigningSolution<?>>> buildChanges(TaskAssigningSolution<?> solution, List<TaskData> updatedTaskDataList, List<User> updatedUserList) {
             return updatedTaskDataList.isEmpty() && updatedUserList.isEmpty() ? emptyChanges : generatedChanges;
         }
 

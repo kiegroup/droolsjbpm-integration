@@ -24,7 +24,7 @@ import org.kie.server.services.taskassigning.core.model.User;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
-public class AddUserProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class AddUserProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private User user;
 
@@ -37,8 +37,8 @@ public class AddUserProblemFactChange implements ProblemFactChange<TaskAssigning
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
-        final TaskAssigningSolution workingSolution = scoreDirector.getWorkingSolution();
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
+        final TaskAssigningSolution<?> workingSolution = scoreDirector.getWorkingSolution();
         final User workingUser = scoreDirector.lookUpWorkingObjectOrReturnNull(user);
         if (workingUser != null) {
             throw new TaskAssigningRuntimeException(String.format("A user with the given identifier id: %s already exists", user.getEntityId()));

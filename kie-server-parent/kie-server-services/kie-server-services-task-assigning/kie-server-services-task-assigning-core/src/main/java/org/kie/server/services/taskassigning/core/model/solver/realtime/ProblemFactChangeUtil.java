@@ -38,7 +38,7 @@ public class ProblemFactChangeUtil {
      * @param scoreDirector a scoreDirector instance for executing the required beforeVariableChanged and
      * afterVariableChanged methods.
      */
-    public static void releaseAllTasks(User workingUser, ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    public static void releaseAllTasks(User workingUser, ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         releaseTasks(workingUser, true, scoreDirector);
     }
 
@@ -49,7 +49,7 @@ public class ProblemFactChangeUtil {
      * @param scoreDirector a scoreDirector instance for executing the required beforeVariableChanged and
      * afterVariableChanged methods.
      */
-    public static void releaseNonPinnedTasks(User workingUser, ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    public static void releaseNonPinnedTasks(User workingUser, ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         releaseTasks(workingUser, false, scoreDirector);
     }
 
@@ -62,7 +62,7 @@ public class ProblemFactChangeUtil {
      * be released.
      * @param scoreDirector a scored director instance for notifying the changes.
      */
-    private static void releaseTasks(User workingUser, boolean includePinnedTasks, ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    private static void releaseTasks(User workingUser, boolean includePinnedTasks, ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         final List<Task> tasks = extractTasks(workingUser, testedTask -> includePinnedTasks || !testedTask.isPinned());
         Task task;
         for (int index = tasks.size() - 1; index >= 0; index--) {

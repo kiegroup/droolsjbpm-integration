@@ -42,6 +42,8 @@ public class SolverBuilderTest {
 
     private static final String NOT_EXISTING_SOLVER_CONFIG_RESOURCE = "NotExistingResource.xml";
 
+    private static final String SOLUTION_FACTORY_NAME = "SOLUTION_FACTORY_NAME";
+
     @Mock
     private KieServerRegistry registry;
 
@@ -76,7 +78,7 @@ public class SolverBuilderTest {
         when(container.getKieContainer()).thenReturn(kieContainer);
         when(container.getStatus()).thenReturn(KieContainerStatus.STARTED);
 
-        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE);
+        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE, SOLUTION_FACTORY_NAME);
         Solver solver = SolverBuilder.create()
                 .solverDef(solverDef)
                 .registry(registry)
@@ -86,7 +88,7 @@ public class SolverBuilderTest {
 
     @Test
     public void buildFromContainerWithContainerNotFoundInRegistryError() {
-        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE);
+        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE, SOLUTION_FACTORY_NAME);
         Assertions.assertThatThrownBy(() ->
                                               SolverBuilder.create()
                                                       .solverDef(solverDef)
@@ -99,7 +101,7 @@ public class SolverBuilderTest {
     public void buildFromContainerWithContainerNotStartedError() {
         when(registry.getContainer(CONTAINER_ID)).thenReturn(container);
         when(container.getStatus()).thenReturn(KieContainerStatus.STOPPED);
-        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE);
+        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE, SOLUTION_FACTORY_NAME);
         Assertions.assertThatThrownBy(() ->
                                               SolverBuilder.create()
                                                       .solverDef(solverDef)

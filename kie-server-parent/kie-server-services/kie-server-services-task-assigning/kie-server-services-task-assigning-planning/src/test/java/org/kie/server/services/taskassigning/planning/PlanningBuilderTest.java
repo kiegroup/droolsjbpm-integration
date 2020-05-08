@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.model.taskassigning.PlanningItem;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.User;
@@ -103,7 +104,7 @@ public class PlanningBuilderTest {
 
         List<User> totalUsers = Arrays.asList(user1, user2, user3, user4, user5, user6, planningUser);
 
-        TaskAssigningSolution solution = new TaskAssigningSolution(1, totalUsers, totalTasks);
+        TaskAssigningSolution solution = new DefaultTaskAssigningSolution(1, totalUsers, totalTasks);
 
         List<PlanningItem> planningItems = PlanningBuilder.create()
                 .withPublishWindowSize(publishWindowSize)

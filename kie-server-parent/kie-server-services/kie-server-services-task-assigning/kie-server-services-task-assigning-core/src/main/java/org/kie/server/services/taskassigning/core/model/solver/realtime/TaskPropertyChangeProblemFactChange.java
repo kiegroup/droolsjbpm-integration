@@ -22,7 +22,7 @@ import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
-public class TaskPropertyChangeProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class TaskPropertyChangeProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private Task task;
 
@@ -55,7 +55,7 @@ public class TaskPropertyChangeProblemFactChange implements ProblemFactChange<Ta
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         Task workingTask = scoreDirector.lookUpWorkingObjectOrReturnNull(task);
         if (workingTask == null) {
             throw new TaskAssigningRuntimeException(String.format("Expected task: %s was not found in current working solution", task));

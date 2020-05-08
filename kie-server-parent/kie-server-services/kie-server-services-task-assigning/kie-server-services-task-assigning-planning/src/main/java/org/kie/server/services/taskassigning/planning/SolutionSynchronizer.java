@@ -75,13 +75,13 @@ public class SolutionSynchronizer extends RunnableBase {
 
     public static class Result {
 
-        private List<ProblemFactChange<TaskAssigningSolution>> changes;
+        private List<ProblemFactChange<TaskAssigningSolution<?>>> changes;
 
-        public Result(List<ProblemFactChange<TaskAssigningSolution>> changes) {
+        public Result(List<ProblemFactChange<TaskAssigningSolution<?>>> changes) {
             this.changes = changes;
         }
 
-        public List<ProblemFactChange<TaskAssigningSolution>> getChanges() {
+        public List<ProblemFactChange<TaskAssigningSolution<?>>> getChanges() {
             return changes;
         }
     }
@@ -219,7 +219,7 @@ public class SolutionSynchronizer extends RunnableBase {
                 }
                 LOGGER.debug("Status was read successful.");
                 if (isAlive()) {
-                    final List<ProblemFactChange<TaskAssigningSolution>> changes = buildChanges(solution, tasksUpdateResult, usersUpdateResult);
+                    final List<ProblemFactChange<TaskAssigningSolution<?>>> changes = buildChanges(solution, tasksUpdateResult, usersUpdateResult);
                     context.setPreviousQueryTime(fromLastModificationDate);
                     LocalDateTime nextQueryTime = context.shiftQueryTime(trimMillis(tasksUpdateResult.getRight()));
                     context.setNextQueryTime(nextQueryTime);
@@ -270,7 +270,7 @@ public class SolutionSynchronizer extends RunnableBase {
         return System.currentTimeMillis() + usersSyncInterval.toMillis();
     }
 
-    protected List<ProblemFactChange<TaskAssigningSolution>> buildChanges(TaskAssigningSolution solution,
+    protected List<ProblemFactChange<TaskAssigningSolution<?>>> buildChanges(TaskAssigningSolution solution,
                                                                           Pair<List<TaskData>, LocalDateTime> tasksUpdateResult,
                                                                           Pair<Boolean, List<User>> usersUpdateResult) {
         if (usersUpdateResult != null && usersUpdateResult.getLeft()) {
@@ -280,12 +280,12 @@ public class SolutionSynchronizer extends RunnableBase {
         }
     }
 
-    protected List<ProblemFactChange<TaskAssigningSolution>> buildChanges(TaskAssigningSolution solution,
+    protected List<ProblemFactChange<TaskAssigningSolution<?>>> buildChanges(TaskAssigningSolution<?> solution,
                                                                           List<TaskData> updatedTaskDataList) {
         return buildChanges(solution, updatedTaskDataList, null);
     }
 
-    protected List<ProblemFactChange<TaskAssigningSolution>> buildChanges(TaskAssigningSolution solution,
+    protected List<ProblemFactChange<TaskAssigningSolution<?>>> buildChanges(TaskAssigningSolution<?> solution,
                                                                           List<TaskData> updatedTaskDataList,
                                                                           List<User> updatedUserList) {
         SolutionChangesBuilder builder = SolutionChangesBuilder.create()
@@ -323,6 +323,7 @@ public class SolutionSynchronizer extends RunnableBase {
                 .withTasks(taskDataList)
                 .withUsers(externalUsers)
                 .withContext(context)
+                .withSolutionFactory(solverExecutor.getSolverDef().getSolutionFactory())
                 .build();
     }
 

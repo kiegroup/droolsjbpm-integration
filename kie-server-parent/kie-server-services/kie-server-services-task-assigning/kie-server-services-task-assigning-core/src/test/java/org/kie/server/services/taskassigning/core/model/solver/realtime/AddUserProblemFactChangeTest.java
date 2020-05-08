@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.User;
 import org.mockito.Mock;
@@ -29,6 +30,7 @@ import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,9 +40,9 @@ public class AddUserProblemFactChangeTest {
     private static final String USER_ID = "USER_ID";
 
     @Mock
-    private ScoreDirector<TaskAssigningSolution> scoreDirector;
+    private ScoreDirector<TaskAssigningSolution<?>> scoreDirector;
 
-    private TaskAssigningSolution workingSolution;
+    private TaskAssigningSolution<?> workingSolution;
 
     private AddUserProblemFactChange change;
 
@@ -49,8 +51,8 @@ public class AddUserProblemFactChangeTest {
     @Before
     public void setUp() {
         user = new User(1, USER_ID);
-        workingSolution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
-        when(scoreDirector.getWorkingSolution()).thenReturn(workingSolution);
+        workingSolution = new DefaultTaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
+        doReturn(workingSolution).when(scoreDirector).getWorkingSolution();
         change = new AddUserProblemFactChange(user);
     }
 

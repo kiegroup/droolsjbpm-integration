@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package org.kie.server.services.taskassigning.planning.test.model;
+package org.kie.server.services.taskassigning.core.model;
 
-/**
- * Test class for the UserSystemServiceLoaderTest
- */
-public class UserSystemService2 extends AbstractUserSystemService {
+public interface SolutionFactory {
 
-    public static final String NAME = "UserSystemService2";
+    String getName();
 
-    public UserSystemService2() {
-        super(NAME);
-    }
+    TaskAssigningSolution<?> newSolution();
 }

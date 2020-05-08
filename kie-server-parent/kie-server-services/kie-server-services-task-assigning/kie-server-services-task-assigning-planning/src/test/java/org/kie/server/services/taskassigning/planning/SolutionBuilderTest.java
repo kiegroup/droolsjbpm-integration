@@ -27,6 +27,8 @@ import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.api.model.taskassigning.TaskData;
+import org.kie.server.services.taskassigning.core.model.DefaultSolutionFactory;
+import org.kie.server.services.taskassigning.core.model.SolutionFactory;
 import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.User;
@@ -46,6 +48,8 @@ import static org.kie.server.services.taskassigning.core.model.ModelConstants.PL
 import static org.kie.server.services.taskassigning.core.model.solver.TaskHelper.extractTasks;
 import static org.kie.server.services.taskassigning.planning.TestUtil.assertContains;
 import static org.kie.server.services.taskassigning.planning.TestUtil.mockExternalUser;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 public class SolutionBuilderTest {
 
@@ -60,9 +64,12 @@ public class SolutionBuilderTest {
 
     private SolverHandlerContext context;
 
+    private SolutionFactory solutionFactory;
+
     @Before
     public void setUp() {
         context = new SolverHandlerContext(Duration.ofMillis(2000));
+        solutionFactory = spy(new DefaultSolutionFactory());
     }
 
     @Test
@@ -72,6 +79,7 @@ public class SolutionBuilderTest {
                 .withTasks(Collections.emptyList())
                 .withUsers(externalUsers)
                 .withContext(context)
+                .withSolutionFactory(solutionFactory)
                 .build();
 
         assertContains(USER1, 1, solution.getUserList());
@@ -87,6 +95,7 @@ public class SolutionBuilderTest {
                 .withTasks(Collections.emptyList())
                 .withUsers(Collections.emptyList())
                 .withContext(context)
+                .withSolutionFactory(solutionFactory)
                 .build();
         assertEquals(1, solution.getTaskList().size());
         assertEquals(DUMMY_TASK, solution.getTaskList().get(0));
@@ -100,9 +109,11 @@ public class SolutionBuilderTest {
                 .withTasks(Collections.singletonList(taskData))
                 .withUsers(externalUsers)
                 .withContext(context)
+                .withSolutionFactory(solutionFactory)
                 .build();
         assertEquals(2, solution.getTaskList().size());
         assertContainsNotAssignedTask(taskData, solution);
+        verify(solutionFactory).newSolution();
     }
 
     @Test
@@ -333,10 +344,11 @@ public class SolutionBuilderTest {
 
         List<org.kie.server.services.taskassigning.user.system.api.User> externalUsers = buildExternalUsers();
         List<TaskData> taskDataList = Arrays.asList(taskData4, taskData1, taskData3, taskData2);
-        TaskAssigningSolution solution = SolutionBuilder.create()
+        TaskAssigningSolution<?> solution = SolutionBuilder.create()
                 .withTasks(taskDataList)
                 .withUsers(externalUsers)
                 .withContext(context)
+                .withSolutionFactory(solutionFactory)
                 .build();
 
         assertEquals(5, solution.getTaskList().size());
@@ -352,6 +364,7 @@ public class SolutionBuilderTest {
         assertExpectedTaskAtPosition(taskData4.getTaskId(), 2, true, user1Tasks);
         assertExpectedTaskAtPosition(taskData1.getTaskId(), 3, false, user1Tasks);
         taskDataList.forEach(taskData -> assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate()));
+        verify(solutionFactory).newSolution();
     }
 
     private void assertExpectedTaskAtPosition(long taskId, int position, boolean pinned, List<Task> tasks) {
@@ -365,10 +378,12 @@ public class SolutionBuilderTest {
                 .withTasks(Collections.singletonList(taskData))
                 .withUsers(externalUsers)
                 .withContext(context)
+                .withSolutionFactory(solutionFactory)
                 .build();
         assertEquals(2, solution.getTaskList().size());
         assertContainsAssignedTask(taskData, taskData.getActualOwner(), pinned, solution);
         assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate());
+        verify(solutionFactory).newSolution();
     }
 
     private void buildAndCheckTaskWithPlanningTaskWasProcessedCorrect(TaskData taskData, PlanningTask planningTask, String owner, boolean pinned) {
@@ -378,10 +393,12 @@ public class SolutionBuilderTest {
                 .withTasks(Collections.singletonList(taskData))
                 .withUsers(externalUsers)
                 .withContext(context)
+                .withSolutionFactory(solutionFactory)
                 .build();
         assertEquals(2, solution.getTaskList().size());
         assertContainsAssignedTask(taskData, owner, pinned, solution);
         assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate());
+        verify(solutionFactory).newSolution();
     }
 
     private List<org.kie.server.services.taskassigning.user.system.api.User> buildExternalUsers() {
@@ -410,7 +427,7 @@ public class SolutionBuilderTest {
         return taskData;
     }
 
-    private void assertContainsNotAssignedTask(TaskData taskData, TaskAssigningSolution solution) {
+    private void assertContainsNotAssignedTask(TaskData taskData, TaskAssigningSolution<?> solution) {
         Task task = solution.getTaskList().stream()
                 .filter(t -> taskData.getTaskId().equals(t.getId()))
                 .findFirst().orElse(null);
@@ -419,7 +436,7 @@ public class SolutionBuilderTest {
         assertTaskChangeWasProcessed(taskData.getTaskId(), taskData.getLastModificationDate());
     }
 
-    private void assertContainsAssignedTask(TaskData taskData, String userId, boolean pinned, TaskAssigningSolution solution) {
+    private void assertContainsAssignedTask(TaskData taskData, String userId, boolean pinned, TaskAssigningSolution<?> solution) {
         Task task = solution.getTaskList().stream()
                 .filter(t -> taskData.getTaskId().equals(t.getId()))
                 .findFirst().orElse(null);

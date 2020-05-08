@@ -47,7 +47,7 @@ public class ProblemFactChangeUtilTest {
     private static final long TASK_ID5 = 5;
 
     @Mock
-    private ScoreDirector<TaskAssigningSolution> scoreDirector;
+    private ScoreDirector<TaskAssigningSolution<?>> scoreDirector;
 
     private User user;
 
@@ -76,7 +76,7 @@ public class ProblemFactChangeUtilTest {
         userTasks.stream().filter(task -> !task.isPinned()).forEach(task -> assertTaskWasReleased(task, scoreDirector));
     }
 
-    public static void assertTaskWasReleased(Task task, ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    public static void assertTaskWasReleased(Task task, ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         verify(scoreDirector).beforeProblemPropertyChanged(task);
         assertThat(task.isPinned()).as("Invalid pinned status for task: %s", task.getInputData()).isFalse();
         verify(scoreDirector).afterProblemPropertyChanged(task);
@@ -85,7 +85,7 @@ public class ProblemFactChangeUtilTest {
         verify(scoreDirector).afterVariableChanged(task, PREVIOUS_TASK_OR_USER);
     }
 
-    public static void assertTaskWasNotReleased(Task task, ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    public static void assertTaskWasNotReleased(Task task, ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         verify(scoreDirector, never()).beforeProblemPropertyChanged(task);
         verify(scoreDirector, never()).afterProblemPropertyChanged(task);
         verify(scoreDirector, never()).beforeVariableChanged(task, PREVIOUS_TASK_OR_USER);

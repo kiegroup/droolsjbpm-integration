@@ -23,7 +23,7 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 
 import static org.kie.server.services.taskassigning.core.model.solver.realtime.ProblemFactChangeUtil.releaseNonPinnedTasks;
 
-public class DisableUserProblemFactChange implements ProblemFactChange<TaskAssigningSolution> {
+public class DisableUserProblemFactChange implements ProblemFactChange<TaskAssigningSolution<?>> {
 
     private User user;
 
@@ -36,7 +36,7 @@ public class DisableUserProblemFactChange implements ProblemFactChange<TaskAssig
     }
 
     @Override
-    public void doChange(ScoreDirector<TaskAssigningSolution> scoreDirector) {
+    public void doChange(ScoreDirector<TaskAssigningSolution<?>> scoreDirector) {
         final User workingUser = scoreDirector.lookUpWorkingObjectOrReturnNull(user);
         if (workingUser == null) {
             return;

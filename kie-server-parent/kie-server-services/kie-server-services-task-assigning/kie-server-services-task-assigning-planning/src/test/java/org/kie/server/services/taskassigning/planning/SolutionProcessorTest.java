@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.client.TaskAssigningRuntimeClient;
+import org.kie.server.services.taskassigning.core.model.DefaultTaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.mockito.Mock;
 
@@ -78,7 +79,7 @@ public class SolutionProcessorTest extends RunnableBaseTest<SolutionProcessor> {
 
         doReturn(result).when(delegate).executePlanning(generatedPlan, TARGET_USER_ID);
 
-        TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
+        TaskAssigningSolution solution = new DefaultTaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
         runnableBase.process(solution);
 
         // wait until the processing has finished
@@ -94,14 +95,14 @@ public class SolutionProcessorTest extends RunnableBaseTest<SolutionProcessor> {
 
     @Test
     public void isProcessing() {
-        TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
+        TaskAssigningSolution solution = new DefaultTaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
         runnableBase.process(solution);
         assertTrue(runnableBase.isProcessing());
     }
 
     @Test
     public void processWithInvalidStatusFailure() {
-        TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
+        TaskAssigningSolution solution = new DefaultTaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
         runnableBase.process(solution);
         Assertions.assertThatThrownBy(() -> runnableBase.process(solution))
                 .hasMessage("SolutionProcessor process method can only be invoked when the status is STOPPED");
@@ -111,7 +112,7 @@ public class SolutionProcessorTest extends RunnableBaseTest<SolutionProcessor> {
     public void processWithDelegateError() throws Exception {
         CompletableFuture future = startRunnableBase();
 
-        TaskAssigningSolution solution = new TaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
+        TaskAssigningSolution solution = new DefaultTaskAssigningSolution(-1, new ArrayList<>(), new ArrayList<>());
 
         RuntimeException generatedError = new RuntimeException("Emulate a service invocation error.");
         doThrow(generatedError).when(delegate).executePlanning(generatedPlan, TARGET_USER_ID);

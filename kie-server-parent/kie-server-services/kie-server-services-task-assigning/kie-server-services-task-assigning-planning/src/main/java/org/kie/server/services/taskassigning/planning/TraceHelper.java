@@ -50,7 +50,7 @@ public class TraceHelper {
                                        List<TaskPropertyChangeProblemFactChange> propertyChanges,
                                        List<AddTaskProblemFactChange> newTaskChanges,
                                        List<AddUserProblemFactChange> newUserChanges,
-                                       List<ProblemFactChange<TaskAssigningSolution>> userChanges,
+                                       List<ProblemFactChange<TaskAssigningSolution<?>>> userChanges,
                                        List<RemoveUserProblemFactChange> removedUsersChanges) {
 
         logger.trace("{}*** Removed tasks ***", NEW_LINE);
@@ -121,7 +121,7 @@ public class TraceHelper {
         logger.trace("*** End of removed users ***");
     }
 
-    static void traceSolution(Logger logger, TaskAssigningSolution solution) {
+    static void traceSolution(Logger logger, TaskAssigningSolution<?> solution) {
         logger.trace("{}*** Start of solution trace, with users = {} and tasks = {} ***", NEW_LINE, solution.getUserList().size(), solution.getTaskList().size());
         for (User user : solution.getUserList()) {
             Task nextTask = user.getNextTask();

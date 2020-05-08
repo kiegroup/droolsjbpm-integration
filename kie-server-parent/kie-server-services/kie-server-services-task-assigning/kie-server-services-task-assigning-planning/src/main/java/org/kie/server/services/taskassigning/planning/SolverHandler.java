@@ -125,7 +125,7 @@ public class SolverHandler {
 
     SolverExecutor createSolverExecutor(SolverDef solverDef,
                                         KieServerRegistry registry,
-                                        SolverEventListener<TaskAssigningSolution> listener) {
+                                        SolverEventListener<TaskAssigningSolution<?>> listener) {
         return new SolverExecutor(solverDef, registry, listener);
     }
 
@@ -146,7 +146,7 @@ public class SolverHandler {
         return new SolutionProcessor(delegate, resultConsumer, targetUserId, publishWindowSize);
     }
 
-    private void addProblemFactChanges(List<ProblemFactChange<TaskAssigningSolution>> changes) {
+    private void addProblemFactChanges(List<ProblemFactChange<TaskAssigningSolution<?>>> changes) {
         checkNotNull("changes", changes);
         if (!solverExecutor.isStarted()) {
             LOGGER.info("SolverExecutor has not been started. Changes will be discarded {}", changes);
@@ -163,7 +163,7 @@ public class SolverHandler {
      * Invoked when the solver produces a new solution.
      * @param event event produced by the solver.
      */
-    private void onBestSolutionChange(BestSolutionChangedEvent<TaskAssigningSolution> event) {
+    private void onBestSolutionChange(BestSolutionChangedEvent<TaskAssigningSolution<?>> event) {
         LOGGER.debug("onBestSolutionChange: isEveryProblemFactChangeProcessed: {}, currentChangeSetId: {}, isCurrentChangeSetProcessed: {}",
                      event.isEveryProblemFactChangeProcessed(), context.getCurrentChangeSetId(), context.isProcessedChangeSet(context.getCurrentChangeSetId()));
 

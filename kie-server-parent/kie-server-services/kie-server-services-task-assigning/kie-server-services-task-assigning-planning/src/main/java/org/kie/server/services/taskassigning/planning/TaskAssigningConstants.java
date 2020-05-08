@@ -104,6 +104,11 @@ public class TaskAssigningConstants {
 
     public static final String TASK_ASSIGNING_SOLVER_CONTAINER_VERSION = "org.kie.server.taskAssigning.solver.container.version";
 
+    /**
+     * Property for configuring the name of the SolutionFactory to use.
+     */
+    public static final String TASK_ASSIGNING_SOLVER_SOLUTION_FACTORY = "org.kie.server.taskAssigning.solver.solutionFactory";
+
     public static final String TASK_ASSIGNING_USER_SYSTEM_NAME = "org.kie.server.taskAssigning.userSystem.name";
 
     public static final String TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID = "org.kie.server.taskAssigning.userSystem.container.id";
