@@ -324,8 +324,18 @@ public class JSONMarshaller implements Marshaller {
     public <T> T unmarshall(String serializedInput, Class<T> type) {
 
         try {
-            Class actualType = classesSet.contains(type) ? Object.class : type;
-            return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
+            //BUG DROOLS-5021: this.classesSet isn't currently not being set correctly for Batch Commands.
+            //Details: https://issues.redhat.com/browse/DROOLS-5021
+            //Original
+            //Class actualType = classesSet.contains(type) ? Object.class : type;
+            //Probable fix -- but doesn't work as intended (breaks ALOT of Unit tests)?
+            //final Class<?> actualType = classesSet.contains(type) ? type : Object.class;
+            //Skipping the test allows all the Unit tests to work, as well the Batch Command to be handled.
+            //NOTE: this.classesSet seems to be set differently in Unit tests versus runtime.
+            final Class<?> actualType = type;
+            @SuppressWarnings("unchecked")
+            final T unwrapped = (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
+            return unwrapped;
         } catch (IOException e) {
             throw new MarshallingException("Error unmarshalling input", e);
         } finally {

@@ -25,9 +25,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.rule.ClearAgendaCommand;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.command.ExecutableCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.ListContainersCommand;
@@ -46,6 +52,7 @@ public class MarshallingRoundTripTest {
         Object[][] data = new Object[][]{
                 {createKieContainerResourceFilter()},
                 {createReleaseIdFilter()},
+                {createBatchExecutionCommand()},
                 {createKieContainerResourceFilter()},
                 {createListContainersCommand()},
                 {createCommandScript()}
@@ -61,6 +68,12 @@ public class MarshallingRoundTripTest {
         return new ReleaseIdFilter("group", "artifact", "version");
     }
 
+    private static BatchExecutionCommand createBatchExecutionCommand() {
+        return new BatchExecutionCommandImpl(
+                             Arrays.asList(new ClearAgendaCommand(), new FireAllRulesCommand()), 
+                             "Batch Commands");
+    }
+
     private static KieContainerResourceFilter createKieContainerResourceFilter() {
         return new KieContainerResourceFilter(createReleaseIdFilter(), createKieContainerStatusFilter());
     }
@@ -72,7 +85,7 @@ public class MarshallingRoundTripTest {
     private static DisposeContainerCommand createDisposeContainerCommand() {
         return new DisposeContainerCommand("some-container-id");
     }
-
+    
     private static CommandScript createCommandScript() {
         List<KieServerCommand> commands = new ArrayList<KieServerCommand>();
         commands.add(createListContainersCommand());
@@ -104,7 +117,13 @@ public class MarshallingRoundTripTest {
     private void verifyMarshallingRoundTrip(Marshaller marshaller, Object inputObject) {
         String rawContent = marshaller.marshall(inputObject);
         Object testObjectAfterMarshallingTurnAround = marshaller.unmarshall(rawContent, inputObject.getClass());
+        //HACK: Implementations of ExecutableCommand were not overriding equals() & hashCode, only toString.
+        if (inputObject instanceof ExecutableCommand<?>) {
+            Assertions.assertThat(inputObject.toString()).isEqualTo(testObjectAfterMarshallingTurnAround.toString());
+        } else {
         Assertions.assertThat(inputObject).isEqualTo(testObjectAfterMarshallingTurnAround);
+        }
+        Assert.assertNotSame(inputObject, testObjectAfterMarshallingTurnAround);
     }
 
     @Test
