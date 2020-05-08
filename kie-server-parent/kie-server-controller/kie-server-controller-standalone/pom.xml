@@ -114,7 +114,7 @@
           <artifactId>cargo-maven2-plugin</artifactId>
           <configuration>
             <container>
-              <containerId>wildfly14x</containerId>
+              <containerId>wildfly18x</containerId>
               <type>installed</type>
               <artifactInstaller>
                 <groupId>org.wildfly</groupId>
