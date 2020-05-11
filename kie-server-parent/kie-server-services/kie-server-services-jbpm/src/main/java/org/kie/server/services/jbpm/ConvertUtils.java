@@ -427,6 +427,7 @@ public class ConvertUtils {
                 .workItemId(userTask.getWorkItemId())
                 .slaCompliance(userTask.getSlaCompliance())
                 .slaDueDate(userTask.getSlaDueDate())
+                .formName(userTask.getFormName())
                 .build();
 
         return instance;

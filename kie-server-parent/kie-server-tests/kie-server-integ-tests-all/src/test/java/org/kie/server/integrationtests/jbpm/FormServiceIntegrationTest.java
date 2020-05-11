@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,9 @@ import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.client.UIServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -387,6 +390,48 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             changeUser(USER_YODA);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             KieServerAssert.assertSuccess(client.disposeContainer(CONTAINER_ID_V2));
+        }
+    }
+    
+    @Test
+    public void testFormName() throws Exception {
+        Long pid = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
+        assertNotNull(pid);
+        assertTrue(pid.longValue() > 0);
+        
+        try {
+            changeUser(USER_ADMINISTRATOR);
+            
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            assertNotNull(tasks);
+            Long taskId = tasks.get(0).getId();
+            
+            TaskInstance ti = taskClient.getTaskInstance(CONTAINER_ID, taskId);
+            assertEquals("HRInterview2", ti.getFormName());
+            
+            taskClient.startTask(CONTAINER_ID, taskId, USER_ADMINISTRATOR);
+            taskClient.completeTask(CONTAINER_ID, taskId, USER_ADMINISTRATOR, Collections.emptyMap());
+            
+            tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            assertNotNull(tasks);
+            taskId = tasks.get(0).getId();
+            
+            ti = taskClient.findTaskById(taskId);
+            assertEquals("Tech Interview", ti.getName());
+            assertEquals("TechInterview", ti.getFormName());
+            
+            taskClient.startTask(CONTAINER_ID, taskId, USER_ADMINISTRATOR);
+            taskClient.completeTask(CONTAINER_ID, taskId, USER_ADMINISTRATOR, Collections.emptyMap());
+            
+            List<WorkItemInstance> workItems = processClient.getWorkItemByProcessInstance(CONTAINER_ID, pid);
+            assertNotNull(workItems);
+            
+            ti = taskClient.findTaskByWorkItemId(workItems.get(0).getId());
+            assertEquals("Create Proposal", ti.getName());
+            assertEquals("CreateProposal", ti.getFormName());
+        } finally {
+            changeUser(TestConfig.getUsername());
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
         }
     }
 }
