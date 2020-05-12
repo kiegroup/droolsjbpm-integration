@@ -974,6 +974,26 @@
             <type>pom</type>
             <scope>import</scope>
           </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-buffer</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-transport</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-codec-http</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-transport-native-epoll</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
@@ -982,6 +1002,40 @@
           <artifactId>wildfly-jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>jakarta.json</groupId>
+              <artifactId>jakarta.json-api</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.geronimo.specs</groupId>
+              <artifactId>geronimo-jms_2.0_spec</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>io.netty</groupId>
+              <artifactId>netty-transport-native-epoll</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.geronimo.specs</groupId>
+              <artifactId>geronimo-json_1.0_spec</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-buffer</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-transport</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-codec-http</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-transport-native-epoll</artifactId>
         </dependency>
       </dependencies>
     </profile>
