@@ -67,8 +67,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.kie.server.api.util.QueryParamFactory.equalsTo;
-import static org.kie.server.api.util.QueryParamFactory.in;
 import static org.kie.server.api.util.QueryParamFactory.list;
+import static org.kie.server.api.util.QueryParamFactory.onlyActiveTasks;
+import static org.kie.server.api.util.QueryParamFactory.onlyCompletedTasks;
 
 
 
@@ -1849,34 +1850,57 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
 
-        try {
 
-            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
-            assertNotNull(tasks);
-            assertEquals(1, tasks.size());
 
-            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, "First%", null, 0, 10);
-            assertNotNull(tasks);
-            assertEquals(1, tasks.size());
+        List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
 
-            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, "First%", null, 0, 10, "Status", false);
-            assertNotNull(tasks);
-            assertEquals(1, tasks.size());
+        SearchQueryFilterSpec spec = new SearchQueryFilterSpec();
+        spec.setAttributesQueryParams(list(equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
+        List<ProcessInstanceCustomVars> listProcesses = queryClient.queryProcessesByVariables(spec, 0, 2);
+        assertNotNull(listProcesses);
+        listProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
 
-            SearchQueryFilterSpec spec = new SearchQueryFilterSpec();
-            spec.setAttributesQueryParams(list(equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
-            List<ProcessInstanceCustomVars> listProcesses = queryClient.queryProcessesByVariables(spec, 0, 2);
-            assertNotNull(listProcesses);
-            listProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
+        spec = new SearchQueryFilterSpec();
+        spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
+        List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        assertNotNull(listTasks);
+        assertEquals(1, listTasks.size());
+        listTasks.stream().forEach(e -> assertEquals(PROCESS_ID_USERTASK, e.getProcessDefinitionId()));
 
-            spec = new SearchQueryFilterSpec();
-            spec.setAttributesQueryParams(list(in(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
-            List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
-            assertNotNull(listTasks);
-            listTasks.stream().forEach(e -> assertEquals(PROCESS_ID_USERTASK, e.getProcessDefinitionId()));
-        } finally {
-            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-        }
+        this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
+        this.taskClient.completeTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda", Collections.emptyMap());
+
+        spec = new SearchQueryFilterSpec();
+        spec.setAttributesQueryParams(list(onlyCompletedTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
+
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        assertNotNull(listTasks);
+        assertEquals(1, listTasks.size());
+
+        spec = new SearchQueryFilterSpec();
+        spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
+
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        assertNotNull(listTasks);
+        assertEquals(1, listTasks.size());
+
+        this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
+        this.taskClient.completeTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda", Collections.emptyMap());
+
+        spec = new SearchQueryFilterSpec();
+        spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
+
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        assertNotNull(listTasks);
+        assertEquals(0, listTasks.size());
+
+        spec = new SearchQueryFilterSpec();
+        spec.setAttributesQueryParams(list(onlyCompletedTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        assertNotNull(listTasks);
+        assertEquals(0, listTasks.size());
     }
 
 

@@ -577,6 +577,7 @@ public class ConvertUtils {
             var.setProcessInstanceId(desc.getProcessInstanceId());
             var.setProcessVariables(desc.getProcessVariables());
             var.setInputVariables(desc.getInputdata());
+            var.setStatus(desc.getStatus());
             data.add(var);
         }
         ProcessInstanceUserTaskWithVariablesList result = new ProcessInstanceUserTaskWithVariablesList();
