@@ -55,6 +55,9 @@ public class ProcessInstanceUserTaskWithVariables {
     @XmlElement(name = "process-variables")
     private Map<String, Object> processVariables;
 
+    @XmlElement(name = "status")
+    private String status;
+
     public Long getId() {
         return id;
     }
@@ -125,6 +128,14 @@ public class ProcessInstanceUserTaskWithVariables {
 
     public void setProcessVariables(Map<String, Object> processVariables) {
         this.processVariables = processVariables;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     @Override
