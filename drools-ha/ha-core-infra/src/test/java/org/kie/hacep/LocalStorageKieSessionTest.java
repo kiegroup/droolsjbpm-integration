@@ -127,7 +127,7 @@ public class LocalStorageKieSessionTest {
         assertEquals((Long) 0L, session.getFactCount().get());
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 20000)
     public void fireUntilHaltTest() throws ExecutionException, InterruptedException {
 
         assertEquals((Long) 0L, session.getFactCount().get());
