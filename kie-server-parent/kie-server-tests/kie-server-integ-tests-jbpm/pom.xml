@@ -299,6 +299,10 @@
               <org.kie.server.datasource.driver.class>${org.kie.server.datasource.driver.class}</org.kie.server.datasource.driver.class>
               <org.jbpm.document.storage>${org.jbpm.document.storage}</org.jbpm.document.storage>
             </systemPropertyVariables>
+            <excludes>
+              <!-- https://issues.redhat.com/browse/JBPM-9158 -->
+              <exclude>org.kie.server.integrationtests.jbpm.UserTaskServiceIntegrationTest</exclude>
+            </excludes>
           </configuration>
         </plugin>
         <plugin>
