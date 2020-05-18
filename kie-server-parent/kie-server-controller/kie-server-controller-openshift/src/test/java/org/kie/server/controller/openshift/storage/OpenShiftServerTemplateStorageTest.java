@@ -17,17 +17,23 @@ package org.kie.server.controller.openshift.storage;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.function.Supplier;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.server.mock.KubernetesCrudDispatcher;
+import io.fabric8.mockwebserver.Context;
+import io.fabric8.mockwebserver.ServerRequest;
+import io.fabric8.mockwebserver.ServerResponse;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
-import io.fabric8.openshift.client.server.mock.OpenShiftServer;
+import io.fabric8.openshift.client.server.mock.OpenShiftMockServer;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
@@ -53,8 +59,8 @@ public class OpenShiftServerTemplateStorageTest extends ServerTemplateStorageTes
     
     protected static final String TEST_APP_NAME = "myapp2";
 
-    @Rule
-    public OpenShiftServer server = new OpenShiftServer(false, true);
+    // Need to use direct OpenShiftMockServer instead of OpenShiftServer as HTTPS support needs to be disabled for proper functionality in JDK 11
+    public OpenShiftMockServer server = new OpenShiftMockServer(new Context(), new MockWebServer(), new HashMap<ServerRequest, Queue<ServerResponse>>(), new KubernetesCrudDispatcher(), false);
 
     @Before
     public void setup() throws IOException {
@@ -71,7 +77,8 @@ public class OpenShiftServerTemplateStorageTest extends ServerTemplateStorageTes
             client = clouldClientHelper.get();
         } else {
             // Get client from MockKubernetes Server
-            client = server.getOpenshiftClient();
+            server.init();
+            client = server.createOpenShiftClient();
         }
 
         // Create cloud repository instance with mock K8S server test client
@@ -184,6 +191,7 @@ public class OpenShiftServerTemplateStorageTest extends ServerTemplateStorageTes
     @After
     public void cleanup() {
         client.configMaps().inNamespace(testNamespace).delete();
+        server.destroy();
         client.close();
     }
 }
