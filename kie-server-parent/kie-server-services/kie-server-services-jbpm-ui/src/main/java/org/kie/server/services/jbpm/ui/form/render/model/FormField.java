@@ -39,6 +39,14 @@ public class FormField {
 
     private List<ItemOption> options;
 
+    private Number min;
+
+    private Number max;
+
+    private Number precision;
+
+    private Number step;
+
     // subform related
     private String nestedForm;
 
@@ -167,6 +175,38 @@ public class FormField {
 
     public void setEditionForm(String editionForm) {
         this.editionForm = editionForm;
+    }
+
+    public Number getMin() {
+        return min;
+    }
+
+    public void setMin(Number min) {
+        this.min = min;
+    }
+
+    public Number getMax() {
+        return max;
+    }
+
+    public void setMax(Number max) {
+        this.max = max;
+    }
+
+    public Number getPrecision() {
+        return precision;
+    }
+
+    public void setPrecision(Number precision) {
+        this.precision = precision;
+    }
+
+    public Number getStep() {
+        return step;
+    }
+
+    public void setStep(Number step) {
+        this.step = step;
     }
 
 }
