@@ -35,6 +35,19 @@
     </plugins>
   </build>
 
+  <!-- TODO REMOVE -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-pmml-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
@@ -165,9 +178,29 @@
       <artifactId>drools-scorecards</artifactId>
       <scope>runtime</scope>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.drools</groupId>-->
+<!--      <artifactId>kie-pmml</artifactId>-->
+<!--      <scope>runtime</scope>-->
+<!--    </dependency>-->
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>kie-pmml</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-commons</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-compiler-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-compiler-core</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-evaluator-assembler</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>

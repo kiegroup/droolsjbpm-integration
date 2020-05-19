@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.maven.plugin;
 
@@ -29,6 +29,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,24 +56,34 @@ import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
+import org.drools.core.definitions.InternalKnowledgePackage;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
 import org.drools.modelcompiler.builder.ModelBuilderImpl;
 import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
+import org.kie.api.internal.io.ResourceTypePackage;
+import org.kie.api.io.ResourceType;
+import org.kie.pmml.commons.model.HasSourcesMap;
+import org.kie.pmml.commons.model.KiePMMLModel;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
-import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
-@Mojo(name = "generateModel",
+@Mojo(name = "generatePMMLModel",
         requiresDependencyResolution = ResolutionScope.NONE,
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
-public class GenerateModelMojo extends AbstractKieMojo {
+public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
+    private static final String KMODULE_XML_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
+            "<kmodule xmlns=\"http://jboss.org/kie/6.0.0/kmodule\">\r\n" +
+            "\r\n%s\r\n" +
+            "</kmodule>";
+    private static final String KBASE_TAG_TEMPLATE = "\t<kbase name=\"%s\" packages=\"%s, PMMLResources\">\r\n" + // defaulting that all pmml files have to be put inside PMMLResources folder
+            "\t\t<ksession name=\"%sSession\" type=\"stateful\" />\r\n"+ //needs to be stateful otherwise an Exception is thrown when creating newSession from KieContainer
+            "\t</kbase>\r\n";
     public static PathMatcher drlFileMatcher = FileSystems.getDefault().getPathMatcher("glob:**.drl");
-
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
 
@@ -94,17 +105,13 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-    @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL")
-    private String generateModel;
-
     @Parameter(property = "generatePMMLModel", defaultValue = "no")
     private String generatePMMLModel;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        // GenerateModelMojo is executed when BuildMojo and GeneratePMMLModelMojo aren't and vice-versa
-        boolean modelParameterEnabled = modelParameterEnabled(generateModel);
-        modelParameterEnabled = modelParameterEnabled && !PMMLModelMode.modelParameterEnabled(generatePMMLModel);
+        // GeneratePMMLModelMojo is executed when BuildMojo and GenerateModelMojo aren't and vice-versa
+        boolean modelParameterEnabled = PMMLModelMode.modelParameterEnabled(generatePMMLModel);
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
         if (modelParameterEnabled && modelCompilerInClassPath) {
             generateModel();
@@ -112,7 +119,6 @@ public class GenerateModelMojo extends AbstractKieMojo {
             getLog().warn("You're trying to build rule assets in a project from an executable rule model, but you did not provide the required dependency on the project classpath.\n" +
                                   "To enable executable rule models for your project, add the `drools-model-compiler` dependency in the `pom.xml` file of your project.\n");
         }
-
     }
 
     private void generateModel() throws MojoExecutionException {
@@ -141,21 +147,22 @@ public class GenerateModelMojo extends AbstractKieMojo {
             throw new RuntimeException(e);
         }
 
+        KieServices ks = KieServices.Factory.get();
+
         try {
+            // FLAG TO KNOW THAT BUILD HAS BEEN LAUNCHED BY MAVEN
+            properties.put("kie-maven-plugin-launcher", "true");
             setSystemProperties(properties);
 
-            KieServices ks = KieServices.Factory.get();
             final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
             kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
             kieBuilder.buildAll(ExecutableModelMavenProject.SUPPLIER,
                                 s -> !s.contains("src/test/java") && !s.contains("src\\test\\java"));
-
             InternalKieModule kieModule = (InternalKieModule) kieBuilder.getKieModule();
             List<String> generatedFiles = kieModule.getFileNames()
                     .stream()
                     .filter(f -> f.endsWith("java"))
                     .collect(Collectors.toList());
-
 
             Set<String> drlFiles = kieModule.getFileNames()
                     .stream()
@@ -206,14 +213,29 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 throw new MojoExecutionException("Unable to write file", e);
             }
 
-            if (ExecModelMode.shouldDeleteFile(generateModel)) {
+            final String kmodulexmlPath = "./resources/META-INF/kmodule.xml";
+            final MemoryFile kmoduleXmlMemoryFile = (MemoryFile) mfs.getFile(kmodulexmlPath);
+            final String kmoduleXmlMemoryFilePath = "META-INF";
+            final Path kmoduleXmlDestinationPath = Paths.get(targetDirectory.getPath(), "classes", kmoduleXmlMemoryFilePath, kmoduleXmlMemoryFile.getName());
+
+            try {
+                if (!Files.exists(kmoduleXmlDestinationPath)) {
+                    Files.createDirectories(kmoduleXmlDestinationPath.getParent());
+                }
+                Files.copy(kmoduleXmlMemoryFile.getContents(), kmoduleXmlDestinationPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new MojoExecutionException("Unable to write file", e);
+            }
+
+            if (ExecModelMode.shouldDeleteFile(generatePMMLModel)) {
                 deleteDrlFiles(drlFiles);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        getLog().info("DSL successfully generated");
+        getLog().info("PMML model successfully generated");
     }
 
     private void deleteDrlFiles(Set<String> actualDrlFiles) throws MojoExecutionException {
@@ -230,7 +252,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 }
             });
             actualDrlFiles.retainAll(deletedFiles);
-            if(!actualDrlFiles.isEmpty()) {
+            if (!actualDrlFiles.isEmpty()) {
                 String actualDrlFiles1 = String.join(",", actualDrlFiles);
                 getLog().warn("Base directory: " + projectDir);
                 getLog().warn("Files not deleted: " + actualDrlFiles1);
@@ -256,12 +278,42 @@ public class GenerateModelMojo extends AbstractKieMojo {
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
+                StringBuilder kbasesTagsBuilder = new StringBuilder();
                 for (ModelBuilderImpl modelBuilder : modelBuilders) {
                     ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageSources());
                     modelFiles.addAll(result.getModelFiles());
-                    final Folder sourceFolder = srcMfs.getFolder("src/main/java");
+                    final InternalKnowledgePackage[] packages = modelBuilder.getPackages();
+                    for (InternalKnowledgePackage internalKnowledgePackage : packages) {
+                        try {
+                            final ResourceTypePackage<?> pmmlPackage = internalKnowledgePackage.getResourceTypePackages().get(ResourceType.PMML);
+                            if (pmmlPackage != null) {
+                                final Iterator<?> iterator = pmmlPackage.iterator();
+                                while (iterator.hasNext()) {
+                                    Object retrieved = iterator.next();
+                                    if (retrieved instanceof KiePMMLModel) {
+                                        KiePMMLModel kiePMMLModel = (KiePMMLModel) retrieved;
+                                        kbasesTagsBuilder.append(String.format(KBASE_TAG_TEMPLATE, kiePMMLModel.getName(), kiePMMLModel.getKModulePackageName(), kiePMMLModel.getName()));
+                                        if (kiePMMLModel instanceof HasSourcesMap) {
+                                            final Map<String, String> sourcesMap = ((HasSourcesMap) retrieved).getSourcesMap();
+                                            sourcesMap.forEach((fileName, fileSource) -> {
+                                                String actualFilePath = fileName.replace(".", "/");
+                                                String filePath = "src/main/java/" + actualFilePath + ".java";
+                                                srcMfs.write(filePath, fileSource.getBytes());
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            throw new RuntimeException(e.getMessage(), e);
+                        }
+                    }
+                    String kmoduleXml = String.format(KMODULE_XML_TEMPLATE, kbasesTagsBuilder.toString());
+                    String kmoduleXmlPath = "src/main/resources/META-INF/kmodule.xml";
+                    srcMfs.write(kmoduleXmlPath, kmoduleXml.getBytes());
+                    final Folder mainFolder = srcMfs.getFolder("src/main");
                     final Folder targetFolder = trgMfs.getFolder(".");
-                    srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
+                    srcMfs.copyFolder(mainFolder, trgMfs, targetFolder);
                 }
                 modelWriter.writeModelFile(modelFiles, trgMfs, getInternalKieModule().getReleaseId());
             }

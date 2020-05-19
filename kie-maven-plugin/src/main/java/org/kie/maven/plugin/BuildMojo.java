@@ -104,9 +104,14 @@ public class BuildMojo extends AbstractKieMojo {
     @Parameter(property = "generateModel", defaultValue = "no")
     private String generateModel;
 
+    @Parameter(property = "generatePMMLModel", defaultValue = "no")
+    private String generatePMMLModel;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
-        // BuildMojo is executed when GenerateModelMojo isn't and vice-versa
+        // BuildMojo is executed when GenerateModelMojo and GeneratePMMLModelMojo aren't and vice-versa
         boolean modelParameterEnabled = modelParameterEnabled(generateModel);
+        modelParameterEnabled = modelParameterEnabled || PMMLModelMode.modelParameterEnabled(generatePMMLModel);
+
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
 
         if (!(modelParameterEnabled && modelCompilerInClassPath)) {

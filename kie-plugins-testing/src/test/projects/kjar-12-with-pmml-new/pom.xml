@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.kie</groupId>
+  <artifactId>kie-maven-plugin-test-kjar-12</artifactId>
+  <version>1.0.0.Final</version>
+
+  <packaging>kjar</packaging>
+
+  <properties>
+    <org.kie.version>7.38.0-SNAPSHOT</org.kie.version>
+    <generateModel>NO</generateModel>
+    <generatePMMLModel>YES</generatePMMLModel>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-models-regression-model</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-models-regression-compiler</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-models-drools-common</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-models-drools-scorecard-model</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-models-drools-scorecard-compiler</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+        <version>${org.kie.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <properties>
+            <drools.dialect.java.compiler.lnglevel>1.8</drools.dialect.java.compiler.lnglevel>
+          </properties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
