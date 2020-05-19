@@ -8,12 +8,9 @@
 <!-- Patternfly -->
 <link href="${serverPath}/patternfly/css/patternfly.min.css" rel="stylesheet">
 <link href="${serverPath}/patternfly/css/patternfly-additions.min.css" rel="stylesheet">
+<link href="${serverPath}/bootstrap/css/bootstrap-slider.css" rel="stylesheet">
 </head>
 <body>
-	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="${serverPath}/patternfly/js/jquery.min.js"></script>
-	<script src="${serverPath}/patternfly/js/patternfly.min.js"></script>
-	<script src="${serverPath}/js/kieserver-ui.js"></script>
 
 	<div class="panel panel-default">
 		<div class="panel-heading">
@@ -26,6 +23,11 @@
 		</div>
 	</div>
 
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="${serverPath}/patternfly/js/jquery.min.js"></script>
+	<script src="${serverPath}/patternfly/js/patternfly.min.js"></script>
+	<script src="${serverPath}/bootstrap/js/bootstrap-slider.js"></script>
+	<script src="${serverPath}/js/kieserver-ui.js"></script>
 	<script>
 		${scriptData}
 	</script>
