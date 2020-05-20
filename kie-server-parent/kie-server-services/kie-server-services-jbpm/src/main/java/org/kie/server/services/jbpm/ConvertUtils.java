@@ -409,7 +409,6 @@ public class ConvertUtils {
     }
 
     public static TaskInstance convertToTask(UserTaskInstanceDesc userTask) {
-
         return TaskInstance.builder()
                            .id(userTask.getTaskId())
                            .name(userTask.getName())
@@ -427,6 +426,7 @@ public class ConvertUtils {
                            .workItemId(userTask.getWorkItemId())
                            .slaCompliance(userTask.getSlaCompliance())
                            .slaDueDate(userTask.getSlaDueDate())
+                           .formName(userTask.getFormName())
                            .subject(userTask.getSubject())
                 .build();
     }
@@ -576,6 +576,7 @@ public class ConvertUtils {
             var.setProcessInstanceId(desc.getProcessInstanceId());
             var.setProcessVariables(desc.getProcessVariables());
             var.setInputVariables(desc.getInputdata());
+            var.setStatus(desc.getStatus());
             data.add(var);
         }
         ProcessInstanceUserTaskWithVariablesList result = new ProcessInstanceUserTaskWithVariablesList();

@@ -33,7 +33,7 @@ public class ConvertUtilsTest {
         UserTaskInstanceDesc userTaskWithSla =
                 new UserTaskInstanceDesc(Long.valueOf(1), "Ready", testDate, "Task1_name", "Task1_desc", 1,
                                          "Task1_Owner", "Task1_Creator", "deployment", "Process", 1L, testDate,
-                                         testDate, 1L, "subject-1", testDate, ProcessInstance.SLA_PENDING);
+                                         testDate, 1L, "formName-1", "subject-1", testDate, ProcessInstance.SLA_PENDING);
         UserTaskInstanceDesc userTask =
                 new UserTaskInstanceDesc(Long.valueOf(1), "Ready", testDate, "Task1_name", "Task1_desc", 1,
                                          "Task1_Owner", "Task1_Creator", "deployment", "Process", 1L, testDate,
@@ -60,5 +60,6 @@ public class ConvertUtilsTest {
         assertEquals(userTask.getSlaDueDate(), taskInstance.getSlaDueDate());
         assertEquals(userTask.getSlaCompliance(), taskInstance.getSlaCompliance());
         assertEquals(userTask.getSubject(), taskInstance.getSubject());
+        assertEquals(userTask.getFormName(), taskInstance.getFormName());
     }
 }
