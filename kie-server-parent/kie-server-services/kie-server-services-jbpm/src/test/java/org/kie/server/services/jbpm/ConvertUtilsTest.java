@@ -19,12 +19,10 @@ import java.util.Date;
 
 import org.jbpm.kie.services.impl.model.UserTaskInstanceDesc;
 import org.junit.Test;
-
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 
 import static org.junit.Assert.assertEquals;
-
 
 public class ConvertUtilsTest {
 
@@ -34,7 +32,7 @@ public class ConvertUtilsTest {
         UserTaskInstanceDesc userTaskWithSla =
                 new UserTaskInstanceDesc(Long.valueOf(1), "Ready", testDate, "Task1_name", "Task1_desc", 1,
                                          "Task1_Owner", "Task1_Creator", "deployment", "Process", 1L, testDate,
-                                         testDate, 1L, testDate, ProcessInstance.SLA_PENDING);
+                                         testDate, 1L, "subject_1", testDate, ProcessInstance.SLA_PENDING);
         UserTaskInstanceDesc userTask =
                 new UserTaskInstanceDesc(Long.valueOf(1), "Ready", testDate, "Task1_name", "Task1_desc", 1,
                                          "Task1_Owner", "Task1_Creator", "deployment", "Process", 1L, testDate,
@@ -60,5 +58,6 @@ public class ConvertUtilsTest {
         assertEquals(userTask.getWorkItemId(), taskInstance.getWorkItemId());
         assertEquals(userTask.getSlaDueDate(), taskInstance.getSlaDueDate());
         assertEquals(userTask.getSlaCompliance(), taskInstance.getSlaCompliance());
+        assertEquals(userTask.getSubject(), taskInstance.getSubject());
     }
 }
