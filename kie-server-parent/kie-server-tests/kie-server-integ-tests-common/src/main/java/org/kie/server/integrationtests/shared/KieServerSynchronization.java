@@ -25,6 +25,7 @@ import java.util.function.BooleanSupplier;
 import org.kie.api.command.Command;
 import org.kie.api.executor.STATUS;
 import org.kie.api.runtime.ExecutionResults;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -32,6 +33,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
@@ -43,8 +45,6 @@ import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.api.model.Message;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
@@ -80,25 +80,14 @@ public class KieServerSynchronization {
         waitForCondition(() -> {
             ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
 
-            // If synchronization finished (number of containers same as expected) then return.
             if (containersList.getResult().getContainers() == null) {
-                if (numberOfExpectedContainers == 0) {
-                    return true;
-                }
+                // If synchronization finished (number of containers same as expected) then return.
+                return numberOfExpectedContainers == 0;
             } else if (numberOfExpectedContainers == containersList.getResult().getContainers().size()) {
-                // Check that all containers are created or disposed.
-                boolean containersInitializing = false;
-                for (KieContainerResource container : containersList.getResult().getContainers()) {
-                    if (KieContainerStatus.CREATING.equals(container.getStatus()) ||
-                            KieContainerStatus.DISPOSING.equals(container.getStatus())) {
-                        containersInitializing = true;
-                    }
-                }
-                if (!containersInitializing) {
-                    return true;
-                }
+                return containersList.getResult().getContainers().stream().map(KieContainerResource::getStatus).allMatch(e -> e.equals(KieContainerStatus.STARTED));
+            } else {
+                return false;
             }
-            return false;
         });
     }
 

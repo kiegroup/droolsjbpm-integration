@@ -75,6 +75,7 @@ public class ControllerConnectRunnable implements Runnable {
                 break;
 
             } catch (KieControllerNotConnectedException e) {
+                logger.error("error during reconnection to", e);
                 long waitTime = Long.parseLong(System.getProperty(KieServerConstants.CFG_KIE_SERVER_CONTROLLER_CONNECT_INTERVAL, "10000"));
                 logger.debug("Still cannot connect to any controllers, waiting for {} before next attempt", waitTime);
                 try {
