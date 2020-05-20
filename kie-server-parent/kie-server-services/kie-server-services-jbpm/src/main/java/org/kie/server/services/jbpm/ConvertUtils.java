@@ -99,39 +99,39 @@ public class ConvertUtils {
         }
 
         org.kie.server.api.model.instance.ProcessInstance instance = org.kie.server.api.model.instance.ProcessInstance.builder()
-                                                                                                                      .id(pi.getId())
-                                                                                                                      .processId(pi.getProcessId())
-                                                                                                                      .processName(pi.getProcessName())
-                                                                                                                      .processVersion(pi.getProcessVersion())
-                                                                                                                      .containerId(pi.getDeploymentId())
-                                                                                                                      .processInstanceDescription(pi.getProcessInstanceDescription())
-                                                                                                                      .correlationKey(pi.getCorrelationKey())
-                                                                                                                      .parentInstanceId(pi.getParentId())
-                                                                                                                      .date(pi.getDataTimeStamp())
-                                                                                                                      .initiator(pi.getInitiator())
-                                                                                                                      .state(pi.getState())
-                                                                                                                      .slaCompliance(pi.getSlaCompliance())
-                                                                                                                      .slaDueDate(pi.getSlaDueDate())
-                                                                                                                      .build();
+                .id(pi.getId())
+                .processId(pi.getProcessId())
+                .processName(pi.getProcessName())
+                .processVersion(pi.getProcessVersion())
+                .containerId(pi.getDeploymentId())
+                .processInstanceDescription(pi.getProcessInstanceDescription())
+                .correlationKey(pi.getCorrelationKey())
+                .parentInstanceId(pi.getParentId())
+                .date(pi.getDataTimeStamp())
+                .initiator(pi.getInitiator())
+                .state(pi.getState())
+                .slaCompliance(pi.getSlaCompliance())
+                .slaDueDate(pi.getSlaDueDate())
+                .build();
 
         if (pi.getActiveTasks() != null && !pi.getActiveTasks().isEmpty()) {
             org.kie.server.api.model.instance.TaskSummary[] tasks = new org.kie.server.api.model.instance.TaskSummary[pi.getActiveTasks().size()];
             int counter = 0;
             for (UserTaskInstanceDesc taskSummary : pi.getActiveTasks()) {
                 org.kie.server.api.model.instance.TaskSummary task = org.kie.server.api.model.instance.TaskSummary.builder()
-                                                                                                                  .id(taskSummary.getTaskId())
-                                                                                                                  .name(taskSummary.getName())
-                                                                                                                  .description(taskSummary.getDescription())
-                                                                                                                  .activationTime(taskSummary.getActivationTime())
-                                                                                                                  .actualOwner(taskSummary.getActualOwner())
-                                                                                                                  .containerId(taskSummary.getDeploymentId())
-                                                                                                                  .createdBy(taskSummary.getCreatedBy())
-                                                                                                                  .createdOn(taskSummary.getCreatedOn())
-                                                                                                                  .priority(taskSummary.getPriority())
-                                                                                                                  .processId(taskSummary.getProcessId())
-                                                                                                                  .processInstanceId(taskSummary.getProcessInstanceId())
-                                                                                                                  .status(taskSummary.getStatus())
-                                                                                                                  .build();
+                        .id(taskSummary.getTaskId())
+                        .name(taskSummary.getName())
+                        .description(taskSummary.getDescription())
+                        .activationTime(taskSummary.getActivationTime())
+                        .actualOwner(taskSummary.getActualOwner())
+                        .containerId(taskSummary.getDeploymentId())
+                        .createdBy(taskSummary.getCreatedBy())
+                        .createdOn(taskSummary.getCreatedOn())
+                        .priority(taskSummary.getPriority())
+                        .processId(taskSummary.getProcessId())
+                        .processInstanceId(taskSummary.getProcessInstanceId())
+                        .status(taskSummary.getStatus())
+                        .build();
                 tasks[counter] = task;
                 counter++;
             }
@@ -140,7 +140,7 @@ public class ConvertUtils {
 
         return instance;
     }
-
+    
     public static ProcessInstanceCustomVarsList convertToProcessInstanceCustomVarsList(Collection<ProcessInstanceCustomDesc> instances) {
         if (instances == null) {
             return new ProcessInstanceCustomVarsList(new org.kie.server.api.model.instance.ProcessInstanceCustomVars[0]);
@@ -155,28 +155,28 @@ public class ConvertUtils {
 
         return new ProcessInstanceCustomVarsList(processInstances);
     }
-
+    
     public static org.kie.server.api.model.instance.ProcessInstanceCustomVars convertToProcessInstanceCustomVars(ProcessInstanceCustomDesc pi) {
         if (pi == null) {
             return null;
         }
 
         org.kie.server.api.model.instance.ProcessInstanceCustomVars instance = org.kie.server.api.model.instance.ProcessInstanceCustomVars.builder()
-                                                                                                                                          .id(pi.getId())
-                                                                                                                                          .processId(pi.getProcessId())
-                                                                                                                                          .processName(pi.getProcessName())
-                                                                                                                                          .processVersion(pi.getProcessVersion())
-                                                                                                                                          .containerId(pi.getDeploymentId())
-                                                                                                                                          .processInstanceDescription(pi.getProcessInstanceDescription())
-                                                                                                                                          .correlationKey(pi.getCorrelationKey())
-                                                                                                                                          .parentInstanceId(pi.getParentId())
-                                                                                                                                          .date(pi.getDataTimeStamp())
-                                                                                                                                          .initiator(pi.getInitiator())
-                                                                                                                                          .state(pi.getState())
-                                                                                                                                          .lastModificationDate(pi.getLastModificationDate())
-                                                                                                                                          .variables(pi.getVariables())
-                                                                                                                                          .build();
-
+                .id(pi.getId())
+                .processId(pi.getProcessId())
+                .processName(pi.getProcessName())
+                .processVersion(pi.getProcessVersion())
+                .containerId(pi.getDeploymentId())
+                .processInstanceDescription(pi.getProcessInstanceDescription())
+                .correlationKey(pi.getCorrelationKey())
+                .parentInstanceId(pi.getParentId())
+                .date(pi.getDataTimeStamp())
+                .initiator(pi.getInitiator())
+                .state(pi.getState())
+                .lastModificationDate(pi.getLastModificationDate())
+                .variables(pi.getVariables())
+                .build();
+        
         return instance;
     }
 
@@ -201,13 +201,13 @@ public class ConvertUtils {
         }
 
         org.kie.server.api.model.definition.ProcessDefinition processDefinition = org.kie.server.api.model.definition.ProcessDefinition.builder()
-                                                                                                                                       .id(processDesc.getId())
-                                                                                                                                       .name(processDesc.getName())
-                                                                                                                                       .packageName(processDesc.getPackageName())
-                                                                                                                                       .version(processDesc.getVersion())
-                                                                                                                                       .containerId(processDesc.getDeploymentId())
-                                                                                                                                       .dynamic(processDesc.isDynamic())
-                                                                                                                                       .build();
+                .id(processDesc.getId())
+                .name(processDesc.getName())
+                .packageName(processDesc.getPackageName())
+                .version(processDesc.getVersion())
+                .containerId(processDesc.getDeploymentId())
+                .dynamic(processDesc.isDynamic())
+                .build();
 
         return processDefinition;
     }
@@ -233,21 +233,21 @@ public class ConvertUtils {
         }
 
         ExecutionErrorInstance errorInstance = ExecutionErrorInstance.builder()
-                                                                     .error(executionError.getError())
-                                                                     .errorId(executionError.getErrorId())
-                                                                     .errorDate(executionError.getErrorDate())
-                                                                     .processInstanceId(executionError.getProcessInstanceId())
-                                                                     .acknowledged(executionError.isAcknowledged())
-                                                                     .acknowledgedAt(executionError.getAcknowledgedAt())
-                                                                     .acknowledgedBy(executionError.getAcknowledgedBy())
-                                                                     .activityId(executionError.getActivityId())
-                                                                     .activityName(executionError.getActivityName())
-                                                                     .jobId(executionError.getJobId())
-                                                                     .containerId(executionError.getDeploymentId())
-                                                                     .message(executionError.getErrorMessage())
-                                                                     .processId(executionError.getProcessId())
-                                                                     .type(executionError.getType())
-                                                                     .build();
+                .error(executionError.getError())
+                .errorId(executionError.getErrorId())
+                .errorDate(executionError.getErrorDate())
+                .processInstanceId(executionError.getProcessInstanceId())
+                .acknowledged(executionError.isAcknowledged())
+                .acknowledgedAt(executionError.getAcknowledgedAt())
+                .acknowledgedBy(executionError.getAcknowledgedBy())
+                .activityId(executionError.getActivityId())
+                .activityName(executionError.getActivityName())
+                .jobId(executionError.getJobId())
+                .containerId(executionError.getDeploymentId())
+                .message(executionError.getErrorMessage())
+                .processId(executionError.getProcessId())
+                .type(executionError.getType())
+                .build();
 
         return errorInstance;
     }
@@ -312,23 +312,24 @@ public class ConvertUtils {
         return taskStatuses;
     }
 
+
     public static NodeInstance convertToNodeInstance(NodeInstanceDesc nodeInstanceDesc) {
 
         NodeInstance nodeInstance = NodeInstance.builder()
-                                                .id(nodeInstanceDesc.getId())
-                                                .name(nodeInstanceDesc.getName())
-                                                .nodeId(nodeInstanceDesc.getNodeId())
-                                                .nodeType(nodeInstanceDesc.getNodeType())
-                                                .processInstanceId(nodeInstanceDesc.getProcessInstanceId())
-                                                .containerId(nodeInstanceDesc.getDeploymentId())
-                                                .workItemId(nodeInstanceDesc.getWorkItemId())
-                                                .completed(nodeInstanceDesc.isCompleted())
-                                                .connection(nodeInstanceDesc.getConnection())
-                                                .date(nodeInstanceDesc.getDataTimeStamp())
-                                                .referenceId(nodeInstanceDesc.getReferenceId())
-                                                .slaCompliance(nodeInstanceDesc.getSlaCompliance())
-                                                .slaDueDate(nodeInstanceDesc.getSlaDueDate())
-                                                .build();
+                .id(nodeInstanceDesc.getId())
+                .name(nodeInstanceDesc.getName())
+                .nodeId(nodeInstanceDesc.getNodeId())
+                .nodeType(nodeInstanceDesc.getNodeType())
+                .processInstanceId(nodeInstanceDesc.getProcessInstanceId())
+                .containerId(nodeInstanceDesc.getDeploymentId())
+                .workItemId(nodeInstanceDesc.getWorkItemId())
+                .completed(nodeInstanceDesc.isCompleted())
+                .connection(nodeInstanceDesc.getConnection())
+                .date(nodeInstanceDesc.getDataTimeStamp())
+                .referenceId(nodeInstanceDesc.getReferenceId())
+                .slaCompliance(nodeInstanceDesc.getSlaCompliance())
+                .slaDueDate(nodeInstanceDesc.getSlaDueDate())
+                .build();
 
         return nodeInstance;
 
@@ -351,12 +352,12 @@ public class ConvertUtils {
 
     public static VariableInstance convertToVariable(VariableDesc variableDesc) {
         VariableInstance instance = VariableInstance.builder()
-                                                    .name(variableDesc.getVariableId())
-                                                    .processInstanceId(variableDesc.getProcessInstanceId())
-                                                    .value(variableDesc.getNewValue())
-                                                    .oldValue(variableDesc.getOldValue())
-                                                    .date(variableDesc.getDataTimeStamp())
-                                                    .build();
+                .name(variableDesc.getVariableId())
+                .processInstanceId(variableDesc.getProcessInstanceId())
+                .value(variableDesc.getNewValue())
+                .oldValue(variableDesc.getOldValue())
+                .date(variableDesc.getDataTimeStamp())
+                .build();
 
         return instance;
     }
@@ -408,27 +409,29 @@ public class ConvertUtils {
     }
 
     public static TaskInstance convertToTask(UserTaskInstanceDesc userTask) {
-        return TaskInstance.builder()
-                           .id(userTask.getTaskId())
-                           .name(userTask.getName())
-                           .processInstanceId(userTask.getProcessInstanceId())
-                           .processId(userTask.getProcessId())
-                           .activationTime(userTask.getActivationTime())
-                           .actualOwner(userTask.getActualOwner())
-                           .containerId(userTask.getDeploymentId())
-                           .createdBy(userTask.getCreatedBy())
-                           .createdOn(userTask.getCreatedOn())
-                           .description(userTask.getDescription())
-                           .expirationTime(userTask.getDueDate())
-                           .status(userTask.getStatus())
-                           .priority(userTask.getPriority())
-                           .workItemId(userTask.getWorkItemId())
-                           .slaCompliance(userTask.getSlaCompliance())
-                           .slaDueDate(userTask.getSlaDueDate())
-                           .subject(userTask.getSubject())
-                           .build();
-    }
 
+        TaskInstance instance = TaskInstance.builder()
+                .id(userTask.getTaskId())
+                .name(userTask.getName())
+                .processInstanceId(userTask.getProcessInstanceId())
+                .processId(userTask.getProcessId())
+                .activationTime(userTask.getActivationTime())
+                .actualOwner(userTask.getActualOwner())
+                .containerId(userTask.getDeploymentId())
+                .createdBy(userTask.getCreatedBy())
+                .createdOn(userTask.getCreatedOn())
+                .description(userTask.getDescription())
+                .expirationTime(userTask.getDueDate())
+                .status(userTask.getStatus())
+                .priority(userTask.getPriority())
+                .workItemId(userTask.getWorkItemId())
+                .slaCompliance(userTask.getSlaCompliance())
+                .slaDueDate(userTask.getSlaDueDate())
+                .build();
+
+        return instance;
+    }
+    
     public static TaskWithProcessDescriptionList convertToTaskInstanceListPO(Collection<UserTaskInstanceWithPotOwnerDesc> instances) {
         if (instances == null) {
             return new TaskWithProcessDescriptionList(new org.kie.server.api.model.instance.TaskWithProcessDescription[0]);
@@ -442,33 +445,33 @@ public class ConvertUtils {
 
         return new TaskWithProcessDescriptionList(taskInstances);
     }
-
+    
     public static TaskWithProcessDescription convertToTaskPO(UserTaskInstanceWithPotOwnerDesc userTask) {
 
         TaskWithProcessDescription instance = TaskWithProcessDescription.builder()
-                                                                        .id(userTask.getTaskId())
-                                                                        .name(userTask.getName())
-                                                                        .processInstanceId(userTask.getProcessInstanceId())
-                                                                        .processId(userTask.getProcessId())
-                                                                        .activationTime(userTask.getActivationTime())
-                                                                        .actualOwner(userTask.getActualOwner())
-                                                                        .containerId(userTask.getDeploymentId())
-                                                                        .createdBy(userTask.getCreatedBy())
-                                                                        .createdOn(userTask.getCreatedOn())
-                                                                        .description(userTask.getDescription())
-                                                                        .formName(userTask.getFormName())
-                                                                        .expirationTime(userTask.getDueDate())
-                                                                        .status(userTask.getStatus())
-                                                                        .priority(userTask.getPriority())
-                                                                        .subject(userTask.getSubject())
-                                                                        .potentialOwners(userTask.getPotentialOwners())
-                                                                        .correlationKey(userTask.getCorrelationKey())
-                                                                        .lastModificationDate(userTask.getLastModificationDate())
-                                                                        .lastModificationUser(userTask.getLastModificationUser())
-                                                                        .inputData(userTask.getInputdata())
-                                                                        .outputData(userTask.getOutputdata())
-                                                                        .processInstanceDescription(userTask.getProcessInstanceDescription())
-                                                                        .build();
+                .id(userTask.getTaskId())
+                .name(userTask.getName())
+                .processInstanceId(userTask.getProcessInstanceId())
+                .processId(userTask.getProcessId())
+                .activationTime(userTask.getActivationTime())
+                .actualOwner(userTask.getActualOwner())
+                .containerId(userTask.getDeploymentId())
+                .createdBy(userTask.getCreatedBy())
+                .createdOn(userTask.getCreatedOn())
+                .description(userTask.getDescription())
+                .formName(userTask.getFormName())
+                .expirationTime(userTask.getDueDate())
+                .status(userTask.getStatus())
+                .priority(userTask.getPriority())
+                .subject(userTask.getSubject())
+                .potentialOwners(userTask.getPotentialOwners())
+                .correlationKey(userTask.getCorrelationKey())
+                .lastModificationDate(userTask.getLastModificationDate())
+                .lastModificationUser(userTask.getLastModificationUser())
+                .inputData(userTask.getInputdata())
+                .outputData(userTask.getOutputdata())
+                .processInstanceDescription(userTask.getProcessInstanceDescription())
+                .build();
 
         return instance;
     }
@@ -490,23 +493,23 @@ public class ConvertUtils {
 
     public static org.kie.server.api.model.instance.TaskSummary convertToTaskSummary(TaskSummary taskSummary) {
         org.kie.server.api.model.instance.TaskSummary task = org.kie.server.api.model.instance.TaskSummary.builder()
-                                                                                                          .id(taskSummary.getId())
-                                                                                                          .name(taskSummary.getName())
-                                                                                                          .description(taskSummary.getDescription())
-                                                                                                          .subject(taskSummary.getSubject())
-                                                                                                          .taskParentId(taskSummary.getParentId())
-                                                                                                          .activationTime(taskSummary.getActivationTime())
-                                                                                                          .actualOwner(taskSummary.getActualOwnerId())
-                                                                                                          .containerId(taskSummary.getDeploymentId())
-                                                                                                          .createdBy(taskSummary.getCreatedById())
-                                                                                                          .createdOn(taskSummary.getCreatedOn())
-                                                                                                          .expirationTime(taskSummary.getExpirationTime())
-                                                                                                          .priority(taskSummary.getPriority())
-                                                                                                          .processId(taskSummary.getProcessId())
-                                                                                                          .processInstanceId(taskSummary.getProcessInstanceId())
-                                                                                                          .status(taskSummary.getStatusId())
-                                                                                                          .skipable(taskSummary.isSkipable())
-                                                                                                          .build();
+                .id(taskSummary.getId())
+                .name(taskSummary.getName())
+                .description(taskSummary.getDescription())
+                .subject(taskSummary.getSubject())
+                .taskParentId(taskSummary.getParentId())
+                .activationTime(taskSummary.getActivationTime())
+                .actualOwner(taskSummary.getActualOwnerId())
+                .containerId(taskSummary.getDeploymentId())
+                .createdBy(taskSummary.getCreatedById())
+                .createdOn(taskSummary.getCreatedOn())
+                .expirationTime(taskSummary.getExpirationTime())
+                .priority(taskSummary.getPriority())
+                .processId(taskSummary.getProcessId())
+                .processInstanceId(taskSummary.getProcessInstanceId())
+                .status(taskSummary.getStatusId())
+                .skipable(taskSummary.isSkipable())
+                .build();
         return task;
     }
 
@@ -516,12 +519,12 @@ public class ConvertUtils {
         }
 
         QueryDefinition query = QueryDefinition.builder()
-                                               .name(queryDefinition.getName())
-                                               .expression(queryDefinition.getExpression())
-                                               .source(queryDefinition.getSource())
-                                               .target(queryDefinition.getTarget().toString())
-                                               .columns(queryDefinition.getColumns())
-                                               .build();
+                                .name(queryDefinition.getName())
+                                .expression(queryDefinition.getExpression())
+                                .source(queryDefinition.getSource())
+                                .target(queryDefinition.getTarget().toString())
+                                .columns(queryDefinition.getColumns())
+                                .build();
         return query;
     }
 
