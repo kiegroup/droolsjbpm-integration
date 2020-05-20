@@ -410,26 +410,25 @@ public class ConvertUtils {
 
     public static TaskInstance convertToTask(UserTaskInstanceDesc userTask) {
 
-        TaskInstance instance = TaskInstance.builder()
-                .id(userTask.getTaskId())
-                .name(userTask.getName())
-                .processInstanceId(userTask.getProcessInstanceId())
-                .processId(userTask.getProcessId())
-                .activationTime(userTask.getActivationTime())
-                .actualOwner(userTask.getActualOwner())
-                .containerId(userTask.getDeploymentId())
-                .createdBy(userTask.getCreatedBy())
-                .createdOn(userTask.getCreatedOn())
-                .description(userTask.getDescription())
-                .expirationTime(userTask.getDueDate())
-                .status(userTask.getStatus())
-                .priority(userTask.getPriority())
-                .workItemId(userTask.getWorkItemId())
-                .slaCompliance(userTask.getSlaCompliance())
-                .slaDueDate(userTask.getSlaDueDate())
+        return TaskInstance.builder()
+                           .id(userTask.getTaskId())
+                           .name(userTask.getName())
+                           .processInstanceId(userTask.getProcessInstanceId())
+                           .processId(userTask.getProcessId())
+                           .activationTime(userTask.getActivationTime())
+                           .actualOwner(userTask.getActualOwner())
+                           .containerId(userTask.getDeploymentId())
+                           .createdBy(userTask.getCreatedBy())
+                           .createdOn(userTask.getCreatedOn())
+                           .description(userTask.getDescription())
+                           .expirationTime(userTask.getDueDate())
+                           .status(userTask.getStatus())
+                           .priority(userTask.getPriority())
+                           .workItemId(userTask.getWorkItemId())
+                           .slaCompliance(userTask.getSlaCompliance())
+                           .slaDueDate(userTask.getSlaDueDate())
+                           .subject(userTask.getSubject())
                 .build();
-
-        return instance;
     }
     
     public static TaskWithProcessDescriptionList convertToTaskInstanceListPO(Collection<UserTaskInstanceWithPotOwnerDesc> instances) {
