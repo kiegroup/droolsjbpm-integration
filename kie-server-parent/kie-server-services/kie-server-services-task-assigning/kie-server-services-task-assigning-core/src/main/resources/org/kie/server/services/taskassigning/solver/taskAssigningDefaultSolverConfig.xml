@@ -11,7 +11,13 @@
     <scoreDrl>org/kie/server/services/taskassigning/solver/taskAssigningScoreRules.drl</scoreDrl>
   </scoreDirectorFactory>
 
-  <constructionHeuristic/>
+  <moveThreadCount>AUTO</moveThreadCount>
+
+  <constructionHeuristic>
+    <changeMoveSelector>
+      <filterClass>org.kie.server.services.taskassigning.core.model.solver.filter.TaskByGroupAndSkillsChangeMoveFilter</filterClass>
+    </changeMoveSelector>
+  </constructionHeuristic>
 
   <localSearch>
     <termination>

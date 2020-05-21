@@ -62,6 +62,9 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_VERSION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID;
@@ -274,12 +277,18 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         final String artifactId = readSystemProperty(TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID, null, value -> value);
         final String version = readSystemProperty(TASK_ASSIGNING_SOLVER_CONTAINER_VERSION, null, value -> value);
         final String solverConfigResource = readSystemProperty(TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE, DEFAULT_SOLVER_CONFIG, value -> value);
+        final String moveThreadCount = readSystemProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT, null, value -> value);
+        final int moveThreadBufferSize = readSystemProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE, -1, Integer::parseInt);
+        final String threadFactoryClass = readSystemProperty(TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS, null, value -> value);
 
         return new SolverDef(containerId,
                              groupId,
                              artifactId,
                              version,
-                             solverConfigResource);
+                             solverConfigResource,
+                             moveThreadCount,
+                             moveThreadBufferSize,
+                             threadFactoryClass);
     }
 
     TaskAssigningService createTaskAssigningService() {

@@ -96,6 +96,21 @@ public class TaskAssigningConstants {
      */
     public static final String TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE = "org.kie.server.taskAssigning.solver.configResource";
 
+    /**
+     * Property for configuring the solver moveThreadCount.
+     */
+    public static final String TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT = "org.kie.server.taskAssigning.solver.moveThreadCount";
+
+    /**
+     * Property for configuring the solver moveThreadBufferSize.
+     */
+    public static final String TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE = "org.kie.server.taskAssigning.solver.moveThreadBufferSize";
+
+    /**
+     * Property for configuring the solver threadFactoryClass.
+     */
+    public static final String TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS = "org.kie.server.taskAssigning.solver.threadFactoryClass";
+
     public static final String TASK_ASSIGNING_SOLVER_CONTAINER_ID = "org.kie.server.taskAssigning.solver.container.id";
 
     public static final String TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID = "org.kie.server.taskAssigning.solver.container.groupId";

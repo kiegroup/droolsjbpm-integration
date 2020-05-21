@@ -38,7 +38,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.optaplanner.core.api.score.buildin.bendable.BendableScore;
+import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScore;
 import org.optaplanner.core.api.solver.event.BestSolutionChangedEvent;
 import org.optaplanner.core.api.solver.event.SolverEventListener;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
@@ -273,7 +273,7 @@ public class SolverHandlerTest {
         BestSolutionChangedEvent<TaskAssigningSolution> event = mock(BestSolutionChangedEvent.class);
         when(event.isEveryProblemFactChangeProcessed()).thenReturn(allChangesProcessed);
         TaskAssigningSolution solution = mock(TaskAssigningSolution.class);
-        BendableScore score = BendableScore.zero(1, 1).withInitScore(solutionInitialized ? 1 : -1);
+        BendableLongScore score = BendableLongScore.zero(1, 1).withInitScore(solutionInitialized ? 1 : -1);
         when(solution.getScore()).thenReturn(score);
         when(event.getNewBestSolution()).thenReturn(solution);
         return event;

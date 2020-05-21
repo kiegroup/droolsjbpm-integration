@@ -25,7 +25,7 @@ import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
-import org.optaplanner.core.api.score.buildin.bendable.BendableScore;
+import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScore;
 import org.optaplanner.persistence.xstream.api.score.buildin.bendable.BendableScoreXStreamConverter;
 
 @PlanningSolution
@@ -42,7 +42,7 @@ public class TaskAssigningSolution extends AbstractPersistable {
 
     @XStreamConverter(BendableScoreXStreamConverter.class)
     @PlanningScore(bendableHardLevelsSize = 2, bendableSoftLevelsSize = 6)
-    private BendableScore score;
+    private BendableLongScore score;
 
     public TaskAssigningSolution() {
     }
@@ -69,11 +69,11 @@ public class TaskAssigningSolution extends AbstractPersistable {
         this.taskList = taskList;
     }
 
-    public BendableScore getScore() {
+    public BendableLongScore getScore() {
         return score;
     }
 
-    public void setScore(BendableScore score) {
+    public void setScore(BendableLongScore score) {
         this.score = score;
     }
 }

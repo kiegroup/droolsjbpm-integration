@@ -16,16 +16,23 @@
 
 package org.kie.server.services.taskassigning.planning;
 
-import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
+import java.util.concurrent.ThreadFactory;
+
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.config.solver.SolverConfig;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class SolverBuilder {
+
+    static final String CONFIGURED_THREAD_FACTORY_CLASS_NOT_FOUND_ERROR = "An error was produced during threadFactoryClass initialization, class: %s was not found.";
+    static final String CONFIGURED_THREAD_FACTORY_CLASS_MUST_IMPLEMENT_THREAD_FACTORY = "An error was produced during threadFactoryClass initialization, class: %s must implement: %s.";
 
     private SolverDef solverDef;
 
@@ -63,8 +70,28 @@ public class SolverBuilder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Solver<TaskAssigningSolution> buildFromResource() {
-        SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.createFromXmlResource(solverDef.getSolverConfigResource());
+        final SolverConfig solverConfig = SolverConfig.createFromXmlResource(solverDef.getSolverConfigResource());
+        if (isNotEmpty(solverDef.getMoveThreadCount())) {
+            solverConfig.setMoveThreadCount(solverDef.getMoveThreadCount());
+            if (solverDef.getMoveThreadBufferSize() >= 1) {
+                solverConfig.setMoveThreadBufferSize(solverConfig.getMoveThreadBufferSize());
+            }
+        }
+        if (isNotEmpty(solverDef.getThreadFactoryClass())) {
+            Class<?> threadFactoryClass;
+            try {
+                threadFactoryClass = Class.forName(solverDef.getThreadFactoryClass());
+            } catch (ClassNotFoundException e) {
+                throw new SolverBuilderException(String.format(CONFIGURED_THREAD_FACTORY_CLASS_NOT_FOUND_ERROR, solverDef.getThreadFactoryClass()));
+            }
+            if (!ThreadFactory.class.isAssignableFrom(threadFactoryClass)) {
+                throw new SolverBuilderException(String.format(CONFIGURED_THREAD_FACTORY_CLASS_MUST_IMPLEMENT_THREAD_FACTORY, solverDef.getThreadFactoryClass(), ThreadFactory.class.getName()));
+            }
+            solverConfig.setThreadFactoryClass((Class<? extends ThreadFactory>) threadFactoryClass);
+        }
+        final SolverFactory<TaskAssigningSolution> solverFactory = SolverFactory.create(solverConfig);
         return solverFactory.buildSolver();
     }
 
