@@ -66,6 +66,9 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_VERSION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID;
@@ -115,6 +118,10 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     private static final String RUNTIME_ALIAS_PWD = "jBPMKeyPassword";
     private static final String RUNTIME_ALIAS_STORED_PWD = "kieserver1!";
 
+    private static final String SOLVER_MOVE_THREAD_COUNT = "AUTO";
+    private static final int SOLVER_MOVE_THREAD_BUFFER_SIZE = 2;
+    private static final String SOLVER_THREAD_FACTORY_CLASS = "SOLVER_THREAD_FACTORY_CLASS";
+
     private static final String SOLVER_CONTAINER_ID = "SOLVER_CONTAINER_ID";
     private static final String SOLVER_CONTAINER_GROUP_ID = "SOLVER_CONTAINER_GROUP_ID";
     private static final String SOLVER_CONTAINER_ARTIFACT_ID = "SOLVER_CONTAINER_ARTIFACT_ID";
@@ -144,6 +151,9 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
     @Mock
     private Solver<TaskAssigningSolution> solver;
+
+    @Captor
+    private ArgumentCaptor<SolverDef> solverDefCaptor;
 
     @Mock
     private KieContainerInstanceImpl solverContainer;
@@ -184,6 +194,10 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         System.clearProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER);
         System.clearProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD);
         System.clearProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT);
+
+        System.clearProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT);
+        System.clearProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE);
+        System.clearProperty(TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS);
 
         System.clearProperty(TASK_ASSIGNING_SOLVER_CONTAINER_ID);
         System.clearProperty(TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID);
@@ -354,11 +368,19 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     @Test
     public void serverStartedSuccessful() {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
+        System.setProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT, SOLVER_MOVE_THREAD_COUNT);
+        System.setProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE, Integer.toString(SOLVER_MOVE_THREAD_BUFFER_SIZE));
+        System.setProperty(TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS, SOLVER_THREAD_FACTORY_CLASS);
+
         enableExtension();
         doReturn(userSystemService).when(extension).lookupUserSystem(eq(USER_SYSTEM_NAME), any());
         doReturn(solver).when(extension).createSolver(eq(registry), any());
 
         initAndStartServerSuccessful();
+        verify(extension).createSolver(eq(registry), solverDefCaptor.capture());
+        assertEquals(SOLVER_MOVE_THREAD_COUNT, solverDefCaptor.getValue().getMoveThreadCount());
+        assertEquals(SOLVER_MOVE_THREAD_BUFFER_SIZE, solverDefCaptor.getValue().getMoveThreadBufferSize());
+        assertEquals(SOLVER_THREAD_FACTORY_CLASS, solverDefCaptor.getValue().getThreadFactoryClass());
     }
 
     @Test

@@ -17,6 +17,7 @@
 package org.kie.server.services.taskassigning.core.model;
 
 import java.util.List;
+import java.util.Set;
 
 public class TestUtil {
 
@@ -39,5 +40,23 @@ public class TestUtil {
             previous = taskOrUser;
         }
         return user;
+    }
+
+    public static Task mockTask(List<OrganizationalEntity> potentialOwners, Set<Object> skills) {
+        Task task = new Task(1, "TaskName", 1);
+        task.getPotentialOwners().addAll(potentialOwners);
+        task.setLabelValues(DefaultLabels.SKILLS.name(), skills);
+        return task;
+    }
+
+    public static User mockUser(String userId, boolean enabled, List<Group> groups, Set<Object> skills) {
+        User user = new User(userId.hashCode(), userId, enabled);
+        user.getGroups().addAll(groups);
+        user.setLabelValues(DefaultLabels.SKILLS.name(), skills);
+        return user;
+    }
+
+    public static Group mockGroup(String groupId) {
+        return new Group(groupId.hashCode(), groupId);
     }
 }

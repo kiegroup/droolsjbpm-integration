@@ -17,7 +17,7 @@
 package org.kie.server.services.taskassigning.solver;
 dialect "java"
 
-import org.optaplanner.core.api.score.buildin.bendable.BendableScoreHolder;
+import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScoreHolder;
 
 import org.kie.server.services.taskassigning.core.model.DefaultLabels;
 import org.kie.server.services.taskassigning.core.model.ModelConstants;
@@ -25,8 +25,9 @@ import org.kie.server.services.taskassigning.core.model.Task;
 import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
 import org.kie.server.services.taskassigning.core.model.solver.PriorityHelper;
 import org.kie.server.services.taskassigning.core.model.solver.TaskHelper;
+import org.kie.server.services.taskassigning.core.model.solver.condition.TaskAssigningConditions;
 
-global BendableScoreHolder scoreHolder;
+global BendableLongScoreHolder scoreHolder;
 
 // ############################################################################
 // Hard constraints
@@ -35,7 +36,7 @@ global BendableScoreHolder scoreHolder;
 // A task can only be assigned to one of it's potential owners or to the PlanningUser
 rule "Required Potential Owner"
     when
-        $task : Task(user != null, (!user.isEnabled() || (!ModelConstants.IS_PLANNING_USER.test(user.getEntityId()) && !TaskHelper.isPotentialOwner($task, user))))
+        $task : Task(user != null, !TaskAssigningConditions.userMeetsPotentialOwnerOrPlanningUserCondition($task, user))
     then
         scoreHolder.addHardConstraintMatch(kcontext, 0, -1);
 end
@@ -43,7 +44,7 @@ end
 // A task with defined skills can only be assigned to users that has all the of them or to the PlanningUser
 rule "Required Skills"
     when
-        $task : Task(user != null, (!user.isEnabled() || (!ModelConstants.IS_PLANNING_USER.test(user.getEntityId()) && !TaskHelper.hasAllLabels($task, user, DefaultLabels.SKILLS.name()))))
+        $task : Task(user != null, !TaskAssigningConditions.userMeetsRequiredSkillsOrPlanningUserCondition($task, user))
     then
         scoreHolder.addHardConstraintMatch(kcontext, 1, -1);
 end
@@ -77,7 +78,7 @@ end
 // When a task has defined affinities consider assigning users that match the most of them as possible.
 rule "Desired Affinities"
     when
-        $task : Task(user != null)
+        $task : Task(user != null, user.isEnabled())
     then
         scoreHolder.addSoftConstraintMatch(kcontext, 2, TaskHelper.countMatchingLabels($task, $task.getUser(), DefaultLabels.AFFINITIES.name()));
 end

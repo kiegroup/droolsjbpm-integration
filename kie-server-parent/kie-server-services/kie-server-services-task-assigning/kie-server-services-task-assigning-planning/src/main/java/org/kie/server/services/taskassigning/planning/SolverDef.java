@@ -22,6 +22,9 @@ public class SolverDef {
     private String groupId;
     private String artifactId;
     private String version;
+    private String moveThreadCount;
+    private int moveThreadBufferSize;
+    private String threadFactoryClass;
 
     private String solverConfigResource;
 
@@ -29,16 +32,32 @@ public class SolverDef {
         this.solverConfigResource = solverConfigResource;
     }
 
+    public SolverDef(String solverConfigResource,
+                     String moveThreadCount,
+                     int moveThreadBufferSize,
+                     String threadFactoryClass) {
+        this.solverConfigResource = solverConfigResource;
+        this.moveThreadCount = moveThreadCount;
+        this.moveThreadBufferSize = moveThreadBufferSize;
+        this.threadFactoryClass = threadFactoryClass;
+    }
+
     public SolverDef(String containerId,
                      String groupId,
                      String artifactId,
                      String version,
-                     String solverConfigResource) {
+                     String solverConfigResource,
+                     String moveThreadCount,
+                     int moveThreadBufferSize,
+                     String threadFactoryClass) {
         this.containerId = containerId;
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
         this.solverConfigResource = solverConfigResource;
+        this.moveThreadCount = moveThreadCount;
+        this.moveThreadBufferSize = moveThreadBufferSize;
+        this.threadFactoryClass = threadFactoryClass;
     }
 
     public String getContainerId() {
@@ -59,5 +78,17 @@ public class SolverDef {
 
     public String getSolverConfigResource() {
         return solverConfigResource;
+    }
+
+    public String getMoveThreadCount() {
+        return moveThreadCount;
+    }
+
+    public int getMoveThreadBufferSize() {
+        return moveThreadBufferSize;
+    }
+
+    public String getThreadFactoryClass() {
+        return threadFactoryClass;
     }
 }
