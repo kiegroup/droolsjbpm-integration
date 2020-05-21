@@ -131,6 +131,7 @@ public class ConvertUtils {
                         .processId(taskSummary.getProcessId())
                         .processInstanceId(taskSummary.getProcessInstanceId())
                         .status(taskSummary.getStatus())
+                        .subject(taskSummary.getSubject())
                         .build();
                 tasks[counter] = task;
                 counter++;
@@ -428,6 +429,7 @@ public class ConvertUtils {
                 .slaCompliance(userTask.getSlaCompliance())
                 .slaDueDate(userTask.getSlaDueDate())
                 .formName(userTask.getFormName())
+                .subject(userTask.getSubject())
                 .build();
 
         return instance;
@@ -472,6 +474,7 @@ public class ConvertUtils {
                 .inputData(userTask.getInputdata())
                 .outputData(userTask.getOutputdata())
                 .processInstanceDescription(userTask.getProcessInstanceDescription())
+                .subject(userTask.getSubject())
                 .build();
 
         return instance;
@@ -510,6 +513,7 @@ public class ConvertUtils {
                 .processInstanceId(taskSummary.getProcessInstanceId())
                 .status(taskSummary.getStatusId())
                 .skipable(taskSummary.isSkipable())
+                .subject(taskSummary.getSubject())
                 .build();
         return task;
     }
