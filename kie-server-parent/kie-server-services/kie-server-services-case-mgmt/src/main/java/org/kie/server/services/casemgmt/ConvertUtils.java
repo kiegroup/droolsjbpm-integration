@@ -478,6 +478,7 @@ public class ConvertUtils {
             var.setProcessVariables(desc.getProcessVariables());
             var.setInputVariables(desc.getInputdata());
             var.setCaseVariables(desc.getExtraData());
+            var.setStatus(desc.getStatus());
             data.add(var);
         }
 

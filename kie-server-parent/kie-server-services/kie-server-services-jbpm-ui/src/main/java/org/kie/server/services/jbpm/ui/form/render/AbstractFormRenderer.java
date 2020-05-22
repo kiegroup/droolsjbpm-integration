@@ -88,6 +88,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("RadioGroup", "radio");
         this.inputTypes.put("Document", "file");
         this.inputTypes.put("DatePicker", "date");
+        this.inputTypes.put("Slider", "slider");
 
         
         cfg = new Configuration(Configuration.VERSION_2_3_26);
@@ -252,7 +253,9 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getTaskEndpoint", "return '" + taskEndpoint.toString() + "';"));
-        scriptDataList.add(buildFunctionWithBody("initializeForm", "taskStatus = '" + task.getTaskData().getStatus().name() + "';initTaskButtons();"));
+        scriptDataList.add(buildFunctionWithBody("initializeForm", "taskStatus = '" + task.getTaskData().getStatus().name() + "';" +
+                                                                   "$('input[data-slider-id]').slider({});" +
+                                                                   "initTaskButtons();"));
         scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
@@ -321,10 +324,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                 
                 for (LayoutItem item : column.getItems()) {
                     if (item.getValue() != null) {
-                        String output = item.getValue();
+                        String output = (String) item.getValue();
                         if (output.contains("${")) {
                             String uuid = UUID.randomUUID().toString();;
-                            loadTemplate(fieldLevelStringLoader, uuid, new ByteArrayInputStream(item.getValue().getBytes(Charset.forName("UTF-8"))));
+                            loadTemplate(fieldLevelStringLoader, uuid, new ByteArrayInputStream(output.getBytes(Charset.forName("UTF-8"))));
                             Map<String, Object> parameters = new HashMap<>();
                             parameters.putAll(inputs);
                             parameters.putAll(outputs);                        
@@ -359,17 +362,24 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             item.setLabel(nonNull(field.getLabel()));
                             item.setPlaceHolder(nonNull(field.getPlaceHolder()));
                             item.setType(fieldType);
-                            item.setValue("");
+
                             item.setOptions(field.getOptions());
                             item.setPattern(getValidationPatternByType(field.getType()));
-                            
+
+                            item.setMin(field.getMin());
+                            item.setMax(field.getMax());
+                            item.setPrecision(field.getPrecision());
+                            item.setStep(field.getStep());
+
+                            Object value = "";
                             if (inputs.get(field.getBinding()) != null) {
-                                item.setValue(inputs.get(field.getBinding()).toString());
+                                value = inputs.get(field.getBinding());
                             }
                             if (outputs.get(field.getBinding()) != null) {
-                                item.setValue(outputs.get(field.getBinding()).toString());
+                                value = outputs.get(field.getBinding());
                             }
                             
+                            item.setValue(value);
                             item.setReadOnly(field.isReadOnly());
                             item.setRequired(field.isRequired());
                             
@@ -576,15 +586,36 @@ public abstract class AbstractFormRenderer implements FormRenderer {
      */
     
     protected void appendFieldJSON(StringBuilder jsonTemplate, String type, String name, String id, String jsType) {
-        jsonTemplate
-            .append("'")
-            .append(name)
-            .append("' : ")
-            .append(jsType)
-            .append(appendExtractionExpression(type, name, id, jsType))
-            .append(")")
-            .append(",");
-    
+        jsonTemplate.append("'")
+                    .append(name)
+                    .append("' : ")
+                    .append(getFieldType(type))
+                    .append(appendExtractionExpression(type, name, id, jsType))
+                    .append(wrapEndFieldType(type))
+                    .append(",");
+
+    }
+
+    protected String getFieldType(String type) {
+        if (type.contains("Integer") || type.contains("Double") || type.contains("Float")) {
+            return "Number(";
+        } else if (type.contains("Boolean")) {
+            return "Boolean(";
+        } else if (type.contains("Date")) {
+            return "Object(";
+        } else if (type.contains("slider")) {
+            return " { \"java.lang.Double\" : Number(";
+        } else {
+            return "String(";
+        }
+    }
+
+    protected String wrapEndFieldType(String type) {
+        if (type.contains("slider")) {
+            return ").toFixed(2) }";
+        } else {
+            return ")";
+        }
     }
     
     protected String appendExtractionExpression(String type, String name, String id, String jsType) {
@@ -669,17 +700,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         return scripts.toString();
     }
     
-    protected String getFieldType(String type) {
-        if (type.contains("Integer") || type.contains("Double") || type.contains("Float")) {
-            return "Number(";
-        } else if (type.contains("Boolean")) {
-            return "Boolean(";
-        } else if (type.contains("Document") || type.contains("Date")) {
-            return "Object(";
-        } else {
-            return "String(";
-        }
-    }
+
     
     protected String getExtractionValue(String jsType) {
         if (jsType.equals("Boolean(")) {
