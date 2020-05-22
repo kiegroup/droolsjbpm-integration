@@ -13,16 +13,26 @@
   <properties>
     <org.kie.version>7.38.0-SNAPSHOT</org.kie.version>
     <generateModel>NO</generateModel>
+    <generateDMNModel>NO</generateDMNModel>
     <generatePMMLModel>YES</generatePMMLModel>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
-
 
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-commons</artifactId>
       <version>${org.kie.version}</version>
     </dependency>
     <dependency>
