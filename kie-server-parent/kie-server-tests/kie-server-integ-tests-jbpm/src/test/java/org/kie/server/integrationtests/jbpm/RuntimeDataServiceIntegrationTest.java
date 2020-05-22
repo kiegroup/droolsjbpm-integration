@@ -1451,7 +1451,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10);
             assertNotNull(events);
-            assertEquals(1, events.size());
+            assertEquals(2, events.size());
 
             TaskEventInstance expectedTaskEventInstance = TaskEventInstance
                     .builder()
@@ -1469,7 +1469,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskClient.startTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
             events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10);
             assertNotNull(events);
-            assertEquals(2, events.size());
+            assertEquals(3, events.size());
 
             event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.ADDED.toString());
             assertTaskEventInstance(expectedTaskEventInstance, event);
@@ -1484,7 +1484,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10);
             assertNotNull(events);
-            assertEquals(3, events.size());
+            assertEquals(4, events.size());
 
             event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.ADDED.toString());
             expectedTaskEventInstance.setType(TaskEvent.TaskEventType.ADDED.toString());
@@ -1536,28 +1536,33 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskClient.stopTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
 
             // test paging of the result
-            List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 3, SORT_BY_TASK_EVENTS_TYPE, true);
+            List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 4, SORT_BY_TASK_EVENTS_TYPE, true);
 
             assertNotNull(events);
-            assertEquals(3, events.size());
+            assertEquals(4, events.size());
 
             TaskEventInstance event = events.get(0);
             assertNotNull(event);
             assertEquals(taskInstance.getId(), event.getTaskId());
-            assertEquals(TaskEvent.TaskEventType.ADDED.toString(), event.getType());
+            assertEquals(TaskEvent.TaskEventType.ACTIVATED.toString(), event.getType());
 
             event = events.get(1);
             assertNotNull(event);
             assertEquals(taskInstance.getId(), event.getTaskId());
-            assertEquals(TaskEvent.TaskEventType.STARTED.toString(), event.getType());
+            assertEquals(TaskEvent.TaskEventType.ADDED.toString(), event.getType());
 
             event = events.get(2);
+            assertNotNull(event);
+            assertEquals(taskInstance.getId(), event.getTaskId());
+            assertEquals(TaskEvent.TaskEventType.STARTED.toString(), event.getType());
+
+            event = events.get(3);
             assertNotNull(event);
             assertEquals(taskInstance.getId(), event.getTaskId());
             assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), event.getType());
 
             try {
-                events = taskClient.findTaskEvents(taskInstance.getId(), 1, 3, SORT_BY_TASK_EVENTS_TYPE, true);
+                events = taskClient.findTaskEvents(taskInstance.getId(), 2, 3, SORT_BY_TASK_EVENTS_TYPE, true);
                 KieServerAssert.assertNullOrEmpty("Task events list is not empty.", events);
             } catch (TaskNotFoundException e) {
                 assertTrue(e.getMessage().contains( "No task found with id " + taskInstance.getId() ));
@@ -1573,7 +1578,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10, SORT_BY_TASK_EVENTS_TYPE, false);
             assertNotNull(events);
-            assertEquals(3, events.size());
+            assertEquals(4, events.size());
 
             event = events.get(0);
             assertNotNull(event);
