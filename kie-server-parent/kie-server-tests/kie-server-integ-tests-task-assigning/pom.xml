@@ -16,6 +16,15 @@
     <java.module.name>org.kie.server.itests.taskassigning</java.module.name>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.sun.activation</groupId>
+        <artifactId>javax.activation</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -45,6 +54,10 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
     </dependency>
 
     <!-- Logging -->
@@ -258,6 +271,27 @@
     </profile>
     <profile>
       <id>tomcat9</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <dependencies combine.children="append">
+                    <!-- required with Java 11 -->
+                    <dependency>
+                      <groupId>com.sun.activation</groupId>
+                      <artifactId>javax.activation</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
     <profile>
       <id>wildfly</id>
@@ -283,6 +317,15 @@
                     <pingTimeout>60000</pingTimeout>
                   </deployable>
                 </deployables>
+                <container>
+                  <dependencies combine.children="append">
+                    <!-- required with Java 11 -->
+                    <dependency>
+                      <groupId>com.sun.activation</groupId>
+                      <artifactId>javax.activation</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
               </configuration>
             </plugin>
           </plugins>
@@ -313,6 +356,15 @@
                     <pingTimeout>60000</pingTimeout>
                   </deployable>
                 </deployables>
+                <container>
+                  <dependencies combine.children="append">
+                    <!-- required with Java 11 -->
+                    <dependency>
+                      <groupId>com.sun.activation</groupId>
+                      <artifactId>javax.activation</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
               </configuration>
             </plugin>
           </plugins>
