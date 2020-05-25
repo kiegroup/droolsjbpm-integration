@@ -93,7 +93,7 @@ public abstract class AbstractTaskAssigningQueryMapper<T> extends AbstractQueryM
 
         PLANNING_TASK_ASSIGNED_USER("ASSIGNEDUSER"),
 
-        PLANNING_TASK_INDEX("INDEX"),
+        PLANNING_TASK_INDEX("TASKINDEX"),
 
         PLANNING_TASK_PUBLISHED("PUBLISHED"),
 

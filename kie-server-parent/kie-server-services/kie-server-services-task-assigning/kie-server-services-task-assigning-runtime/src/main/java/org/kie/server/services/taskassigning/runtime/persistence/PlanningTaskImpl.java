@@ -32,6 +32,7 @@ public class PlanningTaskImpl {
     @Column(name = "taskId")
     private long taskId;
     private String assignedUser;
+    @Column(name = "taskIndex")
     private int index;
     private short published = 0;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
