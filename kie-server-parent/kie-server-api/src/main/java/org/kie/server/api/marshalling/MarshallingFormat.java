@@ -17,6 +17,7 @@
 package org.kie.server.api.marshalling;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -57,19 +58,24 @@ public enum MarshallingFormat {
         }
     }
 
+    
     public static boolean isStrictType(String type) {
-        int idx;
-        if ((idx = type.indexOf(';')) < 0 || (idx + 1) == type.length()) {
-            return false;
-        }
-        // we map parameter=1, pararmeter=2,.... into a map
-        Map<String, String> parameters = Arrays.asList(type.substring(idx + 1).split(","))
-                                               .stream()
-                                               .filter(e -> e.split("=").length > 1) // remove bad parameters
-                                               .map(e -> e.split("="))
-                                               .collect(Collectors.toMap(e -> ((String[]) e)[0].trim(), e -> ((String[]) e)[1]));
-        return Boolean.parseBoolean(parameters.get(Marshaller.MARSHALLER_PARAMETER_STRICT));
+        String strictParam  = (String)buildParameters(type).get(Marshaller.MARSHALLER_PARAMETER_STRICT);
+        return strictParam != null && Boolean.parseBoolean(strictParam);
     }
+    
+    public static Map<String,Object> buildParameters(String contentType)
+    {
+        int idx;
+        return ((idx = contentType.indexOf(';')) < 0 || (idx + 1) == contentType.length()) 
+                ? Collections.emptyMap() 
+                : Arrays.stream(contentType.substring(idx + 1).split(",")).
+                    filter(e -> e.split("=").length > 1) // remove bad parameters
+                    .map(e -> e.split("="))
+                    .collect(Collectors.toMap(e -> e[0].trim(), e ->  e[1].trim()));
+    }
+    
+
 
     public static MarshallingFormat fromType(String type) {
         if (startsWithIgnoreCase(type, "xstream") || startsWithIgnoreCase(type, "application/xstream")) {

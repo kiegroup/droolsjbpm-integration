@@ -41,6 +41,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -93,6 +94,8 @@ public class JSONMarshaller implements Marshaller {
     private static final Logger logger = LoggerFactory.getLogger(MarshallerFactory.class);
 
     private static final boolean STRICT_ID_FORMAT = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_STRICT_ID_FORMAT, "false"));
+    private static final String FIELDS = "fields";
+    private static final String NOT_NULL = "not_null";
 
     private boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
@@ -102,6 +105,8 @@ public class JSONMarshaller implements Marshaller {
         private boolean stripped;
 
         private boolean wrap;
+        
+        private boolean writeNull;
 
         public JSONContext() {
             this.reset();
@@ -110,6 +115,7 @@ public class JSONMarshaller implements Marshaller {
         public void reset() {
             stripped = false;
             wrap = false;
+            writeNull = true;
         }
 
         public boolean isStripped() {
@@ -127,12 +133,21 @@ public class JSONMarshaller implements Marshaller {
         public boolean isWrap() {
             return wrap;
         }
+
+        public boolean isWriteNull() {
+            return writeNull;
+        }
+
+        public void setWriteNull(boolean writeNull) {
+            this.writeNull = writeNull;
+        }
     }
 
     private ThreadLocal<JSONContext> jsonContext = ThreadLocal.withInitial(() -> new JSONContext());
 
     protected ClassLoader classLoader;
     protected ObjectMapper objectMapper;
+    private ObjectMapper notNullObjectMapper;
 
     protected Set<Class<?>> classesSet;
 
@@ -142,6 +157,8 @@ public class JSONMarshaller implements Marshaller {
 
     // Optional Marshaller Extension to handle new types
     private static final List<JSONMarshallerExtension> EXTENSIONS;
+
+    
 
     // Load Marshaller Extension
     static {
@@ -159,8 +176,8 @@ public class JSONMarshaller implements Marshaller {
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
         buildMarshaller(classes, classLoader);
-
         configureMarshaller(classes, classLoader);
+        this.notNullObjectMapper = objectMapper.copy().setSerializationInclusion(Include.NON_NULL);
     }
 
     protected void buildMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
@@ -304,7 +321,11 @@ public class JSONMarshaller implements Marshaller {
     public String marshall(Object input, Map<String, Object> parameters) {
         try {
             if (parameters.containsKey(MARSHALLER_PARAMETER_STRICT)) {
-                jsonContext.get().setWrap((boolean) parameters.get(MARSHALLER_PARAMETER_STRICT));
+                jsonContext.get().setWrap(Boolean.parseBoolean((String) parameters.get(MARSHALLER_PARAMETER_STRICT)));
+            }
+            if (NOT_NULL.equals(parameters.get(FIELDS)))
+            {
+                jsonContext.get().setWriteNull(false);
             }
             return marshall(input);
         } finally {
@@ -316,7 +337,7 @@ public class JSONMarshaller implements Marshaller {
     @Override
     public String marshall(Object objectInput) {
         try {
-            return objectMapper.writeValueAsString(wrap(objectInput));
+            return getMapper(objectMapper,notNullObjectMapper).writeValueAsString(wrap(objectInput));
         } catch (IOException e) {
             throw new MarshallingException("Error marshalling input", e);
         }
@@ -326,7 +347,7 @@ public class JSONMarshaller implements Marshaller {
     public <T> T unmarshall(String serializedInput, Class<T> type) {
 
         try {
-            Class actualType = classesSet.contains(type) ? Object.class : type;
+            Class<?> actualType = classesSet.contains(type) ? Object.class : type;
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
         } catch (IOException e) {
             throw new MarshallingException("Error unmarshalling input", e);
@@ -358,11 +379,15 @@ public class JSONMarshaller implements Marshaller {
 
     protected Object unwrap(Object data) {
         if (data instanceof Wrapped) {
-            return ((Wrapped) data).unwrap();
+            return ((Wrapped<?>) data).unwrap();
         }
 
         return data;
     }
+    
+    
+
+  
 
     class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {
 
@@ -535,25 +560,27 @@ public class JSONMarshaller implements Marshaller {
     class CustomObjectSerializer extends JsonSerializer<Object> {
 
         private ObjectMapper customObjectMapper;
+        private ObjectMapper notNullObjectMapper;
 
         public CustomObjectSerializer(ObjectMapper customObjectMapper) {
             this.customObjectMapper = customObjectMapper;
+            this.notNullObjectMapper = customObjectMapper.copy().setSerializationInclusion(Include.NON_NULL);
         }
 
         @Override
         public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
-
-            String json = customObjectMapper.writeValueAsString(value);
-            jgen.writeRawValue(json);
+            jgen.writeRawValue(getMapper(customObjectMapper,notNullObjectMapper).writeValueAsString(value));
         }
     }
 
     class WrappingObjectSerializer extends JsonSerializer<Object> {
 
         private ObjectMapper customObjectMapper;
+        private ObjectMapper notNullObjectMapper;
 
         public WrappingObjectSerializer(ObjectMapper customObjectMapper) {
             this.customObjectMapper = customObjectMapper;
+            this.notNullObjectMapper = customObjectMapper.copy().setSerializationInclusion(Include.NON_NULL);
         }
 
         @Override
@@ -561,17 +588,17 @@ public class JSONMarshaller implements Marshaller {
             String className = value.getClass().getName();
 
             if (value instanceof Collection) {
-                String collectionJson = writeCollection((Collection) value, customObjectMapper);
+                String collectionJson = writeCollection((Collection) value, getMapper(customObjectMapper,notNullObjectMapper));
                 jgen.writeRawValue(collectionJson);
             } else if (value instanceof Map) {
-                String mapJson = writeMap((Map) value, customObjectMapper);
+                String mapJson = writeMap((Map) value, getMapper(customObjectMapper,notNullObjectMapper));
                 jgen.writeRawValue(mapJson);
             } else if (value instanceof Object[] || value.getClass().isArray()) {
-                String arrayJson = writeArray((Object[]) value, customObjectMapper);
+                String arrayJson = writeArray((Object[]) value, getMapper(customObjectMapper,notNullObjectMapper));
                 jgen.writeRawValue(arrayJson);
             } else {
 
-                String json = customObjectMapper.writeValueAsString(value);
+                String json = getMapper(customObjectMapper,notNullObjectMapper).writeValueAsString(value);
 
                 // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
                 if (!className.startsWith("java.") && !className.startsWith("javax.") && !json.contains(className)) {
@@ -649,13 +676,13 @@ public class JSONMarshaller implements Marshaller {
             return builder.toString();
         }
 
-        private String writeCollection(Collection collection, ObjectMapper customObjectMapper) throws IOException {
+        private String writeCollection(Collection<?> collection, ObjectMapper customObjectMapper) throws IOException {
 
             StringBuilder builder = new StringBuilder();
             builder.append("[");
 
             int size = collection.size();
-            Iterator it = collection.iterator();
+            Iterator<?> it = collection.iterator();
             while (it.hasNext()) {
                 size--;
                 Object element = it.next();
@@ -678,6 +705,13 @@ public class JSONMarshaller implements Marshaller {
             return builder.toString();
         }
     }
+    
+    private ObjectMapper getMapper(ObjectMapper alwaysMapper, ObjectMapper notNullMapper)
+    {
+        return jsonContext.get().isWriteNull() ? alwaysMapper : notNullMapper;
+    }
+
+    
 
     class CustomObjectDeserializer extends UntypedObjectDeserializer {
 
