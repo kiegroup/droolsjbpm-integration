@@ -57,7 +57,9 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String BAD_CONTAINER_ID = "bad-definition-project";
     protected static final String CONTAINER_ID_USERTASK = "usertask-project";
     protected static final String CONTAINER_ID_SECURED = "secured-project";
+    protected static final String CONTAINER_ID_RESTART = "restart-project";
    
+    protected static final String PROCESS_ID_RESTART = "restart-project.simple";
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
     protected static final String PROCESS_ID_USERTASK2 = "definition-project.usertask2";
     protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";

@@ -137,6 +137,7 @@ import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
+import org.kie.server.api.model.definition.ProcessStartSpec;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
@@ -411,7 +412,8 @@ public class JaxbMarshaller implements Marshaller {
                                                  SearchQueryFilterSpec.class,
                                                  ProcessInstanceUserTaskWithVariablesList.class,
                                                  CaseUserTaskWithVariablesList.class,
-                                                 CaseInstanceCustomVarsList.class
+                                                 CaseInstanceCustomVarsList.class,
+                                                 ProcessStartSpec.class
         };
     }
 

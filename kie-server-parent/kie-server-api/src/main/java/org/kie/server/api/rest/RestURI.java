@@ -27,6 +27,7 @@ public class RestURI {
     public static final String CONTAINER_ID = "containerId";
     public static final String PROCESS_ID = "processId";
     public static final String PROCESS_INST_ID = "processInstanceId";
+    public static final String PROCESS_INST_HISTORY_TYPE = "processInstanceHistoryType";
     public static final String SIGNAL_NAME = "signalName";
     public static final String VAR_NAME = "varName";
     public static final String TASK_NAME = "taskName";
@@ -83,6 +84,8 @@ public class RestURI {
     // uris
     // process related prefixed by PROCESS_URI
     public static final String START_PROCESS_POST_URI = "{" + PROCESS_ID + "}/instances";
+    public static final String START_PROCESS_FROM_NODES_POST_URI = "{" + PROCESS_ID + "}/instances/fromNodes";
+    public static final String START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI = "{" + PROCESS_ID + "}/instances/correlation/{" + CORRELATION_KEY + "}/fromNodes";
     public static final String START_PROCESS_WITH_CORRELATION_KEY_POST_URI = "{" + PROCESS_ID + "}/instances/correlation/{" + CORRELATION_KEY + "}";
     public static final String ABORT_PROCESS_INST_DEL_URI = "instances/{" + PROCESS_INST_ID + "}";
     public static final String ABORT_PROCESS_INSTANCES_DEL_URI = "instances";

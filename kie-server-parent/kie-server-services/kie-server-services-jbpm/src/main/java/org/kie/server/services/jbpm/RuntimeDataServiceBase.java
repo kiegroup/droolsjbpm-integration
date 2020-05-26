@@ -25,6 +25,7 @@ import java.util.Map;
 import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.RuntimeDataService.EntryType;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
@@ -292,6 +293,15 @@ public class RuntimeDataServiceBase {
         NodeInstanceList nodeInstanceList = convertToNodeInstanceList(result);
         logger.debug("Returning result of node instances search: {}", nodeInstanceList);
         return nodeInstanceList;
+    }
+
+    public NodeInstanceList getProcessInstanceFullHistoryByType(long processInstanceId, String entryType, Integer page, Integer pageSize) {
+
+        logger.debug("About to search for node instances with page {} and page size {}", page, pageSize);
+        Collection<NodeInstanceDesc> result = null;
+
+        result = runtimeDataService.getProcessInstanceFullHistoryByType(processInstanceId, EntryType.valueOf(entryType), buildQueryContext(page, pageSize));
+        return convertToNodeInstanceList(result);
     }
 
     public VariableInstanceList getVariablesCurrentState(long processInstanceId) {
