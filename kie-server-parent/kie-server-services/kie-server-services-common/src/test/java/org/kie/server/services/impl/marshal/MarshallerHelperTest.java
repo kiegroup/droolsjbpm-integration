@@ -15,9 +15,7 @@
 
 package org.kie.server.services.impl.marshal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,10 +25,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.json.JSONException;
 import org.junit.Test;
-import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.definition.ProcessInstanceField;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
@@ -42,6 +39,9 @@ import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.xmlunit.matchers.CompareMatcher;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class MarshallerHelperTest {
 
@@ -217,6 +217,22 @@ public class MarshallerHelperTest {
 		ProcessInstanceQueryFilterSpec unmarshalledPiQfs = helper.unmarshal(marshalledQFS, MarshallingFormat.JSON.toString(), ProcessInstanceQueryFilterSpec.class);
 		assertThat(expectedPiQfs, new ReflectionEquals(unmarshalledPiQfs));
 	}
+	
+	
+	
+	@Test
+    public void testJsonUnmarshallNotNull() throws JSONException {
+	    KieServerRegistry kieServerRegistryMock = Mockito.mock(KieServerRegistry.class);
+	    Set<Class<?>> extraClasses = new HashSet<>();
+	    // simulate server conditions
+        extraClasses.add(Date.class);
+        extraClasses.add(org.kie.server.api.model.type.JaxbByteArray.class);
+        Mockito.when(kieServerRegistryMock.getExtraClasses()).thenReturn(extraClasses);
+        MarshallerHelper helper = new MarshallerHelper(kieServerRegistryMock);
+        JSONAssert.assertEquals("{\"order-asc\" : false}", helper.marshal("application/json ; fields = not_null ", new QueryFilterSpecBuilder().get()), true);
+        // test reset
+        JSONAssert.assertEquals("{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null, \"order-by-clause\" : null}", helper.marshal("application/json", new QueryFilterSpecBuilder().get()),true);
+    }
 	
 	@Test
 	public void testJsonUnmarshallTaskQueryFilterSpec() {
