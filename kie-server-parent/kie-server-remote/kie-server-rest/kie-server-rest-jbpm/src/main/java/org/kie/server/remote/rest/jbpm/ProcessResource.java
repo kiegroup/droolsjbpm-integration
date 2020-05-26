@@ -15,9 +15,57 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.DeploymentNotActiveException;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessDefinitionNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.WorkItemNotFoundException;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.ProcessServiceBase;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INSTANCES_DEL_URI;
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INST_DEL_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
 import static org.kie.server.api.rest.RestURI.PROCESS_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_PARENT_GET_URI;
@@ -34,24 +82,27 @@ import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEMS_BY_PRO
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_HISTORY_TYPE;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_NAME;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INSTANCES_PORT_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INST_POST_URI;
+import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_POST_URI;
+import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON;
@@ -75,54 +126,6 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.CREATE_RESPONSE
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.WORK_ITEM_NOT_FOUND;
-
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.DeploymentNotActiveException;
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessDefinitionNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.WorkItemNotFoundException;
-import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.model.instance.WorkItemInstanceList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.ProcessServiceBase;
-import org.kie.server.services.jbpm.RuntimeDataServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Process instances")
 @Path("server/" + PROCESS_URI)
@@ -193,6 +196,96 @@ public class ProcessResource  {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
                     MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
+        }
+    }
+
+    @ApiOperation(value = "Starts a new process instance from the specific nodes",
+            response=Long.class, code=201)
+    @ApiResponses(value = {@ApiResponse(code = 201, response = Long.class, message = "Process instance created",
+                                        examples = @Example(value = {@ExampleProperty(mediaType = JSON, value = LONG_RESPONSE_JSON),
+                                                                     @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
+            @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+    @POST
+    @Path(START_PROCESS_FROM_NODES_POST_URI)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response startProcessFromNodeIds(@javax.ws.rs.core.Context HttpHeaders headers,
+            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "process instance id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
+                                            @ApiParam(value = "optional map of process variables", required = false) @DefaultValue("") String payload) {
+
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        
+        try {
+            String response = processServiceBase.startProcessFromNodeIds(containerId, processId, payload, type);
+
+            logger.debug("Returning CREATED response with content '{}'", response);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+        } catch (DeploymentNotActiveException e) {
+            return badRequest(
+                    e.getMessage(), v);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(
+                    MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
+        }
+    }
+
+    @ApiOperation(value = "Starts a new process instance from the specific nodes",
+                  response = Long.class, code = 201)
+    @ApiResponses(value = {@ApiResponse(code = 201, response = Long.class, message = "Process instance created",
+                                        examples = @Example(value = {@ExampleProperty(mediaType = JSON, value = LONG_RESPONSE_JSON),
+                                                                     @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
+                           @ApiResponse(code = 500, message = "Unexpected error"),
+                           @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
+                           @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+    @POST
+    @Path(START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response startProcessWithCorrelationKeyFromNodeIds(@javax.ws.rs.core.Context HttpHeaders headers,
+                                            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+                                            @ApiParam(value = "process instance id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
+                                                              @ApiParam(value = "correlation key that should be used for creating the process", required = true,
+                                                                        example = "evaluation") @PathParam(CORRELATION_KEY) String correlationKey,
+                                                              @ApiParam(value = "start process specifications", required = false) @DefaultValue("") String payload) {
+
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+
+        try {
+            String response = processServiceBase.startProcessWithCorrelationKeyFromNodeIds(containerId, processId, correlationKey, payload, type);
+
+            logger.debug("Returning CREATED response with content '{}'", response);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+        } catch (DeploymentNotActiveException e) {
+            return badRequest(
+                              e.getMessage(), v);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                            MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound(
+                            MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(
+                                       MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
         }
     }
 
@@ -824,13 +917,20 @@ public class ProcessResource  {
             @ApiParam(value = "identifier of the process instance that history should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) long processInstanceId,
             @ApiParam(value = "instructs if active nodes only should be collected, defaults to false", required = false) @QueryParam("activeOnly")Boolean active, 
             @ApiParam(value = "instructs if completed nodes only should be collected, defaults to false", required = false) @QueryParam("completedOnly")Boolean completed,
+                                              @ApiParam(value = "entry type from the history", required = false,
+                                                        example = "123") @QueryParam(PROCESS_INST_HISTORY_TYPE) String processInstHistoryType,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            NodeInstanceList nodeInstanceList = runtimeDataServiceBase.getProcessInstanceHistory(processInstanceId, active, completed, page, pageSize);
+            NodeInstanceList nodeInstanceList = null;
+            if (processInstHistoryType == null) {
+                nodeInstanceList = runtimeDataServiceBase.getProcessInstanceHistory(processInstanceId, active, completed, page, pageSize);
+            } else {
+                nodeInstanceList = runtimeDataServiceBase.getProcessInstanceFullHistoryByType(processInstanceId, processInstHistoryType, page, pageSize);
+            }
             logger.debug("Returning result of node instances search: {}", nodeInstanceList);
             return createCorrectVariant(nodeInstanceList, headers, Response.Status.OK, conversationIdHeader);
         }  catch (ProcessInstanceNotFoundException e) {

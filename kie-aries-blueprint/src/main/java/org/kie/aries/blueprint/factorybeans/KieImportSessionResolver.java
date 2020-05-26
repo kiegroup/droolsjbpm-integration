@@ -16,6 +16,9 @@
 
 package org.kie.aries.blueprint.factorybeans;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.kie.api.KieBase;
 import org.kie.api.command.Command;
 import org.kie.api.event.process.ProcessEventListener;
@@ -41,9 +44,6 @@ import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
 import org.kie.api.time.SessionClock;
 import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
-
-import java.util.Collection;
-import java.util.Map;
 
 public class KieImportSessionResolver extends AbstractKieObjectsResolver implements KieSession, StatelessKieSession {
 
@@ -402,5 +402,10 @@ public class KieImportSessionResolver extends AbstractKieObjectsResolver impleme
     @Override
     public void execute( Iterable iterable ) {
         statelessKieSession.execute( iterable );
+    }
+
+    @Override
+    public ProcessInstance startProcessFromNodeIds(String processId, Map<String, Object> params, String... nodeId) {
+        return kieSession.startProcessFromNodeIds(processId, params, nodeId);
     }
 }
