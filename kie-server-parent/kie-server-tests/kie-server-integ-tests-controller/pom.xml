@@ -17,53 +17,8 @@
     <version.org.glassfish.tyrus>1.11.1</version.org.glassfish.tyrus>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-standalone</artifactId>
-        <classifier>ee7</classifier>
-        <type>war</type>
-        <scope>test</scope>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-standalone</artifactId>
-        <classifier>webc</classifier>
-        <type>war</type>
-        <scope>test</scope>
-        <version>${project.version}</version>
-      </dependency>
-     <dependency>
-        <groupId>org.glassfish.tyrus</groupId>
-        <artifactId>tyrus-container-jdk-client</artifactId>
-        <version>${version.org.glassfish.tyrus}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.tyrus</groupId>
-        <artifactId>tyrus-spi</artifactId>
-        <version>${version.org.glassfish.tyrus}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.tyrus</groupId>
-        <artifactId>tyrus-client</artifactId>
-        <version>${version.org.glassfish.tyrus}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.tyrus</groupId>
-        <artifactId>tyrus-core</artifactId>
-        <version>${version.org.glassfish.tyrus}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.spec.javax.websocket</groupId>
-        <artifactId>jboss-websocket-api_1.1_spec</artifactId>
-        <version>1.1.1.Final</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
+    <!-- Common Kie server test classes -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-integ-tests-common</artifactId>
@@ -78,44 +33,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-api</artifactId>
-    </dependency>
-
-    <!-- REST -->
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>net.jcip</groupId>
-          <artifactId>jcip-annotations</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    
-    <!-- websocket -->
-    <dependency>
-      <groupId>io.undertow</groupId>
-      <artifactId>undertow-servlet</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -132,19 +49,15 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
     </dependency>
-    <!-- Replacement for the above excluded 'commons-logging:commons-logging' -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
     </dependency>
 
+    <!-- Deployments for application servers -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
@@ -312,6 +225,30 @@
     </profile>
     <profile>
       <id>oracle-wls-12</id>
+      <dependencyManagement>
+        <dependencies>
+         <dependency>
+            <groupId>org.glassfish.tyrus</groupId>
+            <artifactId>tyrus-container-jdk-client</artifactId>
+            <version>${version.org.glassfish.tyrus}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.glassfish.tyrus</groupId>
+            <artifactId>tyrus-spi</artifactId>
+            <version>${version.org.glassfish.tyrus}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.glassfish.tyrus</groupId>
+            <artifactId>tyrus-client</artifactId>
+            <version>${version.org.glassfish.tyrus}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.glassfish.tyrus</groupId>
+            <artifactId>tyrus-core</artifactId>
+            <version>${version.org.glassfish.tyrus}</version>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
       <dependencies>
         <dependency>
           <groupId>org.glassfish.tyrus</groupId>
