@@ -61,6 +61,10 @@ public interface ProcessServicesClient {
 
     Long startProcess(String containerId, String processId, CorrelationKey correlationKey, Map<String, Object> variables);
 
+    Long startProcessFromNodeIds(String containerId, String processId, Map<String, Object> variables, String... nodes);
+
+    Long startProcessFromNodeIds(String containerId, String processId, CorrelationKey correlationKey, Map<String, Object> variables, String... nodes);
+
     void abortProcessInstance(String containerId, Long processInstanceId);
 
     void abortProcessInstances(String containerId, List<Long> processInstanceIds);
@@ -101,6 +105,8 @@ public interface ProcessServicesClient {
 
     List<NodeInstance> findNodeInstances(String containerId, Long processInstanceId, Integer page, Integer pageSize);
 
+    List<NodeInstance> findNodeInstancesByType(String containerId, Long processInstanceId, String entryType, Integer page, Integer pageSize);
+
     List<VariableInstance> findVariablesCurrentState(String containerId, Long processInstanceId);
 
     List<VariableInstance> findVariableHistory(String containerId, Long processInstanceId, String variableName, Integer page, Integer pageSize);
@@ -116,4 +122,5 @@ public interface ProcessServicesClient {
     List<ProcessInstance> findProcessInstances(String containerId, Integer page, Integer pageSize);
 
     List<ProcessInstance> findProcessInstances(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
 }
