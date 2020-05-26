@@ -863,6 +863,11 @@
             <artifactId>netty-transport-native-epoll</artifactId>
             <version>${version.io.netty}</version>
           </dependency>
+          <!-- Redeclare jboss-connector-api_1.7_spec dependency here to use version from Kie BOM, otherwise it will bring duplicated dependencies -->
+          <dependency>
+            <groupId>org.jboss.spec.javax.resource</groupId>
+            <artifactId>jboss-connector-api_1.7_spec</artifactId>
+          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
@@ -1003,6 +1008,11 @@
            <artifactId>netty-transport-native-epoll</artifactId>
            <version>${version.io.netty}</version>
          </dependency>
+          <!-- Redeclare jboss-connector-api_1.7_spec dependency here to use version from Kie BOM, otherwise it will bring duplicated dependencies -->
+          <dependency>
+            <groupId>org.jboss.spec.javax.resource</groupId>
+            <artifactId>jboss-connector-api_1.7_spec</artifactId>
+          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
