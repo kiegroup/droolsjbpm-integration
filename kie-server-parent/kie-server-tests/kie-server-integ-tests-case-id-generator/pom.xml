@@ -20,6 +20,7 @@
   </properties>
 
   <dependencies>
+    <!-- Common Kie server test classes -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-integ-tests-common</artifactId>
@@ -43,6 +44,7 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Deployments for application servers -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>

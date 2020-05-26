@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
-import org.jbpm.services.api.TaskNotFoundException;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -1564,8 +1563,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             try {
                 events = taskClient.findTaskEvents(taskInstance.getId(), 2, 3, SORT_BY_TASK_EVENTS_TYPE, true);
                 KieServerAssert.assertNullOrEmpty("Task events list is not empty.", events);
-            } catch (TaskNotFoundException e) {
-                assertTrue(e.getMessage().contains( "No task found with id " + taskInstance.getId() ));
             } catch (KieServicesException ee) {
                 if(configuration.isRest()) {
                     KieServerAssert.assertResultContainsString(ee.getMessage(), "Could not find task instance with id " + taskInstance.getId());
@@ -1841,8 +1838,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             } else {
                 assertTrue(e.getMessage().contains("No task found with id " + invalidId));
             }
-        } catch (TaskNotFoundException tnfe) {
-            assertTrue(tnfe.getMessage().contains("No task found with id " + invalidId));
         }
     }
 

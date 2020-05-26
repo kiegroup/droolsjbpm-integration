@@ -17,6 +17,7 @@
   </properties>
 
   <dependencies>
+    <!-- Common Kie server test classes -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-integ-tests-common</artifactId>
@@ -53,6 +54,7 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Deployments for application servers -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
@@ -203,123 +205,15 @@
     </profile>
     <profile>
       <id>wildfly</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <!-- default, may be overridden in container specific
-                      profiles -->
-                    <classifier>${kie.server.classifier}</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>60000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <profile>
       <id>eap7</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <!-- default, may be overridden in container specific
-                      profiles -->
-                    <classifier>${kie.server.classifier}</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>60000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <profile>
       <id>oracle-wls-12</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <!-- default, may be overridden in container specific
-                      profiles -->
-                    <classifier>${kie.server.classifier}</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>60000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <profile>
       <id>websphere9</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <!-- default, may be overridden in container specific
-                      profiles -->
-                    <classifier>${kie.server.classifier}</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>60000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <!-- TODO: re-enable the profile and finish its configuration once task assigning is supported on Spring Boot.
     <profile>
