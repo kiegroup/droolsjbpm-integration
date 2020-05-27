@@ -28,15 +28,11 @@
     <producerConfig>bootstrap.servers=localhost:9092</producerConfig>
   </appender>
 
-  <logger name="org.hacep" level="debug" additivity="false">
+  <logger name="org.hacep" level="warn" additivity="false">
     <appender-ref ref="KafkaAppender"/>
   </logger>
 
   <logger name="org.kie.hacep.util.PrinterLogImpl" level="info" additivity="false">
-    <appender-ref ref="STDOUT"/>
-  </logger>
-
-  <logger name="org.eclipse" level="info" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
 
@@ -55,7 +51,9 @@
     <appender-ref ref="STDOUT"/>
   </logger>
 
-  <root level="debug">
+
+
+  <root level="warn">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>
