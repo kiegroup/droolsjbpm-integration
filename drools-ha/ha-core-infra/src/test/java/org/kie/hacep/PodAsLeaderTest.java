@@ -46,7 +46,7 @@ public class PodAsLeaderTest extends KafkaFullTopicsTests {
 
     private Logger logger = LoggerFactory.getLogger("org.hacep");
 
-    @Test(timeout = 15000)
+    @Test(timeout = 30000)
     public void processOneSentMessageAsLeaderTest() {
         Bootstrap.startEngine(envConfig);
         Bootstrap.getConsumerController().getCallback().updateStatus(State.LEADER);
