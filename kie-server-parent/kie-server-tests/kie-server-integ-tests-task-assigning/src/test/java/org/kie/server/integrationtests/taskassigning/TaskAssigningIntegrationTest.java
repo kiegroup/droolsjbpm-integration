@@ -46,6 +46,7 @@ public class TaskAssigningIntegrationTest extends KieServerBaseIntegrationTest {
     private static final ReleaseId TEST_KJAR = new ReleaseId("org.kie.server.testing", "task-assigning", "1.0.0.Final");
     private static final String CONTAINER_ID = "task-assigning";
     private static final String PROCESS_ID = "org.kie.server.CreditDispute";
+    private static final int ASSIGNMENT_TIMEOUT_SECONDS = 600;
 
     private final KieServicesClient kieServicesClient = createDefaultClient();
     private final ProcessServicesClient processClient = kieServicesClient.getServicesClient(ProcessServicesClient.class);
@@ -86,7 +87,7 @@ public class TaskAssigningIntegrationTest extends KieServerBaseIntegrationTest {
     }
 
     private void doNextTaskByUser(String userId) {
-        List<TaskSummary> tasks = waitForTasks(() -> taskClient.findTasks(userId, 0, 1), 10);
+        List<TaskSummary> tasks = waitForTasks(() -> taskClient.findTasks(userId, 0, 1), ASSIGNMENT_TIMEOUT_SECONDS);
         assertThat(tasks).hasSize(1);
         final long resolveDisputeTaskId = tasks.get(0).getId();
         taskClient.startTask(CONTAINER_ID, resolveDisputeTaskId, userId);
