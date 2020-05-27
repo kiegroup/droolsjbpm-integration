@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
@@ -63,6 +65,54 @@ public class ProcessUserTaskServicesSecurityIntegrationTest extends JbpmKieServe
                 () -> processClient.startProcess(CONTAINER_ID_SECURED, PROCESS_ID_USERTASK_SECURED),
                 403,
                 String.format(NO_PERMISSION_MSG, USER_YODA));
+    }
+    
+    @Test
+    public void testNonAllowedUserCannotStartProcessFromNodeIds() throws Exception{
+        Map<String, Object> parameters = new HashMap<>();
+        Long processInstanceId = startProcessAsAdministrator(PROCESS_ID_USERTASK_SECURED);
+        try {
+            processClient.abortProcessInstance(CONTAINER_ID_SECURED, processInstanceId);
+
+            List<NodeInstance> list = this.processClient.findNodeInstancesByType(CONTAINER_ID_SECURED, processInstanceId, "ABORTED", 0, 10);
+            String[] nodeIds = list.stream().map(NodeInstance::getNodeId).toArray(String[]::new);
+
+            processInstanceId = null;
+            changeUser(USER_YODA);
+            assertClientException(
+                () -> processClient.startProcessFromNodeIds(CONTAINER_ID_SECURED, PROCESS_ID_USERTASK_SECURED, parameters, nodeIds),
+                403,
+                String.format(NO_PERMISSION_MSG, USER_YODA));
+        } finally {
+            if (processInstanceId != null) 
+                abortProcessAsAdministrator(processInstanceId);
+            changeUser(TestConfig.getUsername());
+        }
+    }
+    
+    @Test
+    public void testNonAllowedUserCannotStartProcessFromNodeIdsWithCorrelationKey() throws Exception{
+        Map<String, Object> parameters = new HashMap<>();
+        Long processInstanceId = startProcessAsAdministrator(PROCESS_ID_USERTASK_SECURED);
+        try {
+            processClient.abortProcessInstance(CONTAINER_ID_SECURED, processInstanceId);
+
+            List<NodeInstance> list = this.processClient.findNodeInstancesByType(CONTAINER_ID_SECURED, processInstanceId, "ABORTED", 0, 10);
+            String[] nodeIds = list.stream().map(NodeInstance::getNodeId).toArray(String[]::new);
+
+            CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
+            CorrelationKey firstKey = correlationKeyFactory.newCorrelationKey("mysimlekey");
+            processInstanceId = null;
+            changeUser(USER_YODA);
+            assertClientException(
+                () -> processClient.startProcessFromNodeIds(CONTAINER_ID_SECURED, PROCESS_ID_USERTASK_SECURED, firstKey, parameters, nodeIds),
+                403,
+                String.format(NO_PERMISSION_MSG, USER_YODA));
+        } finally {
+            if (processInstanceId != null) 
+                abortProcessAsAdministrator(processInstanceId);
+            changeUser(TestConfig.getUsername());
+        }
     }
     
     @Test
