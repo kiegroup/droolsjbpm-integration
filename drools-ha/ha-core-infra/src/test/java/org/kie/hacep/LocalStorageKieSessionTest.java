@@ -43,6 +43,7 @@ import static org.junit.Assert.*;
 import static org.kie.remote.CommonConfig.getTestProperties;
 import static org.kie.remote.impl.EntryPointUtil.DEFAULT_ENTRY_POINT;
 
+@Ignore("https://issues.redhat.com/browse/DROOLS-5321")
 public class LocalStorageKieSessionTest {
 
     RemoteKieSession session;
