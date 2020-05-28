@@ -23,6 +23,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+import javax.persistence.Version;
 
 @Entity
 @Table(name = "PlanningTask")
@@ -31,12 +32,16 @@ public class PlanningTaskImpl {
     @Id
     @Column(name = "taskId")
     private long taskId;
+    @Version
+    @Column(name = "OPTLOCK")
+    private Integer version;
     private String assignedUser;
     @Column(name = "taskIndex")
     private int index;
     private short published = 0;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private java.util.Date lastModificationDate;
+
 
     public PlanningTaskImpl() {
         //hibernate required constructor
@@ -56,6 +61,14 @@ public class PlanningTaskImpl {
 
     public void setTaskId(long taskId) {
         this.taskId = taskId;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     public String getAssignedUser() {
