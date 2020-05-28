@@ -25,6 +25,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.kie.hacep.core.Bootstrap;
 import org.kie.hacep.core.InfraFactory;
 import org.kie.hacep.core.infra.election.State;
