@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import org.kie.server.services.taskassigning.core.AbstractTaskAssigningCoreTest;
@@ -35,14 +35,22 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssigningCoreTest {
 
     final Random random = new Random();
+    private static int changeIds = 1;
+
+    protected synchronized int nextChangeId() {
+        return changeIds++;
+    }
 
     protected class ProgrammedProblemFactChange<C extends ProblemFactChange<TaskAssigningSolution>> {
+
+        int id;
 
         private TaskAssigningSolution solutionAfterChange;
 
         private C change;
 
         public ProgrammedProblemFactChange() {
+            this.id = nextChangeId();
         }
 
         public ProgrammedProblemFactChange(C change) {
@@ -55,6 +63,14 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
 
         public void setSolutionAfterChange(TaskAssigningSolution solutionAfterChange) {
             this.solutionAfterChange = solutionAfterChange;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
         }
 
         public C getChange() {
@@ -72,7 +88,7 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
         //store the first solution that was produced by the solver for knowing how things looked like at the very
         //beginning before any change was produced.
         final TaskAssigningSolution[] initialSolution = {null};
-        final AtomicBoolean changesInProgress = new AtomicBoolean(false);
+        final AtomicInteger lastExecutedChangeId = new AtomicInteger(-1);
 
         final Semaphore programNextChange = new Semaphore(0);
         final Semaphore allChangesWereProduced = new Semaphore(0);
@@ -90,16 +106,17 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
                 initialSolution[0] = event.getNewBestSolution();
                 //let the problem fact changes start being produced.
                 programNextChange.release();
-            } else if (event.isEveryProblemFactChangeProcessed() && changesInProgress.compareAndSet(true, false)) {
+            } else if (event.isEveryProblemFactChangeProcessed() && !scheduledChanges.isEmpty()) {
                 ProgrammedProblemFactChange programmedChange = scheduledChanges.get(scheduledChanges.size() - 1);
-                programmedChange.setSolutionAfterChange(event.getNewBestSolution());
-
-                if (pendingChanges[0] > 0) {
-                    //let the Programmed changes producer produce next change
-                    programNextChange.release();
-                } else {
-                    solver.terminateEarly();
-                    allChangesWereProduced.release();
+                if (lastExecutedChangeId.compareAndSet(programmedChange.getId(), -1)) {
+                    programmedChange.setSolutionAfterChange(event.getNewBestSolution());
+                    if (pendingChanges[0] > 0) {
+                        //let the Programmed changes producer produce next change
+                        programNextChange.release();
+                    } else {
+                        solver.terminateEarly();
+                        allChangesWereProduced.release();
+                    }
                 }
             }
         });
@@ -116,8 +133,10 @@ public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssignin
                     hasMoreChanges = !programmedChanges.isEmpty();
                     pendingChanges[0] = programmedChanges.size();
                     scheduledChanges.add(programmedChange);
-                    changesInProgress.set(true);
-                    solver.addProblemFactChange(programmedChange.getChange());
+                    solver.addProblemFactChange(scoreDirector -> {
+                        lastExecutedChangeId.set(programmedChange.getId());
+                        programmedChange.getChange().doChange(scoreDirector);
+                    });
                 } catch (InterruptedException e) {
                     LOGGER.error("It looks like the test Future was interrupted.", e);
                 }

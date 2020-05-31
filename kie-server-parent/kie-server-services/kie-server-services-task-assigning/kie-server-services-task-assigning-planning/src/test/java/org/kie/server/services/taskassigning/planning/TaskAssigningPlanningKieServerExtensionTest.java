@@ -16,11 +16,17 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.io.FileOutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.assertj.core.api.Assertions;
 import org.drools.core.impl.InternalKieContainer;
@@ -113,6 +119,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     private static final String RUNTIME_TIMEOUT = "1234";
 
     private static final String KEY_STORE_RESOURCE = "taskAssigningKeystore.jceks";
+    private static final String KEY_STORE_RESOURCE_IBM = "taskAssigningKeystoreIBM.jceks";
+
     private static final String KEY_STORE_PASSWORD = "jBPMKeyStorePassword";
     private static final String RUNTIME_ALIAS = "jBPMAlias";
     private static final String RUNTIME_ALIAS_PWD = "jBPMKeyPassword";
@@ -268,9 +276,10 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
     private void initRuntimeClientWithKeyStore(String alias, String aliasPwd, String expectedPwd) throws URISyntaxException {
         prepareInitRuntimeClient();
-        URL keyStoreResourceURL = getClass().getClassLoader().getResource(KEY_STORE_RESOURCE);
+        String currentKeyStore = getCurrentKeyStore();
+        URL keyStoreResourceURL = getClass().getClassLoader().getResource(currentKeyStore);
         if (keyStoreResourceURL == null) {
-            fail(KEY_STORE_RESOURCE + " was not found");
+            fail(currentKeyStore + " was not found");
         } else {
             System.setProperty(PROP_PWD_KS_URL, keyStoreResourceURL.toURI().toString());
             System.setProperty(PROP_PWD_KS_PWD, KEY_STORE_PASSWORD);
@@ -673,5 +682,47 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
     private void disableExtension() {
         System.setProperty(KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED, "true");
+    }
+
+    private String getCurrentKeyStore() {
+        String vendor = System.getProperty("java.vendor");
+        if (vendor.toUpperCase().contains("IBM")) {
+            return KEY_STORE_RESOURCE_IBM;
+        } else {
+            return KEY_STORE_RESOURCE;
+        }
+    }
+
+    /**
+     * Helper method for facilitating the generation of the KeyStore compatible with IBM jdk.
+     */
+    private void generateTaskAssigningIBMKeyStore() throws Exception {
+        makeNewKeystoreEntry(KEY_STORE_RESOURCE_IBM, RUNTIME_ALIAS, RUNTIME_ALIAS_PWD, RUNTIME_ALIAS_STORED_PWD, KEY_STORE_PASSWORD);
+    }
+
+    /**
+     * Helper method for facilitating the generation of the KeyStore with the values used by this tests.
+     */
+    private static void makeNewKeystoreEntry(String keyStoreLocation,
+                                             String entryAlias,
+                                             String entryAliasPassword,
+                                             String valueToCipherAndStore,
+                                             String keyStorePassword) throws Exception {
+
+        KeyStore ks = KeyStore.getInstance("JCEKS");
+        ks.load(null, keyStorePassword.toCharArray());
+
+        SecretKeyFactory factoryBPE = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+        SecretKey generatedSecret =
+                factoryBPE.generateSecret(new PBEKeySpec(
+                        valueToCipherAndStore.toCharArray()));
+
+        KeyStore.PasswordProtection entryPasswordProtection = new KeyStore.PasswordProtection(entryAliasPassword.toCharArray());
+
+        KeyStore.SecretKeyEntry secret = new KeyStore.SecretKeyEntry(generatedSecret);
+        ks.setEntry(entryAlias, secret, entryPasswordProtection);
+
+        FileOutputStream fos = new java.io.FileOutputStream(keyStoreLocation);
+        ks.store(fos, keyStorePassword.toCharArray());
     }
 }
