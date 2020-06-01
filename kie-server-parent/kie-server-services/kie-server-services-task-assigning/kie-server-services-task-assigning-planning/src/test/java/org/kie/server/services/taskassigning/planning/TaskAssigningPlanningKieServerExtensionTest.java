@@ -56,12 +56,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_URL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ID;
@@ -195,10 +195,10 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     public void cleanUp() {
         System.clearProperty(KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED);
 
-        System.clearProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL);
-        System.clearProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER);
-        System.clearProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD);
-        System.clearProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT);
+        System.clearProperty(TASK_ASSIGNING_PROCESS_RUNTIME_URL);
+        System.clearProperty(TASK_ASSIGNING_PROCESS_RUNTIME_USER);
+        System.clearProperty(TASK_ASSIGNING_PROCESS_RUNTIME_PWD);
+        System.clearProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT);
 
         System.clearProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT);
         System.clearProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE);
@@ -280,8 +280,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         } else {
             System.setProperty(PROP_PWD_KS_URL, keyStoreResourceURL.toURI().toString());
             System.setProperty(PROP_PWD_KS_PWD, KEY_STORE_PASSWORD);
-            System.setProperty(JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, alias);
-            System.setProperty(JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD, aliasPwd);
+            System.setProperty(TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, alias);
+            System.setProperty(TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD, aliasPwd);
             enableExtension();
             System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
             extension.init(kieServer, registry);
@@ -556,10 +556,10 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     }
 
     private void prepareInitRuntimeClient() {
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL, RUNTIME_URL);
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER, RUNTIME_USER);
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD, RUNTIME_PWD);
-        System.setProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT, RUNTIME_TIMEOUT);
+        System.setProperty(TASK_ASSIGNING_PROCESS_RUNTIME_URL, RUNTIME_URL);
+        System.setProperty(TASK_ASSIGNING_PROCESS_RUNTIME_USER, RUNTIME_USER);
+        System.setProperty(TASK_ASSIGNING_PROCESS_RUNTIME_PWD, RUNTIME_PWD);
+        System.setProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT, RUNTIME_TIMEOUT);
     }
 
     private void prepareServerStartWithSolverContainerConfig() {
