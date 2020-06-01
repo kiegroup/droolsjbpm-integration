@@ -18,6 +18,8 @@
     <module>kie-server-spring-boot-autoconfiguration-drools</module>
     <module>kie-server-spring-boot-autoconfiguration-jbpm</module>
     <module>kie-server-spring-boot-autoconfiguration-optaplanner</module>
+    <module>kie-server-spring-boot-autoconfiguration-task-assigning-runtime</module>
+    <module>kie-server-spring-boot-autoconfiguration-task-assigning-planning</module>
   </modules>
 
 </project>

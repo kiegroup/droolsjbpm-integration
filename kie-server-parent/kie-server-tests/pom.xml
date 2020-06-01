@@ -1336,6 +1336,8 @@
         <kieserver.casemgmt.enabled>false</kieserver.casemgmt.enabled>
         <kieserver.optaplanner.enabled>false</kieserver.optaplanner.enabled>
         <kieserver.swagger.enabled>false</kieserver.swagger.enabled>
+        <kieserver.taskAssigning.runtime.enabled>false</kieserver.taskAssigning.runtime.enabled>
+        <kieserver.taskAssigning.planning.enabled>false</kieserver.taskAssigning.planning.enabled>
         <jbpm.executor.enabled>false</jbpm.executor.enabled>
         <kieserver.prometheus.enabled>false</kieserver.prometheus.enabled>
         <kieserver.scenariosimulation.enabled>false</kieserver.scenariosimulation.enabled>

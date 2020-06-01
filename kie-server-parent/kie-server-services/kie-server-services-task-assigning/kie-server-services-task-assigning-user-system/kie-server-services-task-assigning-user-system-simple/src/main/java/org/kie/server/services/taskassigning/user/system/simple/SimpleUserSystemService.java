@@ -42,17 +42,17 @@ public class SimpleUserSystemService implements UserSystemService {
     /**
      * Property name for configuring the path to the users definition file.
      */
-    static final String USERS_FILE = "org.kie.server.services.taskassigning.user.system.simple.users";
+    public static final String USERS_FILE = "org.kie.server.services.taskassigning.user.system.simple.users";
 
     /**
      * Property name for configuring the path to the optional users skills definition file.
      */
-    static final String SKILLS_FILE = "org.kie.server.services.taskassigning.user.system.simple.skills";
+    public static final String SKILLS_FILE = "org.kie.server.services.taskassigning.user.system.simple.skills";
 
     /**
      * Property name for configuring the path to the optional users affinities definition file.
      */
-    static final String AFFINITIES_FILE = "org.kie.server.services.taskassigning.user.system.simple.affinities";
+    public static final String AFFINITIES_FILE = "org.kie.server.services.taskassigning.user.system.simple.affinities";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleUserSystemService.class);
 

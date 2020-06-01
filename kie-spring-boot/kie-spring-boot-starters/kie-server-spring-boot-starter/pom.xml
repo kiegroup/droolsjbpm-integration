@@ -93,6 +93,14 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration-optaplanner</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-spring-boot-autoconfiguration-task-assigning-runtime</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-spring-boot-autoconfiguration-task-assigning-planning</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

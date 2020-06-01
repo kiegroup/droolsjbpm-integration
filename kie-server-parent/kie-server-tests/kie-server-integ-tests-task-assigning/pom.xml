@@ -111,6 +111,9 @@
       </testResource>
       <testResource>
         <directory>../src/test/filtered-resources</directory>
+        <excludes>
+          <exclude>application.properties</exclude>
+        </excludes>
         <filtering>true</filtering>
       </testResource>
     </testResources>
@@ -215,15 +218,31 @@
     <profile>
       <id>websphere9</id>
     </profile>
-    <!-- TODO: re-enable the profile and finish its configuration once task assigning is supported on Spring Boot.
     <profile>
       <id>springboot</id>
       <properties>
         <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
-        <jbpm.executor.enabled>true</jbpm.executor.enabled>
+        <kieserver.jbpmui.enabled>false</kieserver.jbpmui.enabled>
+        <kieserver.optaplanner.enabled>false</kieserver.optaplanner.enabled>
+        <kieserver.casemgmt.enabled>false</kieserver.casemgmt.enabled>
+        <kieserver.drools.enabled>false</kieserver.drools.enabled>
+
         <org.kie.server.bypass.auth.user>true</org.kie.server.bypass.auth.user>
+        <kieserver.taskAssigning.runtime.enabled>true</kieserver.taskAssigning.runtime.enabled>
+        <kieserver.taskAssigning.planning.enabled>true</kieserver.taskAssigning.planning.enabled>
+
+        <taskassigning.processRuntime.url>http://${container.hostname}:${container.port}/kie-server-services/services/rest/server</taskassigning.processRuntime.url>
+        <taskassigning.processRuntime.user>administrator</taskassigning.processRuntime.user>
+        <taskassigning.processRuntime.pwd>usetheforce123@</taskassigning.processRuntime.pwd>
+        <taskassigning.processRuntime.targetUser>administrator</taskassigning.processRuntime.targetUser>
+        <taskassigning.core.model.planningUserId>administrator</taskassigning.core.model.planningUserId>
+        <taskassigning.publishWindowSize>2</taskassigning.publishWindowSize>
+        <taskassigning.solutionSyncInterval>PT1S</taskassigning.solutionSyncInterval>
+
+        <taskassigning.userSystem.name>SimpleUserSystemService</taskassigning.userSystem.name>
+        <taskassigning.userSystem.simple.users>${project.build.testOutputDirectory}/roles.properties</taskassigning.userSystem.simple.users>
+        <taskassigning.userSystem.simple.skills>${project.build.testOutputDirectory}/skills.properties</taskassigning.userSystem.simple.skills>
       </properties>
     </profile>
-    -->
   </profiles>
 </project>

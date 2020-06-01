@@ -24,44 +24,44 @@ public class TaskAssigningConstants {
     /**
      * Property for configuring the rest endpoint url of the kie-server with the jBPM runtime.
      */
-    public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL = "org.kie.server.taskAssigning.processRuntime.url";
+    public static final String TASK_ASSIGNING_PROCESS_RUNTIME_URL = "org.kie.server.taskAssigning.processRuntime.url";
 
     /**
      * Property for configuring the user for connecting with the with the jBPM runtime.
      */
-    public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER = "org.kie.server.taskAssigning.processRuntime.user";
+    public static final String TASK_ASSIGNING_PROCESS_RUNTIME_USER = "org.kie.server.taskAssigning.processRuntime.user";
 
     /**
      * Property for configuring the user password for connecting with the jBPM runtime.
      */
-    public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD = "org.kie.server.taskAssigning.processRuntime.pwd";
+    public static final String TASK_ASSIGNING_PROCESS_RUNTIME_PWD = "org.kie.server.taskAssigning.processRuntime.pwd";
 
     /**
      * Property for configuring the alias of the user password for connecting with the jBPM runtime in cases where the
      * kie-server key store is used.
      */
-    public static final String JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS = "kie.keystore.key.taskAssigning.processRuntime.alias";
+    public static final String TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS = "org.kie.server.taskAssigning.processRuntime.key.alias";
 
     /**
      * Property for configuring the password for getting the key stored under the alias name
-     * JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS in cases where the kie-server key store is used.
+     * TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS in cases where the kie-server key store is used.
      */
-    public static final String JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD = "kie.keystore.key.taskAssigning.processRuntime.pwd";
+    public static final String TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD = "org.kie.server.taskAssigning.processRuntime.key.pwd";
 
     /**
      * Property for configuring the connection timeout when interacting with the jBPM runtime.
      */
-    public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT = "org.kie.server.taskAssigning.processRuntime.timeout";
+    public static final String TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT = "org.kie.server.taskAssigning.processRuntime.timeout";
 
     /**
      * Property for configuring a user identifier for using as the "on behalf of" user when interacting with the jBPM runtime.
      */
-    public static final String JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER = "org.kie.server.taskAssigning.processRuntime.targetUser";
+    public static final String TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER = "org.kie.server.taskAssigning.processRuntime.targetUser";
 
     /**
      * Property for configuring the size of the tasks publish window.
      */
-    public static final String JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE = "org.kie.server.taskAssigning.publishWindowSize";
+    public static final String TASK_ASSIGNING_PUBLISH_WINDOW_SIZE = "org.kie.server.taskAssigning.publishWindowSize";
 
     /**
      * Property for configuring the solution synchronization period. This value is "normally" a short interval in
@@ -74,12 +74,12 @@ public class TaskAssigningConstants {
      * "PT0.500S"  configures 500 milliseconds.
      * "PT3S"      configures 3000 milliseconds.
      */
-    public static final String JBPM_TASK_ASSIGNING_SYNC_INTERVAL = "org.kie.server.taskAssigning.solutionSyncInterval";
+    public static final String TASK_ASSIGNING_SYNC_INTERVAL = "org.kie.server.taskAssigning.solutionSyncInterval";
 
     /**
      * Property for configuring the safety minimal query distance in milliseconds.
      */
-    public static final String JBPM_TASK_ASSIGNING_SYNC_QUERIES_SHIFT = "org.kie.server.taskAssigning.solutionSyncQueriesShift";
+    public static final String TASK_ASSIGNING_SYNC_QUERIES_SHIFT = "org.kie.server.taskAssigning.solutionSyncQueriesShift";
 
     /**
      * Property for configuring the users information synchronization period.
@@ -89,7 +89,7 @@ public class TaskAssigningConstants {
      * e.g.
      * "PT1H30M"   configures 1 hour 30 minutes.
      */
-    public static final String JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL = "org.kie.server.taskAssigning.usersSyncInterval";
+    public static final String TASK_ASSIGNING_USERS_SYNC_INTERVAL = "org.kie.server.taskAssigning.usersSyncInterval";
 
     /**
      * Property for configuring the resource with the solver configuration.

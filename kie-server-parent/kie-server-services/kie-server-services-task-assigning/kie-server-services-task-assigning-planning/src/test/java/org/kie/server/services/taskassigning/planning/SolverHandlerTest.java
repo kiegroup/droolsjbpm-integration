@@ -46,10 +46,10 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_INTERVAL;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SYNC_INTERVAL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USERS_SYNC_INTERVAL;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -65,13 +65,13 @@ import static org.mockito.Mockito.when;
 public class SolverHandlerTest {
 
     // surefire configured system property
-    private static final String TARGET_USER = System.getProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, "TARGET_USER");
+    private static final String TARGET_USER = System.getProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, "TARGET_USER");
     // surefire configured system property
-    private static final int PUBLISH_WINDOW_SIZE = Integer.valueOf(System.getProperty(JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, "2"));
+    private static final int PUBLISH_WINDOW_SIZE = Integer.valueOf(System.getProperty(TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, "2"));
     // surefire configured system property
-    private static final Duration SYNC_INTERVAL = Duration.parse(System.getProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, "PT3S"));
+    private static final Duration SYNC_INTERVAL = Duration.parse(System.getProperty(TASK_ASSIGNING_SYNC_INTERVAL, "PT3S"));
     // surefire configured system property
-    private static final Duration USERS_SYNC_INTERVAL = Duration.parse(System.getProperty(JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL, "PT6H"));
+    private static final Duration USERS_SYNC_INTERVAL = Duration.parse(System.getProperty(TASK_ASSIGNING_USERS_SYNC_INTERVAL, "PT6H"));
 
     @Mock
     private SolverDef solverDef;
