@@ -22,8 +22,7 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
       <version>${version.org.kie}</version>
-      <scope>system</scope>
-      <systemPath>${kie.api.path}</systemPath>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.spec.javax.xml.bind</groupId>
