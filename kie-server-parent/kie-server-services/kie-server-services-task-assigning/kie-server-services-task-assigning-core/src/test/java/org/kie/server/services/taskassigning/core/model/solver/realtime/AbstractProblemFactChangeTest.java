@@ -35,10 +35,10 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractProblemFactChangeTest extends AbstractTaskAssigningCoreTest {
 
     final Random random = new Random();
-    private static int changeIds = 1;
+    private static final AtomicInteger changeIds = new AtomicInteger(1);
 
-    protected synchronized int nextChangeId() {
-        return changeIds++;
+    protected static int nextChangeId() {
+        return changeIds.getAndIncrement();
     }
 
     protected class ProgrammedProblemFactChange<C extends ProblemFactChange<TaskAssigningSolution>> {
