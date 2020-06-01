@@ -34,11 +34,11 @@ import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_INTERVAL;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_SYNC_QUERIES_SHIFT;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SYNC_INTERVAL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SYNC_QUERIES_SHIFT;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.util.PropertyUtil.readSystemProperty;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
@@ -52,11 +52,11 @@ public class SolverHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverHandler.class);
 
-    private static final String TARGET_USER_ID = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, null, value -> value);
-    private static final int PUBLISH_WINDOW_SIZE = readSystemProperty(JBPM_TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, 2, Integer::parseInt);
-    private static final Duration SYNC_INTERVAL = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_INTERVAL, Duration.parse("PT2S"), Duration::parse);
-    private static final Duration SYNC_QUERIES_SHIFT = readSystemProperty(JBPM_TASK_ASSIGNING_SYNC_QUERIES_SHIFT, Duration.parse("PT10M"), Duration::parse);
-    private static final Duration USERS_SYNC_INTERVAL = readSystemProperty(JBPM_TASK_ASSIGNING_USERS_SYNC_INTERVAL, Duration.parse("PT2H"), Duration::parse);
+    private static final String TARGET_USER_ID = readSystemProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, null, value -> value);
+    private static final int PUBLISH_WINDOW_SIZE = readSystemProperty(TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, 2, Integer::parseInt);
+    private static final Duration SYNC_INTERVAL = readSystemProperty(TASK_ASSIGNING_SYNC_INTERVAL, Duration.parse("PT2S"), Duration::parse);
+    private static final Duration SYNC_QUERIES_SHIFT = readSystemProperty(TASK_ASSIGNING_SYNC_QUERIES_SHIFT, Duration.parse("PT10M"), Duration::parse);
+    private static final Duration USERS_SYNC_INTERVAL = readSystemProperty(TASK_ASSIGNING_USERS_SYNC_INTERVAL, Duration.parse("PT2H"), Duration::parse);
 
     private static final long EXECUTOR_TERMINATION_TIMEOUT = 5;
 

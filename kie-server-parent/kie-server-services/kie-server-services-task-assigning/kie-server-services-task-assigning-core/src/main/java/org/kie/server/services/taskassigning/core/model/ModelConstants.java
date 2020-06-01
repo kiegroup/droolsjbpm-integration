@@ -28,7 +28,7 @@ public class ModelConstants {
     /**
      * System property for configuring the PLANNING_USER entityId.
      */
-    private static final String PLANNING_USER_ID_PROPERTY = "org.kie.server.services.taskassigning.core.model.planningUserId";
+    public static final String PLANNING_USER_ID_PROPERTY = "org.kie.server.services.taskassigning.core.model.planningUserId";
 
     public static final String PLANNING_USER_ID = System.getProperty(PLANNING_USER_ID_PROPERTY, "planninguser");
 
