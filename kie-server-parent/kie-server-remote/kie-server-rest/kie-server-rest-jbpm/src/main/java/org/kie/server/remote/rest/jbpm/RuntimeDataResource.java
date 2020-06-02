@@ -423,12 +423,9 @@ public class RuntimeDataResource {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
-
         ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process definition search: {}", processDefinitionList);
-
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
-
     }
 
     @ApiOperation(value="Returns all process definitions.",

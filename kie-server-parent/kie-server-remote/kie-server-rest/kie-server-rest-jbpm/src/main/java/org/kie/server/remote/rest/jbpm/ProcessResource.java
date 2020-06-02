@@ -890,7 +890,7 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize, sort, sortOrder);
+            ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentIdCheckContainer(containerId, page, pageSize, sort, sortOrder);
             logger.debug("Returning result of process definition search: {}", processDefinitionList);
     
             return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
