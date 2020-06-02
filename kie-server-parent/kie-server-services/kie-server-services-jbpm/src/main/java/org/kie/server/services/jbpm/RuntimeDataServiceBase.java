@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jbpm.services.api.AdvanceRuntimeDataService;
+import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.RuntimeDataService.EntryType;
@@ -332,22 +333,34 @@ public class RuntimeDataServiceBase {
 
     public ProcessDefinitionList getProcessesByDeploymentId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         try {
-            containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
-            logger.debug("About to search for process definitions within container '{}' with page {} and page size {}", containerId, page, pageSize);
-            if (sort == null || sort.isEmpty()) {
-                sort = "ProcessName";
-            }
-            Collection<ProcessDefinition> definitions = runtimeDataService.getProcessesByDeploymentId(containerId, buildQueryContext(page, pageSize, sort, sortOrder));
-            logger.debug("Found {} process definitions within container '{}'", definitions.size(), containerId);
-    
-            ProcessDefinitionList processDefinitionList = convertToProcessList(definitions);
-            logger.debug("Returning result of process definition search: {}", processDefinitionList);
-    
-            return processDefinitionList;
+            return getProcessesByDeploymentIdUncatch(containerId, page, pageSize, sort, sortOrder);
         } catch (IllegalArgumentException e) {
             // container was not found by locator
             return new ProcessDefinitionList();
         }
+    }
+    
+    public ProcessDefinitionList getProcessesByDeploymentIdCheckContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        try {
+           return getProcessesByDeploymentIdUncatch(containerId, page, pageSize, sort, sortOrder);
+        } catch (IllegalArgumentException e) {
+            throw new DeploymentNotFoundException(containerId + " not found");
+        }
+    }
+    
+    private ProcessDefinitionList getProcessesByDeploymentIdUncatch(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+        logger.debug("About to search for process definitions within container '{}' with page {} and page size {}", containerId, page, pageSize);
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessName";
+        }
+        Collection<ProcessDefinition> definitions = runtimeDataService.getProcessesByDeploymentId(containerId, buildQueryContext(page, pageSize, sort, sortOrder));
+        logger.debug("Found {} process definitions within container '{}'", definitions.size(), containerId);
+
+        ProcessDefinitionList processDefinitionList = convertToProcessList(definitions);
+        logger.debug("Returning result of process definition search: {}", processDefinitionList);
+
+        return processDefinitionList;
     }
 
     public ProcessDefinitionList getProcessesByFilter(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder) {
