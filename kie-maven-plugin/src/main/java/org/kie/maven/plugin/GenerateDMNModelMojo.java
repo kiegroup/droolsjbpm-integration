@@ -147,10 +147,12 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
     }
 
     private List<String> getDMNFIles(InternalKieModule kieModule) {
-        return kieModule.getFileNames()
-                        .stream()
-                        .filter(f -> f.endsWith("dmn"))
-                        .collect(Collectors.toList());
+        return getFilesByType(kieModule, "dmn");
+//
+//        return kieModule.getFileNames()
+//                        .stream()
+//                        .filter(f -> f.endsWith("dmn"))
+//                        .collect(Collectors.toList());
     }
 
     private void compileDMNFile(InternalKieModule kieModule, DMNAssemblerService assemblerService, KnowledgeBuilder knowledgeBuilder, String dmnFile) throws Exception {

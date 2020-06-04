@@ -119,7 +119,6 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
     private List<Path> createdPaths = new ArrayList<>();
     private List<Path> movedPmmlFiles = new ArrayList<>();
-    ;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -312,9 +311,6 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                             throw new RuntimeException(e.getMessage(), e);
                         }
                     }
-//                    String kmoduleXml = String.format(KMODULE_XML_TEMPLATE, kbasesTagsBuilder.toString());
-//                    String kmoduleXmlPath = "src/main/resources/META-INF/kmodule.xml";
-//                    srcMfs.write(kmoduleXmlPath, kmoduleXml.getBytes());
                     final Folder mainFolder = srcMfs.getFolder("src/main");
                     final Folder targetFolder = trgMfs.getFolder(".");
                     srcMfs.copyFolder(mainFolder, trgMfs, targetFolder);
