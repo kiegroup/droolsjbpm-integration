@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
@@ -29,6 +28,7 @@ import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -43,6 +43,7 @@ public class DMNLocalDateIntegrationTest
 
     private static final String CONTAINER_1_ID = "local-date-unary-check";
     private static final String CONTAINER_1_ALIAS = "localdate";
+    private static final String PERSON_CLASS_NAME = "org.example.localdateunarytest.Person";
 
     @BeforeClass
     public static void deployArtifacts() {
@@ -54,19 +55,15 @@ public class DMNLocalDateIntegrationTest
     }
 
     @Override
-    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses)
-            throws Exception {
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
 
     @Test
-    @Ignore("JBPM-9173")
     public void test_evaluateLocaleDateUnaryCheck() {
         DMNContext dmnContext = dmnClient.newContext();
-        final Map<String, Object> personData = new HashMap<>();
-        personData.put("id", "person-id-1");
-        personData.put("name", "Eager Join");
-        personData.put("dojoining", LocalDate.of(2021, 8, 11));
-        dmnContext.set("PersonData", personData);
+        final Object person = KieServerReflections.createInstance(PERSON_CLASS_NAME, kieContainer.getClassLoader(), "person-id-1", "Eager Join", LocalDate.of(2021, 8, 11));
+        dmnContext.set("PersonData", person);
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID,
                                                                        "https://kiegroup.org/dmn/_5851203A-5DA1-4020-B7D1-E23C89634164",
                                                                        "Test",

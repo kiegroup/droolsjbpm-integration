@@ -11,7 +11,18 @@
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 
-<!-- there should be no need for Kie, Kie-DMN, etc dependencies here -->
+<!-- Normally, there should be no need for Kie, Kie-DMN, etc dependencies here
+     However this test requires to explicit JAXB converter for the dates as example here: https://github.com/kiegroup/droolsjbpm-integration/blob/e15e207945ba32581955394947d1671ea381109e/kie-server-parent/kie-server-api/src/test/java/org/kie/server/api/marshalling/objects/DateObject.java#L53
+     Hence this `kie-internal` with `provided` scope dependency is the bare minimum to re-create what could be defined on a Business-Central based project.
+ -->
+<dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+      <version>${version.org.kie}</version>
+      <scope>provided</scope>
+    </dependency>
+</dependencies>
 
   <build>
     <plugins>

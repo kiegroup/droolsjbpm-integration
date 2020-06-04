@@ -29,7 +29,7 @@
       <dmn:annotation name=""/>
       <dmn:rule id="_FFE43BB7-3314-4441-A2CD-E07A7881504C">
         <dmn:inputEntry id="_567C635B-081E-4255-AD79-787FF55DECD6">
-          <dmn:text>&gt;today()</dmn:text>
+          <dmn:text>&gt;date("2020-06-04")</dmn:text>
         </dmn:inputEntry>
         <dmn:outputEntry id="_DE7B6538-E749-4EB3-B50E-F3C505AC7ACD">
           <dmn:text>"xyz"</dmn:text>
