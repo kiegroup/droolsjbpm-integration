@@ -17,19 +17,15 @@
 package org.kie.server.services.taskassigning.runtime.command;
 
 import java.util.Arrays;
-import java.util.Date;
 
 import org.jbpm.services.task.commands.DelegateTaskCommand;
-import org.jbpm.services.task.commands.TaskContext;
 import org.kie.api.runtime.Context;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.User;
-import org.kie.internal.task.api.TaskPersistenceContext;
 import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.api.model.taskassigning.PlanningItem;
-import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
 
 import static org.kie.api.task.model.Status.Ready;
 import static org.kie.api.task.model.Status.Reserved;
@@ -49,7 +45,7 @@ public class DelegateAndSaveCommand extends PlanningCommand {
 
     @Override
     public Void execute(Context context) {
-        final TaskContext taskContext = (TaskContext) context;
+        super.execute(context);
         final Task task = taskContext.getPersistenceContext().findTask(planningItem.getTaskId());
         final org.kie.api.task.model.TaskData taskData = task.getTaskData();
         final Status status = taskData.getStatus();
@@ -80,12 +76,7 @@ public class DelegateAndSaveCommand extends PlanningCommand {
             }
         }
 
-        TaskPersistenceContext persistenceContext = taskContext.getPersistenceContext();
-        persistenceContext.merge(new PlanningTaskImpl(planningItem.getTaskId(),
-                                                      planningItem.getPlanningTask().getAssignedUser(),
-                                                      planningItem.getPlanningTask().getIndex(),
-                                                      planningItem.getPlanningTask().isPublished(),
-                                                      new Date()));
+        saveOrUpdatePlanningTask(planningItem);
         return null;
     }
 
