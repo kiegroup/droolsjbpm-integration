@@ -21,9 +21,12 @@ import java.util.Properties;
 import org.kie.remote.message.Message;
 import org.kie.remote.message.ResultMessage;
 import org.kie.remote.util.LocalMessageSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalProducer implements Producer {
 
+    private Logger logger = LoggerFactory.getLogger(LocalProducer.class);
     private final LocalMessageSystem queue = LocalMessageSystem.get();
 
     @Override
@@ -34,11 +37,17 @@ public class LocalProducer implements Producer {
 
     @Override
     public <T> void produceSync(String topicName, String key, ResultMessage<T> object) {
+        if(logger.isDebugEnabled()){
+            logger.debug("LocalProducer.produceSync topic:{} key:{} ResultMessage:{}", topicName, key,  object);
+        }
         queue.put(topicName, object);
     }
 
     @Override
     public void produceSync(String topicName, String key, Message object) {
+        if(logger.isDebugEnabled()){
+            logger.debug("LocalProducer.produceSync topic:{} Message:{}", topicName, object);
+        }
         queue.put(topicName, object);
     }
 }
