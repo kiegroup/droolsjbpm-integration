@@ -15,16 +15,22 @@
 
 package org.kie.server.controller.openshift.storage;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.server.mock.KubernetesCrudDispatcher;
+import io.fabric8.mockwebserver.Context;
+import io.fabric8.mockwebserver.ServerRequest;
+import io.fabric8.mockwebserver.ServerResponse;
 import io.fabric8.openshift.client.OpenShiftClient;
-import io.fabric8.openshift.client.server.mock.OpenShiftServer;
+import io.fabric8.openshift.client.server.mock.OpenShiftMockServer;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -57,13 +63,14 @@ public class ServerTemplateConverterTest {
     private OpenShiftClient client;
     private KieServerStateOpenShiftRepository repo;
 
-    @Rule
-    public OpenShiftServer server = new OpenShiftServer(false, true);
+    // Need to use direct OpenShiftMockServer instead of OpenShiftServer as HTTPS support needs to be disabled for proper functionality in JDK 11
+    public OpenShiftMockServer server = new OpenShiftMockServer(new Context(), new MockWebServer(), new HashMap<ServerRequest, Queue<ServerResponse>>(), new KubernetesCrudDispatcher(), false);
 
     @Before
     public void setup() {
         // Get client from MockKubernetes Server
-        client = server.getOpenshiftClient();
+        server.init();
+        client = server.createOpenShiftClient();
 
         // The default namespace for MockKubernetes Server is 'test'
         testNamespace = "test";
@@ -152,6 +159,7 @@ public class ServerTemplateConverterTest {
     @After
     public void tearDown() {
         client.configMaps().inNamespace(testNamespace).delete();
+        server.destroy();
         client.close();
     }
 

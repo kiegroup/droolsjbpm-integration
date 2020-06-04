@@ -427,6 +427,7 @@ public class ConvertUtils {
                 .workItemId(userTask.getWorkItemId())
                 .slaCompliance(userTask.getSlaCompliance())
                 .slaDueDate(userTask.getSlaDueDate())
+                .formName(userTask.getFormName())
                 .build();
 
         return instance;
@@ -577,6 +578,7 @@ public class ConvertUtils {
             var.setProcessInstanceId(desc.getProcessInstanceId());
             var.setProcessVariables(desc.getProcessVariables());
             var.setInputVariables(desc.getInputdata());
+            var.setStatus(desc.getStatus());
             data.add(var);
         }
         ProcessInstanceUserTaskWithVariablesList result = new ProcessInstanceUserTaskWithVariablesList();
