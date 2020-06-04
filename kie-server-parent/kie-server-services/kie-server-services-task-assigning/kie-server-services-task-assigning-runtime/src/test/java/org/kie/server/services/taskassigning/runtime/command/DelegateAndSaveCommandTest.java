@@ -18,26 +18,27 @@ package org.kie.server.services.taskassigning.runtime.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.runtime.Context;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.PeopleAssignments;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
+import org.kie.api.task.model.TaskData;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.kie.api.task.model.Status.Completed;
 import static org.kie.api.task.model.Status.Created;
 import static org.kie.api.task.model.Status.Error;
@@ -49,30 +50,75 @@ import static org.kie.api.task.model.Status.Ready;
 import static org.kie.api.task.model.Status.Reserved;
 import static org.kie.api.task.model.Status.Suspended;
 import static org.kie.server.services.taskassigning.runtime.command.DelegateAndSaveCommand.TASK_MODIFIED_ERROR_MSG;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@RunWith(Parameterized.class)
 public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<DelegateAndSaveCommand> {
 
-    @Mock
     private Task task;
 
-    @Mock
     private org.kie.api.task.model.TaskData taskData;
 
-    @Mock
     private PeopleAssignments peopleAssignments;
 
-    private List<OrganizationalEntity> potentialOwners = new ArrayList<>();
+    private List<OrganizationalEntity> potentialOwners;
 
-    @Mock
     private org.kie.api.task.model.User organizationalEntity;
 
     private DelegateTaskCommand delegateTaskCommand;
 
-    @Captor
-    private ArgumentCaptor<PlanningTaskImpl> planningTaskCaptor;
+    @Parameterized.Parameter
+    public Status status;
+
+    @Parameterized.Parameter(1)
+    public boolean statusIsValid;
+
+    @Parameterized.Parameter(2)
+    public boolean potentialOwnerBelongsToTask;
+
+    @Parameterized.Parameter(3)
+    public PlanningTaskImpl previousPlanningTask;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        List<Object[]> data = new ArrayList<>();
+
+        data.add(new Object[]{Ready, true, false, null});
+        data.add(new Object[]{Ready, true, false, mockPlanningTask(TASK_ID)});
+        data.add(new Object[]{Ready, true, true, null});
+        data.add(new Object[]{Ready, true, true, mockPlanningTask(TASK_ID)});
+
+        data.add(new Object[]{Reserved, true, false, null});
+        data.add(new Object[]{Reserved, true, false, mockPlanningTask(TASK_ID)});
+        data.add(new Object[]{Reserved, true, true, null});
+        data.add(new Object[]{Reserved, true, true, mockPlanningTask(TASK_ID)});
+
+        data.add(new Object[]{Created, false, false, null});
+        data.add(new Object[]{InProgress, false, false, null});
+        data.add(new Object[]{Suspended, false, false, null});
+        data.add(new Object[]{Completed, false, false, null});
+        data.add(new Object[]{Failed, false, false, null});
+        data.add(new Object[]{Error, false, false, null});
+        data.add(new Object[]{Exited, false, false, null});
+        data.add(new Object[]{Obsolete, false, false, null});
+        return data;
+    }
+
+    @Override
+    @Before
+    public void setUp() {
+        super.setUp();
+        task = mock(Task.class);
+        taskData = mock(TaskData.class);
+        peopleAssignments = mock(PeopleAssignments.class);
+        potentialOwners = new ArrayList<>();
+        organizationalEntity = mock(org.kie.api.task.model.User.class);
+        delegateTaskCommand = mock(DelegateTaskCommand.class);
+        planningTaskCaptor = ArgumentCaptor.forClass(PlanningTaskImpl.class);
+    }
 
     @Override
     protected DelegateAndSaveCommand createCommand() {
@@ -88,57 +134,42 @@ public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<Dele
     }
 
     @Test
-    public void executeReadyTaskWhenPotentialOwnerAlreadyBelongsToTask() {
-        executeWithValidStatus(Ready, true);
-        assertPotentialOwnerIsPresent();
+    public void execute() {
+        if (statusIsValid) {
+            executeWithValidStatus(status, potentialOwnerBelongsToTask, previousPlanningTask);
+            if (potentialOwnerBelongsToTask) {
+                assertThat(potentialOwners).contains(organizationalEntity);
+            } else {
+                assertThat(potentialOwners).doesNotContain(organizationalEntity);
+            }
+        } else {
+            executeWithInvalidStatus(status, previousPlanningTask);
+        }
     }
 
-    @Test
-    public void executeReservedTaskWhenPotentialOwnerAlreadyBelongsToTask() {
-        executeWithValidStatus(Reserved, true);
-        assertPotentialOwnerIsPresent();
-    }
-
-    @Test
-    public void executeReadyTaskWhenPotentialOwnerNotBelongsToTask() {
-        executeWithValidStatus(Ready, false);
-        assertPotentialOwnerIsNotPresent();
-    }
-
-    @Test
-    public void executeReservedTaskWhenPotentialOwnerNotBelongsToTask() {
-        executeWithValidStatus(Reserved, false);
-        assertPotentialOwnerIsNotPresent();
-    }
-
-    @Test
-    public void executeWithTaskInInvalidStatus() {
-        List<Status> invalidStatuses = Arrays.asList(Created, InProgress, Suspended, Completed,
-                                                     Failed, Error, Exited, Obsolete);
-        invalidStatuses.forEach(this::executeWithInvalidStatus);
-    }
-
-    private void executeWithValidStatus(Status status, boolean potentialOwnerAlreadyBelongs) {
-        prepareExecution(status, potentialOwnerAlreadyBelongs);
+    private void executeWithValidStatus(Status status, boolean potentialOwnerAlreadyBelongs, PlanningTaskImpl previousPlanningTask) {
+        prepareExecution(status, potentialOwnerAlreadyBelongs, previousPlanningTask);
         command.execute(taskContext);
 
         verify(delegateTaskCommand).execute(taskContext);
-        verify(persistenceContext).merge(planningTaskCaptor.capture());
-        assertEquals(TASK_ID, planningTaskCaptor.getValue().getTaskId(), 0);
-        assertEquals(ASSIGNED_USER, planningTaskCaptor.getValue().getAssignedUser());
-        assertEquals(INDEX, planningTaskCaptor.getValue().getIndex(), 0);
-        assertEquals(PUBLISHED, planningTaskCaptor.getValue().isPublished());
+
+        if (previousPlanningTask != null) {
+            verifyPlanningTaskMerged(previousPlanningTask);
+        } else {
+            verify(persistenceContext).persist(planningTaskCaptor.capture());
+            verifyPlanningTaskPersisted(planningTaskCaptor.getValue());
+        }
     }
 
-    private void executeWithInvalidStatus(Status status) {
-        prepareExecution(status, false);
+    private void executeWithInvalidStatus(Status status, PlanningTaskImpl previousPlanningTask) {
+        prepareExecution(status, false, previousPlanningTask);
         Assertions.assertThatThrownBy(() -> command.execute(taskContext)).hasMessage(String.format(TASK_MODIFIED_ERROR_MSG,
                                                                                                    TASK_ID,
                                                                                                    status,
                                                                                                    Arrays.toString(new Status[]{Ready, Reserved})));
     }
 
-    private void prepareExecution(Status status, boolean potentialOwnerAlreadyBelongs) {
+    private void prepareExecution(Status status, boolean potentialOwnerAlreadyBelongs, PlanningTaskImpl previousPlanningTask) {
         when(task.getTaskData()).thenReturn(taskData);
         when(taskData.getStatus()).thenReturn(status);
         when(task.getPeopleAssignments()).thenReturn(peopleAssignments);
@@ -147,6 +178,9 @@ public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<Dele
             potentialOwners.add(organizationalEntity);
         }
         when(persistenceContext.findTask(TASK_ID)).thenReturn(task);
+        if (previousPlanningTask != null) {
+            when(persistenceContext.find(PlanningTaskImpl.class, TASK_ID)).thenReturn(previousPlanningTask);
+        }
         when(organizationalEntity.getId()).thenReturn(ASSIGNED_USER);
         delegateTaskCommand = spy(new DelegateTaskCommand() {
             @Override
@@ -160,11 +194,9 @@ public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<Dele
         when(command.createDelegateCommand(TASK_ID, USER_ID, ASSIGNED_USER)).thenReturn(delegateTaskCommand);
     }
 
-    private void assertPotentialOwnerIsPresent() {
-        assertTrue(potentialOwners.contains(organizationalEntity));
-    }
-
-    private void assertPotentialOwnerIsNotPresent() {
-        assertFalse(potentialOwners.contains(organizationalEntity));
+    private static PlanningTaskImpl mockPlanningTask(long taskId) {
+        PlanningTaskImpl result = new PlanningTaskImpl();
+        result.setTaskId(taskId);
+        return spy(result);
     }
 }
