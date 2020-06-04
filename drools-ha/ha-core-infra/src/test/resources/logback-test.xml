@@ -28,7 +28,7 @@
     <producerConfig>bootstrap.servers=localhost:9092</producerConfig>
   </appender>
 
-  <logger name="org.hacep" level="debug" additivity="false">
+  <logger name="org.hacep" level="warn" additivity="false">
     <appender-ref ref="KafkaAppender"/>
   </logger>
 
