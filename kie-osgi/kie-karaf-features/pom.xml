@@ -32,8 +32,8 @@
     <karaf.version.org.eclipse.jdt>${version.org.eclipse.jdt}</karaf.version.org.eclipse.jdt>
 
     <!-- used by jbpm-commons -->
-    <karaf.version.org.jboss.spec.javax.security.jacc>1.0.0.Final</karaf.version.org.jboss.spec.javax.security.jacc>
-    <karaf.version.org.jboss.spec.javax.interceptor>1.0.0.Final</karaf.version.org.jboss.spec.javax.interceptor>
+    <karaf.version.org.jboss.spec.javax.security.jacc>2.0.0.Final</karaf.version.org.jboss.spec.javax.security.jacc>
+    <karaf.version.org.jboss.spec.javax.interceptor>2.0.0.Final</karaf.version.org.jboss.spec.javax.interceptor>
     <!-- Geronimo servlet-api bundle is needed by Fuse 6.2.x and javax-servlet by Fuse 6.3.x+ -->
     <karaf.version.org.apache.geronimo.specs.servlet>1.0</karaf.version.org.apache.geronimo.specs.servlet>
     <karaf.version.javax.servlet>3.1.0</karaf.version.javax.servlet>
