@@ -20,16 +20,12 @@ import org.junit.Test;
 import org.kie.server.api.model.taskassigning.PlanningItem;
 import org.kie.server.api.model.taskassigning.PlanningTask;
 import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SavePlanningItemCommandTest extends AbstractPlanningCommandTest<SavePlanningItemCommand> {
-
-    @Captor
-    private ArgumentCaptor<PlanningTaskImpl> planningTaskCaptor;
 
     @Override
     protected SavePlanningItemCommand createCommand() {
@@ -45,12 +41,18 @@ public class SavePlanningItemCommandTest extends AbstractPlanningCommandTest<Sav
     }
 
     @Test
-    public void execute() {
+    public void executeWithPlanningTaskExisting() {
+        PlanningTaskImpl planningTask = mock(PlanningTaskImpl.class);
+        when(persistenceContext.find(PlanningTaskImpl.class, TASK_ID)).thenReturn(planningTask);
         command.execute(taskContext);
-        verify(persistenceContext).merge(planningTaskCaptor.capture());
-        assertEquals(TASK_ID, planningTaskCaptor.getValue().getTaskId(), 0);
-        assertEquals(ASSIGNED_USER, planningTaskCaptor.getValue().getAssignedUser());
-        assertEquals(INDEX, planningTaskCaptor.getValue().getIndex(), 0);
-        assertEquals(PUBLISHED, planningTaskCaptor.getValue().isPublished());
+        verifyPlanningTaskMerged(planningTask);
+    }
+
+    @Test
+    public void executeWithPlanningTaskNotExisting() {
+        when(persistenceContext.find(PlanningTaskImpl.class, TASK_ID)).thenReturn(null);
+        command.execute(taskContext);
+        verify(persistenceContext).persist(planningTaskCaptor.capture());
+        verifyPlanningTaskPersisted(planningTaskCaptor.getValue());
     }
 }

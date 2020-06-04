@@ -16,11 +16,8 @@
 
 package org.kie.server.services.taskassigning.runtime.command;
 
-import java.util.Date;
-
 import org.kie.api.runtime.Context;
 import org.kie.server.api.model.taskassigning.PlanningItem;
-import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
 
 /**
  * Helper class intended to be used by the TaskAssigningRuntimeServiceBase and planning execution.
@@ -34,11 +31,7 @@ public class SavePlanningItemCommand extends PlanningCommand {
     @Override
     public Object execute(Context context) {
         super.execute(context);
-        persistenceContext.merge(new PlanningTaskImpl(planningItem.getTaskId(),
-                                                      planningItem.getPlanningTask().getAssignedUser(),
-                                                      planningItem.getPlanningTask().getIndex(),
-                                                      planningItem.getPlanningTask().isPublished(),
-                                                      new Date()));
+        saveOrUpdatePlanningTask(planningItem);
         return null;
     }
 }
