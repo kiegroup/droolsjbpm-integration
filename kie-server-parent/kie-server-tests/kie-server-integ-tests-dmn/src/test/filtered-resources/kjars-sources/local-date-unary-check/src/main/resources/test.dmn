@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns="https://kiegroup.org/dmn/_5851203A-5DA1-4020-B7D1-E23C89634164" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="_94A9233F-13D5-4A28-99E3-AC0298FA5FCD" name="Test" expressionLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/" namespace="https://kiegroup.org/dmn/_5851203A-5DA1-4020-B7D1-E23C89634164">
+  <dmn:extensionElements/>
+  <dmn:itemDefinition id="_0603510D-BD8E-448E-AEE6-AC5D6F24C008" name="person" isCollection="false">
+    <dmn:itemComponent id="_27F553BA-D706-459E-99EF-0F704911348C" name="id" isCollection="false">
+      <dmn:typeRef>string</dmn:typeRef>
+    </dmn:itemComponent>
+    <dmn:itemComponent id="_8E41DC61-6217-4EF9-9081-1FD5921489C8" name="name" isCollection="false">
+      <dmn:typeRef>string</dmn:typeRef>
+    </dmn:itemComponent>
+    <dmn:itemComponent id="_93D8F173-4C81-4291-94C2-072E286550A9" name="dojoining" isCollection="false">
+      <dmn:typeRef>date</dmn:typeRef>
+    </dmn:itemComponent>
+  </dmn:itemDefinition>
+  <dmn:decision id="_544CD7B3-C371-436D-AC43-FB126B4AC476" name="PersonDecision">
+    <dmn:extensionElements/>
+    <dmn:variable id="_03B6721D-B8AA-485A-99D8-3B7E3B7E4ED1" name="PersonDecision" typeRef="person"/>
+    <dmn:informationRequirement id="_84F8B78A-1058-4187-AFFF-3B37D6DCF548">
+      <dmn:requiredInput href="#_D29A640F-0C79-45EE-BB1C-8DCB1E567F9E"/>
+    </dmn:informationRequirement>
+    <dmn:decisionTable id="_D42C1CDE-C0A4-4572-AD41-D712BC3649C6" hitPolicy="UNIQUE" preferredOrientation="Rule-as-Row">
+      <dmn:input id="_B0142DF2-70D0-4BB0-8B94-E3AA05FE20B9">
+        <dmn:inputExpression id="_7D7A6DB1-D007-4043-9910-D7E1209A5FBF" typeRef="date">
+          <dmn:text>PersonData.dojoining</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:output id="_356E7EE3-D1FE-401E-8587-71775A97E05C" name="name" typeRef="string"/>
+      <dmn:output id="_315E6D79-92C6-4307-9461-19CAF58F3049" name="id" typeRef="string"/>
+      <dmn:annotation name=""/>
+      <dmn:rule id="_FFE43BB7-3314-4441-A2CD-E07A7881504C">
+        <dmn:inputEntry id="_567C635B-081E-4255-AD79-787FF55DECD6">
+          <dmn:text>&gt;date("2020-06-04")</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="_DE7B6538-E749-4EB3-B50E-F3C505AC7ACD">
+          <dmn:text>"xyz"</dmn:text>
+        </dmn:outputEntry>
+        <dmn:outputEntry id="_B5EC9A7B-DAB5-4317-BBC8-0AFC242DB08B">
+          <dmn:text>"abc"</dmn:text>
+        </dmn:outputEntry>
+        <dmn:annotationEntry>
+          <dmn:text></dmn:text>
+        </dmn:annotationEntry>
+      </dmn:rule>
+    </dmn:decisionTable>
+  </dmn:decision>
+  <dmn:inputData id="_D29A640F-0C79-45EE-BB1C-8DCB1E567F9E" name="PersonData">
+    <dmn:extensionElements/>
+    <dmn:variable id="_A65CD28E-EFD7-4E87-8325-9842A092FA03" name="PersonData" typeRef="person"/>
+  </dmn:inputData>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <di:extension>
+        <kie:ComponentsWidthsExtension>
+          <kie:ComponentWidths dmnElementRef="_D42C1CDE-C0A4-4572-AD41-D712BC3649C6">
+            <kie:width>50.0</kie:width>
+            <kie:width>271.0</kie:width>
+            <kie:width>100.0</kie:width>
+            <kie:width>100.0</kie:width>
+            <kie:width>100.0</kie:width>
+          </kie:ComponentWidths>
+        </kie:ComponentsWidthsExtension>
+      </di:extension>
+      <dmndi:DMNShape id="dmnshape-_544CD7B3-C371-436D-AC43-FB126B4AC476" dmnElementRef="_544CD7B3-C371-436D-AC43-FB126B4AC476" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="438" y="310" width="100" height="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="dmnshape-_D29A640F-0C79-45EE-BB1C-8DCB1E567F9E" dmnElementRef="_D29A640F-0C79-45EE-BB1C-8DCB1E567F9E" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="130" y="310" width="100" height="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="dmnedge-_84F8B78A-1058-4187-AFFF-3B37D6DCF548" dmnElementRef="_84F8B78A-1058-4187-AFFF-3B37D6DCF548">
+        <di:waypoint x="180" y="335"/>
+        <di:waypoint x="488" y="310"/>
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</dmn:definitions>
