@@ -90,7 +90,7 @@
 
     <karaf.version.com.github.javaparser>3.10.2</karaf.version.com.github.javaparser>
 
-    <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
+    <version.org.jboss.logging.jboss-logging>3.4.1.Final</version.org.jboss.logging.jboss-logging>
   </properties>
 
   <dependencyManagement>
