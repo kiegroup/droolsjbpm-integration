@@ -69,7 +69,6 @@
     <!-- By default we use bundled H2 database jar -->
     <springboot.jdbc.driver.jar/>
 
-    <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
@@ -209,7 +208,6 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>${version.org.postgresql}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -488,7 +486,7 @@
     <profile>
       <id>postgresql</id>
       <properties>
-        <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL82Dialect</org.kie.server.persistence.dialect>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL95Dialect</org.kie.server.persistence.dialect>
         <org.kie.server.datasource.driver.class>org.postgresql.xa.PGXADataSource</org.kie.server.datasource.driver.class>
         <!-- Connection URL, format example: jdbc:postgresql://localhost:5432/mydb -->
         <org.kie.server.datasource.connection.url>specify-postgresql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
