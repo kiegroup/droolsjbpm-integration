@@ -18,7 +18,6 @@ package org.kie.server.integrationtests.controller;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -35,11 +34,9 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.api.model.spec.ContainerSpecList;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -221,61 +218,5 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertNotNull(containerInfo.getResult());
         assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
         assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
-    }
-
-    @Test
-    public void testContainerDisposedAfterStartup() throws Exception {
-        // Getting info from currently started kie server.
-        ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, kieServerInfo.getType());
-        assertNotNull(kieServerInfo.getResult());
-
-        // Create container.
-        ServerTemplate serverTemplate = new ServerTemplate(kieServerInfo.getResult().getServerId(), kieServerInfo.getResult().getName());
-        serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), kieServerInfo.getResult().getLocation()));
-        controllerClient.saveServerTemplate(serverTemplate);
-        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, RELEASE_ID, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
-        controllerClient.saveContainerSpec(kieServerInfo.getResult().getServerId(), containerSpec);
-        controllerClient.startContainer(containerSpec);
-
-        // Check that there is one container deployed.
-        try {
-            KieServerSynchronization.waitForKieServerSynchronization(client, 1);
-        } catch (TimeoutException e) {
-            // Sometimes creating container fails in embedded server (unknown Socket timeout error, tends to happen here).
-            // Retrigger container creation. These tests should be refactored to use more reliable container instead of embedded TJWSEmbeddedJaxrsServer.
-            controllerClient.startContainer(containerSpec);
-            KieServerSynchronization.waitForKieServerSynchronization(client, 1);
-        }
-        ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
-        assertNotNull(containersList.getResult().getContainers());
-        assertEquals(1, containersList.getResult().getContainers().size());
-
-        ServerTemplateList instanceList = controllerClient.listServerTemplates();
-        assertEquals(1, instanceList.getServerTemplates().length);
-
-        ServerTemplate returnedServerTemplate = controllerClient.getServerTemplate(kieServerInfo.getResult().getServerId());
-        logger.info("+++++++++++++++++++++++" + returnedServerTemplate.getServerInstanceKeys());
-
-        // Turn kie server off, dispose container and start kie server again.
-        server.stopKieServer();
-        KieServerSynchronization.waitForServerInstanceSynchronization(controllerClient, kieServerInfo.getResult().getServerId(), 0);
-
-        returnedServerTemplate = controllerClient.getServerTemplate(kieServerInfo.getResult().getServerId());
-        logger.info("------------------------" + returnedServerTemplate.getServerInstanceKeys());
-
-        controllerClient.stopContainer(containerSpec);
-        controllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
-        
-        ContainerSpecList containerList = controllerClient.listContainerSpec(serverTemplate.getId());
-        KieServerAssert.assertNullOrEmpty("Active containers spec found!", containerList.getContainerSpecs());
-
-        server.startKieServer(true);
-
-        // Check that no container is deployed on kie server.
-        containersList = client.listContainers();
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
-        KieServerAssert.assertNullOrEmpty("Active containers found!", containersList.getResult().getContainers());
     }
 }
