@@ -11,7 +11,7 @@
     <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream-java8/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
-    <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.3/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
     <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
