@@ -89,12 +89,16 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+
         // do any other bootstrapping rule service requires
         Set<Class<?>> extraClasses = new HashSet<Class<?>>();
 
         // create kbases so declared types can be created
         Collection<String> kbases = kieContainerInstance.getKieContainer().getKieBaseNames();
         for (String kbase : kbases) {
+            if (kbase.startsWith("KiePMML")) {
+                continue;
+            }
             kieContainerInstance.getKieContainer().getKieBase(kbase);
         }
 

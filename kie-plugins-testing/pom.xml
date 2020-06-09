@@ -43,6 +43,12 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-maven-plugin</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-inject-bean</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
