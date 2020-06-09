@@ -133,6 +133,11 @@
         <exclusion>
           <groupId>org.jboss.spec.javax.el</groupId>
           <artifactId>jboss-el-api_3.0_spec</artifactId>
+        <!-- Prevent old Netty versions from unused Infinispan -->
+        </exclusion>
+        <exclusion>
+          <groupId>io.thorntail</groupId>
+          <artifactId>infinispan</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
