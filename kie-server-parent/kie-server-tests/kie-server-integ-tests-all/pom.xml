@@ -290,6 +290,11 @@
           <artifactId>hibernate-core</artifactId>
           <scope>test</scope>
           <exclusions>
+            <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+            <exclusion>
+              <groupId>org.glassfish.jaxb</groupId>
+              <artifactId>jaxb-runtime</artifactId>
+            </exclusion>
             <exclusion>
               <groupId>javax.activation</groupId>
               <artifactId>javax.activation-api</artifactId>

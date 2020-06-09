@@ -72,6 +72,11 @@
           <groupId>ch.qos.logback</groupId>
           <artifactId>logback-classic</artifactId>
         </exclusion>
+        <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+        <exclusion>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

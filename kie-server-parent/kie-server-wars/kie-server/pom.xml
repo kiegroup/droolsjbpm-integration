@@ -302,6 +302,11 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
       <exclusions>
+        <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+        <exclusion>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.apache.geronimo.specs</groupId>
           <artifactId>geronimo-jta_1.1_spec</artifactId>
