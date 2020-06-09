@@ -622,7 +622,7 @@ public abstract class AbstractKieServerImplTest {
             }
 
             @Override
-            protected KieServerController getController() {
+            public KieServerController getController() {
                 return new DefaultRestControllerImpl(getServerRegistry()) {
                     @Override
                     public KieServerSetup connect(KieServerInfo serverInfo) {
