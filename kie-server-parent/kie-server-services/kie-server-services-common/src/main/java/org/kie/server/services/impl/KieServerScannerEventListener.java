@@ -53,8 +53,7 @@ public class KieServerScannerEventListener implements KieScannerEventListener {
             String containerId = kieContainerInstance.getContainerId();
             ReleaseId releaseId = kieContainerInstance.getKieContainer().getContainerReleaseId();
 
-            Map<String, Object> parameters = kieServer.getContainerParameters(releaseId, 
-                    kieServer.getMessagesForContainer(containerId));
+            Map<String, Object> parameters = kieServer.getContainerParameters(kieContainerInstance.getKieContainer(), kieServer.getMessagesForContainer(containerId));
             
             for (KieServerExtension extension : extensions) {
                 boolean allowed = extension.isUpdateContainerAllowed(containerId, kieContainerInstance, parameters);
