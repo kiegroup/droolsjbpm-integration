@@ -36,6 +36,10 @@
     <appender-ref ref="STDOUT"/>
   </logger>
 
+  <logger name="org.eclipse" level="info" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
   <logger name="org.apache.kafka" level="off" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
@@ -50,8 +54,6 @@
   <logger name="kafka.controller" level="off" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-
-
 
   <root level="warn">
     <appender-ref ref="STDOUT" />
