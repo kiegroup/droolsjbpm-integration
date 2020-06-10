@@ -90,7 +90,7 @@ public class LocalStorageStreamingKieSessionTest {
 
         Collection<StockTickEvent> events  = session.getObjects(StockTickEvent.class).get();
         assertNotNull(events);
-        assertTrue(events.size() == 1);
+        assertEquals(1, events.size());
         assertTrue(events.iterator().next().isProcessed());
 
         session.halt();
