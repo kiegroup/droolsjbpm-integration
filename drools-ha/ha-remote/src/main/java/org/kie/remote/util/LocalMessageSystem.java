@@ -16,15 +16,15 @@
 
 package org.kie.remote.util;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class LocalMessageSystem {
 
-    private Map<String, BlockingQueue<Object>> queues = new HashMap<>();
+    private Map<String, BlockingQueue<Object>> queues = new ConcurrentHashMap<>();
 
     private LocalMessageSystem() { }
 
