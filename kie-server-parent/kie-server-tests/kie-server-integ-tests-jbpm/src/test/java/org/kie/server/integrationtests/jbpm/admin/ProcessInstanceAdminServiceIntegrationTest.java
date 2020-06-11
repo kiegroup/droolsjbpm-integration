@@ -15,9 +15,14 @@
 
 package org.kie.server.integrationtests.jbpm.admin;
 
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,6 +36,7 @@ import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.TimerInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
@@ -38,9 +44,21 @@ import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.kie.api.runtime.process.ProcessInstance.SLA_ABORTED;
+import static org.kie.api.runtime.process.ProcessInstance.SLA_MET;
+import static org.kie.api.runtime.process.ProcessInstance.SLA_PENDING;
+import static org.kie.api.runtime.process.ProcessInstance.SLA_VIOLATED;
 
 public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
+
+    private static final String USER_TASK_NAME = "Hello";
 
     private static final KieServerConfigItem PPI_RUNTIME_STRATEGY = new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, RuntimeStrategy.PER_PROCESS_INSTANCE.name(), String.class.getName());
 
@@ -380,4 +398,133 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
         assertEquals(USER_YODA, errorInstance.getAcknowledgedBy());
     }
 
+    @Test(timeout = 10000)
+    public void testSLAMetAfterUpdateSLATimerInCompletedProcess() throws Exception {
+        Long pid = startAndAssertProcess(PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
+
+        Long timerId = assertTimerInstanceName(pid, USER_TASK_NAME);
+        
+        Date now = new Date();
+        //postpone due date to next day
+        processAdminClient.updateTimer(CONTAINER_ID, pid, timerId, 24*60*60, 0, 0);
+
+        //4 secs is former SLA timer delay in bpmn
+        assertSLAComplianceAfterWaiting(pid, SLA_PENDING, 4);
+        
+        completeAssignedTask(USER_YODA);
+        
+        assertSlaComplianceAndDueDate(pid, addSeconds(now, 24*60*60), "END", SLA_MET);
+    }
+
+    @Test(timeout = 10000)
+    public void testSLAAbortedAfterUpdateSLATimerInAbortedProcess() throws Exception {
+        Long pid = startAndAssertProcess(PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
+
+        Long timerId = assertTimerInstanceName(pid, USER_TASK_NAME);
+        
+        Date now = new Date();
+        //postpone due date to next day
+        processAdminClient.updateTimer(CONTAINER_ID, pid, timerId, 24*60*60, 0, 0);
+
+        //4 secs is former SLA timer delay in bpmn
+        assertSLAComplianceAfterWaiting(pid, SLA_PENDING, 4);
+        
+        processClient.abortProcessInstance(CONTAINER_ID, pid);
+        
+        assertSlaComplianceAndDueDate(pid, addSeconds(now, 24*60*60), "ABORTED", SLA_ABORTED);
+    }
+
+    @Test(timeout = 15000)
+    public void testSLAViolatedAfterUpdateSLATimerInCompletedProcess() throws Exception {
+        Long pid = startAndAssertProcess(PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
+
+        Long timerId = assertTimerInstanceName(pid, USER_TASK_NAME);
+        
+        Date now = new Date();
+        //postpone due date 3 more seconds: total 7 seconds
+        processAdminClient.updateTimer(CONTAINER_ID, pid, timerId, 7, 0, 0);
+
+        //4 secs is former SLA timer delay in bpmn, after updating to 7, wait 9 for obtaining VIOLATED
+        assertSLAComplianceAfterWaiting(pid, SLA_VIOLATED, 9);
+        
+        completeAssignedTask(USER_YODA);
+        
+        assertSlaComplianceAndDueDate(pid, addSeconds(now, 7), "END", SLA_VIOLATED);
+    }
+    
+    @Test(timeout = 15000)
+    public void testSLAViolatedAfterUpdateSLATimerInAbortedProcess() throws Exception {
+        Long pid = startAndAssertProcess(PROCESS_ID_USERTASK_WITH_SLA_ON_TASK);
+
+        Long timerId = assertTimerInstanceName(pid, USER_TASK_NAME);
+        
+        Date now = new Date();
+        //postpone due date 3 more seconds: total 7 seconds
+        processAdminClient.updateTimer(CONTAINER_ID, pid, timerId, 7, 0, 0);
+
+        //4 secs is former SLA timer delay in bpmn, after updating to 7, wait 9 for obtaining VIOLATED
+        assertSLAComplianceAfterWaiting(pid, SLA_VIOLATED, 9);
+        
+        processClient.abortProcessInstance(CONTAINER_ID, pid);
+        
+        assertSlaComplianceAndDueDate(pid, addSeconds(now, 7), "ABORTED", SLA_VIOLATED);
+    }
+
+    private Long startAndAssertProcess(String processId) {
+        Long pid = processClient.startProcess(CONTAINER_ID, processId);
+        assertNotNull(pid);
+        assertTrue(pid.longValue() > 0);
+        return pid;
+    }
+
+    private Long assertTimerInstanceName(Long pid, String taskName) {
+        List<TimerInstance> timers = processAdminClient.getTimerInstances(CONTAINER_ID, pid);
+        assertNotNull(timers);
+        assertEquals(1, timers.size());
+
+        TimerInstance timerInstance = timers.get(0);
+        assertNotNull(timerInstance);
+        assertEquals("[SLA]"+taskName, timerInstance.getTimerName());
+        assertNotNull(timerInstance.getId());
+        assertNotNull(timerInstance.getTimerId());
+        return timerInstance.getId();
+    }
+
+    private void assertSLAComplianceAfterWaiting(Long pid, int slaCompliance, int waitingTime) throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        assertFalse(latch.await(waitingTime, TimeUnit.SECONDS));
+        List<NodeInstance> activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
+        assertThat(activeNodes).hasSize(1);
+        assertEquals("SLA compliance should be "+slaCompliance+" after updating the timer and waiting "+waitingTime+" seconds", 
+                     slaCompliance, activeNodes.get(0).getSlaCompliance().intValue());
+    }
+
+    private void completeAssignedTask(String userId) {
+        List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(userId, 0, 10);
+        assertNotNull(taskList);
+        assertEquals(1, taskList.size());
+        Long taskId = taskList.get(0).getId();
+        taskClient.startTask(CONTAINER_ID, taskId, userId);
+        taskClient.completeTask(CONTAINER_ID, taskId, userId, Collections.emptyMap());
+    }
+
+    private void assertSlaComplianceAndDueDate(Long pid, 
+                                               Date dueDate,
+                                               String entryType,
+                                               int slaCompliance) {
+        List<NodeInstance> nodes = processClient.findNodeInstancesByType(CONTAINER_ID, pid, entryType, 0, 10);
+        NodeInstance userTask = nodes.stream()
+                                     .filter(n -> USER_TASK_NAME.equals(n.getName()))
+                                     .findFirst()
+                                     .orElseThrow(() -> new RuntimeException("Node '"+USER_TASK_NAME+"' not found as entryType "+entryType));
+        assertEquals(slaCompliance, userTask.getSlaCompliance().intValue());
+        assertThat(userTask.getSlaDueDate()).isCloseTo(dueDate, 2000);
+    }
+
+    private Date addSeconds(Date now, int secondsToAdd) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(now);
+        c.add(Calendar.SECOND, secondsToAdd);
+        return c.getTime();
+    }
 }
