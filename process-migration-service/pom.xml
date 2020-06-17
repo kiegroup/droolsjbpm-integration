@@ -20,6 +20,7 @@
     <version.org.jboss.weld.weld-api>2.4.SP2</version.org.jboss.weld.weld-api>
     <!-- Frontend properties -->
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+    <maven-war-plugin.version>3.2.2</maven-war-plugin.version>
     <!-- Following properties are used only for testing -->
     <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running
          SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
@@ -296,6 +297,10 @@
           <artifactId>process-exec-maven-plugin</artifactId>
           <version>0.8</version>
         </plugin>
+        <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${maven-war-plugin.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -415,6 +420,12 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <attachClasses>true</attachClasses>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
