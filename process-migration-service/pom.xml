@@ -303,6 +303,9 @@
         <groupId>io.thorntail</groupId>
         <artifactId>thorntail-maven-plugin</artifactId>
         <version>${version.thorntail}</version>
+        <configuration>
+          <filterWebInfLib>uberjar-only</filterWebInfLib>
+        </configuration>
         <executions>
           <execution>
             <goals>
