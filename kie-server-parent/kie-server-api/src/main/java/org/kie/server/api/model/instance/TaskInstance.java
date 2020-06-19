@@ -91,8 +91,11 @@ public class TaskInstance {
     @XmlElement(name = "task-output-data")
     private Map<String, Object> outputData;
 
-    public TaskInstance() {
-    }
+    @XmlElement(name = "correlation-key")
+    private String correlationKey;
+
+    @XmlElement(name = "process-type")
+    private Integer processType;
 
     public static Builder builder() {
         return new Builder();
@@ -306,6 +309,23 @@ public class TaskInstance {
         this.outputData = outputData;
     }
 
+    public Integer getProcessType() {
+        return processType;
+    }
+
+    public void setProcessType(Integer processType) {
+        this.processType = processType;
+    }
+
+    public String getCorrelationKey() {
+        return correlationKey;
+    }
+
+    public void setCorrelationKey(String correlationKey) {
+        this.correlationKey = correlationKey;
+    }
+
+
     @Override
     public String toString() {
         return "TaskInstance{" +
@@ -320,6 +340,8 @@ public class TaskInstance {
                 ", workItemId=" + workItemId +
                 ", slaCompliance=" + slaCompliance +
                 ", slaDueDate=" + slaDueDate  +
+                ", correlationKey=" + correlationKey +
+                ", processType=" +processType +
                 '}';
     }
 
@@ -458,6 +480,16 @@ public class TaskInstance {
 
         public Builder outputData(Map<String, Object> outputData) {
             taskInstance.setOutputData(outputData);
+            return this;
+        }
+
+        public Builder correlationKey(String correlationKey) {
+            taskInstance.setCorrelationKey(correlationKey);
+            return this;
+        }
+
+        public Builder processType(Integer processType) {
+            taskInstance.setProcessType(processType);
             return this;
         }
     }
