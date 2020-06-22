@@ -25,6 +25,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.kie.hacep.core.Bootstrap;
 import org.kie.hacep.core.InfraFactory;
 import org.kie.hacep.core.infra.election.State;
@@ -43,6 +44,7 @@ import static org.junit.Assert.*;
 import static org.kie.remote.CommonConfig.getTestProperties;
 import static org.kie.remote.impl.EntryPointUtil.DEFAULT_ENTRY_POINT;
 
+@Ignore("https://issues.redhat.com/browse/DROOLS-5321")
 public class LocalStorageKieSessionTest {
 
     RemoteKieSession session;
@@ -127,7 +129,7 @@ public class LocalStorageKieSessionTest {
         assertEquals((Long) 0L, session.getFactCount().get());
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 20000)
     public void fireUntilHaltTest() throws ExecutionException, InterruptedException {
 
         assertEquals((Long) 0L, session.getFactCount().get());

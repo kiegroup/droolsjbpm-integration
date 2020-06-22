@@ -106,7 +106,6 @@
         <exclude>javax.persistence:javax.persistence-api</exclude>
         <exclude>xml-apis:xml-apis:jar</exclude>
         <exclude>javax.mail:mail</exclude>
-        <exclude>org.apache.cxf:cxf-rt-ws-policy</exclude>
       </excludes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>

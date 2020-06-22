@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-osgi</artifactId>
-    <version>7.38.0-SNAPSHOT</version>
+    <version>7.40.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-karaf-features</artifactId>
@@ -67,7 +67,7 @@
     <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.2.11_1</karaf.servicemix.version.com.sun.xml.bind.jaxb>
     <karaf.servicemix.version.com.thoughtworks.xstream>1.4.10_1</karaf.servicemix.version.com.thoughtworks.xstream>
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
-    <karaf.servicemix.version.javax.xml.bind.jaxb>2.2.0</karaf.servicemix.version.javax.xml.bind.jaxb>
+    <karaf.servicemix.version.javax.xml.bind.jaxb>2.3_3</karaf.servicemix.version.javax.xml.bind.jaxb>
     <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
     <karaf.servicemix.version.org.apache.poi>3.15_1</karaf.servicemix.version.org.apache.poi>
     <!-- Santurio and xmlresolver needed by POI 3.15+ -->
@@ -90,7 +90,7 @@
 
     <karaf.version.com.github.javaparser>3.10.2</karaf.version.com.github.javaparser>
 
-    <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
+    <version.org.jboss.logging.jboss-logging>3.4.1.Final</version.org.jboss.logging.jboss-logging>
   </properties>
 
   <dependencyManagement>
@@ -171,7 +171,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.specs</groupId>
-        <artifactId>org.apache.servicemix.specs.jaxb-api-2.2</artifactId>
+        <artifactId>org.apache.servicemix.specs.jaxb-api-2.3</artifactId>
         <version>${karaf.servicemix.version.javax.xml.bind.jaxb}</version>
       </dependency>
       <dependency>
@@ -586,7 +586,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.jaxb-api-2.2</artifactId>
+      <artifactId>org.apache.servicemix.specs.jaxb-api-2.3</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

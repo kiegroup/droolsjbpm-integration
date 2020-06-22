@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.38.0-SNAPSHOT</version>
+    <version>7.40.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>process-migration-service</artifactId>
@@ -20,6 +20,7 @@
     <version.org.jboss.weld.weld-api>2.4.SP2</version.org.jboss.weld.weld-api>
     <!-- Frontend properties -->
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+    <maven-war-plugin.version>3.2.2</maven-war-plugin.version>
     <!-- Following properties are used only for testing -->
     <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running
          SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
@@ -125,6 +126,16 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>jpa</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.enterprise</groupId>
+          <artifactId>cdi-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.el</groupId>
+          <artifactId>jboss-el-api_3.0_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.thorntail</groupId>
@@ -166,6 +177,12 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-test-util</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jboss.weld</groupId>
@@ -175,6 +192,18 @@
         <exclusion>
           <artifactId>hibernate-jpa-2.1-api</artifactId>
           <groupId>org.hibernate.javax.persistence</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.enterprise</groupId>
+          <artifactId>cdi-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.el</groupId>
+          <artifactId>jboss-el-api_3.0_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -186,6 +215,19 @@
         <exclusion>
           <groupId>javax.activation</groupId>
           <artifactId>javax.activation-api</artifactId>
+        </exclusion>
+        <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+        <exclusion>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.persistence</groupId>
+          <artifactId>javax.persistence-api</artifactId>
+        </exclusion>   
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -203,6 +245,16 @@
     <dependency>
       <groupId>org.kie.soup</groupId>
       <artifactId>kie-soup-maven-integration</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.enterprise</groupId>
+          <artifactId>cdi-api</artifactId>
+        </exclusion> 
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -245,6 +297,10 @@
           <artifactId>process-exec-maven-plugin</artifactId>
           <version>0.8</version>
         </plugin>
+        <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${maven-war-plugin.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -252,6 +308,9 @@
         <groupId>io.thorntail</groupId>
         <artifactId>thorntail-maven-plugin</artifactId>
         <version>${version.thorntail}</version>
+        <configuration>
+          <filterWebInfLib>uberjar-only</filterWebInfLib>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -361,6 +420,12 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <attachClasses>true</attachClasses>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
@@ -511,7 +576,7 @@
     <profile>
       <id>wildfly</id>
       <properties>
-        <cargo.container.id>wildfly14x</cargo.container.id>
+        <cargo.container.id>wildfly18x</cargo.container.id>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
       </properties>
       <build>

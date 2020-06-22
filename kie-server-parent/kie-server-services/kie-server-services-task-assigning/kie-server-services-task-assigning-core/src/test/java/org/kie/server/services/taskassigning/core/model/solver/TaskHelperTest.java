@@ -135,6 +135,29 @@ public class TaskHelperTest {
     }
 
     @Test
+    public void isPotentialOwnerOfTaskWithNoGroupsAndUserNoGroups() {
+        Task task = new Task();
+        User user = availableUsers.get(0);
+        assertThat(isPotentialOwner(task, user)).isFalse();
+    }
+
+    @Test
+    public void isPotentialOwnerOfTaskWithGroupsAndUserNoGroups() {
+        Task task = new Task();
+        task.getPotentialOwners().add(availableGroups.get(0));
+        User user = availableUsers.get(0);
+        assertThat(isPotentialOwner(task, user)).isFalse();
+    }
+
+    @Test
+    public void isPotentialOwnerOfTaskWithNoGroupsAndUserWithGroups() {
+        Task task = new Task();
+        User user = availableUsers.get(0);
+        user.getGroups().add(availableGroups.get(0));
+        assertThat(isPotentialOwner(task, user)).isFalse();
+    }
+
+    @Test
     public void hasAllLabels() {
         Task task = mockTask(taskLabelName, taskLabelValues);
         User user = mockUser(userLabelName, userLabelValues);

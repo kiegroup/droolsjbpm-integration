@@ -16,6 +16,8 @@
 
 package org.kie.server.services.taskassigning.planning;
 
+import java.util.concurrent.ThreadFactory;
+
 import org.assertj.core.api.Assertions;
 import org.drools.core.impl.InternalKieContainer;
 import org.junit.Test;
@@ -27,8 +29,11 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.optaplanner.core.api.solver.Solver;
+import org.optaplanner.core.impl.solver.thread.DefaultSolverThreadFactory;
 
 import static org.junit.Assert.assertNotNull;
+import static org.kie.server.services.taskassigning.planning.SolverBuilder.CONFIGURED_THREAD_FACTORY_CLASS_MUST_IMPLEMENT_THREAD_FACTORY;
+import static org.kie.server.services.taskassigning.planning.SolverBuilder.CONFIGURED_THREAD_FACTORY_CLASS_NOT_FOUND_ERROR;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,6 +46,10 @@ public class SolverBuilderTest {
     private static final String CONTAINER_ID = "CONTAINER_ID";
 
     private static final String NOT_EXISTING_SOLVER_CONFIG_RESOURCE = "NotExistingResource.xml";
+
+    private static final String NOT_EXISTING_CLASS = "MyNonExistingClass";
+
+    private static final String AUTO = "AUTO";
 
     @Mock
     private KieServerRegistry registry;
@@ -56,6 +65,38 @@ public class SolverBuilderTest {
                 .registry(registry)
                 .build();
         assertNotNull(solver);
+    }
+
+    @Test
+    public void buildFromResourceWithCustomThreadParamsSuccessful() {
+        SolverDef solverDef = new SolverDef(SOLVER_SIMPLE_CONFIG_RESOURCE, AUTO, 10, DefaultSolverThreadFactory.class.getName());
+        Solver solver = SolverBuilder.create()
+                .solverDef(solverDef)
+                .registry(registry)
+                .build();
+        assertNotNull(solver);
+    }
+
+    @Test
+    public void buildFromResourceWithThreadFactoryNotFoundError() {
+        SolverDef solverDef = new SolverDef(SOLVER_SIMPLE_CONFIG_RESOURCE, AUTO, 10, NOT_EXISTING_CLASS);
+        Assertions.assertThatThrownBy(() ->
+                                              SolverBuilder.create()
+                                                      .solverDef(solverDef)
+                                                      .registry(registry)
+                                                      .build())
+                .hasMessageContaining(String.format(CONFIGURED_THREAD_FACTORY_CLASS_NOT_FOUND_ERROR, NOT_EXISTING_CLASS));
+    }
+
+    @Test
+    public void buildFromResourceWithThreadFactoryWrongError() {
+        SolverDef solverDef = new SolverDef(SOLVER_SIMPLE_CONFIG_RESOURCE, AUTO, 10, String.class.getName());
+        Assertions.assertThatThrownBy(() ->
+                                              SolverBuilder.create()
+                                                      .solverDef(solverDef)
+                                                      .registry(registry)
+                                                      .build())
+                .hasMessageContaining(String.format(CONFIGURED_THREAD_FACTORY_CLASS_MUST_IMPLEMENT_THREAD_FACTORY, String.class.getName(), ThreadFactory.class.getName()));
     }
 
     @Test
@@ -76,7 +117,7 @@ public class SolverBuilderTest {
         when(container.getKieContainer()).thenReturn(kieContainer);
         when(container.getStatus()).thenReturn(KieContainerStatus.STARTED);
 
-        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE);
+        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE, null, -1, null);
         Solver solver = SolverBuilder.create()
                 .solverDef(solverDef)
                 .registry(registry)
@@ -86,7 +127,7 @@ public class SolverBuilderTest {
 
     @Test
     public void buildFromContainerWithContainerNotFoundInRegistryError() {
-        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE);
+        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE, null, -1, null);
         Assertions.assertThatThrownBy(() ->
                                               SolverBuilder.create()
                                                       .solverDef(solverDef)
@@ -99,7 +140,7 @@ public class SolverBuilderTest {
     public void buildFromContainerWithContainerNotStartedError() {
         when(registry.getContainer(CONTAINER_ID)).thenReturn(container);
         when(container.getStatus()).thenReturn(KieContainerStatus.STOPPED);
-        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE);
+        SolverDef solverDef = new SolverDef(CONTAINER_ID, null, null, null, SOLVER_CONTAINER_CONFIG_RESOURCE, null, -1, null);
         Assertions.assertThatThrownBy(() ->
                                               SolverBuilder.create()
                                                       .solverDef(solverDef)

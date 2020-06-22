@@ -18,17 +18,14 @@ package org.kie.server.services.taskassigning.runtime.command;
 
 import org.junit.Test;
 import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
-import org.mockito.Mock;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DeletePlanningItemCommandTest extends AbstractPlanningCommandTest<DeletePlanningItemCommand> {
-
-    @Mock
-    private PlanningTaskImpl planningTask;
 
     @Override
     protected DeletePlanningItemCommand createCommand() {
@@ -37,6 +34,7 @@ public class DeletePlanningItemCommandTest extends AbstractPlanningCommandTest<D
 
     @Test
     public void executeWithExistingItem() {
+        PlanningTaskImpl planningTask = mock(PlanningTaskImpl.class);
         when(persistenceContext.find(PlanningTaskImpl.class, TASK_ID)).thenReturn(planningTask);
         command.execute(taskContext);
         verify(persistenceContext).remove(planningTask);

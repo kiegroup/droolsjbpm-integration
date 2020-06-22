@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.38.0-SNAPSHOT</version>
+    <version>7.40.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -69,7 +69,6 @@
     <!-- By default we use bundled H2 database jar -->
     <springboot.jdbc.driver.jar/>
 
-    <version.org.postgresql>42.1.1</version.org.postgresql>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
@@ -95,6 +94,7 @@
     <module>kie-server-integ-tests-dmn</module>
     <module>kie-server-integ-tests-scenario-simulation</module>
     <module>kie-server-integ-tests-custom-extension</module>
+    <module>kie-server-integ-tests-task-assigning</module>
   </modules>
 
   <dependencyManagement>
@@ -208,7 +208,6 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>${version.org.postgresql}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -233,6 +232,14 @@
                       <dependency>
                         <groupId>org.kie.server</groupId>
                         <artifactId>kie-server-router-proxy</artifactId>
+                        <ignoreClasses>
+                          <ignoreClass>*</ignoreClass>
+                        </ignoreClasses>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.wildfly.security</groupId>
+                        <artifactId>wildfly-elytron</artifactId>
+                        <type>jar</type>
                         <ignoreClasses>
                           <ignoreClass>*</ignoreClass>
                         </ignoreClasses>
@@ -479,7 +486,7 @@
     <profile>
       <id>postgresql</id>
       <properties>
-        <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL82Dialect</org.kie.server.persistence.dialect>
+        <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL95Dialect</org.kie.server.persistence.dialect>
         <org.kie.server.datasource.driver.class>org.postgresql.xa.PGXADataSource</org.kie.server.datasource.driver.class>
         <!-- Connection URL, format example: jdbc:postgresql://localhost:5432/mydb -->
         <org.kie.server.datasource.connection.url>specify-postgresql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
@@ -745,14 +752,14 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-    </profile>    
+    </profile>
     <profile>
       <id>wildfly</id>
-      <properties>        
+      <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
-        <cargo.container.id>wildfly14x</cargo.container.id>
+        <cargo.container.id>wildfly18x</cargo.container.id>
         <!-- Enable integration tests and Cargo when running with application server. -->
         <skipITs>false</skipITs>
         <cargo.maven.skip>false</cargo.maven.skip>
@@ -824,8 +831,8 @@
       </build>
       <dependencyManagement>
         <dependencies>
-          <!-- This is far from ideal, as it is not designed as BOM. However, 
-            there is nothing like wildfly-bom, so this is the closest thing I could find. 
+          <!-- This is far from ideal, as it is not designed as BOM. However,
+            there is nothing like wildfly-bom, so this is the closest thing I could find.
             Important: this overrides lots of the versions coming from kie-p-w-d -->
           <dependency>
             <groupId>org.wildfly</groupId>
@@ -833,6 +840,31 @@
             <version>${version.org.wildfly}</version>
             <type>pom</type>
             <scope>import</scope>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
+          <!-- Redeclare jboss-connector-api_1.7_spec dependency here to use version from Kie BOM, otherwise it will bring duplicated dependencies -->
+          <dependency>
+            <groupId>org.jboss.spec.javax.resource</groupId>
+            <artifactId>jboss-connector-api_1.7_spec</artifactId>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -847,6 +879,40 @@
           <artifactId>wildfly-jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
+          <exclusions>
+            <exclusion>
+                <groupId>jakarta.json</groupId>
+                <artifactId>jakarta.json-api</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms_2.0_spec</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-epoll</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-json_1.0_spec</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-buffer</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-transport</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-codec-http</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-transport-native-epoll</artifactId>
         </dependency>
       </dependencies>
     </profile>
@@ -855,8 +921,8 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-        <!-- eap7 is basically wildfly14; until there is a EAP 7 specific containerId, 'wildfly14x' should work just fine -->
-        <cargo.container.id>wildfly14x</cargo.container.id>
+        <!-- eap7.3 is basically wildfly18; until there is a EAP 7 specific containerId, 'wildfly18x' should work just fine -->
+        <cargo.container.id>wildfly18x</cargo.container.id>
         <!-- Enable integration tests and Cargo when running with application server. -->
         <skipITs>false</skipITs>
         <cargo.maven.skip>false</cargo.maven.skip>
@@ -910,8 +976,8 @@
       </build>
       <dependencyManagement>
        <dependencies>
-          <!-- This is far from ideal, as it is not designed as BOM. However, 
-            there is nothing like wildfly-bom, so this is the closest thing I could find. 
+          <!-- This is far from ideal, as it is not designed as BOM. However,
+            there is nothing like wildfly-bom, so this is the closest thing I could find.
             Important: this overrides lots of the versions coming from kie-p-w-d -->
           <dependency>
             <groupId>org.wildfly</groupId>
@@ -919,6 +985,31 @@
             <version>${version.org.wildfly}</version>
             <type>pom</type>
             <scope>import</scope>
+          </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-buffer</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-transport</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-codec-http</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty-transport-native-epoll</artifactId>
+           <version>${version.io.netty}</version>
+         </dependency>
+          <!-- Redeclare jboss-connector-api_1.7_spec dependency here to use version from Kie BOM, otherwise it will bring duplicated dependencies -->
+          <dependency>
+            <groupId>org.jboss.spec.javax.resource</groupId>
+            <artifactId>jboss-connector-api_1.7_spec</artifactId>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -928,6 +1019,40 @@
           <artifactId>wildfly-jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>jakarta.json</groupId>
+              <artifactId>jakarta.json-api</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.geronimo.specs</groupId>
+              <artifactId>geronimo-jms_2.0_spec</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>io.netty</groupId>
+              <artifactId>netty-transport-native-epoll</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.geronimo.specs</groupId>
+              <artifactId>geronimo-json_1.0_spec</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-buffer</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-transport</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-codec-http</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-transport-native-epoll</artifactId>
         </dependency>
       </dependencies>
     </profile>
@@ -1209,6 +1334,8 @@
         <kieserver.casemgmt.enabled>false</kieserver.casemgmt.enabled>
         <kieserver.optaplanner.enabled>false</kieserver.optaplanner.enabled>
         <kieserver.swagger.enabled>false</kieserver.swagger.enabled>
+        <kieserver.taskAssigning.runtime.enabled>false</kieserver.taskAssigning.runtime.enabled>
+        <kieserver.taskAssigning.planning.enabled>false</kieserver.taskAssigning.planning.enabled>
         <jbpm.executor.enabled>false</jbpm.executor.enabled>
         <kieserver.prometheus.enabled>false</kieserver.prometheus.enabled>
         <kieserver.scenariosimulation.enabled>false</kieserver.scenariosimulation.enabled>

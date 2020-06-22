@@ -43,10 +43,9 @@
             "_comment": "Changes between 7.33.0.Final and the current branch. These changes are desired and thus ignored.",
             "ignore": [
                 {
-
                     "code": "java.method.addedToInterface",
-                    "new": "method java.lang.Long org.kie.server.client.UserTaskServicesClient::saveTaskContent(java.lang.String, java.lang.Long, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>)", 
-                    "package":"org.kie.server.client",
+                    "new": "method java.lang.Long org.kie.server.client.UserTaskServicesClient::saveTaskContent(java.lang.String, java.lang.Long, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>)",
+                    "package": "org.kie.server.client",
                     "classSimpleName": "UserTaskServicesClient",
                     "methodName": "saveTaskContent",
                     "elementKind": "method",
@@ -87,6 +86,33 @@
                     "methodName": "queryUserTaskByVariables",
                     "elementKind": "method",
                     "justification": "added services for querying task belonging process by varaibles"
+                },
+                {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.Long org.kie.server.client.ProcessServicesClient::startProcessFromNodeIds(java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>, java.lang.String[])",
+                    "package": "org.kie.server.client",
+                    "classSimpleName": "ProcessServicesClient",
+                    "methodName": "startProcessFromNodeIds",
+                    "elementKind": "method",
+                    "justification": "start process from arbitrary nodes"
+                },
+                {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.Long org.kie.server.client.ProcessServicesClient::startProcessFromNodeIds(java.lang.String, java.lang.String, org.kie.internal.process.CorrelationKey, java.util.Map<java.lang.String, java.lang.Object>, java.lang.String[])",
+                    "package": "org.kie.server.client",
+                    "classSimpleName": "ProcessServicesClient",
+                    "methodName": "startProcessFromNodeIds",
+                    "elementKind": "method",
+                    "justification": "start process with correlation key from arbitrary nodes"
+                },
+                {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.ProcessServicesClient::findNodeInstancesByType(java.lang.String, java.lang.Long, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                    "package": "org.kie.server.client",
+                    "classSimpleName": "ProcessServicesClient",
+                    "methodName": "findNodeInstancesByType",
+                    "elementKind": "method",
+                    "justification": "method for searching for records types"
                 }
             ]
         }

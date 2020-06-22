@@ -17,7 +17,6 @@
 package org.kie.server.services.taskassigning.user.system.simple;
 
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -71,9 +70,9 @@ public class SimpleUserSystemServiceHelperTest {
 
     @Test
     public void buildFromInputStream() throws Exception {
-        InputStream inUsers = Files.newInputStream(Paths.get(SimpleUserSystemServiceHelperTest.class.getResource(USERS_FILE).getPath()));
-        InputStream inSkills = Files.newInputStream(Paths.get(SimpleUserSystemServiceHelperTest.class.getResource(SKILLS_FILE).getPath()));
-        InputStream inAffinities = Files.newInputStream(Paths.get(SimpleUserSystemServiceHelperTest.class.getResource(AFFINITIES_FILE).getPath()));
+        InputStream inUsers = SimpleUserSystemServiceHelperTest.class.getResourceAsStream(USERS_FILE);
+        InputStream inSkills = SimpleUserSystemServiceHelperTest.class.getResourceAsStream(SKILLS_FILE);
+        InputStream inAffinities = SimpleUserSystemServiceHelperTest.class.getResourceAsStream(AFFINITIES_FILE);
 
         try {
             assertUserGroupInfo(SimpleUserSystemServiceHelper.buildInfo(inUsers, inSkills, inAffinities));

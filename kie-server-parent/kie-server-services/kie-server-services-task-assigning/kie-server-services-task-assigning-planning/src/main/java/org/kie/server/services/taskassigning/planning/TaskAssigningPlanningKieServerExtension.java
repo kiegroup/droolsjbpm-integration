@@ -51,17 +51,20 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED;
 import static org.kie.server.common.KeyStoreHelperUtil.loadPasswordKey;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_URL;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_VERSION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID;
@@ -274,12 +277,18 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
         final String artifactId = readSystemProperty(TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID, null, value -> value);
         final String version = readSystemProperty(TASK_ASSIGNING_SOLVER_CONTAINER_VERSION, null, value -> value);
         final String solverConfigResource = readSystemProperty(TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE, DEFAULT_SOLVER_CONFIG, value -> value);
+        final String moveThreadCount = readSystemProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT, null, value -> value);
+        final int moveThreadBufferSize = readSystemProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE, -1, Integer::parseInt);
+        final String threadFactoryClass = readSystemProperty(TASK_ASSIGNING_SOLVER_THREAD_FACTORY_CLASS, null, value -> value);
 
         return new SolverDef(containerId,
                              groupId,
                              artifactId,
                              version,
-                             solverConfigResource);
+                             solverConfigResource,
+                             moveThreadCount,
+                             moveThreadBufferSize,
+                             threadFactoryClass);
     }
 
     TaskAssigningService createTaskAssigningService() {
@@ -420,14 +429,14 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
     }
 
     private void initRuntimeClient() {
-        String url = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_URL, "http://localhost:8080/kie-server/services/rest/server", value -> value);
-        String user = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_USER, "wbadmin", value -> value);
-        String pwd = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_PWD, null, value -> value);
-        String pwdAlias = readSystemProperty(JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, null, value -> value);
+        String url = readSystemProperty(TASK_ASSIGNING_PROCESS_RUNTIME_URL, "http://localhost:8080/kie-server/services/rest/server", value -> value);
+        String user = readSystemProperty(TASK_ASSIGNING_PROCESS_RUNTIME_USER, "wbadmin", value -> value);
+        String pwd = readSystemProperty(TASK_ASSIGNING_PROCESS_RUNTIME_PWD, null, value -> value);
+        String pwdAlias = readSystemProperty(TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, null, value -> value);
         if (isNotEmpty(pwdAlias)) {
-            pwd = loadPasswordKey(JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, JBPM_TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD, pwd);
+            pwd = loadPasswordKey(TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD, pwd);
         }
-        long timeout = readSystemProperty(JBPM_TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT, 90000L, Long::parseLong);
+        long timeout = readSystemProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT, 90000L, Long::parseLong);
         this.runtimeClient = createRuntimeClient(url, user, pwd, timeout);
     }
 

@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.server.testing</groupId>
+    <artifactId>common-parent</artifactId>
+    <version>1.0.0.Final</version>
+  </parent>
+
+  <artifactId>local-date-unary-check</artifactId>
+  <version>1.0.0.Final</version>
+  <packaging>kjar</packaging>
+
+<!-- Normally, there should be no need for Kie, Kie-DMN, etc dependencies here
+     However this test requires to explicit JAXB converter for the dates as example here: https://github.com/kiegroup/droolsjbpm-integration/blob/e15e207945ba32581955394947d1671ea381109e/kie-server-parent/kie-server-api/src/test/java/org/kie/server/api/marshalling/objects/DateObject.java#L53
+     Hence this `kie-internal` with `provided` scope dependency is the bare minimum to re-create what could be defined on a Business-Central based project.
+ -->
+<dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+      <version>${version.org.kie}</version>
+      <scope>provided</scope>
+    </dependency>
+</dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

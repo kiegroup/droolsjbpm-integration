@@ -175,7 +175,7 @@ public class SolutionProcessor extends RunnableBase {
         LOGGER.debug("Solution processing finished: {}", solution);
         if (isAlive()) {
             resultConsumer.accept(result);
-            status.set(Status.STOPPED);
+            status.compareAndSet(STARTED, STOPPED);
         }
     }
 

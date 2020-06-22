@@ -16,6 +16,10 @@
 
 package org.kie.aries.blueprint.factorybeans;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.command.Command;
@@ -45,10 +49,6 @@ import org.kie.api.runtime.rule.ViewChangedEventListener;
 import org.kie.api.time.SessionClock;
 import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 public class KieSessionResolver extends AbstractKieObjectsResolver implements KieSession, StatelessKieSession {
 
     private KieSession kieSession;
@@ -74,7 +74,7 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
 
     private synchronized Object getSession() {
         boolean stateless = isStateless();
-        if ( stateless ) {
+        if (stateless) {
             if (statelessKieSession != null) {
                 return statelessKieSession;
             }
@@ -85,16 +85,16 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
         }
 
         Object obj;
-        if ( stateless ) {
+        if (stateless) {
             statelessKieSession = newStatelessSession(kSessionOptions.getkBaseRef(), releaseId, null);
             obj = statelessKieSession;
         } else {
             kieSession = newStatefulSession(kSessionOptions.getkBaseRef(), releaseId, null);
-            KieSessionFactoryBeanHelper.executeCommands( kieSession, commands );
+            KieSessionFactoryBeanHelper.executeCommands(kieSession, commands);
             obj = kieSession;
         }
 
-        KieSessionFactoryBeanHelper.addListeners( (KieRuntimeEventManager) obj, listeners );
+        KieSessionFactoryBeanHelper.addListeners((KieRuntimeEventManager) obj, listeners);
         KieSessionFactoryBeanHelper.attachLoggers((KieRuntimeEventManager) obj, loggers);
 
         return obj;
@@ -105,11 +105,11 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     private KieSession getKieSession() {
-        return ( (KieSession) getSession() );
+        return ((KieSession) getSession());
     }
 
     private StatelessKieSession getStatelessKieSession() {
-        return ( (StatelessKieSession) getSession() );
+        return ((StatelessKieSession) getSession());
     }
 
     @Override
@@ -133,8 +133,8 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public <T> T execute( Command<T> command ) {
-        return ( (CommandExecutor) getSession() ).execute( command );
+    public <T> T execute(Command<T> command) {
+        return ((CommandExecutor) getSession()).execute(command);
     }
 
     @Override
@@ -143,25 +143,25 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public void setGlobal( String identifier, Object value ) {
+    public void setGlobal(String identifier, Object value) {
         if (isStateless()) {
-            getStatelessKieSession().setGlobal( identifier, value );
+            getStatelessKieSession().setGlobal(identifier, value);
         } else {
-            getKieSession().setGlobal( identifier, value );
+            getKieSession().setGlobal(identifier, value);
         }
     }
 
     @Override
-    public Object getGlobal( String identifier ) {
-        return getKieSession().getGlobal( identifier );
+    public Object getGlobal(String identifier) {
+        return getKieSession().getGlobal(identifier);
     }
 
     @Override
     public Globals getGlobals() {
         if (isStateless()) {
-            return getStatelessKieSession().getGlobals( );
+            return getStatelessKieSession().getGlobals();
         } else {
-            return getKieSession().getGlobals( );
+            return getKieSession().getGlobals();
         }
     }
 
@@ -178,36 +178,36 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     @Override
     public KieBase getKieBase() {
         if (isStateless()) {
-            return getStatelessKieSession().getKieBase( );
+            return getStatelessKieSession().getKieBase();
         } else {
-            return getKieSession().getKieBase( );
+            return getKieSession().getKieBase();
         }
     }
 
     @Override
-    public void registerChannel( String name, Channel channel ) {
+    public void registerChannel(String name, Channel channel) {
         if (isStateless()) {
-            getStatelessKieSession().registerChannel( name, channel );
+            getStatelessKieSession().registerChannel(name, channel);
         } else {
-            getKieSession().registerChannel( name, channel );
+            getKieSession().registerChannel(name, channel);
         }
     }
 
     @Override
-    public void unregisterChannel( String name ) {
+    public void unregisterChannel(String name) {
         if (isStateless()) {
-            getStatelessKieSession().unregisterChannel( name );
+            getStatelessKieSession().unregisterChannel(name);
         } else {
-            getKieSession().unregisterChannel( name );
+            getKieSession().unregisterChannel(name);
         }
     }
 
     @Override
     public Map<String, Channel> getChannels() {
         if (isStateless()) {
-            return getStatelessKieSession().getChannels( );
+            return getStatelessKieSession().getChannels();
         } else {
-            return getKieSession().getChannels( );
+            return getKieSession().getChannels();
         }
     }
 
@@ -227,8 +227,8 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public EntryPoint getEntryPoint( String name ) {
-        return getKieSession().getEntryPoint( name );
+    public EntryPoint getEntryPoint(String name) {
+        return getKieSession().getEntryPoint(name);
     }
 
     @Override
@@ -237,13 +237,13 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public QueryResults getQueryResults( String query, Object... arguments ) {
-        return getKieSession().getQueryResults( query, arguments );
+    public QueryResults getQueryResults(String query, Object... arguments) {
+        return getKieSession().getQueryResults(query, arguments);
     }
 
     @Override
-    public LiveQuery openLiveQuery( String query, Object[] arguments, ViewChangedEventListener listener ) {
-        return getKieSession().openLiveQuery( query, arguments, listener );
+    public LiveQuery openLiveQuery(String query, Object[] arguments, ViewChangedEventListener listener) {
+        return getKieSession().openLiveQuery(query, arguments, listener);
     }
 
     @Override
@@ -252,43 +252,43 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public FactHandle insert( Object object ) {
-        return getKieSession().insert( object );
+    public FactHandle insert(Object object) {
+        return getKieSession().insert(object);
     }
 
     @Override
-    public void retract( FactHandle handle ) {
-        getKieSession().retract( handle );
+    public void retract(FactHandle handle) {
+        getKieSession().retract(handle);
     }
 
     @Override
-    public void delete( FactHandle handle ) {
-        getKieSession().delete( handle );
+    public void delete(FactHandle handle) {
+        getKieSession().delete(handle);
     }
 
     @Override
-    public void delete( FactHandle handle, FactHandle.State fhState ) {
-        getKieSession().delete( handle, fhState );
+    public void delete(FactHandle handle, FactHandle.State fhState) {
+        getKieSession().delete(handle, fhState);
     }
 
     @Override
-    public void update( FactHandle handle, Object object ) {
-        getKieSession().update( handle, object );
+    public void update(FactHandle handle, Object object) {
+        getKieSession().update(handle, object);
     }
 
     @Override
-    public void update( FactHandle handle, Object object, String... modifiedProperties ) {
-        getKieSession().update( handle, object, modifiedProperties );
+    public void update(FactHandle handle, Object object, String... modifiedProperties) {
+        getKieSession().update(handle, object, modifiedProperties);
     }
 
     @Override
-    public FactHandle getFactHandle( Object object ) {
-        return getKieSession().getFactHandle( object );
+    public FactHandle getFactHandle(Object object) {
+        return getKieSession().getFactHandle(object);
     }
 
     @Override
-    public Object getObject( FactHandle factHandle ) {
-        return getKieSession().getObject( factHandle );
+    public Object getObject(FactHandle factHandle) {
+        return getKieSession().getObject(factHandle);
     }
 
     @Override
@@ -297,7 +297,7 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public Collection<? extends Object> getObjects( ObjectFilter filter ) {
+    public Collection<? extends Object> getObjects(ObjectFilter filter) {
         return getKieSession().getObjects(filter);
     }
 
@@ -307,7 +307,7 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public <T extends FactHandle> Collection<T> getFactHandles( ObjectFilter filter ) {
+    public <T extends FactHandle> Collection<T> getFactHandles(ObjectFilter filter) {
         return getKieSession().getFactHandles(filter);
     }
 
@@ -322,13 +322,13 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public void addEventListener( ProcessEventListener listener ) {
-        getKieSession().addEventListener( listener );
+    public void addEventListener(ProcessEventListener listener) {
+        getKieSession().addEventListener(listener);
     }
 
     @Override
-    public void removeEventListener( ProcessEventListener listener ) {
-        getKieSession().removeEventListener( listener );
+    public void removeEventListener(ProcessEventListener listener) {
+        getKieSession().removeEventListener(listener);
     }
 
     @Override
@@ -337,33 +337,33 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public ProcessInstance startProcess( String processId ) {
-        return getKieSession().startProcess( processId );
+    public ProcessInstance startProcess(String processId) {
+        return getKieSession().startProcess(processId);
     }
 
     @Override
-    public ProcessInstance startProcess( String processId, Map<String, Object> parameters ) {
-        return getKieSession().startProcess( processId, parameters );
+    public ProcessInstance startProcess(String processId, Map<String, Object> parameters) {
+        return getKieSession().startProcess(processId, parameters);
     }
 
     @Override
-    public ProcessInstance createProcessInstance( String processId, Map<String, Object> parameters ) {
-        return getKieSession().createProcessInstance( processId, parameters );
+    public ProcessInstance createProcessInstance(String processId, Map<String, Object> parameters) {
+        return getKieSession().createProcessInstance(processId, parameters);
     }
 
     @Override
-    public ProcessInstance startProcessInstance( long processInstanceId ) {
-        return getKieSession().startProcessInstance( processInstanceId );
+    public ProcessInstance startProcessInstance(long processInstanceId) {
+        return getKieSession().startProcessInstance(processInstanceId);
     }
 
     @Override
-    public void signalEvent( String type, Object event ) {
-        getKieSession().signalEvent( type, event );
+    public void signalEvent(String type, Object event) {
+        getKieSession().signalEvent(type, event);
     }
 
     @Override
-    public void signalEvent( String type, Object event, long processInstanceId ) {
-        getKieSession().signalEvent( type, event, processInstanceId );
+    public void signalEvent(String type, Object event, long processInstanceId) {
+        getKieSession().signalEvent(type, event, processInstanceId);
     }
 
     @Override
@@ -372,18 +372,18 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public ProcessInstance getProcessInstance( long processInstanceId ) {
-        return getKieSession().getProcessInstance( processInstanceId );
+    public ProcessInstance getProcessInstance(long processInstanceId) {
+        return getKieSession().getProcessInstance(processInstanceId);
     }
 
     @Override
-    public ProcessInstance getProcessInstance( long processInstanceId, boolean readonly ) {
-        return getKieSession().getProcessInstance( processInstanceId, readonly );
+    public ProcessInstance getProcessInstance(long processInstanceId, boolean readonly) {
+        return getKieSession().getProcessInstance(processInstanceId, readonly);
     }
 
     @Override
-    public void abortProcessInstance( long processInstanceId ) {
-        getKieSession().abortProcessInstance( processInstanceId );
+    public void abortProcessInstance(long processInstanceId) {
+        getKieSession().abortProcessInstance(processInstanceId);
     }
 
     @Override
@@ -392,13 +392,13 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public void addEventListener( RuleRuntimeEventListener listener ) {
-        getKieSession().addEventListener( listener );
+    public void addEventListener(RuleRuntimeEventListener listener) {
+        getKieSession().addEventListener(listener);
     }
 
     @Override
-    public void removeEventListener( RuleRuntimeEventListener listener ) {
-        getKieSession().removeEventListener( listener );
+    public void removeEventListener(RuleRuntimeEventListener listener) {
+        getKieSession().removeEventListener(listener);
     }
 
     @Override
@@ -407,13 +407,13 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public void addEventListener( AgendaEventListener listener ) {
-        getKieSession().addEventListener( listener );
+    public void addEventListener(AgendaEventListener listener) {
+        getKieSession().addEventListener(listener);
     }
 
     @Override
-    public void removeEventListener( AgendaEventListener listener ) {
-        getKieSession().removeEventListener( listener );
+    public void removeEventListener(AgendaEventListener listener) {
+        getKieSession().removeEventListener(listener);
     }
 
     @Override
@@ -427,17 +427,17 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public int fireAllRules( int max ) {
+    public int fireAllRules(int max) {
         return getKieSession().fireAllRules(max);
     }
 
     @Override
-    public int fireAllRules( AgendaFilter agendaFilter ) {
+    public int fireAllRules(AgendaFilter agendaFilter) {
         return getKieSession().fireAllRules(agendaFilter);
     }
 
     @Override
-    public int fireAllRules( AgendaFilter agendaFilter, int max ) {
+    public int fireAllRules(AgendaFilter agendaFilter, int max) {
         return getKieSession().fireAllRules(agendaFilter, max);
     }
 
@@ -447,27 +447,32 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public void fireUntilHalt( AgendaFilter agendaFilter ) {
+    public void fireUntilHalt(AgendaFilter agendaFilter) {
         getKieSession().fireUntilHalt(agendaFilter);
     }
-    
+
     @Override
     public void submit(AtomicAction action) {
-        getKieSession().submit( action );
+        getKieSession().submit(action);
     }
 
     @Override
     public <T> T getKieRuntime(Class<T> cls) {
-        return getKieSession().getKieRuntime( cls );
+        return getKieSession().getKieRuntime(cls);
     }
 
     @Override
-    public void execute( Object object ) {
-        getStatelessKieSession().execute( object );
+    public void execute(Object object) {
+        getStatelessKieSession().execute(object);
     }
 
     @Override
-    public void execute( Iterable objects ) {
-        getStatelessKieSession().execute( objects );
+    public void execute(Iterable objects) {
+        getStatelessKieSession().execute(objects);
+    }
+
+    @Override
+    public ProcessInstance startProcessFromNodeIds(String processId, Map<String, Object> params, String... nodeId) {
+        return getKieSession().startProcessFromNodeIds(processId, params, nodeId);
     }
 }

@@ -128,8 +128,8 @@
                     "methodName": "startProcess",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::startProcessWithCorrelation(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::startProcessWithCorrelation(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
@@ -143,8 +143,8 @@
                     "methodName": "startProcessWithCorrelation",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::abortProcessInstance(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::abortProcessInstance(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
@@ -158,8 +158,8 @@
                     "methodName": "abortProcessInstance",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::abortProcessInstances(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.Long>)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::abortProcessInstances(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.Long>)",
@@ -173,8 +173,8 @@
                     "methodName": "abortProcessInstances",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::setProcessVariable(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::setProcessVariable(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
@@ -188,8 +188,8 @@
                     "methodName": "setProcessVariable",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::setProcessVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::setProcessVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
@@ -203,8 +203,8 @@
                     "methodName": "setProcessVariables",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::signalProcessInstance(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::signalProcessInstance(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
@@ -218,8 +218,8 @@
                     "methodName": "signalProcessInstance",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::signalProcessInstances(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.Long>, java.lang.String, java.lang.String)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::signalProcessInstances(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.Long>, java.lang.String, java.lang.String)",
@@ -233,8 +233,8 @@
                     "methodName": "signalProcessInstances",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::abortWorkItem(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.Long)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::abortWorkItem(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.Long)",
@@ -248,8 +248,8 @@
                     "methodName": "abortWorkItem",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::completeWorkItem(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.Long, java.lang.String)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::completeWorkItem(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.Long, java.lang.String)",
@@ -263,8 +263,8 @@
                     "methodName": "completeWorkItem",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getWorkItem(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.Long)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getWorkItem(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.Long)",
@@ -278,8 +278,8 @@
                     "methodName": "getWorkItem",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getWorkItemByProcessInstance(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getWorkItemByProcessInstance(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
@@ -293,8 +293,8 @@
                     "methodName": "getWorkItemByProcessInstance",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getAvailableSignals(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getAvailableSignals(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
@@ -308,8 +308,8 @@
                     "methodName": "getAvailableSignals",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method java.lang.Object org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceVariable(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
                     "new": "method java.lang.Object org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceVariable(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
@@ -323,8 +323,8 @@
                     "methodName": "getProcessInstanceVariable",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 },
-                 {
+                },
+                {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
                     "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long)",
@@ -338,7 +338,125 @@
                     "methodName": "getProcessInstanceVariables",
                     "elementKind": "method",
                     "justification": "new Swagger ApiResponse annotation for not allowed actions"
-                 }
+                },
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.Integer===, java.lang.Integer)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+                    "annotationType": "io.swagger.annotations.ApiParam",
+                    "annotation": "@io.swagger.annotations.ApiParam(value = \"entry type from the history\", required = false, example = \"123\")",
+                    "attribute": "value",
+                    "oldValue": "\"optional pagination - at which page to start, defaults to 0 (meaning first)\"",
+                    "newValue": "\"entry type from the history\"",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "parameterIndex": "5",
+                    "elementKind": "parameter",
+                    "justification": "history attributed added"
+                },
+                {
+                    "code": "java.annotation.attributeAdded",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.Integer===, java.lang.Integer)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+                    "annotationType": "io.swagger.annotations.ApiParam",
+                    "annotation": "@io.swagger.annotations.ApiParam(value = \"entry type from the history\", required = false, example = \"123\")",
+                    "attribute": "example",
+                    "value": "\"123\"",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "parameterIndex": "5",
+                    "elementKind": "parameter",
+                    "justification": "history attributed added"
+                },
+                {
+                    "code": "java.annotation.removed",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.Integer===, java.lang.Integer)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+                    "annotationType": "javax.ws.rs.DefaultValue",
+                    "annotation": "@javax.ws.rs.DefaultValue(\"0\")",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "parameterIndex": "5",
+                    "elementKind": "parameter",
+                    "justification": "history attributed added"
+                },
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.Integer===, java.lang.Integer)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"processInstanceHistoryType\")",
+                    "attribute": "value",
+                    "oldValue": "\"page\"",
+                    "newValue": "\"processInstanceHistoryType\"",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "parameterIndex": "5",
+                    "elementKind": "parameter",
+                    "justification": "history attributed added"
+                },
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.Integer, ===java.lang.Integer===)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+                    "annotationType": "io.swagger.annotations.ApiParam",
+                    "annotation": "@io.swagger.annotations.ApiParam(value = \"optional pagination - at which page to start, defaults to 0 (meaning first)\", required = false)",
+                    "attribute": "value",
+                    "oldValue": "\"optional pagination - size of the result, defaults to 10\"",
+                    "newValue": "\"optional pagination - at which page to start, defaults to 0 (meaning first)\"",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "parameterIndex": "6",
+                    "elementKind": "parameter",
+                    "justification": "history attributed added"
+                },
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.Integer, ===java.lang.Integer===)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+                    "annotationType": "javax.ws.rs.DefaultValue",
+                    "annotation": "@javax.ws.rs.DefaultValue(\"0\")",
+                    "attribute": "value",
+                    "oldValue": "\"10\"",
+                    "newValue": "\"0\"",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "parameterIndex": "6",
+                    "elementKind": "parameter",
+                    "justification": "history attributed added"
+                },
+                {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.Integer, ===java.lang.Integer===)",
+                    "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"page\")",
+                    "attribute": "value",
+                    "oldValue": "\"pageSize\"",
+                    "newValue": "\"page\"",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "parameterIndex": "6",
+                    "elementKind": "parameter",
+                    "justification": "history attributed added"
+                },
+                {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.Integer, java.lang.Integer)",
+                    "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                    "package": "org.kie.server.remote.rest.jbpm",
+                    "classSimpleName": "ProcessResource",
+                    "methodName": "getProcessInstanceHistory",
+                    "elementKind": "method",
+                    "justification": "history attributed added"
+                }
             ]
         }
     }

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services</artifactId>
-    <version>7.38.0-SNAPSHOT</version>
+    <version>7.40.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-jbpm</artifactId>
@@ -185,6 +185,13 @@
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream-hibernate</artifactId>
+      <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- TEST -->
     <dependency>

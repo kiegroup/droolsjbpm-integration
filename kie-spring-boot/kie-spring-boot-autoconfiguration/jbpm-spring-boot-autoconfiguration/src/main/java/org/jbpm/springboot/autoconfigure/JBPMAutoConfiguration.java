@@ -83,6 +83,7 @@ import org.jbpm.services.task.deadlines.NotificationListener;
 import org.jbpm.services.task.deadlines.notifications.impl.NotificationListenerManager;
 import org.jbpm.services.task.identity.DefaultUserInfo;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
+import org.jbpm.springboot.persistence.JBPMPersistenceUnitPostProcessor;
 import org.jbpm.springboot.quartz.SpringConnectionProvider;
 import org.jbpm.springboot.security.SpringSecurityIdentityProvider;
 import org.jbpm.springboot.security.SpringSecurityUserGroupCallback;
@@ -140,22 +141,22 @@ public class JBPMAutoConfiguration {
 
     protected static final String PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
     protected static final String PERSISTENCE_XML_LOCATION = "classpath:/META-INF/jbpm-persistence.xml";
-    
-    private static final String CLASS_RESOURCE_PATTERN = "/**/*.class"; 
+
+    private static final String CLASS_RESOURCE_PATTERN = "/**/*.class";
     private static final String PACKAGE_INFO_SUFFIX = ".package-info";
-    
+
     private static final String QUARTZ_PROPS = "org.quartz.properties";
     private static final String QUARTZ_FAILED_DELAY = "org.jbpm.timer.quartz.delay";
     private static final String QUARTZ_FAILED_RETRIES = "org.jbpm.timer.quartz.retries";
     private static final String QUARTZ_RESECHEDULE_DELAY = "org.jbpm.timer.quartz.reschedule.delay";
     private static final String QUARTZ_START_DELAY = "org.jbpm.timer.delay";
-    
+
     private static final String TX_FACTORY_CLASS = "org.kie.txm.factory.class";
     private static final String SPRING_TX_FACTORY_CLASS = "org.kie.spring.persistence.KieSpringTransactionManagerFactory";
-  
+
     private ApplicationContext applicationContext;
     private JBPMProperties properties;
-    
+
     private PlatformTransactionManager transactionManager;
 
     private List<NotificationListener> notificationListeners;
@@ -163,7 +164,7 @@ public class JBPMAutoConfiguration {
     public JBPMAutoConfiguration(PlatformTransactionManager transactionManager,
                                  JBPMProperties properties,
                                  ApplicationContext applicationContext) {
-                
+
         this.transactionManager = transactionManager;
         this.properties = properties;
         this.applicationContext = applicationContext;
@@ -172,7 +173,7 @@ public class JBPMAutoConfiguration {
         if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
             ((KieSpringTransactionManagerFactory) transactionManagerFactory).setGlobalTransactionManager(applicationContext.getBean(AbstractPlatformTransactionManager.class));
         }
-        
+
         // init any spring based ObjectModelResolvers
         List<ObjectModelResolver> resolvers = ObjectModelResolverProvider.getResolvers();
         if (resolvers != null) {
@@ -201,19 +202,20 @@ public class JBPMAutoConfiguration {
         adapter.setPrepareConnection(false);
         factoryBean.setJpaVendorAdapter(adapter);
 
+        List<PersistenceUnitPostProcessor> postProcessors = new ArrayList<>();
         String packagesToScan = jpaProperties.getProperties().get("entity-scan-packages");
         if (packagesToScan != null) {
-            factoryBean.setPersistenceUnitPostProcessors(new PersistenceUnitPostProcessor() {
-                
+            postProcessors.add(new PersistenceUnitPostProcessor() {
+
                 @Override
                 public void postProcessPersistenceUnitInfo(MutablePersistenceUnitInfo pui) {
                     Set<TypeFilter> entityTypeFilters = new LinkedHashSet<TypeFilter>(3);
                     entityTypeFilters.add(new AnnotationTypeFilter(Entity.class, false));
                     entityTypeFilters.add(new AnnotationTypeFilter(Embeddable.class, false));
                     entityTypeFilters.add(new AnnotationTypeFilter(MappedSuperclass.class, false));
-                    
+
                     ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-                    
+
                     if (packagesToScan != null) {
                         for (String pkg : packagesToScan.split(",")) {
                             try {
@@ -238,9 +240,9 @@ public class JBPMAutoConfiguration {
                             }
                         }
                     }
-                    
+
                 }
-                
+
                 private boolean matchesFilter(MetadataReader reader, MetadataReaderFactory readerFactory, Set<TypeFilter> entityTypeFilters) throws IOException {
                     for (TypeFilter filter : entityTypeFilters) {
                         if (filter.match(reader, readerFactory)) {
@@ -251,30 +253,32 @@ public class JBPMAutoConfiguration {
                 }
             });
         }
-   
+
+        postProcessors.addAll(applicationContext.getBeansOfType(JBPMPersistenceUnitPostProcessor.class).values());
+        factoryBean.setPersistenceUnitPostProcessors(postProcessors.toArray(new PersistenceUnitPostProcessor[0]));
         return factoryBean;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "identityProvider")
     public IdentityProvider identityProvider() {
-        
+
         return new SpringSecurityIdentityProvider();
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "kieTransactionManager")
     public TransactionManager kieTransactionManager() {
-        
+
         return new KieSpringTransactionManager((AbstractPlatformTransactionManager) transactionManager);
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "userGroupCallback")
     public UserGroupCallback userGroupCallback(IdentityProvider identityProvider) {
         return new SpringSecurityUserGroupCallback(identityProvider);
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "userInfo")
     public UserInfo userInfo() throws IOException {
@@ -282,30 +286,30 @@ public class JBPMAutoConfiguration {
         Properties userInfo = PropertiesLoaderUtils.loadProperties(resource);
         return new DefaultUserInfo(userInfo);
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "definitionService")
     public DefinitionService definitionService() {
-        
+
         return new BPMN2DataServiceImpl();
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "formService")
     public FormManagerService formService() {
-        
+
         return new FormManagerServiceImpl();
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "runtimeManagerFactory")
     public RuntimeManagerFactory runtimeManagerFactory(UserGroupCallback userGroupCallback, UserInfo userInfo) {
-        
+
         SpringRuntimeManagerFactoryImpl runtimeManager = new SpringRuntimeManagerFactoryImpl();
         runtimeManager.setTransactionManager((AbstractPlatformTransactionManager) transactionManager);
         runtimeManager.setUserGroupCallback(userGroupCallback);
         runtimeManager.setUserInfo(userInfo);
-        
+
         if (properties.getQuartz().isEnabled()) {
             System.setProperty(QUARTZ_PROPS, properties.getQuartz().getConfiguration());
             System.setProperty(QUARTZ_FAILED_DELAY, String.valueOf(properties.getQuartz().getFailedJobDelay()));
@@ -319,23 +323,23 @@ public class JBPMAutoConfiguration {
             System.clearProperty(QUARTZ_RESECHEDULE_DELAY);
             System.clearProperty(QUARTZ_START_DELAY);
         }
-        
+
         return runtimeManager;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "transactionalCommandService")
     public TransactionalCommandService transactionalCommandService(EntityManagerFactory entityManagerFactory, TransactionManager kieTransactionManager) {
-        
+
         return new SpringTransactionalCommandService(entityManagerFactory, kieTransactionManager, (AbstractPlatformTransactionManager) transactionManager);
     }
-    
+
     @Bean(destroyMethod="shutdown")
     @ConditionalOnMissingBean(name = "deploymentService")
     public DeploymentService deploymentService(DefinitionService definitionService, RuntimeManagerFactory runtimeManagerFactory, FormManagerService formService, EntityManagerFactory entityManagerFactory, IdentityProvider identityProvider            ) {
-        
+
         EntityManagerFactoryManager.get().addEntityManagerFactory(PERSISTENCE_UNIT_NAME, entityManagerFactory);
-        
+
         SpringKModuleDeploymentService deploymentService = new SpringKModuleDeploymentService();
         ((SpringKModuleDeploymentService) deploymentService).setBpmn2Service(definitionService);
         ((SpringKModuleDeploymentService) deploymentService).setEmf(entityManagerFactory);
@@ -366,11 +370,11 @@ public class JBPMAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "runtimeDataService")
     public RuntimeDataService runtimeDataService(EntityManagerFactory entityManagerFactory, UserGroupCallback userGroupCallback, UserInfo userInfo, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider, DeploymentService deploymentService) {
-        
+
         Environment environment = EnvironmentFactory.newEnvironment();
         environment.set(EnvironmentName.TRANSACTION_MANAGER, transactionManager);
         environment.set(EnvironmentName.ENTITY_MANAGER_FACTORY, entityManagerFactory);
-        
+
         TaskService taskService = HumanTaskServiceFactory.newTaskServiceConfigurator()
                 .entityManagerFactory(entityManagerFactory)
                 .userGroupCallback(userGroupCallback)
@@ -387,13 +391,13 @@ public class JBPMAutoConfiguration {
         runtimeDataService.setTaskAuditService(TaskAuditServiceFactory.newTaskAuditServiceConfigurator()
                 .setTaskService(taskService)
                 .getTaskAuditService());
-        
+
         ((KModuleDeploymentService) deploymentService).setRuntimeDataService(runtimeDataService);
         ((KModuleDeploymentService) deploymentService).addListener(runtimeDataService);
-        
+
         return runtimeDataService;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "advanceRuntimeDataService")
     public AdvanceRuntimeDataService advanceRuntimeDataService(EntityManagerFactory entityManagerFactory,
@@ -423,29 +427,29 @@ public class JBPMAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "processService")
     public ProcessService processService(RuntimeDataService runtimeDataService, DeploymentService deploymentService) {
-        
+
         ProcessServiceImpl processService = new ProcessServiceImpl();
         processService.setDataService(runtimeDataService);
         processService.setDeploymentService(deploymentService);
-        
+
         return processService;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "userTaskService")
     public UserTaskService userTaskService(RuntimeDataService runtimeDataService, DeploymentService deploymentService) {
-        
+
         UserTaskServiceImpl userTaskService = new UserTaskServiceImpl();
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
-        
+
         return userTaskService;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "queryService")
     public QueryService queryService(DataSource dataSource, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider, DeploymentService deploymentService, UserGroupCallback userGroupCallback) {
-        
+
         QueryServiceImpl queryService = new QueryServiceImpl();
         queryService.setIdentityProvider(identityProvider);
         queryService.setCommandService(transactionalCommandService);
@@ -453,26 +457,26 @@ public class JBPMAutoConfiguration {
         // override data source locator to not use JNDI
         SQLDataSetProvider sqlDataSetProvider = SQLDataSetProvider.get();
         sqlDataSetProvider.setDataSourceLocator(new SQLDataSourceLocator() {
-                        
+
             @Override
             public DataSource lookup(SQLDataSetDef def) throws Exception {
                 return dataSource;
             }
         });
-        
+
         queryService.init();
         ((KModuleDeploymentService) deploymentService).addListener(queryService);
-        
+
         return queryService;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "processInstanceMigrationService")
     public ProcessInstanceMigrationService processInstanceMigrationService() {
-        
+
         return new ProcessInstanceMigrationServiceImpl();
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "processInstanceAdminService")
     public ProcessInstanceAdminService processInstanceAdminService(RuntimeDataService runtimeDataService, ProcessService processService, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider) {
@@ -481,10 +485,10 @@ public class JBPMAutoConfiguration {
         processInstanceAdminService.setRuntimeDataService(runtimeDataService);
         processInstanceAdminService.setCommandService(transactionalCommandService);
         processInstanceAdminService.setIdentityProvider(identityProvider);
-        
+
         return processInstanceAdminService;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "userTaskAdminService")
     public UserTaskAdminService userTaskAdminService(RuntimeDataService runtimeDataService, UserTaskService userTaskService, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider) {
@@ -492,54 +496,54 @@ public class JBPMAutoConfiguration {
         userTaskAdminService.setRuntimeDataService(runtimeDataService);
         userTaskAdminService.setUserTaskService(userTaskService);
         userTaskAdminService.setIdentityProvider(identityProvider);
-        userTaskAdminService.setCommandService(transactionalCommandService);        
-        
+        userTaskAdminService.setCommandService(transactionalCommandService);
+
         return userTaskAdminService;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "executorService")
     @ConditionalOnProperty(name = "jbpm.executor.enabled")
     public ExecutorService executorService(EntityManagerFactory entityManagerFactory, TransactionalCommandService transactionalCommandService, DeploymentService deploymentService) {
-        
+
         ExecutorEventSupportImpl eventSupport = new ExecutorEventSupportImpl();
         // configure services
         ExecutorService service = ExecutorServiceFactory.newExecutorService(entityManagerFactory, transactionalCommandService, eventSupport);
-        
+
         service.setInterval(properties.getExecutor().getInterval());
         service.setRetries(properties.getExecutor().getRetries());
         service.setThreadPoolSize(properties.getExecutor().getThreadPoolSize());
         service.setTimeunit(TimeUnit.valueOf(properties.getExecutor().getTimeUnit()));
 
         ((KModuleDeploymentService) deploymentService).setExecutorService(service);
-        
+
         return service;
     }
-    
+
     @Bean
     @ConditionalOnMissingBean(name = "caseIdGenerator")
     public CaseIdGenerator caseIdGenerator(TransactionalCommandService transactionalCommandService) {
-        
+
         return new TableCaseIdGenerator(transactionalCommandService);
     }
-    
+
     @Bean
     @ConditionalOnClass({ CaseRuntimeDataServiceImpl.class })
     @ConditionalOnMissingBean(name = "caseRuntimeService")
     public CaseRuntimeDataService caseRuntimeService(CaseIdGenerator caseIdGenerator, RuntimeDataService runtimeDataService, DeploymentService deploymentService, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider) {
-        
+
         CaseRuntimeDataServiceImpl caseRuntimeDataService = new CaseRuntimeDataServiceImpl();
         caseRuntimeDataService.setCaseIdGenerator(caseIdGenerator);
         caseRuntimeDataService.setRuntimeDataService(runtimeDataService);
         caseRuntimeDataService.setCommandService(transactionalCommandService);
         caseRuntimeDataService.setIdentityProvider(identityProvider);
-        
+
         // configure case mgmt services as listeners
         ((KModuleDeploymentService)deploymentService).addListener(caseRuntimeDataService);
-        
+
         return caseRuntimeDataService;
     }
-    
+
     @Bean
     @ConditionalOnClass({ CaseServiceImpl.class })
     @ConditionalOnMissingBean(name = "caseService")
@@ -553,16 +557,16 @@ public class JBPMAutoConfiguration {
         caseService.setCommandService(transactionalCommandService);
         caseService.setAuthorizationManager(new AuthorizationManagerImpl(identityProvider, transactionalCommandService));
         caseService.setIdentityProvider(identityProvider);
-        
+
         // build case configuration on deployment listener
         CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(identityProvider, transactionalCommandService);
 
         // configure case mgmt services as listeners        
         ((KModuleDeploymentService)deploymentService).addListener(configurationListener);
-        
+
         return caseService;
     }
-    
+
     @Bean
     @ConditionalOnClass({ CaseInstanceMigrationServiceImpl.class })
     @ConditionalOnMissingBean(name = "caseInstanceMigrationService")
@@ -572,22 +576,22 @@ public class JBPMAutoConfiguration {
         caseInstanceMigrationService.setCommandService(new TransactionalCommandService(entityManagerFactory));
         caseInstanceMigrationService.setProcessInstanceMigrationService(processInstanceMigrationService);
         caseInstanceMigrationService.setProcessService(processService);
-        
+
         return caseInstanceMigrationService;
     }
-    
 
-    
+
+
     /*
      * Helper methods
      */
 
-    
+
     protected Object extractFromOptional(Optional<?> optionalList) {
         if (optionalList.isPresent()) {
             return optionalList.get();
         }
-        
+
         return Collections.emptyList();
     }
 }

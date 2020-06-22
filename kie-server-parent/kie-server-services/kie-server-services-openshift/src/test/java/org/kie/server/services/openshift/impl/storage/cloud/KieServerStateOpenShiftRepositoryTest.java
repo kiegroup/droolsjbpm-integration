@@ -19,6 +19,7 @@ package org.kie.server.services.openshift.impl.storage.cloud;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -26,12 +27,16 @@ import com.thoughtworks.xstream.XStream;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ReplicationController;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.server.mock.KubernetesCrudDispatcher;
+import io.fabric8.mockwebserver.Context;
+import io.fabric8.mockwebserver.ServerRequest;
+import io.fabric8.mockwebserver.ServerResponse;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
-import io.fabric8.openshift.client.server.mock.OpenShiftServer;
+import io.fabric8.openshift.client.server.mock.OpenShiftMockServer;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 
 import static org.kie.server.api.KieServerConstants.*;
 import static org.kie.server.controller.api.KieServerControllerConstants.*;
@@ -60,8 +65,8 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
     protected OpenShiftClient client;
     protected KieServerStateOpenShiftRepository repo;
 
-    @Rule
-    public OpenShiftServer server = new OpenShiftServer(false, true);
+    // Need to use direct OpenShiftMockServer instead of OpenShiftServer as HTTPS support needs to be disabled for proper functionality in JDK 11
+    public OpenShiftMockServer server = new OpenShiftMockServer(new Context(), new MockWebServer(), new HashMap<ServerRequest, Queue<ServerResponse>>(), new KubernetesCrudDispatcher(), false);
 
     @Before
     public void setup() {
@@ -79,7 +84,8 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
             client = clouldClientHelper.get();
         } else {
             // Get client from MockKubernetes Server
-            client = server.getOpenshiftClient();
+            server.init();
+            client = server.createOpenShiftClient();
         }
 
         // Create cloud repository instance with mock K8S server test client
@@ -134,6 +140,7 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
         System.clearProperty(KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED);
         client.configMaps().inNamespace(testNamespace).delete();
         client.deploymentConfigs().inNamespace(testNamespace).delete();
+        server.destroy();
         client.close();
     }
     

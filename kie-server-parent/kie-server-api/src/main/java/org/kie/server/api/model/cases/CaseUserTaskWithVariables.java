@@ -61,6 +61,9 @@ public class CaseUserTaskWithVariables {
     @XmlElement(name = "case-instance-variables")
     private Map<String, Object> caseVariables;
 
+    @XmlElement(name = "status")
+    private String status;
+
     public Long getId() {
         return id;
     }
@@ -150,11 +153,20 @@ public class CaseUserTaskWithVariables {
         this.processInstanceId = processInstanceId;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "CaseUserTaskWithVariables [id=" + id + ", name=" + name + ", actualOwner=" + actualOwner + ", correlationKey=" + correlationKey + ", potentialOwners=" + potentialOwners + ", caseDefinitionId=" +
                caseDefinitionId + ", processInstanceId=" + processInstanceId + ", caseId=" + caseId + ", inputVariables=" + inputVariables + ", processVariables=" + processVariables + ", caseVariables=" + caseVariables +
                "]";
     }
+
 
 }

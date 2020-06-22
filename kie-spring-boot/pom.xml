@@ -16,7 +16,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.38.0-SNAPSHOT</version>
+    <version>7.40.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -100,6 +100,16 @@
       <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-server-spring-boot-autoconfiguration-optaplanner</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-spring-boot-autoconfiguration-task-assigning-runtime</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-spring-boot-autoconfiguration-task-assigning-planning</artifactId>
         <version>${project.version}</version>
       </dependency>
 

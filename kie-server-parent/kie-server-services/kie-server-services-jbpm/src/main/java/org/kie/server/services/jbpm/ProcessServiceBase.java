@@ -15,10 +15,6 @@
 
 package org.kie.server.services.jbpm;
 
-import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,6 +31,7 @@ import org.kie.api.runtime.process.WorkItem;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.server.api.model.definition.ProcessStartSpec;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
@@ -44,6 +41,10 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
 
 public class ProcessServiceBase {
 
@@ -95,8 +96,40 @@ public class ProcessServiceBase {
         Long processInstanceId = processService.startProcess(containerId, processId, parameters);
 
         // return response
-        String response = marshallerHelper.marshal(containerId, marshallingType, processInstanceId);
-        return response;
+        return marshallerHelper.marshal(containerId, marshallingType, processInstanceId);
+    }
+
+    public String startProcessFromNodeIds(String containerId, String processId, String payload, String marshallingType) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+        // check validity of deployment and process id
+        definitionService.getProcessDefinition(containerId, processId);
+
+        logger.debug("About to unmarshal parameters from payload: '{}'", payload);
+        ProcessStartSpec parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, ProcessStartSpec.class);
+
+        logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters.getVariables());
+        Long newProcessInstanceId = processService.startProcessFromNodeIds(containerId, processId, parameters.getVariables());
+
+        // return response
+        return marshallerHelper.marshal(containerId, marshallingType, newProcessInstanceId);
+    }
+
+    public String startProcessWithCorrelationKeyFromNodeIds(String containerId, String processId, String correlationKey, String payload, String marshallingType) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+        // check validity of deployment and process id
+        definitionService.getProcessDefinition(containerId, processId);
+
+        logger.debug("About to unmarshal parameters from start spec parameters: '{}'", payload);
+        ProcessStartSpec parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, ProcessStartSpec.class);
+
+        String[] correlationProperties = correlationKey.split(":");
+        CorrelationKey actualCorrelationKey = correlationKeyFactory.newCorrelationKey(Arrays.asList(correlationProperties));
+
+        logger.debug("Calling start  from custom nodes process with id {} on container {} and parameters {}", processId, containerId, parameters.getVariables());
+        Long newProcessInstanceId = processService.startProcessFromNodeIds(containerId, processId, actualCorrelationKey, parameters.getVariables(), parameters.getNodeIds().stream().toArray(String[]::new));
+
+        // return response
+        return marshallerHelper.marshal(containerId, marshallingType, newProcessInstanceId);
     }
 
     public String startProcessWithCorrelation(String containerId, String processId, String correlationKey, String payload, String marshallingType) {
@@ -104,19 +137,18 @@ public class ProcessServiceBase {
         // check validity of deployment and process id
         definitionService.getProcessDefinition(containerId, processId);
 
-        logger.debug("About to unmarshal parameters from payload: '{}'", payload);
+        logger.debug("About to unmarshal parameters from start spec parameters: '{}'", payload);
         Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
 
         String[] correlationProperties = correlationKey.split(":");
 
         CorrelationKey actualCorrelationKey = correlationKeyFactory.newCorrelationKey(Arrays.asList(correlationProperties));
 
-        logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters);
+        logger.debug("Calling start from custom nodes process with id {} on container {} and parameters {}", processId, containerId, parameters);
         Long processInstanceId = processService.startProcess(containerId, processId, actualCorrelationKey, parameters);
 
         // return response
-        String response = marshallerHelper.marshal(containerId, marshallingType, processInstanceId);
-        return response;
+        return marshallerHelper.marshal(containerId, marshallingType, processInstanceId);
 
     }
 
@@ -379,5 +411,7 @@ public class ProcessServiceBase {
 
         return processInstanceList;
     }
+
+
 
 }

@@ -18,14 +18,16 @@ package org.kie.server.services.taskassigning.runtime.command;
 
 import org.jbpm.services.task.commands.TaskContext;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.kie.internal.task.api.TaskPersistenceContext;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.kie.server.services.taskassigning.runtime.persistence.PlanningTaskImpl;
+import org.mockito.ArgumentCaptor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractPlanningCommandTest<T extends PlanningCommand> {
 
     protected static final Long TASK_ID = 1L;
@@ -34,19 +36,39 @@ public abstract class AbstractPlanningCommandTest<T extends PlanningCommand> {
     protected static final Boolean PUBLISHED = Boolean.TRUE;
     protected static final String USER_ID = "USER_ID";
 
-    @Mock
     protected TaskContext taskContext;
 
-    @Mock
     protected TaskPersistenceContext persistenceContext;
+
+    protected ArgumentCaptor<PlanningTaskImpl> planningTaskCaptor;
 
     protected T command;
 
     @Before
     public void setUp() {
+        taskContext = mock(TaskContext.class);
+        persistenceContext = mock(TaskPersistenceContext.class);
+        planningTaskCaptor = ArgumentCaptor.forClass(PlanningTaskImpl.class);
         when(taskContext.getPersistenceContext()).thenReturn(persistenceContext);
         command = createCommand();
     }
 
     protected abstract T createCommand();
+
+    protected void verifyPlanningTaskMerged(PlanningTaskImpl planningTask) {
+        verify(persistenceContext).merge(planningTask);
+        verify(planningTask).setAssignedUser(ASSIGNED_USER);
+        verify(planningTask).setIndex(INDEX);
+        verify(planningTask).setPublished(PUBLISHED);
+        verify(planningTask).setLastModificationDate(any());
+    }
+
+    protected void verifyPlanningTaskPersisted(PlanningTaskImpl planningTask) {
+        verify(persistenceContext).persist(planningTask);
+        assertThat(planningTask.getTaskId()).isEqualTo(TASK_ID);
+        assertThat(planningTask.getAssignedUser()).isEqualTo(ASSIGNED_USER);
+        assertThat(planningTask.getIndex()).isEqualTo(INDEX);
+        assertThat(planningTask.isPublished()).isEqualTo(PUBLISHED);
+        assertThat(planningTask.getLastModificationDate()).isNotNull();
+    }
 }

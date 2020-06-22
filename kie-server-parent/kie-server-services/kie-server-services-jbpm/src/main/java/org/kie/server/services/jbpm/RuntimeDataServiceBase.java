@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.jbpm.services.api.AdvanceRuntimeDataService;
+import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.RuntimeDataService.EntryType;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
@@ -61,6 +63,11 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_NAME;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_OWNER;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_STATUS;
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
 import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
@@ -289,6 +296,15 @@ public class RuntimeDataServiceBase {
         return nodeInstanceList;
     }
 
+    public NodeInstanceList getProcessInstanceFullHistoryByType(long processInstanceId, String entryType, Integer page, Integer pageSize) {
+
+        logger.debug("About to search for node instances with page {} and page size {}", page, pageSize);
+        Collection<NodeInstanceDesc> result = null;
+
+        result = runtimeDataService.getProcessInstanceFullHistoryByType(processInstanceId, EntryType.valueOf(entryType), buildQueryContext(page, pageSize));
+        return convertToNodeInstanceList(result);
+    }
+
     public VariableInstanceList getVariablesCurrentState(long processInstanceId) {
         logger.debug("About to search for variables within process instance  '{}'", processInstanceId);
 
@@ -317,22 +333,34 @@ public class RuntimeDataServiceBase {
 
     public ProcessDefinitionList getProcessesByDeploymentId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         try {
-            containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
-            logger.debug("About to search for process definitions within container '{}' with page {} and page size {}", containerId, page, pageSize);
-            if (sort == null || sort.isEmpty()) {
-                sort = "ProcessName";
-            }
-            Collection<ProcessDefinition> definitions = runtimeDataService.getProcessesByDeploymentId(containerId, buildQueryContext(page, pageSize, sort, sortOrder));
-            logger.debug("Found {} process definitions within container '{}'", definitions.size(), containerId);
-    
-            ProcessDefinitionList processDefinitionList = convertToProcessList(definitions);
-            logger.debug("Returning result of process definition search: {}", processDefinitionList);
-    
-            return processDefinitionList;
+            return getProcessesByDeploymentIdUncatch(containerId, page, pageSize, sort, sortOrder);
         } catch (IllegalArgumentException e) {
             // container was not found by locator
             return new ProcessDefinitionList();
         }
+    }
+    
+    public ProcessDefinitionList getProcessesByDeploymentIdCheckContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        try {
+           return getProcessesByDeploymentIdUncatch(containerId, page, pageSize, sort, sortOrder);
+        } catch (IllegalArgumentException e) {
+            throw new DeploymentNotFoundException(containerId + " not found");
+        }
+    }
+    
+    private ProcessDefinitionList getProcessesByDeploymentIdUncatch(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+        logger.debug("About to search for process definitions within container '{}' with page {} and page size {}", containerId, page, pageSize);
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessName";
+        }
+        Collection<ProcessDefinition> definitions = runtimeDataService.getProcessesByDeploymentId(containerId, buildQueryContext(page, pageSize, sort, sortOrder));
+        logger.debug("Found {} process definitions within container '{}'", definitions.size(), containerId);
+
+        ProcessDefinitionList processDefinitionList = convertToProcessList(definitions);
+        logger.debug("Returning result of process definition search: {}", processDefinitionList);
+
+        return processDefinitionList;
     }
 
     public ProcessDefinitionList getProcessesByFilter(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder) {
@@ -615,10 +643,24 @@ public class RuntimeDataServiceBase {
         if (payload != null) {
             filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
         }
-        return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                        convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                        queryContext));
+
+        List<String> params = filter.getAttributesQueryParams().stream().map(e -> e.getColumn()).collect(toList());
+        params.removeAll(asList(TASK_ATTR_NAME, TASK_ATTR_OWNER, TASK_ATTR_STATUS));
+
+        if (params.size() == filter.getAttributesQueryParams().size() && filter.getTaskVariablesQueryParams().isEmpty()) {
+            return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                            convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                            queryContext));
+        } else {
+
+            return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                                   convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                                   convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                                   filter.getOwners(),
+                                                                                                                   queryContext));
+        }
     }
+
 
     public ProcessInstanceUserTaskWithVariablesList queryUserTasksByVariables(String payload, String payloadType, QueryContext queryContext) {
         SearchQueryFilterSpec filter = new SearchQueryFilterSpec();

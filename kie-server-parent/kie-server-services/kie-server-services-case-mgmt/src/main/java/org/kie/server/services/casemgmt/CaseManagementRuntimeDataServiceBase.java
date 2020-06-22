@@ -57,7 +57,12 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService.TASK_ATTR_NAME;
+import static org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService.TASK_ATTR_OWNER;
+import static org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService.TASK_ATTR_STATUS;
+import static org.kie.server.services.casemgmt.ConvertUtils.convertToCaseInstanceCustomVarsList;
 import static org.kie.server.services.casemgmt.ConvertUtils.convertToServiceApiQueryParam;
 
 public class CaseManagementRuntimeDataServiceBase {
@@ -454,9 +459,22 @@ public class CaseManagementRuntimeDataServiceBase {
         if (payload != null) {
             filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
         }
-        return ConvertUtils.convertToCaseInstanceCustomVarsList(advanceCaseRuntimeDataService.queryCaseByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getCaseVariablesQueryParams()),
-                                                                                                                   queryContext));
+
+        List<String> params = filter.getAttributesQueryParams().stream().map(e -> e.getColumn()).collect(toList());
+        params.removeAll(asList(TASK_ATTR_NAME, TASK_ATTR_OWNER, TASK_ATTR_STATUS));
+
+        if (params.size() == filter.getAttributesQueryParams().size() && filter.getTaskVariablesQueryParams().isEmpty()) {
+            return convertToCaseInstanceCustomVarsList(advanceCaseRuntimeDataService.queryCaseByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                          convertToServiceApiQueryParam(filter.getCaseVariablesQueryParams()),
+                                                                                                          queryContext));
+        } else {
+            return convertToCaseInstanceCustomVarsList(advanceCaseRuntimeDataService.queryCaseByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                                 convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                                 convertToServiceApiQueryParam(filter.getCaseVariablesQueryParams()),
+                                                                                                                 filter.getOwners(),
+                                                                                                                 queryContext));
+        }
+
     }
 
     public CaseUserTaskWithVariablesList queryUserTasksByVariables(String payload, String payloadType, QueryContext queryContext) {

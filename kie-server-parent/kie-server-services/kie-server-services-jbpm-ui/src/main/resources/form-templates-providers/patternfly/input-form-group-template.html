@@ -62,6 +62,14 @@
 	</#if>
     <input id="${item.id}" name="${item.name}" type="date" class="form-control" value="${item.value}" ${(item.required)?string('required', '')} pattern="${item.pattern}"/>    
 </div>
+<#elseif item.type == "slider">
+<div class="form-group">
+	<label for="${item.id}">${item.label}</label> 
+	<#if item.required>
+	<strong style="color: red">*</strong>
+	</#if>
+    <input id="${item.id}" data-slider-id='${item.id}Slider' data-slider-value="${item.value}" name="${item.name}" data-slider-min="${item.min}" data-slider-max="${item.max}" data-slider-step="${item.step}" type="text" class="form-control" value="${item.value}" ${(item.required)?string('required', '')} data-slider-tooltip="hide" data-slider-handle="triangle" style="width: 100%;"/>    
+</div>
 <#else>
 <div class="form-group">
 	<label for="${item.id}">${item.label}</label> 
