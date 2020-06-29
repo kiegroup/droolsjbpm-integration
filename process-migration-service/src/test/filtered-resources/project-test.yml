@@ -1,6 +1,6 @@
 thorntail:
-  port:
-    offset: 100
+  http:
+    port: ${pim.server.http.port}
   logging:
     root-logger:
       level: INFO
