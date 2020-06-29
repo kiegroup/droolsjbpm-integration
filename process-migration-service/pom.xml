@@ -43,7 +43,8 @@
     <kie.server.password>usetheforce123@</kie.server.password>
 
     <!-- PIM service configuration -->
-    <pim.server.http>http://${container.hostname}:8180/</pim.server.http>
+    <pim.server.http.port>18080</pim.server.http.port>
+    <pim.server.http>http://${container.hostname}:${pim.server.http.port}/</pim.server.http>
     <pim.server.http.rest>${pim.server.http}/rest</pim.server.http.rest>
     <pim.server.http.health>${pim.server.http}/health</pim.server.http.health>
     <pim.username>kermit</pim.username>
