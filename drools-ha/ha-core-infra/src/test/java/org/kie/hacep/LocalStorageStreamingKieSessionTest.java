@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.hacep.core.Bootstrap;
 import org.kie.hacep.core.InfraFactory;
@@ -78,6 +79,7 @@ public class LocalStorageStreamingKieSessionTest {
         Assert.assertEquals(11.5, session.getObjects(Result.class).get().iterator().next().getValue());
     }
 
+    @Ignore("https://issues.redhat.com/browse/DROOLS-5430")
     @Test(timeout = 10000)
     public void fireUntilHaltTest() throws ExecutionException, InterruptedException {
 
