@@ -55,6 +55,6 @@ public class QueryServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegration
         assertTrue(tasks.length > 0);
         WebTarget target = newRequest(RestURI.build(TestConfig.getKieServerHttpUrl(), QUERY_URI + "/" + TASK_GET_URI, Collections.singletonMap(TASK_INSTANCE_ID, tasks[0].getId())));
         assertTrue(target.request(MediaType.APPLICATION_JSON_TYPE).get(String.class).contains("null"));
-        assertFalse(target.request().header("content-type", MediaType.APPLICATION_JSON + ";fields=not_null,strict=true").get(String.class).contains("null"));
+        assertFalse(target.request().header("content-type", MediaType.APPLICATION_JSON + ";fields=not_null").get(String.class).contains("null"));
     }
 }
