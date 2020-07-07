@@ -576,6 +576,12 @@
   <profiles>
     <profile>
       <id>wildfly</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>wildfly</value>
+        </property>
+      </activation>
       <properties>
         <cargo.container.id>wildfly18x</cargo.container.id>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
