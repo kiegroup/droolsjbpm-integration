@@ -175,6 +175,12 @@
   <profiles>
     <profile>
       <id>tomcat9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>tomcat9</value>
+        </property>
+      </activation>
       <build>
         <pluginManagement>
           <plugins>

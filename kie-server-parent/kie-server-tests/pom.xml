@@ -584,6 +584,12 @@
     </profile>
     <profile>
       <id>tomcat9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>tomcat9</value>
+        </property>
+      </activation>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jbpmDs</org.kie.server.persistence.ds>
         <kie.server.classifier>webc</kie.server.classifier>
@@ -755,6 +761,12 @@
     </profile>
     <profile>
       <id>wildfly</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>wildfly</value>
+        </property>
+      </activation>
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
@@ -918,6 +930,12 @@
     </profile>
     <profile>
       <id>eap7</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>eap7</value>
+        </property>
+      </activation>
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
@@ -1058,6 +1076,12 @@
     </profile>
     <profile>
       <id>oracle-wls-12</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>oracle-wls-12</value>
+        </property>
+      </activation>
       <properties>
         <kie.server.remoting.url>t3://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>weblogic.jndi.WLInitialContextFactory</kie.server.context.factory>
@@ -1180,6 +1204,12 @@
     </profile>
     <profile>
       <id>websphere9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>websphere9</value>
+        </property>
+      </activation>
       <properties>
         <container.port>9080</container.port>
         <kie.server.remoting.url>iiop://${container.hostname}:2809</kie.server.remoting.url>
@@ -1325,6 +1355,12 @@
     </profile>
     <profile>
       <id>springboot</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>springboot</value>
+        </property>
+      </activation>
       <properties>
         <!-- By default disable everything, enable what is needed in child POMs-->
         <kieserver.drools.enabled>false</kieserver.drools.enabled>

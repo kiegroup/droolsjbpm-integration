@@ -205,21 +205,57 @@
   <profiles>
     <profile>
       <id>tomcat9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>tomcat9</value>
+        </property>
+      </activation>
     </profile>
     <profile>
       <id>wildfly</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>wildfly</value>
+        </property>
+      </activation>
     </profile>
     <profile>
       <id>eap7</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>eap7</value>
+        </property>
+      </activation>
     </profile>
     <profile>
       <id>oracle-wls-12</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>oracle-wls-12</value>
+        </property>
+      </activation>
     </profile>
     <profile>
       <id>websphere9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>websphere9</value>
+        </property>
+      </activation>
     </profile>
     <profile>
       <id>springboot</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>springboot</value>
+        </property>
+      </activation>
       <properties>
         <kieserver.jbpm.enabled>true</kieserver.jbpm.enabled>
         <kieserver.jbpmui.enabled>false</kieserver.jbpmui.enabled>

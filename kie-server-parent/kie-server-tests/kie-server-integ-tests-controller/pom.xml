@@ -192,6 +192,12 @@
     </profile>
     <profile>
       <id>tomcat9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>tomcat9</value>
+        </property>
+      </activation>
       <properties>
         <kie.server.controller.classifier>webc</kie.server.controller.classifier>
       </properties>
@@ -205,6 +211,12 @@
     </profile>
     <profile>
       <id>wildfly</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>wildfly</value>
+        </property>
+      </activation>
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>
@@ -215,6 +227,12 @@
     </profile>
     <profile>
       <id>eap7</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>eap7</value>
+        </property>
+      </activation>
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>
@@ -225,6 +243,12 @@
     </profile>
     <profile>
       <id>oracle-wls-12</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>oracle-wls-12</value>
+        </property>
+      </activation>
       <dependencyManagement>
         <dependencies>
          <dependency>
@@ -274,6 +298,12 @@
     </profile>
     <profile>
       <id>websphere9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>websphere9</value>
+        </property>
+      </activation>
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>
