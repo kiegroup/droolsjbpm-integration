@@ -115,6 +115,9 @@
     <bundle>mvn:org.kie/kie-dmn-model/${version.org.kie}</bundle> <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api, which needs kie-dmn-model -->
     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>   <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api -->
     <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${version.com.fasterxml.jackson.databind}</bundle>
   </feature>
 
   <feature name="servlet-api-kie" version="${project.version}">
