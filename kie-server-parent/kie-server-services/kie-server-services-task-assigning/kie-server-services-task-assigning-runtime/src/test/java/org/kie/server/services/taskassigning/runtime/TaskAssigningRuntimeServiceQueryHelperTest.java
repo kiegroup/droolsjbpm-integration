@@ -99,6 +99,22 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
     private static final Map<String, Object> TASK2_INPUTS = new HashMap<>();
     private static final Map<String, Object> TASK3_INPUTS = new HashMap<>();
 
+    public static final String TASK1_PARAM1 = "task1.param1";
+    public static final String TASK1_PARAM1_VALUE = "task1.param1.value";
+    public static final String TASK1_PARAM2 = "task1.param2";
+
+    public static final String TASK2_PARAM1 = "task2.param1";
+    public static final String TASK2_PARAM1_VALUE = "task2.param1.value";
+    public static final String TASK2_PARAM2 = "task2.param2";
+
+    public static final String TASK3_PARAM1 = "task3.param1";
+    public static final String TASK3_PARAM1_VALUE = "task3.param1.value";
+    public static final String TASK3_PARAM2 = "task3.param2";
+
+    private static final Map<String, Object> TASK1_INPUTS_SANITIZED = new HashMap<>();
+    private static final Map<String, Object> TASK2_INPUTS_SANITIZED = new HashMap<>();
+    private static final Map<String, Object> TASK3_INPUTS_SANITIZED = new HashMap<>();
+
     private static final String CONTAINER_ID = "CONTAINER_ID";
 
     @Mock
@@ -160,9 +176,9 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
         verifyQueryWasExecuted();
 
         // all the inputs were loaded
-        assertEquals(TASK1_INPUTS, result.get(0).getInputData());
-        assertEquals(TASK2_INPUTS, result.get(1).getInputData());
-        assertEquals(TASK3_INPUTS, result.get(2).getInputData());
+        assertEquals(TASK1_INPUTS_SANITIZED, result.get(0).getInputData());
+        assertEquals(TASK2_INPUTS_SANITIZED, result.get(1).getInputData());
+        assertEquals(TASK3_INPUTS_SANITIZED, result.get(2).getInputData());
     }
 
     @Test
@@ -174,7 +190,7 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
         verifyQueryWasExecuted();
 
         // task1 is Ready and has PlanningTask
-        assertEquals(TASK1_INPUTS, result.get(0).getInputData());
+        assertEquals(TASK1_INPUTS_SANITIZED, result.get(0).getInputData());
         // task2 is Reserved but hasn't PlanningTask
         assertNull(result.get(1).getInputData());
         // task3 is not active.
@@ -323,9 +339,18 @@ public class TaskAssigningRuntimeServiceQueryHelperTest {
         TaskData task2 = mockTaskData(TASK2_ID, Status.Reserved, true, CONTAINER_ID);
         TaskData task3 = mockTaskData(TASK3_ID, Status.Completed, true, CONTAINER_ID);
 
-        TASK1_INPUTS.put("task1.param", "task1.param.value");
-        TASK2_INPUTS.put("task2.param", "task2.param.value");
-        TASK3_INPUTS.put("task3.param", "task3.param.value");
+        TASK1_INPUTS.put(TASK1_PARAM1, TASK1_PARAM1_VALUE);
+        TASK1_INPUTS.put(TASK1_PARAM2, null);
+
+        TASK2_INPUTS.put(TASK2_PARAM1, TASK2_PARAM1_VALUE);
+        TASK2_INPUTS.put(TASK2_PARAM2, null);
+
+        TASK3_INPUTS.put(TASK3_PARAM1, TASK3_PARAM1_VALUE);
+        TASK3_INPUTS.put(TASK3_PARAM2, null);
+
+        TASK1_INPUTS_SANITIZED.put(TASK1_PARAM1, TASK1_PARAM1_VALUE);
+        TASK2_INPUTS_SANITIZED.put(TASK2_PARAM1, TASK2_PARAM1_VALUE);
+        TASK3_INPUTS_SANITIZED.put(TASK3_PARAM1, TASK3_PARAM1_VALUE);
 
         when(userTaskService.getTaskInputContentByTaskId(any(), eq(TASK1_ID))).thenReturn(TASK1_INPUTS);
         when(userTaskService.getTaskInputContentByTaskId(any(), eq(TASK2_ID))).thenReturn(TASK2_INPUTS);

@@ -151,6 +151,9 @@ public class TaskAssigningRuntimeServiceQueryHelper {
     }
 
     private static boolean isSimpleTypeValue(Object value) {
+        if (value == null) {
+            return false;
+        }
         return isPrimitiveWrapper(value.getClass()) || value instanceof Date || value instanceof String;
     }
 
