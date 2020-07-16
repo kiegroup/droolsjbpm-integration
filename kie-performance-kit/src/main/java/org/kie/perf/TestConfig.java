@@ -86,7 +86,10 @@ public class TestConfig {
         }
         properties.put("startScriptLocation", startScriptLocation);
 
-        testPackage = System.getProperty("org.kie.perf.suite.test-package", DEFAULT_TEST_PACKAGE);
+        testPackage = System.getProperty("org.kie.perf.suite.test-package");
+        if (testPackage == null || testPackage.isEmpty()) {
+            testPackage = DEFAULT_TEST_PACKAGE;
+        }
         properties.put("org.kie.perf.suite.test-package", testPackage);
 
         runType = RunType.valueOf(System.getProperty("runType").toUpperCase());
