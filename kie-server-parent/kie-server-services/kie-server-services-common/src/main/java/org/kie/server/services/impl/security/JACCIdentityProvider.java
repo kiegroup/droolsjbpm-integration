@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 
@@ -74,7 +75,7 @@ public class JACCIdentityProvider implements IdentityProvider {
                         Enumeration<? extends Principal> groups = ((Group) principal).members();
 
                         while (groups.hasMoreElements()) {
-                            Principal groupPrincipal = (Principal) groups.nextElement();
+                            Principal groupPrincipal =  groups.nextElement();
                             roles.add(groupPrincipal.getName());
                         }
                         break;
@@ -91,6 +92,31 @@ public class JACCIdentityProvider implements IdentityProvider {
 
     @Override
     public boolean hasRole(String s) {
+        Subject subject = getSubjectFromContainer();
+        if (subject != null) {
+            Set<Principal> principals = subject.getPrincipals();
+            if (principals != null) {
+                for (Principal principal : principals) {
+                    if (principal instanceof Group) {
+                        Enumeration<? extends Principal> groups = ((Group) principal).members();
+                        while (groups.hasMoreElements()) {
+                            Principal groupPrincipal =  groups.nextElement();
+                            if (groupPrincipal.getName().equals(s)) {
+                                return true;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        for (SecurityAdapter adapter : adapters) {
+            List<String> adapterRoles = adapter.getRoles();
+            if (adapterRoles != null && adapterRoles.contains(s)) {
+                return true;
+            }
+        }
+        
         return false;
     }
 
