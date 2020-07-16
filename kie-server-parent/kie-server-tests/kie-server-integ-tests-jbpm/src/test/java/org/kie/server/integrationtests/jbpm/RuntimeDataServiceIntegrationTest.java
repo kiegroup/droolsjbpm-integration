@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
+import org.jbpm.workflow.core.WorkflowProcess;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -1334,6 +1335,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         parameters.put("personData", createPersonInstance(USER_JOHN));
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+        ProcessInstance desc = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
 
         try {
 
@@ -1357,7 +1359,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertEquals(1, workItems.size());
             Long workItemId = workItems.get(0).getId();
 
-            TaskInstance expectedTaskInstace = TaskInstance
+            TaskInstance expectedTaskInstance = TaskInstance
                     .builder()
                     .name("First task")
                     .status(Status.Reserved.toString())
@@ -1367,21 +1369,23 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                     .processId(PROCESS_ID_USERTASK)
                     .containerId(CONTAINER_ID)
                     .processInstanceId(processInstanceId)
+                    .processType(WorkflowProcess.PROCESS_TYPE)
+                    .correlationKey(desc.getCorrelationKey())
                     .build();
 
             TaskInstance taskById = taskClient.findTaskById(taskSummary.getId());
-            assertTaskInstance(expectedTaskInstace, taskById);
+            assertTaskInstance(expectedTaskInstance, taskById);
             assertEquals(workItemId, taskById.getWorkItemId());
             assertNull(taskById.getSlaCompliance());
 
             taskById = taskClient.findTaskById(taskSummary.getId(), true);
-            assertTaskInstance(expectedTaskInstace, taskById);
+            assertTaskInstance(expectedTaskInstance, taskById);
             assertTrue(taskById.getSlaCompliance()==0);
             assertEquals(workItemId, taskById.getWorkItemId());
 
 
             taskById = taskClient.findTaskByWorkItemId(workItems.get(0).getId());
-            assertTaskInstance(expectedTaskInstace, taskById);
+            assertTaskInstance(expectedTaskInstance, taskById);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
@@ -1950,6 +1954,8 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(expected.getProcessId(), actual.getProcessId());
         assertEquals(expected.getContainerId(), actual.getContainerId());
         assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
+        assertEquals(expected.getCorrelationKey(), actual.getCorrelationKey());
+        assertEquals(expected.getProcessType(), actual.getProcessType());
     }
 
     private void assertTaskEventInstance(TaskEventInstance expected, TaskEventInstance actual) {

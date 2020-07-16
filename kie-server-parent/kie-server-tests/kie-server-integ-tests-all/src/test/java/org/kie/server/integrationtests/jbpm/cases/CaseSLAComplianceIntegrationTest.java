@@ -15,13 +15,13 @@
 
 package org.kie.server.integrationtests.jbpm.cases;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.AbstractStringAssert;
+import org.jbpm.workflow.core.WorkflowProcess;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,6 +35,8 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CaseSLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -77,7 +79,10 @@ public class CaseSLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrati
         changeUser(USER_JOHN);
         String caseId = caseClient.startCase(CONTAINER_ID, SLA_CASE_DEF_ID, caseFile);
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
-
+        List<org.kie.server.api.model.instance.ProcessInstance> instances = caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10);
+        
+        
+        
         assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
         assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(SLA_CASE_DEF_ID);
         assertThat(caseInstance.getContainerId()).isEqualTo(CONTAINER_ID);
@@ -89,6 +94,14 @@ public class CaseSLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrati
         TaskSummary johnTask = johnTasks.get(0);
         assertThat(johnTasks).hasSize(1);
         assertThat(johnTask.getName()).isEqualTo("Hello1");
+        assertThat(johnTask.getProcessType()).isEqualTo(WorkflowProcess.CASE_TYPE);
+        AbstractStringAssert<?> corKeyAssert = assertThat(johnTask.getCorrelationKey());
+        if (!instances.isEmpty()) {
+            corKeyAssert.isEqualTo(instances.get(0).getCorrelationKey());
+        }
+        else {
+            corKeyAssert.isNull();
+        }
 
         changeUser(USER_MARY);
         List<TaskSummary> maryTasks = taskClient.findTasksAssignedAsPotentialOwner(USER_MARY, 0, 10);

@@ -50,6 +50,14 @@ public class TaskEventInstance {
 
     @XmlElement(name = "task-event-message")
     private String message;
+    
+
+    @XmlElement(name = "correlation-key")
+    private String correlationKey;
+
+    @XmlElement(name = "process-type")
+    private Integer processType;
+
 
     public TaskEventInstance() {
     }
@@ -114,6 +122,26 @@ public class TaskEventInstance {
         this.workItemId = workItemId;
     }
 
+    
+    public String getCorrelationKey() {
+        return correlationKey;
+    }
+
+    
+    public void setCorrelationKey(String correlationKey) {
+        this.correlationKey = correlationKey;
+    }
+
+    
+    public Integer getProcessType() {
+        return processType;
+    }
+
+    
+    public void setProcessType(Integer processType) {
+        this.processType = processType;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -124,16 +152,8 @@ public class TaskEventInstance {
 
     @Override
     public String toString() {
-        return "TaskEventInstance{" +
-                "id=" + id +
-                ", taskId=" + taskId +
-                ", type='" + type + '\'' +
-                ", userId='" + userId + '\'' +
-                ", logTime=" + logTime +
-                ", processInstanceId=" + processInstanceId +
-                ", workItemId=" + workItemId +
-                ", message=" + message +
-                '}';
+        return "TaskEventInstance [id=" + id + ", taskId=" + taskId + ", type=" + type + ", userId=" + userId + ", logTime=" + logTime + ", processInstanceId=" + processInstanceId + ", workItemId=" + workItemId +
+               ", message=" + message + ", correlationKey=" + correlationKey + ", processType=" + processType + "]";
     }
 
     public static class Builder {
@@ -171,6 +191,16 @@ public class TaskEventInstance {
 
         public Builder workItemId(Long workItemId) {
             taskEventInstance.setWorkItemId(workItemId);
+            return this;
+        }
+
+        public Builder correlationKey(String correlationKey) {
+            taskEventInstance.setCorrelationKey(correlationKey);
+            return this;
+        }
+
+        public Builder processType (Integer processType) {
+            taskEventInstance.setProcessType(processType);
             return this;
         }
 

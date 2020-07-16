@@ -430,6 +430,8 @@ public class ConvertUtils {
                 .slaDueDate(userTask.getSlaDueDate())
                 .formName(userTask.getFormName())
                 .subject(userTask.getSubject())
+                .processType(userTask.getProcessType())
+                .correlationKey(userTask.getCorrelationKey())
                 .build();
 
         return instance;
@@ -496,7 +498,7 @@ public class ConvertUtils {
     }
 
     public static org.kie.server.api.model.instance.TaskSummary convertToTaskSummary(TaskSummary taskSummary) {
-        org.kie.server.api.model.instance.TaskSummary task = org.kie.server.api.model.instance.TaskSummary.builder()
+        return org.kie.server.api.model.instance.TaskSummary.builder()
                 .id(taskSummary.getId())
                 .name(taskSummary.getName())
                 .description(taskSummary.getDescription())
@@ -514,8 +516,8 @@ public class ConvertUtils {
                 .status(taskSummary.getStatusId())
                 .skipable(taskSummary.isSkipable())
                 .subject(taskSummary.getSubject())
-                .build();
-        return task;
+                .correlationKey(taskSummary.getCorrelationKey())
+                .processType(taskSummary.getProcessType()).build();
     }
 
     public static QueryDefinition convertQueryDefinition(org.jbpm.services.api.query.model.QueryDefinition queryDefinition) {

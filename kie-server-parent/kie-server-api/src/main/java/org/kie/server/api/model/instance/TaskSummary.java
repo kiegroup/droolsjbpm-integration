@@ -63,6 +63,10 @@ public class TaskSummary {
     private String containerId;
     @XmlElement(name = "task-parent-id")
     private Long parentId;
+    @XmlElement(name = "correlation-key")
+    private String correlationKey;
+    @XmlElement(name = "process-type")
+    private Integer processType;
 
     public static Builder builder() {
         return new Builder();
@@ -195,6 +199,22 @@ public class TaskSummary {
     public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
+    
+    public Integer getProcessType() {
+        return processType;
+    }
+
+    public void setProcessType(Integer processType) {
+        this.processType = processType;
+    }
+
+    public String getCorrelationKey() {
+        return correlationKey;
+    }
+
+    public void setCorrelationKey(String correlationKey) {
+        this.correlationKey = correlationKey;
+    }
 
     @Override
     public String toString() {
@@ -209,6 +229,8 @@ public class TaskSummary {
                 ", processInstanceId=" + processInstanceId +
                 ", processId='" + processId + '\'' +
                 ", containerId='" + containerId + '\'' +
+                ", correlationKey=" + correlationKey +
+                ", processType=" +processType +
                 '}';
     }
 
@@ -313,6 +335,16 @@ public class TaskSummary {
         public Builder taskParentId(Long parentId) {
             taskSummary.setParentId(parentId);
 
+            return this;
+        }
+        
+        public Builder correlationKey(String correlationKey) {
+            taskSummary.setCorrelationKey(correlationKey);
+            return this;
+        }
+
+        public Builder processType(Integer processType) {
+            taskSummary.setProcessType(processType);
             return this;
         }
     }
