@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.integrationtests.policy;
+package org.kie.server.integrationtests.generator;
 
 import java.util.ArrayList;
 import java.util.List;
