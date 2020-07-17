@@ -21,8 +21,8 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
@@ -35,6 +35,7 @@ import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.exception.KieServerControllerClientException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
@@ -70,6 +71,8 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
     }
 
     @Test //RHPAM-479
+    //Added to UnstableOnJenkinsPrBuilder to avoid random failures/timeouts on PRs, see https://issues.redhat.com/browse/JBPM-9246
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testScanNow() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
 
@@ -109,6 +112,8 @@ public abstract class KieControllerRuleCapabilitiesIntegrationTest<T extends Kie
     }
 
     @Test
+    //Added to UnstableOnJenkinsPrBuilder to avoid random failures/timeouts on PRs, see https://issues.redhat.com/browse/JBPM-9246
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testStartAndStopScanner() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
         ContainerSpec container = createContainerSpec(serverTemplate,
