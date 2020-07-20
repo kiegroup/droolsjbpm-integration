@@ -9,6 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.hacep.core.Bootstrap;
 import org.kie.hacep.core.infra.election.State;
@@ -34,6 +35,7 @@ public class PodAsReplicaTest extends KafkaFullTopicsTests {
 
     private Logger logger = LoggerFactory.getLogger(PodAsReplicaTest.class);
 
+    @Ignore //see https://github.com/kiegroup/droolsjbpm-integration/pull/2156
     @Test(timeout = 30000L)
     public void processOneSentMessageAsLeaderAndThenReplicaTest() {
         Bootstrap.startEngine(envConfig);
