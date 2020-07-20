@@ -86,4 +86,10 @@ public class MarshallingFormatTest {
         assertFalse(MarshallingFormat.isStrictType("application/json;")); // no parameter
         assertFalse(MarshallingFormat.isStrictType("application/xml;strict=")); // bad parameter
     }
+
+    @Test
+    public void testMultipleMediaTypeParameters() {
+        assertEquals("not_null", MarshallingFormat.buildParameters("application/json;fields=not_null;strict=true").get("fields"));
+        assertEquals("true", MarshallingFormat.buildParameters("application/json;fields=not_null;strict=true").get("strict"));
+    }
 }
