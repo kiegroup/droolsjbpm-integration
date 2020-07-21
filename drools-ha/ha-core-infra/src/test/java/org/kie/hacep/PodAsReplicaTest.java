@@ -35,7 +35,7 @@ public class PodAsReplicaTest extends KafkaFullTopicsTests {
 
     private Logger logger = LoggerFactory.getLogger(PodAsReplicaTest.class);
 
-    @Test(timeout = 600000L) //see random failure https://github.com/kiegroup/droolsjbpm-integration/pull/2156
+    @Test(timeout = 600000L)
     public void processOneSentMessageAsLeaderAndThenReplicaTest() {
         Bootstrap.startEngine(envConfig);
         Bootstrap.getConsumerController().getCallback().updateStatus(State.LEADER);
