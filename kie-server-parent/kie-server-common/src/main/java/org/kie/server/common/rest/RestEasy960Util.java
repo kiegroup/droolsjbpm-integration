@@ -17,7 +17,9 @@ package org.kie.server.common.rest;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +42,8 @@ public class RestEasy960Util {
     public static List<Variant> variants 
             = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE,
                                  new MediaType("application", "json", Collections.singletonMap("strict", "true")),
+                                 new MediaType("application", "json", Collections.singletonMap("fields", "not_null")),
+                                 new MediaType("application", "json", mapOf("strict", "true", "fields", "not_null")),
                                  MediaType.APPLICATION_JSON_TYPE)
                      .add().build();
     public static Variant defaultVariant 
@@ -69,5 +73,12 @@ public class RestEasy960Util {
             // return restRequest.selectVariant(variants);
         }
         return null;
+    }
+
+    private static Map<String, String> mapOf(String key1, String value1, String key2, String value2) {
+        Map<String, String> result = new HashMap<>();
+        result.put(key1, value1);
+        result.put(key2, value2);
+        return Collections.unmodifiableMap(result);
     }
 }
