@@ -1,0 +1,3 @@
+# used by the SolverServiceBaseTest
+org.kie.server.services.optaplanner.TestConfigProvider1
+org.kie.server.services.optaplanner.TestConfigProvider2
