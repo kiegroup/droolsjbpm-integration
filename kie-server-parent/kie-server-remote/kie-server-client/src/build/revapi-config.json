@@ -113,6 +113,42 @@
                     "methodName": "findNodeInstancesByType",
                     "elementKind": "method",
                     "justification": "method for searching for records types"
+                },
+                {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.kie.server.api.model.cases.CaseInstance> org.kie.server.client.CaseServicesClient::getCaseInstances(java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean, boolean)",
+                    "package": "org.kie.server.client",
+                    "classSimpleName": "CaseServicesClient",
+                    "methodName": "getCaseInstances",
+                    "elementKind": "method",
+                    "justification": "https://issues.redhat.com/browse/JBPM-9223"
+                },
+                {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.kie.server.api.model.cases.CaseInstance> org.kie.server.client.CaseServicesClient::getCaseInstancesOwnedBy(java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean, boolean)",
+                    "package": "org.kie.server.client",
+                    "classSimpleName": "CaseServicesClient",
+                    "methodName": "getCaseInstancesOwnedBy",
+                    "elementKind": "method",
+                    "justification": "https://issues.redhat.com/browse/JBPM-9223"
+                },
+                {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.kie.server.api.model.cases.CaseInstance> org.kie.server.client.CaseServicesClient::getCaseInstancesByDefinition(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean, boolean)",
+                    "package": "org.kie.server.client",
+                    "classSimpleName": "CaseServicesClient",
+                    "methodName": "getCaseInstancesByDefinition",
+                    "elementKind": "method",
+                    "justification": "https://issues.redhat.com/browse/JBPM-9223"
+                },
+                {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.kie.server.api.model.cases.CaseInstance> org.kie.server.client.CaseServicesClient::getCaseInstancesByContainer(java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean, boolean)",
+                    "package": "org.kie.server.client",
+                    "classSimpleName": "CaseServicesClient",
+                    "methodName": "getCaseInstancesByContainer",
+                    "elementKind": "method",
+                    "justification": "https://issues.redhat.com/browse/JBPM-9223"
                 }
             ]
         }

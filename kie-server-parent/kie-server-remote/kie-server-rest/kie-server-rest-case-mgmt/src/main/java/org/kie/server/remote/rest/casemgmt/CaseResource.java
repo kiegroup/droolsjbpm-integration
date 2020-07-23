@@ -15,6 +15,55 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.casemgmt.api.CaseCommentNotFoundException;
+import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
+import org.jbpm.casemgmt.api.model.CaseStatus;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.server.api.model.cases.CaseAdHocFragmentList;
+import org.kie.server.api.model.cases.CaseCommentList;
+import org.kie.server.api.model.cases.CaseDefinition;
+import org.kie.server.api.model.cases.CaseDefinitionList;
+import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.cases.CaseMilestoneList;
+import org.kie.server.api.model.cases.CaseRoleAssignmentList;
+import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
+import org.kie.server.services.casemgmt.CaseManagementServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.CASE_AD_HOC_FRAGMENTS_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_ALL_DEFINITIONS_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_COMMENTS_DELETE_URI;
@@ -83,56 +132,6 @@ import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVari
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.casemgmt.api.CaseCommentNotFoundException;
-import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
-import org.jbpm.casemgmt.api.model.CaseStatus;
-import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.server.api.model.cases.CaseAdHocFragmentList;
-import org.kie.server.api.model.cases.CaseCommentList;
-import org.kie.server.api.model.cases.CaseDefinition;
-import org.kie.server.api.model.cases.CaseDefinitionList;
-import org.kie.server.api.model.cases.CaseInstance;
-import org.kie.server.api.model.cases.CaseInstanceList;
-import org.kie.server.api.model.cases.CaseMilestoneList;
-import org.kie.server.api.model.cases.CaseRoleAssignmentList;
-import org.kie.server.api.model.cases.CaseStageList;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
-import org.kie.server.services.casemgmt.CaseManagementServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Case instances")
 @Path("server/" + CASE_URI)
@@ -944,7 +943,8 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -956,7 +956,7 @@ public class CaseResource extends AbstractCaseResource {
                         actualStatus.add(CaseStatus.OPEN.getName());
                     }
                     logger.debug("About to look for case instances in container {} with status {}", containerId, actualStatus);
-                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByContainer(containerId, actualStatus, page, pageSize, sort, sortOrder);
+                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByContainer(containerId, actualStatus, page, pageSize, sort, sortOrder, withData);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
@@ -978,7 +978,8 @@ public class CaseResource extends AbstractCaseResource {
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -990,7 +991,7 @@ public class CaseResource extends AbstractCaseResource {
                         actualStatus.add(CaseStatus.OPEN.getName());
                     }
                     logger.debug("About to look for case instances with case definition id {} with status {}", caseDefId, actualStatus);
-                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByDefinition(containerId, caseDefId, actualStatus, page, pageSize, sort, sortOrder);
+                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByDefinition(containerId, caseDefId, actualStatus, page, pageSize, sort, sortOrder, withData);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
