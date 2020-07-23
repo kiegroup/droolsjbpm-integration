@@ -153,18 +153,26 @@ public interface CaseServicesClient {
     List<CaseInstance> getCaseInstances(Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+    
+    List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder, boolean withData);
 
     List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<String> status, Integer page, Integer pageSize);
 
     List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
+    List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder, boolean withData);
+
     List<CaseInstance> getCaseInstancesByContainer(String containerId, List<String> status, Integer page, Integer pageSize);
 
     List<CaseInstance> getCaseInstancesByContainer(String containerId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
+    List<CaseInstance> getCaseInstancesByContainer(String containerId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder, boolean withData);
+
     List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<String> status, Integer page, Integer pageSize);
 
     List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder, boolean withData);
 
     List<CaseInstance> getCaseInstancesByData(String dataItemName, List<String> status, Integer page, Integer pageSize);
 
