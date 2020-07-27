@@ -15,15 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm.admin;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +44,15 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -85,7 +86,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     @Test
     public void testAddPotentialOwnersToNonExistentTask() throws Exception {
         changeUser(USER_ADMINISTRATOR);
-        OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+        OrgEntities add = OrgEntities.builder().users(asList(USER_JOHN)).build();
         assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(CONTAINER_ID, BAD_TASK_ID, false, add), "Error code: 404", "Task with id " + BAD_TASK_ID + " was not found");
     }
 
@@ -108,7 +109,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities add = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(BAD_CONTAINER_ID, task.getId(), false, add), 
                                                   "Container '" + BAD_CONTAINER_ID +"' is not instantiated or cannot find container for alias '" + BAD_CONTAINER_ID +"'", 
                                                   "Container '" + BAD_CONTAINER_ID +"' is not instantiated or cannot find container for alias '" + BAD_CONTAINER_ID +"'");
@@ -132,7 +133,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities add = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(CONTAINER_ID_ALIAS, task.getId(), false, add), 
                                                   "Container '" + CONTAINER_ID_V2 + "' is not associated with alias '" + CONTAINER_ID_ALIAS + "'", 
                                                   "Container '" + CONTAINER_ID_V2 + "' is not associated with alias '" + CONTAINER_ID_ALIAS + "'");
@@ -215,7 +216,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(potOwners).hasSize(3);
             Assertions.assertThat(potOwners).contains(USER_YODA, "PM", "HR");
 
-            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities add = OrgEntities.builder().users(asList(USER_JOHN)).build();
 
             userTaskAdminClient.addPotentialOwners(CONTAINER_ID_ALIAS, task.getId(), false, add);
 
@@ -240,7 +241,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(potOwners).hasSize(1);
             Assertions.assertThat(potOwners).contains(USER_JOHN);
 
-            add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("PM")).build();
+            add = OrgEntities.builder().users(asList(USER_YODA)).groups(asList("PM")).build();
 
             userTaskAdminClient.addPotentialOwners(CONTAINER_ID_ALIAS, task.getId(), false, add);
 
@@ -259,13 +260,13 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
     @Test
     public void testReassignNotCompletedOnNonExistentTask() throws Exception {
-        OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+        OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
         assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign), "Error code: 404", "Task with id " + BAD_TASK_ID + " was not found");
     }
 
     @Test
     public void testReassignNotStartedOnNonExistentTask() throws Exception {
-        OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+        OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
         assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign), "Error code: 404", "Task with id " + BAD_TASK_ID + " was not found");
     }
 
@@ -279,7 +280,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, task.getId(), "2sssss", reassign), "Error code: 400", "Error parsing time string:");
         } finally {
             if (processInstanceId != null) {
@@ -298,7 +299,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, task.getId(), "2ssss", reassign), "Error code: 400", "Error parsing time string:");
         } finally {
             if (processInstanceId != null) {
@@ -317,7 +318,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
 
             assertClientException(
                     () -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, task.getId(), "", reassign),
@@ -368,7 +369,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), 
                                                   "Container '" + BAD_CONTAINER_ID +"' is not instantiated or cannot find container for alias '" + BAD_CONTAINER_ID +"'", 
                                                   "Container '" + BAD_CONTAINER_ID +"' is not instantiated or cannot find container for alias '" + BAD_CONTAINER_ID +"'");
@@ -392,7 +393,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID_ALIAS, task.getId(), "2s", reassign), 
                                                   "Container '" + CONTAINER_ID_V2 + "' is not associated with alias '" + CONTAINER_ID_ALIAS + "'", 
                                                   "Container '" + CONTAINER_ID_V2 + "' is not associated with alias '" + CONTAINER_ID_ALIAS + "'");
@@ -416,7 +417,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), 
                                                   "Container '" + BAD_CONTAINER_ID +"' is not instantiated or cannot find container for alias '" + BAD_CONTAINER_ID +"'", 
                                                   "Container '" + BAD_CONTAINER_ID +"' is not instantiated or cannot find container for alias '" + BAD_CONTAINER_ID +"'");
@@ -440,7 +441,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID_ALIAS, task.getId(), "2s", reassign), 
                                                   "Container '" + CONTAINER_ID_V2 + "' is not associated with alias '" + CONTAINER_ID_ALIAS + "'", 
                                                   "Container '" + CONTAINER_ID_V2 + "' is not associated with alias '" + CONTAINER_ID_ALIAS + "'");
@@ -461,7 +462,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             assertClientException(
                     () -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID_V2, task.getId(), "", reassign),
                     400,
@@ -520,7 +521,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(potOwners).hasSize(3);
             Assertions.assertThat(potOwners).contains(USER_YODA, "PM", "HR");
 
-            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities add = OrgEntities.builder().users(asList(USER_JOHN)).build();
 
             userTaskAdminClient.addPotentialOwners(CONTAINER_ID, task.getId(), false, add);
 
@@ -545,7 +546,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(potOwners).hasSize(1);
             Assertions.assertThat(potOwners).contains(USER_JOHN);
 
-            add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("PM")).build();
+            add = OrgEntities.builder().users(asList(USER_YODA)).groups(asList("PM")).build();
 
             userTaskAdminClient.addPotentialOwners(CONTAINER_ID, task.getId(), false, add);
 
@@ -584,7 +585,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<String> excludedOwners = instance.getExcludedOwners();
             Assertions.assertThat(excludedOwners).hasSize(0);
 
-            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities add = OrgEntities.builder().users(asList(USER_JOHN)).build();
 
             userTaskAdminClient.addExcludedOwners(CONTAINER_ID, task.getId(), false, add);
 
@@ -601,7 +602,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             excludedOwners = instance.getExcludedOwners();
             Assertions.assertThat(excludedOwners).hasSize(0);
 
-            add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("PM")).build();
+            add = OrgEntities.builder().users(asList(USER_YODA)).groups(asList("PM")).build();
 
             userTaskAdminClient.addExcludedOwners(CONTAINER_ID, task.getId(), false, add);
 
@@ -649,7 +650,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(businessAdmins).hasSize(2);
             Assertions.assertThat(businessAdmins).contains(USER_ADMINISTRATOR, "Administrators");
 
-            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities add = OrgEntities.builder().users(asList(USER_JOHN)).build();
 
             userTaskAdminClient.addBusinessAdmins(CONTAINER_ID, task.getId(), false, add);
 
@@ -667,7 +668,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(businessAdmins).hasSize(2);
             Assertions.assertThat(businessAdmins).contains(USER_ADMINISTRATOR, "Administrators");
 
-            add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("Administrators2")).build();
+            add = OrgEntities.builder().users(asList(USER_YODA)).groups(asList("Administrators2")).build();
 
             userTaskAdminClient.addBusinessAdmins(CONTAINER_ID, task.getId(), false, add);
 
@@ -824,7 +825,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(potOwners).hasSize(3);
             Assertions.assertThat(potOwners).contains(USER_YODA, "PM", "HR");
 
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
 
             if (whenNotStarted) {
                 userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, taskId, "2s", reassign);
@@ -869,7 +870,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(reassignments).isNotNull();
             Assertions.assertThat(reassignments).hasSize(0);
 
-            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            OrgEntities reassign = OrgEntities.builder().users(asList(USER_JOHN)).build();
             Long reassignmentId = null;
             if (whenNotStarted) {
                 reassignmentId = userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, taskId, "10s", reassign);
@@ -971,7 +972,15 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(notifications).isNotNull();
             Assertions.assertThat(notifications).hasSize(0);
 
-            EmailNotification emailNotification = EmailNotification.builder().from("test@jbpm.org").replyTo("no-reply@jbpm.org").subject("reminder").body("my test content").users(Arrays.asList(USER_JOHN)).build();
+            EmailNotification emailNotification = EmailNotification.builder()
+                                                                   .from("test@jbpm.org")
+                                                                   .replyTo("no-reply@jbpm.org")
+                                                                   .subject("reminder")
+                                                                   .body("my test content")
+                                                                   .users(singletonList(USER_JOHN))
+                                                                   .emails(singletonList("email@jbpm.org"))
+                                                                   .build();
+
             Long notificationId = null;
             if (whenNotStarted) {
                 notificationId = userTaskAdminClient.notifyWhenNotStarted(CONTAINER_ID, taskId, "10s", emailNotification);
@@ -982,6 +991,10 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             notifications = userTaskAdminClient.getTaskNotifications(CONTAINER_ID, taskId, true);
             Assertions.assertThat(notifications).isNotNull();
             Assertions.assertThat(notifications).hasSize(1);
+            Assertions.assertThat(notifications.get(0).getUsers()).hasSize(1);
+            Assertions.assertThat(notifications.get(0).getUsers().get(0)).isEqualTo(USER_JOHN);
+            Assertions.assertThat(notifications.get(0).getEmails()).hasSize(1);
+            Assertions.assertThat(notifications.get(0).getEmails().get(0)).isEqualTo("email@jbpm.org");
 
             userTaskAdminClient.cancelNotification(CONTAINER_ID, taskId, notificationId);
 

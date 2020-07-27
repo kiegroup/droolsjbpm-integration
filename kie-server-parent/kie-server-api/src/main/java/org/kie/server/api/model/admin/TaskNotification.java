@@ -38,6 +38,8 @@ public class TaskNotification {
     private List<String> users;
     @XmlElement(name = "groups")
     private List<String> groups;
+    @XmlElement(name = "emails")
+    private List<String> emails;
     @XmlElement(name = "active")
     private boolean active;
     @XmlElement(name = "subject")
@@ -75,6 +77,14 @@ public class TaskNotification {
 
     public void setUsers(List<String> users) {
         this.users = users;
+    }
+
+    public List<String> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<String> emails) {
+        this.emails = emails;
     }
 
     public List<String> getGroups() {
@@ -153,6 +163,11 @@ public class TaskNotification {
 
         public Builder groups(List<String> groups) {
             taskReassignment.setGroups(groups);
+            return this;
+        }
+
+        public Builder emails(List<String> emails) {
+            taskReassignment.setEmails(emails);
             return this;
         }
 
