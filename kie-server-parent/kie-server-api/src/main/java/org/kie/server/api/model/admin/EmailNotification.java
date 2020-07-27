@@ -35,6 +35,8 @@ public class EmailNotification {
     private List<String> users;
     @XmlElement(name = "groups")
     private List<String> groups;
+    @XmlElement(name = "emails")
+    private List<String> emails;
     @XmlElement(name = "subject")
     private String subject;
     @XmlElement(name = "body")
@@ -88,6 +90,14 @@ public class EmailNotification {
         this.groups = groups;
     }
 
+    public List<String> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<String> emails) {
+        this.emails = emails;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -127,6 +137,11 @@ public class EmailNotification {
 
         public Builder groups(List<String> groups) {
             emailNotification.setGroups(groups);
+            return this;
+        }
+
+        public Builder emails(List<String> emails) {
+            emailNotification.setEmails(emails);
             return this;
         }
     }
