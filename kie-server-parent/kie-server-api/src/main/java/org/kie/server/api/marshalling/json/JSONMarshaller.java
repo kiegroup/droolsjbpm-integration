@@ -72,6 +72,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.jsontype.impl.AsWrapperTypeDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
@@ -280,6 +281,7 @@ public class JSONMarshaller implements Marshaller {
 
             deserializeObjectMapper.registerModule(modDeser);
             deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(introspectorPair));
+            deserializeObjectMapper.setTypeFactory(TypeFactory.defaultInstance().withClassLoader(classLoader));
         }
 
         if (formatDate) {
