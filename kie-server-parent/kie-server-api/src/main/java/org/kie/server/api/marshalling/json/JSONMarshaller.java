@@ -21,7 +21,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Member;
-import java.net.URLClassLoader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -281,6 +280,8 @@ public class JSONMarshaller implements Marshaller {
 
             deserializeObjectMapper.registerModule(modDeser);
             deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(introspectorPair));
+            // Don't use withClassLoader() because we rely on thread context classloader. We use classLoader only for fallback
+            deserializeObjectMapper.setTypeFactory(FallbackableTypeFactory.defaultInstance().withFallbackClassLoader(classLoader));
         }
 
         if (formatDate) {
@@ -867,7 +868,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromArray(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
+                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
                 Object value = deser.deserialize(jp, ctxt);
                 return value;
@@ -880,7 +881,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromObject(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
+                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
 
                     try {
@@ -904,7 +905,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromScalar(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
+                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass())) {
                     try {
                         return super.deserializeTypedFromScalar(jp, ctxt);
@@ -926,7 +927,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromAny(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
+                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass())) {
                     try {
                         return super.deserializeTypedFromAny(jp, ctxt);
@@ -968,15 +969,6 @@ public class JSONMarshaller implements Marshaller {
                 }
             } finally {
                 Thread.currentThread().setContextClassLoader(current);
-            }
-        }
-
-        private ClassLoader getClassLoaderForDeserialization() {
-            ClassLoader baseTypeClassLoader = _baseType.getRawClass().getClassLoader();
-            if (baseTypeClassLoader instanceof URLClassLoader) {
-                return classLoader;
-            } else {
-                return baseTypeClassLoader;
             }
         }
 
