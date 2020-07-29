@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Member;
+import java.net.URLClassLoader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +73,6 @@ import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.jsontype.impl.AsWrapperTypeDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
@@ -281,7 +281,6 @@ public class JSONMarshaller implements Marshaller {
 
             deserializeObjectMapper.registerModule(modDeser);
             deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(introspectorPair));
-            deserializeObjectMapper.setTypeFactory(TypeFactory.defaultInstance().withClassLoader(classLoader));
         }
 
         if (formatDate) {
@@ -868,7 +867,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromArray(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
+                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
                 JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
                 Object value = deser.deserialize(jp, ctxt);
                 return value;
@@ -881,7 +880,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromObject(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
+                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
                 if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
 
                     try {
@@ -905,7 +904,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromScalar(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
+                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
                 if (classesSet.contains(_baseType.getRawClass())) {
                     try {
                         return super.deserializeTypedFromScalar(jp, ctxt);
@@ -927,7 +926,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromAny(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
+                Thread.currentThread().setContextClassLoader(getClassLoaderForDeserialization());
                 if (classesSet.contains(_baseType.getRawClass())) {
                     try {
                         return super.deserializeTypedFromAny(jp, ctxt);
@@ -969,6 +968,15 @@ public class JSONMarshaller implements Marshaller {
                 }
             } finally {
                 Thread.currentThread().setContextClassLoader(current);
+            }
+        }
+
+        private ClassLoader getClassLoaderForDeserialization() {
+            ClassLoader baseTypeClassLoader = _baseType.getRawClass().getClassLoader();
+            if (baseTypeClassLoader instanceof URLClassLoader) {
+                return classLoader;
+            } else {
+                return baseTypeClassLoader;
             }
         }
 
