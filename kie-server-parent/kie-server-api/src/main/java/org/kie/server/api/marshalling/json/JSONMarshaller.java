@@ -103,6 +103,8 @@ public class JSONMarshaller implements Marshaller {
 
     public static class JSONContext {
 
+        private ClassLoader classLoader;
+
         private boolean stripped;
 
         private boolean wrap;
@@ -117,6 +119,15 @@ public class JSONMarshaller implements Marshaller {
             stripped = false;
             wrap = false;
             writeNull = true;
+            classLoader = null;
+        }
+
+        public void setClassLoader(ClassLoader classLoader) {
+            this.classLoader = classLoader;
+        }
+
+        public ClassLoader getClassLoader() {
+            return classLoader;
         }
 
         public boolean isStripped() {
@@ -349,6 +360,7 @@ public class JSONMarshaller implements Marshaller {
     public <T> T unmarshall(String serializedInput, Class<T> type) {
 
         try {
+            jsonContext.get().setClassLoader(this.classLoader);
             Class<?> actualType = classesSet.contains(type) ? Object.class : type;
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
         } catch (IOException e) {
@@ -879,7 +891,12 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromObject(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
+                ClassLoader projectClassLoader = jsonContext.get().getClassLoader();
+                if (projectClassLoader != null) {
+                    Thread.currentThread().setContextClassLoader(projectClassLoader);
+                } else {
+                    Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
+                }
                 if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
 
                     try {
