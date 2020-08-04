@@ -1,5 +1,6 @@
 Developing Drools and jBPM
 ==========================
+test
 
 **If you want to build or contribute to a kiegroup project, [read this document](https://github.com/kiegroup/droolsjbpm-build-bootstrap/blob/master/README.md).**
 
