@@ -46,13 +46,13 @@ public class SolverHandlerContextTest {
     @Test
     public void currentChangeSetId() {
         context.setCurrentChangeSetId(2);
-        assertThat(2).isEqualTo(context.getCurrentChangeSetId());
+        assertThat(context.getCurrentChangeSetId()).isEqualTo(2);
     }
 
     @Test
     public void nextChangeSetId() {
         for (int i = 1; i < 10; i++) {
-            assertThat(i).isEqualTo(context.nextChangeSetId());
+            assertThat(context.nextChangeSetId()).isEqualTo(i);
         }
     }
 
@@ -62,6 +62,14 @@ public class SolverHandlerContextTest {
         for (int i = 0; i <= 5; i++) {
             assertThat(context.isProcessedChangeSet(i)).isTrue();
         }
+    }
+
+    @Test
+    public void isCurrentChangeSetProcessed() {
+        context.setCurrentChangeSetId(5);
+        assertThat(context.isCurrentChangeSetProcessed()).isFalse();
+        context.setProcessedChangeSet(5);
+        assertThat(context.isCurrentChangeSetProcessed()).isTrue();
     }
 
     @Test
@@ -76,14 +84,14 @@ public class SolverHandlerContextTest {
     public void getPreviousQueryTime() {
         LocalDateTime queryTime = LocalDateTime.now();
         context.setPreviousQueryTime(queryTime);
-        assertThat(queryTime).isEqualTo(context.getPreviousQueryTime());
+        assertThat(context.getPreviousQueryTime()).isEqualTo(queryTime);
     }
 
     @Test
     public void getNextQueryTime() {
         LocalDateTime queryTime = LocalDateTime.now();
         context.setNextQueryTime(queryTime);
-        assertThat(queryTime).isEqualTo(context.getNextQueryTime());
+        assertThat(context.getNextQueryTime()).isEqualTo(queryTime);
     }
 
     @Test

@@ -19,27 +19,25 @@ package org.kie.server.services.taskassigning.planning;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
-import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.taskassigning.core.model.TaskAssigningSolution;
+import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.optaplanner.core.api.solver.event.BestSolutionChangedEvent;
 import org.optaplanner.core.api.solver.event.SolverEventListener;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SYNC_INTERVAL;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SYNC_QUERIES_SHIFT;
-import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USERS_SYNC_INTERVAL;
-import static org.kie.server.services.taskassigning.planning.util.PropertyUtil.readSystemProperty;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 /**
@@ -52,25 +50,24 @@ public class SolverHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverHandler.class);
 
-    private static final String TARGET_USER_ID = readSystemProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER, null, value -> value);
-    private static final int PUBLISH_WINDOW_SIZE = readSystemProperty(TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, 2, Integer::parseInt);
-    private static final Duration SYNC_INTERVAL = readSystemProperty(TASK_ASSIGNING_SYNC_INTERVAL, Duration.parse("PT2S"), Duration::parse);
-    private static final Duration SYNC_QUERIES_SHIFT = readSystemProperty(TASK_ASSIGNING_SYNC_QUERIES_SHIFT, Duration.parse("PT10M"), Duration::parse);
-    private static final Duration USERS_SYNC_INTERVAL = readSystemProperty(TASK_ASSIGNING_USERS_SYNC_INTERVAL, Duration.parse("PT2H"), Duration::parse);
-
     private static final long EXECUTOR_TERMINATION_TIMEOUT = 5;
 
     private final SolverDef solverDef;
     private final KieServerRegistry registry;
     private final TaskAssigningRuntimeDelegate delegate;
     private final UserSystemService userSystemService;
-    private final ExecutorService executorService;
+    private final ScheduledExecutorService executorService;
+    private final SolverHandlerConfig config;
 
     /**
      * Synchronizes potential concurrent accesses by the SolverWorker, SolutionProcessor and SolutionSynchronizer.
      */
     private final ReentrantLock lock = new ReentrantLock();
-    private TaskAssigningSolution currentSolution = null;
+    private AtomicReference<TaskAssigningSolution> currentSolution = new AtomicReference<>(null);
+    private AtomicReference<TaskAssigningSolution> lastBestSolution = new AtomicReference<>(null);
+    private AtomicBoolean onBackgroundImprovedSolutionSent = new AtomicBoolean(false);
+
+    private AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<>(null);
 
     private SolverExecutor solverExecutor;
     private SolverHandlerContext context;
@@ -81,26 +78,29 @@ public class SolverHandler {
                          final KieServerRegistry registry,
                          final TaskAssigningRuntimeDelegate delegate,
                          final UserSystemService userSystemService,
-                         final ExecutorService executorService) {
+                         final ScheduledExecutorService executorService,
+                         final SolverHandlerConfig config) {
         checkNotNull("solverDef", solverDef);
         checkNotNull("registry", registry);
         checkNotNull("delegate", delegate);
         checkNotNull("userSystemService", userSystemService);
         checkNotNull("executorService", executorService);
+        checkNotNull("config", config);
         this.solverDef = solverDef;
         this.registry = registry;
         this.delegate = delegate;
         this.userSystemService = userSystemService;
         this.executorService = executorService;
-        this.context = new SolverHandlerContext(SYNC_QUERIES_SHIFT);
+        this.config = config;
+        this.context = new SolverHandlerContext(config.getSyncQueriesShift());
     }
 
     public void start() {
         solverExecutor = createSolverExecutor(solverDef, registry, this::onBestSolutionChange);
         solutionSynchronizer = createSolutionSynchronizer(solverExecutor, delegate, userSystemService,
-                                                          SYNC_INTERVAL, USERS_SYNC_INTERVAL, context, this::onUpdateSolution);
-        solutionProcessor = createSolutionProcessor(delegate, this::onSolutionProcessed, TARGET_USER_ID,
-                                                    PUBLISH_WINDOW_SIZE);
+                                                          config.getSyncInterval(), config.getUsersSyncInterval(), context, this::onSolutionSynchronized);
+        solutionProcessor = createSolutionProcessor(delegate, this::onSolutionProcessed, config.getTargetUserId(),
+                                                    config.getPublishWindowSize());
         executorService.execute(solverExecutor); //is started/stopped on demand by the SolutionSynchronizer.
         executorService.execute(solutionSynchronizer);
         executorService.execute(solutionProcessor);
@@ -153,6 +153,7 @@ public class SolverHandler {
             return;
         }
         if (!changes.isEmpty()) {
+            onBackgroundImprovedSolutionSent.set(false);
             solverExecutor.addProblemFactChanges(changes);
         } else {
             LOGGER.info("It looks like an empty change list was provided. Nothing will be done since it has no effect on the solution.");
@@ -164,21 +165,81 @@ public class SolverHandler {
      * @param event event produced by the solver.
      */
     private void onBestSolutionChange(BestSolutionChangedEvent<TaskAssigningSolution> event) {
-        LOGGER.debug("onBestSolutionChange: isEveryProblemFactChangeProcessed: {}, currentChangeSetId: {}, isCurrentChangeSetProcessed: {}",
-                     event.isEveryProblemFactChangeProcessed(), context.getCurrentChangeSetId(), context.isProcessedChangeSet(context.getCurrentChangeSetId()));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("onBestSolutionChange: isEveryProblemFactChangeProcessed: {}, currentChangeSetId: {}," +
+                                 " isCurrentChangeSetProcessed: {}, newBestSolution: {}",
+                         event.isEveryProblemFactChangeProcessed(), context.getCurrentChangeSetId(),
+                         context.isCurrentChangeSetProcessed(), event.getNewBestSolution());
+        }
 
-        if (event.isEveryProblemFactChangeProcessed() &&
-                event.getNewBestSolution().getScore().isSolutionInitialized() &&
-                !context.isProcessedChangeSet(context.getCurrentChangeSetId())) {
+        TaskAssigningSolution newBestSolution = event.getNewBestSolution();
+        if (event.isEveryProblemFactChangeProcessed() && newBestSolution.getScore().isSolutionInitialized()) {
+            lastBestSolution.set(newBestSolution);
+            if (hasWaitForImprovedSolutionDuration()) {
+                scheduleOnBestSolutionChange(newBestSolution, config.getWaitForImprovedSolutionDuration().toMillis());
+            } else {
+                onBestSolutionChange(newBestSolution);
+            }
+        }
+    }
+
+    private void scheduleOnBestSolutionChange(TaskAssigningSolution chBestSolution, long delay) {
+        if (scheduledFuture.get() == null && !context.isCurrentChangeSetProcessed()) {
             lock.lock();
+            LOGGER.debug("Schedule execute solution change with previous chBestSolution: {}", chBestSolution);
             try {
-                LOGGER.debug("A new solution has been produced for changeSetId: {}", context.getCurrentChangeSetId());
-                currentSolution = event.getNewBestSolution();
-                context.setProcessedChangeSet(context.getCurrentChangeSetId());
-                solutionProcessor.process(currentSolution);
+                Supplier<TaskAssigningSolution> solutionSupplier = () -> lastBestSolution.get();
+                ScheduledFuture<?> future = executorService.schedule(() -> executeSolutionChange(chBestSolution, solutionSupplier),
+                                                                     delay,
+                                                                     TimeUnit.MILLISECONDS);
+                scheduledFuture.set(future);
             } finally {
                 lock.unlock();
             }
+        }
+    }
+
+    private void onBestSolutionChange(TaskAssigningSolution newBestSolution) {
+        if (!context.isCurrentChangeSetProcessed()) {
+            executeSolutionChange(newBestSolution);
+        }
+    }
+
+    private void executeSolutionChange(TaskAssigningSolution chBestSolution, Supplier<TaskAssigningSolution> solutionSupplier) {
+        lock.lock();
+        try {
+            TaskAssigningSolution currentLastBestSolution = solutionSupplier.get();
+            LOGGER.debug("Executing delayed solution change for currentChangeSetId: {}, lastBestSolution: {}, lastBestSolution: {}",
+                         context.getCurrentChangeSetId(), currentLastBestSolution.getScore(), currentLastBestSolution);
+
+            if (chBestSolution == currentLastBestSolution) {
+                LOGGER.debug("SAME SOLUTION: lastBestSolution is the same as the chBestSolution");
+            } else {
+                if (chBestSolution.getScore().compareTo(currentLastBestSolution.getScore()) < 0) {
+                    LOGGER.debug("SCORE IMPROVEMENT: lastBestSolution has a better score than the chBestSolution: " +
+                                         "currentChangeSetId: {}, chBestSolution: {}, chBestSolution: {}",
+                                 context.getCurrentChangeSetId(), chBestSolution.getScore(), chBestSolution);
+                } else {
+                    LOGGER.debug("SAME SCORE: lastBestSolution is not the same as the chBestSolution BUT score has not improved" +
+                                         ", currentChangeSetId: {}, chBestSolution: {}, chBestSolution: {}",
+                                 context.getCurrentChangeSetId(), chBestSolution.getScore(), chBestSolution);
+                }
+            }
+            executeSolutionChange(currentLastBestSolution);
+        } finally {
+            scheduledFuture.set(null);
+            lock.unlock();
+        }
+    }
+
+    private void executeSolutionChange(TaskAssigningSolution solution) {
+        lock.lock();
+        try {
+            currentSolution.set(solution);
+            context.setProcessedChangeSet(context.getCurrentChangeSetId());
+            solutionProcessor.process(currentSolution.get());
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -195,18 +256,25 @@ public class SolverHandler {
                 solverExecutor.stop();
                 context.clearProcessedChangeSet();
                 solutionSynchronizer.initSolverExecutor();
-                currentSolution = null;
+                currentSolution.set(null);
+                lastBestSolution.set(null);
+                onBackgroundImprovedSolutionSent.set(false);
             } else {
                 LocalDateTime fromLastModificationDate;
                 if (result.getExecutionResult().hasError()) {
                     LOGGER.debug("A recoverable error was produced during solution processing. errorCode: {}, message: {} " +
                                          "Solution will be properly updated on next refresh", result.getExecutionResult().getError(), result.getExecutionResult().getErrorMessage());
                     fromLastModificationDate = context.getPreviousQueryTime();
+                    solutionSynchronizer.synchronizeSolution(currentSolution.get(), fromLastModificationDate);
                 } else {
                     fromLastModificationDate = context.getNextQueryTime();
                     context.clearTaskChangeTimes(context.getPreviousQueryTime());
+                    if (hasImproveSolutionOnBackgroundDuration() && !onBackgroundImprovedSolutionSent.get()) {
+                        solutionSynchronizer.synchronizeSolution(currentSolution.get(), fromLastModificationDate, config.getImproveSolutionOnBackgroundDuration());
+                    } else {
+                        solutionSynchronizer.synchronizeSolution(currentSolution.get(), fromLastModificationDate);
+                    }
                 }
-                solutionSynchronizer.synchronizeSolution(currentSolution, fromLastModificationDate);
             }
         } finally {
             lock.unlock();
@@ -215,13 +283,32 @@ public class SolverHandler {
 
     /**
      * Invoked every time the SolutionSynchronizer gets updated information from the jBPM runtime and there are changes
-     * to apply.
+     * to apply, or when the configurable amount of time with no changes has elapsed.
      * @param result Contains the list of changes to apply.
      */
-    private void onUpdateSolution(SolutionSynchronizer.Result result) {
+    private void onSolutionSynchronized(SolutionSynchronizer.Result result) {
         lock.lock();
         try {
-            addProblemFactChanges(result.getChanges());
+            if (result.hasChanges()) {
+                addProblemFactChanges(result.getChanges());
+            } else {
+                LOGGER.debug("Processing synchronization unchanged period timeout. Checking if there is a" +
+                                     " lastBestSolution with an improved score to send");
+                TaskAssigningSolution bestSolution = lastBestSolution.get();
+                onBackgroundImprovedSolutionSent.set(true);
+                if (bestSolution.getScore().compareTo(currentSolution.get().getScore()) > 0) {
+                    LOGGER.debug("About to process lastBestSolution after improveSolutionOnBackgroundDuration timeout with score: {}, lastBestSolution: {}.",
+                                 bestSolution.getScore(), bestSolution);
+                    currentSolution.set(bestSolution);
+                    solutionProcessor.process(currentSolution.get());
+                } else {
+                    LOGGER.debug("Looks like lastBestSolution is the same as the already sent currentSolution or has the same score" +
+                                         ", nothing to do. Restarting synchronization");
+                    LocalDateTime fromLastModificationDate = context.getNextQueryTime();
+                    context.clearTaskChangeTimes(context.getPreviousQueryTime());
+                    solutionSynchronizer.synchronizeSolution(currentSolution.get(), fromLastModificationDate);
+                }
+            }
         } finally {
             lock.unlock();
         }
@@ -229,5 +316,13 @@ public class SolverHandler {
 
     private boolean isRecoverableError(PlanningExecutionResult.ErrorCode errorCode) {
         return errorCode == PlanningExecutionResult.ErrorCode.TASK_MODIFIED_SINCE_PLAN_CALCULATION_ERROR;
+    }
+
+    protected boolean hasWaitForImprovedSolutionDuration() {
+        return config.getWaitForImprovedSolutionDuration().toMillis() > 0;
+    }
+
+    protected boolean hasImproveSolutionOnBackgroundDuration() {
+        return config.getImproveSolutionOnBackgroundDuration().toMillis() > 0;
     }
 }

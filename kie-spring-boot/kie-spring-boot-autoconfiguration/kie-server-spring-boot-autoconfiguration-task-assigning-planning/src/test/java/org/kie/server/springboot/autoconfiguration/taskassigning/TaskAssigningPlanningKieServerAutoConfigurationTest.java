@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED;
 import static org.kie.server.services.taskassigning.core.model.ModelConstants.PLANNING_USER_ID_PROPERTY;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
@@ -40,6 +41,7 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_RUNTIME_DELEGATE_PAGE_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
@@ -81,6 +83,8 @@ public class TaskAssigningPlanningKieServerAutoConfigurationTest {
             TASK_ASSIGNING_SYNC_INTERVAL,
             TASK_ASSIGNING_SYNC_QUERIES_SHIFT,
             TASK_ASSIGNING_USERS_SYNC_INTERVAL,
+            TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION,
+            TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION,
             TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE,
             TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT,
             TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE,
@@ -131,6 +135,8 @@ public class TaskAssigningPlanningKieServerAutoConfigurationTest {
         assertSystemProperty(TASK_ASSIGNING_SYNC_INTERVAL, properties.getSolutionSyncInterval());
         assertSystemProperty(TASK_ASSIGNING_SYNC_QUERIES_SHIFT, properties.getSolutionSyncQueriesShift());
         assertSystemProperty(TASK_ASSIGNING_USERS_SYNC_INTERVAL, properties.getUsersSyncInterval());
+        assertSystemProperty(TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION, properties.getWaitForImprovedSolutionDuration());
+        assertSystemProperty(TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION, properties.getImproveSolutionOnBackgroundDuration());
 
         assertSystemProperty(TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE, properties.getSolver().getConfigResource());
         assertSystemProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT, properties.getSolver().getMoveThreadCount());

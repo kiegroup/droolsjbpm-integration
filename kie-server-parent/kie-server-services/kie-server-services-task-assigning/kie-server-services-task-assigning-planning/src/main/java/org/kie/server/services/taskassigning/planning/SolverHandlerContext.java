@@ -53,6 +53,10 @@ public class SolverHandlerContext {
         return changeSetId <= lastProcessedChangeSetId;
     }
 
+    public boolean isCurrentChangeSetProcessed() {
+        return isProcessedChangeSet(currentChangeSetId);
+    }
+
     public void setProcessedChangeSet(long changeSetId) {
         this.lastProcessedChangeSetId = changeSetId;
     }

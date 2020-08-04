@@ -16,7 +16,7 @@
 
 package org.kie.server.services.taskassigning.planning;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class TaskAssigningServiceTest {
     private UserSystemService userSystemService;
 
     @Mock
-    private ExecutorService executorService;
+    private ScheduledExecutorService executorService;
 
     @Mock
     private TaskAssigningRuntimeDelegate delegate;
@@ -54,12 +54,19 @@ public class TaskAssigningServiceTest {
 
     private TaskAssigningService taskAssigningService;
 
+    @Mock
+    private TaskAssigningServiceConfig serviceConfig;
+
+    @Mock
+    private SolverHandlerConfig handlerConfig;
+
     @Before
     public void setUp() {
-        taskAssigningService = spy(new TaskAssigningService());
+        doReturn(handlerConfig).when(serviceConfig).getSolverHandlerConfig();
+        taskAssigningService = spy(new TaskAssigningService(serviceConfig));
         doReturn(solverHandler)
                 .when(taskAssigningService)
-                .createSolverHandler(eq(solverDef), eq(registry), eq(delegate), eq(userSystemService), eq(executorService));
+                .createSolverHandler(eq(solverDef), eq(registry), eq(delegate), eq(userSystemService), eq(executorService), eq(handlerConfig));
         taskAssigningService.setUserSystemService(userSystemService);
         taskAssigningService.setDelegate(delegate);
         taskAssigningService.setExecutorService(executorService);

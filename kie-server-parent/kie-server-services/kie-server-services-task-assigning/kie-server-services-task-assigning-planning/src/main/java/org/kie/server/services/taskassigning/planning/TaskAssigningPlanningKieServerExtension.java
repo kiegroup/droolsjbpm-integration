@@ -19,8 +19,8 @@ package org.kie.server.services.taskassigning.planning;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
@@ -70,11 +70,13 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_CONTAINER_VERSION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USER_SYSTEM_NAME;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.readAndValidateTaskAssigningServiceConfig;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.ACTIVATE_CONTAINER_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.CONTAINER_NOT_ACCESSIBLE_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.CREATE_CONTAINER_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.EXTENSION_CONTAINER_NOT_IN_EXPECTED_STATUS_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.HEALTH_CHECK_IS_ALIVE_MESSAGE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.TASK_ASSIGNING_SERVICE_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_CONTAINER_NOT_AVAILABLE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_NOT_CONFIGURED_ERROR;
@@ -108,7 +110,7 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
     private TaskAssigningRuntimeClient runtimeClient;
     private UserSystemService userSystemService;
     private TaskAssigningService taskAssigningService;
-    private ExecutorService executorService;
+    private ScheduledExecutorService executorService;
     private SolverDef solverDef;
     private String userSystemName;
     private KieContainerResource userSystemContainer = null;
@@ -154,9 +156,13 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
             throw new KieServicesException(String.format(USER_SYSTEM_CONFIGURATION_ERROR, e.getMessage()), e);
         }
 
-        this.executorService = Executors.newFixedThreadPool(3);
-        this.taskAssigningService = createTaskAssigningService();
-        this.services.add(taskAssigningService);
+        this.executorService = Executors.newScheduledThreadPool(4);
+        try {
+            this.taskAssigningService = createTaskAssigningService(readAndValidateTaskAssigningServiceConfig());
+            this.services.add(taskAssigningService);
+        } catch (TaskAssigningValidationException e) {
+            throw new KieServicesException(String.format(String.format(TASK_ASSIGNING_SERVICE_CONFIGURATION_ERROR, e.getMessage()), e));
+        }
 
         this.initialized = true;
     }
@@ -291,8 +297,8 @@ public class TaskAssigningPlanningKieServerExtension implements KieServerExtensi
                              threadFactoryClass);
     }
 
-    TaskAssigningService createTaskAssigningService() {
-        return new TaskAssigningService();
+    TaskAssigningService createTaskAssigningService(TaskAssigningServiceConfig serviceConfig) {
+        return new TaskAssigningService(serviceConfig);
     }
 
     private UserSystemService getUserSystemService() {

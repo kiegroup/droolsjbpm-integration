@@ -92,6 +92,32 @@ public class TaskAssigningConstants {
     public static final String TASK_ASSIGNING_USERS_SYNC_INTERVAL = "org.kie.server.taskAssigning.usersSyncInterval";
 
     /**
+     * Property for configuring the amount of time to execute LS phase before sending any plan to the kie-server with
+     * the jBPM runtime. Allows an early improvement of the solution. This value should typically be low, e.g. 500
+     * milliseconds, etc.
+     *
+     * The formats accepted are based on the ISO-8601 duration format {@code PnDTnHnMn.nS} with days considered to
+     * be exactly 24 hours.
+     * <p>
+     * e.g.
+     * "PT0.500S"  configures 500 milliseconds.
+     */
+    public static final String TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION = "org.kie.server.taskAssigning.waitForImprovedSolutionDuration";
+
+    /**
+     * Property for configuring the amount of time to execute the LS phase in background and sending an eventually
+     * improved solution to the jBPM runtime after this time.
+     *
+     * The formats accepted are based on the ISO-8601 duration format {@code PnDTnHnMn.nS} with days considered to
+     * be exactly 24 hours.
+     * <p>
+     * e.g.
+     * "PT1.500S"  configures 1500 milliseconds.
+     * "PT1M"      configures 1 minute.
+     */
+    public static final String TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION = "org.kie.server.taskAssigning.improveSolutionOnBackgroundDuration";
+
+    /**
      * Property for configuring the resource with the solver configuration.
      */
     public static final String TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE = "org.kie.server.taskAssigning.solver.configResource";
