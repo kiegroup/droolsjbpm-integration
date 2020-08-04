@@ -162,7 +162,7 @@ public class SolverExecutor extends RunnableBase {
                         status.set(STOPPED);
                         LOGGER.debug("Solver has been stopped. It can be restarted with the start(solution) method.");
                     } else {
-                        LOGGER.error("SolverExecutor has been destroyed. No more invocations can be done on this instance.");
+                        LOGGER.debug("SolverExecutor has been destroyed. No more invocations can be done on this instance.");
                     }
                 }
             } catch (InterruptedException e) {

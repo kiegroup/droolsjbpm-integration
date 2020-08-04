@@ -57,6 +57,8 @@ public class TaskAssigningPlanningKieServerExtensionMessages {
 
     static final String USER_SYSTEM_CONFIGURATION_ERROR = "User system service is not properly configured, error: %s";
 
+    static final String TASK_ASSIGNING_SERVICE_CONFIGURATION_ERROR = "Task assigning service is not properly configured, error: %s";
+
     static final String USER_SYSTEM_CONTAINER_NOT_AVAILABLE = "User system service container %s is not available." +
             " " + EXTENSION_WONT_OPERATE_PROPERLY_ERROR_PART;
 
@@ -70,6 +72,14 @@ public class TaskAssigningPlanningKieServerExtensionMessages {
             " containerId: %s, groupId: %s, artifactId: %s, version: %s";
 
     static final String HEALTH_CHECK_IS_ALIVE_MESSAGE = EXTENSION_NAME + " is alive";
+
+    static final String PARAMETER_MUST_HAVE_A_NON_EMPTY_STRING_VALUE_ERROR = "Parameter %s must have a non empty string value";
+
+    static final String PARAMETER_MUST_HAVE_A_GREATER_THAN_ZERO_INTEGER_VALUE_ERROR = "Parameter %s must be configured with a greater than zero integer value";
+
+    static final String PARAMETER_MUST_HAVE_A_GREATER_THAN_ZERO_DURATION_VALUE_ERROR = "Parameter %s must be configured with a greater than zero time duration";
+
+    static final String PARAMETER_MUST_HAVE_A_GREATER_OR_EQUAL_TO_ZERO_DURATION_VALUE_ERROR = "Parameter %s must be configured with a greater or equal to zero time duration";
 
     static String addExtensionMessagePrefix(String msg) {
         return String.format(PLANNER_EXTENSION_MESSAGE_PREFIX, msg);

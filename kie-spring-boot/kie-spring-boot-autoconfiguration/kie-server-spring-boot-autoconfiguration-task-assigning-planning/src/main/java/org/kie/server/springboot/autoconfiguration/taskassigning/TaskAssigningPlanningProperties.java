@@ -37,6 +37,10 @@ public class TaskAssigningPlanningProperties {
 
     private String usersSyncInterval;
 
+    private String waitForImprovedSolutionDuration;
+
+    private String improveSolutionOnBackgroundDuration;
+
     private RuntimeDelegate runtimeDelegate = new RuntimeDelegate();
 
     public int getPublishWindowSize() {
@@ -77,6 +81,22 @@ public class TaskAssigningPlanningProperties {
 
     public void setUsersSyncInterval(String usersSyncInterval) {
         this.usersSyncInterval = usersSyncInterval;
+    }
+
+    public String getWaitForImprovedSolutionDuration() {
+        return waitForImprovedSolutionDuration;
+    }
+
+    public void setWaitForImprovedSolutionDuration(String waitForImprovedSolutionDuration) {
+        this.waitForImprovedSolutionDuration = waitForImprovedSolutionDuration;
+    }
+
+    public String getImproveSolutionOnBackgroundDuration() {
+        return improveSolutionOnBackgroundDuration;
+    }
+
+    public void setImproveSolutionOnBackgroundDuration(String improveSolutionOnBackgroundDuration) {
+        this.improveSolutionOnBackgroundDuration = improveSolutionOnBackgroundDuration;
     }
 
     public Solver getSolver() {

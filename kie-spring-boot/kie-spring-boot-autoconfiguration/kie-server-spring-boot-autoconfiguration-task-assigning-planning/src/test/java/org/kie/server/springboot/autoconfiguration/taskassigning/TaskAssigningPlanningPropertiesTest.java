@@ -44,6 +44,10 @@ public class TaskAssigningPlanningPropertiesTest {
 
     public static final String USERS_SYNC_INTERVAL = "USERS_SYNC_INTERVAL";
 
+    public static final String WAIT_FOR_IMPROVED_SOLUTION_DURATION = "WAIT_FOR_IMPROVED_SOLUTION_DURATION";
+
+    public static final String IMPROVE_SOLUTION_ON_BACKGROUND_DURATION = "IMPROVE_SOLUTION_ON_BACKGROUND_DURATION";
+
     public static final String SOLVER_CONFIG_RESOURCE = "SOLVER_CONFIG_RESOURCE";
 
     public static final String SOLVER_MOVE_THREAD_COUNT = "SOLVER_MOVE_THREAD_COUNT";
@@ -106,6 +110,8 @@ public class TaskAssigningPlanningPropertiesTest {
         properties.setSolutionSyncInterval(SOLUTION_SYNC_INTERVAL);
         properties.setSolutionSyncQueriesShift(SOLUTION_SYNC_QUERIES_SHIFT);
         properties.setUsersSyncInterval(USERS_SYNC_INTERVAL);
+        properties.setWaitForImprovedSolutionDuration(WAIT_FOR_IMPROVED_SOLUTION_DURATION);
+        properties.setImproveSolutionOnBackgroundDuration(IMPROVE_SOLUTION_ON_BACKGROUND_DURATION);
 
         properties.getUserSystem().setName(USER_SYSTEM_NAME);
         properties.getUserSystem().getContainer().setId(USER_SYSTEM_CONTAINER_ID);
@@ -150,6 +156,8 @@ public class TaskAssigningPlanningPropertiesTest {
         assertEquals(SOLUTION_SYNC_INTERVAL, properties.getSolutionSyncInterval());
         assertEquals(SOLUTION_SYNC_QUERIES_SHIFT, properties.getSolutionSyncQueriesShift());
         assertEquals(USERS_SYNC_INTERVAL, properties.getUsersSyncInterval());
+        assertEquals(WAIT_FOR_IMPROVED_SOLUTION_DURATION, properties.getWaitForImprovedSolutionDuration());
+        assertEquals(IMPROVE_SOLUTION_ON_BACKGROUND_DURATION, properties.getImproveSolutionOnBackgroundDuration());
 
         assertEquals(USER_SYSTEM_NAME, properties.getUserSystem().getName());
         assertEquals(USER_SYSTEM_CONTAINER_ID, properties.getUserSystem().getContainer().getId());
