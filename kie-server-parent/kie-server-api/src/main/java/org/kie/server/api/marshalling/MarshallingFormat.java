@@ -69,7 +69,7 @@ public enum MarshallingFormat {
         int idx;
         return ((idx = contentType.indexOf(';')) < 0 || (idx + 1) == contentType.length()) 
                 ? Collections.emptyMap() 
-                : Arrays.stream(contentType.substring(idx + 1).split(",")).
+                : Arrays.stream(contentType.substring(idx + 1).split(";")).
                     filter(e -> e.split("=").length > 1) // remove bad parameters
                     .map(e -> e.split("="))
                     .collect(Collectors.toMap(e -> e[0].trim(), e ->  e[1].trim()));

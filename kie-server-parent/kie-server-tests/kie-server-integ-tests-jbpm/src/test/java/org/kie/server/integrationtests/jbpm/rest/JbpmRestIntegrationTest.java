@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm.rest;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,8 +38,11 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.DocumentInstance;
 import org.kie.server.api.model.instance.DocumentInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbString;
+import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerUtil;
@@ -49,6 +53,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INST_DEL_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.DOCUMENT_ID;
@@ -59,13 +64,17 @@ import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_URI;
+import static org.kie.server.api.rest.RestURI.QUERY_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
+import static org.kie.server.api.rest.RestURI.TASK_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
 import static org.kie.server.api.rest.RestURI.build;
 
 
 public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "rest-processes", "1.0.0.Final");
+    private static ReleaseId releaseIdDefinitionProject = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
    
     private static Logger logger = LoggerFactory.getLogger(JbpmRestIntegrationTest.class);
 
@@ -75,11 +84,13 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/rest-processes");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
         // set the accepted formats with quality param to express preference
         acceptHeadersByFormat.put(MarshallingFormat.JAXB, "application/xml;q=0.9,application/json;q=0.3");// xml is preferred over json
         acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml
 
         createContainer(CONTAINER, releaseId);
+        createContainer(CONTAINER_ID, releaseIdDefinitionProject);
     }
 
     /**
@@ -216,6 +227,23 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
             }
         }
 
+    }
+
+    @Test
+    public void testBasicJbpmRequestAcceptHeadersStrictAndField() throws Exception {
+        assumeTrue(marshallingFormat == MarshallingFormat.JSON);
+
+        long processId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        ProcessInstance desc = processClient.getProcessInstance(CONTAINER_ID, processId);
+        TaskSummary[] tasks = desc.getActiveUserTasks().getTasks();
+        assertTrue(tasks.length > 0);
+
+        WebTarget target = newRequest(RestURI.build(TestConfig.getKieServerHttpUrl(), QUERY_URI + "/" + TASK_GET_URI, Collections.singletonMap(TASK_INSTANCE_ID, tasks[0].getId())));
+        Assertions.assertThat(target.request(MediaType.APPLICATION_JSON_TYPE).get(String.class)).contains("null");
+        Assertions.assertThat(target.request().header("content-type", MediaType.APPLICATION_JSON + ";fields=not_null;strict=true").get(String.class)).doesNotContain("null");
+        Assertions.assertThat(target.request().header("content-type", MediaType.APPLICATION_JSON + ";fields=not_null").get(String.class)).doesNotContain("null");
+        Assertions.assertThat(target.request().header("accept", MediaType.APPLICATION_JSON + ";fields=not_null;strict=true").get(String.class)).doesNotContain("null");
+        Assertions.assertThat(target.request().header("accept", MediaType.APPLICATION_JSON + ";fields=not_null").get(String.class)).doesNotContain("null");
     }
 
     @Test
