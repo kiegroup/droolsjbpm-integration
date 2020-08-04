@@ -16,18 +16,26 @@
 
 package org.kie.server.services.taskassigning.planning;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
-import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.taskassigning.user.system.api.UserSystemService;
+
+import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 public class TaskAssigningService {
 
     private TaskAssigningRuntimeDelegate delegate;
     private UserSystemService userSystemService;
-    private ExecutorService executorService;
+    private ScheduledExecutorService executorService;
 
     private SolverHandler solverHandler;
+    private SolverHandlerConfig solverHandlerConfig;
+
+    public TaskAssigningService(TaskAssigningServiceConfig config) {
+        checkNotNull("config", config);
+        this.solverHandlerConfig = config.getSolverHandlerConfig();
+    }
 
     public void setDelegate(TaskAssigningRuntimeDelegate delegate) {
         this.delegate = delegate;
@@ -37,12 +45,12 @@ public class TaskAssigningService {
         this.userSystemService = userSystemService;
     }
 
-    public void setExecutorService(ExecutorService executorService) {
+    public void setExecutorService(ScheduledExecutorService executorService) {
         this.executorService = executorService;
     }
 
     public void start(SolverDef solverDef, KieServerRegistry registry) {
-        solverHandler = createSolverHandler(solverDef, registry, delegate, userSystemService, executorService);
+        solverHandler = createSolverHandler(solverDef, registry, delegate, userSystemService, executorService, solverHandlerConfig);
         solverHandler.start();
     }
 
@@ -54,7 +62,7 @@ public class TaskAssigningService {
 
     SolverHandler createSolverHandler(SolverDef solverDef, KieServerRegistry registry,
                                       TaskAssigningRuntimeDelegate delegate, UserSystemService userSystemService,
-                                      ExecutorService executorService) {
-        return new SolverHandler(solverDef, registry, delegate, userSystemService, executorService);
+                                      ScheduledExecutorService executorService, SolverHandlerConfig solverHandlerConfig) {
+        return new SolverHandler(solverDef, registry, delegate, userSystemService, executorService, solverHandlerConfig);
     }
 }

@@ -37,9 +37,4 @@ public abstract class AbstractPersistable {
     public void setId(Long id) {
         this.id = id;
     }
-
-    @Override
-    public String toString() {
-        return getClass().getName().replaceAll(".*\\.", "") + "-" + id;
-    }
 }
