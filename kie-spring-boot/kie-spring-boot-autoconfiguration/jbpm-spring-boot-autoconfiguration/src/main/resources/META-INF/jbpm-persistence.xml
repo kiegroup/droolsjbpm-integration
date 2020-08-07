@@ -33,6 +33,7 @@
     <class>org.jbpm.services.task.impl.model.TaskDefImpl</class>
     <class>org.jbpm.services.task.impl.model.TaskDataImpl</class>
     <class>org.jbpm.services.task.impl.model.UserImpl</class>
+    <class>org.jbpm.services.task.impl.model.EmailImpl</class>
 
     <!-- Event Classes -->
     <class>org.jbpm.services.task.audit.impl.model.TaskEventImpl</class>
