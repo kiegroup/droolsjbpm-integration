@@ -25,10 +25,6 @@
       <artifactId>batik-anim</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-ext</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
