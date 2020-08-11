@@ -79,8 +79,8 @@ public class DMNGetModelsIntegrationTest
         Collection<DMNInputDataInfo> inputs = modelInfo.getInputs();
         assertThat(inputs, hasSize(4));
 
-        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a number", "feel", "number");
-        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a string", "feel", "string");
+        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a number", XMLConstants.DEFAULT_NS_PREFIX, "number");
+        assertCollectionOfInputDataForNameHasTypeRef(inputs, "a string", XMLConstants.DEFAULT_NS_PREFIX, "string");
         assertCollectionOfInputDataForNameHasTypeRef(inputs, "a list of numbers", XMLConstants.DEFAULT_NS_PREFIX, "tList");
         assertCollectionOfInputDataForNameHasTypeRef(inputs, "a Person", XMLConstants.DEFAULT_NS_PREFIX, "tPerson");
 
@@ -88,7 +88,7 @@ public class DMNGetModelsIntegrationTest
         assertThat(itemDefs, hasSize(2));
         DMNItemDefinitionInfo tList = itemDefs.stream().filter(id -> id.getName().equals("tList")).findFirst().get();
         assertThat(tList.getTypeRef().getLocalPart(), is("number"));
-        assertThat(tList.getTypeRef().getPrefix(), is("feel"));
+        assertThat(tList.getTypeRef().getPrefix(), is(XMLConstants.DEFAULT_NS_PREFIX));
         assertThat(tList.getIsCollection(), is(true));
 
         DMNItemDefinitionInfo tPerson = itemDefs.stream().filter(id -> id.getName().equals("tPerson")).findFirst().get();
@@ -97,10 +97,10 @@ public class DMNGetModelsIntegrationTest
         assertThat(tPerson.getItemComponent(), hasSize(3));
         assertThat(tPerson.getItemComponent().get(0).getName(), is("full name"));
         assertThat(tPerson.getItemComponent().get(0).getTypeRef().getLocalPart(), is("string"));
-        assertThat(tPerson.getItemComponent().get(0).getTypeRef().getPrefix(), is("feel"));
+        assertThat(tPerson.getItemComponent().get(0).getTypeRef().getPrefix(), is(XMLConstants.DEFAULT_NS_PREFIX));
         assertThat(tPerson.getItemComponent().get(1).getName(), is("age"));
         assertThat(tPerson.getItemComponent().get(1).getTypeRef().getLocalPart(), is("number"));
-        assertThat(tPerson.getItemComponent().get(1).getTypeRef().getPrefix(), is("feel"));
+        assertThat(tPerson.getItemComponent().get(1).getTypeRef().getPrefix(), is(XMLConstants.DEFAULT_NS_PREFIX));
         assertThat(tPerson.getItemComponent().get(2).getName(), is("favorite numbers"));
         assertThat(tPerson.getItemComponent().get(2).getTypeRef().getLocalPart(), is("tList"));
         assertThat(tPerson.getItemComponent().get(2).getTypeRef().getPrefix(), is(XMLConstants.DEFAULT_NS_PREFIX));
