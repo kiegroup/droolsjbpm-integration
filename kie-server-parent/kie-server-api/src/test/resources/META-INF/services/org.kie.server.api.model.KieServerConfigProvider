@@ -1,0 +1,3 @@
+# used by KieServerConfigProviderTest
+org.kie.server.api.model.KieServerConfigProvider1
+org.kie.server.api.model.KieServerConfigProvider2

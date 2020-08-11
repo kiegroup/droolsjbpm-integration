@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.40.0-SNAPSHOT</version>
+    <version>7.42.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-case-id-generator</artifactId>
@@ -30,6 +30,11 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-case-mgmt-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
 
     <!-- Logging -->
@@ -175,6 +180,12 @@
   <profiles>
     <profile>
       <id>tomcat9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>tomcat9</value>
+        </property>
+      </activation>
       <build>
         <pluginManagement>
           <plugins>

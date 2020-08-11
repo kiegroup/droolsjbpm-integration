@@ -21,6 +21,7 @@ import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
@@ -69,6 +70,7 @@ public class JMXQuartzSchedulerTest {
     private static final String VERSION = "1.0";
 
     private static final String PROCESS_ID = "org.jbpm.sample.intermediate-timer";
+    private static final String EVENT_NODE_NAME = "Intermediate Catch Event 1";
 
     private KModuleDeploymentUnit unit = null;
     private MBeanServer mBeanServer = null;
@@ -107,7 +109,7 @@ public class JMXQuartzSchedulerTest {
 
     @Test(timeout = 30000)
     public void whenSchedulerStartedThenTimerIsFired() throws Exception {
-        long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
+        Long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
         assertNotNull(processInstanceId);
 
         countDownListener.getCountDown().await();
@@ -119,7 +121,7 @@ public class JMXQuartzSchedulerTest {
 
     @Test(timeout = 30000)
     public void whenSchedulerPausedThenTimerNotFired() throws Exception {
-        long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
+        Long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
         assertNotNull(processInstanceId);
 
         pauseScheduler();
@@ -136,7 +138,7 @@ public class JMXQuartzSchedulerTest {
 
     @Test(timeout = 40000)
     public void whenSchedulerRestartedThenTimerIsFired() throws Exception {
-        long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
+        Long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
         assertNotNull(processInstanceId);
 
         pauseScheduler();
@@ -151,6 +153,30 @@ public class JMXQuartzSchedulerTest {
         ProcessInstance pi = processService.getProcessInstance(processInstanceId);
         assertNull(pi);
     }
+    
+    @SuppressWarnings("unchecked")
+    @Test(timeout = 5000)
+    public void testTimerName() throws Exception {
+        Long processInstanceId = processService.startProcess(unit.getIdentifier(), PROCESS_ID);
+        assertNotNull(processInstanceId);
+
+        try {
+            findTargetObjectName();
+            
+            List<String> jobGroupNames = (List<String>) mBeanServer.getAttribute(oName, "JobGroupNames");
+            assertEquals("There should be just only one job group name", 1, jobGroupNames.size());
+            assertEquals("jobGroupName must be the deployment unit id", unit.getIdentifier(), jobGroupNames.get(0));
+
+            List<String> jobNames = (List<String>) mBeanServer.invoke(oName, "getJobNames",  new String[] {jobGroupNames.get(0)} , new String[] {"java.lang.String"});
+            assertEquals("There should be just only one job name", 1, jobNames.size());
+            String jobName = jobNames.get(0);
+            assertTrue(String.format("jobName '%s' must contain the node name '%s'", jobName, EVENT_NODE_NAME), jobName.contains(EVENT_NODE_NAME));
+        
+        } finally {
+            processService.abortProcessInstance(processInstanceId);
+        }
+    }
+
 
     private void awaitWithoutInterruption() throws InterruptedException {
         // Wait 20 seconds, as the timer was scheduled for 15 seconds

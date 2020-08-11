@@ -16,19 +16,23 @@
 package org.kie.server.services.optaplanner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.kie.api.runtime.KieContainer;
+import org.kie.server.api.model.KieServerConfigProviderLoader;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.services.api.KieContainerInstance;
-import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
@@ -36,27 +40,33 @@ import org.kie.server.services.prometheus.PrometheusMetricsSolverListener;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.core.impl.phase.event.PhaseLifecycleListener;
+import org.optaplanner.core.config.solver.SolverConfig;
 import org.optaplanner.core.impl.solver.AbstractSolver;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.optaplanner.OptaplannerKieServerExtension.EXTENSION_NAME;
 
 /**
  * OptaPlanner solver service.
  */
 public class SolverServiceBase {
 
+    public static final String SCAN_EXCLUDED_PACKAGES_CONFIG_ITEM = EXTENSION_NAME + ".scanExcludedPackages";
+
     private static final Logger logger = LoggerFactory.getLogger(SolverServiceBase.class);
     private final ExecutorService executor;
 
     private final KieServerRegistry context;
     private final Map<String, SolverInstanceContext> solvers = new ConcurrentHashMap<>();
+    private final List<String> scanExcludedPackages;
 
     public SolverServiceBase(KieServerRegistry context,
                              ExecutorService executorService) {
         this.context = context;
         this.executor = executorService;
+        this.scanExcludedPackages = loadScanExcludedPackages();
     }
 
     public ServiceResponse<SolverInstance> createSolver(String containerId,
@@ -94,10 +104,8 @@ public class SolverServiceBase {
                 }
 
                 try {
-                    SolverFactory<Object> solverFactory = SolverFactory.createFromKieContainerXmlResource(ci.getKieContainer(),
-                                                                                                          instance.getSolverConfigFile());
-
-                    Solver<Object> solver = solverFactory.buildSolver();
+                    Solver<Object> solver = buildSolver(ci.getKieContainer(),
+                                                        instance.getSolverConfigFile());
 
                     sic.setSolver(solver);
                     registerListener(solver, solverId);
@@ -126,6 +134,27 @@ public class SolverServiceBase {
                                          "Error creating solver '" + solverId + "' in container '" + containerId + "': " + e.getMessage(),
                                          instance);
         }
+    }
+
+    private Solver<Object> buildSolver(KieContainer container, String solverConfigResource) {
+        SolverConfig solverConfig = SolverConfig.createFromXmlResource(solverConfigResource, container.getClassLoader());
+        if (solverConfig.getScanAnnotatedClassesConfig() != null && !scanExcludedPackages.isEmpty()) {
+            List<String> scanExcludedPackagesToSet = new ArrayList<>();
+            if (solverConfig.getScanAnnotatedClassesConfig().getPackageExcludeList() != null) {
+                scanExcludedPackagesToSet.addAll(solverConfig.getScanAnnotatedClassesConfig().getPackageExcludeList());
+            }
+            scanExcludedPackagesToSet.addAll(scanExcludedPackages);
+            solverConfig.getScanAnnotatedClassesConfig().setPackageExcludeList(scanExcludedPackagesToSet);
+        }
+        SolverFactory<Object> solverFactory = SolverFactory.createFromKieContainer(container, solverConfig);
+        return newSolver(solverFactory);
+    }
+
+    /**
+     * facilitates testing
+     */
+    Solver<Object> newSolver(SolverFactory<Object> solverFactory) {
+        return solverFactory.buildSolver();
     }
 
     public ServiceResponse<SolverInstanceList> getSolvers(String containerId) {
@@ -512,7 +541,7 @@ public class SolverServiceBase {
     }
 
     private void registerListener(Solver solver, String solverId) {
-        PrometheusKieServerExtension extension = (PrometheusKieServerExtension)context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
+        PrometheusKieServerExtension extension = (PrometheusKieServerExtension) context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
         if (extension != null) {
             ((AbstractSolver) solver).addPhaseLifecycleListener(new PrometheusMetricsSolverListener(solverId));
 
@@ -528,5 +557,25 @@ public class SolverServiceBase {
             }
         }
         sic.getSolver().terminateEarly();
+    }
+
+    /**
+     * @return The list of package names that must be excluded from scanning when OptaPlanner is scanning classes
+     * marked e.g. as PlanningSolution when a SolverFactory is being built.
+     * <p>
+     * KieServer modules that wants to declare system packages for being excluded can use KieServerConfigProviders and
+     * return a list of KieServerConfigItems with the name SCAN_EXCLUDED_PACKAGES_CONFIG_ITEM.
+     */
+    private List<String> loadScanExcludedPackages() {
+        return KieServerConfigProviderLoader.getConfigItems().stream()
+                .filter(Objects::nonNull)
+                .filter(item -> SCAN_EXCLUDED_PACKAGES_CONFIG_ITEM.equals(item.getName()))
+                .map(item -> StringUtils.trimToEmpty(item.getValue()))
+                .filter(StringUtils::isNotEmpty)
+                .flatMap(value -> Arrays.stream(value.split(",")))
+                .map(StringUtils::trimToEmpty)
+                .filter(StringUtils::isNotEmpty)
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

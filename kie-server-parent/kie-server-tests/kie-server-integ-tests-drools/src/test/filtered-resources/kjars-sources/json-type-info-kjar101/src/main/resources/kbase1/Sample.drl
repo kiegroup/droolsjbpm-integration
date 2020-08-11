@@ -1,0 +1,11 @@
+package kbase1;
+
+import org.kie.server.testing.*;
+
+rule "rule-1"
+    when
+        $fact : Fact1()
+    then
+        $fact.setResultValue($fact.getParameter().getClass().getName() + "-new");
+end
+

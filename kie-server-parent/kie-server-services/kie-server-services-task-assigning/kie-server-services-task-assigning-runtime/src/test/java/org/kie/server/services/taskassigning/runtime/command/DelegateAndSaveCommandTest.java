@@ -50,6 +50,7 @@ import static org.kie.api.task.model.Status.Ready;
 import static org.kie.api.task.model.Status.Reserved;
 import static org.kie.api.task.model.Status.Suspended;
 import static org.kie.server.services.taskassigning.runtime.command.DelegateAndSaveCommand.TASK_MODIFIED_ERROR_MSG;
+import static org.kie.server.services.taskassigning.runtime.command.DelegateAndSaveCommand.TASK_MODIFIED_ERROR_MSG_1;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -145,6 +146,13 @@ public class DelegateAndSaveCommandTest extends AbstractPlanningCommandTest<Dele
         } else {
             executeWithInvalidStatus(status, previousPlanningTask);
         }
+    }
+
+    @Test
+    public void executeWithDeletedTask() {
+        when(persistenceContext.findTask(TASK_ID)).thenReturn(null);
+        Assertions.assertThatThrownBy(() -> command.execute(taskContext)).hasMessage(String.format(TASK_MODIFIED_ERROR_MSG_1,
+                                                                                                   TASK_ID));
     }
 
     private void executeWithValidStatus(Status status, boolean potentialOwnerAlreadyBelongs, PlanningTaskImpl previousPlanningTask) {

@@ -15,9 +15,6 @@
 
 package org.kie.server.services.impl.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.ArrayList;
@@ -35,6 +32,10 @@ import javax.security.jacc.PolicyContextHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.internal.identity.IdentityProvider;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class JACCIdentityProviderWildFlyTomcatTest {
 
@@ -101,6 +102,10 @@ public class JACCIdentityProviderWildFlyTomcatTest {
         assertEquals(2, jaccIdentityProvider.getRoles().size());
         assertTrue(jaccIdentityProvider.getRoles().contains(GROUP_ONE_NAME));
         assertTrue(jaccIdentityProvider.getRoles().contains(GROUP_TWO_NAME));
+        assertTrue(jaccIdentityProvider.hasRole(GROUP_ONE_NAME));
+        assertTrue(jaccIdentityProvider.hasRole(GROUP_TWO_NAME));
+        assertFalse(jaccIdentityProvider.hasRole("non_existing_role"));
+        assertFalse(jaccIdentityProvider.hasRole(null));
     }
 
     private class GroupImpl implements Group {

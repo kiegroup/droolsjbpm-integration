@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.40.0-SNAPSHOT</version>
+    <version>7.42.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -24,10 +24,6 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-anim</artifactId>
       <exclusions>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-ext</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>

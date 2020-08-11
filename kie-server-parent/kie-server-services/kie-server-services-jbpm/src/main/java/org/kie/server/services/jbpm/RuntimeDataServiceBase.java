@@ -596,6 +596,8 @@ public class RuntimeDataServiceBase {
                         .user(taskSummary.getUserId())
                         .workItemId(taskSummary.getWorkItemId())
                         .message(taskSummary.getMessage())
+                        .correlationKey(taskSummary.getCorrelationKey())
+                        .processType(taskSummary.getProcessType())
                         .build();
                 instances[counter] = task;
                 counter++;

@@ -5,7 +5,7 @@
   <parent>
     <artifactId>camel-container-tests</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.40.0-SNAPSHOT</version>
+    <version>7.42.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -173,7 +173,7 @@
             <artifactId>cargo-maven2-plugin</artifactId>
             <configuration>
               <container>
-                <containerId>wildfly18x</containerId>
+                <containerId>wildfly19x</containerId>
                 <home>${project.build.directory}/application-server/wildfly-${version.org.wildfly}</home>
                 <type>installed</type>
                 <systemProperties>
@@ -280,7 +280,7 @@
             <artifactId>cargo-maven2-plugin</artifactId>
             <configuration>
               <container>
-                <containerId>wildfly18x</containerId>
+                <containerId>wildfly19x</containerId>
                 <home>${project.build.directory}/application-server</home>
                 <type>installed</type>
                 <systemProperties>
