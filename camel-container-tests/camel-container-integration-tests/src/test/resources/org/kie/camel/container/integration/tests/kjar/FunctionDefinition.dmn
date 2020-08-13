@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2019 Red Hat, Inc. and/or its affiliates.
   ~
@@ -14,58 +14,69 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<definitions id="_function-definition" 
-    name="function-definition"
-    namespace="https://www.drools.org/kie-dmn/function-definition"
-    xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
-    xmlns:kie="https://www.drools.org/kie-dmn/function-definition"
-    xmlns:feel="http://www.omg.org/spec/FEEL/20140401">
-  <decision id="_b459d12a-f00f-4846-a12e-2883455f7d7b" name="Math">
-    <variable id="_e2be00de-3280-4ca8-a6e6-6804876c045b" name="Math"/>
-    <informationRequirement>
-      <requiredInput href="#_38863c23-d5e1-4af3-aeef-fc84706ee46b"/>
-    </informationRequirement>
-    <informationRequirement>
-      <requiredInput href="#_29fb05e4-387f-4180-aad7-8680787bb45a"/>
-    </informationRequirement>
-    <context>
-      <contextEntry>
-        <variable id="_d6970f58-cacc-4028-a04d-5fc38b9846b2" name="SumFunction" typeRef="feel:function"/>
-        <functionDefinition>
-          <formalParameter name="v1" typeRef="feel:number"/>
-          <formalParameter name="v2" typeRef="feel:number"/>
-          <literalExpression typeRef="feel:number">
-            <text>v1+v2</text>
-          </literalExpression>
-        </functionDefinition>
-      </contextEntry>
-      <contextEntry>
-        <variable id="_f2392e71-805f-4404-98ee-c510b229fccd" name="Sum" typeRef="feel:number"/>
-        <invocation>
-          <literalExpression>
-            <text>SumFunction</text>
-          </literalExpression>
-          <binding>
-            <parameter name="v1"/>
-            <literalExpression>
-              <text>a</text>
-            </literalExpression>
-          </binding>
-          <binding>
-            <parameter name="v2"/>
-            <literalExpression>
-              <text>b</text>
-            </literalExpression>
-          </binding>
-        </invocation>
-      </contextEntry>
-    </context>
-  </decision>
-  <inputData id="_38863c23-d5e1-4af3-aeef-fc84706ee46b" name="a">
-    <variable id="_102502ce-b714-4d1b-ad8f-82635b9fd2f1" name="a" typeRef="feel:number"/>
-  </inputData>
-  <inputData id="_29fb05e4-387f-4180-aad7-8680787bb45a" name="b">
-    <variable id="_e876cfa3-f9dc-4f59-b3fe-bbab5b8a450e" name="b" typeRef="feel:number"/>
-  </inputData>
-</definitions>
+<semantic:definitions xmlns="https://www.drools.org/kie-dmn/function-definition"
+                      xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+                      xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+                      xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/"
+                      xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/"
+                      xmlns:kie="https://www.drools.org/kie-dmn/function-definition"
+                      xmlns:semantic="http://www.omg.org/spec/DMN/20180521/MODEL/"
+                      id="_function-definition"
+                      name="function-definition"
+                      namespace="https://www.drools.org/kie-dmn/function-definition">
+   <semantic:decision id="_b459d12a-f00f-4846-a12e-2883455f7d7b" name="Math">
+      <semantic:variable id="_e2be00de-3280-4ca8-a6e6-6804876c045b" name="Math"/>
+      <semantic:informationRequirement>
+         <semantic:requiredInput href="#_38863c23-d5e1-4af3-aeef-fc84706ee46b"/>
+      </semantic:informationRequirement>
+      <semantic:informationRequirement>
+         <semantic:requiredInput href="#_29fb05e4-387f-4180-aad7-8680787bb45a"/>
+      </semantic:informationRequirement>
+      <semantic:context>
+         <semantic:contextEntry>
+            <semantic:variable id="_d6970f58-cacc-4028-a04d-5fc38b9846b2"
+                               name="SumFunction"
+                               typeRef="function"/>
+            <semantic:functionDefinition>
+               <semantic:formalParameter name="v1" typeRef="number"/>
+               <semantic:formalParameter name="v2" typeRef="number"/>
+               <semantic:literalExpression typeRef="number">
+                  <semantic:text>v1+v2</semantic:text>
+               </semantic:literalExpression>
+            </semantic:functionDefinition>
+         </semantic:contextEntry>
+         <semantic:contextEntry>
+            <semantic:variable id="_f2392e71-805f-4404-98ee-c510b229fccd"
+                               name="Sum"
+                               typeRef="number"/>
+            <semantic:invocation>
+               <semantic:literalExpression>
+                  <semantic:text>SumFunction</semantic:text>
+               </semantic:literalExpression>
+               <semantic:binding>
+                  <semantic:parameter name="v1"/>
+                  <semantic:literalExpression>
+                     <semantic:text>a</semantic:text>
+                  </semantic:literalExpression>
+               </semantic:binding>
+               <semantic:binding>
+                  <semantic:parameter name="v2"/>
+                  <semantic:literalExpression>
+                     <semantic:text>b</semantic:text>
+                  </semantic:literalExpression>
+               </semantic:binding>
+            </semantic:invocation>
+         </semantic:contextEntry>
+      </semantic:context>
+   </semantic:decision>
+   <semantic:inputData id="_38863c23-d5e1-4af3-aeef-fc84706ee46b" name="a">
+      <semantic:variable id="_102502ce-b714-4d1b-ad8f-82635b9fd2f1"
+                         name="a"
+                         typeRef="number"/>
+   </semantic:inputData>
+   <semantic:inputData id="_29fb05e4-387f-4180-aad7-8680787bb45a" name="b">
+      <semantic:variable id="_e876cfa3-f9dc-4f59-b3fe-bbab5b8a450e"
+                         name="b"
+                         typeRef="number"/>
+   </semantic:inputData>
+</semantic:definitions>
