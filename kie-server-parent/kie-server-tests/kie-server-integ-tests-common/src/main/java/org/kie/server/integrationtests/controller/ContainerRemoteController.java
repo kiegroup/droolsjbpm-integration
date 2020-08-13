@@ -23,6 +23,7 @@ import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.deployable.DeployableType;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.deployer.Deployer;
+import org.codehaus.cargo.container.jboss.JBossPropertySet;
 import org.codehaus.cargo.container.property.RemotePropertySet;
 import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.container.weblogic.WebLogicPropertySet;
@@ -47,6 +48,9 @@ public class ContainerRemoteController {
 
         configuration.setProperty(ServletPropertySet.PORT, containerPort);
 
+        if(TestConfig.isJbossManagementPortProvided()) {
+            configuration.setProperty(JBossPropertySet.JBOSS_MANAGEMENT_HTTP_PORT, TestConfig.getJbossManagementPort());
+        }
         if(TestConfig.isCargoRemoteUsernameProvided()) {
             configuration.setProperty(RemotePropertySet.USERNAME, TestConfig.getCargoRemoteUsername());
         }
