@@ -25,8 +25,6 @@ import org.kie.server.services.impl.storage.KieServerState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.stream.Collectors.joining;
-
 public class ContainerManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ContainerManager.class);
@@ -36,14 +34,11 @@ public class ContainerManager {
     }
 
     public void installContainersSync(KieServerImpl kieServer, Set<KieContainerResource> containers, KieServerState currentState, KieServerSetup kieServerSetup) {
+        logger.info("About to install containers '{}' on kie server '{}'", containers, kieServer);
         if (containers == null) {
             kieServer.markAsReady();
             return;
         }
-
-        String str = containers.stream().map(KieContainerResource::toString).collect(joining("\n\t"));
-        logger.info("About to install containers on kie server \n\t{}:\n\t{}", kieServer, str);
-
         for (KieContainerResource containerResource : containers) {
             if (KieContainerStatus.STARTED.equals(containerResource.getStatus())) {
                 kieServer.createContainer(containerResource.getContainerId(), containerResource);

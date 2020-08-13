@@ -401,15 +401,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 return;
             }
             ReleaseId releaseId = kieContainerInstance.getKieContainer().getReleaseId();
-            if (releaseId == null) {
-                releaseId = kieContainerInstance.getResource().getReleaseId();
-            }
 
             KModuleDeploymentUnit unit = new CustomIdKmoduleDeploymentUnit(id, releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion());
 
             if (!hasDefaultSession) {
-                unit.setKbaseName(kieContainer.getKieBaseModel(id).getName());
-                unit.setKsessionName(kieContainer.getKieSessionNamesInKieBase(id).iterator().next());
+                unit.setKbaseName(kbaseNames.iterator().next());
+                unit.setKsessionName(ksessionNames.iterator().next());
             }
             // override defaults if config options are given
             KieServerConfig config = new KieServerConfig(kieContainerInstance.getResource().getConfigItems());
@@ -423,13 +420,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 unit.setMergeMode(MergeMode.valueOf(mergeMode));
             }
             String ksession = config.getConfigItemValue(KieServerConstants.PCFG_KIE_SESSION);
-            if (ksession != null) {
-                unit.setKsessionName(ksession);
-            }
+            unit.setKsessionName(ksession);
             String kbase = config.getConfigItemValue(KieServerConstants.PCFG_KIE_BASE);
-            if (kbase != null && !kbase.isEmpty()) {
-                unit.setKbaseName(kbase);
-            }
+            unit.setKbaseName(kbase);
 
             // reuse kieContainer to avoid unneeded bootstrap
             unit.setKieContainer(kieContainer);

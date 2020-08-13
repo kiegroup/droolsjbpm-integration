@@ -32,7 +32,6 @@ public class KieServerProperties implements InitializingBean {
     private String controllers = "";
     private String serverId = "SpringBoot";
     private String serverName = "KieServer-SpringBoot";
-    private boolean classPathContainer;
 
     private Swagger swagger = new Swagger();
     
@@ -86,7 +85,6 @@ public class KieServerProperties implements InitializingBean {
         this.addons = addons;
     }
 
-
     @Override
     public void afterPropertiesSet() throws Exception {
         if (!this.addons.isEmpty()) {
@@ -95,16 +93,6 @@ public class KieServerProperties implements InitializingBean {
             }
         }
     }
-
-
-    public boolean isClassPathContainer() {
-        return classPathContainer;
-    }
-
-    public void setClassPathContainer(boolean classPathContainer) {
-        this.classPathContainer = classPathContainer;
-    }
-
 
     public static class Swagger {
 

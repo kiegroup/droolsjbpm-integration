@@ -49,7 +49,6 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.eq;
 
 public class KieServerImplOperationTest {
 
@@ -80,7 +79,7 @@ public class KieServerImplOperationTest {
         kieServer = new KieServerImpl(repository, services) {
 
             @Override
-            public Map<String, Object> getContainerParameters(InternalKieContainer container, List<Message> messages) {
+            protected Map<String, Object> getContainerParameters(org.kie.api.builder.ReleaseId releaseId, List<Message> messages) {
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(KieServerConstants.KIE_SERVER_PARAM_MESSAGES, messages);
                 return parameters;
@@ -201,7 +200,7 @@ public class KieServerImplOperationTest {
         Mockito.when(services.getRepository()).thenReturn(mockedKieRepository);
 
         MutableBoolean fail = new MutableBoolean(false);
-        Mockito.when(services.newKieContainer(eq(containerId), eq(releaseId))).then(e -> {
+        Mockito.when(services.newKieContainer(containerId, releaseId)).then(e -> {
             if (fail.isTrue()) {
                 throw new IllegalStateException("already exists in container");
             } else {
