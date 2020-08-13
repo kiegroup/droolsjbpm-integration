@@ -89,7 +89,6 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-
         // do any other bootstrapping rule service requires
         Set<Class<?>> extraClasses = new HashSet<Class<?>>();
 

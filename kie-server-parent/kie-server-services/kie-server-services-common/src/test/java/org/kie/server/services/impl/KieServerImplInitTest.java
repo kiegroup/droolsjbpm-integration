@@ -15,6 +15,9 @@
 
 package org.kie.server.services.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,9 +37,6 @@ import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class KieServerImplInitTest {
 
@@ -112,7 +112,7 @@ public class KieServerImplInitTest {
             }
 
             @Override
-            public KieServerController getController() {
+            protected KieServerController getController() {
                 return new KieServerController() {
                     
                     
@@ -154,9 +154,10 @@ public class KieServerImplInitTest {
             }
 
             @Override
-            public KieServerController getController() {
+            protected KieServerController getController() {
                 return new KieServerController() {
-
+                    
+                    
                     @Override
                     public void disconnect(KieServerInfo serverInfo) {                        
                     }
