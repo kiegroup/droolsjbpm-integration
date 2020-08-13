@@ -16,7 +16,6 @@
                     <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
                     <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-                    <prepare-package>org.kie:kie-maven-plugin:package-dependencies-kjar</prepare-package>
                     <package>org.apache.maven.plugins:maven-jar-plugin:jar</package>
                     <install>org.apache.maven.plugins:maven-install-plugin:install</install>
                     <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
