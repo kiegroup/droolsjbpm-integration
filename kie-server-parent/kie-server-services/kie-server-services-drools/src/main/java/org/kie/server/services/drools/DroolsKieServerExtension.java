@@ -96,9 +96,6 @@ public class DroolsKieServerExtension implements KieServerExtension {
         // create kbases so declared types can be created
         Collection<String> kbases = kieContainerInstance.getKieContainer().getKieBaseNames();
         for (String kbase : kbases) {
-            if (kbase.startsWith("KiePMML")) {
-                continue;
-            }
             kieContainerInstance.getKieContainer().getKieBase(kbase);
         }
 
