@@ -82,7 +82,7 @@ public class SimulationFilterPathFormatConverter implements
                             }
                         }
                         BigDecimal bd = new BigDecimal(probability);
-                        bd = bd.setScale(5, RoundingMode.ROUND_HALF_UP);
+                        bd = bd.setScale(5, RoundingMode.HALF_UP);
                         probability = bd.doubleValue();
                         if (probability != 100) {
                             throw new IllegalArgumentException("Process is not valid for simulation - use validation to find errors");
