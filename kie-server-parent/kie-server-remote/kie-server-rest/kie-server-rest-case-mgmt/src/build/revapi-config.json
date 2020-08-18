@@ -108,7 +108,67 @@
                     "methodName": "getCaseInstancesByDefinition",
                     "elementKind": "method",
                     "justification": "https://issues.redhat.com/browse/JBPM-9223"
-                }
+                },
+                {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "io.swagger.annotations.ApiOperation",
+                   "annotation": "@io.swagger.annotations.ApiOperation(\"Queries cases by variables\")",
+                   "package": "org.kie.server.remote.rest.casemgmt",
+                   "classSimpleName": "CaseQueryResource",
+                   "methodName": "queryCaseByVariables",
+                   "elementKind": "method",
+                   "justification": "[JBPM-9296] Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "org.kie.server.remote.rest.common.marker.KieServerEndpoint",
+                   "annotation": "@org.kie.server.remote.rest.common.marker.KieServerEndpoint(categories = {org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.DEFAULT, org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.HISTORY})",
+                   "package": "org.kie.server.remote.rest.casemgmt",
+                   "classSimpleName": "CaseQueryResource",
+                   "methodName": "queryCaseByVariables",
+                   "elementKind": "method",
+                   "justification": "[JBPM-9296] Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "io.swagger.annotations.ApiOperation",
+                   "annotation": "@io.swagger.annotations.ApiOperation(\"Queries cases tasks by variables\")",
+                   "package": "org.kie.server.remote.rest.casemgmt",
+                   "classSimpleName": "CaseQueryResource",
+                   "methodName": "queryCaseUserTasksByVariables",
+                   "elementKind": "method",
+                   "justification": "[JBPM-9296] Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "org.kie.server.remote.rest.common.marker.KieServerEndpoint",
+                   "annotation": "@org.kie.server.remote.rest.common.marker.KieServerEndpoint(categories = {org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.DEFAULT, org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.HISTORY})",
+                   "package": "org.kie.server.remote.rest.casemgmt",
+                   "classSimpleName": "CaseQueryResource",
+                   "methodName": "queryCaseUserTasksByVariables",
+                   "elementKind": "method",
+                   "justification": "[JBPM-9296] Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseQueryResource::queryCaseByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "io.swagger.annotations.ApiOperation",
+                   "annotation": "@io.swagger.annotations.ApiOperation(\"Queries cases by variables and tasks\")",
+                   "package": "org.kie.server.remote.rest.casemgmt",
+                   "classSimpleName": "CaseQueryResource",
+                   "methodName": "queryCaseByVariables",
+                   "elementKind": "method",
+                   "justification": "[JBPM-9296] Self contained Audit/History module"
+                 }
             ]
         }
     }
