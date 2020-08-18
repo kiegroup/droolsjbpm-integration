@@ -102,6 +102,10 @@ public final class QueryParamFactory {
         return new QueryParam(column, "TYPE", Arrays.asList(type));
     }
 
+    public static QueryParam history() {
+        return new QueryParam("TABLE", "MODE", Arrays.asList("HISTORY"));
+    }
+
     public static QueryParam onlyActiveTasks() {
         return in("TASK_STATUS", "Created", "Ready", "Reserved", "InProgress", "Suspended");
     }
