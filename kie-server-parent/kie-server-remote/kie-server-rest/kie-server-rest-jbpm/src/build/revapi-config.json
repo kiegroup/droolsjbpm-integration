@@ -68,6 +68,77 @@
                    "fieldName": "EMAIL_NOTIFICATION_XML",
                    "elementKind": "field",
                    "justification": "added email organization entity in notifications"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "class org.kie.server.remote.rest.jbpm.QueryDataResource",
+                   "new": "class org.kie.server.remote.rest.jbpm.QueryDataResource",
+                   "annotationType": "org.kie.server.remote.rest.common.marker.KieServerEndpoint",
+                   "annotation": "@org.kie.server.remote.rest.common.marker.KieServerEndpoint(categories = {org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.DEFAULT, org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.HISTORY})",
+                   "package": "org.kie.server.remote.rest.jbpm",
+                   "classSimpleName": "QueryDataResource",
+                   "elementKind": "class",
+                   "justification": "JBPM-9296 Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryProcessesByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryProcessesByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "io.swagger.annotations.ApiOperation",
+                   "annotation": "@io.swagger.annotations.ApiOperation(\"Queries processes by variables\")",
+                   "package": "org.kie.server.remote.rest.jbpm",
+                   "classSimpleName": "RuntimeDataResource",
+                   "methodName": "queryProcessesByVariables",
+                   "elementKind": "method",
+                   "justification": "JBPM-9296 Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryProcessesByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryProcessesByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "org.kie.server.remote.rest.common.marker.KieServerEndpoint",
+                   "annotation": "@org.kie.server.remote.rest.common.marker.KieServerEndpoint(categories = {org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.DEFAULT, org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.HISTORY})",
+                   "package": "org.kie.server.remote.rest.jbpm",
+                   "classSimpleName": "RuntimeDataResource",
+                   "methodName": "queryProcessesByVariables",
+                   "elementKind": "method",
+                   "justification": "JBPM-9296 Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "io.swagger.annotations.ApiOperation",
+                   "annotation": "@io.swagger.annotations.ApiOperation(\"Queries process tasks by variables\")",
+                   "package": "org.kie.server.remote.rest.jbpm",
+                   "classSimpleName": "RuntimeDataResource",
+                   "methodName": "queryUserTasksByVariables",
+                   "elementKind": "method",
+                   "justification": "JBPM-9296 Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryUserTasksByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "org.kie.server.remote.rest.common.marker.KieServerEndpoint",
+                   "annotation": "@org.kie.server.remote.rest.common.marker.KieServerEndpoint(categories = {org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.DEFAULT, org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType.HISTORY})",
+                   "package": "org.kie.server.remote.rest.jbpm",
+                   "classSimpleName": "RuntimeDataResource",
+                   "methodName": "queryUserTasksByVariables",
+                   "elementKind": "method",
+                   "justification": "JBPM-9296 Self contained Audit/History module"
+                 },
+                 {
+                   "code": "java.annotation.added",
+                   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryProcessesByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::queryProcessesByVariables(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+                   "annotationType": "io.swagger.annotations.ApiOperation",
+                   "annotation": "@io.swagger.annotations.ApiOperation(\"Queries processes by variables and tasks\")",
+                   "package": "org.kie.server.remote.rest.jbpm",
+                   "classSimpleName": "RuntimeDataResource",
+                   "methodName": "queryProcessesByVariables",
+                   "elementKind": "method",
+                   "justification": "JBPM-9296 Self contained Audit/History module"
                  }
             ]
         }

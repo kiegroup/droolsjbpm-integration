@@ -15,6 +15,8 @@
 
 package org.kie.server.remote.rest.common;
 
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_REST_MODE_READONLY;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import org.kie.server.remote.rest.common.marker.KieServerEndpointRequestFilter;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
@@ -48,6 +51,10 @@ public class KieServerApplication extends Application {
 				for (KieServerExtension extension : extensions) {
 					addAll(extension.getAppComponents(SupportedTransports.REST));
 				}
+                // add filter only if the history mode is active
+                if (Boolean.getBoolean(KIE_SERVER_REST_MODE_READONLY)) {
+                    add(new KieServerEndpointRequestFilter());
+                }
 			}
 		};
 	}

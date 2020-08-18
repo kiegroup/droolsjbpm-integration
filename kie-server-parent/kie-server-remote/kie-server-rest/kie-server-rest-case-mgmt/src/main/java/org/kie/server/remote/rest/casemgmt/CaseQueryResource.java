@@ -48,6 +48,8 @@ import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
+import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.slf4j.Logger;
@@ -376,10 +378,12 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    @ApiOperation(value = "Queries cases by variables and tasks")
     @POST
     @Path(RestURI.VARIABLES_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryCaseByVariables(@Context HttpHeaders headers, String payload,
                                          @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
                                          @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
@@ -400,10 +404,12 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     }
 
+    @ApiOperation(value = "Queries cases tasks by variables")
     @POST
     @Path(RestURI.VARIABLES_TASKS_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryCaseUserTasksByVariables(@Context HttpHeaders headers,
                                                   String payload,
                                                   @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 

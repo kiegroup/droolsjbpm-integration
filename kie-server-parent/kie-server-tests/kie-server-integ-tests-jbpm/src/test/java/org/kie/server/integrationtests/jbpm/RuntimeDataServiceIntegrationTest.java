@@ -39,6 +39,7 @@ import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -67,6 +68,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.kie.server.api.util.QueryParamFactory.equalsTo;
+import static org.kie.server.api.util.QueryParamFactory.history;
 import static org.kie.server.api.util.QueryParamFactory.list;
 import static org.kie.server.api.util.QueryParamFactory.onlyActiveTasks;
 import static org.kie.server.api.util.QueryParamFactory.onlyCompletedTasks;
@@ -1866,6 +1868,12 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertNotNull(listProcesses);
         listProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
 
+        SearchQueryFilterSpec specHistory = new SearchQueryFilterSpec();
+        specHistory.setAttributesQueryParams(list(history(), equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
+        List<ProcessInstanceCustomVars> listHistoryProcesses = queryClient.queryProcessesByVariables(specHistory, 0, 2);
+        assertNotNull(listHistoryProcesses);
+        listHistoryProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
+        
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
         List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);

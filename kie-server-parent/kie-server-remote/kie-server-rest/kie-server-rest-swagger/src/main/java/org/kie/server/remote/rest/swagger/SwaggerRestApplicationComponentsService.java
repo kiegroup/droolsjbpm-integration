@@ -15,18 +15,27 @@
 
 package org.kie.server.remote.rest.swagger;
 
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_REST_MODE_READONLY;
+import static org.kie.server.remote.rest.swagger.ReadOnlySwaggerDecoration.SWAGGER_EXTENSION_READ_ONLY;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.swagger.SwaggerKieServerExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import io.swagger.config.FilterFactory;
+import io.swagger.core.filter.AbstractSpecFilter;
+import io.swagger.core.filter.SwaggerSpecFilter;
+import io.swagger.jaxrs.ext.SwaggerExtension;
+import io.swagger.jaxrs.ext.SwaggerExtensions;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
+import io.swagger.model.ApiDescription;
+import io.swagger.models.Operation;
 
 public class SwaggerRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
@@ -39,6 +48,21 @@ public class SwaggerRestApplicationComponentsService implements KieServerApplica
 			return Collections.emptyList();
 		}
 				
+        // add filter only if the history mode is active
+        if (Boolean.getBoolean(KIE_SERVER_REST_MODE_READONLY)) {
+            SwaggerSpecFilter filter = new AbstractSpecFilter() {
+
+                @Override
+                public boolean isOperationAllowed(Operation operation, ApiDescription api, Map<String, List<String>> params, Map<String, String> cookies, Map<String, List<String>> headers) {
+                    return operation.getVendorExtensions().containsKey(SWAGGER_EXTENSION_READ_ONLY);
+                }
+
+            };
+            FilterFactory.setFilter(filter);
+            List<SwaggerExtension> extensions = new ArrayList<>(SwaggerExtensions.getExtensions());
+            extensions.add(new ReadOnlySwaggerDecoration());
+            SwaggerExtensions.setExtensions(extensions);
+        }
 		List<Object> components = new ArrayList<Object>(2);
 		// Swagger Resources
 		components.add(new KieApiListingResource());
