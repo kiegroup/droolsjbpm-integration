@@ -77,6 +77,8 @@ public class TestConfig {
     private static final StringTestParameter CARGO_REMOTE_PASSWORD = new StringTestParameter("cargo.remote.password");
     private static final StringTestParameter KIE_SERVER_WAR_PATH = new StringTestParameter("kie.server.war.path");
 
+    private static final StringTestParameter JBOSS_MANAGEMENT_PORT = new StringTestParameter("cargo.jboss.management-http.port");
+
     private static final StringTestParameter WEBLOGIC_HOME = new StringTestParameter("weblogic.home");
 
     private static final StringTestParameter JMS_SKIP = new StringTestParameter("jms.skip");
@@ -399,6 +401,20 @@ public class TestConfig {
      */
     public static String getContainerPort() {
         return TestConfig.CONTAINER_PORT.getParameterValue();
+    }
+
+    /**
+     * @return JBoss management port.
+     */
+    public static String getJbossManagementPort() {
+        return TestConfig.JBOSS_MANAGEMENT_PORT.getParameterValue();
+    }
+
+    /**
+     * @return True if JBoss management port is provided.
+     */
+    public static boolean isJbossManagementPortProvided() {
+        return TestConfig.JBOSS_MANAGEMENT_PORT.isParameterConfigured();
     }
 
     /**
