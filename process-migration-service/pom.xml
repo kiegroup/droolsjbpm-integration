@@ -26,7 +26,9 @@
          SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
     <kie.server.version>${project.version}</kie.server.version>
     <container.hostname>localhost</container.hostname>
-    <container.port>19090</container.port>
+    <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
+         is not able to override the value of the property. The port number would then always be the same
+         (the default one, unless changed from outside) -->
     <kie.server.context>kie-server</kie.server.context>
     <cargo.container.id>valid-id-needs-to-be-specified-in-appropriate-container-profile</cargo.container.id>
     <kie.server.classifier>ee8</kie.server.classifier>
@@ -429,6 +431,28 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>reserve-network-port</id>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <portNames>
+                <portName>container.port</portName>
+                <portName>cargo.jboss.ajp.port</portName>
+                <portName>cargo.jboss.https.port</portName>
+                <portName>cargo.jboss.management-http.port</portName>
+                <portName>cargo.jboss.management-https.port</portName>
+              </portNames>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-maven2-plugin</artifactId>
         <configuration>
@@ -604,6 +628,10 @@
                   <cargo.jboss.management-http.port>19991</cargo.jboss.management-http.port>
                   <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                   <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                  <cargo.jboss.ajp.port>${cargo.jboss.ajp.port}</cargo.jboss.ajp.port>
+                  <cargo.jboss.https.port>${cargo.jboss.https.port}</cargo.jboss.https.port>
+                  <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
+                  <cargo.jboss.management-https.port>${cargo.jboss.management-https.port}</cargo.jboss.management-https.port>
                 </properties>
                 <datasources>
                   <datasource>
