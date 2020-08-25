@@ -109,6 +109,8 @@ public class JSONMarshaller implements Marshaller {
         
         private boolean writeNull;
 
+        private ClassLoader classLoader;
+
         public JSONContext() {
             this.reset();
         }
@@ -117,6 +119,15 @@ public class JSONMarshaller implements Marshaller {
             stripped = false;
             wrap = false;
             writeNull = true;
+            classLoader = null;
+        }
+
+        public void setClassLoader(ClassLoader classLoader) {
+            this.classLoader = classLoader;
+        }
+
+        public ClassLoader getClassLoader() {
+            return classLoader;
         }
 
         public boolean isStripped() {
@@ -280,8 +291,6 @@ public class JSONMarshaller implements Marshaller {
 
             deserializeObjectMapper.registerModule(modDeser);
             deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(introspectorPair));
-            // Don't use withClassLoader() because we rely on thread context classloader. We use classLoader only for fallback
-            deserializeObjectMapper.setTypeFactory(FallbackableTypeFactory.defaultInstance().withFallbackClassLoader(classLoader));
         }
 
         if (formatDate) {
@@ -351,6 +360,7 @@ public class JSONMarshaller implements Marshaller {
     public <T> T unmarshall(String serializedInput, Class<T> type) {
 
         try {
+            jsonContext.get().setClassLoader(this.classLoader);
             Class<?> actualType = classesSet.contains(type) ? Object.class : type;
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
         } catch (IOException e) {
@@ -868,6 +878,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromArray(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
+                ctxt = new FallbackableDeserializationContext(ctxt, jsonContext.get().getClassLoader());
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
                 Object value = deser.deserialize(jp, ctxt);
@@ -881,6 +892,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromObject(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
+                ctxt = new FallbackableDeserializationContext(ctxt, jsonContext.get().getClassLoader());
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
 
@@ -905,6 +917,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromScalar(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
+                ctxt = new FallbackableDeserializationContext(ctxt, jsonContext.get().getClassLoader());
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass())) {
                     try {
@@ -927,6 +940,7 @@ public class JSONMarshaller implements Marshaller {
         public Object deserializeTypedFromAny(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             ClassLoader current = Thread.currentThread().getContextClassLoader();
             try {
+                ctxt = new FallbackableDeserializationContext(ctxt, jsonContext.get().getClassLoader());
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass())) {
                     try {
