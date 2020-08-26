@@ -1,0 +1,25 @@
+<persistence version="2.0"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+  <persistence-unit name="org.jbpm.audit" transaction-type="JTA">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <mapping-file>META-INF/jbpm-audit-orm.xml</mapping-file>
+
+    <class>org.jbpm.services.task.audit.impl.model.TaskEventImpl</class>
+    <class>org.jbpm.services.task.audit.impl.model.AuditTaskImpl</class>
+    <class>org.jbpm.services.task.audit.impl.model.TaskVariableImpl</class>
+    <class>org.jbpm.services.task.audit.impl.model.BAMTaskSummaryImpl</class>
+    <class>org.jbpm.process.audit.NodeInstanceLog</class>
+    <class>org.jbpm.process.audit.VariableInstanceLog</class>
+    <class>org.jbpm.process.audit.ProcessInstanceLog</class>
+
+    <properties>  
+      <property name="packagesToScan" value="org.kie.server.spring.boot.autoconfiguration.audit.replication"/>
+      <property name="hibernate.connection.handling_mode" value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION"/>
+    </properties>
+  </persistence-unit>
+
+</persistence>
