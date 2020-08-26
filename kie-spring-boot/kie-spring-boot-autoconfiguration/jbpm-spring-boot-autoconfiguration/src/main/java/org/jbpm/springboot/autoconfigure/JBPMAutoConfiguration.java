@@ -19,19 +19,13 @@ package org.jbpm.springboot.autoconfigure;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
 import org.dashbuilder.dataprovider.sql.SQLDataSetProvider;
@@ -83,7 +77,6 @@ import org.jbpm.services.task.deadlines.NotificationListener;
 import org.jbpm.services.task.deadlines.notifications.impl.NotificationListenerManager;
 import org.jbpm.services.task.identity.DefaultUserInfo;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
-import org.jbpm.springboot.persistence.JBPMPersistenceUnitPostProcessor;
 import org.jbpm.springboot.quartz.SpringConnectionProvider;
 import org.jbpm.springboot.security.SpringSecurityIdentityProvider;
 import org.jbpm.springboot.security.SpringSecurityUserGroupCallback;
@@ -117,21 +110,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
-import org.springframework.core.type.classreading.MetadataReader;
-import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
-import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
-import org.springframework.util.ClassUtils;
 
 @Configuration
 @ConditionalOnClass({ KModuleDeploymentService.class })
@@ -143,8 +125,7 @@ public class JBPMAutoConfiguration {
     protected static final String PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
     protected static final String PERSISTENCE_XML_LOCATION = "classpath:/META-INF/jbpm-persistence.xml";
 
-    private static final String CLASS_RESOURCE_PATTERN = "/**/*.class";
-    private static final String PACKAGE_INFO_SUFFIX = ".package-info";
+
 
     private static final String QUARTZ_PROPS = "org.quartz.properties";
     private static final String QUARTZ_FAILED_DELAY = "org.jbpm.timer.quartz.delay";
@@ -195,70 +176,11 @@ public class JBPMAutoConfiguration {
     @Primary
     @ConditionalOnMissingBean(name = "entityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource, JpaProperties jpaProperties){
-        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-        factoryBean.setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
-        factoryBean.setPersistenceXmlLocation(PERSISTENCE_XML_LOCATION);
-        factoryBean.setJtaDataSource(dataSource);
-        factoryBean.setJpaPropertyMap(jpaProperties.getProperties());
-        HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-        adapter.setPrepareConnection(false);
-        factoryBean.setJpaVendorAdapter(adapter);
-
-        List<PersistenceUnitPostProcessor> postProcessors = new ArrayList<>();
-        String packagesToScan = jpaProperties.getProperties().get("entity-scan-packages");
-        if (packagesToScan != null) {
-            postProcessors.add(new PersistenceUnitPostProcessor() {
-
-                @Override
-                public void postProcessPersistenceUnitInfo(MutablePersistenceUnitInfo pui) {
-                    Set<TypeFilter> entityTypeFilters = new LinkedHashSet<TypeFilter>(3);
-                    entityTypeFilters.add(new AnnotationTypeFilter(Entity.class, false));
-                    entityTypeFilters.add(new AnnotationTypeFilter(Embeddable.class, false));
-                    entityTypeFilters.add(new AnnotationTypeFilter(MappedSuperclass.class, false));
-
-                    ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-
-                    if (packagesToScan != null) {
-                        for (String pkg : packagesToScan.split(",")) {
-                            try {
-                                String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
-                                        ClassUtils.convertClassNameToResourcePath(pkg) + CLASS_RESOURCE_PATTERN;
-                                Resource[] resources = resourcePatternResolver.getResources(pattern);
-                                MetadataReaderFactory readerFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
-                                for (Resource resource : resources) {
-                                    if (resource.isReadable()) {
-                                        MetadataReader reader = readerFactory.getMetadataReader(resource);
-                                        String className = reader.getClassMetadata().getClassName();
-                                        if (matchesFilter(reader, readerFactory, entityTypeFilters)) {
-                                            pui.addManagedClassName(className);
-                                        } else if (className.endsWith(PACKAGE_INFO_SUFFIX)) {
-                                            pui.addManagedPackage(className.substring(0, className.length() - PACKAGE_INFO_SUFFIX.length()));
-                                        }
-                                    }
-                                }
-                            }
-                            catch (IOException ex) {
-                                throw new PersistenceException("Failed to scan classpath for unlisted entity classes", ex);
-                            }
-                        }
-                    }
-
-                }
-
-                private boolean matchesFilter(MetadataReader reader, MetadataReaderFactory readerFactory, Set<TypeFilter> entityTypeFilters) throws IOException {
-                    for (TypeFilter filter : entityTypeFilters) {
-                        if (filter.match(reader, readerFactory)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            });
-        }
-
-        postProcessors.addAll(applicationContext.getBeansOfType(JBPMPersistenceUnitPostProcessor.class).values());
-        factoryBean.setPersistenceUnitPostProcessors(postProcessors.toArray(new PersistenceUnitPostProcessor[0]));
-        return factoryBean;
+        return EntityManagerFactoryHelper.create(applicationContext,
+                                                 dataSource,
+                                                 jpaProperties,
+                                                 PERSISTENCE_UNIT_NAME,
+                                                 PERSISTENCE_XML_LOCATION);
     }
 
     @Bean
