@@ -101,6 +101,7 @@ import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorImpl;
 import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorManager;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
@@ -708,12 +709,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
     protected void addTaskBAMEventListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
         final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
         if (descriptor.getAuditMode() != AuditMode.NONE) {
-            descriptor.getBuilder().addTaskEventListener(
-                    new ObjectModel(
+            List<ObjectModel> oldList = descriptor.getTaskEventListeners();
+            ObjectModel model = new ObjectModel(
                             "mvel",
                             "new org.jbpm.services.task.lifecycle.listeners.BAMTaskEventListener(false)"
-                    )
             );
+            if(!oldList.contains(model)) {
+                if(!oldList.isEmpty()) {
+                    oldList.add(0, model);
+                } else {
+                    oldList.add(model);
+                }
+            }
+            descriptor.getBuilder().setTaskEventListeners(oldList);
             unit.setDeploymentDescriptor(descriptor);
         }
     }
@@ -743,8 +751,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     protected DeploymentDescriptor getDeploymentDescriptor(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
         DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
         if (descriptor == null) {
-            List<DeploymentDescriptor> descriptorHierarchy = DeploymentDescriptorManagerUtil.getDeploymentDescriptorHierarchy(deploymentDescriptorManager, kieContainer);
-            descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
+            return DeploymentDescriptorManagerUtil.getDeploymentDescriptor(deploymentDescriptorManager, kieContainer, MergeMode.MERGE_COLLECTIONS);
         }
         return descriptor;
     }
