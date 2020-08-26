@@ -60,6 +60,8 @@ import org.jbpm.kie.services.impl.admin.ProcessInstanceMigrationServiceImpl;
 import org.jbpm.kie.services.impl.admin.UserTaskAdminServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.kie.services.impl.query.QueryServiceImpl;
+import org.jbpm.persistence.api.integration.EventEmitter;
+import org.jbpm.persistence.api.integration.EventManagerProvider;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.DefinitionService;
@@ -142,6 +144,7 @@ public class JBPMAutoConfiguration {
     private PlatformTransactionManager transactionManager;
 
     private List<NotificationListener> notificationListeners;
+    private List<EventEmitter> eventEmitters;
 
     public JBPMAutoConfiguration(PlatformTransactionManager transactionManager,
                                  JBPMProperties properties,
@@ -289,6 +292,29 @@ public class JBPMAutoConfiguration {
             NotificationListenerManager.get().registerAdditionalNotificationListener(new ArrayList<>(foundBeans.values()));
         }
         return notificationListeners;
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean(name = "eventEmitters")
+    public List<EventEmitter> eventEmitterBeans() {
+        if (eventEmitters == null) {
+            eventEmitters = new ArrayList<>();
+            Map<String, EventEmitter> foundBeans = applicationContext.getBeansOfType(EventEmitter.class);
+            for (EventEmitter emitter : foundBeans.values()) {
+                logger.debug("Found event emitter {} ", emitter);
+                eventEmitters.add(emitter);
+            }
+
+            if(eventEmitters.size() > 1) {
+                logger.warn("It is not possible to register more that one EventEmitter, Found {}", eventEmitters);
+            }
+
+            if(!eventEmitters.isEmpty()) {
+                EventManagerProvider.getInstance().get().setEventEmitter(eventEmitters.get(0));
+            }
+        }
+        return eventEmitters;
     }
 
     @Bean
