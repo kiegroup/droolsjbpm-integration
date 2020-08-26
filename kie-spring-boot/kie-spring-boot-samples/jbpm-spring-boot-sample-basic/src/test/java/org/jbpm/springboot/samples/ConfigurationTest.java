@@ -27,7 +27,7 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.springboot.samples.handlers.CustomWorkItemHandler;
 import org.jbpm.springboot.samples.handlers.LogWorkItemHandler;
 import org.jbpm.springboot.samples.handlers.WidWorkItemHandler;
-import org.jbpm.springboot.samples.listeners.CustomProcessEventListener;
+import org.jbpm.springboot.samples.events.listeners.CustomProcessEventListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.jbpm.springboot.samples.listeners;
+package org.jbpm.springboot.samples.events.listeners;
 
 import java.util.concurrent.CountDownLatch;
 
