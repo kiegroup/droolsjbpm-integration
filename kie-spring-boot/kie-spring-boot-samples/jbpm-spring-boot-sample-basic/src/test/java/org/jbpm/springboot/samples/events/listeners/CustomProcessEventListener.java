@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.jbpm.springboot.samples.listeners;
+package org.jbpm.springboot.samples.events.listeners;
 
 import org.kie.api.event.process.ProcessCompletedEvent;
 import org.kie.api.event.process.ProcessEventListener;

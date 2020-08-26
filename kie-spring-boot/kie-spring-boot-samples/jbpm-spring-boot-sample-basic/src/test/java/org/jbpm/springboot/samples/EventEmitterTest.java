@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.jbpm.springboot.samples;
 
 import java.io.File;
@@ -23,7 +7,7 @@ import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
-import org.jbpm.springboot.samples.events.listeners.CountDownLatchNotificationListener;
+import org.jbpm.springboot.samples.events.emitters.CountDownLatchEmitter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = {JBPMApplication.class, TestAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-test.properties")
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
-public class CustomNotificationListenerTest {
+public class EventEmitterTest {
 
     static final String ARTIFACT_ID = "evaluation";
     static final String GROUP_ID = "org.jbpm.test";
@@ -63,14 +47,14 @@ public class CustomNotificationListenerTest {
     private ProcessService processService;
 
     @Autowired
-    private CountDownLatchNotificationListener countDownListener;
+    private CountDownLatchEmitter countDownLatchEmitter;
 
     @BeforeClass
     public static void generalSetup() {
         KieServices ks = KieServices.Factory.get();
         ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
-        File kjar = new File("../kjars/notification/notification.jar");
-        File pom = new File("../kjars/notification/pom.xml");
+        File kjar = new File("../kjars/evaluation/jbpm-module.jar");
+        File pom = new File("../kjars/evaluation/pom.xml");
         MavenRepository repository = getMavenRepository();
         repository.installArtifact(releaseId, kjar, pom);
 
@@ -90,26 +74,25 @@ public class CustomNotificationListenerTest {
         deploymentService.undeploy(unit);
     }
 
-    @Test(timeout = 60000)
+    @Test(timeout = 10000)
     public void testProcessEventListenerRegistration() throws Exception {
-        countDownListener.configure(1);
+        countDownLatchEmitter.configure(4);
 
         assertNotNull(unit);
+        assertNotNull(countDownLatchEmitter.getProcessService());
 
-        long processInstanceId = processService.startProcess(unit.getIdentifier(), "notification");
+        Long processInstanceId = processService.startProcess(unit.getIdentifier(), "evaluation");
 
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId > 0);
 
-        // Custom notifications should not be set yet
-        assertThat(this.countDownListener.getEventsReceived().size()).isEqualTo(0);
-
-        countDownListener.getCountDown().await();
-
-        // 1 custom notification should now exist
-        assertThat(this.countDownListener.getEventsReceived().size()).isEqualTo(1);
+        // "newCollection", "apply" and "deliver" methods should've been called
+        assertThat(countDownLatchEmitter.getCountDownLatch().getCount()).isEqualTo(1);
 
         processService.abortProcessInstance(processInstanceId);
+        countDownLatchEmitter.getCountDownLatch().await();
+
+        assertThat(countDownLatchEmitter.getCountDownLatch().getCount()).isEqualTo(0);
 
         ProcessInstance pi = processService.getProcessInstance(processInstanceId);
         assertNull(pi);
