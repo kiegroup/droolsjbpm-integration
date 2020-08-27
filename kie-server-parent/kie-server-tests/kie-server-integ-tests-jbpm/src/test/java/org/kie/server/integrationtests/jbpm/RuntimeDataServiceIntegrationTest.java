@@ -1859,14 +1859,12 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
 
         List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
-        assertNotNull(tasks);
-        assertEquals(1, tasks.size());
+        Assertions.assertThat(tasks).hasSize(1);
 
         SearchQueryFilterSpec spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
         List<ProcessInstanceCustomVars> listProcesses = queryClient.queryProcessesByVariables(spec, 0, 2);
-        assertNotNull(listProcesses);
-        listProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
+        Assertions.assertThat(listProcesses).extracting(ProcessInstanceCustomVars::getContainerId).containsOnly(CONTAINER_ID);
 
         SearchQueryFilterSpec specHistory = new SearchQueryFilterSpec();
         specHistory.setAttributesQueryParams(list(history(), equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
@@ -1877,9 +1875,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
         List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
-        assertNotNull(listTasks);
-        assertEquals(1, listTasks.size());
-        listTasks.stream().forEach(e -> assertEquals(PROCESS_ID_USERTASK, e.getProcessDefinitionId()));
+        Assertions.assertThat(listTasks).hasSize(1).extracting(ProcessInstanceUserTaskWithVariables::getProcessDefinitionId).containsOnly(PROCESS_ID_USERTASK);
 
         this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
         this.taskClient.completeTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda", Collections.emptyMap());
@@ -1888,15 +1884,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         spec.setAttributesQueryParams(list(onlyCompletedTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
 
         listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
-        assertNotNull(listTasks);
-        assertEquals(1, listTasks.size());
+        Assertions.assertThat(listTasks).hasSize(1);
 
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
 
         listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
-        assertNotNull(listTasks);
-        assertEquals(1, listTasks.size());
+        Assertions.assertThat(listTasks).hasSize(1);
 
         this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
         this.taskClient.completeTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda", Collections.emptyMap());
@@ -1905,14 +1899,12 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
 
         listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
-        assertNotNull(listTasks);
-        assertEquals(0, listTasks.size());
+        Assertions.assertThat(listTasks).isEmpty();
 
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyCompletedTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
         listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
-        assertNotNull(listTasks);
-        assertEquals(0, listTasks.size());
+        Assertions.assertThat(listTasks).isEmpty();
     }
 
 
