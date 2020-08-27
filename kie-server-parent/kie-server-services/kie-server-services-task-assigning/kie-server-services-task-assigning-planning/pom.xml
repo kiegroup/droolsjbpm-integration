@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services-task-assigning</artifactId>
-    <version>7.42.0-SNAPSHOT</version>
+    <version>7.43.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-task-assigning-planning</artifactId>
@@ -86,21 +86,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <systemPropertyVariables>
-            <org.kie.server.taskAssigning.processRuntime.targetUser>TARGET_USER</org.kie.server.taskAssigning.processRuntime.targetUser>
-            <org.kie.server.taskAssigning.publishWindowSize>2</org.kie.server.taskAssigning.publishWindowSize>
-            <org.kie.server.taskAssigning.solutionSyncInterval>PT3S</org.kie.server.taskAssigning.solutionSyncInterval>
-            <org.kie.server.taskAssigning.usersSyncInterval>PT6H</org.kie.server.taskAssigning.usersSyncInterval>
-          </systemPropertyVariables>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

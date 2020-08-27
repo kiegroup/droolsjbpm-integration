@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.drools.core.impl.InternalKieContainer;
 import org.junit.After;
 import org.junit.Before;
@@ -48,12 +47,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.optaplanner.core.api.solver.Solver;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.drools.core.util.KeyStoreConstants.PROP_PWD_KS_PWD;
 import static org.drools.core.util.KeyStoreConstants.PROP_PWD_KS_URL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
@@ -62,6 +59,7 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_URL;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_USER;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ID;
@@ -77,13 +75,16 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtension.CAPABILITY_TASK_ASSIGNING_PLANNING;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtension.EXTENSION_NAME;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtension.EXTENSION_START_ORDER;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelperTest.clearTaskAssigningServiceProperties;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.ACTIVATE_CONTAINER_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.CREATE_CONTAINER_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.HEALTH_CHECK_IS_ALIVE_MESSAGE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PARAMETER_MUST_HAVE_A_GREATER_THAN_ZERO_INTEGER_VALUE_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_CONTAINER_NOT_AVAILABLE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PLANNER_SOLVER_INSTANTIATION_CHECK_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.SOLVER_CONFIGURATION_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.TASK_ASSIGNING_SERVICE_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.UNDESIRED_EXTENSIONS_RUNNING_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_CONFIGURATION_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.USER_SYSTEM_CONTAINER_NOT_AVAILABLE;
@@ -182,13 +183,17 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     @Mock
     private TaskAssigningService taskAssigningService;
 
+    @Captor
+    private ArgumentCaptor<TaskAssigningServiceConfig> taskAssigningServiceConfigCaptor;
+
     @Before
     public void setUp() {
         internalUserSystemKieContainerClassLoader = getClass().getClassLoader();
         internalSolverKieContainerClassLoader = getClass().getClassLoader();
         extension = spy(new TaskAssigningPlanningKieServerExtension());
         when(kieServer.healthCheck(anyBoolean())).thenReturn(new ArrayList<>());
-        doReturn(taskAssigningService).when(extension).createTaskAssigningService();
+        prepareTaskAssigningServiceProperties();
+        doReturn(taskAssigningService).when(extension).createTaskAssigningService(any());
     }
 
     @After
@@ -199,6 +204,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         System.clearProperty(TASK_ASSIGNING_PROCESS_RUNTIME_USER);
         System.clearProperty(TASK_ASSIGNING_PROCESS_RUNTIME_PWD);
         System.clearProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TIMEOUT);
+
+        clearTaskAssigningServiceProperties();
 
         System.clearProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT);
         System.clearProperty(TASK_ASSIGNING_SOLVER_MOVE_THREAD_BUFFER_SIZE);
@@ -218,19 +225,19 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
     @Test
     public void isActiveDefaultValue() {
-        assertFalse(extension.isActive());
+        assertThat(extension.isActive()).isFalse();
     }
 
     @Test
     public void isActiveTrue() {
         enableExtension();
-        assertTrue(extension.isActive());
+        assertThat(extension.isActive()).isTrue();
     }
 
     @Test
     public void isActiveFalse() {
         disableExtension();
-        assertFalse(extension.isActive());
+        assertThat(extension.isActive()).isFalse();
     }
 
     @Test
@@ -294,8 +301,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         System.setProperty(TASK_ASSIGNING_SOLVER_CONTAINER_ID, SOLVER_CONTAINER_ID);
         enableExtension();
         String error = String.format(SOLVER_CONFIGURATION_ERROR, String.format(REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING, SOLVER_CONTAINER_ID, null, null, null));
-        Assertions.assertThatThrownBy(() -> extension.init(kieServer, registry)).hasMessage(error);
-        assertFalse(extension.isInitialized());
+        assertThatThrownBy(() -> extension.init(kieServer, registry)).hasMessage(error);
+        assertThat(extension.isInitialized()).isFalse();
     }
 
     @Test
@@ -304,15 +311,15 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         prepareSolverContainerProperties();
         enableExtension();
         extension.init(kieServer, registry);
-        assertTrue(extension.isInitialized());
+        assertThat(extension.isInitialized()).isTrue();
     }
 
     @Test
     public void initWithUserSystemMissingError() {
         enableExtension();
         String error = String.format(USER_SYSTEM_CONFIGURATION_ERROR, String.format(USER_SYSTEM_NAME_NOT_CONFIGURED_ERROR, TASK_ASSIGNING_USER_SYSTEM_NAME));
-        Assertions.assertThatThrownBy(() -> extension.init(kieServer, registry)).hasMessage(error);
-        assertFalse(extension.isInitialized());
+        assertThatThrownBy(() -> extension.init(kieServer, registry)).hasMessage(error);
+        assertThat(extension.isInitialized()).isFalse();
     }
 
     @Test
@@ -321,8 +328,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_CONTAINER_ID, USER_SYSTEM_CONTAINER_ID);
         enableExtension();
         String error = String.format(USER_SYSTEM_CONFIGURATION_ERROR, String.format(REQUIRED_PARAMETERS_FOR_CONTAINER_ARE_MISSING, USER_SYSTEM_CONTAINER_ID, null, null, null));
-        Assertions.assertThatThrownBy(() -> extension.init(kieServer, registry)).hasMessage(error);
-        assertFalse(extension.isInitialized());
+        assertThatThrownBy(() -> extension.init(kieServer, registry)).hasMessage(error);
+        assertThat(extension.isInitialized()).isFalse();
     }
 
     @Test
@@ -330,12 +337,23 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         prepareUserContainerProperties();
         enableExtension();
         extension.init(kieServer, registry);
-        assertTrue(extension.isInitialized());
+        assertThat(extension.isInitialized()).isTrue();
+    }
+
+    @Test
+    public void initWithTaskAssigningServiceConfigErrors() {
+        System.setProperty(TASK_ASSIGNING_PUBLISH_WINDOW_SIZE, "make failure");
+        System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
+        enableExtension();
+        String error = String.format(TASK_ASSIGNING_SERVICE_CONFIGURATION_ERROR, String.format(PARAMETER_MUST_HAVE_A_GREATER_THAN_ZERO_INTEGER_VALUE_ERROR,
+                                                                                               TASK_ASSIGNING_PUBLISH_WINDOW_SIZE));
+        assertThatThrownBy(() -> extension.init(kieServer, registry)).hasMessageStartingWith(error);
+        assertThat(extension.isInitialized()).isFalse();
     }
 
     @Test
     public void getExtensionName() {
-        assertEquals(EXTENSION_NAME, extension.getExtensionName());
+        assertThat(extension.getExtensionName()).isEqualTo(EXTENSION_NAME);
     }
 
     @Test
@@ -344,13 +362,13 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         enableExtension();
         extension.init(kieServer, registry);
         List<Object> services = extension.getServices();
-        assertEquals(1, services.size());
-        assertTrue(services.get(0) instanceof TaskAssigningService);
+        assertThat(services.size()).isEqualTo(1);
+        assertThat(services.get(0)).isInstanceOf(TaskAssigningService.class);
     }
 
     @Test
     public void getImplementedCapability() {
-        assertEquals(CAPABILITY_TASK_ASSIGNING_PLANNING, extension.getImplementedCapability());
+        assertThat(extension.getImplementedCapability()).isEqualTo(CAPABILITY_TASK_ASSIGNING_PLANNING);
     }
 
     @Test
@@ -358,17 +376,18 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
         enableExtension();
         extension.init(kieServer, registry);
-        assertNotNull(extension.getAppComponents(TaskAssigningService.class));
+        assertThat(extension.getAppComponents(TaskAssigningService.class)).isNotNull();
     }
 
     @Test
     public void getStartOrder() {
-        assertEquals(EXTENSION_START_ORDER, extension.getStartOrder(), 0);
+        assertThat(extension.getStartOrder()).isEqualTo(EXTENSION_START_ORDER);
     }
 
     @Test
     public void toStringTest() {
-        assertEquals(EXTENSION_NAME + " KIE Server extension", extension.toString());
+        String expectedValue = EXTENSION_NAME + " KIE Server extension";
+        assertThat(extension).hasToString(expectedValue);
     }
 
     @Test
@@ -384,9 +403,9 @@ public class TaskAssigningPlanningKieServerExtensionTest {
 
         initAndStartServerSuccessful();
         verify(extension).createSolver(eq(registry), solverDefCaptor.capture());
-        assertEquals(SOLVER_MOVE_THREAD_COUNT, solverDefCaptor.getValue().getMoveThreadCount());
-        assertEquals(SOLVER_MOVE_THREAD_BUFFER_SIZE, solverDefCaptor.getValue().getMoveThreadBufferSize());
-        assertEquals(SOLVER_THREAD_FACTORY_CLASS, solverDefCaptor.getValue().getThreadFactoryClass());
+        assertThat(solverDefCaptor.getValue().getMoveThreadCount()).isEqualTo(SOLVER_MOVE_THREAD_COUNT);
+        assertThat(solverDefCaptor.getValue().getMoveThreadBufferSize()).isEqualTo(SOLVER_MOVE_THREAD_BUFFER_SIZE);
+        assertThat(solverDefCaptor.getValue().getThreadFactoryClass()).isEqualTo(SOLVER_THREAD_FACTORY_CLASS);
     }
 
     @Test
@@ -555,6 +574,10 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         assertContainsMesssage(messages, Severity.INFO, HEALTH_CHECK_IS_ALIVE_MESSAGE, 0);
     }
 
+    private void prepareTaskAssigningServiceProperties() {
+        TaskAssigningPlanningKieServerExtensionHelperTest.prepareTaskAssigningServiceProperties();
+    }
+
     private void prepareInitRuntimeClient() {
         System.setProperty(TASK_ASSIGNING_PROCESS_RUNTIME_URL, RUNTIME_URL);
         System.setProperty(TASK_ASSIGNING_PROCESS_RUNTIME_USER, RUNTIME_USER);
@@ -659,8 +682,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     }
 
     private void assertContainsMesssage(List<Message> messages, Severity severity, String message, int index) {
-        assertEquals(severity, messages.get(index).getSeverity());
-        assertEquals(message, messages.get(index).getMessages().iterator().next());
+        assertThat(messages.get(index).getSeverity()).isEqualTo(severity);
+        assertThat(messages.get(index).getMessages().iterator().next()).isEqualTo(message);
     }
 
     private void initAndStartServerSuccessful() {
@@ -671,6 +694,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         verify(taskAssigningService).setDelegate(any());
         verify(taskAssigningService).setUserSystemService(userSystemService);
         verify(taskAssigningService).start(any(), eq(registry));
+        verify(extension).createTaskAssigningService(taskAssigningServiceConfigCaptor.capture());
+        assertThat(taskAssigningServiceConfigCaptor.getValue()).isNotNull();
     }
 
     private void enableExtension() {

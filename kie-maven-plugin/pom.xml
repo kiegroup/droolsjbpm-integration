@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.42.0-SNAPSHOT</version>
+    <version>7.43.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -45,6 +46,29 @@
       <artifactId>maven-artifact</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-artifact-transfer</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-guice</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-shared-utils</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <exclusions>
@@ -55,6 +79,14 @@
         <exclusion>
           <groupId>org.eclipse.sisu</groupId>
           <artifactId>org.eclipse.sisu.plexus</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -93,7 +125,7 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging-api</artifactId>
         </exclusion>
-        <!-- Superseded by Guava-->
+        <!-- Superseded by Guava -->
         <exclusion>
           <groupId>com.google.collections</groupId>
           <artifactId>google-collections</artifactId>
@@ -271,7 +303,7 @@
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--Logs-->
+    <!--Logs -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-ext</artifactId>
