@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<semantic:definitions xmlns="http://www.omg.org/spec/DMN/20151101"
+<semantic:definitions xmlns="https://www.drools.org/kie-dmn"
                       xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
                       xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
                       xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/"
@@ -23,7 +23,7 @@
                       xmlns:semantic="http://www.omg.org/spec/DMN/20180521/MODEL/"
                       id="_function-definition"
                       name="function-definition"
-                      namespace="http://www.omg.org/spec/DMN/20151101">
+                      namespace="https://www.drools.org/kie-dmn">
    <semantic:decision id="_b459d12a-f00f-4846-a12e-2883455f7d7b" name="Math">
       <semantic:variable id="_e2be00de-3280-4ca8-a6e6-6804876c045b" name="Math"/>
       <semantic:informationRequirement>
