@@ -17,10 +17,13 @@ package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,6 +55,8 @@ import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.service.NotificationService;
+import org.kie.server.controller.api.service.NotificationServiceFactory;
+import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.service.LoggingNotificationService;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
@@ -62,9 +67,46 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerControllerImpl.class);
 
-    private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
+    private KieServerTemplateStorage templateStorage;
 
     private NotificationService notificationService = LoggingNotificationService.getInstance();
+
+    public KieServerControllerImpl () {
+        // retrieve the implementations
+        Map<String, PersistingServerTemplateStorageService> servicesFound = new HashMap<>();
+
+        ServiceLoader<PersistingServerTemplateStorageService> storageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
+        Iterator<PersistingServerTemplateStorageService> storageServicesIterator = storageServices.iterator();
+        while (storageServicesIterator.hasNext()) {
+            PersistingServerTemplateStorageService storageService = storageServicesIterator.next();
+            logger.debug("Server template storage for kie server controller found {}", storageService.getTemplateStorage().toString());
+            servicesFound.put(storageService.getClass().getName(), storageService);
+        }
+
+        String storageServiceClassName = System.getProperty(KieServerConstants.KIE_SERVER_SERVER_TEMPLATE_STORAGE_SERVICE, "org.kie.server.controller.impl.service.FileBasedServerTemplateStorageService");
+
+
+        if(servicesFound.containsKey(storageServiceClassName)) {
+            templateStorage = servicesFound.get(storageServiceClassName).getTemplateStorage();
+        }
+
+        if(templateStorage == null) {
+            logger.warn("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
+            templateStorage = InMemoryKieServerTemplateStorage.getInstance();
+        }
+
+        logger.info("Server template storage for kie server controller is {}", templateStorage.toString());
+
+        ServiceLoader<NotificationServiceFactory> notificationServiceLoader = ServiceLoader.load(NotificationServiceFactory.class);
+        if (notificationServiceLoader != null && notificationServiceLoader.iterator().hasNext()) {
+            final NotificationService notificationService = notificationServiceLoader.iterator().next().getNotificationService();
+            this.setNotificationService(notificationService);
+            logger.debug("Notification service for standalone kie server controller is {}",
+                         notificationService.toString());
+        } else {
+            logger.warn("Notification service not defined. Default notification: LoggingNotificationService will be used");
+        }
+    }
 
     @Override
     public synchronized KieServerSetup connect(KieServerInfo serverInfo) {
@@ -170,11 +212,6 @@ public abstract class KieServerControllerImpl implements KieServerController {
             for (Map.Entry<Capability, ServerConfig> entry : serverTemplate.getConfigs().entrySet()) {
 
                 KieServerConfigItem configItem = new KieServerConfigItem();
-
-                ServerConfig config = entry.getValue();
-                // currently ServerConfig does not have data...
-                //configItem.setName();
-                //configItem.setValue();
                 // type of the config item is capability
                 configItem.setType(entry.getKey().toString());
 

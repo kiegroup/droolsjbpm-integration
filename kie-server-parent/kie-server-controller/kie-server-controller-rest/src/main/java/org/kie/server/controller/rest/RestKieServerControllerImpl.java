@@ -15,6 +15,11 @@
 
 package org.kie.server.controller.rest;
 
+import static org.kie.server.controller.rest.ControllerUtils.createCorrectVariant;
+import static org.kie.server.controller.rest.ControllerUtils.getContentType;
+import static org.kie.server.controller.rest.ControllerUtils.marshal;
+import static org.kie.server.controller.rest.ControllerUtils.unmarshal;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -33,23 +38,14 @@ import javax.ws.rs.core.Response;
 
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
-import org.kie.server.controller.api.storage.KieServerControllerStorage;
 import org.kie.server.controller.impl.KieServerControllerImpl;
-import org.kie.server.controller.impl.storage.InMemoryKieServerControllerStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.kie.server.controller.rest.ControllerUtils.createCorrectVariant;
-import static org.kie.server.controller.rest.ControllerUtils.getContentType;
-import static org.kie.server.controller.rest.ControllerUtils.marshal;
-import static org.kie.server.controller.rest.ControllerUtils.unmarshal;
 
 @Path("/controller")
 public class RestKieServerControllerImpl extends KieServerControllerImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(RestKieServerControllerImpl.class);
-
-    private KieServerControllerStorage storage = InMemoryKieServerControllerStorage.getInstance();
 
     @PUT
     @Path("server/{serverInstanceId}")

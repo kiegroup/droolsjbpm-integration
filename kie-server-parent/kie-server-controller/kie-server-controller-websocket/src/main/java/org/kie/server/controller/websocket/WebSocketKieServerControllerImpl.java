@@ -16,7 +16,6 @@
 package org.kie.server.controller.websocket;
 
 import java.util.Collections;
-import java.util.ServiceLoader;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Any;
@@ -33,8 +32,6 @@ import javax.websocket.server.ServerEndpoint;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.service.NotificationService;
-import org.kie.server.controller.api.service.NotificationServiceFactory;
-import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerControllerImpl;
 import org.slf4j.Logger;
@@ -52,29 +49,7 @@ public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
     
     @Inject @Any
     private Instance<NotificationService> notificationService;
-    
-    public WebSocketKieServerControllerImpl() {
-        ServiceLoader<PersistingServerTemplateStorageService> storageServices = ServiceLoader.load(PersistingServerTemplateStorageService.class);
-        if (storageServices != null && storageServices.iterator().hasNext()) {
-            PersistingServerTemplateStorageService storageService = storageServices.iterator().next();
-            setTemplateStorage(storageService.getTemplateStorage());
-            logger.debug("Server template storage for standalone kie server controller is {}", storageService.getTemplateStorage().toString());
-        } else {
-            logger.debug("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
-        }
 
-        ServiceLoader<NotificationServiceFactory> notificationServiceLoader = ServiceLoader.load(NotificationServiceFactory.class);
-        if (notificationServiceLoader != null && notificationServiceLoader.iterator().hasNext()) {
-            final NotificationService notificationService = notificationServiceLoader.iterator().next().getNotificationService();
-            this.setNotificationService(notificationService);
-
-            logger.debug("Notification service for standalone kie server controller is {}",
-                         notificationService.toString());
-        } else {
-            logger.warn("Notification service not defined. Default notification: LoggingNotificationService will be used");
-        }
-    }
-    
     @PostConstruct
     public void configure() {
         if(templateStorage.isUnsatisfied()){

@@ -55,6 +55,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
     public static final String KIE_SERVER_MGMT_API_DISABLED = "org.kie.server.mgmt.api.disabled";
     public static final String KIE_SERVER_STARTUP_STRATEGY = "org.kie.server.startup.strategy";
+    public static final String KIE_SERVER_SERVER_TEMPLATE_STORAGE_SERVICE = "org.kie.server.template.storage.service";
     public static final String KIE_SERVER_MODE = "org.kie.server.mode";
     public static final String KIE_SERVER_INCLUDE_STACKTRACE = "org.kie.server.stacktrace.included";
     public static final String KIE_SERVER_STRICT_ID_FORMAT = "org.kie.server.strict.id.format";
