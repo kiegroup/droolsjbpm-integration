@@ -17,10 +17,12 @@
 package org.jbpm.springboot.samples.events.listeners;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.deadlines.NotificationListener;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.internal.task.api.model.NotificationEvent;
@@ -32,9 +34,11 @@ public class CountDownLatchNotificationListener implements NotificationListener 
 
     private CountDownLatch latch;
     private List<NotificationEvent> eventsReceived;
-
+    private boolean saveContent = false;
+    private Long contentId;
+    
     @Autowired
-    private ProcessService processService;
+    private UserTaskService userTaskService;
 
     public CountDownLatchNotificationListener() {
         this.eventsReceived = new ArrayList<NotificationEvent>();
@@ -44,8 +48,17 @@ public class CountDownLatchNotificationListener implements NotificationListener 
         this.latch = new CountDownLatch(threads);
     }
 
+    public void setSaveContent(boolean saveContent) {
+        this.saveContent = saveContent;
+    }
+    
     @Override
     public void onNotification(NotificationEvent event, UserInfo userInfo) {
+        if (saveContent) {
+            Map<String, Object> outputVars = new HashMap<String, Object>();
+            outputVars.put("grade", "A");
+            contentId = userTaskService.saveContent(event.getTask().getId(), outputVars);
+        }
         this.eventsReceived.add(event);
         this.latch.countDown();
     }
@@ -56,6 +69,10 @@ public class CountDownLatchNotificationListener implements NotificationListener 
 
     public  List<NotificationEvent> getEventsReceived() {
         return this.eventsReceived;
+    }
+    
+    public Long getContentId() {
+        return this.contentId;
     }
 
     public void reset(){
