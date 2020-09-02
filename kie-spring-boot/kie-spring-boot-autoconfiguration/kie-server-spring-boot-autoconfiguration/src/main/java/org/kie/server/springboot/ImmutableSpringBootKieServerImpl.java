@@ -17,7 +17,6 @@
 package org.kie.server.springboot;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import org.appformer.maven.support.DependencyFilter;
@@ -26,12 +25,9 @@ import org.kie.internal.identity.IdentityProvider;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.controller.api.KieServerController;
-import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieServerExtension;
-import org.kie.server.services.impl.InmutableContainerStartupStrategy;
+import org.kie.server.services.impl.ImmutableContainerStartupStrategy;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.storage.memory.InMemoryKieServerStateRepository;
 
@@ -60,32 +56,12 @@ public class ImmutableSpringBootKieServerImpl extends SpringBootKieServerImpl {
 
     @Override
     protected KieContainerInstanceImpl createContainerInstanceImpl(String containerId, ReleaseId releaseId) {
-        return new InmutableSpringBootKieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId, this);
-    }
-
-    private class SpringBootKieServerController implements KieServerController {
-
-        @Override
-        public void disconnect(KieServerInfo serverInfo) {
-            // immutable container cannot be disconnected
-        }
-
-        @Override
-        public KieServerSetup connect(KieServerInfo serverInfo) {
-            KieServerSetup serverSetup = new KieServerSetup();
-            serverSetup.setContainers(new HashSet<>(containers));
-            return serverSetup;
-        }
-    }
-
-    @Override
-    public KieServerController getController() {
-        return new SpringBootKieServerController();
+        return new ImmutableSpringBootKieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId, this);
     }
 
     @Override
     public void init() {
-        init(new InmutableContainerStartupStrategy());
+        init(new ImmutableContainerStartupStrategy(containers));
     }
 
 }

@@ -42,7 +42,6 @@ public class InMemoryKieServerStateRepository implements KieServerStateRepositor
             KieServerState newState = new KieServerState();
             newState.setConfiguration(new KieServerConfig());
             newState.setContainers(new HashSet<>());
-            newState.setControllers(new HashSet<>());
             data.put(serverId, newState);
         }
         return data.get(serverId);
