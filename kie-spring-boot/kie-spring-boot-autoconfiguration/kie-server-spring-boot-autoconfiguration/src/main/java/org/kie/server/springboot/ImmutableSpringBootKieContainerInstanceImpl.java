@@ -23,9 +23,9 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 
 
-public class InmutableSpringBootKieContainerInstanceImpl extends KieContainerInstanceImpl {
+public class ImmutableSpringBootKieContainerInstanceImpl extends KieContainerInstanceImpl {
 
-    public InmutableSpringBootKieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer, ReleaseId releaseId, KieServerImpl kieServer) {
+    public ImmutableSpringBootKieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer, ReleaseId releaseId, KieServerImpl kieServer) {
         super(containerId, status, kieContainer, releaseId, kieServer);
     }
 
