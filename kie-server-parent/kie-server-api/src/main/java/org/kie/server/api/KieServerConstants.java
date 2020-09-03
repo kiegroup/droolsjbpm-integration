@@ -164,5 +164,7 @@ public class KieServerConstants {
     // System variable to store the enabled packages for the XStreamMarshaller
     public static final String SYSTEM_XSTREAM_ENABLED_PACKAGES = "org.kie.server.xstream.enabled.packages";
 
+    public static final String XSTREAM_IGNORE_UNKNOWN_ELEMENTS = "org.kie.server.xstream.ignore.unknown.elements";
+
     public static final String RESET_CONTAINER_BEFORE_UPDATE = "resetBeforeUpdate";
 }

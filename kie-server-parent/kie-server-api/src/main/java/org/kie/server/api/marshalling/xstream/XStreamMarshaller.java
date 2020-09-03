@@ -28,6 +28,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.drools.core.runtime.help.impl.XStreamXML;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -85,6 +86,8 @@ public class XStreamMarshaller implements Marshaller {
     protected XStream xstream;
     protected ClassLoader classLoader;
     protected Map<String, Class> classNames = new HashMap<String, Class>();
+
+    private boolean ignoreUnknownElements = Boolean.parseBoolean(System.getProperty(KieServerConstants.XSTREAM_IGNORE_UNKNOWN_ELEMENTS, "false"));
 
     // Optional marshaller extensions to handle new types / configure custom behavior
     private static final List<XStreamMarshallerExtension> EXTENSIONS;
@@ -153,6 +156,10 @@ public class XStreamMarshaller implements Marshaller {
         this.xstream.addPermission(new KieServerTypePermission(classes));
         String classWildcards[] = {"org.kie.api.pmml.*", "org.kie.pmml.pmml_4_2.model.*"};
         this.xstream.allowTypesByWildcard(classWildcards);
+
+        if (ignoreUnknownElements) {
+            this.xstream.ignoreUnknownElements();
+        }
 
         AbstractScoreXStreamConverter.registerScoreConverters(xstream);
 

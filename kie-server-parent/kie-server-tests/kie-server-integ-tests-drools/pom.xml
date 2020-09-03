@@ -116,6 +116,7 @@
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
+              <org.kie.server.xstream.ignore.unknown.elements>true</org.kie.server.xstream.ignore.unknown.elements>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -158,6 +159,7 @@
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
+              <org.kie.server.xstream.ignore.unknown.elements>true</org.kie.server.xstream.ignore.unknown.elements>
             </systemProperties>
           </container>
         </configuration>

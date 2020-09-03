@@ -1466,6 +1466,7 @@
                       <argument>-Dorg.kie.server.bypass.auth.user=${org.kie.server.bypass.auth.user}</argument>
                       <argument>-Dorg.kie.server.policy.activate=${org.kie.server.policy.activate}</argument>
                       <argument>-Dpolicy.klo.interval=${policy.klo.interval}</argument>
+                      <argument>-Dorg.kie.server.xstream.ignore.unknown.elements=true</argument>
                       <argument>org.springframework.boot.loader.JarLauncher</argument>
                     </arguments>
                   </configuration>

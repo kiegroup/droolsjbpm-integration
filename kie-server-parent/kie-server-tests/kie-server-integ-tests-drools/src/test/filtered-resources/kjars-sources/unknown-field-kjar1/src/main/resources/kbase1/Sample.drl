@@ -1,0 +1,12 @@
+package kbase1;
+
+import org.kie.server.testing.*;
+
+rule "rule-1"
+    when
+        $fact : MyFact()
+    then
+        $fact.setField1("OK");
+        System.out.println($fact.toString());
+end
+
