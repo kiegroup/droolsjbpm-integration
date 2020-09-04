@@ -161,7 +161,7 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
                 long minExec = exitStat.getMinTimeStamp() - enterStat.getMinTimeStamp();
                 long maxExec = exitStat.getMaxTimeStamp() - enterStat.getMaxTimeStamp();
             
-                nodeProperties.put("duration", new Double(StatUtils.mean(new double[]{minExec, maxExec})).longValue());
+                nodeProperties.put("duration", Double.valueOf(StatUtils.mean(new double[]{minExec, maxExec})).longValue());
                 nodeProperties.put("max-exec", maxExec);
                 nodeProperties.put("min-exec", minExec);
                 nodeProperties.put("range", (maxExec - minExec)/2);

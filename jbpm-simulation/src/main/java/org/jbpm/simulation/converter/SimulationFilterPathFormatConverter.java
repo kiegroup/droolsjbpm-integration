@@ -16,6 +16,7 @@
 package org.jbpm.simulation.converter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -81,7 +82,7 @@ public class SimulationFilterPathFormatConverter implements
                             }
                         }
                         BigDecimal bd = new BigDecimal(probability);
-                        bd = bd.setScale(5, BigDecimal.ROUND_HALF_UP);
+                        bd = bd.setScale(5, RoundingMode.HALF_UP);
                         probability = bd.doubleValue();
                         if (probability != 100) {
                             throw new IllegalArgumentException("Process is not valid for simulation - use validation to find errors");

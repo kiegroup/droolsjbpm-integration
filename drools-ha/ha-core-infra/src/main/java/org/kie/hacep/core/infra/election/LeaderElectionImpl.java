@@ -16,6 +16,7 @@
 package org.kie.hacep.core.infra.election;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -195,7 +196,7 @@ public class LeaderElectionImpl implements LeaderElection {
                         logPrefix(),
                         new BigDecimal(delay).divide(BigDecimal.valueOf(1000),
                                                      2,
-                                                     BigDecimal.ROUND_HALF_UP));
+                                                     RoundingMode.HALF_UP));
         }
         try {
             Thread.sleep(delay);
