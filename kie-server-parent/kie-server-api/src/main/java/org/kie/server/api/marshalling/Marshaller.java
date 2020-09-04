@@ -31,6 +31,10 @@ public interface Marshaller {
 
     public String marshall(Object input);
 
+    public default <T> T unmarshall(String input, Class<T> type, Map<String, Object> parameters) {
+        return unmarshall(input, type);
+    }
+
     public <T> T unmarshall(String input, Class<T> type);
 
     public void dispose();

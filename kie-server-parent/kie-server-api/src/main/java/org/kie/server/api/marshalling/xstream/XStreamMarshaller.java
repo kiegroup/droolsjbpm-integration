@@ -84,10 +84,14 @@ public class XStreamMarshaller implements Marshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(XStreamMarshaller.class);
     protected XStream xstream;
+    protected Set<Class<?>> classes;
     protected ClassLoader classLoader;
     protected Map<String, Class> classNames = new HashMap<String, Class>();
 
     private boolean ignoreUnknownElements = Boolean.parseBoolean(System.getProperty(KieServerConstants.XSTREAM_IGNORE_UNKNOWN_ELEMENTS, "false"));
+    private boolean ignoreUnknownElementsPerRequest = false;
+
+    public static final String IGNORE_UNKNOWN_ELEMENTS = "ignoreUnknownElements"; // media type
 
     // Optional marshaller extensions to handle new types / configure custom behavior
     private static final List<XStreamMarshallerExtension> EXTENSIONS;
@@ -106,6 +110,7 @@ public class XStreamMarshaller implements Marshaller {
 
     public XStreamMarshaller(Set<Class<?>> classes,
                              final ClassLoader classLoader) {
+        this.classes = classes;
         this.classLoader = classLoader;
         buildMarshaller(classes,
                         classLoader);
@@ -222,6 +227,31 @@ public class XStreamMarshaller implements Marshaller {
     @Override
     public String marshall(Object objectInput) {
         return xstream.toXML(objectInput);
+    }
+
+    @Override
+    public <T> T unmarshall(String input,
+                            Class<T> type, Map<String, Object> parameters) {
+        Object value = parameters.get(IGNORE_UNKNOWN_ELEMENTS);
+        if (!ignoreUnknownElements) {
+            if (value instanceof String && Boolean.TRUE.equals(Boolean.parseBoolean((String)value))) {
+                xstream.ignoreUnknownElements();
+                ignoreUnknownElementsPerRequest = true;
+            } else if (ignoreUnknownElementsPerRequest) {
+                recreateInstance();
+                ignoreUnknownElementsPerRequest = false;
+            }
+        }
+        return (T) xstream.fromXML(input);
+    }
+
+    private void recreateInstance() {
+        classNames = new HashMap<>();
+        buildMarshaller(classes, classLoader);
+
+        configureMarshaller(classes, classLoader);
+        // Extend the marshaller with optional extensions
+        EXTENSIONS.forEach(ext -> ext.extend(this));
     }
 
     @Override

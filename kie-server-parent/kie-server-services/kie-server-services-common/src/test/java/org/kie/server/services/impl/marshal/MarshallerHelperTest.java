@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.json.JSONException;
 import org.junit.Test;
@@ -35,13 +37,17 @@ import org.kie.server.api.util.ProcessInstanceQueryFilterSpecBuilder;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.domain.Person;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.xmlunit.matchers.CompareMatcher;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MarshallerHelperTest {
 
@@ -278,4 +284,27 @@ public class MarshallerHelperTest {
 
 	}
 
+	@Test
+	public void testXStreamUnmarshallIgnoreUnknownElements() {
+		KieServerRegistry kieServerRegistryMock = Mockito.mock(KieServerRegistry.class);
+		Set<Class<?>> extraClasses = new HashSet<>();
+		// simulate server conditions
+		extraClasses.add(Person.class);
+		Mockito.when(kieServerRegistryMock.getExtraClasses()).thenReturn(extraClasses);
+		MarshallerHelper helper = new MarshallerHelper(kieServerRegistryMock);
+
+		// Person class actually doesn't have 'age' field
+		String data = "<org.kie.server.services.impl.domain.Person><name>John</name><age>27</age></org.kie.server.services.impl.domain.Person>";
+
+		Person person = helper.unmarshal(data, "application/xstream ; ignoreUnknownElements = true ", Person.class);
+		assertThat(person.getName(), is("John"));
+
+		// test reset
+		try {
+			person = helper.unmarshal(data, "application/xstream ; ignoreUnknownElements = false ", Person.class);
+			fail("Should throw Exception here");
+		} catch (AbstractReflectionConverter.UnknownFieldException e) {
+			assertTrue(true);
+		}
+	}
 }

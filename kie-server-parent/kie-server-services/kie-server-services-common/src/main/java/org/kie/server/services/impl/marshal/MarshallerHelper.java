@@ -105,7 +105,7 @@ public class MarshallerHelper {
             throw new IllegalArgumentException("No marshaller found for format " + format);
         }
 
-        Object instance = marshaller.unmarshall(data, unmarshalType);
+        Object instance = marshaller.unmarshall(data, unmarshalType, MarshallingFormat.buildParameters(marshallingFormat));
 
         if (instance instanceof Wrapped) {
             return (T) ((Wrapped) instance).unwrap();
@@ -126,7 +126,7 @@ public class MarshallerHelper {
         	serverMarshallers.put(format, marshaller);
         }
 
-        Object instance = marshaller.unmarshall(data, unmarshalType);
+        Object instance = marshaller.unmarshall(data, unmarshalType, MarshallingFormat.buildParameters(marshallingFormat));
 
         if (instance instanceof Wrapped) {
             return (T) ((Wrapped) instance).unwrap();
