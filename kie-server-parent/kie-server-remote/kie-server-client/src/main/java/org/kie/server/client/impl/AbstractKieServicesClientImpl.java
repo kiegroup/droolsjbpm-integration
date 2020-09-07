@@ -810,7 +810,7 @@ public abstract class AbstractKieServicesClientImpl {
                 return operation.doOperation(url);
             } catch (KieServerHttpRequestException e) {
                 if (e.getCause() instanceof IOException) {
-                    logger.debug("Marking endpoint '{}' as failed due to {}", url, e.getCause().getMessage());
+                    logger.warn("Marking endpoint '{}' as failed due to {}", url, e.getCause().getMessage());
                     String failedBaseUrl = loadBalancer.markAsFailed(url);
                     nextUrl = loadBalancer.getUrl();
                     url = url.replace(failedBaseUrl, nextUrl);
