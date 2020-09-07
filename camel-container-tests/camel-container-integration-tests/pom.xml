@@ -24,7 +24,9 @@
     <kie.server.classifier>ee7</kie.server.classifier>
     <container.hostname>localhost</container.hostname>
     <container.port>8080</container.port>
-    <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
+    <offset.container.port>8180</offset.container.port>
+    <single.kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</single.kie.server.base.http.url>
+    <separate.kie.server.base.http.url>http://${container.hostname}:${offset.container.port}/${kie.server.context}/services/rest/server</separate.kie.server.base.http.url>
     <kie.maven.settings.custom>${user.home}/.m2/settings.xml</kie.maven.settings.custom>
     <org.kie.server.mode.production>PRODUCTION</org.kie.server.mode.production>
   </properties>
@@ -200,6 +202,7 @@
                 <systemProperties>
                   <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
                   <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
+                  <kie.server.port>${container.port}</kie.server.port>
                 </systemProperties>
               </container>
               <deployables>
@@ -212,7 +215,7 @@
                   <properties>
                     <context>${kie.server.context}</context>
                   </properties>
-                  <pingURL>${kie.server.base.http.url}</pingURL>
+                  <pingURL>${single.kie.server.base.http.url}</pingURL>
                   <pingTimeout>300000</pingTimeout>
                 </deployable>
                 <deployable>
@@ -273,7 +276,7 @@
       <id>eap</id>
       <activation>
         <property>
-          <name>eap.url</name>
+          <name>fuse.eap.url</name>
         </property>
       </activation>
       <build>
@@ -288,12 +291,16 @@
                 </goals>
                 <configuration>
                   <target>
-                    <get src="${eap.url}" dest="${project.build.directory}/eap.zip" />
-                    <unzip src="${project.build.directory}/eap.zip" dest="${project.build.directory}/application-server">
+                    <get src="${fuse.eap.url}" dest="${project.build.directory}/eap-fuse.zip" />
+                    <unzip src="${project.build.directory}/eap-fuse.zip" dest="${project.build.directory}/application-server-fuse">
+                      <cutdirsmapper dirs="1" />
+                    </unzip>
+                    <get src="${kie-server.eap.url}" dest="${project.build.directory}/eap-kie-server.zip" />
+                    <unzip src="${project.build.directory}/eap-kie-server.zip" dest="${project.build.directory}/application-server-kie-server">
                       <cutdirsmapper dirs="1" />
                     </unzip>
                     <get src="${fuse.on.eap.url}" dest="${project.build.directory}/fuse-on-eap.jar"/>
-                    <java jar="${project.build.directory}/fuse-on-eap.jar" fork="true" dir="${project.build.directory}/application-server" />
+                    <java jar="${project.build.directory}/fuse-on-eap.jar" fork="true" dir="${project.build.directory}/application-server-fuse" />
                   </target>
                 </configuration>
               </execution>
@@ -302,67 +309,118 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration>
-              <container>
-                <containerId>wildfly19x</containerId>
-                <home>${project.build.directory}/application-server</home>
-                <type>installed</type>
-                <systemProperties>
-                  <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
-                  <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
-                </systemProperties>
-              </container>
-              <deployables>
-                <deployable>
-                  <groupId>org.drools</groupId>
-                  <artifactId>camel-container-tests-module</artifactId>
-                  <type>war</type>
-                </deployable>
-                <deployable>
-                  <location>${kie.server.war}</location>
-                  <type>war</type>
-                  <properties>
-                    <context>${kie.server.context}</context>
-                  </properties>
-                  <pingURL>${kie.server.base.http.url}</pingURL>
-                  <pingTimeout>300000</pingTimeout>
-                </deployable>
-              </deployables>
-              <configuration>
-                <properties>
-                  <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                  <cargo.jvmargs>-Djava.net.preferIPv4Stack=true</cargo.jvmargs>
-                  <cargo.jboss.ajp.port>${cargo.jboss.ajp.port}</cargo.jboss.ajp.port>
-                  <cargo.jboss.https.port>${cargo.jboss.https.port}</cargo.jboss.https.port>
-                  <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
-                  <cargo.jboss.management-https.port>${cargo.jboss.management-https.port}</cargo.jboss.management-https.port>
-                </properties>
-                <users>
-                  <user>
-                    <name>yoda</name>
-                    <password>test</password>
-                    <roles>
-                      <role>kie-server</role>
-                      <role>guest</role>
-                    </roles>
-                  </user>
-                </users>
-              </configuration>
-            </configuration>
             <executions>
               <execution>
-                <id>start-container</id>
+                <id>start-fuse-container</id>
                 <phase>pre-integration-test</phase>
                 <goals>
                   <goal>start</goal>
                 </goals>
+                <configuration>
+                  <container>
+                    <containerId>wildfly19x</containerId>
+                    <home>${project.build.directory}/application-server-fuse</home>
+                    <type>installed</type>
+                    <contextKey>fuse</contextKey>
+                    <systemProperties>
+                      <kie.server.port>${offset.container.port}</kie.server.port>
+                    </systemProperties>
+                  </container>
+                  <deployables>
+                    <deployable>
+                      <groupId>org.drools</groupId>
+                      <artifactId>camel-container-tests-module</artifactId>
+                      <type>war</type>
+                    </deployable>
+                  </deployables>
+                  <configuration>
+                    <home>${project.build.directory}/application-server-fuse-configuration</home>
+                    <properties>
+                      <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                      <cargo.jvmargs>-Djava.net.preferIPv4Stack=true</cargo.jvmargs>
+                      <cargo.jboss.ajp.port>${cargo.jboss.ajp.port}</cargo.jboss.ajp.port>
+                      <cargo.jboss.https.port>${cargo.jboss.https.port}</cargo.jboss.https.port>
+                      <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
+                      <cargo.jboss.management-https.port>${cargo.jboss.management-https.port}</cargo.jboss.management-https.port>
+                    </properties>
+                  </configuration>
+                </configuration>
               </execution>
               <execution>
-                <id>stop-container</id>
+                <id>stop-fuse-container</id>
                 <phase>post-integration-test</phase>
                 <goals>
                   <goal>stop</goal>
                 </goals>
+                <configuration>
+                  <container>
+                    <contextKey>fuse</contextKey>
+                  </container>
+                </configuration>
+              </execution>
+              <execution>
+                <id>start-kie-server-container</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+                <configuration>
+                  <container>
+                    <containerId>wildfly19x</containerId>
+                    <home>${project.build.directory}/application-server-kie-server</home>
+                    <type>installed</type>
+                    <contextKey>kie-server</contextKey>
+                    <systemProperties>
+                      <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
+                      <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
+                    </systemProperties>
+                  </container>
+                  <deployables>
+                    <deployable>
+                      <location>${kie.server.war}</location>
+                      <type>war</type>
+                      <properties>
+                        <context>${kie.server.context}</context>
+                      </properties>
+                      <pingURL>${separate.kie.server.base.http.url}</pingURL>
+                      <pingTimeout>300000</pingTimeout>
+                    </deployable>
+                  </deployables>
+                  <configuration>
+                    <home>${project.build.directory}/application-server-kie-server-configuration</home>
+                    <properties>
+                      <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                      <cargo.jvmargs>-Djava.net.preferIPv4Stack=true</cargo.jvmargs>
+                      <cargo.jboss.ajp.port>${cargo.jboss.ajp.port}</cargo.jboss.ajp.port>
+                      <cargo.jboss.https.port>${cargo.jboss.https.port}</cargo.jboss.https.port>
+                      <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
+                      <cargo.jboss.management-https.port>${cargo.jboss.management-https.port}</cargo.jboss.management-https.port>
+                      <cargo.port.offset>100</cargo.port.offset>
+                    </properties>
+                    <users>
+                      <user>
+                        <name>yoda</name>
+                        <password>test</password>
+                        <roles>
+                          <role>kie-server</role>
+                          <role>guest</role>
+                        </roles>
+                      </user>
+                    </users>
+                  </configuration>
+                </configuration>
+              </execution>
+              <execution>
+                <id>stop-kie-server-container</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+                <configuration>
+                  <container>
+                    <contextKey>kie-server</contextKey>
+                  </container>
+                </configuration>
               </execution>
             </executions>
           </plugin>
