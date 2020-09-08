@@ -16,7 +16,7 @@
   <kbase name="MixedMining" packages="miningmodelmixed, miningmodelmixed.mixedminingsegmentation.mixedminingsegment1">
     <ksession name="MixedMiningSession" type="stateless"/>
   </kbase>
-  <kbase name="PredicatesMining" packages="predicatesmining">
+  <kbase name="PredicatesMining" packages="predicatesmining, miningmodelpredicates.predicatesminingsegmentation.predicatesminingsegment1">
     <ksession name="PredicatesMiningSession" type="stateless"/>
   </kbase>
 
