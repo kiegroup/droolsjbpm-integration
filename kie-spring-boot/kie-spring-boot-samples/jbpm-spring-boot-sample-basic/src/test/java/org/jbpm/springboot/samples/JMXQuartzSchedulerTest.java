@@ -34,7 +34,7 @@ import org.appformer.maven.integration.MavenRepository;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
-import org.jbpm.springboot.samples.listeners.CountDownLatchEventListener;
+import org.jbpm.springboot.samples.events.listeners.CountDownLatchEventListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
