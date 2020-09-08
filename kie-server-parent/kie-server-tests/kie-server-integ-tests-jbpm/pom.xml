@@ -15,6 +15,7 @@
   <properties>
     <java.module.name>org.kie.server.itests.jbpm.core</java.module.name>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
+    <skip-prepare-kie-server>true</skip-prepare-kie-server>
   </properties>
 
   <dependencies>
@@ -41,7 +42,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -67,7 +67,6 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-services-api</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <!-- Used for instantiation of CorrelationKeyFactory -->
@@ -75,6 +74,12 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-persistence-jpa</artifactId>
       <scope>test</scope>
+    </dependency>
+    
+    <!-- Used for CustomNotificationListener -->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
     </dependency>
 
     <!-- Used as an email client in UserTaskEscalationIntegrationTest -->
@@ -146,6 +151,30 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>prepare-kie-server</id>
+              <phase>pre-integration-test</phase>
+              <configuration>
+                <skip>${skip-prepare-kie-server}</skip>
+                <target>
+                  <unzip src="${kie-server.war.path}"
+                         dest="${project.build.directory}/unzipped-kie-server" />
+                  <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar"
+                        todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib" />
+                  <zip destfile="${project.build.directory}/kie-server.war"
+                       basedir="${project.build.directory}/unzipped-kie-server" />
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
@@ -203,6 +232,10 @@
       </testResource>
     </testResources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-maven2-plugin</artifactId>
@@ -312,6 +345,27 @@
           <value>tomcat9</value>
         </property>
       </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.webc.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <deployables>
+                  <deployable>
+                    <location>${project.build.directory}/kie-server.war</location>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
     <profile>
       <id>wildfly</id>
@@ -321,6 +375,10 @@
           <value>wildfly</value>
         </property>
       </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee8.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
@@ -332,6 +390,7 @@
                   <deployable>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>kie-server</artifactId>
+                    <location>${project.build.directory}/kie-server.war</location>
                     <!-- default, may be overridden in container specific 
                       profiles -->
                     <classifier>${kie.server.classifier}</classifier>
@@ -367,6 +426,10 @@
           <value>eap7</value>
         </property>
       </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee8.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
@@ -378,6 +441,7 @@
                   <deployable>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>kie-server</artifactId>
+                    <location>${project.build.directory}/kie-server.war</location>
                     <!-- default, may be overridden in container specific 
                       profiles -->
                     <classifier>${kie.server.classifier}</classifier>
@@ -413,6 +477,10 @@
           <value>oracle-wls-12</value>
         </property>
       </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee7.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
@@ -424,6 +492,7 @@
                   <deployable>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>kie-server</artifactId>
+                    <location>${project.build.directory}/kie-server.war</location>
                     <!-- default, may be overridden in container specific 
                       profiles -->
                     <classifier>${kie.server.classifier}</classifier>
@@ -459,19 +528,23 @@
           <value>websphere9</value>
         </property>
       </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee7.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
           <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <systemPropertyVariables>
-              <webservice.http.url>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface/AcmeDemoService.wsdl</webservice.http.url>
-            </systemPropertyVariables>
-          </configuration>
-        </plugin>
-            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <webservice.http.url>http://${container.hostname}:${container.port}/kie-server-test-web-service/AcmeDemoInterface/AcmeDemoService.wsdl</webservice.http.url>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+          <plugin>
               <groupId>org.codehaus.cargo</groupId>
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
@@ -479,6 +552,7 @@
                   <deployable>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>kie-server</artifactId>
+                    <location>${project.build.directory}/kie-server.war</location>
                     <!-- default, may be overridden in container specific 
                       profiles -->
                     <classifier>${kie.server.classifier}</classifier>

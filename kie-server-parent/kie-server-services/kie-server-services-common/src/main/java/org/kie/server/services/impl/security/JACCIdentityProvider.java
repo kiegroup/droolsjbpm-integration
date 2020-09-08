@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.Stack;
 
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
@@ -29,7 +30,11 @@ import javax.security.jacc.PolicyContext;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.security.SecurityAdapter;
 
+import static java.util.Collections.emptyList;
+
 public class JACCIdentityProvider implements IdentityProvider {
+    
+    private Stack<String> contextUsers;
 
     private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
 
@@ -39,10 +44,25 @@ public class JACCIdentityProvider implements IdentityProvider {
         for (SecurityAdapter adapter : securityAdapters) {
             adapters.add(adapter);
         }
+        contextUsers = new Stack<>();
+    }
+    
+    @Override
+    public void setContextIdentity(String userId) {
+        contextUsers.push(userId);
+    }
+
+    @Override
+    public void removeContextIdentity() {
+        contextUsers.pop();
     }
 
     @Override
     public String getName() {
+        if (!contextUsers.isEmpty()) {
+            return contextUsers.peek();
+        }
+
         Subject subject = getSubjectFromContainer();
 
         if (subject != null) {
@@ -61,6 +81,10 @@ public class JACCIdentityProvider implements IdentityProvider {
 
     @Override
     public List<String> getRoles() {
+        if (!contextUsers.isEmpty()) {
+            return emptyList();
+        }
+
         List<String> roles = new ArrayList<String>();
 
         Subject subject = getSubjectFromContainer();

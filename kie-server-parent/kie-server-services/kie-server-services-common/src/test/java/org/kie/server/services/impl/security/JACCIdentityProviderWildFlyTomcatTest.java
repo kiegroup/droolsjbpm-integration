@@ -42,6 +42,7 @@ public class JACCIdentityProviderWildFlyTomcatTest {
     private static final String PRINCIPAL_NAME="yoda";
     private static final String GROUP_ONE_NAME="groupOne";
     private static final String GROUP_TWO_NAME="groupTwo";
+    private static final String CONTEXT_USER_NAME="contextUser";
 
     private PolicyContextHandler handler;
 
@@ -106,6 +107,19 @@ public class JACCIdentityProviderWildFlyTomcatTest {
         assertTrue(jaccIdentityProvider.hasRole(GROUP_TWO_NAME));
         assertFalse(jaccIdentityProvider.hasRole("non_existing_role"));
         assertFalse(jaccIdentityProvider.hasRole(null));
+    }
+    
+    @Test
+    public void testContextUsers() {
+        IdentityProvider jaccIdentityProvider = new JACCIdentityProvider();
+        
+        jaccIdentityProvider.setContextIdentity(CONTEXT_USER_NAME);
+        assertEquals(CONTEXT_USER_NAME, jaccIdentityProvider.getName());
+        assertEquals(0, jaccIdentityProvider.getRoles().size());
+        
+        jaccIdentityProvider.removeContextIdentity();
+        assertEquals(PRINCIPAL_NAME, jaccIdentityProvider.getName());
+        assertEquals(2, jaccIdentityProvider.getRoles().size());
     }
 
     private class GroupImpl implements Group {
