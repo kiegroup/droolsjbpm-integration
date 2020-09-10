@@ -16,16 +16,13 @@
 
 package org.kie.camel.container.integration.tests;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.drools.core.command.runtime.process.GetProcessIdsCommand;
-import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
-import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
-import org.drools.core.marshalling.impl.ProtobufMessages;
 import org.junit.Test;
 import org.kie.api.runtime.ExecutionResults;
 
@@ -42,7 +39,7 @@ public class ProcessEngineIntegrationTest extends AbstractKieCamelIntegrationTes
 
         final ExecutionResults executionResults = runCommand(getProcessIdsCommand);
         Assertions.assertThat(executionResults).isNotNull();
-        Assertions.assertThat((List) executionResults.getValue(DEFAULT_OUT_ID)).contains(SIMPLE_PROCESS_ID,
+        Assertions.assertThat(( List ) executionResults.getValue(DEFAULT_OUT_ID)).contains(SIMPLE_PROCESS_ID,
                                                                                          PROCESS_WITH_SIGNAL);
     }
 
