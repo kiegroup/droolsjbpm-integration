@@ -55,7 +55,7 @@ public class ConfigFileWatcher implements Runnable {
             if(toWatch.toFile().exists()) {
                 lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
             } else {
-                log.warnv("configuration file does not exists {0} ", this.toWatch);
+                log.warnv("configuration file does not exist {0} ", this.toWatch);
             }
         } catch (IOException e) {
             log.error("Unable to read last modified date of routers config file", e);
@@ -72,7 +72,7 @@ public class ConfigFileWatcher implements Runnable {
             while(active.get()) {
                 try {
                     if(!toWatch.toFile().exists()) {
-                       log.warnv("configuration file does not exists {0} ", this.toWatch);
+                       log.warnv("configuration file does not exist {0} ", this.toWatch);
                        Thread.sleep(sleepTime);
                        continue;
                     }
@@ -90,7 +90,7 @@ public class ConfigFileWatcher implements Runnable {
                         lastUpdate = lastModified.toMillis();
                     }
                 } catch(IOException ioe) {
-                    log.warn("Unexpected exception while watching config file, maybe file does not exist ?", ioe);
+                    log.warn("Unexpected exception while watching config file, maybe file does not exist? ", ioe);
                 }
                 Thread.sleep(sleepTime);
             }
