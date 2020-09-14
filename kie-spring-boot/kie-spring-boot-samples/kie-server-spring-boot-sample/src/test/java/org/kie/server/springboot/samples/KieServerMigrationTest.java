@@ -16,11 +16,6 @@
 
 package org.kie.server.springboot.samples;
 
-import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,16 +42,26 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-test.properties")
 public class KieServerMigrationTest {
+    
+    private static final Logger logger = LoggerFactory.getLogger(KieServerMigrationTest.class);
 
     static final String ARTIFACT_ID = "evaluation";
     static final String GROUP_ID = "org.jbpm.test";
@@ -142,22 +147,28 @@ public class KieServerMigrationTest {
         assertEquals(containerId, processInstance.getContainerId());
         
         try {
-            
             MigrationReportInstance report = processAdminClient.migrateProcessInstance(containerId, processInstanceId, containerId2, processId);
             assertTrue(report.isSuccessful());
-            
             processInstance = queryClient.findProcessInstanceById(processInstanceId);
             assertNotNull(processInstance);
             assertEquals(1, processInstance.getState().intValue());
             assertEquals(containerId2, processInstance.getContainerId());
-        } finally {
-            // at the end abort process instance
-            processClient.abortProcessInstance(containerId2, processInstanceId);
-    
-            processInstance = queryClient.findProcessInstanceById(processInstanceId);
-            assertNotNull(processInstance);
-            assertEquals(3, processInstance.getState().intValue());
         }
+        catch (Exception ex ) {
+            // clean up if failure
+            try {
+                processClient.abortProcessInstance(containerId, processInstanceId);
+            } catch (Exception abortEx) {
+                logger.warn("Error aborting process instance over container "+containerId, abortEx);
+            }
+            fail("Migration failed: " + ex);
+            throw ex;
+        }
+        //abort process instance (outside try/catch), to not hide exception that will certainly occur if  migration fails 
+        processClient.abortProcessInstance(containerId2, processInstanceId);
+        processInstance = queryClient.findProcessInstanceById(processInstanceId);
+        assertNotNull(processInstance);
+        assertEquals(3, processInstance.getState().intValue());
     }
 
    
