@@ -60,7 +60,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_STRICT_ID_FORMAT = "org.kie.server.strict.id.format";
     public static final String KIE_SERVER_IMAGESERVICE_MAX_NODES = "org.kie.server.service.image.max_nodes";
     public static final String KIE_SERVER_REST_MODE_READONLY = "org.kie.server.rest.mode.readonly";
-
+    public static final String KIE_SERVER_NOTIFY_UPDATES_TO_CONTROLLERS = "org.kie.server.update..notifications.rest.enabled";
     // configuration parameters
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";
     public static final String CFG_PERSISTANCE_TM = "org.kie.server.persistence.tm";
