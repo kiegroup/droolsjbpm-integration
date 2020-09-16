@@ -29,6 +29,8 @@ import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.SSLContextBuilder;
 import org.xnio.ssl.XnioSsl;
 
+import static org.kie.server.router.utils.TrustStoreHelper.getCurrentTrustStore;
+
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,7 +40,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class KieServerProxyClientTest {
 
-    private static final String TRUSTSTORE_PATH = SSLContextBuilder.class.getClassLoader().getResource("keystores/router.truststore").getFile();
+    private static final String TRUSTSTORE_PATH = KieServerProxyClientTest.class
+                                                  .getClassLoader()
+                                                  .getResource(getCurrentTrustStore())
+                                                  .getFile();
+
     private static final String TRUSTSTORE_PASSWORD = "mykeystorepass";
 
     private ConfigRepository repository = new FileRepository();
