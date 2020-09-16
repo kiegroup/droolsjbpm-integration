@@ -26,10 +26,12 @@ import java.util.stream.Collectors;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
@@ -73,7 +75,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
         ServerTemplate serverTemplate = templateStorage.load(serverId);
         KieServerSetup serverSetup = new KieServerSetup();
         ServerInstanceKey serverInstanceKey = null;
-        List<Container> containerList = new ArrayList<Container>();
+
         if (isKieServerLocationAvailable) {
             if (serverTemplate == null || serverTemplate.getServerInstance(serverId) == null) {
                 logger.warn("Trying to connect a detached or undefined KIE server: {} is not supported.", serverId);
@@ -85,6 +87,8 @@ public abstract class KieServerControllerImpl implements KieServerController {
         } else {
             serverInstanceKey = ModelFactory.newServerInstanceKey(serverInfo.getServerId(), serverInfo.getLocation());
         }
+
+
         if (serverTemplate != null) {
             if (!checkValidServerInstance(serverTemplate, serverInfo, serverSetup)) {
                 return serverSetup;
@@ -100,88 +104,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
                 logger.debug("KieServerInstance updated after connect from server {}", serverInfo.getLocation());
             }
 
-            Set<KieContainerResource> containers = new HashSet<KieContainerResource>();
-            for (ContainerSpec containerSpec : serverTemplate.getContainersSpec()) {
-
-                KieContainerResource containerResource = new KieContainerResource();
-                containerResource.setContainerId(containerSpec.getId());
-                containerResource.setContainerAlias(containerSpec.getContainerName());
-                containerResource.setReleaseId(containerSpec.getReleasedId());
-                containerResource.setStatus(containerSpec.getStatus());
-
-                // cover scanner and rules config
-                ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
-                if (containerConfig != null) {
-                    RuleConfig ruleConfig = (RuleConfig) containerConfig;
-
-                    KieScannerResource scannerResource = new KieScannerResource();
-                    scannerResource.setPollInterval(ruleConfig.getPollInterval());
-                    scannerResource.setStatus(ruleConfig.getScannerStatus());
-
-                    containerResource.setScanner(scannerResource);
-                }
-                // cover process config
-                containerConfig = containerSpec.getConfigs().get(Capability.PROCESS);
-                if (containerConfig != null) {
-                    ProcessConfig processConfig = (ProcessConfig) containerConfig;
-
-                    KieServerConfigItem configItem = new KieServerConfigItem();
-                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName(KieServerConstants.PCFG_KIE_BASE);
-                    configItem.setValue(processConfig.getKBase());
-
-                    containerResource.addConfigItem(configItem);
-
-                    configItem = new KieServerConfigItem();
-                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName(KieServerConstants.PCFG_KIE_SESSION);
-                    configItem.setValue(processConfig.getKSession());
-
-                    containerResource.addConfigItem(configItem);
-
-                    configItem = new KieServerConfigItem();
-                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName(KieServerConstants.PCFG_MERGE_MODE);
-                    configItem.setValue(processConfig.getMergeMode());
-
-                    containerResource.addConfigItem(configItem);
-
-                    configItem = new KieServerConfigItem();
-                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName(KieServerConstants.PCFG_RUNTIME_STRATEGY);
-                    configItem.setValue(processConfig.getRuntimeStrategy());
-
-                    containerResource.addConfigItem(configItem);
-                }
-
-                containers.add(containerResource);
-
-                containerList.add(new Container(containerSpec.getId(),
-                                                containerSpec.getContainerName(),
-                                                serverInstanceKey,
-                                                new ArrayList<Message>(),
-                                                containerSpec.getReleasedId(),
-                                                serverInstanceKey.getUrl() + "/containers/" + containerSpec.getId()));
-            }
-            serverSetup.setContainers(containers);
-
-            // server configuration
-            KieServerConfig serverConfig = new KieServerConfig();
-            for (Map.Entry<Capability, ServerConfig> entry : serverTemplate.getConfigs().entrySet()) {
-
-                KieServerConfigItem configItem = new KieServerConfigItem();
-
-                ServerConfig config = entry.getValue();
-                // currently ServerConfig does not have data...
-                //configItem.setName();
-                //configItem.setValue();
-                // type of the config item is capability
-                configItem.setType(entry.getKey().toString());
-
-                serverConfig.addConfigItem(configItem);
-            }
-
-            serverSetup.setServerConfig(serverConfig);
+            serverSetup = toKieServerSetup(serverTemplate);
         } else {
             logger.debug("Server id {} unknown to this controller, registering...", serverInfo.getServerId());
             serverTemplate = new ServerTemplate();
@@ -209,19 +132,166 @@ public abstract class KieServerControllerImpl implements KieServerController {
         }
 
         logger.info("Server {} connected to controller", serverInfo.getLocation());
+        List<Container> containerList = new ArrayList<Container>();
+        for(ContainerSpec containerSpec : serverTemplate.getContainersSpec()) {
+            containerList.add(new Container(containerSpec.getId(),
+                                            containerSpec.getContainerName(),
+                                            serverInstanceKey,
+                                            new ArrayList<Message>(),
+                                            containerSpec.getReleasedId(),
+                                            serverInstanceKey.getUrl() + "/containers/" + containerSpec.getId()));
+        }
 
         ServerInstance serverInstance = new ServerInstance();
         serverInstance.setServerName(serverInstanceKey.getServerName());
         serverInstance.setServerTemplateId(serverInstanceKey.getServerTemplateId());
         serverInstance.setServerInstanceId(serverInstanceKey.getServerInstanceId());
         serverInstance.setUrl(serverInstanceKey.getUrl());
-
         serverInstance.setContainers(containerList);
 
         notifyOnConnect(serverInstance);
         return serverSetup;
     }
 
+    @Override
+    public KieServerSetup update(KieServerStateInfo kieServerStateInfo) {
+        String serverId = kieServerStateInfo.getServerId();
+        ServerTemplate serverTemplate = templateStorage.load(serverId);
+        ServerInstanceKey serverInstanceKey = ModelFactory.newServerInstanceKey(kieServerStateInfo.getServerId(), kieServerStateInfo.getLocation());
+        if (serverTemplate == null) {
+            logger.info("Server id {} unknown to this controller, state update will create the template", kieServerStateInfo.getServerId());
+            return new KieServerSetup();
+        }
+
+        // we update the server instance with the containers
+        List<Container> containerList = new ArrayList<Container>();
+        List<KieContainerStatus> invalidStatus = Collections.singletonList(KieContainerStatus.STOPPED);
+        for(ContainerSpec containerSpec : serverTemplate.getContainersSpec()) {
+            if(invalidStatus.contains(containerSpec.getStatus())) {
+                continue;
+            }
+            Container container = new Container(containerSpec.getId(),
+                          containerSpec.getContainerName(),
+                          serverInstanceKey,
+                          new ArrayList<Message>(),
+                          containerSpec.getReleasedId(),
+                          serverInstanceKey.getUrl() + "/containers/" + containerSpec.getId());
+            container.setStatus(containerSpec.getStatus());
+            containerList.add(container);
+        }
+
+        ServerInstance serverInstance = new ServerInstance();
+        serverInstance.setServerName(serverInstanceKey.getServerName());
+        serverInstance.setServerTemplateId(serverInstanceKey.getServerTemplateId());
+        serverInstance.setServerInstanceId(serverInstanceKey.getServerInstanceId());
+        serverInstance.setUrl(serverInstanceKey.getUrl());
+        serverInstance.setContainers(containerList);
+
+        // we update and notify
+        notificationService.notify(new ServerInstanceUpdated(serverInstance));
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
+
+        for(ContainerSpec currentSpec : serverTemplate.getContainersSpec()) {
+            List<Container> specContainerList = new ArrayList<Container>();
+            for(ServerInstanceKey currentServerInstanceKey : serverTemplate.getServerInstanceKeys()) {
+               Container container = new Container(currentSpec.getId(),
+                                                currentSpec.getContainerName(),
+                                                currentServerInstanceKey,
+                                                new ArrayList<Message>(),
+                                                currentSpec.getReleasedId(),
+                                                currentServerInstanceKey.getUrl() + "/containers/" + currentSpec.getId());
+               container.setStatus(currentSpec.getStatus());
+               specContainerList.add(container);
+            }
+            notificationService.notify(serverTemplate, currentSpec, specContainerList);
+        }
+
+
+        return toKieServerSetup(serverTemplate);
+    }
+
+    private KieServerSetup toKieServerSetup(ServerTemplate serverTemplate) {
+        KieServerSetup serverSetup = new KieServerSetup();
+        Set<KieContainerResource> containers = new HashSet<KieContainerResource>();
+        for (ContainerSpec containerSpec : serverTemplate.getContainersSpec()) {
+
+            KieContainerResource containerResource = new KieContainerResource();
+            containerResource.setContainerId(containerSpec.getId());
+            containerResource.setContainerAlias(containerSpec.getContainerName());
+            containerResource.setReleaseId(containerSpec.getReleasedId());
+            containerResource.setStatus(containerSpec.getStatus());
+
+            // cover scanner and rules config
+            ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
+            if (containerConfig != null) {
+                RuleConfig ruleConfig = (RuleConfig) containerConfig;
+
+                KieScannerResource scannerResource = new KieScannerResource();
+                scannerResource.setPollInterval(ruleConfig.getPollInterval());
+                scannerResource.setStatus(ruleConfig.getScannerStatus());
+
+                containerResource.setScanner(scannerResource);
+            }
+            // cover process config
+            containerConfig = containerSpec.getConfigs().get(Capability.PROCESS);
+            if (containerConfig != null) {
+                ProcessConfig processConfig = (ProcessConfig) containerConfig;
+                computeProcessConfigItems(processConfig).forEach(e -> containerResource.addConfigItem(e));
+            }
+
+            containers.add(containerResource);
+
+        }
+        serverSetup.setContainers(containers);
+
+        // server configuration
+        KieServerConfig serverConfig = new KieServerConfig();
+        for (Map.Entry<Capability, ServerConfig> entry : serverTemplate.getConfigs().entrySet()) {
+
+            KieServerConfigItem configItem = new KieServerConfigItem();
+            configItem.setType(entry.getKey().toString());
+
+            serverConfig.addConfigItem(configItem);
+        }
+
+        serverSetup.setServerConfig(serverConfig);
+        return serverSetup;
+    }
+    
+
+    private List<KieServerConfigItem> computeProcessConfigItems(ProcessConfig processConfig) {
+        List<KieServerConfigItem> items = new ArrayList<>();
+
+        KieServerConfigItem configItem = new KieServerConfigItem();
+        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+        configItem.setName(KieServerConstants.PCFG_KIE_BASE);
+        configItem.setValue(processConfig.getKBase());
+
+        items.add(configItem);
+
+        configItem = new KieServerConfigItem();
+        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+        configItem.setName(KieServerConstants.PCFG_KIE_SESSION);
+        configItem.setValue(processConfig.getKSession());
+
+        items.add(configItem);
+
+        configItem = new KieServerConfigItem();
+        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+        configItem.setName(KieServerConstants.PCFG_MERGE_MODE);
+        configItem.setValue(processConfig.getMergeMode());
+
+        items.add(configItem);
+
+        configItem = new KieServerConfigItem();
+        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+        configItem.setName(KieServerConstants.PCFG_RUNTIME_STRATEGY);
+        configItem.setValue(processConfig.getRuntimeStrategy());
+        items.add(configItem);
+        return items;
+    }
+
+    
     private boolean isOpenShiftSupported() {
         return "true".equals(System.getProperty(KieServerControllerConstants.KIE_CONTROLLER_OPENSHIFT_ENABLED, "false"));
     }

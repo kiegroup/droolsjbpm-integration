@@ -202,7 +202,7 @@ public class KieServerImpl implements KieServer {
         kieServerActive.set(false);
         policyManager.stop();
         // disconnect from controller
-        KieServerController kieController = getController();
+        KieServerController kieController = getDefaultController();
         kieController.disconnect(getInfoInternal());
 
         for (KieServerExtension extension : context.getServerExtensions()) {
@@ -319,7 +319,7 @@ public class KieServerImpl implements KieServer {
                                     currentState.getContainers().add(container);
                                 });
                                 eventSupport.fireAfterContainerStarted(this, ci);
-
+                                getDefaultController().update(getInternalServerState());
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                             } else {
                                 ci.getResource().setStatus(KieContainerStatus.FAILED);
@@ -429,7 +429,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerActivated(this, kci);
-                    
+                    getDefaultController().update(getInternalServerState());
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " activated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " activated successfully.", kci.getResource());
                 }
@@ -478,7 +478,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerDeactivated(this, kci);
-                    
+                    getDefaultController().update(getInternalServerState());
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " deactivated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " deactivated successfully.", kci.getResource());
                 }
@@ -611,7 +611,7 @@ public class KieServerImpl implements KieServer {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully stopped."));
 
                         eventSupport.fireAfterContainerStopped(this, kci);
-
+                        getDefaultController().update(getInternalServerState());
                         return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully disposed.");
                     } else {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " was not instantiated."));
@@ -675,6 +675,7 @@ public class KieServerImpl implements KieServer {
                             }
                         });
                     });
+                    getDefaultController().update(getInternalServerState());
                     return scannerResponse;
                 }
             } else {
@@ -951,7 +952,7 @@ public class KieServerImpl implements KieServer {
 
                 logger.info("Container {} successfully updated to release id {}", containerId, releaseId);
                 ks.getRepository().removeKieModule(originalReleaseId);
-
+                getDefaultController().update(getInternalServerState());
                 messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + containerId));
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
             } else {
@@ -1012,14 +1013,27 @@ public class KieServerImpl implements KieServer {
     }
 
     public ServiceResponse<KieServerStateInfo> getServerState() {
+        KieServerStateInfo state = getInternalServerState();
+        if(state != null) {
+            return new ServiceResponse<KieServerStateInfo>(ServiceResponse.ResponseType.SUCCESS, "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
+        } else {
+            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state");
+        }
+
+    }
+
+    public KieServerStateInfo getInternalServerState() {
         try {
+            KieServerInfo kieServerInfo = getInfoInternal();
             KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-            KieServerStateInfo state = new KieServerStateInfo(currentState.getControllers(), currentState.getConfiguration(), currentState.getContainers());
-            return new ServiceResponse<KieServerStateInfo>(ServiceResponse.ResponseType.SUCCESS,
-                                                           "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
+            KieServerStateInfo stateInfo = new KieServerStateInfo(currentState.getControllers(), currentState.getConfiguration(), currentState.getContainers());
+            stateInfo.setServerId(kieServerInfo.getServerId());
+            stateInfo.setLocation(kieServerInfo.getLocation());
+
+            return stateInfo;
         } catch (Exception e) {
             logger.error("Error when loading server state due to {}", e.getMessage(), e);
-            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state due to " + e.getMessage());
+            return null;
         }
     }
 
@@ -1068,6 +1082,10 @@ public class KieServerImpl implements KieServer {
         }
 
         return controller;
+    }
+
+    protected KieServerController getDefaultController() {
+        return new DefaultRestControllerImpl(context);
     }
 
     protected ContainerManager getContainerManager() {

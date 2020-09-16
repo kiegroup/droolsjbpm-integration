@@ -57,6 +57,11 @@ public abstract class WebSocketClientImpl<T extends MessageHandler> extends Endp
         this.onReconnect = onReconnect;
     }
 
+    
+    public URI getEndpoint() {
+        return endpoint;
+    }
+
     @Override
     public void onClose(Session session, CloseReason reason) {
         if (!session.getId().equals(this.session.getId())) {

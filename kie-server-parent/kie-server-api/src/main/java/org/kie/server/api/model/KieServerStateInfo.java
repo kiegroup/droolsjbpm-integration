@@ -31,6 +31,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("kie-server-state-info")
 public class KieServerStateInfo {
 
+    @XmlElement(name = "server-id") 
+    private String serverId;
+
+    @XmlElement(name = "server-location")
+    private String location;
+
     @XmlElement(name = "controller")
     private Set<String> controllers = new HashSet<String>();
 
@@ -48,6 +54,15 @@ public class KieServerStateInfo {
         this.controllers = controllers;
         this.configuration = configuration;
         this.containers = containers;
+    }
+
+    
+    public String getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     public Set<String> getControllers() {
@@ -73,4 +88,14 @@ public class KieServerStateInfo {
     public void setContainers(Set<KieContainerResource> containers) {
         this.containers = containers;
     }
+
+    
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
 }
