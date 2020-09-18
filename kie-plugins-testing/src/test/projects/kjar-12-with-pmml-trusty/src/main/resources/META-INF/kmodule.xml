@@ -19,5 +19,8 @@
   <kbase name="PredicatesMining" packages="predicatesmining, miningmodelpredicates.predicatesminingsegmentation.predicatesminingsegment1">
     <ksession name="PredicatesMiningSession" type="stateless"/>
   </kbase>
+  <kbase name="SegmentationClassificationMajorityVote" packages="segmentationclassificationmajorityvote">
+    <ksession name="SegmentationClassificationMajorityVoteSession" type="stateless"/>
+  </kbase>
 
 </kmodule>

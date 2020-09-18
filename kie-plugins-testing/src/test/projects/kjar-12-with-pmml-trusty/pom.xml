@@ -11,7 +11,7 @@
   <packaging>kjar</packaging>
 
   <properties>
-    <org.kie.version>7.43.0-SNAPSHOT</org.kie.version>
+    <org.kie.version>7.44.0-SNAPSHOT</org.kie.version>
     <generateModel>NO</generateModel>
     <generateDMNModel>NO</generateDMNModel>
     <generatePMMLModel>YES</generatePMMLModel>
