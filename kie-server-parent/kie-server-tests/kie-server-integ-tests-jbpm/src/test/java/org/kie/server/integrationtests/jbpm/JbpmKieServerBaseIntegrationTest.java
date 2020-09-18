@@ -58,6 +58,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String CONTAINER_ID_USERTASK = "usertask-project";
     protected static final String CONTAINER_ID_SECURED = "secured-project";
     protected static final String CONTAINER_ID_RESTART = "restart-project";
+    protected static final String CONTAINER_ID_NOTIFICATION = "notification-project";
    
     protected static final String PROCESS_ID_RESTART = "restart-project.simple";
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
@@ -84,6 +85,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_USERTASK_SECURED = "secured-project.usertask";
     protected static final String PROCESS_ID_SIGNAL_PROCESS_SECURED = "secured-project.signalprocess";
     protected static final String PROCESS_ID_WORKITEM_SECURED = "secured-project.workitem";
+    protected static final String PROCESS_ID_NOTIFICATION = "notification";
     
     protected static final long SERVICE_TIMEOUT = 30000;
     protected static final long TIMEOUT_BETWEEN_CALLS = 200;
