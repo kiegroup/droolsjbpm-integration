@@ -24,7 +24,7 @@ jobs:
         id: build-chain
         uses: kiegroup/github-action-build-chain@v1.4
         with:
-          build-command: 'mvn -e -nsu -Dfull -Pwildfly install -Pjenkins-pr-builder -Prun-code-coverage  -Dcontainer.profile=wildfly -Dcontainer=wildfly -Dintegration-tests=true -Dmaven.test.failure.ignore=true -DjvmArgs="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gclog"'
+          build-command: 'mvn -e -nsu -Dfull -Pwildfly install -Pjenkins-pr-builder -Prun-code-coverage  -Dcontainer.profile=wildfly -Dcontainer=wildfly -Dintegration-tests=true -Dmaven.test.failure.ignore=true -DjvmArgs="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gclog" -pl :kie-server-spring-boot-autoconfiguration-audit-replication'
           build-command-upstream: |
             mvn -e --builder smart -T1C install -DskipTests -Dgwt.compiler.skip=true -Dgwt.skipCompilation=true -Denforcer.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Drevapi.skip=true
             rm -rf ./*
