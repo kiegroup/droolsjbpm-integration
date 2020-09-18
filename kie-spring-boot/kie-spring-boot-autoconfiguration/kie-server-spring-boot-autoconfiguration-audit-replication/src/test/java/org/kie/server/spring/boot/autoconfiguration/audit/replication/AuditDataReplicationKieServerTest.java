@@ -41,10 +41,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = ApplicationSender.class)
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
+@Transactional(timeout = 600)
 public class AuditDataReplicationKieServerTest {
 
     private static final Long TIMEOUT = 10000L;
