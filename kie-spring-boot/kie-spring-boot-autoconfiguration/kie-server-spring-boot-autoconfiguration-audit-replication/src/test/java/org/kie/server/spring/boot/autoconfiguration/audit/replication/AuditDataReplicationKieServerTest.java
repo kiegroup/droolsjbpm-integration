@@ -46,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = ApplicationSender.class)
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
-@Transactional(timeout = 600)
+@Transactional(timeout = 60000)
 public class AuditDataReplicationKieServerTest {
 
     private static final Long TIMEOUT = 10000L;
