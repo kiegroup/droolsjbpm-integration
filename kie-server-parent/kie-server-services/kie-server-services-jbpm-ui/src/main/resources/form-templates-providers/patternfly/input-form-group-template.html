@@ -97,7 +97,7 @@
     <div data-field="helpBlock" class="help-block"></div>
 </div>
 <#elseif item.type == "documentCollection">
-<div>
+<div class="form-group">
 	<label for="${item.id}">${item.label}</label> 
     <div id="${item.id}" data-field="documentCollection">
     	<#if item.value?size gt 0>
@@ -135,6 +135,21 @@
 		    </div>
 		</#if>
     </div>
+</div>
+<#elseif item.type == "multipleSelector">
+<div class="form-group">
+  <label for="${item.id}">${item.label}</label>
+  <#if item.required>
+    <strong style="color: red">*</strong>
+  </#if>
+    <select multiple class="form-control" id="${item.id}" ${(item.readOnly)?string('disabled', '')}>
+        <#if item.options?size gt 0>
+            <#assign itemList=item.options>
+            <#list itemList as option>
+                <option value="${option.value}" ${(item.value?seq_contains(option.value))?string('selected','')}>${option.text}</option> 
+            </#list>
+        </#if>
+    </select>
 </div>
 <#elseif item.type == "slider">
 <div class="form-group">
