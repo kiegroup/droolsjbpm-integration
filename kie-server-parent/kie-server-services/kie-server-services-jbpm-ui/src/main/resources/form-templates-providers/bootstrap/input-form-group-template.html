@@ -125,6 +125,14 @@
         </#if>
     </select>
 </div>
+<#elseif item.type == "multipleInput">
+<div class="form-group">
+  <label for="${item.id}">${item.label}</label>
+  <#if item.required>
+    <strong style="color: red">*</strong>
+  </#if>
+  <input type="text" multiple class="form-control" id="${item.id}" ${(item.readOnly)?string('disabled', '')} data-role="tagsinput" value="${item.value}" />
+</div>
 <#else>
 <div class="form-group">
 	<label for="${item.id}">${item.label}</label> 

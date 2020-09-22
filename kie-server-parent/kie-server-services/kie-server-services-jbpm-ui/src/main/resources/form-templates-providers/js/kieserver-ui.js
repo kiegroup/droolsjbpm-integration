@@ -422,6 +422,10 @@ function getMultipleSelectorData(inputId) {
     return opts;
 }
 
+function getMultipleInputData(inputId) {
+	return $('#' + inputId).tagsinput('items');
+}
+
 function getDateFormated(id) {
 	var d = new Date(document.getElementById(id).value);
 	

@@ -61,41 +61,6 @@
 	</#if>
     <input id="${item.id}" name="${item.name}" type="date" class="form-control" value="${item.value}" ${(item.required)?string('required', '')} pattern="${item.pattern}"/>    
 </div>
-<#elseif item.type == "multipleInput">
-<div class="form-group" data-i18n-prefix="DefaultFormGroupViewImpl.">
-    <label class="control-label" data-i18n-prefix="FieldLabelViewImpl." data-field="fieldLabel" for=""><span data-field="labelText">MultipleInput</span></label>
-    <div data-field="fieldContainer"><div data-field="container" data-i18n-prefix="MultipleInputViewImpl."><div data-i18n-prefix="MultipleInputComponentViewImpl.">
-    <div class="toolbar-pf kie-wb-common-forms-lov-input-toolbar" data-field="toolbar" style="display: none;">
-        <form class="toolbar-pf-actions">
-            <div class="pull-right" role="toolbar">
-                <div class="form-group">
-                    <button type="button" class="btn btn-primary" data-field="addButton" title="Add new"><span class="glyphicon glyphicon-plus"></span></button>
-                    <button type="button" class="btn btn-danger" data-field="removeButton" title="Remove selected items" disabled=""><span class="glyphicon glyphicon-minus"></span></button>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-default" data-field="promoteButton" title="Move up selected items" disabled=""><span class="glyphicon glyphicon-arrow-up"></span></button>
-                    <button type="button" class="btn btn-default" data-field="degradeButton" title="Move down selected items" disabled=""><span class="glyphicon glyphicon-arrow-down"></span></button>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="row" data-field="errorContainer" style="display: none;">
-        <div class="col-md-12">
-            <div class="alert alert-danger alert-dismissable">
-                <button type="button" class="close" data-field="hideErrorButton">
-                    <span class="pficon pficon-close"></span>
-                </button>
-                <span class="pficon pficon-error-circle-o"></span>
-                <div data-field="errorMessage"></div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12" data-field="table"><div class="GHA-YCMDCOB"><table cellspacing="0" cellpadding="0" style="width: 100%;"><tbody><tr><td align="left" width="33%" style="vertical-align: top;"><div class="GHA-YCMDDOB" style="width: 100%;"></div></td><td align="left" width="33%" style="vertical-align: top;"><div class="GHA-YCMDBOB" style="width: 100%;"></div></td><td align="right" width="33%" style="vertical-align: top;"><table cellspacing="0" cellpadding="0"><tbody><tr><td align="left" style="vertical-align: top;"><div class="GHA-YCMDFOB" style="width: 100%;"></div></td><td align="left" style="vertical-align: top;"><button type="button" class="btn btn-default GHA-YCMDH4" data-toggle="button" title="Mostrar/esconder columnas" aria-hidden="true" style="display: none;"><i class="fa fa-list-ul"></i> </button></td></tr></tbody></table></td></tr></tbody></table><div><div __gwtcellbasedwidgetimpldispatchingfocus="true" __gwtcellbasedwidgetimpldispatchingblur="true" class="table GHA-YCMDM4 GHA-YCMDJ4" style="position: relative; overflow: hidden; height: 180px;"><div style="position: absolute; left: 0px; width: 100%; top: 0px; min-width: 20px; min-height: 20px; overflow: hidden;"><div style="visibility: hidden; position: absolute; height: 100%; width: 100%; overflow: scroll; z-index: -1;"><div style="height: 127px; width: 315px;"></div></div><div style="visibility: hidden; position: absolute; height: 100%; width: 100%; overflow: scroll; z-index: -1;"><div style="width: 200%; height: 200%;"></div></div><div><table cellspacing="0" class="table-hover table-striped table-bordered GHA-YCMDL4 table" style="table-layout: fixed; width: 100%; margin-bottom: 0px;"><colgroup><col style="width: 35px;"><col></colgroup><thead><tr __gwt_header_row="0"><th colspan="1" class="gwtb3-d gwtb3-d" __gwt_column="column-gwt-uid-325" __gwt_header="header-gwt-uid-326"></th><th colspan="1" class="gwtb3-d gwtb3-d" __gwt_column="column-gwt-uid-327" __gwt_header="header-gwt-uid-328">Value</th></tr></thead></table></div></div><div style="position: absolute; left: 0px; width: 100%; bottom: 0px; min-width: 20px; min-height: 20px; overflow: hidden; display: none;"><div style="visibility: hidden; position: absolute; height: 100%; width: 100%; overflow: scroll; z-index: -1;"><div style="height: 100px; width: 100px;"></div></div><div style="visibility: hidden; position: absolute; height: 100%; width: 100%; overflow: scroll; z-index: -1;"><div style="width: 200%; height: 200%;"></div></div></div><div style="position: absolute; left: 0px; width: 100%; overflow: hidden; top: 27px; height: 153px;"><div class="GHA-YCMDHI" style="position: relative; overflow: hidden; height: 100%;"><div aria-hidden="true" style="position: absolute; z-index: -32767; top: -20ex; width: 10em; height: 10ex; visibility: hidden;">&nbsp;</div><div style="position: absolute; overflow: hidden; left: 0px; top: 0px; right: -15px; bottom: -15px;"><div style="position: absolute; zoom: 1; overflow: scroll; left: 0px; top: 0px; right: 0px; bottom: 0px;"><div class="GHA-YCMDCB" style="position: relative; zoom: 1; min-width: 20px; min-height: 20px; display: block;"><div style="visibility: hidden; position: absolute; height: 100%; width: 100%; overflow: scroll; z-index: -1;"><div style="height: 126px; width: 315px;"></div></div><div style="visibility: hidden; position: absolute; height: 100%; width: 100%; overflow: scroll; z-index: -1;"><div style="width: 200%; height: 200%;"></div></div><table align="center" class="table" style=""><colgroup><col></colgroup><tbody><tr><td><span class="label label-default">No Items</span></td></tr></tbody></table></div></div></div><div style="position: absolute; overflow: hidden; right: 0px; bottom: 0px; width: 0px; height: 0px;"><div class="GHA-YCMDII" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"></div></div><div style="position: absolute; overflow: hidden; left: 0px; top: 0px; right: 0px; bottom: 0px; display: none;"><div class="GHA-YCMDCPB GHA-YCMDCB" style="height: 15px; position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"><div class="GHA-YCMDBPB GHA-YCMDJI"> <div class="GHA-YCMDAPB"></div> </div></div></div><div style="position: absolute; overflow: hidden; top: 0px; right: 0px; bottom: 0px; width: 15px; display: none;"><div class="GHA-YCMDOI GHA-YCMDCB" style="width: 15px; position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"><div class="GHA-YCMDNI GHA-YCMDLI"> <div style="height: 26px;"></div> </div></div></div></div></div></div></div><table cellspacing="0" cellpadding="0" style="width: 100%;"><tbody><tr><td align="left" width="50%" style="vertical-align: middle;"><select class="form-control" aria-hidden="true" style="width: 100px; display: none;"><option value="5">5 Objetos</option><option value="10">10 Objetos</option><option value="15">15 Objetos</option><option value="20">20 Objetos</option></select></td><td align="right" width="50%" style="vertical-align: top;"><table cellspacing="0" cellpadding="0" class="pagination pagination-right pull-right GHA-YCMDEOB"><tbody><tr><td align="left" class="GHA-YCMDF4" style="vertical-align: middle;"><button type="button" class="btn btn-default disabled" disabled=""><i class="fa fa-angle-double-left"></i> </button></td><td align="left" class="GHA-YCMDF4" style="vertical-align: middle;"><button type="button" class="btn btn-default disabled" disabled=""><i class="fa fa-angle-left"></i> </button></td><td align="left" class="GHA-YCMDG4" style="vertical-align: middle;"><div class="gwt-HTML">0 de 0</div></td><td align="left" class="GHA-YCMDF4" style="vertical-align: middle;"><button type="button" class="btn btn-default disabled" disabled=""><i class="fa fa-angle-right"></i> </button></td><td align="left" class="GHA-YCMDF4" style="vertical-align: middle;"><button type="button" class="btn btn-default disabled" disabled="" aria-hidden="true" style="display: none;"><i class="fa fa-fast-forward"></i> </button></td><td align="left" class="GHA-YCMDF4" style="vertical-align: middle;"><button type="button" class="btn btn-default disabled" disabled="" aria-hidden="true" style="display: none;"><i class="fa fa-angle-double-right"></i> </button></td></tr></tbody></table></td></tr></tbody></table></div></div>
-    </div>
-</div></div></div>
-    <div data-field="helpBlock" class="help-block"></div>
-</div>
 <#elseif item.type == "documentCollection">
 <div class="form-group">
 	<label for="${item.id}">${item.label}</label> 
@@ -150,6 +115,14 @@
             </#list>
         </#if>
     </select>
+</div>
+<#elseif item.type == "multipleInput">
+<div class="form-group">
+  <label for="${item.id}">${item.label}</label>
+  <#if item.required>
+    <strong style="color: red">*</strong>
+  </#if>
+  <input type="text" multiple class="form-control" id="${item.id}" ${(item.readOnly)?string('disabled', '')} data-role="tagsinput" value="${item.value}" />
 </div>
 <#elseif item.type == "slider">
 <div class="form-group">

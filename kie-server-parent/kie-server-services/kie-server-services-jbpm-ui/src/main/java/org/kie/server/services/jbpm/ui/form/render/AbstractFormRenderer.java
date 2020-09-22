@@ -16,8 +16,6 @@
 
 package org.kie.server.services.jbpm.ui.form.render;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import java.io.BufferedReader;
@@ -101,6 +99,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("Slider", "slider");
         this.inputTypes.put("DocumentCollection", "documentCollection");
         this.inputTypes.put("MultipleSelector", "multipleSelector");
+        this.inputTypes.put("MultipleInput", "multipleInput");
 
         
         cfg = new Configuration(Configuration.VERSION_2_3_26);
@@ -267,6 +266,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         scriptDataList.add(buildFunctionWithBody("getTaskEndpoint", "return '" + taskEndpoint.toString() + "';"));
         scriptDataList.add(buildFunctionWithBody("initializeForm", "taskStatus = '" + task.getTaskData().getStatus().name() + "';\n" +
                                                                    "$('input[data-slider-id]').slider({});\n" +
+                                                                   "$('input[data-role=tagsinput').tagsinput();\n" + 
                                                                    "initTaskButtons();\n"));
         scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
@@ -423,11 +423,20 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                                                    .collect(toList());
                                     item.setValue(items);
                                 case "multipleSelector":
-                                    item.setOptions(field.getListOfValues().stream().map(e -> new ItemOption(e)).collect(toList()));
+                                    item.setOptions(field.getListOfValues().stream().map(ItemOption::new).collect(toList()));
                                     if(value instanceof String) {
                                         item.setValue(Collections.singletonList(value));
                                     } else {
                                         item.setValue(value);
+                                    }
+                                    break;
+                                case "multipleInput":
+                                    if(value instanceof String) {
+                                        item.setValue(value);
+                                    } else if (value instanceof List){
+                                        item.setValue(String.join(",", (List) value));
+                                    } else {
+                                        item.setValue("");
                                     }
                                     break;
                                 default:
@@ -664,7 +673,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             return "Boolean(";
         } else if (type.contains("Date")) {
             return "Object(";
-        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("multipleSelector") || type.contains("Date")) {
+        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("multipleSelector") || type.contains("multipleInput")) {
             return "Object(";
         } else if (type.contains("slider")) {
             return " { \"java.lang.Double\" : Number(";
@@ -707,6 +716,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                         .append("')");
         } else if(type.equals("multipleSelector")) {
             jsonTemplate.append("getMultipleSelectorData('")
+                        .append(id)
+                        .append("')");
+        } else if(type.equals("multipleInput")) {
+            jsonTemplate.append("getMultipleInputData('")
                         .append(id)
                         .append("')");
         } else {
