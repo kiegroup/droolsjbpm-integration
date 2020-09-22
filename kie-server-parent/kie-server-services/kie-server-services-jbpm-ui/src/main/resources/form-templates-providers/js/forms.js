@@ -155,3 +155,6 @@ $(document).on('click', '.kie-wb-common-forms-docs-upload-content > .close', fun
 $('input[data-slider-id]').slider({});
 
 
+
+
+

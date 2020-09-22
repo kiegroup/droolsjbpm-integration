@@ -21,6 +21,16 @@ public class ItemOption {
     private String text;
     private String value;
 
+    
+    public ItemOption() {
+        // nothing
+    }
+
+    public ItemOption(String text) {
+        this.text = text;
+        this.value = text;
+    }
+
     public String getText() {
         return text;
     }

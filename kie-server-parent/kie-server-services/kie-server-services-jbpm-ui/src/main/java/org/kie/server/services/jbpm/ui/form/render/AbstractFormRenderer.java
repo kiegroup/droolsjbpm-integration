@@ -16,7 +16,9 @@
 
 package org.kie.server.services.jbpm.ui.form.render;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -25,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,6 +48,7 @@ import org.kie.api.task.model.Task;
 import org.kie.server.services.jbpm.ui.form.render.model.FormField;
 import org.kie.server.services.jbpm.ui.form.render.model.FormInstance;
 import org.kie.server.services.jbpm.ui.form.render.model.FormLayout;
+import org.kie.server.services.jbpm.ui.form.render.model.ItemOption;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutColumn;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutItem;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutRow;
@@ -69,8 +71,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     public static final String PROCESS_LAYOUT_TEMPLATE = "process-layout";
     public static final String TASK_LAYOUT_TEMPLATE = "task-layout";
     public static final String TABLE_LAYOUT_TEMPLATE = "table";
-    public static final List<String> FIELDS_EXCLUSION_TRANSFORMATION = singletonList("documentCollection");
-    
+
     private Map<String, String> inputTypes;
     private StringTemplateLoader stringLoader = new StringTemplateLoader();
     private Configuration cfg;
@@ -99,6 +100,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("DatePicker", "date");
         this.inputTypes.put("Slider", "slider");
         this.inputTypes.put("DocumentCollection", "documentCollection");
+        this.inputTypes.put("MultipleSelector", "multipleSelector");
 
         
         cfg = new Configuration(Configuration.VERSION_2_3_26);
@@ -407,24 +409,31 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                 value = outputs.get(field.getBinding());
                             }
                             
-                            if(!FIELDS_EXCLUSION_TRANSFORMATION.contains(fieldType)) {
-                                item.setValue(value.toString());
-                            } else if (value instanceof DocumentCollection){
-                                DocumentCollection<Document> docCollection = (DocumentCollection<Document>) value;
-                                docCollection.getDocuments().stream()
-                                                           .map(e -> (DocumentImpl) e)
-                                                           .forEach(DocumentImpl::load);
-
-                                List<DocumentItem> items = docCollection.getDocuments()
-                                                               .stream()
-                                                               .map(e -> new DocumentItem(e.getName(), Base64.getEncoder().encodeToString(e.getContent())))
-                                                               .collect(Collectors.toList());
-                                item.setValue(items);
-                            } else {
-                                item.setValue(Collections.emptyList());
-                            }
                             
+                            switch(fieldType) {
+                                case "documentCollection":
+                                    DocumentCollection<Document> docCollection = (DocumentCollection<Document>) value;
+                                    docCollection.getDocuments().stream()
+                                                               .map(e -> (DocumentImpl) e)
+                                                               .forEach(DocumentImpl::load);
 
+                                    List<DocumentItem> items = docCollection.getDocuments()
+                                                                   .stream()
+                                                                   .map(e -> new DocumentItem(e.getName(), Base64.getEncoder().encodeToString(e.getContent())))
+                                                                   .collect(toList());
+                                    item.setValue(items);
+                                case "multipleSelector":
+                                    item.setOptions(field.getListOfValues().stream().map(e -> new ItemOption(e)).collect(toList()));
+                                    if(value instanceof String) {
+                                        item.setValue(Collections.singletonList(value));
+                                    } else {
+                                        item.setValue(value);
+                                    }
+                                    break;
+                                default:
+                                    item.setValue((value != null) ? value.toString() : "");
+                                    break;
+                            }
 
                             item.setReadOnly(field.isReadOnly());
                             item.setRequired(field.isRequired());
@@ -655,17 +664,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             return "Boolean(";
         } else if (type.contains("Date")) {
             return "Object(";
-        } else if (type.contains("Integer") || type.contains("Double") || type.contains("Float")) {
-            return "Number(";
-        } else if (type.contains("Boolean")) {
-            return "Boolean(";
-        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("Date")) {
+        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("multipleSelector") || type.contains("Date")) {
             return "Object(";
         } else if (type.contains("slider")) {
             return " { \"java.lang.Double\" : Number(";
         } else {
             return "String(";
         }
+
     }
 
     protected String wrapEndFieldType(String type) {
@@ -697,6 +703,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                         .append("')");
         } else if (type.equals("documentCollection")) {
             jsonTemplate.append("getDocumentCollectionData('")
+                        .append(id)
+                        .append("')");
+        } else if(type.equals("multipleSelector")) {
+            jsonTemplate.append("getMultipleSelectorData('")
                         .append(id)
                         .append("')");
         } else {

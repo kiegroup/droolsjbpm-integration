@@ -37,7 +37,11 @@ public class FormField {
     @JsonProperty("readOnly")
     private boolean readOnly;
 
+
     private List<ItemOption> options;
+
+    @JsonProperty("listOfValues")
+    private List<String> listOfValues;
 
     private Number min;
 
@@ -207,6 +211,14 @@ public class FormField {
 
     public void setStep(Number step) {
         this.step = step;
+    }
+
+    public List<String> getListOfValues() {
+        return listOfValues;
+    }
+
+    public void setListOfValues(List<String> listOfValues) {
+        this.listOfValues = listOfValues;
     }
 
 }

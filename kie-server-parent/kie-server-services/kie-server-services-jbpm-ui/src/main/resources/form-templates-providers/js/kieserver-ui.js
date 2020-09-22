@@ -404,6 +404,24 @@ function getDocumentCollectionData(inputId) {
 
 }
 
+function getMultipleSelectorData(inputId) {
+    var opts = [];
+
+    // loop through options in select list
+    var sel = $('#' + inputId)[0];
+    for (var i=0, len= sel.options.length; i<len; i++) {
+        opt = sel.options[i];
+        // check if selected
+        if ( opt.selected ) {
+            // add to array of option elements to return from this function
+            opts.push(opt.value);
+        }
+    }
+    
+    // return array containing references to selected option elements
+    return opts;
+}
+
 function getDateFormated(id) {
 	var d = new Date(document.getElementById(id).value);
 	
