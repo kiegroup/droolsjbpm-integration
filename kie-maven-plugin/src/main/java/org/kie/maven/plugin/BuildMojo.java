@@ -101,7 +101,7 @@ public class BuildMojo extends AbstractKieMojo {
     private PlexusContainer container;
 
 
-    @Parameter(property = "generateModel", defaultValue = "no")
+    @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL")
     private String generateModel;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
