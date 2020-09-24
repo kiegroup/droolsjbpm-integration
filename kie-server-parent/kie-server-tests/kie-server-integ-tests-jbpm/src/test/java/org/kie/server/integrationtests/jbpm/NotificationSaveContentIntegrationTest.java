@@ -51,7 +51,7 @@ public class NotificationSaveContentIntegrationTest extends JbpmKieServerBaseInt
         createContainer(CONTAINER_ID_NOTIFICATION, releaseId);
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void testSaveContentOnNotification() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID_NOTIFICATION, PROCESS_ID_NOTIFICATION);
         assertNotNull(processInstanceId);

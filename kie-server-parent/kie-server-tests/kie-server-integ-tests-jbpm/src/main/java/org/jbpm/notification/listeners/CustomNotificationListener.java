@@ -33,7 +33,7 @@ public class CustomNotificationListener implements NotificationListener {
 
     @Override
     public void onNotification(NotificationEvent event, UserInfo userInfo) {
-        logger.debug("onNotification with event content {}", event.getContent());
+        logger.info("onNotification with event content {}", event.getContent());
         try {
             if ("TaskSaveContent".equals(event.getTask().getName())) {
                 userTaskService.saveContent(event.getTask().getId(), singletonMap("grade", "E"));
