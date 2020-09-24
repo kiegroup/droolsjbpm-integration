@@ -89,7 +89,7 @@ public class AuditDataReplicationKieServerTest {
         KieJarBuildHelper.createKieJar("src/test/resources/kjar/");
         Configuration config = new ConfigurationImpl();
         config.setSecurityEnabled(false);
-        config.addAcceptorConfiguration("amqp-acceptor", "tcp://localhost:61616?protocols=AMQP");
+        config.addAcceptorConfiguration("amqp-acceptor", "tcp://localhost:8888?protocols=AMQP");
 
         CoreQueueConfiguration auditQueue = new CoreQueueConfiguration();
         auditQueue.setAddress("audit-queue");
