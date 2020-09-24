@@ -18,7 +18,7 @@
       <MiningField name="input3" usageType="active" invalidValueTreatment="returnInvalid" />
     </MiningSchema>
     <Segmentation multipleModelMethod="majorityVote">
-      <Segment id="1">
+      <Segment id="A1">
         <True/>
         <TreeModel functionName="classification" noTrueChildStrategy="returnLastPrediction">
           <MiningSchema>
@@ -38,7 +38,7 @@
           </Node>
         </TreeModel>
       </Segment>
-      <Segment id="2">
+      <Segment id="A2">
         <True/>
         <TreeModel functionName="classification" noTrueChildStrategy="returnLastPrediction">
           <MiningSchema>
@@ -58,7 +58,7 @@
           </Node>
         </TreeModel>
       </Segment>
-      <Segment id="3">
+      <Segment id="A3">
         <True />
         <TreeModel functionName="classification" noTrueChildStrategy="returnLastPrediction">
           <MiningSchema>

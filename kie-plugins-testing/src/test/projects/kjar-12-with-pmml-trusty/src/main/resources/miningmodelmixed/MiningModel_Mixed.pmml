@@ -32,6 +32,9 @@
     </DataField>
     <DataField name="validLicense" optype="categorical" dataType="boolean"/>
     <DataField name="overallScore" optype="continuous" dataType="double" />
+    <DataField name="input1" optype="continuous" dataType="double"/>
+    <DataField name="input2" optype="continuous" dataType="double"/>
+    <DataField name="input3" optype="continuous" dataType="double"/>
   </DataDictionary>
   <MiningModel functionName="regression" modelName="MixedMining">
     <MiningSchema>
@@ -156,6 +159,44 @@
             </Characteristic>
           </Characteristics>
         </Scorecard>
+      </Segment>
+      <Segment>
+        <True/>
+        <TreeModel modelName="SimpleClassificationTreeModel" functionName="classification">
+          <MiningSchema>
+            <MiningField name="overallScore" usageType="predicted" invalidValueTreatment="returnInvalid"/>
+            <MiningField name="input1" usageType="active" invalidValueTreatment="returnInvalid" />
+            <MiningField name="input2" usageType="active" invalidValueTreatment="returnInvalid"/>
+            <MiningField name="input3" usageType="active" invalidValueTreatment="returnInvalid"/>
+          </MiningSchema>
+          <Output>
+            <OutputField name="Predicted_result" optype="categorical" dataType="string" feature="predictedValue"/>
+          </Output>
+          <Node id="1">
+            <True/>
+            <Node id="2" score="1">
+              <SimplePredicate field="input1" operator="equal" value="5"/>
+            </Node>
+            <Node id="3">
+              <SimplePredicate field="input1" operator="lessThan" value="5"/>
+              <Node id="5" score="2">
+                <SimplePredicate field="input2" operator="lessThan" value="-2"/>
+              </Node>
+              <Node id="6" score="3">
+                <SimplePredicate field="input2" operator="greaterOrEqual" value="-2"/>
+              </Node>
+            </Node>
+            <Node id="4" score="4">
+              <SimplePredicate field="input1" operator="greaterThan" value="5"/>
+              <Node id="7" score="5">
+                <SimplePredicate field="input3" operator="lessThan" value="0.5"/>
+              </Node>
+              <Node id="8" score="6">
+                <SimplePredicate field="input3" operator="greaterOrEqual" value="0.5"/>
+              </Node>
+            </Node>
+          </Node>
+        </TreeModel>
       </Segment>
     </Segmentation>
   </MiningModel>
