@@ -46,7 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = ApplicationSender.class)
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
-@Transactional(timeout = 60000)
 public class AuditDataReplicationKieServerTest {
 
     private static final Long TIMEOUT = 10000L;
@@ -66,6 +65,7 @@ public class AuditDataReplicationKieServerTest {
 
     @Autowired
     @Qualifier("datasource-replica")
+
     private DataSource datasourceReplica;
 
     @Autowired
@@ -91,7 +91,7 @@ public class AuditDataReplicationKieServerTest {
         KieJarBuildHelper.createKieJar("src/test/resources/kjar/");
         Configuration config = new ConfigurationImpl();
         config.setSecurityEnabled(false);
-        config.addAcceptorConfiguration("amqp-acceptor", "tcp://localhost:10022?protocols=AMQP");
+        config.addAcceptorConfiguration("amqp-acceptor", "tcp://localhost:8888?protocols=AMQP");
 
         CoreQueueConfiguration auditQueue = new CoreQueueConfiguration();
         auditQueue.setAddress("audit-queue");
