@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.drools.testcoverage</groupId>
-    <artifactId>kie-maven-plugin-no-execmodel-tests-parent</artifactId>
+    <artifactId>kie-maven-plugin-default-execmodel-tests-parent</artifactId>
     <version>7.44.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>kie-maven-plugin-no-execmodel-test-suite</artifactId>
+  <artifactId>kie-maven-plugin-default-execmodel-test-suite</artifactId>
 
-  <name>KIE Integration :: KIE Maven Plugin Additional Tests (NO exec model)</name>
+  <name>KIE Integration :: KIE Maven Plugin Additional Tests (DEFAULT exec model)</name>
 
   <dependencies>
     <dependency>
@@ -45,14 +45,14 @@
 
     <dependency>
       <groupId>org.drools.testcoverage</groupId>
-      <artifactId>kjar-with-instrumentation-no-execmodel</artifactId>
+      <artifactId>kjar-with-instrumentation-default-execmodel</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <!-- Artificial dependency to make sure the `kjar-with-instrumentation` is always build before the
            test-suite. Without this dependency the parallel (-T) build sometimes fails. -->
       <groupId>org.drools.testcoverage</groupId>
-      <artifactId>kjar-with-instrumentation-no-execmodel-wrapper</artifactId>
+      <artifactId>kjar-with-instrumentation-default-execmodel-wrapper</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
