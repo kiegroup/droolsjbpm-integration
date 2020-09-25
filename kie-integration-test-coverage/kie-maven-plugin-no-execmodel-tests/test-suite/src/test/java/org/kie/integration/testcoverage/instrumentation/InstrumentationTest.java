@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InstrumentationTest {
 
     private static final KieServices KIE_SERVICES = KieServices.get();
-    private static final ReleaseId RELEASE_ID = KIE_SERVICES.newReleaseId("org.drools.testcoverage", "kjar-with-instrumentation", TestUtil.getProjectVersion());
+    private static final ReleaseId RELEASE_ID = KIE_SERVICES.newReleaseId("org.drools.testcoverage", "kjar-with-instrumentation-no-execmodel", TestUtil.getProjectVersion());
 
     private static KieContainer kieContainer;
     private KieSession kieSession;

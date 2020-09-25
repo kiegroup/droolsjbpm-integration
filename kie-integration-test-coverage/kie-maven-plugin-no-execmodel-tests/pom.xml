@@ -18,12 +18,12 @@
     <dependencies>
       <dependency>
         <groupId>org.drools.testcoverage</groupId>
-        <artifactId>kjar-with-instrumentation</artifactId>
+        <artifactId>kjar-with-instrumentation-no-execmodel</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
         <groupId>org.drools.testcoverage</groupId>
-        <artifactId>kjar-with-instrumentation-wrapper</artifactId>
+        <artifactId>kjar-with-instrumentation-no-execmodel-wrapper</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
     </dependencies>
@@ -46,7 +46,7 @@
   </build>
 
   <modules>
-    <module>kjar-with-instrumentation-wrapper</module>
+    <module>kjar-with-instrumentation-no-execmodel-wrapper</module>
     <module>test-suite</module>
   </modules>
 </project>

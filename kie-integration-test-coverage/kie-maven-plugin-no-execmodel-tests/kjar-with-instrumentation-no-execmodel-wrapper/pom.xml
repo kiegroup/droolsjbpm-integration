@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>kjar-with-instrumentation-wrapper</artifactId>
+  <artifactId>kjar-with-instrumentation-no-execmodel-wrapper</artifactId>
   <packaging>jar</packaging>
 
   <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR Wrapper</name>
@@ -32,7 +32,7 @@
         <configuration>
           <cloneProjectsTo>${project.build.directory}/wrapped-project</cloneProjectsTo>
           <localRepositoryPath>${settings.localRepository}</localRepositoryPath>
-          <pom>${project.basedir}/src/test/resources/kjar-with-instrumentation/pom.xml</pom>
+          <pom>${project.basedir}/src/test/resources/kjar-with-instrumentation-no-execmodel/pom.xml</pom>
           <streamLogs>true</streamLogs>
           <goals>
             <goal>install</goal>
