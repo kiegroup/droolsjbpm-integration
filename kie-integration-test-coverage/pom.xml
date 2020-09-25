@@ -17,6 +17,7 @@
 
   <modules>
     <module>kie-maven-plugin-no-execmodel-tests</module>
+    <module>kie-maven-plugin-default-execmodel-tests</module>
     <module>kie-maven-plugin-separate-model-tests</module>
     <module>kie-spring-test</module>
   </modules>
