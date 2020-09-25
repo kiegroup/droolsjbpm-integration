@@ -19,19 +19,6 @@
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-model-compiler</artifactId>
-      <version>@version.org.kie@</version>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-canonical-model</artifactId>
-      <version>@version.org.kie@</version>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -41,6 +28,7 @@
         <extensions>true</extensions>
         <configuration>
           <instrument-enabled>true</instrument-enabled>
+          <generateModel>NO</generateModel>
         </configuration>
       </plugin>
     </plugins>

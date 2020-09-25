@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.core.impl.InternalKieContainer;
-import org.drools.modelcompiler.CanonicalKieModule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -94,8 +94,8 @@ public class InstrumentationTest {
 
     @Test
     public void testMetaInfoExists() {
-        CanonicalKieModule kieModule = (CanonicalKieModule)((InternalKieContainer)kieContainer).getMainKieModule();
-        Collection<String> fileNames = kieModule.getFileNames();
+        ZipKieModule zipKieModule = (ZipKieModule)((InternalKieContainer)kieContainer).getMainKieModule();
+        Collection<String> fileNames = zipKieModule.getFileNames();
 
         assertThat(fileNames).contains("META-INF/kmodule.info");
         assertThat(fileNames).contains("META-INF/instrumentationKBase/kbase.cache");
