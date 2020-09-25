@@ -24,9 +24,7 @@ jobs:
         id: build-chain
         uses: kiegroup/github-action-build-chain@v1.4
         with:
-          parent-dependencies: 'kie-jpmml-integration'
-          child-dependencies: 'openshift-drools-hacep'
-          build-command: 'mvn -e -nsu -Dfull -Pwildfly install -Pjenkins-pr-builder -Prun-code-coverage  -Dcontainer.profile=wildfly -Dcontainer=wildfly -Dintegration-tests=true -Dmaven.test.failure.ignore=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120'
+          build-command: 'mvn -e -nsu -Dfull -Pwildfly install -Pjenkins-pr-builder -Prun-code-coverage  -Dcontainer.profile=wildfly -Dcontainer=wildfly -Dintegration-tests=true -Dmaven.test.failure.ignore=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -pl :kie-server-spring-boot-autoconfiguration-audit-replication'
           build-command-upstream: |
             mvn -e --builder smart -T1C install -DskipTests -Dgwt.compiler.skip=true -Dgwt.skipCompilation=true -Denforcer.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Drevapi.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
             rm -rf ./*
