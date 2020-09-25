@@ -9,10 +9,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>kie-maven-plugin-tests-parent</artifactId>
+  <artifactId>kie-maven-plugin-no-execmodel-tests-parent</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE Integration :: KIE Maven Plugin Additional Test Coverage</name>
+  <name>KIE Integration :: KIE Maven Plugin Additional Test Coverage (no exec model)</name>
 
   <dependencyManagement>
     <dependencies>
