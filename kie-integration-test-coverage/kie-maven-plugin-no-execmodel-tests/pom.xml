@@ -12,7 +12,7 @@
   <artifactId>kie-maven-plugin-no-execmodel-tests-parent</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE Integration :: KIE Maven Plugin Additional Test Coverage (no exec model)</name>
+  <name>KIE Integration :: KIE Maven Plugin Additional Test Coverage (NO exec model)</name>
 
   <dependencyManagement>
     <dependencies>

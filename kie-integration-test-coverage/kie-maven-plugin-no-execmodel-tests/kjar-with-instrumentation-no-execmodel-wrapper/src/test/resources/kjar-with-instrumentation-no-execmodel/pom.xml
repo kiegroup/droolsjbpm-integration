@@ -11,7 +11,7 @@
 
   <packaging>kjar</packaging>
 
-  <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR</name>
+  <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR (NO exec model)</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

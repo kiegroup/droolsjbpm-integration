@@ -11,7 +11,7 @@
 
   <artifactId>kie-maven-plugin-test-suite</artifactId>
 
-  <name>KIE Integration :: KIE Maven Plugin Additional Tests</name>
+  <name>KIE Integration :: KIE Maven Plugin Additional Tests (NO exec model)</name>
 
   <dependencies>
     <dependency>

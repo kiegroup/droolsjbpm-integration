@@ -12,7 +12,7 @@
   <artifactId>kjar-with-instrumentation-no-execmodel-wrapper</artifactId>
   <packaging>jar</packaging>
 
-  <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR Wrapper</name>
+  <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR Wrapper (NO exec model)</name>
 
   <dependencies>
     <dependency>
