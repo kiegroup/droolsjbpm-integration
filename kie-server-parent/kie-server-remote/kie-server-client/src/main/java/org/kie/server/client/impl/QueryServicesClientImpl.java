@@ -110,8 +110,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(PROCESS_ID, processId);
 
-            result = makeHttpGetRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_ID_GET_URI, valuesMap), ProcessDefinitionList.class);
-
+            result = makeHttpGetRequestAndCreateCustomResponseWithHandleNotFound(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_ID_GET_URI, valuesMap), ProcessDefinitionList.class);
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessesById", new Object[]{processId})));
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);

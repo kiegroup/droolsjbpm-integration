@@ -210,6 +210,27 @@ public abstract class AbstractKieServicesClientImpl {
         }
     }
 
+    protected <T> T makeHttpGetRequestAndCreateCustomResponseWithHandleNotFound(String uri, Class<T> resultType) {
+        logger.debug("About to send GET request to '{}'", uri);
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation() {
+            @Override
+            public KieServerHttpRequest doOperation(String url) {
+                return newRequest(url).get();
+            }
+        });
+        KieServerHttpResponse response = request.response();
+
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
+        if (response.code() == Response.Status.NOT_FOUND.getStatusCode()) {
+            return null;
+        }
+        if (response.code() == Response.Status.OK.getStatusCode()) {
+            return deserialize(response.body(), resultType);
+        } else {
+            throw createExceptionForUnexpectedResponseCode(request, response);
+        }
+    }
+
     protected String makeHttpGetRequestAndCreateRawResponse(String uri) {
         logger.debug("About to send GET request to '{}'", uri);
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation() {
