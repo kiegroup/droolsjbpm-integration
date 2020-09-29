@@ -6,31 +6,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.drools.testcoverage</groupId>
-  <artifactId>kjar-with-instrumentation</artifactId>
+  <artifactId>kjar-with-instrumentation-no-execmodel</artifactId>
   <version>@version.org.kie@</version>
 
   <packaging>kjar</packaging>
 
-  <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR</name>
+  <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR (NO exec model)</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-model-compiler</artifactId>
-      <version>@version.org.kie@</version>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-canonical-model</artifactId>
-      <version>@version.org.kie@</version>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
@@ -41,6 +28,7 @@
         <extensions>true</extensions>
         <configuration>
           <instrument-enabled>true</instrument-enabled>
+          <generateModel>NO</generateModel>
         </configuration>
       </plugin>
     </plugins>
