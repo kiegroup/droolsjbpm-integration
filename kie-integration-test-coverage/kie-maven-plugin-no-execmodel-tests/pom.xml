@@ -9,21 +9,21 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>kie-maven-plugin-tests-parent</artifactId>
+  <artifactId>kie-maven-plugin-no-execmodel-tests-parent</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE Integration :: KIE Maven Plugin Additional Test Coverage</name>
+  <name>KIE Integration :: KIE Maven Plugin Additional Test Coverage (NO exec model)</name>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.drools.testcoverage</groupId>
-        <artifactId>kjar-with-instrumentation</artifactId>
+        <artifactId>kjar-with-instrumentation-no-execmodel</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
         <groupId>org.drools.testcoverage</groupId>
-        <artifactId>kjar-with-instrumentation-wrapper</artifactId>
+        <artifactId>kjar-with-instrumentation-no-execmodel-wrapper</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
     </dependencies>
@@ -46,7 +46,7 @@
   </build>
 
   <modules>
-    <module>kjar-with-instrumentation-wrapper</module>
+    <module>kjar-with-instrumentation-no-execmodel-wrapper</module>
     <module>test-suite</module>
   </modules>
 </project>
