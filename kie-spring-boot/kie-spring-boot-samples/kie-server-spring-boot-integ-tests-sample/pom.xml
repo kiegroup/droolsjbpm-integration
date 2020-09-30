@@ -79,7 +79,7 @@
           <executions>
             <execution>
               <id>enforce-direct-dependencies</id>
-              <phase>validate</phase>
+              <phase>none</phase>
               <goals>
                 <goal>enforce</goal>
               </goals>
