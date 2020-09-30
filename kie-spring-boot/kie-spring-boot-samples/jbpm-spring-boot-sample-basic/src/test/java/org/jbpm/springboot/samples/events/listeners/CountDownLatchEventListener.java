@@ -17,11 +17,9 @@ package org.jbpm.springboot.samples.events.listeners;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.jbpm.services.api.ProcessService;
 import org.kie.api.event.process.DefaultProcessEventListener;
 import org.kie.api.event.process.ProcessCompletedEvent;
 import org.kie.api.event.process.ProcessNodeLeftEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,21 +30,6 @@ public class CountDownLatchEventListener extends DefaultProcessEventListener {
     private String expectedNodeName;
     
     private String executingThread;
-    
-    @Autowired
-    private ProcessService processService;
-
-    private String variable;
-
-    private Object result;
-
-    public void setVariable(String variable) {
-        this.variable = variable;
-    }
-
-    public Object getResult() {
-        return result;
-    }
     
     public void configure(String processId, int threads) {
         this.expectedProcessId = processId;
@@ -71,13 +54,6 @@ public class CountDownLatchEventListener extends DefaultProcessEventListener {
         if (this.latch != null && event.getProcessInstance().getProcessId().equals(expectedProcessId)) {
             this.executingThread = Thread.currentThread().getName();
             this.latch.countDown();
-        }
-    }
-    
-    @Override
-    public void beforeProcessCompleted(ProcessCompletedEvent event) {
-        if (variable != null) {
-          result = processService.getProcessInstanceVariable(event.getProcessInstance().getId(), variable);
         }
     }
     
