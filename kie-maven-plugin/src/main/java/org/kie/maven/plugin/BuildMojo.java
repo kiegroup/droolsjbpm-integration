@@ -68,7 +68,7 @@ import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
-public class BuildMojo extends AbstractKieMojo {
+public class BuildMojo extends AbstractDMNValidationAwareMojo {
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
@@ -114,7 +114,7 @@ public class BuildMojo extends AbstractKieMojo {
         }
     }
 
-    private void buildDrl() throws MojoFailureException {
+    private void buildDrl() throws MojoFailureException, MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Set<URL> urls = new HashSet<>();
@@ -168,6 +168,10 @@ public class BuildMojo extends AbstractKieMojo {
                 throw new MojoFailureException("Build failed!");
             } else {
                 writeClassFiles( kModule );
+            }
+
+            if (shallPerformDMNDTAnalysis()) {
+                performDMNDTAnalysis(kModule);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
