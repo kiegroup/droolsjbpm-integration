@@ -30,6 +30,8 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="[4,5)">spring-orm</feature>
     <feature version="[2,3)">jpa</feature>
+    <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
+    <bundle>mvn:org.drools/drools-serialization-protobuf/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-persistence-api/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
   </feature>
