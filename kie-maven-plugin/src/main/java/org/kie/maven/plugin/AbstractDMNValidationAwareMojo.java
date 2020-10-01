@@ -60,14 +60,16 @@ public abstract class AbstractDMNValidationAwareMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.resources}")
     private List<Resource> resources;
 
-    @Parameter(property = "validateDMN", defaultValue = "VALIDATE_SCHEMA,VALIDATE_MODEL")
+    @Parameter(property = "validateDMN", defaultValue = "VALIDATE_SCHEMA,VALIDATE_MODEL,ANALYZE_DECISION_TABLE")
     private String validateDMN;
 
     protected String getValidateDMN() {
         return validateDMN;
     }
 
-    protected void logValidationMessages(List<DMNMessage> validation, Function<DMNMessage, String> prefixer) {
+    protected void logValidationMessages(List<DMNMessage> validation,
+                                         Function<DMNMessage, String> prefixer,
+                                         Function<DMNMessage, String> computeMessage) {
         for (DMNMessage msg : validation) {
             Consumer<CharSequence> logFn = null;
             switch (msg.getLevel()) {
@@ -84,7 +86,7 @@ public abstract class AbstractDMNValidationAwareMojo extends AbstractKieMojo {
             }
             StringBuilder sb = new StringBuilder();
             sb.append(prefixer.apply(msg));
-            sb.append(msg.getText());
+            sb.append(computeMessage.apply(msg));
             logFn.accept(sb.toString());
         }
     }
@@ -124,7 +126,7 @@ public abstract class AbstractDMNValidationAwareMojo extends AbstractKieMojo {
                 for (DTAnalysis r : results) {
                     getLog().info(" analysis for decision table '" + r.nameOrIDOfTable() + "':");
                     List<DMNMessage> messages = r.asDMNMessages();
-                    logValidationMessages(messages, (u) -> "  ");
+                    logValidationMessages(messages, (u) -> "  ", DMNMessage::getMessage);
                     if (messages.stream().anyMatch(m -> m.getLevel() == Level.ERROR)) {
                         throw new MojoFailureException("There are DMN Validation Error(s).");
                     }

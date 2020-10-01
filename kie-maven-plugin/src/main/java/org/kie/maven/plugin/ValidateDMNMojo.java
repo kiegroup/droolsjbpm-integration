@@ -80,7 +80,7 @@ public class ValidateDMNMojo extends AbstractDMNValidationAwareMojo {
         dmnModelPaths.forEach(x -> getLog().info("Will validate DMN model: " + x.toString()));
         List<DMNMessage> validation = validator.validateUsing(actualFlags.toArray(new Validation[]{}))
                                                .theseModels(dmnModelPaths.stream().map(Path::toFile).collect(Collectors.toList()).toArray(new File[]{}));
-        logValidationMessages(validation, this::validateMsgPrefixer);
+        logValidationMessages(validation, this::validateMsgPrefixer, DMNMessage::getText);
         if (validation.stream().anyMatch(m -> m.getLevel() == Level.ERROR)) {
             throw new MojoFailureException("There are DMN Validation Error(s).");
         }
