@@ -16,6 +16,7 @@
 package org.kie.server.controller.api;
 
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
 
 /**
@@ -33,6 +34,15 @@ public interface KieServerController {
      */
     KieServerSetup connect(KieServerInfo serverInfo);
 
+    /**
+     * Entry point for for KieServer to update its status information.
+     * @param serverInfo representation of minimal set of information about KieServer
+     */
+
+    default KieServerSetup update(KieServerStateInfo containerSpec) {
+        return new KieServerSetup();
+    }
+    
     /**
      * Notifies controller that server is going down.
      * @param serverInfo representation of minimal set of information about KieServer

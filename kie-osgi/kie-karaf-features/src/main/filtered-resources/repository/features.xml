@@ -8,7 +8,6 @@
   <repository>mvn:org.apache.camel.karaf/apache-camel/${karaf.version.org.apache.camel}/xml/features</repository>
 
   <feature name="drools-common" version="${project.version}" description="Drools Commons">
-    <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream-java8/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.3/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
@@ -26,7 +25,6 @@
   </feature>
 
   <feature name="drools-decisiontable" description="Drools Decision Tables" version="${project.version}">
-    <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-templates</feature>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>

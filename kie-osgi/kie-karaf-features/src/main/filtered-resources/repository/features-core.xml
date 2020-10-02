@@ -16,6 +16,7 @@
     <bundle>mvn:org.drools/drools-model-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-mvel/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-cdi/${version.org.drools}</bundle>
     <bundle>mvn:org.kie/kie-osgi-integration/${version.org.drools}</bundle>
   </feature>
@@ -29,6 +30,8 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="[4,5)">spring-orm</feature>
     <feature version="[2,3)">jpa</feature>
+    <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
+    <bundle>mvn:org.drools/drools-serialization-protobuf/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-persistence-api/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
   </feature>
@@ -44,6 +47,7 @@
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-mvel/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core-reflective/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core-dynamic/${version.org.drools}</bundle>
   </feature>

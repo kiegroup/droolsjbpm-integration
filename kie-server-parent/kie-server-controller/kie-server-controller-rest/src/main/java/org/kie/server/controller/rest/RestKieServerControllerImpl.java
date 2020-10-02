@@ -21,6 +21,7 @@ import java.util.Collections;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -32,10 +33,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
-import org.kie.server.controller.api.storage.KieServerControllerStorage;
 import org.kie.server.controller.impl.KieServerControllerImpl;
-import org.kie.server.controller.impl.storage.InMemoryKieServerControllerStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,24 @@ public class RestKieServerControllerImpl extends KieServerControllerImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(RestKieServerControllerImpl.class);
 
-    private KieServerControllerStorage storage = InMemoryKieServerControllerStorage.getInstance();
+    @POST
+    @Path("server/{serverInstanceId}")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response updatetKieServer(@Context HttpHeaders headers,
+                                     @PathParam("serverInstanceId") String id,
+                                     String serverInfoPayload) {
+        String contentType = getContentType(headers);
+        logger.debug("Received connect request from server with id {}", id);
+        KieServerStateInfo kieServerStateInfo = unmarshal(serverInfoPayload, contentType, KieServerStateInfo.class);
+
+        logger.debug("Server info update {}", kieServerStateInfo);
+        KieServerSetup serverSetup = update(kieServerStateInfo);
+
+        String response = marshal(contentType, serverSetup);
+        logger.debug("Returning response for connect of server '{}': {}", id, response);
+        return createCorrectVariant(response, headers, serverSetup.hasNoErrors() ? Response.Status.OK: Response.Status.BAD_REQUEST);
+    }
 
     @PUT
     @Path("server/{serverInstanceId}")
