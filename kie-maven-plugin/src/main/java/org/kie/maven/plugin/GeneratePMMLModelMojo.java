@@ -162,12 +162,12 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                     .filter(f -> f.endsWith("java"))
                     .collect(Collectors.toList());
 
-            Set<String> drlFiles = kieModule.getFileNames()
-                    .stream()
-                    .filter(f -> f.endsWith("drl"))
-                    .collect(Collectors.toSet());
-
-            getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
+//            Set<String> drlFiles = kieModule.getFileNames()
+//                    .stream()
+//                    .filter(f -> f.endsWith("drl"))
+//                    .collect(Collectors.toSet());
+//
+//            getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
 
             MemoryFileSystem mfs = kieModule instanceof CanonicalKieModule ?
                     ((MemoryKieModule) ((CanonicalKieModule) kieModule).getInternalKieModule()).getMemoryFileSystem() :
@@ -211,9 +211,9 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 throw new MojoExecutionException("Unable to write file", e);
             }
 
-            if (ExecModelMode.shouldDeleteFile(generatePMMLModel)) {
-                deleteDrlFiles(drlFiles);
-            }
+//            if (ExecModelMode.shouldDeleteFile(generatePMMLModel)) {
+//                deleteDrlFiles(drlFiles);
+//            }
 
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -223,30 +223,30 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         getLog().info("PMML model successfully generated");
     }
 
-    private void deleteDrlFiles(Set<String> actualDrlFiles) throws MojoExecutionException {
-        // Remove drl files
-        try (final Stream<Path> drlFilesToDeleted = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p))) {
-            Set<String> deletedFiles = new HashSet<>();
-            drlFilesToDeleted.forEach(p -> {
-                try {
-                    Files.delete(p);
-                    deletedFiles.add(p.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Unable to delete file " + p);
-                }
-            });
-            actualDrlFiles.retainAll(deletedFiles);
-            if (!actualDrlFiles.isEmpty()) {
-                String actualDrlFiles1 = String.join(",", actualDrlFiles);
-                getLog().warn("Base directory: " + projectDir);
-                getLog().warn("Files not deleted: " + actualDrlFiles1);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new MojoExecutionException("Unable to find .drl files");
-        }
-    }
+//    private void deleteDrlFiles(Set<String> actualDrlFiles) throws MojoExecutionException {
+//        // Remove drl files
+//        try (final Stream<Path> drlFilesToDeleted = Files.find(outputDirectory.toPath(), Integer.MAX_VALUE, (p, f) -> drlFileMatcher.matches(p))) {
+//            Set<String> deletedFiles = new HashSet<>();
+//            drlFilesToDeleted.forEach(p -> {
+//                try {
+//                    Files.delete(p);
+//                    deletedFiles.add(p.toString());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    throw new RuntimeException("Unable to delete file " + p);
+//                }
+//            });
+//            actualDrlFiles.retainAll(deletedFiles);
+//            if (!actualDrlFiles.isEmpty()) {
+//                String actualDrlFiles1 = String.join(",", actualDrlFiles);
+//                getLog().warn("Base directory: " + projectDir);
+//                getLog().warn("Files not deleted: " + actualDrlFiles1);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            throw new MojoExecutionException("Unable to find .drl files");
+//        }
+//    }
 
     public static class ExecutableModelMavenProject implements KieBuilder.ProjectType {
 

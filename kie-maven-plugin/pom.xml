@@ -180,16 +180,34 @@
       <artifactId>drools-scorecards</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- LEGACY PMML -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>kie-pmml</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- TRUSTY PMML -->
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-pmml-dependencies</artifactId>
-      <type>pom</type>
-<!--      <scope>runtime</scope>-->
+      <artifactId>kie-pmml-commons</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-models-drools-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-compiler-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-compiler-core</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-evaluator-assembler</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
