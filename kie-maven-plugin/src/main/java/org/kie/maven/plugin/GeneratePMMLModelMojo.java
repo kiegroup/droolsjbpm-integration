@@ -21,21 +21,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -70,11 +66,8 @@ import org.kie.api.builder.KieBuilder;
 import org.kie.api.internal.io.ResourceTypePackage;
 import org.kie.api.io.ResourceType;
 import org.kie.pmml.commons.model.HasSourcesMap;
-import org.kie.pmml.commons.model.KiePMMLFactoryModel;
-import org.kie.pmml.commons.model.KiePMMLModel;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
-import static org.kie.pmml.commons.utils.KiePMMLModelUtils.getSanitizedPackageName;
 
 @Mojo(name = "generatePMMLModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -82,13 +75,6 @@ import static org.kie.pmml.commons.utils.KiePMMLModelUtils.getSanitizedPackageNa
         defaultPhase = LifecyclePhase.COMPILE)
 public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
-    private static final String KMODULE_XML_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
-            "<kmodule xmlns=\"http://jboss.org/kie/6.0.0/kmodule\">\r\n" +
-            "\r\n%s\r\n" +
-            "</kmodule>";
-    private static final String KBASE_TAG_TEMPLATE = "\t<kbase name=\"%s\" packages=\"%s\">\r\n" + // defaulting that all pmml files have to be put inside PMMLResources folder
-            "\t\t<ksession name=\"%sSession\" type=\"stateless\" />\r\n" +
-            "\t</kbase>\r\n";
     private static final String CLASSES = "classes";
     private static final String PMMLRESOURCES = "PMMLResources";
     private static final String PMML = "pmml";
@@ -277,7 +263,6 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
-                StringBuilder kbasesTagsBuilder = new StringBuilder();
                 for (ModelBuilderImpl modelBuilder : modelBuilders) {
                     ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageSources());
                     modelFiles.addAll(result.getModelFiles());
@@ -289,13 +274,6 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                                 final Iterator<?> iterator = pmmlPackage.iterator();
                                 while (iterator.hasNext()) {
                                     Object retrieved = iterator.next();
-                                    // Declaring kbase tag inside generated kmodule; one kbase for each actual model
-                                    if (retrieved instanceof KiePMMLModel && !(retrieved instanceof KiePMMLFactoryModel)) {
-                                        KiePMMLModel kiePMMLModel = (KiePMMLModel) retrieved;
-                                        String kbaseName = kiePMMLModel.getName();
-                                        String kpackageName = kiePMMLModel.getKModulePackageName();
-                                        kbasesTagsBuilder.append(String.format(KBASE_TAG_TEMPLATE, kbaseName, kpackageName, kbaseName));
-                                    }
                                     // adding sources to source folder
                                     if (retrieved instanceof HasSourcesMap) {
                                         final Map<String, String> sourcesMap = ((HasSourcesMap) retrieved).getSourcesMap();
