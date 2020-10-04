@@ -148,6 +148,10 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
     </dependency>
+    <dependency> <!-- required when NOT producing the executable model for kbase.cache file -->
+      <groupId>org.drools</groupId>
+      <artifactId>drools-serialization-protobuf</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
