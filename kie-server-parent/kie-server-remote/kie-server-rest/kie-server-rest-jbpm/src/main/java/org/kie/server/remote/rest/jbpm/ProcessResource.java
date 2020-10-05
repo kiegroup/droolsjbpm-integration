@@ -153,8 +153,7 @@ public class ProcessResource  {
         return url;
     }
 
-    @ApiOperation(value="Starts a new process instance of a specified process.",
-            response=Long.class, code=201)
+    @ApiOperation(value="Starts a new process instance of a specified process.")
     @ApiResponses(value = { 
             @ApiResponse(code = 201, response=Long.class, message = "Process instance started", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
@@ -199,8 +198,7 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value = "Starts a new process instance from the specific nodes",
-            response=Long.class, code=201)
+    @ApiOperation(value = "Starts a new process instance from the specific nodes")
     @ApiResponses(value = {@ApiResponse(code = 201, response = Long.class, message = "Process instance created",
                                         examples = @Example(value = {@ExampleProperty(mediaType = JSON, value = LONG_RESPONSE_JSON),
                                                                      @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
@@ -243,8 +241,7 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value = "Starts a new process instance from the specific nodes",
-                  response = Long.class, code = 201)
+    @ApiOperation(value = "Starts a new process instance from the specific nodes")
     @ApiResponses(value = {@ApiResponse(code = 201, response = Long.class, message = "Process instance created",
                                         examples = @Example(value = {@ExampleProperty(mediaType = JSON, value = LONG_RESPONSE_JSON),
                                                                      @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
@@ -289,8 +286,7 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Starts a new process instance of a specified process and assigns a new correlation key to the process instance.",
-            response=Long.class, code=201)
+    @ApiOperation(value="Starts a new process instance of a specified process and assigns a new correlation key to the process instance.")
     @ApiResponses(value = { @ApiResponse(code = 201, response=Long.class, message = "Process instance started", examples=@Example(value= {
             @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
             @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
@@ -335,8 +331,7 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Aborts a specified process instance in a specified KIE container.",
-            response=Void.class, code=204)
+    @ApiOperation(value = "Aborts a specified process instance in a specified KIE container.", response = Void.class, code = 204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
                             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
                             @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
@@ -367,8 +362,7 @@ public class ProcessResource  {
     }
 
 
-    @ApiOperation(value="Aborts multiple specified process instances in a specified KIE container.",
-            response=Void.class, code=204)
+    @ApiOperation(value = "Aborts multiple specified process instances in a specified KIE container.", response = Void.class, code = 204)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
@@ -436,8 +430,7 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Signals multiple process instances with a specified signal name.",
-            response=Void.class, code=200)
+    @ApiOperation(value = "Signals multiple process instances with a specified signal name.", response = Void.class, code = 200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
@@ -478,11 +471,10 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified process instance in a specified KIE container.",
-            response=ProcessInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified process instance in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_GET_URI)
@@ -583,12 +575,11 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns the value of a specified variable in a specified process instance.",
-            response=Object.class, code=200)
+    @ApiOperation(value="Returns the value of a specified variable in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = Object.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VAR_RESPONSE_JSON)}) )})
     @GET
     @Path(PROCESS_INSTANCE_VAR_GET_URI)
@@ -621,12 +612,11 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Retrieves all variables for a specified process instance as a map in which the key is the variable name and the value is the variable value.",
-            response=Map.class, code=200)
+    @ApiOperation(value="Retrieves all variables for a specified process instance as a map in which the key is the variable name and the value is the variable value.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
             @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = Map.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_VARS_GET_URI)
@@ -659,12 +649,11 @@ public class ProcessResource  {
 
     }
 
-    @ApiOperation(value="Returns all available signal names for a specified process instance.",
-            response=String.class, responseContainer="List", code=200)
+    @ApiOperation(value="Returns all available signal names for a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
             @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response= String.class, responseContainer= "List", message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_SIGNALS_GET_URI)
@@ -768,12 +757,11 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified work item for a specified process instance.",
-            response=WorkItemInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified work item for a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"), 
             @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = WorkItemInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEM_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI)
@@ -806,12 +794,11 @@ public class ProcessResource  {
 
     }
 
-    @ApiOperation(value="Returns all work items for a specified process instance.",
-            response=WorkItemInstanceList.class, code=200)
+    @ApiOperation(value="Returns all work items for a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"), 
             @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = WorkItemInstanceList.class,  message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEMS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI)
@@ -840,11 +827,10 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns a list of process instances in a specified KIE container.",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns a list of process instances in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
                             @ApiResponse(code = 404, message = "Container Id not found"), 
-                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                            @ApiResponse(code = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_GET_URI)
@@ -872,11 +858,10 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns a list of process definitions in a specified KIE container.",
-            response=ProcessDefinitionList.class, code=200)
+    @ApiOperation(value="Returns a list of process definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
                             @ApiResponse(code = 404, message = "Container Id not found"), 
-                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -903,11 +888,10 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns node instances for the specified process instance.",
-            response=NodeInstanceList.class, code=200)
+    @ApiOperation(value="Returns node instances for the specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
                             @ApiResponse(code = 404, message = "Process Instance or Container Id not found"), 
-                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                            @ApiResponse(code = 200, response = NodeInstanceList.class, message = "Successful response", examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCES_NODE_INSTANCES_GET_URI)
@@ -943,11 +927,10 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns the current variable values of a specified process instance in a specified KIE container.",
-            response=VariableInstanceList.class, code=200)
+    @ApiOperation(value="Returns the current variable values of a specified process instance in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
                             @ApiResponse(code = 404, message = "Process Instance or Container Id not found"), 
-                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                            @ApiResponse(code = 200, response = VariableInstanceList.class, message = "Successful response", examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCES_GET_URI)
@@ -973,11 +956,10 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns the history of a specified variable in a specified process instance.",
-            response=VariableInstanceList.class, code=200)
+    @ApiOperation(value="Returns the history of a specified variable in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
                             @ApiResponse(code = 404, message = "Process Instance or Container Id not found"), 
-                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                            @ApiResponse(code = 200, response = VariableInstanceList.class, message = "Successful response", examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI)
@@ -1006,10 +988,9 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns a list of process instances for which a specified process instance is a parent process instance",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns a list of process instances for which a specified process instance is a parent process instance")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCES_BY_PARENT_GET_URI)

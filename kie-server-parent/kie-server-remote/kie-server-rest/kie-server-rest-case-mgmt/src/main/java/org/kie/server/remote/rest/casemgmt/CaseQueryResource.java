@@ -96,10 +96,9 @@ public class CaseQueryResource extends AbstractCaseResource {
         super(caseManagementRuntimeDataServiceBase, context);
     }
 
-    @ApiOperation(value="Returns cases instances with authentication checks.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns cases instances with authentication checks.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
@@ -141,10 +140,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns cases instances that involve the querying user in a specified role.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns cases instances that involve the querying user in a specified role.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
@@ -175,10 +173,9 @@ public class CaseQueryResource extends AbstractCaseResource {
      * case definition methods
      */
     
-    @ApiOperation(value="Returns a specified case definition from all KIE containers.",
-            response=CaseDefinitionList.class, code=200)
+    @ApiOperation(value="Returns a specified case definition from all KIE containers.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, message = "Successful response", response = CaseDefinitionList.class, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -205,10 +202,9 @@ public class CaseQueryResource extends AbstractCaseResource {
     /*
      * process definition methods
      */
-    @ApiOperation(value="Returns a specified process associated with case definitions from all KIE containers.",
-            response=ProcessDefinitionList.class, code=200)
+    @ApiOperation(value="Returns a specified process associated with case definitions from all KIE containers.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_ALL_PROCESSES_INSTANCES_GET_URI)
@@ -233,10 +229,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns processes associated with case definitions in a specified KIE container.",
-            response=ProcessDefinitionList.class, code=200)
+    @ApiOperation(value="Returns processes associated with case definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI)
@@ -265,10 +260,9 @@ public class CaseQueryResource extends AbstractCaseResource {
      * Case tasks
      */
 
-    @ApiOperation(value="Returns tasks for potential owners in a specified case instance.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns tasks for potential owners in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_POT_OWNER_GET_URI)
@@ -294,10 +288,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns tasks for business administrators in a specified case instance.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns tasks for business administrators in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_ADMIN_GET_URI)
@@ -323,10 +316,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns tasks for stakeholders in a specified case instance.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns tasks for stakeholders in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_STAKEHOLDER_GET_URI)
@@ -352,10 +344,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns case file data items for a specified case instance.",
-            response=CaseFileDataItemList.class, code=200)
+    @ApiOperation(value="Returns case file data items for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseFileDataItemList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_CASE_FILE_DATA_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_FILE_GET_URI)
@@ -378,7 +369,7 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value = "Queries cases by variables and tasks")
+    @ApiOperation(value = "Queries cases by variables and tasks", response = CaseInstanceCustomVarsList.class)
     @POST
     @Path(RestURI.VARIABLES_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -404,7 +395,7 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     }
 
-    @ApiOperation(value = "Queries cases tasks by variables")
+    @ApiOperation(value = "Queries cases tasks by variables", response = CaseUserTaskWithVariablesList.class)
     @POST
     @Path(RestURI.VARIABLES_TASKS_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
