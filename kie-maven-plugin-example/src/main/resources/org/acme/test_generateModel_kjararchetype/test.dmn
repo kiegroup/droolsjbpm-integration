@@ -46,7 +46,7 @@
       <semantic:informationRequirement>
          <semantic:requiredInput href="#_a69e86bf-4e59-444f-abf8-09d38f762bab"/>
       </semantic:informationRequirement>
-      <semantic:decisionTable hitPolicy="UNIQUE"
+      <semantic:decisionTable hitPolicy="PRIORITY"
                               id="_b950dde1-532a-4bfb-9bdd-1e3768b15fac"
                               outputLabel="Exemptions">
          <semantic:input id="_e2659f15-f658-41dc-ae2d-7e50abd1f555">
@@ -59,7 +59,11 @@
                <semantic:text>Account holder.employed</semantic:text>
             </semantic:inputExpression>
          </semantic:input>
-         <semantic:output id="_15bb42a9-4650-40b1-b7c0-1dde877b4d3f"/>
+         <semantic:output id="_15bb42a9-4650-40b1-b7c0-1dde877b4d3f">
+           <semantic:outputValues id="manual1">
+             <semantic:text>"Exempted","Standard"</semantic:text>
+           </semantic:outputValues>
+         </semantic:output>
          <semantic:rule id="_a8532882-b9d8-4b02-aba1-dc46325e1f13">
             <semantic:inputEntry id="_45266326-5e3d-4b5d-b7d9-00b65e184761">
                <semantic:text>-</semantic:text>

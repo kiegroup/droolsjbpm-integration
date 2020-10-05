@@ -15,7 +15,7 @@ public class ValidateDMNMojoFlagsTest {
 
     public static final Logger LOG = LoggerFactory.getLogger(ValidateDMNMojoFlagsTest.class);
 
-    private ValidateDMNMojo mojo;
+    private AbstractDMNValidationAwareMojo mojo;
 
     @Before
     public void init() {
