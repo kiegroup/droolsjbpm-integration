@@ -3,4 +3,5 @@
   <kbase name="instrumentationKBase" default="true" packages="org.kie.integration.testcoverage.instrumentation">
     <ksession name="instrumentationSession" default="true" type="stateful" />
   </kbase>
+  <kbase name="dmnKBase" packages="org.kie.integration.testcoverage.dmn" />
 </kmodule>
