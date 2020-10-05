@@ -211,29 +211,7 @@
     </dependency>
 
     <!-- test dependencies -->
-    <dependency>
-      <groupId>org.amqphub.spring</groupId>
-      <artifactId>amqp-10-jms-spring-boot-starter</artifactId>
-      <exclusions>
-          <exclusion>
-              <groupId>org.apache.geronimo.specs</groupId>
-              <artifactId>geronimo-jms_2.0_spec</artifactId>
-          </exclusion>
-      </exclusions>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.messaginghub</groupId>
-      <artifactId>pooled-jms</artifactId>
-      <exclusions>
-          <exclusion>
-              <groupId>org.apache.geronimo.specs</groupId>
-              <artifactId>geronimo-jms_2.0_spec</artifactId>
-          </exclusion>
-      </exclusions>
-      <scope>test</scope>
-    </dependency>
-    
+
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-artemis</artifactId>
@@ -263,12 +241,6 @@
                 <artifactId>geronimo-jta_1.1_spec</artifactId>
             </exclusion>
         </exclusions>
-    </dependency>
-
-    <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>artemis-amqp-protocol</artifactId>
-        <scope>test</scope>
     </dependency>
 
     <dependency>
