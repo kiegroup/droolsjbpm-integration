@@ -86,6 +86,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     private static final String PMMLRESOURCES = "PMMLResources";
     private static final String PMML = "pmml";
     private static final PMMLAssemblerService PMML_ASSEMBLER_SERVICE = new PMMLAssemblerService();
+    private static final String generatedSourcesPath = "/generated-sources/";
     public static PathMatcher drlFileMatcher = FileSystems.getDefault().getPathMatcher("glob:**.drl");
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
@@ -119,6 +120,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
     private void generateModel() throws MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        URLClassLoader projectClassLoader = null;
         try {
             Set<URL> urls = new HashSet<>();
             for (String element : project.getCompileClasspathElements()) {
@@ -134,12 +136,10 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 }
             }
             urls.add(outputDirectory.toURI().toURL());
-
-            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
-                                                                        getClass().getClassLoader());
+            projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
             Thread.currentThread().setContextClassLoader(projectClassLoader);
         } catch (DependencyResolutionRequiredException | MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new MojoExecutionException(e.getMessage(), e);
         }
 
         final List<Resource> resources = getPMMLResources();
@@ -153,7 +153,6 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
         kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
         try {
-            final String generatedSourcesPath = "/generated-sources/";
             final String newCompileSourceRoot = targetDirectory.getPath() + generatedSourcesPath;
             project.addCompileSourceRoot(newCompileSourceRoot);
 
@@ -165,7 +164,8 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 try {
                     Files.deleteIfExists(newFile);
                     Files.createDirectories(newFile.getParent());
-                    Files.copy(new ByteArrayInputStream(generatedFile.getData()), newFile, StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(new ByteArrayInputStream(generatedFile.getData()), newFile,
+                               StandardCopyOption.REPLACE_EXISTING);
 
                     getLog().info("Generating " + newFile);
                 } catch (IOException e) {
@@ -175,18 +175,26 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+            if (projectClassLoader != null) {
+                try {
+                    projectClassLoader.close();
+                } catch (IOException e) {
+                    getLog().warn(e);
+                }
+            }
         }
         getLog().info("PMML model successfully generated");
     }
 
-    private void generateFile(final List<PMMLResource> pmmlResources, final List<GeneratedFile> generatedFiles) {
+    private void generateFile(final List<PMMLResource> pmmlResources, final List<GeneratedFile> generatedFiles) throws MojoExecutionException {
         if (pmmlResources.isEmpty()) {
             return;
         }
         for (PMMLResource resource : pmmlResources) {
             ModelBuilderImpl<PackageSources> modelBuilder = new ModelBuilderImpl<>(PackageSources::dumpSources,
                                                                                    new KnowledgeBuilderConfigurationImpl(getClass().getClassLoader()),
-                                                                                   new ReleaseIdImpl("dummy:dummy:0.0.0"),
+                                                                                   new ReleaseIdImpl("dummy:dummy:0.0" +
+                                                                                                             ".0"),
                                                                                    true, false);
             CompositeKnowledgeBuilder batch = modelBuilder.batch();
             List<KiePMMLModel> kiepmmlModels = resource.getKiePmmlModels();
@@ -198,18 +206,18 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     private void addModels(final List<KiePMMLModel> kiepmmlModels,
                            final PMMLResource resource,
                            final CompositeKnowledgeBuilder batch,
-                           final List<GeneratedFile> generatedFiles) {
+                           final List<GeneratedFile> generatedFiles) throws MojoExecutionException {
         for (KiePMMLModel model : kiepmmlModels) {
             if (model.getName() == null || model.getName().isEmpty()) {
                 String errorMessage = String.format("Model name should not be empty inside %s",
                                                     resource.getModelPath());
-                throw new RuntimeException(errorMessage);
+                throw new MojoExecutionException(errorMessage);
             }
             if (!(model instanceof HasSourcesMap)) {
                 String errorMessage = String.format("Expecting HasSourcesMap instance, retrieved %s inside %s",
                                                     model.getClass().getName(),
                                                     resource.getModelPath());
-                throw new RuntimeException(errorMessage);
+                throw new MojoExecutionException(errorMessage);
             }
             Map<String, String> sourceMap = ((HasSourcesMap) model).getSourcesMap();
             for (Map.Entry<String, String> sourceMapEntry : sourceMap.entrySet()) {
@@ -232,22 +240,25 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     }
 
     private List<GeneratedFile> generateRules(ModelBuilderImpl<PackageSources> modelBuilder,
-                                              CompositeKnowledgeBuilder batch) {
+                                              CompositeKnowledgeBuilder batch) throws MojoExecutionException {
         try {
             batch.build();
-        } catch (RuntimeException e) {
-            for (DroolsError error : modelBuilder.getErrors().getErrors()) {
-                logger.error(error.toString());
+            if (modelBuilder.hasErrors()) {
+                StringBuilder builder = new StringBuilder();
+                for (DroolsError error : modelBuilder.getErrors().getErrors()) {
+                    logger.error(error.toString());
+                    builder.append(error.toString()).append(" ");
+                }
+                throw new MojoExecutionException(builder.toString());
             }
+        } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
-        if (modelBuilder.hasErrors()) {
+            StringBuilder builder = new StringBuilder(e.getMessage()).append(" ");
             for (DroolsError error : modelBuilder.getErrors().getErrors()) {
                 logger.error(error.toString());
+                builder.append(error.toString()).append(" ");
             }
-            throw new RuntimeException(" modelBuilder.getErrors().getErrors()");
+            throw new MojoExecutionException(builder.toString(), e);
         }
 
         return generateModels(modelBuilder).stream().map(f -> new GeneratedFile(
@@ -276,6 +287,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         List<Resource> toReturn = new ArrayList<>();
         for (org.apache.maven.model.Resource resourceDirectory : resourcesDirectories) {
             File directoryFile = new File(resourceDirectory.getDirectory());
+            getLog().info("Looking for PMML models in " + directoryFile.getPath());
             String errorMessageTemplate = null;
             if (!directoryFile.exists()) {
                 errorMessageTemplate = "Resource path %s does not exists";
@@ -288,6 +300,11 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 throw new MojoExecutionException(String.format(errorMessageTemplate, resourceDirectory));
             }
             toReturn.addAll(getPMMLFiles(directoryFile));
+        }
+        if (toReturn.isEmpty()) {
+            getLog().info("No PMML Models found.");
+        } else {
+            getLog().info(String.format("Found %s PMML models", toReturn.size()));
         }
         return toReturn;
     }
