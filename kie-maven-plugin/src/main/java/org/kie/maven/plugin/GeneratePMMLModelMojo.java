@@ -138,41 +138,9 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
             urls.add(outputDirectory.toURI().toURL());
             projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
             Thread.currentThread().setContextClassLoader(projectClassLoader);
+            generateFiles();
         } catch (DependencyResolutionRequiredException | MalformedURLException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        }
-
-        final List<Resource> resources = getPMMLResources();
-        final List<PMMLResource> pmmlResources = resources.stream()
-                .map(this::parseResource)
-                .collect(toList());
-        final List<GeneratedFile> generatedFiles = new ArrayList<>();
-        generateFile(pmmlResources, generatedFiles);
-
-        KieServices ks = KieServices.Factory.get();
-        final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
-        kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
-        try {
-            final String newCompileSourceRoot = targetDirectory.getPath() + generatedSourcesPath;
-            project.addCompileSourceRoot(newCompileSourceRoot);
-
-            for (GeneratedFile generatedFile : generatedFiles) {
-                final Path newFile = Paths.get(targetDirectory.getPath(),
-                                               generatedSourcesPath,
-                                               generatedFile.getPath());
-
-                try {
-                    Files.deleteIfExists(newFile);
-                    Files.createDirectories(newFile.getParent());
-                    Files.copy(new ByteArrayInputStream(generatedFile.getData()), newFile,
-                               StandardCopyOption.REPLACE_EXISTING);
-
-                    getLog().info("Generating " + newFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new MojoExecutionException("Unable to write file", e);
-                }
-            }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
             if (projectClassLoader != null) {
@@ -184,6 +152,40 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
             }
         }
         getLog().info("PMML model successfully generated");
+    }
+
+    private void generateFiles() throws MojoExecutionException {
+        final List<Resource> resources = getPMMLResources();
+        final List<PMMLResource> pmmlResources = resources.stream()
+                .map(this::parseResource)
+                .collect(toList());
+        final List<GeneratedFile> generatedFiles = new ArrayList<>();
+        generateFile(pmmlResources, generatedFiles);
+
+        KieServices ks = KieServices.Factory.get();
+        final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
+        kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
+        final String newCompileSourceRoot = targetDirectory.getPath() + generatedSourcesPath;
+        project.addCompileSourceRoot(newCompileSourceRoot);
+        for (GeneratedFile generatedFile : generatedFiles) {
+            writeFile(generatedFile);
+        }
+    }
+
+    private void writeFile(final GeneratedFile generatedFile) throws MojoExecutionException {
+        final Path newFile = Paths.get(targetDirectory.getPath(),
+                                       generatedSourcesPath,
+                                       generatedFile.getPath());
+        try {
+            Files.deleteIfExists(newFile);
+            Files.createDirectories(newFile.getParent());
+            Files.copy(new ByteArrayInputStream(generatedFile.getData()), newFile,
+                       StandardCopyOption.REPLACE_EXISTING);
+            getLog().info("Generating " + newFile);
+        } catch (IOException e) {
+            getLog().error(e);
+            throw new MojoExecutionException("Unable to write file", e);
+        }
     }
 
     private void generateFile(final List<PMMLResource> pmmlResources, final List<GeneratedFile> generatedFiles) throws MojoExecutionException {

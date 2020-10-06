@@ -184,11 +184,6 @@
       <artifactId>drools-scorecards</artifactId>
       <scope>runtime</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.drools</groupId>-->
-<!--      <artifactId>kie-pmml</artifactId>-->
-<!--      <scope>runtime</scope>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-commons</artifactId>
