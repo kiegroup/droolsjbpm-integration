@@ -49,10 +49,10 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
+import org.drools.compiler.kie.builder.impl.CompilationCacheProvider;
 import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
-import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.kie.api.KieServices;
@@ -68,7 +68,7 @@ import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
-public class BuildMojo extends AbstractKieMojo {
+public class BuildMojo extends AbstractDMNValidationAwareMojo {
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
@@ -114,7 +114,7 @@ public class BuildMojo extends AbstractKieMojo {
         }
     }
 
-    private void buildDrl() throws MojoFailureException {
+    private void buildDrl() throws MojoFailureException, MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Set<URL> urls = new HashSet<>();
@@ -158,7 +158,7 @@ public class BuildMojo extends AbstractKieMojo {
                 CompilerHelper helper = new CompilerHelper();
                 helper.share(kieMap, kModule, getLog());
             } else {
-                new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
+                CompilationCacheProvider.get().writeKieModuleMetaInfo(kModule, new DiskResourceStore(outputDirectory));
             }
 
             if (!errors.isEmpty()) {
@@ -168,6 +168,10 @@ public class BuildMojo extends AbstractKieMojo {
                 throw new MojoFailureException("Build failed!");
             } else {
                 writeClassFiles( kModule );
+            }
+
+            if (shallPerformDMNDTAnalysis()) {
+                performDMNDTAnalysis(kModule);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);

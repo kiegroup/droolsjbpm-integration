@@ -69,7 +69,7 @@ import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
         requiresDependencyResolution = ResolutionScope.NONE,
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
-public class GenerateModelMojo extends AbstractKieMojo {
+public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
 
     public static PathMatcher drlFileMatcher = FileSystems.getDefault().getPathMatcher("glob:**.drl");
 
@@ -111,7 +111,7 @@ public class GenerateModelMojo extends AbstractKieMojo {
 
     }
 
-    private void generateModel() throws MojoExecutionException {
+    private void generateModel() throws MojoExecutionException, MojoFailureException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Set<URL> urls = new HashSet<>();
@@ -200,6 +200,10 @@ public class GenerateModelMojo extends AbstractKieMojo {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new MojoExecutionException("Unable to write file", e);
+            }
+
+            if (shallPerformDMNDTAnalysis()) {
+                performDMNDTAnalysis(kieModule);
             }
 
             if (ExecModelMode.shouldDeleteFile(generateModel)) {

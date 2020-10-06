@@ -11,11 +11,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.apache.activemq.artemis.api.core.RoutingType;
-import org.apache.activemq.artemis.core.config.Configuration;
-import org.apache.activemq.artemis.core.config.CoreQueueConfiguration;
-import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
-import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.assertj.core.api.Assertions;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
@@ -26,7 +21,6 @@ import org.jbpm.services.task.audit.impl.model.AuditTaskImpl;
 import org.jbpm.services.task.audit.impl.model.BAMTaskSummaryImpl;
 import org.jbpm.services.task.audit.impl.model.TaskEventImpl;
 import org.jbpm.services.task.audit.impl.model.TaskVariableImpl;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -78,7 +72,6 @@ public class AuditDataReplicationKieServerTest {
     @Autowired
     private UserTaskService userTaskService;
 
-    protected static final EmbeddedActiveMQ embedded = new EmbeddedActiveMQ();
 
     @Autowired
     @Qualifier("auditDataReplicationConsumer")
@@ -87,24 +80,6 @@ public class AuditDataReplicationKieServerTest {
     @BeforeClass
     public static void startUp() throws Exception {
         KieJarBuildHelper.createKieJar("src/test/resources/kjar/");
-        Configuration config = new ConfigurationImpl();
-        config.setSecurityEnabled(false);
-        config.addAcceptorConfiguration("amqp-acceptor", "tcp://localhost:10022?protocols=AMQP");
-
-        CoreQueueConfiguration auditQueue = new CoreQueueConfiguration();
-        auditQueue.setAddress("audit-queue");
-        auditQueue.setRoutingType(RoutingType.ANYCAST);
-        auditQueue.setName("audit-queue");
-        config.addQueueConfiguration(auditQueue); 
-
-        embedded.setConfiguration(config);
-        embedded.start();
-        
-    }
-
-    @AfterClass
-    public static void shutDown() throws Exception {
-        embedded.stop();
     }
 
     @Before
