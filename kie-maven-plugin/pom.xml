@@ -222,6 +222,30 @@
       <artifactId>drools-scorecards</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- LEGACY PMML -->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>kie-pmml</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.xml.bind</groupId>
+          <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>runtime</scope>
+    </dependency>
     <!-- TRUSTY PMML -->
     <dependency>
       <groupId>org.kie</groupId>
