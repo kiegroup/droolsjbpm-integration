@@ -29,22 +29,21 @@ import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.dmn.DMNKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-public class DMNPMMLNaiveBayesIntegrationTest extends DMNKieServerBaseIntegrationTest {
+public class DMNPMMLNeuralNetworkIntegrationTest extends DMNPMMLKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-naive-bayes-kjar",
+            "org.kie.server.testing", "dmn-pmml-nn-kjar",
             "1.0.0.Final" );
 
-    private static final String CONTAINER_1_ID  = "dmn-pml-naive-bayes";
+    private static final String CONTAINER_1_ID  = "dmn-pml-neuralnetwork";
 
-    private static final String NAIVE_BAYES_MODEL_NAMESPACE
+    private static final String NEURAL_NETWORK_MODEL_NAMESPACE
             = "https://kiegroup.org/dmn/_51A1FD67-8A67-4332-9889-B718BE8B7456";
-    private static final String NAIVE_BAYES_MODEL_NAME = "NaiveBayesDMN";
-    private static final String NAIVE_BAYES_DECISION_NAME = "Decision1";
+    private static final String NEURAL_NETWORK_MODEL_NAME = "NeuralNetworkDMN";
+    private static final String NEURAL_NETWORK_DECISION_NAME = "Decision1";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
@@ -52,7 +51,7 @@ public class DMNPMMLNaiveBayesIntegrationTest extends DMNKieServerBaseIntegratio
     public static void deployArtifacts() {
         if (DMNPMMLTestUtils.extendedPMMLTestsEnabled() == true) {
             KieServerDeployer.buildAndDeployCommonMavenParent();
-            KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-naive-bayes");
+            KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-nn");
 
             kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
@@ -63,12 +62,8 @@ public class DMNPMMLNaiveBayesIntegrationTest extends DMNKieServerBaseIntegratio
         }
     }
 
-    /*
-     * This it.test is reportedly not working in the "embedded" EE container,
-     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
-     */
     @Test
-    public void testDMNWithPMMLKmeans() {
+    public void testDMNWithPMMLNeuralNetwork() {
         Assume.assumeTrue(DMNPMMLTestUtils.extendedPMMLTestsEnabled());
 
         final DMNContext dmnContext = dmnClient.newContext();
@@ -78,9 +73,9 @@ public class DMNPMMLNaiveBayesIntegrationTest extends DMNKieServerBaseIntegratio
         dmnContext.set("Petal.Width", 0.3);
         final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
                 CONTAINER_1_ID,
-                NAIVE_BAYES_MODEL_NAMESPACE,
-                NAIVE_BAYES_MODEL_NAME,
-                NAIVE_BAYES_DECISION_NAME,
+                NEURAL_NETWORK_MODEL_NAMESPACE,
+                NEURAL_NETWORK_MODEL_NAME,
+                NEURAL_NETWORK_DECISION_NAME,
                 dmnContext);
 
         Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);

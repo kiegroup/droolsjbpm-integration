@@ -13,8 +13,14 @@ import com.jboss.soap.service.acmedemo.FlightRequest;
 public class AcmeDemoInterfaceImpl implements AcmeDemoInterface {
 
     public Flight listAvailablePlanes(FlightRequest in) {
-        String startCity = in.getStartCity();
-        String endCity = in.getEndCity();
+        String startCity = null;
+        String endCity = null;
+        String startDate = null;
+        if (in != null) {
+            startCity = in.getStartCity();
+            endCity = in.getEndCity();
+            startDate = in.getStartDate();
+        }
         BigDecimal outboundBD = new BigDecimal(525);
 
         Flight outbound = new Flight();
@@ -23,7 +29,7 @@ public class AcmeDemoInterfaceImpl implements AcmeDemoInterface {
         outbound.setRatePerPerson(outboundBD);
         outbound.setStartCity(startCity);
         outbound.setTargetCity(endCity);
-        outbound.setTravelDate(in.getStartDate());
+        outbound.setTravelDate(startDate);
 
         System.out.println("OUTBOUND FLIGHT variables set");
 

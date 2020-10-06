@@ -16,8 +16,6 @@
 
 package org.kie.server.integrationtests.dmn.pmml;
 
-import java.math.BigDecimal;
-
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +27,6 @@ import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.dmn.DMNKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -37,25 +34,26 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
  * This it.test is reportedly not working in the "embedded" EE container,
  * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
  */
-public class DMNPMMLScorecardIntegrationTest extends DMNKieServerBaseIntegrationTest {
+public class DMNPMMLTreeIntegrationTest extends DMNPMMLKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-scorecard-kjar",
+            "org.kie.server.testing", "dmn-pmml-tree-kjar",
             "1.0.0.Final" );
 
-    private static final String CONTAINER_1_ID  = "dmn-pmml-scorecard";
+    private static final String CONTAINER_1_ID  = "dmn-pmml-tree";
 
-    private static final String SCORECARD_MODEL_NAMESPACE
-            = "http://www.trisotech.com/definitions/_ca466dbe-20b4-4e88-a43f-4ce3aff26e4f";
-    private static final String SCORECARD_MODEL_NAME = "KiePMMLScoreCard";
-    private static final String SCORECARD_DECISION_NAME = "my decision";
+    private static final String TREE_MODEL_NAMESPACE
+            = "https://kiegroup.org/dmn/_FAA4232D-9D61-4089-BB05-5F5D7C1AECE1";
+    private static final String TREE_MODEL_NAME = "TestTreeDMN";
+    private static final String TREE_DECISION_NAME = "Decision";
+    private static final String TREE_DECISION_RESULT = "decision";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-scorecard");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-tree");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
@@ -70,13 +68,15 @@ public class DMNPMMLScorecardIntegrationTest extends DMNKieServerBaseIntegration
      * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
      */
     @Test
-    public void testDMNwithPMMLScorecard() {
+    public void testDMNWithPMMLTree() {
         final DMNContext dmnContext = dmnClient.newContext();
+        dmnContext.set("temperature", 30);
+        dmnContext.set("humidity", 10);
         final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
                 CONTAINER_1_ID,
-                SCORECARD_MODEL_NAMESPACE,
-                SCORECARD_MODEL_NAME,
-                SCORECARD_DECISION_NAME,
+                TREE_MODEL_NAMESPACE,
+                TREE_MODEL_NAME,
+                TREE_DECISION_NAME,
                 dmnContext);
 
         Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);
@@ -84,7 +84,7 @@ public class DMNPMMLScorecardIntegrationTest extends DMNKieServerBaseIntegration
         final DMNResult dmnResult = serviceResponse.getResult();
         Assertions.assertThat(dmnResult).isNotNull();
         Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final BigDecimal result = (BigDecimal) dmnResult.getDecisionResultByName(SCORECARD_DECISION_NAME).getResult();
-        Assertions.assertThat(result).isEqualTo(new BigDecimal("41.345"));
+        final String result = (String) dmnResult.getDecisionResultByName(TREE_DECISION_NAME).getResult();
+        Assertions.assertThat(result).isEqualTo("sunglasses");
     }
 }

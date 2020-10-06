@@ -34,31 +34,50 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 @Category({JEEOnly.class})
 public class WebServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "webservice-project", "1.0.0.Final");
+    private static ReleaseId releaseWsId = new ReleaseId("org.kie.server.testing", "webservice-project", "1.0.0.Final");
+    private static ReleaseId releaseWsNoClientId = new ReleaseId("org.kie.server.testing", "webservice-no-client-project", "1.0.0.Final");
     protected static final String WS_CONTAINER_ID = "webservice-project";
+    protected static final String WS_NO_CLIENT_CONTAINER_ID = "webservice-no-client-project";
     protected static final String PROCESS_ID_WS = "org.specialtripsagency.specialtripsagencyprocess";
-    
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/webservice-project");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/webservice-no-client-project");
 
-        kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+        // container for webservice-project
+        kieContainer = KieServices.Factory.get().newKieContainer(releaseWsId);
+        createContainer(WS_CONTAINER_ID, releaseWsId);
 
-        createContainer(WS_CONTAINER_ID, releaseId);
+        // second container for webservice-no-client project
+        kieContainer = KieServices.Factory.get().newKieContainer(releaseWsNoClientId);
+        createContainer(WS_NO_CLIENT_CONTAINER_ID, releaseWsNoClientId);
     }
 
 
     @Test
-    public void testCallWebServiceFromProcess() throws Exception {
+    public void testCallWebServiceFromProcess() {
         Map<String, Object> params = new HashMap<>();
         params.put("serviceUrl", TestConfig.getWebServiceHttpURL());
         Long pid = processClient.startProcess(WS_CONTAINER_ID, PROCESS_ID_WS, params);
-        
+
         assertThat(pid).isNotNull();
         ProcessInstance pi = queryClient.findProcessInstanceById(pid);
-        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);        
+        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
+
+    }
+
+    @Test
+    public void testCallWebServiceNoClientFromProcess() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("serviceUrl", TestConfig.getWebServiceHttpURL());
+        Long pid = processClient.startProcess(WS_NO_CLIENT_CONTAINER_ID, PROCESS_ID_WS, params);
+
+        assertThat(pid).isNotNull();
+        ProcessInstance pi = queryClient.findProcessInstanceById(pid);
+        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
 
     }
 
