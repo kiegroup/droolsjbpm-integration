@@ -97,14 +97,10 @@ public class GenerateModelMojo extends AbstractKieMojo {
     @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL") // DROOLS-5663 align kie-maven-plugin default value for generateModel configuration flag
     private String generateModel;
 
-    @Parameter(property = "generatePMMLModel", defaultValue = "no")
-    private String generatePMMLModel;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        // GenerateModelMojo is executed when BuildMojo and GeneratePMMLModelMojo aren't and vice-versa
+        // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
         boolean modelParameterEnabled = modelParameterEnabled(generateModel);
-        modelParameterEnabled = modelParameterEnabled && !PMMLModelMode.modelParameterEnabled(generatePMMLModel);
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
         if (modelParameterEnabled && modelCompilerInClassPath) {
             generateModel();

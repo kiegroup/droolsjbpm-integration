@@ -11,10 +11,9 @@
   <packaging>kjar</packaging>
 
   <properties>
-    <org.kie.version>7.44.0-SNAPSHOT</org.kie.version>
+    <org.kie.version>7.45.0-SNAPSHOT</org.kie.version>
     <generateModel>NO</generateModel>
     <generateDMNModel>NO</generateDMNModel>
-    <generatePMMLModel>YES</generatePMMLModel>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
@@ -39,7 +38,35 @@
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>properties-maven-plugin</artifactId>
+          <version>1.0.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>set-system-properties</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <property>
+                  <name>kie-pmml-implementation</name>
+                  <value>new</value>
+                </property>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
