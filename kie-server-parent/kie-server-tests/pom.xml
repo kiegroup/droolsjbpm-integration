@@ -95,6 +95,7 @@
     <module>kie-server-integ-tests-scenario-simulation</module>
     <module>kie-server-integ-tests-custom-extension</module>
     <module>kie-server-integ-tests-task-assigning</module>
+    <module>kie-server-integ-tests-dmn-pmml</module>
   </modules>
 
   <dependencyManagement>

@@ -29,22 +29,21 @@ import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.dmn.DMNKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-public class DMNPMMLNeuralNetworkIntegrationTest extends DMNKieServerBaseIntegrationTest {
+public class DMNPMMLKMeansIntegrationTest extends DMNPMMLKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-nn-kjar",
+            "org.kie.server.testing", "dmn-pmml-kmeans-kjar",
             "1.0.0.Final" );
 
-    private static final String CONTAINER_1_ID  = "dmn-pml-neuralnetwork";
+    private static final String CONTAINER_1_ID  = "dmn-pml-kmeans";
 
-    private static final String NEURAL_NETWORK_MODEL_NAMESPACE
+    private static final String KMEANS_MODEL_NAMESPACE
             = "https://kiegroup.org/dmn/_51A1FD67-8A67-4332-9889-B718BE8B7456";
-    private static final String NEURAL_NETWORK_MODEL_NAME = "NeuralNetworkDMN";
-    private static final String NEURAL_NETWORK_DECISION_NAME = "Decision1";
+    private static final String KMEANS_MODEL_NAME = "KMeansDMN";
+    private static final String KMEANS_DECISION_NAME = "Decision1";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
@@ -52,7 +51,7 @@ public class DMNPMMLNeuralNetworkIntegrationTest extends DMNKieServerBaseIntegra
     public static void deployArtifacts() {
         if (DMNPMMLTestUtils.extendedPMMLTestsEnabled() == true) {
             KieServerDeployer.buildAndDeployCommonMavenParent();
-            KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-nn");
+            KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-kmeans");
 
             kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
@@ -63,25 +62,28 @@ public class DMNPMMLNeuralNetworkIntegrationTest extends DMNKieServerBaseIntegra
         }
     }
 
+    /*
+     * This it.test is reportedly not working in the "embedded" EE container,
+     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
+     */
     @Test
-    public void testDMNWithPMMLNeuralNetwork() {
+    public void testDMNWithPMMLKmeans() {
         Assume.assumeTrue(DMNPMMLTestUtils.extendedPMMLTestsEnabled());
 
         final DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set("Sepal.Length", 5.7);
-        dmnContext.set("Sepal.Width", 3.8);
-        dmnContext.set("Petal.Length", 1.7);
-        dmnContext.set("Petal.Width", 0.3);
+        dmnContext.set("x", 5);
+        dmnContext.set("y", 5);
+
         final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
                 CONTAINER_1_ID,
-                NEURAL_NETWORK_MODEL_NAMESPACE,
-                NEURAL_NETWORK_MODEL_NAME,
-                NEURAL_NETWORK_DECISION_NAME,
+                KMEANS_MODEL_NAMESPACE,
+                KMEANS_MODEL_NAME,
+                KMEANS_DECISION_NAME,
                 dmnContext);
 
         Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);
         Assertions.assertThat(serviceResponse.getResult().getDecisionResultByName("Decision1").getResult()).isNotNull();
         final Map<String, Object> decisionResult = (Map<String, Object>) serviceResponse.getResult().getDecisionResultByName("Decision1").getResult();
-        Assertions.assertThat((String) decisionResult.get("Predicted_Species")).isEqualTo("setosa");
+        Assertions.assertThat((String) decisionResult.get("predictedValue")).isEqualTo("4");
     }
 }

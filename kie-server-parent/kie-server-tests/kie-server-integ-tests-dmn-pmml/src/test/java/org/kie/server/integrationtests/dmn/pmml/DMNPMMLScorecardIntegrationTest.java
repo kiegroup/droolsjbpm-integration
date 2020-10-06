@@ -29,7 +29,6 @@ import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.dmn.DMNKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -37,25 +36,25 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
  * This it.test is reportedly not working in the "embedded" EE container,
  * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
  */
-public class DMNPMMLMiningIntegrationTest extends DMNKieServerBaseIntegrationTest {
+public class DMNPMMLScorecardIntegrationTest extends DMNPMMLKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-mining-kjar",
+            "org.kie.server.testing", "dmn-pmml-scorecard-kjar",
             "1.0.0.Final" );
 
-    private static final String CONTAINER_1_ID  = "dmn-pmml-mining";
+    private static final String CONTAINER_1_ID  = "dmn-pmml-scorecard";
 
-    private static final String MINING_MODEL_NAMESPACE
-            = "https://kiegroup.org/dmn/_0E8EC382-BB89-4877-8D37-A59B64285F05";
-    private static final String MINING_MODEL_NAME = "MiningModelDMN";
-    private static final String MINING_DECISION_NAME = "Decision";
+    private static final String SCORECARD_MODEL_NAMESPACE
+            = "http://www.trisotech.com/definitions/_ca466dbe-20b4-4e88-a43f-4ce3aff26e4f";
+    private static final String SCORECARD_MODEL_NAME = "KiePMMLScoreCard";
+    private static final String SCORECARD_DECISION_NAME = "my decision";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-mining");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-scorecard");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
@@ -70,16 +69,13 @@ public class DMNPMMLMiningIntegrationTest extends DMNKieServerBaseIntegrationTes
      * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
      */
     @Test
-    public void testDMNWithPMMLMining() {
+    public void testDMNwithPMMLScorecard() {
         final DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set("input1", 200);
-        dmnContext.set("input2", -1);
-        dmnContext.set("input3", 2);
         final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
                 CONTAINER_1_ID,
-                MINING_MODEL_NAMESPACE,
-                MINING_MODEL_NAME,
-                MINING_DECISION_NAME,
+                SCORECARD_MODEL_NAMESPACE,
+                SCORECARD_MODEL_NAME,
+                SCORECARD_DECISION_NAME,
                 dmnContext);
 
         Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);
@@ -87,7 +83,7 @@ public class DMNPMMLMiningIntegrationTest extends DMNKieServerBaseIntegrationTes
         final DMNResult dmnResult = serviceResponse.getResult();
         Assertions.assertThat(dmnResult).isNotNull();
         Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final BigDecimal result = (BigDecimal) dmnResult.getDecisionResultByName(MINING_DECISION_NAME).getResult();
-        Assertions.assertThat(result).isEqualTo(new BigDecimal("-299"));
+        final BigDecimal result = (BigDecimal) dmnResult.getDecisionResultByName(SCORECARD_DECISION_NAME).getResult();
+        Assertions.assertThat(result).isEqualTo(new BigDecimal("41.345"));
     }
 }
