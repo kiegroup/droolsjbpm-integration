@@ -15,7 +15,10 @@
 
 package org.jbpm.springboot.services;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import javax.persistence.EntityManagerFactory;
 
 import org.drools.core.event.AbstractEventSupport;
 import org.jbpm.casemgmt.api.event.CaseEventListener;
@@ -50,7 +53,17 @@ public class SpringKModuleDeploymentService extends KModuleDeploymentService {
         return factory;
     }
 
-    
+    @Override
+    protected Map<String, Object> buildContextParameters(KieContainer kieContainer) {
+        Map<String, Object> contextParams = new HashMap<>();
+        Map<String, EntityManagerFactory> emfsFound = context.getBeansOfType(EntityManagerFactory.class);
+        for(Map.Entry<String, EntityManagerFactory> entry : emfsFound.entrySet()) {
+            contextParams.put(entry.getKey(), entry.getValue());
+        }
+        contextParams.putAll(super.buildContextParameters(kieContainer));
+        return contextParams;
+    }
+
     public void setContext(ApplicationContext context) {
         this.context = context;
     }
