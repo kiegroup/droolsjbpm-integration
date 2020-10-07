@@ -87,7 +87,6 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     private static final String PMML = "pmml";
     private static final PMMLAssemblerService PMML_ASSEMBLER_SERVICE = new PMMLAssemblerService();
     private static final String generatedSourcesPath = "/generated-sources/";
-    public static PathMatcher drlFileMatcher = FileSystems.getDefault().getPathMatcher("glob:**.drl");
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
     @Parameter(required = true, defaultValue = "${project.build.directory}")
@@ -155,13 +154,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     }
 
     private void generateFiles() throws MojoExecutionException {
-        final List<Resource> resources = getPMMLResources();
-        final List<PMMLResource> pmmlResources = resources.stream()
-                .map(this::parseResource)
-                .collect(toList());
-        final List<GeneratedFile> generatedFiles = new ArrayList<>();
-        generateFile(pmmlResources, generatedFiles);
-
+        final List<GeneratedFile> generatedFiles = getGeneratedFiles();
         KieServices ks = KieServices.Factory.get();
         final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
         kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
@@ -188,38 +181,80 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         }
     }
 
-    private void generateFile(final List<PMMLResource> pmmlResources, final List<GeneratedFile> generatedFiles) throws MojoExecutionException {
-        if (pmmlResources.isEmpty()) {
-            return;
+    private List<GeneratedFile> getGeneratedFiles() throws MojoExecutionException {
+        List<GeneratedFile> toReturn = new ArrayList<>();
+        for (org.apache.maven.model.Resource resourceDirectory : resourcesDirectories) {
+            File directoryFile = new File(resourceDirectory.getDirectory());
+            getLog().info("Looking for PMML models in " + directoryFile.getPath());
+            String errorMessageTemplate = null;
+            if (!directoryFile.exists()) {
+                errorMessageTemplate = "Resource path %s does not exists";
+            } else if (!directoryFile.canRead()) {
+                errorMessageTemplate = "Resource path %s is not readable";
+            } else if (!directoryFile.isDirectory()) {
+                errorMessageTemplate = "Resource path %s is not a directory";
+            }
+            if (errorMessageTemplate != null) {
+                throw new MojoExecutionException(String.format(errorMessageTemplate, resourceDirectory));
+            }
+            toReturn.addAll(getGeneratedFiles(directoryFile));
         }
-        for (PMMLResource resource : pmmlResources) {
-            ModelBuilderImpl<PackageSources> modelBuilder = new ModelBuilderImpl<>(PackageSources::dumpSources,
-                                                                                   new KnowledgeBuilderConfigurationImpl(getClass().getClassLoader()),
-                                                                                   new ReleaseIdImpl("dummy:dummy:0.0" +
-                                                                                                             ".0"),
-                                                                                   true, false);
-            CompositeKnowledgeBuilder batch = modelBuilder.batch();
-            List<KiePMMLModel> kiepmmlModels = resource.getKiePmmlModels();
-            addModels(kiepmmlModels, resource, batch, generatedFiles);
-            generatedFiles.addAll(generateRules(modelBuilder, batch));
+        if (toReturn.isEmpty()) {
+            getLog().info("No PMML Models found.");
+        } else {
+            getLog().info(String.format("Found %s PMML models", toReturn.size()));
         }
+        return toReturn;
+    }
+
+    private List<GeneratedFile> getGeneratedFiles(File resourceDirectory) throws MojoExecutionException {
+        final List<GeneratedFile> toReturn = new ArrayList<>();
+        try (Stream<Path> stream = Files
+                .walk(resourceDirectory.toPath(), Integer.MAX_VALUE)
+                .filter(path -> path.toString().endsWith(PMML))) {
+            return stream
+                    .map(Path::toFile)
+                    .map(FileSystemResource::new)
+                    .map(this::parseResource)
+                    .map(this::getGenerateFiles)
+                    .reduce(toReturn, (previous, toAdd) -> {
+                        previous.addAll(toAdd);
+                        return previous;
+                    });
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
+
+    private List<GeneratedFile> getGenerateFiles(final PMMLResource pmmlResources) {
+        final List<GeneratedFile> toReturn = new ArrayList<>();
+        ModelBuilderImpl<PackageSources> modelBuilder = new ModelBuilderImpl<>(PackageSources::dumpSources,
+                                                                               new KnowledgeBuilderConfigurationImpl(getClass().getClassLoader()),
+                                                                               new ReleaseIdImpl("dummy:dummy:0.0" +
+                                                                                                         ".0"),
+                                                                               true, false);
+        CompositeKnowledgeBuilder batch = modelBuilder.batch();
+        List<KiePMMLModel> kiepmmlModels = pmmlResources.getKiePmmlModels();
+        addModels(kiepmmlModels, pmmlResources, batch, toReturn);
+        toReturn.addAll(generateRules(modelBuilder, batch));
+        return toReturn;
     }
 
     private void addModels(final List<KiePMMLModel> kiepmmlModels,
                            final PMMLResource resource,
                            final CompositeKnowledgeBuilder batch,
-                           final List<GeneratedFile> generatedFiles) throws MojoExecutionException {
+                           final List<GeneratedFile> generatedFiles) {
         for (KiePMMLModel model : kiepmmlModels) {
             if (model.getName() == null || model.getName().isEmpty()) {
                 String errorMessage = String.format("Model name should not be empty inside %s",
                                                     resource.getModelPath());
-                throw new MojoExecutionException(errorMessage);
+                throw new RuntimeException(errorMessage);
             }
             if (!(model instanceof HasSourcesMap)) {
                 String errorMessage = String.format("Expecting HasSourcesMap instance, retrieved %s inside %s",
                                                     model.getClass().getName(),
                                                     resource.getModelPath());
-                throw new MojoExecutionException(errorMessage);
+                throw new RuntimeException(errorMessage);
             }
             Map<String, String> sourceMap = ((HasSourcesMap) model).getSourcesMap();
             for (Map.Entry<String, String> sourceMapEntry : sourceMap.entrySet()) {
@@ -242,7 +277,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     }
 
     private List<GeneratedFile> generateRules(ModelBuilderImpl<PackageSources> modelBuilder,
-                                              CompositeKnowledgeBuilder batch) throws MojoExecutionException {
+                                              CompositeKnowledgeBuilder batch) {
         try {
             batch.build();
             if (modelBuilder.hasErrors()) {
@@ -260,7 +295,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 logger.error(error.toString());
                 builder.append(error.toString()).append(" ");
             }
-            throw new MojoExecutionException(builder.toString(), e);
+            throw new RuntimeException(builder.toString(), e);
         }
 
         return generateModels(modelBuilder).stream().map(f -> new GeneratedFile(
@@ -285,42 +320,4 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         return new PMMLResource(kiePMMLModels, new File(resource.getSourcePath()).toPath(), modelPath);
     }
 
-    private List<Resource> getPMMLResources() throws MojoExecutionException {
-        List<Resource> toReturn = new ArrayList<>();
-        for (org.apache.maven.model.Resource resourceDirectory : resourcesDirectories) {
-            File directoryFile = new File(resourceDirectory.getDirectory());
-            getLog().info("Looking for PMML models in " + directoryFile.getPath());
-            String errorMessageTemplate = null;
-            if (!directoryFile.exists()) {
-                errorMessageTemplate = "Resource path %s does not exists";
-            } else if (!directoryFile.canRead()) {
-                errorMessageTemplate = "Resource path %s is not readable";
-            } else if (!directoryFile.isDirectory()) {
-                errorMessageTemplate = "Resource path %s is not a directory";
-            }
-            if (errorMessageTemplate != null) {
-                throw new MojoExecutionException(String.format(errorMessageTemplate, resourceDirectory));
-            }
-            toReturn.addAll(getPMMLFiles(directoryFile));
-        }
-        if (toReturn.isEmpty()) {
-            getLog().info("No PMML Models found.");
-        } else {
-            getLog().info(String.format("Found %s PMML models", toReturn.size()));
-        }
-        return toReturn;
-    }
-
-    private List<Resource> getPMMLFiles(File resourceDirectory) throws MojoExecutionException {
-        try (Stream<Path> stream = Files
-                .walk(resourceDirectory.toPath(), Integer.MAX_VALUE)
-                .filter(path -> path.toString().endsWith(PMML))) {
-            return stream
-                    .map(Path::toFile)
-                    .map(FileSystemResource::new)
-                    .collect(toList());
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
-        }
-    }
 }
