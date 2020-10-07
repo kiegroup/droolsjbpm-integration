@@ -80,9 +80,14 @@ public class StartProcessServiceIntegrationTest extends JbpmKieServerBaseIntegra
 
             processInstanceId = null;
             processInstanceId = processClient.startProcessFromNodeIds(CONTAINER_ID_RESTART, PROCESS_ID_RESTART, parameters, nodeIds);
+
             assertNotNull(processInstance);
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
 
+            list = this.processClient.findNodeInstancesByType(CONTAINER_ID_RESTART, processInstanceId, "START", 0, 10);
+            assertNotNull(list);
+            assertThat(list.size(), is(1));
+            assertThat(list.get(0).getName(), is("Human Task"));
             processClient.abortProcessInstance(CONTAINER_ID_RESTART, processInstanceId);
         } catch (Exception e) {
             if (processInstanceId != null) {

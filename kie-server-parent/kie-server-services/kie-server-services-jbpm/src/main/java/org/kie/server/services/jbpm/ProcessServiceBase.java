@@ -112,7 +112,7 @@ public class ProcessServiceBase {
         ProcessStartSpec parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, ProcessStartSpec.class);
 
         logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters.getVariables());
-        Long newProcessInstanceId = processService.startProcessFromNodeIds(containerId, processId, parameters.getVariables());
+        Long newProcessInstanceId = processService.startProcessFromNodeIds(containerId, processId, parameters.getVariables(), parameters.getNodeIds().stream().toArray(String[]::new));
 
         // return response
         return marshallerHelper.marshal(containerId, marshallingType, newProcessInstanceId);
