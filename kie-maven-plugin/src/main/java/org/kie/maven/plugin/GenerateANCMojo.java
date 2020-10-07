@@ -133,7 +133,7 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
             for (String kbase : kieContainer.getKieBaseNames()) {
                 InternalKnowledgeBase kieBase = (InternalKnowledgeBase) kieContainer.getKieBase(kbase);
 
-                List<CompiledNetworkSource> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSource(kieBase.getRete());
+                List<CompiledNetworkSource> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSources(kieBase.getRete());
 
                 getLog().info(String.format("Found %d generated files in Knowledge Base %s", ancSourceFiles.size(), kbase));
 
