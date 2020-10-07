@@ -138,6 +138,8 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
                 getLog().info(String.format("Found %d generated files in Knowledge Base %s", ancSourceFiles.size(), kbase));
 
                 final String alphaNetworkCompilerPath = "/generated-sources/alpha-network-compiler/main/java";
+                final String newCompileSourceRoot = targetDirectory.getPath() + alphaNetworkCompilerPath;
+                project.addCompileSourceRoot(newCompileSourceRoot);
 
                 for (CompiledNetworkSource generatedFile : ancSourceFiles) {
                     final Path newFile = Paths.get(targetDirectory.getPath(),
