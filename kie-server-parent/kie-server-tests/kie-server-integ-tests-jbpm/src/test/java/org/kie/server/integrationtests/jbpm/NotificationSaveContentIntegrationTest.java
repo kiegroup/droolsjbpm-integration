@@ -25,6 +25,7 @@ import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.kie.api.task.model.Status.Reserved;
 
-@Category(JEEOnly.class)
+@Category({JEEOnly.class,UnstableOnJenkinsPrBuilder.class}) // https://issues.redhat.com/browse/JBPM-9383
 public class NotificationSaveContentIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", CONTAINER_ID_NOTIFICATION,
