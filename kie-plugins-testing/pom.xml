@@ -35,7 +35,6 @@
     </plugins>
   </build>
 
-  <!-- TODO REMOVE -->
   <dependencyManagement>
     <dependencies>
       <dependency>
