@@ -60,8 +60,11 @@ import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
 import org.drools.modelcompiler.builder.ModelBuilderImpl;
 import org.drools.modelcompiler.builder.ModelWriter;
+import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.ReleaseId;
+import org.kie.api.runtime.KieContainer;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
 import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
@@ -264,8 +267,22 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                     final Folder sourceFolder = srcMfs.getFolder("src/main/java");
                     final Folder targetFolder = trgMfs.getFolder(".");
                     srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
+                }
+                modelWriter.writeModelFile(modelFiles, trgMfs, getInternalKieModule().getReleaseId());
+            }
 
+            @Override
+            public void afterProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
+                ReleaseId releaseId = this.getInternalKieModule().getReleaseId();
 
+                KieContainer kieContainer = KieServices.get().newKieContainer(releaseId);
+
+                MemoryFileSystem srcMfs = new MemoryFileSystem();
+                List<String> modelFiles = new ArrayList<>();
+                ModelWriter modelWriter = new ModelWriter();
+                for (ModelBuilderImpl modelBuilder : modelBuilders) {
+                    KieBase kieBase = kieContainer.getKieBase(modelBuilder.getKieBaseName());
+                    System.out.println(kieBase);
                 }
                 modelWriter.writeModelFile(modelFiles, trgMfs, getInternalKieModule().getReleaseId());
             }
