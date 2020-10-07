@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -257,11 +258,14 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
                 for (ModelBuilderImpl modelBuilder : modelBuilders) {
-                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageSources());
+                    Collection packageSources = modelBuilder.getPackageSources();
+                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, packageSources);
                     modelFiles.addAll(result.getModelFiles());
                     final Folder sourceFolder = srcMfs.getFolder("src/main/java");
                     final Folder targetFolder = trgMfs.getFolder(".");
                     srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
+
+
                 }
                 modelWriter.writeModelFile(modelFiles, trgMfs, getInternalKieModule().getReleaseId());
             }

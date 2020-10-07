@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+  <configuration>
+    <property key="drools.alphaNetworkCompiler" value="INMEMORY"/>
+  </configuration>
     <kbase name="KBase1" packages="org.kie.example">
         <ksession name="KBase1.session" type="stateful"/>
     </kbase>
