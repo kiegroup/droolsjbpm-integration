@@ -16,8 +16,11 @@
 package org.kie.maven.plugin;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class AbstractKieMojo extends AbstractMojo {
 
@@ -30,6 +33,13 @@ public abstract class AbstractKieMojo extends AbstractMojo {
             }
             getLog().debug("Configured system properties were successfully set.");
         }
+    }
+
+    protected List<String> getFilesByType(InternalKieModule kieModule, String fileType) {
+        return kieModule.getFileNames()
+                .stream()
+                .filter(f -> f.endsWith(fileType))
+                .collect(Collectors.toList());
     }
 
 }

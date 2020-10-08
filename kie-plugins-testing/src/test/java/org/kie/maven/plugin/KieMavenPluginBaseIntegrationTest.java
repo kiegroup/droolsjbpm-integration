@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,14 +11,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.maven.plugin;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
@@ -27,14 +28,18 @@ import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(MavenJUnitTestRunner.class)
 @MavenVersions({"3.3.9", "3.5.0"})
 abstract public class KieMavenPluginBaseIntegrationTest {
 
+    private final static Logger logger = LoggerFactory.getLogger(KieMavenPluginBaseIntegrationTest.class);
+
+    private static final ConcurrentHashMap<String, MavenExecutionResult> BUILT_MAP = new ConcurrentHashMap<>();
     @Rule
     public final TestResources resources = new TestResources();
-
     public final MavenRuntime.MavenRuntimeBuilder mavenRuntimeBuilder;
 
     public KieMavenPluginBaseIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) {
@@ -54,6 +59,7 @@ abstract public class KieMavenPluginBaseIntegrationTest {
     }
 
     protected MavenExecutionResult buildKJarProject(String kjarName, String[] options, String... mavenGoals) throws Exception {
+        logger.info("Asking for kjar {} {} {}", kjarName, options, mavenGoals);
         final MavenRuntime mavenRuntime = mavenRuntimeBuilder
                 .forkedBuilder()
                 // To enable logging using slf4j-simple on the internal classes of the plug-in:
@@ -61,13 +67,31 @@ abstract public class KieMavenPluginBaseIntegrationTest {
                 .withEnvironment(System.getenv())
                 .withCliOptions(options)
                 .build();
+        StringBuilder builder = new StringBuilder();
+        builder.append(kjarName).append("_");
+        builder.append(mavenRuntime.getMavenVersion()).append("_");
+        for (String option : options) {
+            builder.append(option).append("_");
+        }
+        for (String mavenGoal : mavenGoals) {
+            builder.append(mavenGoal).append("_");
+        }
+        final String key = builder.toString();
+        return BUILT_MAP.computeIfAbsent(key, v -> getMavenExecutionResult(kjarName, mavenRuntime, mavenGoals));
+    }
 
-        File basedir = resources.getBasedir(kjarName);
-        MavenExecutionResult result = mavenRuntime
-                .forProject(basedir)
-                .execute(mavenGoals);
-        result.assertErrorFreeLog();
-        return result;
+    private MavenExecutionResult getMavenExecutionResult(final String kjarName, final MavenRuntime mavenRuntime, final String... mavenGoals) {
+        try {
+            logger.info("Compiling kjar {} {} {}", kjarName, mavenRuntime.getMavenVersion(), mavenGoals);
+            File basedir = resources.getBasedir(kjarName);
+            MavenExecutionResult toReturn = mavenRuntime
+                    .forProject(basedir)
+                    .execute(mavenGoals);
+            toReturn.assertErrorFreeLog();
+            return toReturn;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private File getBasedir(String projectName) throws Exception {

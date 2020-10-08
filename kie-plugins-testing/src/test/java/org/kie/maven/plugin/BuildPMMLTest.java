@@ -53,11 +53,6 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
     }
 
     @Test
-    public void testCleanInstallWithPMML() throws Exception {
-        buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
-    }
-
-    @Test
     public void testUseBuildKjarWithPMML() throws Exception {
         buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
 
@@ -81,7 +76,7 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
         final File basedir = result.getBasedir();
         final File kjarFile = new File(basedir, "target/" + GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
-        Assertions.assertThat(kjarFile.exists()).isTrue();
+        Assertions.assertThat(kjarFile).exists();
 
         final JarFile jarFile = new JarFile(kjarFile);
         final Set<String> jarContent = new HashSet<>();

@@ -21,6 +21,11 @@
       <artifactId>drools-model-compiler</artifactId>
       <version>${org.kie.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>kie-pmml</artifactId>
+      <version>${org.kie.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
