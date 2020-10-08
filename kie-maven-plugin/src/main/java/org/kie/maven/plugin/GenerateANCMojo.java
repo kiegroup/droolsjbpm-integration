@@ -36,7 +36,6 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -46,6 +45,7 @@ import org.drools.ancompiler.CompiledNetworkSource;
 import org.drools.ancompiler.ObjectTypeNodeCompiler;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 
@@ -54,7 +54,6 @@ import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
 
 @Mojo(name = "generateANC",
         requiresDependencyResolution = ResolutionScope.NONE,
-        requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
 public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
 
@@ -82,8 +81,10 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
     @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL")
     private String generateModel;
 
+    private static final String ALPHA_NETWORK_COMPILER_PATH = "/generated-sources/alpha-network-compiler/main/java";
+
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException {
         // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
         boolean ancParameterEnabled = ancEnabled(generateModel);
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
@@ -137,7 +138,7 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
 
                 getLog().info(String.format("Found %d generated files in Knowledge Base %s", ancSourceFiles.size(), kbase));
 
-                final String alphaNetworkCompilerPath = "/generated-sources/alpha-network-compiler/main/java";
+                final String alphaNetworkCompilerPath = ALPHA_NETWORK_COMPILER_PATH;
                 final String newCompileSourceRoot = targetDirectory.getPath() + alphaNetworkCompilerPath;
                 project.addCompileSourceRoot(newCompileSourceRoot);
 
@@ -155,12 +156,32 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
                                     StandardOpenOption.CREATE,
                                     StandardOpenOption.TRUNCATE_EXISTING);
 
-                        getLog().info("Written ANC " + newFile);
+                        getLog().info("Written Compiled Alpha Network: " + newFile);
                     } catch (IOException e) {
                         e.printStackTrace();
                         throw new MojoExecutionException("Unable to write file", e);
                     }
                 }
+            }
+
+            // generate the ANC file
+            String ancFile = CanonicalKieModule.getANCFile(new ReleaseIdImpl(
+                    project.getGroupId(),
+                    project.getArtifactId(),
+                    project.getVersion()
+            ));
+            final Path ancFilePath = Paths.get(targetDirectory.getPath(),
+                                               "classes",
+                                               ancFile);
+
+            try {
+                Files.deleteIfExists(ancFilePath);
+                Files.createDirectories(ancFilePath.getParent());
+                Files.createFile(ancFilePath);
+                getLog().info("Written ANC File: " + ancFilePath.toAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new MojoExecutionException("Unable to write file: ", e);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
