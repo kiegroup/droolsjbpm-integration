@@ -16,6 +16,8 @@
 
 package org.kie.server.integrationtests.dmn.pmml;
 
+import java.math.BigDecimal;
+
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +29,6 @@ import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.dmn.DMNKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -35,26 +36,25 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
  * This it.test is reportedly not working in the "embedded" EE container,
  * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
  */
-public class DMNPMMLTreeIntegrationTest extends DMNKieServerBaseIntegrationTest {
+public class DMNPMMLMiningIntegrationTest extends DMNPMMLKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-tree-kjar",
+            "org.kie.server.testing", "dmn-pmml-mining-kjar",
             "1.0.0.Final" );
 
-    private static final String CONTAINER_1_ID  = "dmn-pmml-tree";
+    private static final String CONTAINER_1_ID  = "dmn-pmml-mining";
 
-    private static final String TREE_MODEL_NAMESPACE
-            = "https://kiegroup.org/dmn/_FAA4232D-9D61-4089-BB05-5F5D7C1AECE1";
-    private static final String TREE_MODEL_NAME = "TestTreeDMN";
-    private static final String TREE_DECISION_NAME = "Decision";
-    private static final String TREE_DECISION_RESULT = "decision";
+    private static final String MINING_MODEL_NAMESPACE
+            = "https://kiegroup.org/dmn/_0E8EC382-BB89-4877-8D37-A59B64285F05";
+    private static final String MINING_MODEL_NAME = "MiningModelDMN";
+    private static final String MINING_DECISION_NAME = "Decision";
 
     private static final long EXTENDED_TIMEOUT = 300000L;
 
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-tree");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-mining");
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
@@ -69,15 +69,16 @@ public class DMNPMMLTreeIntegrationTest extends DMNKieServerBaseIntegrationTest 
      * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
      */
     @Test
-    public void testDMNWithPMMLTree() {
+    public void testDMNWithPMMLMining() {
         final DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set("temperature", 30);
-        dmnContext.set("humidity", 10);
+        dmnContext.set("input1", 200);
+        dmnContext.set("input2", -1);
+        dmnContext.set("input3", 2);
         final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
                 CONTAINER_1_ID,
-                TREE_MODEL_NAMESPACE,
-                TREE_MODEL_NAME,
-                TREE_DECISION_NAME,
+                MINING_MODEL_NAMESPACE,
+                MINING_MODEL_NAME,
+                MINING_DECISION_NAME,
                 dmnContext);
 
         Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);
@@ -85,7 +86,7 @@ public class DMNPMMLTreeIntegrationTest extends DMNKieServerBaseIntegrationTest 
         final DMNResult dmnResult = serviceResponse.getResult();
         Assertions.assertThat(dmnResult).isNotNull();
         Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final String result = (String) dmnResult.getDecisionResultByName(TREE_DECISION_NAME).getResult();
-        Assertions.assertThat(result).isEqualTo("sunglasses");
+        final BigDecimal result = (BigDecimal) dmnResult.getDecisionResultByName(MINING_DECISION_NAME).getResult();
+        Assertions.assertThat(result).isEqualTo(new BigDecimal("-299"));
     }
 }
