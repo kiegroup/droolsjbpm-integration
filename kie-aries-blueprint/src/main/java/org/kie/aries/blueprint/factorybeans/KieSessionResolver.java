@@ -347,6 +347,16 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
+    public ProcessInstance startProcess(String processId, AgendaFilter agendaFilter) {
+        return getKieSession().startProcess(processId, agendaFilter);
+    }
+
+    @Override
+    public ProcessInstance startProcess(String processId, Map<String, Object> parameters, AgendaFilter agendaFilter) {
+        return getKieSession().startProcess(processId, parameters, agendaFilter);
+    }
+
+    @Override
     public ProcessInstance createProcessInstance(String processId, Map<String, Object> parameters) {
         return getKieSession().createProcessInstance(processId, parameters);
     }

@@ -210,6 +210,16 @@ public class KieImportSessionResolver extends AbstractKieObjectsResolver impleme
     }
 
     @Override
+    public ProcessInstance startProcess( String s, AgendaFilter agendaFilter ) {
+        return kieSession.startProcess( s, agendaFilter );
+    }
+
+    @Override
+    public ProcessInstance startProcess( String s, Map<String, Object> map, AgendaFilter agendaFilter ) {
+        return kieSession.startProcess( s, map, agendaFilter );
+    }
+
+    @Override
     public ProcessInstance createProcessInstance( String s, Map<String, Object> map ) {
         return kieSession.createProcessInstance( s, map );
     }
