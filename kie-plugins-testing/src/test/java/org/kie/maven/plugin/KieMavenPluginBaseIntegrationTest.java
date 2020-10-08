@@ -59,7 +59,7 @@ abstract public class KieMavenPluginBaseIntegrationTest {
     }
 
     protected MavenExecutionResult buildKJarProject(String kjarName, String[] options, String... mavenGoals) throws Exception {
-        logger.info("buildKJarProject {} {} {}", kjarName, options, mavenGoals);
+        logger.info("Asking for kjar {} {} {}", kjarName, options, mavenGoals);
         final MavenRuntime mavenRuntime = mavenRuntimeBuilder
                 .forkedBuilder()
                 // To enable logging using slf4j-simple on the internal classes of the plug-in:
@@ -77,21 +77,21 @@ abstract public class KieMavenPluginBaseIntegrationTest {
             builder.append(mavenGoal).append("_");
         }
         final String key = builder.toString();
-        if (!BUILT_MAP.containsKey(key)) {
-            BUILT_MAP.put(key, getMavenExecutionResult(kjarName, mavenRuntime, mavenGoals));
-        }
-        return BUILT_MAP.get(key);
+        return BUILT_MAP.computeIfAbsent(key, v -> getMavenExecutionResult(kjarName, mavenRuntime, mavenGoals));
     }
 
-    private MavenExecutionResult getMavenExecutionResult(final String kjarName, final MavenRuntime mavenRuntime, final String... mavenGoals) throws Exception {
-        logger.info("getMavenExecutionResult {} {} {}", kjarName, mavenRuntime.getMavenVersion(), mavenGoals);
-        File basedir = resources.getBasedir(kjarName);
-        MavenExecutionResult toReturn = mavenRuntime
-                .forProject(basedir)
-                .execute(mavenGoals);
-        toReturn.assertErrorFreeLog();
-        return toReturn;
-
+    private MavenExecutionResult getMavenExecutionResult(final String kjarName, final MavenRuntime mavenRuntime, final String... mavenGoals) {
+        try {
+            logger.info("Compiling kjar {} {} {}", kjarName, mavenRuntime.getMavenVersion(), mavenGoals);
+            File basedir = resources.getBasedir(kjarName);
+            MavenExecutionResult toReturn = mavenRuntime
+                    .forProject(basedir)
+                    .execute(mavenGoals);
+            toReturn.assertErrorFreeLog();
+            return toReturn;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private File getBasedir(String projectName) throws Exception {
