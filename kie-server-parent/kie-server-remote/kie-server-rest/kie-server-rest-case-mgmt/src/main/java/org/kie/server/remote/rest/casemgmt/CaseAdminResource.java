@@ -79,10 +79,9 @@ public class CaseAdminResource extends AbstractCaseResource {
         this.caseAdminServiceBase = caseAdminServiceBase;
     }
 
-    @ApiOperation(value="Returns case instances without authentication checks.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns case instances without authentication checks.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(ADMIN_CASE_ALL_INSTANCES_GET_URI)
@@ -119,11 +118,10 @@ public class CaseAdminResource extends AbstractCaseResource {
                                    });
     }
     
-    @ApiOperation(value="Migrates a specified case instance to another KIE container and case definition.",
-            response=CaseMigrationReportInstance.class, code=201)
+    @ApiOperation(value="Migrates a specified case instance to another KIE container and case definition.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance or Container Id not found"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = CaseMigrationReportInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_MIGRATION_REPORT_JSON)})) })
     @PUT
     @Path(MIGRATE_CASE_INST_PUT_URI)

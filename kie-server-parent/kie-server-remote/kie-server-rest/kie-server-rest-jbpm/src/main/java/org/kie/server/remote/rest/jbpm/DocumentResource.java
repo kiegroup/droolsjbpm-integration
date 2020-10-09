@@ -15,27 +15,6 @@
 
 package org.kie.server.remote.rest.jbpm;
 
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_CONTENT_GET_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_DELETE_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_GET_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_PUT_URI;
-import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
-import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
-import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
-import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.CREATE_DOC_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_XML;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENTS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENT_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -57,6 +36,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Variant;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import io.swagger.annotations.ResponseHeader;
 import org.kie.server.api.model.instance.DocumentInstance;
 import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.remote.rest.common.Header;
@@ -66,14 +53,26 @@ import org.kie.server.services.jbpm.DocumentServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
-import io.swagger.annotations.ResponseHeader;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.CREATE_DOC_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.DOCUMENT_XML;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENTS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENT_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 
 @Api(value="Documents")
 @Path("server/" + DOCUMENT_URI)
@@ -133,11 +132,10 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified document.",
-            response=DocumentInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified document.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Document with given id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = DocumentInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_DOCUMENT_RESPONSE_JSON)})) })
     @GET
     @Path(DOCUMENT_INSTANCE_GET_URI)
@@ -160,10 +158,9 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Returns all documents from KIE Server.",
-            response=DocumentInstanceList.class, code=200)
+    @ApiOperation(value="Returns all documents from KIE Server.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = DocumentInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_DOCUMENTS_RESPONSE_JSON)})) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -184,10 +181,9 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Uploads a new document to KIE Server.",
-            response=String.class, code=201)
+    @ApiOperation(value="Uploads a new document to KIE Server.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = String.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CREATE_DOC_RESPONSE_JSON)}))})
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

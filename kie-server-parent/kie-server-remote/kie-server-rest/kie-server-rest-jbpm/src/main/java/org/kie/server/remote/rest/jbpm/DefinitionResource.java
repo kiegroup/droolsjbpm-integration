@@ -15,34 +15,6 @@
 
 package org.kie.server.remote.rest.jbpm;
 
-import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
-import static org.kie.server.api.rest.RestURI.PROCESS_ID;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_SERVICE_TASKS_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_SUBPROCESS_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASKS_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASK_INPUT_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASK_OUTPUT_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_DEF_VARIABLES_GET_URI;
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
-import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEF_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_ENTITIES_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_SERVICE_TASKS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_SUBP_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_VARS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASKS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASK_INPUTS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASK_OUTPUTS_RESPONSE_JSON;
-import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
-
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 
@@ -56,6 +28,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ServiceTasksDefinition;
@@ -68,13 +47,33 @@ import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_SERVICE_TASKS_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_SUBPROCESS_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASKS_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASK_INPUT_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASK_OUTPUT_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_DEF_VARIABLES_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEF_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_ENTITIES_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_SERVICE_TASKS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_SUBP_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_VARS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASKS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASK_INPUTS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASK_OUTPUTS_RESPONSE_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 
 @Api(value="Process and task definitions")
 @Path("server/" + PROCESS_DEF_URI)
@@ -93,11 +92,10 @@ public class DefinitionResource {
     }
 
 
-    @ApiOperation(value="Returns entity and task information for a specified process.",
-            response=ProcessDefinition.class, code=200)
+    @ApiOperation(value="Returns entity and task information for a specified process.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEF_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_GET_URI)
@@ -121,11 +119,10 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves sub process definitions that are defined in given process within given container",
-            response=SubProcessesDefinition.class, code=200)
+    @ApiOperation(value="Retrieves sub process definitions that are defined in given process within given container")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = SubProcessesDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_SUBP_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_SUBPROCESS_GET_URI)
@@ -148,11 +145,10 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves process variables definitions that are present in given process and container",
-            response=VariablesDefinition.class, code=200)
+    @ApiOperation(value="Retrieves process variables definitions that are present in given process and container")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = VariablesDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_VARS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_VARIABLES_GET_URI)
@@ -175,11 +171,10 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves service tasks definitions that are present in given process and container",
-            response=ServiceTasksDefinition.class, code=200)
+    @ApiOperation(value="Retrieves service tasks definitions that are present in given process and container")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ServiceTasksDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_SERVICE_TASKS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_SERVICE_TASKS_GET_URI)
@@ -202,11 +197,10 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves actors and groups that are involved in given process and container",
-            response=AssociatedEntitiesDefinition.class, code=200)
+    @ApiOperation(value="Retrieves actors and groups that are involved in given process and container")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = AssociatedEntitiesDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_ENTITIES_RESPONSE_JSON)})) })    
     @GET
     @Path(PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI)
@@ -229,11 +223,10 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves user tasks definitions that are present in given process and container",
-            response=UserTaskDefinitionList.class, code=200)
+    @ApiOperation(value="Retrieves user tasks definitions that are present in given process and container")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = UserTaskDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASKS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASKS_GET_URI)
@@ -256,11 +249,10 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves input variables defined on a given user task",
-            response=TaskInputsDefinition.class, code=200)
+    @ApiOperation(value="Retrieves input variables defined on a given user task")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskInputsDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_INPUTS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASK_INPUT_GET_URI)
@@ -285,11 +277,10 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves output variables defined on a given user task",
-            response=TaskOutputsDefinition.class, code=200)
+    @ApiOperation(value="Retrieves output variables defined on a given user task")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskOutputsDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_OUTPUTS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASK_OUTPUT_GET_URI)

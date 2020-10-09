@@ -107,10 +107,9 @@ public class QueryDataResource {
         this.context = context;
     }
 
-    @ApiOperation(value="Returns all custom query definitions.",
-                  response = QueryDefinitionList.class, code = 200)
+    @ApiOperation(value="Returns all custom query definitions.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = QueryDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_LIST_RESPONSE_JSON)})) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -133,11 +132,10 @@ public class QueryDataResource {
                                      conversationIdHeader );
     }
 
-    @ApiOperation(value="Registers a custom query definition.",
-                  response = QueryDefinition.class, code = 201)
+    @ApiOperation(value="Registers a custom query definition.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 409, message = "Query with given name already exists"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = QueryDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
     @POST
     @Path(CREATE_QUERY_DEF_POST_URI)
@@ -181,10 +179,9 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Replaces existing custom query definition or registers it as new if the query does not already exist.",
-                  response = QueryDefinition.class, code = 201)
+    @ApiOperation(value="Replaces existing custom query definition or registers it as new if the query does not already exist.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = QueryDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
     @PUT
     @Path(REPLACE_QUERY_DEF_PUT_URI)
@@ -257,11 +254,10 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified custom query.",
-                  response = QueryDefinition.class, code = 200)
+    @ApiOperation(value="Returns information about a specified custom query.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Query definition with given name not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = QueryDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
     @GET
     @Path(QUERY_DEF_GET_URI)
@@ -296,11 +292,10 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Returns the results of a specified custom query.",
-                  response = Object.class, responseContainer = "List", code = 200)
+    @ApiOperation(value="Returns the results of a specified custom query.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Query definition with given name not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = Object.class, responseContainer = "List", message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @GET
     @Path(RUN_QUERY_DEF_GET_URI)
@@ -332,11 +327,10 @@ public class QueryDataResource {
                                      conversationIdHeader );
     }
 
-    @ApiOperation(value="Returns the results of a specified custom query and filters the results based on a provided builder or filter request body.",
-                  response = Object.class, code = 200)
+    @ApiOperation(value="Returns the results of a specified custom query and filters the results based on a provided builder or filter request body.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = Object.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_POST_URI)
@@ -411,11 +405,10 @@ public class QueryDataResource {
         }
     }
 
-    @ApiOperation(value="Returns the results of a specified custom query on a specified KIE container and filters the results based on a provided builder or filter request body.",
-                  response = Object.class, code = 200)
+    @ApiOperation(value="Returns the results of a specified custom query on a specified KIE container and filters the results based on a provided builder or filter request body.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 400, message = "Query parameters or filter spec provide invalid conditions"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = Object.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI)

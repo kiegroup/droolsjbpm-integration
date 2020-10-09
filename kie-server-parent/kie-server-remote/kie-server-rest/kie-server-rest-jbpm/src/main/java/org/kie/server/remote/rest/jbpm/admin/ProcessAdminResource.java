@@ -15,6 +15,50 @@
 
 package org.kie.server.remote.rest.jbpm.admin;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.NodeInstanceNotFoundException;
+import org.jbpm.services.api.NodeNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.MigrationReportInstance;
+import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.ProcessNodeList;
+import org.kie.server.api.model.admin.TimerInstanceList;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.ACK_ERRORS_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ACK_ERROR_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ADMIN_PROCESS_URI;
@@ -35,12 +79,12 @@ import static org.kie.server.api.rest.RestURI.UPDATE_TIMER_PROCESS_INST_PUT_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_EXEC_ERRORS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_EXEC_ERROR_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_MIGRATION_REPORTS_RESPONSE_JSON;
@@ -59,51 +103,6 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.NODE_INSTANCE_N
 import static org.kie.server.remote.rest.jbpm.resources.Messages.NODE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TIMER_INSTANCE_NOT_FOUND;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.NodeInstanceNotFoundException;
-import org.jbpm.services.api.NodeNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
-import org.kie.server.api.model.admin.ExecutionErrorInstance;
-import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
-import org.kie.server.api.model.admin.MigrationReportInstance;
-import org.kie.server.api.model.admin.MigrationReportInstanceList;
-import org.kie.server.api.model.admin.ProcessNodeList;
-import org.kie.server.api.model.admin.TimerInstanceList;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Process instance administration")
 @Path("server/" + ADMIN_PROCESS_URI)
@@ -124,12 +123,11 @@ public class ProcessAdminResource {
         this.context = context;
     }
 
-    @ApiOperation(value="Migrates a specified process instance to a process definition in another KIE container.",
-            response=MigrationReportInstance.class, code=201)
+    @ApiOperation(value="Migrates a specified process instance to a process definition in another KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = MigrationReportInstance.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORT_RESPONSE_JSON)})) })
     @PUT
     @Path(MIGRATE_PROCESS_INST_PUT_URI)
@@ -164,12 +162,11 @@ public class ProcessAdminResource {
     }
 
 
-    @ApiOperation(value="Migrates multiple process instances to process definition in another KIE container.",
-            response=MigrationReportInstanceList.class, code=201)
+    @ApiOperation(value="Migrates multiple process instances to process definition in another KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = MigrationReportInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORTS_RESPONSE_JSON)})) })
     @PUT
     @Path(MIGRATE_PROCESS_INSTANCES_PUT_URI)
@@ -341,12 +338,11 @@ public class ProcessAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns all timers for a specified process instance.",
-            response=TimerInstanceList.class, code=200)
+    @ApiOperation(value="Returns all timers for a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TimerInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TIMERS_RESPONSE_JSON)})) })
     @GET
     @Path(TIMERS_PROCESS_INST_GET_URI)
@@ -372,11 +368,10 @@ public class ProcessAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns all the active node instances in a specified process instance.",
-            response=NodeInstanceList.class, code=200)
+    @ApiOperation(value="Returns all the active node instances in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = NodeInstanceList.class , message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)})) })
     @GET
     @Path(NODE_INSTANCES_PROCESS_INST_GET_URI)
@@ -402,11 +397,10 @@ public class ProcessAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns all nodes in a specified process instance.",
-            response=ProcessNodeList.class, code=200)
+    @ApiOperation(value="Returns all nodes in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessNodeList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_NODES_RESPONSE_JSON)})) })
     @GET
     @Path(NODES_PROCESS_INST_GET_URI)
@@ -484,11 +478,10 @@ public class ProcessAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified process execution error.",
-            response=ExecutionErrorInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified process execution error.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstance.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERROR_RESPONSE_JSON)})) })
     @GET
     @Path(ERROR_GET_URI)
@@ -513,11 +506,10 @@ public class ProcessAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns all process execution errors for a specified process instance.",
-            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiOperation(value="Returns all process execution errors for a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_BY_PROCESS_INST_GET_URI)
@@ -549,11 +541,10 @@ public class ProcessAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns all process execution errors for a specified KIE container.",
-            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiOperation(value="Returns all process execution errors for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_GET_URI)

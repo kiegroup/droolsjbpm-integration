@@ -152,11 +152,10 @@ public class CaseResource extends AbstractCaseResource {
         this.caseManagementServiceBase = caseManagementServiceBase;
     }
 
-    @ApiOperation(value="Starts a new case instance for a specified case definition.",
-            response=String.class, code=201)
+    @ApiOperation(value="Starts a new case instance for a specified case definition.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case definition or Container Id not found"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = String.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ID_JSON)})) })
     @POST
     @Path(START_CASE_POST_URI)
@@ -185,11 +184,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns information about a specified case instance.",
-            response=CaseInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCE_JSON)})) })
     @GET
     @Path(CASE_INSTANCE_GET_URI)
@@ -284,11 +282,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns data from the case files of a specified case instance.",
-            response=Map.class, code=200)
+    @ApiOperation(value="Returns data from the case files of a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = Map.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON)})) })
     @GET
     @Path(CASE_FILE_GET_URI)
@@ -309,11 +306,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns the value of a specified case file data item in a specified case instance.",
-            response=Object.class, code=200)
+    @ApiOperation(value="Returns the value of a specified case file data item in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = Object.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON)})) })
     @GET
     @Path(CASE_FILE_BY_NAME_GET_URI)
@@ -585,11 +581,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns milestones for a specified case instance.",
-            response=CaseMilestoneList.class, code=200)
+    @ApiOperation(value="Returns milestones for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseMilestoneList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_MILESTONES_JSON)})) })
     @GET
     @Path(CASE_MILESTONES_GET_URI)
@@ -613,11 +608,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns stages for a specified case instance.",
-            response=CaseStageList.class, code=200)
+    @ApiOperation(value="Returns stages for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseStageList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_STAGES_JSON)})) })
     @GET
     @Path(CASE_STAGES_GET_URI)
@@ -641,11 +635,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns ad hoc fragments for a specified case instance.",
-            response=CaseAdHocFragmentList.class, code=200)
+    @ApiOperation(value="Returns ad hoc fragments for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseAdHocFragmentList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ADHOC_FRAGMENTS_JSON)})) })
     @GET
     @Path(CASE_AD_HOC_FRAGMENTS_GET_URI)
@@ -666,11 +659,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns process instances in a specified case instance.",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns process instances in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=PROCESS_INSTANCES_JSON)})) })
     @GET
     @Path(CASE_PROCESS_INSTANCES_GET_URI)
@@ -701,11 +693,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns node instances for a specified case instance.",
-            response=NodeInstanceList.class, code=200)
+    @ApiOperation(value="Returns node instances for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = NodeInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=NODE_INSTANCES_JSON)})) })
     @GET
     @Path(CASE_NODE_INSTANCES_GET_URI)
@@ -734,11 +725,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns role assignments for a specified case instance.",
-            response=CaseRoleAssignmentList.class, code=200)
+    @ApiOperation(value="Returns role assignments for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseRoleAssignmentList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ROLES_ASSIGNMENTS_JSON)})) })
     @GET
     @Path(CASE_ROLES_GET_URI)
@@ -809,11 +799,10 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns comments from a specified case instance.",
-            response=CaseCommentList.class, code=200)
+    @ApiOperation(value="Returns comments from a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseCommentList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_COMMENTS_JSON)})) })
     @GET
     @Path(CASE_COMMENTS_GET_URI)
@@ -929,10 +918,9 @@ public class CaseResource extends AbstractCaseResource {
      * basic queries through container
      */
 
-    @ApiOperation(value="Returns case instances in a specified KIE container.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns case instances in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_GET_URI)
@@ -963,10 +951,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns case instances for a specified case definition.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns case instances for a specified case definition.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_BY_DEF_GET_URI)
@@ -998,10 +985,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns case definitions in a specified KIE container.",
-            response=CaseDefinitionList.class, code=200)
+    @ApiOperation(value="Returns case definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
     @GET
     @Path(CASE_ALL_DEFINITIONS_GET_URI)
@@ -1026,10 +1012,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns information about a specified case definition.",
-            response=CaseDefinition.class, code=200)
+    @ApiOperation(value="Returns information about a specified case definition.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITION_JSON)}))})
     @GET
     @Path(CASE_DEFINITIONS_BY_ID_GET_URI)
