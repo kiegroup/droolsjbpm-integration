@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ReleaseId;
@@ -31,12 +32,14 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.scenariosimulation.ScenarioSimulationResult;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ScenarioSimulationServicesClient;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+@Category({UnstableOnJenkinsPrBuilder.class}) // remove once https://issues.redhat.com/browse/JBPM-9421 is fixed
 public class ScenarioSimulationIntegrationTest
         extends RestJmsSharedBaseIntegrationTest {
 
