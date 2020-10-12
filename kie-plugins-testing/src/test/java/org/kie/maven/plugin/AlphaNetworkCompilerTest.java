@@ -37,9 +37,9 @@ import static org.junit.Assert.assertTrue;
 public class AlphaNetworkCompilerTest extends KieMavenPluginBaseIntegrationTest {
 
     private final static String GROUP_ID = "org.kie";
-    private final static String ARTIFACT_ID = "kie-maven-plugin-test-kjar-12";
+    private final static String ARTIFACT_ID = "kie-maven-plugin-test-kjar-13";
     private final static String VERSION = "1.0.0.Final";
-    private final static String KJAR_NAME = "kjar-12-with-compiledalphanetwork";
+    private final static String KJAR_NAME = "kjar-13-with-compiledalphanetwork";
 
     public AlphaNetworkCompilerTest(MavenRuntime.MavenRuntimeBuilder builder) {
         super(builder);
@@ -49,7 +49,7 @@ public class AlphaNetworkCompilerTest extends KieMavenPluginBaseIntegrationTest 
     public void testAlphaNetworkCompiler() throws Exception {
 
         buildKJarProject(KJAR_NAME,
-                         new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion(), "-DgenerateModel=WITHANC"},
+                         new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion() },
                          "clean", "install");
 
         final KieServices kieServices = KieServices.get();

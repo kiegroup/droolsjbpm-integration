@@ -21,11 +21,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.kie</groupId>
-  <artifactId>kie-maven-plugin-test-kjar-12</artifactId>
+  <artifactId>kie-maven-plugin-test-kjar-13</artifactId>
   <version>1.0.0.Final</version>
 
   <properties>
-    <org.kie.version>7.45.0-SNAPSHOT</org.kie.version>
+    <org.kie.version>1.0.0.Final</org.kie.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
@@ -61,12 +61,6 @@
       <artifactId>drools-compiler</artifactId>
       <version>${org.kie.version}</version>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>junit</groupId>-->
-<!--      <artifactId>junit</artifactId>-->
-<!--      <scope>test</scope>-->
-<!--      <version>4.12</version>-->
-<!--    </dependency>-->
   </dependencies>
 
   <packaging>kjar</packaging>
@@ -78,6 +72,9 @@
         <artifactId>kie-maven-plugin</artifactId>
         <version>${org.kie.version}</version>
         <extensions>true</extensions>
+        <configuration>
+          <generateModel>WITHANC</generateModel>
+        </configuration>
       </plugin>
     </plugins>
   </build>
