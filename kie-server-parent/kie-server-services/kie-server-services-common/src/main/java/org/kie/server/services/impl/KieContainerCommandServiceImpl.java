@@ -21,7 +21,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.drools.compiler.kie.builder.impl.KieContainerImpl;
+import org.drools.compiler.kie.builder.impl.KieProject;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.command.Command;
 import org.kie.api.command.ExecutableCommand;
 import org.kie.api.runtime.CommandExecutor;
@@ -90,8 +93,17 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                 if( sessionId != null ) {
                     ks = context.getKieSessionLookupManager().lookup(sessionId, kci, context);
                 } else {
-                    // if no session ID is defined, then the default is a stateful session
-                    ks = kci.getKieContainer().getKieSession();
+                    // if no session ID is defined, then use default ksession. Stateful session takes priority
+                    KieProject kieProject = ((KieContainerImpl) kci.getKieContainer()).getKieProject();
+                    KieSessionModel defaultStatefulModel = kieProject.getDefaultKieSession();
+                    KieSessionModel defaultStatelessModel = kieProject.getDefaultStatelessKieSession();
+                    if (defaultStatefulModel != null) {
+                        ks = kci.getKieContainer().getKieSession();
+                    } else if (defaultStatelessModel != null) {
+                        ks = kci.getKieContainer().getStatelessKieSession();
+                    } else {
+                        throw new IllegalStateException("No default KieSession found on container '" + kci.getContainerId() + "'.");
+                    }
                 }
                 if (ks != null) {
                     Class<? extends Command> type =  BatchExecutionCommandImpl.class;
