@@ -64,7 +64,6 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
-import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
 @Mojo(name = "generateModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -95,13 +94,10 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-    @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL") // DROOLS-5663 align kie-maven-plugin default value for generateModel configuration flag
-    private String generateModel;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
-        boolean modelParameterEnabled = modelParameterEnabled(generateModel);
+        boolean modelParameterEnabled = isModelParameterEnabled();
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
         if (modelParameterEnabled && modelCompilerInClassPath) {
             generateModel();
@@ -207,7 +203,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                 performDMNDTAnalysis(kieModule);
             }
 
-            if (ExecModelMode.shouldDeleteFile(generateModel)) {
+            if (ExecModelMode.shouldDeleteFile(getGenerateModelOption())) {
                 deleteDrlFiles(drlFiles);
             }
         } finally {

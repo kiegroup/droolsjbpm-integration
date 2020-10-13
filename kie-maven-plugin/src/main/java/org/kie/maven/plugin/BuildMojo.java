@@ -101,12 +101,9 @@ public class BuildMojo extends AbstractDMNValidationAwareMojo {
     private PlexusContainer container;
 
 
-    @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL") // DROOLS-5663 align kie-maven-plugin default value for generateModel configuration flag
-    private String generateModel;
-
     public void execute() throws MojoExecutionException, MojoFailureException {
         // BuildMojo is executed when GenerateModelMojo isn't and vice-versa
-        boolean modelParameterEnabled = modelParameterEnabled(generateModel);
+        boolean modelParameterEnabled = isModelParameterEnabled();
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
 
         if (!(modelParameterEnabled && modelCompilerInClassPath)) {

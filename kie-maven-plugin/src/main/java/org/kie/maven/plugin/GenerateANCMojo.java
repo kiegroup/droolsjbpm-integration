@@ -78,15 +78,12 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-    @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL")
-    private String generateModel;
-
     private static final String ALPHA_NETWORK_COMPILER_PATH = "/generated-sources/alpha-network-compiler/main/java";
 
     @Override
     public void execute() throws MojoExecutionException {
         // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
-        boolean ancParameterEnabled = ancEnabled(generateModel);
+        boolean ancParameterEnabled = ancEnabled(getGenerateModelOption());
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
         if (ancParameterEnabled && modelCompilerInClassPath) {
             generateANC();
