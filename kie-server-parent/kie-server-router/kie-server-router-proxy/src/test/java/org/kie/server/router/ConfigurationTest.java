@@ -16,6 +16,7 @@
 package org.kie.server.router;
 
 import org.junit.Test;
+import org.kie.server.router.repository.ConfigurationMarshaller;
 import org.kie.server.router.spi.ConfigRepository;
 
 import static org.junit.Assert.assertEquals;
@@ -25,6 +26,55 @@ import org.assertj.core.api.Assertions;
 
 public class ConfigurationTest {
 
+    @Test
+    public void testAddDuplicateContainer() throws Exception {
+
+        Configuration configuration = new Configuration();
+        
+        String containerId = "itorders_1.01";
+        String serverUrl = "http://localhost:8090/kie-server/services/rest/server";
+        String alias = "itorders_1.01";
+        String serverId = "default-kieServer";
+        String releaseId = "1.0";
+        
+        
+        ContainerInfo containerInfo = new ContainerInfo(containerId, alias, releaseId);
+        configuration.addContainerHost(containerId, serverUrl);
+        configuration.addContainerHost(alias, serverUrl);
+        configuration.addServerHost(serverId, serverUrl);
+        configuration.addContainerInfo(containerInfo);
+        
+        
+        serverUrl = "http://localhost:8190/kie-server/services/rest/server";
+      
+        containerInfo = new ContainerInfo(containerId, alias, releaseId);
+        configuration.addContainerHost(containerId, serverUrl);
+        configuration.addContainerHost(alias, serverUrl);
+        configuration.addServerHost(serverId, serverUrl);
+        configuration.addContainerInfo(containerInfo);
+
+        serverUrl = "http://localhost:8290/kie-server/services/rest/server";
+        
+        containerInfo = new ContainerInfo(containerId, alias, releaseId);
+        configuration.addContainerHost(containerId, serverUrl);
+        configuration.addContainerHost(alias, serverUrl);
+        configuration.addServerHost(serverId, serverUrl);
+        configuration.addContainerInfo(containerInfo);
+
+        alias = "itorders_1.0.1";
+        containerInfo = new ContainerInfo(containerId, alias, releaseId);
+        configuration.addContainerHost(containerId, serverUrl);
+        configuration.addContainerHost(alias, serverUrl);
+        configuration.addServerHost(serverId, serverUrl);
+        configuration.addContainerInfo(containerInfo);
+
+        assertEquals(2, configuration.getHostsPerContainer().size());
+        assertEquals(1, configuration.getHostsPerServer().size());
+
+        assertEquals(3, configuration.getHostsPerContainer().get("itorders_1.01").size());
+        assertEquals(1, configuration.getHostsPerContainer().get("itorders_1.0.1").size());
+        assertEquals(3, configuration.getHostsPerServer().get("default-kieServer").size());
+    }
 
     @Test
     public void testRemoveServerWhenUnavailable() {
@@ -115,8 +165,8 @@ public class ConfigurationTest {
         assertEquals(2, config.getHostsPerContainer().size());
         assertEquals(1, config.getHostsPerServer().size());
 
-        assertEquals(2, config.getHostsPerContainer().get("container1").size());        
-        assertEquals(2, config.getHostsPerServer().get("server1").size());
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
 
         config.removeContainerHost("container1", "http://localhost:8080/server");
         config.removeContainerHost("container", "http://localhost:8080/server");
@@ -127,8 +177,8 @@ public class ConfigurationTest {
         assertEquals(2, config.getHostsPerContainer().size());
         assertEquals(1, config.getHostsPerServer().size());
 
-        assertEquals(1, config.getHostsPerContainer().get("container1").size());       
-        assertEquals(1, config.getHostsPerServer().get("server1").size());
+        assertEquals(0, config.getHostsPerContainer().get("container1").size());       
+        assertEquals(0, config.getHostsPerServer().get("server1").size());
     }
     
     @Test
