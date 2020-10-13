@@ -1,37 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>kie-maven-plugin-integration-tests</artifactId>
+    <groupId>org.drools</groupId>
+    <version>7.45.0-SNAPSHOT</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.kie</groupId>
-  <artifactId>kie-maven-plugin-test-kjar-12</artifactId>
-  <version>1.0.0.Final</version>
-
+  <artifactId>kie-pmml-trusty-integration-tests</artifactId>
   <packaging>kjar</packaging>
+
+  <name>KIE :: PMML :: Trusty :: Integration Tests</name>
+  <description>Trusty PMML Integration Tests</description>
 
   <properties>
     <generateModel>NO</generateModel>
     <generateDMNModel>NO</generateDMNModel>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
-      <version>${org.kie.version}</version>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
-      <version>${org.kie.version}</version>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-dependencies</artifactId>
-      <version>${org.kie.version}</version>
       <type>pom</type>
     </dependency>
   </dependencies>
@@ -69,8 +73,34 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
-        <version>${org.kie.version}</version>
         <extensions>true</extensions>
+        <configuration>
+          <properties>
+            <drools.dialect.java.compiler.lnglevel>1.8</drools.dialect.java.compiler.lnglevel>
+          </properties>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <configuration>
+          <projectsDirectory>src/it</projectsDirectory>
+          <debug>true</debug>
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <logDirectory>${project.build.directory}/it</logDirectory>
+          <filterProperties>
+            <org.kie.version>${project.version}</org.kie.version>
+          </filterProperties>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>install</goal>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

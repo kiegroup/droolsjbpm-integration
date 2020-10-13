@@ -1,0 +1,1 @@
+Module to use maven-invoker-plugin for full round-trip integration tests
