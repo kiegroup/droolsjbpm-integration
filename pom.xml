@@ -77,7 +77,6 @@
     <module>optaplanner-workbench-models</module>
     <module>drools-ha</module>
     <module>kie-maven-plugin-integration-tests</module>
-    <module>kie-pmml-integration-tests</module>
   </modules>
 
   <dependencyManagement>
