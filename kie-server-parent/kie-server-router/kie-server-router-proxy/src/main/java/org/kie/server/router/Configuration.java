@@ -57,7 +57,9 @@ public class Configuration {
             hosts = new ArrayList<>();
             hostsPerContainer.put(containerId, hosts);
         }
-        hosts.add(serverUrl);
+        if(!hosts.contains(serverUrl)) {
+            hosts.add(serverUrl);
+        }
 
         this.listeners.forEach(l -> l.onContainerAdded(containerId, serverUrl));
     }
@@ -68,7 +70,9 @@ public class Configuration {
             hosts = new ArrayList<>();
             hostsPerServer.put(serverId, hosts);
         }
-        hosts.add(serverUrl);
+        if(!hosts.contains(serverUrl)) {
+            hosts.add(serverUrl);
+        }
 
         this.listeners.forEach(l -> l.onServerAdded(serverId, serverUrl));
     }
@@ -79,14 +83,18 @@ public class Configuration {
             containersByAlias = new ArrayList<>();
             containerInfosPerContainer.put(containerInfo.getAlias(), containersByAlias);
         }
-        containersByAlias.add(containerInfo);
+        if(!containersByAlias.contains(containerInfo)) {
+            containersByAlias.add(containerInfo);
+        }
 
         List<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
         if (containersById == null) {
             containersById = new ArrayList<>();
             containerInfosPerContainer.put(containerInfo.getContainerId(), containersById);
         }
-        containersById.add(containerInfo);
+        if(!containersById.contains(containerInfo)) {
+            containersById.add(containerInfo);
+        }
     }
     
     public void removeContainerHost(String containerId, String serverUrl) {

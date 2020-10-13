@@ -62,13 +62,12 @@ public class ConfigurationMarshaller {
         }
         Set<String> processed = new HashSet<>();
         for (Entry<String, List<ContainerInfo>> entry : containerInfo.entrySet()) {
-            if (processed.contains(entry.getKey())) {
-                continue;
-            }
             entry.getValue().forEach(ci -> {
+                if(processed.contains(ci.getKey())) {
+                    return;
+                }
                 JSONObject jsonCI = new JSONObject();
-                processed.add(ci.getAlias());
-                processed.add(ci.getContainerId());
+                processed.add(ci.getKey());
                 try {
                     jsonCI.put("alias", ci.getAlias());
                     jsonCI.put("containerId", ci.getContainerId());
