@@ -12,9 +12,6 @@
 
   <name>KIE :: Maven Plugin :: Integration Tests</name>
 
-  <modules>
-    <module>kie-pmml-trusty-integration-tests</module>
-  </modules>
 
   <artifactId>kie-maven-plugin-integration-tests</artifactId>
 
