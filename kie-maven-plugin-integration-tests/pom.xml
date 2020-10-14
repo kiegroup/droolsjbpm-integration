@@ -15,5 +15,10 @@
 
   <artifactId>kie-maven-plugin-integration-tests</artifactId>
 
+  <modules>
+<!--    <module>kie-pmml-integration-tests</module>-->
+<!--    <module>kie-pmml-trusty-integration-tests</module>-->
+  </modules>
+
 
 </project>
