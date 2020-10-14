@@ -138,7 +138,7 @@ public class KieSpringTransactionManager
                     return TransactionManager.STATUS_ACTIVE;
                 }
             } finally {
-                if (currentTransaction == null) {
+                if (currentTransaction == null && transaction != null) {
                     ptm.commit(transaction);
                 }
             }
