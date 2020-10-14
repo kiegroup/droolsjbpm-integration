@@ -37,7 +37,7 @@ public abstract class AbstractPMMLTest {
 
     protected static PMMLRuntime getPMMLRuntime(String modelName, String fileName) {
         File pmmlFile  = getFile(fileName);
-        return PMML_RUNTIME_FACTORY.getPMMLRuntimeFromFile(modelName, pmmlFile);
+        return PMML_RUNTIME_FACTORY.getPMMLRuntimeFromFile(pmmlFile);
     }
 
     @Test

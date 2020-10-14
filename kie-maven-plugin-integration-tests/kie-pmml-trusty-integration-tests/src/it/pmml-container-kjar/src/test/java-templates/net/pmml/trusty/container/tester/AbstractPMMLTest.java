@@ -49,7 +49,7 @@ public abstract class AbstractPMMLTest {
     }
 
     protected static PMMLRuntime getPMMLRuntime(String modelName, String pmmlFile) {
-        return  PMML_RUNTIME_FACTORY.getPMMLRuntimeFromKieContainer(modelName, KIEBASE_NAME, pmmlFile, GAV);
+        return  PMML_RUNTIME_FACTORY.getPMMLRuntimeFromKieContainerByKieBase(KIEBASE_NAME, pmmlFile, GAV);
     }
 
     @Test
