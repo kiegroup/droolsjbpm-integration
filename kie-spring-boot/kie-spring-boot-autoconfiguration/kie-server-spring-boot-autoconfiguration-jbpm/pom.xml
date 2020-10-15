@@ -240,5 +240,9 @@
       <artifactId>xercesImpl</artifactId>
       <groupId>xerces</groupId>
     </dependency>
+    <dependency>
+    	<groupId>org.kie.server</groupId>
+    	<artifactId>kie-server-services-kafka</artifactId>
+    </dependency>
   </dependencies>
 </project>

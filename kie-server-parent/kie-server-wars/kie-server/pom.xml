@@ -367,6 +367,10 @@
       <artifactId>jaxb-xjc</artifactId>
     </dependency>
 
+    <dependency>
+    	<groupId>org.kie.server</groupId>
+    	<artifactId>kie-server-services-kafka</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
