@@ -32,6 +32,7 @@ public class KieServerConstants {
     public static final String KIE_CASE_SERVER_EXT_DISABLED = "org.jbpm.case.server.ext.disabled";
     public static final String KIE_DMN_SERVER_EXT_DISABLED = "org.kie.dmn.server.ext.disabled";
     public static final String KIE_SWAGGER_SERVER_EXT_DISABLED = "org.kie.swagger.server.ext.disabled";
+    public static final String KIE_KAFKA_SERVER_EXT_DISABLED = "org.kie.kafka.server.ext.disabled";
     public static final String KIE_PROMETHEUS_SERVER_EXT_DISABLED = "org.kie.prometheus.server.ext.disabled";
     public static final String KIE_SCENARIO_SIMULATION_SERVER_EXT_DISABLED = "org.kie.scenariosimulation.server.ext.disabled";
     public static final String KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED = "org.kie.server.taskAssigning.planning.ext.disabled";
@@ -135,6 +136,7 @@ public class KieServerConstants {
     public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
     public static final String CAPABILITY_DMN = "DMN"; // DMN
     public static final String CAPABILITY_SWAGGER = "Swagger"; // Swagger
+    public static final String CAPABILITY_BPM_KAFKA = "BPM-KAFKA"; // Business Process Management Kafka
     public static final String CAPABILITY_PROMETHEUS = "Prometheus"; // Prometheus
     public static final String CAPABILITY_SCENARIO_SIMULATION = "Scenario Simulation"; // Scenario Simulation
     public static final String CAPABILITY_TASK_ASSIGNING_RUNTIME = "TaskAssigningRuntime"; //Task Assigning Runtime
