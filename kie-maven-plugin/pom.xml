@@ -218,12 +218,6 @@
       <artifactId>drools-scorecards</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- LEGACY PMML -->
-<!--    <dependency>-->
-<!--      <groupId>org.drools</groupId>-->
-<!--      <artifactId>kie-pmml</artifactId>-->
-<!--      <scope>runtime</scope>-->
-<!--    </dependency>-->
     <!-- TRUSTY PMML -->
     <dependency>
       <groupId>org.kie</groupId>

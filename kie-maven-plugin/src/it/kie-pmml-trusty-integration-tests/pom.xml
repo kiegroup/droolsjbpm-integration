@@ -24,7 +24,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <kjar.version>@org.kie.version@</kjar.version>
-<!--    <kjar.version>7.45.0-SNAPSHOT</kjar.version>-->
   </properties>
 
   <dependencies>
