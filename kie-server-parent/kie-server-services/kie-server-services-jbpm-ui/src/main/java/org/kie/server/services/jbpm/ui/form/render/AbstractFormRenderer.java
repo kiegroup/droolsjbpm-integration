@@ -422,6 +422,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                                                    .map(e -> new DocumentItem(e.getName(), Base64.getEncoder().encodeToString(e.getContent())))
                                                                    .collect(toList());
                                     item.setValue(items);
+                                    break;
                                 case "multipleSelector":
                                     item.setOptions(field.getListOfValues().stream().map(ItemOption::new).collect(toList()));
                                     if(value instanceof String) {
