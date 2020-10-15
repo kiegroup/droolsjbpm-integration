@@ -1810,20 +1810,23 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue(mappedDefinitions.contains("DataVerification"));
         assertTrue(mappedDefinitions.contains("hiring"));
 
-        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1);
+        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1,
+                CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, true);
         assertNotNull(definitions);
         assertEquals(1, definitions.size());
         assertEquals("DataVerification", definitions.get(0).getId());
 
-        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 1, 1);
-        assertNotNull(definitions);
-        assertEquals(1, definitions.size());
-        assertEquals(USER_TASK_DEF_ID, definitions.get(0).getId());
-
-        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1, CaseServicesClient.SORT_BY_PROCESS_NAME, false);
+        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 1, 1,
+                CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, true);
         assertNotNull(definitions);
         assertEquals(1, definitions.size());
         assertEquals("hiring", definitions.get(0).getId());
+
+        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1,
+                CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, false);
+        assertNotNull(definitions);
+        assertEquals(1, definitions.size());
+        assertEquals(USER_TASK_DEF_ID, definitions.get(0).getId());
     }
 
     @Test
@@ -1833,7 +1836,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, definitions.size());
         assertEquals("hiring", definitions.get(0).getId());
 
-        definitions = caseClient.findProcesses(0, 1, CaseServicesClient.SORT_BY_PROCESS_NAME, false);
+        definitions = caseClient.findProcesses(1, 1, CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, false);
         assertNotNull(definitions);
         assertEquals(1, definitions.size());
         assertEquals("hiring", definitions.get(0).getId());
