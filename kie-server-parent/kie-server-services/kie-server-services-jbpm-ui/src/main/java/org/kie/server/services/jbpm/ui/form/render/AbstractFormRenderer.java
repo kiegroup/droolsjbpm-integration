@@ -412,16 +412,21 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             
                             switch(fieldType) {
                                 case "documentCollection":
-                                    DocumentCollection<Document> docCollection = (DocumentCollection<Document>) value;
-                                    docCollection.getDocuments().stream()
-                                                               .map(e -> (DocumentImpl) e)
-                                                               .forEach(DocumentImpl::load);
+                                    if (value instanceof DocumentCollection) {
+                                        DocumentCollection<Document> docCollection = (DocumentCollection<Document>) value;
+                                        docCollection.getDocuments().stream()
+                                                .map(e -> (DocumentImpl) e)
+                                                .forEach(DocumentImpl::load);
 
-                                    List<DocumentItem> items = docCollection.getDocuments()
-                                                                   .stream()
-                                                                   .map(e -> new DocumentItem(e.getName(), Base64.getEncoder().encodeToString(e.getContent())))
-                                                                   .collect(toList());
-                                    item.setValue(items);
+                                        List<DocumentItem> items = docCollection.getDocuments()
+                                                .stream()
+                                                .map(e -> new DocumentItem(e.getName(), Base64.getEncoder().encodeToString(e.getContent())))
+                                                .collect(toList());
+                                        item.setValue(items);
+                                    } else {
+                                        // In case there is no document collection, just provide an empty one
+                                        item.setValue(Collections.emptyList());
+                                    }
                                     break;
                                 case "multipleSelector":
                                     item.setOptions(field.getListOfValues().stream().map(ItemOption::new).collect(toList()));
