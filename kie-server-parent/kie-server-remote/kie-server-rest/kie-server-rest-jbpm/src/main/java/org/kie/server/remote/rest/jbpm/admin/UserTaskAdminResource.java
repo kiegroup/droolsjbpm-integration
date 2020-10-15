@@ -15,6 +15,46 @@
 
 package org.kie.server.remote.rest.jbpm.admin;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.TaskNotFoundException;
+import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.TaskNotificationList;
+import org.kie.server.api.model.admin.TaskReassignmentList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.ACK_ERRORS_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ACK_ERROR_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ADMIN_TASK_URI;
@@ -42,12 +82,12 @@ import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_EXEC_ERRORS_RESPONSE_JSON;
@@ -63,47 +103,6 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.TaskNotFoundException;
-import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
-import org.kie.server.api.model.admin.ExecutionErrorInstance;
-import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
-import org.kie.server.api.model.admin.TaskNotificationList;
-import org.kie.server.api.model.admin.TaskReassignmentList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Task instance administration")
 @Path("server/" + ADMIN_TASK_URI)
@@ -360,11 +359,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Schedules a specified task instance to be reassigned to specified users or groups and returns the ID of the reassignment.",
-            response=Long.class, code=201)
+    @ApiOperation(value="Schedules a specified task instance to be reassigned to specified users or groups and returns the ID of the reassignment.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = Long.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
@@ -411,11 +409,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Creates an email notification for the specified task instance and returns the ID of the new notification.",
-            response=Long.class, code=201)
+    @ApiOperation(value="Creates an email notification for the specified task instance and returns the ID of the new notification.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = Long.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
@@ -513,11 +510,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns task reassignments for a specified task instance.",
-            response=TaskReassignmentList.class, code=200)
+    @ApiOperation(value="Returns task reassignments for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskReassignmentList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_REASSIGNMENTS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
@@ -542,11 +538,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns notifications created for a specified task instance.",
-            response=TaskNotificationList.class, code=200)
+    @ApiOperation(value="Returns notifications created for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskNotificationList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_NOTIFICATIONS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
@@ -623,11 +618,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified task execution error.",
-            response=ExecutionErrorInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified task execution error.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstance.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERROR_RESPONSE_JSON)})) })
     @GET
     @Path(ERROR_GET_URI)
@@ -651,11 +645,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns task execution errors for a specified task instance.",
-            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiOperation(value="Returns task execution errors for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
@@ -684,11 +677,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns all task execution errors for a specified KIE container.",
-            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiOperation(value="Returns all task execution errors for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_GET_URI)
