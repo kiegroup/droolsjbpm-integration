@@ -17,10 +17,7 @@ package org.kie.server.services.drools;
 
 import java.util.List;
 
-import org.drools.compiler.kie.builder.impl.KieContainerImpl;
-import org.drools.compiler.kie.builder.impl.KieProject;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
-import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.event.rule.AgendaEventListener;
@@ -30,6 +27,7 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.util.KieServerUtils;
 
 /**
  * Direct rules execution service that allow use of typed objects instead of string only
@@ -55,17 +53,8 @@ public class RulesExecutionService {
             if( command.getLookup() != null ) {
                 ks = context.getKieSessionLookupManager().lookup(command.getLookup(), kci, context);
             } else {
-                // if no session ID is defined, then use default ksession. Stateful session takes priority
-                KieProject kieProject = ((KieContainerImpl)kci.getKieContainer()).getKieProject();
-                KieSessionModel defaultStatefulModel = kieProject.getDefaultKieSession();
-                KieSessionModel defaultStatelessModel = kieProject.getDefaultStatelessKieSession();
-                if (defaultStatefulModel != null) {
-                    ks = ((KieContainerInstanceImpl)kci).getKieContainer().getKieSession();
-                } else if (defaultStatelessModel != null) {
-                    ks = ((KieContainerInstanceImpl)kci).getKieContainer().getStatelessKieSession();
-                } else {
-                    throw new IllegalStateException("No default KieSession found on container '" + kci.getContainerId() + "'.");
-                }
+                // if no session ID is defined, then use default stateful/stateless ksession.
+                ks = KieServerUtils.getDefaultKieSession((KieContainerInstanceImpl)kci);
             }
 
             if (ks != null) {
