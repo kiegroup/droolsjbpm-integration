@@ -55,6 +55,8 @@ import org.kie.dmn.validation.dtanalysis.InternalDMNDTAnalyserFactory;
 import org.kie.dmn.validation.dtanalysis.model.DTAnalysis;
 import org.kie.internal.utils.ChainedProperties;
 
+import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
+
 public abstract class AbstractDMNValidationAwareMojo extends AbstractKieMojo {
 
     @Parameter(required = true, defaultValue = "${project.build.resources}")
@@ -63,8 +65,19 @@ public abstract class AbstractDMNValidationAwareMojo extends AbstractKieMojo {
     @Parameter(property = "validateDMN", defaultValue = "VALIDATE_SCHEMA,VALIDATE_MODEL,ANALYZE_DECISION_TABLE")
     private String validateDMN;
 
+    @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL") // DROOLS-5663 align kie-maven-plugin default value for generateModel configuration flag
+    private String generateModel;
+
     protected String getValidateDMN() {
         return validateDMN;
+    }
+
+    public String getGenerateModelOption() {
+        return generateModel;
+    }
+
+    protected boolean isModelParameterEnabled() {
+        return modelParameterEnabled(generateModel);
     }
 
     protected void logValidationMessages(List<DMNMessage> validation,

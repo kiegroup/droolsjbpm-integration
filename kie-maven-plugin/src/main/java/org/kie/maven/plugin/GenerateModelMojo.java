@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,6 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
-import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
 @Mojo(name = "generateModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -94,13 +94,10 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-    @Parameter(property = "generateModel", defaultValue = "YES_WITHDRL") // DROOLS-5663 align kie-maven-plugin default value for generateModel configuration flag
-    private String generateModel;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
-        boolean modelParameterEnabled = modelParameterEnabled(generateModel);
+        boolean modelParameterEnabled = isModelParameterEnabled();
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
         if (modelParameterEnabled && modelCompilerInClassPath) {
             generateModel();
@@ -206,7 +203,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                 performDMNDTAnalysis(kieModule);
             }
 
-            if (ExecModelMode.shouldDeleteFile(generateModel)) {
+            if (ExecModelMode.shouldDeleteFile(getGenerateModelOption())) {
                 deleteDrlFiles(drlFiles);
             }
         } finally {
@@ -257,11 +254,14 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
                 for (ModelBuilderImpl modelBuilder : modelBuilders) {
-                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, modelBuilder.getPackageSources());
+                    Collection packageSources = modelBuilder.getPackageSources();
+                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, packageSources);
                     modelFiles.addAll(result.getModelFiles());
                     final Folder sourceFolder = srcMfs.getFolder("src/main/java");
                     final Folder targetFolder = trgMfs.getFolder(".");
                     srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
+
+
                 }
                 modelWriter.writeModelFile(modelFiles, trgMfs, getInternalKieModule().getReleaseId());
             }
