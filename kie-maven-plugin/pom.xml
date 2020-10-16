@@ -24,6 +24,28 @@
           <goalPrefix>kie</goalPrefix>
         </configuration>
       </plugin>
+      <!-- plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <configuration>
+          <projectsDirectory>src/it</projectsDirectory>
+          <debug>true</debug>
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <logDirectory>${project.build.directory}/it</logDirectory>
+          <filterProperties>
+            <org.kie.version>${project.version}</org.kie.version>
+          </filterProperties>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>install</goal>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin -->
     </plugins>
   </build>
 
@@ -198,12 +220,6 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-scorecards</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- LEGACY PMML -->
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>kie-pmml</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- TRUSTY PMML -->
