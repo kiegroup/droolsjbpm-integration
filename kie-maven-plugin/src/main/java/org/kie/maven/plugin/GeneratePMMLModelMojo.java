@@ -73,7 +73,7 @@ import static org.kie.api.pmml.PMMLConstants.KIE_PMML_IMPLEMENTATION;
 import static org.kie.api.pmml.PMMLConstants.LEGACY;
 import static org.kie.api.pmml.PMMLConstants.NEW;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
-import static org.kie.pmml.evaluator.assembler.service.PMMLCompilerService.getKiePMMLModelsFromResourceFromPlugin;
+import static org.kie.pmml.evaluator.assembler.service.PMMLCompilerService.getKiePMMLModelsFromResourceWithSources;
 
 @Mojo(name = "generatePMMLModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -317,7 +317,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     private PMMLResource parseResource(Resource resource) {
         final InternalKnowledgeBase knowledgeBase = new KnowledgeBaseImpl("PMML", null);
         KnowledgeBuilderImpl kbuilderImpl = new KnowledgeBuilderImpl(knowledgeBase);
-        List<KiePMMLModel> kiePMMLModels = getKiePMMLModelsFromResourceFromPlugin(kbuilderImpl, resource);
+        List<KiePMMLModel> kiePMMLModels = getKiePMMLModelsFromResourceWithSources(kbuilderImpl, resource);
         String modelPath = resource.getSourcePath();
         return new PMMLResource(kiePMMLModels, new File(resource.getSourcePath()).toPath(), modelPath);
     }
