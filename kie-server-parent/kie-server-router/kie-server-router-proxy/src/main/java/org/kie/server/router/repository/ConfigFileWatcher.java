@@ -16,6 +16,7 @@
 package org.kie.server.router.repository;
 
 import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,6 +56,8 @@ public class ConfigFileWatcher implements Runnable {
             if(toWatch.toFile().exists()) {
                 lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
             } else {
+                File file = new File(this.toWatch.toString() + "kie-server-router.json");
+                file.createNewFile();
                 log.warnv("configuration file does not exist {0} ", this.toWatch);
             }
         } catch (IOException e) {
