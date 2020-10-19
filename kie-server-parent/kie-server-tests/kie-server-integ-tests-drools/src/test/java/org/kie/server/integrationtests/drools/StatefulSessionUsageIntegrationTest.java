@@ -143,7 +143,6 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
         // and 'duplicated' flag should be true, because second person was added
         assertEquals("The 'duplicated' field should be true!", true, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
-
     }
 
     @Test
@@ -326,5 +325,33 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
         factHandles = (Collection<FactHandle>) facts;
         assertEquals(0, factHandles.size());
+    }
+
+    @Test
+    public void testStatefulDefault() {
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands); // Don't provide lookup
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        // first call should set the surname for the inserted person
+
+        ExecutionResults actualData = reply.getResult();
+
+        Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
+        // and 'duplicated' flag should stay false, as only one person is in working memory
+        assertEquals("The 'duplicated' field should be false!", false, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
+
+        commands = new ArrayList<Command<?>>();
+        executionCommand = commandsFactory.newBatchExecution(commands); // Don't provide lookup
+        commands.add(commandsFactory.newDispose());
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 }
