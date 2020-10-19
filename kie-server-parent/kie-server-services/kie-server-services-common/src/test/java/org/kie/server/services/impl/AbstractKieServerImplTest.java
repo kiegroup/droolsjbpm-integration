@@ -555,6 +555,7 @@ public abstract class AbstractKieServerImplTest {
     }
     
     @Test
+    //https://issues.redhat.com/browse/JBPM-9435
     public void kieServerStateResponseTest() {
         System.setProperty(KieServerConstants.CFG_KIE_USER, "kieserver");
         System.setProperty(KieServerConstants.CFG_KIE_PASSWORD, "kieserver1!");
