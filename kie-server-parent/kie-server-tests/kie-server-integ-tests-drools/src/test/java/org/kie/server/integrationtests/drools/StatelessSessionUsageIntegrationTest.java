@@ -81,4 +81,21 @@ public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseInt
                 PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(value, PERSON_SURNAME_FIELD));
     }
 
+    @Test
+    public void testStatelessDefault() {
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands); // Don't provide lookup
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        ExecutionResults actualData = reply.getResult();
+        Object value = actualData.getValue(PERSON_OUT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Vader'",
+                PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(value, PERSON_SURNAME_FIELD));
+    }
 }
