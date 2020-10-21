@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +59,7 @@ import org.drools.compiler.kie.builder.impl.ResultsImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
 import org.drools.modelcompiler.builder.ModelBuilderImpl;
+import org.drools.modelcompiler.builder.ModelSourceClass;
 import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -251,18 +252,25 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
             @Override
             public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
+                Folder sourceFolder = srcMfs.getFolder("src/main/java");
+
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
-                for (ModelBuilderImpl modelBuilder : modelBuilders) {
-                    Collection packageSources = modelBuilder.getPackageSources();
-                    ModelWriter.Result result = modelWriter.writeModel(srcMfs, packageSources);
-                    modelFiles.addAll(result.getModelFiles());
-                    final Folder sourceFolder = srcMfs.getFolder("src/main/java");
-                    final Folder targetFolder = trgMfs.getFolder(".");
-                    srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
 
-
+                Map<String, List<String>> modelsByKBase = new HashMap<>();
+                for (Map.Entry<String, ModelBuilderImpl> modelBuilder : modelBuilders.entrySet()) {
+                    ModelWriter.Result result = modelWriter.writeModel( srcMfs, modelBuilder.getValue().getPackageSources() );
+                    modelFiles.addAll( result.getModelFiles() );
+                    modelsByKBase.put( modelBuilder.getKey(), result.getModelFiles() );
                 }
+
+                InternalKieModule kieModule = getInternalKieModule();
+                ModelSourceClass modelSourceClass = new ModelSourceClass( kieModule.getReleaseId(), kieModule.getKieModuleModel().getKieBaseModels(), modelsByKBase, hasDynamicClassLoader() );
+                String projectSourcePath = modelSourceClass.getName();
+                srcMfs.write(projectSourcePath, modelSourceClass.generate().getBytes());
+
+                Folder targetFolder = trgMfs.getFolder(".");
+                srcMfs.copyFolder(sourceFolder, trgMfs, targetFolder);
                 modelWriter.writeModelFile(modelFiles, trgMfs, getInternalKieModule().getReleaseId());
             }
         }
