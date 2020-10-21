@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,6 +41,7 @@ import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -129,6 +131,8 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
     @Test
     @Category({UnstableOnJenkinsPrBuilder.class})
     public void testSLAonUserTaskViolated() throws Exception {
+        Assume.assumeFalse(TestConfig.isWebLogicHomeProvided()); //Skip the test for WebLogic due to deadlock issues related to https://issues.redhat.com/browse/JBPM-9309
+
         Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_WITH_SLA_ON_TASK, new HashMap<>());
         assertProcessInstance(pid, STATE_ACTIVE, SLA_NA);
 
