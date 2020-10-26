@@ -37,7 +37,7 @@ public class WebServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "webservice-project", "1.0.0.Final");
     protected static final String WS_CONTAINER_ID = "webservice-project";
     protected static final String PROCESS_ID_WS = "org.specialtripsagency.specialtripsagencyprocess";
-    
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -51,14 +51,14 @@ public class WebServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
 
     @Test
-    public void testCallWebServiceFromProcess() throws Exception {
+    public void testCallWebServiceFromProcess() {
         Map<String, Object> params = new HashMap<>();
         params.put("serviceUrl", TestConfig.getWebServiceHttpURL());
         Long pid = processClient.startProcess(WS_CONTAINER_ID, PROCESS_ID_WS, params);
-        
+
         assertThat(pid).isNotNull();
         ProcessInstance pi = queryClient.findProcessInstanceById(pid);
-        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);        
+        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
 
     }
 
