@@ -174,9 +174,6 @@
       <plugin>
         <groupId>org.revapi</groupId>
         <artifactId>revapi-maven-plugin</artifactId>
-        <configuration>
-          <failSeverity>breaking</failSeverity>
-        </configuration>
       </plugin>
     </plugins>
   </build>
