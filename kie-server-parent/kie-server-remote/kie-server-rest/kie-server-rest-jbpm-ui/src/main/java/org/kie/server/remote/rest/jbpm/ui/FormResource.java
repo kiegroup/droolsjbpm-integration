@@ -99,11 +99,10 @@ public class FormResource {
         this.context = context;
     }
 
-    @ApiOperation(value="Returns the form information for a specified process definition.",
-            response=String.class, code=200)
+    @ApiOperation(value="Returns the form information for a specified process definition.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process definition, form or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=String.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=PROCESS_FORM_DEF_JSON)})) })
     @GET
     @Path(PROCESS_FORM_GET_URI)
@@ -140,11 +139,10 @@ public class FormResource {
         }
     }
 
-    @ApiOperation(value="Returns the form information for a specified task instance.",
-            response=String.class, code=200)
+    @ApiOperation(value="Returns the form information for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task, form or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=String.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=TASK_FORM_DEF_JSON)})) })
     @GET
     @Path(TASK_FORM_GET_URI)
