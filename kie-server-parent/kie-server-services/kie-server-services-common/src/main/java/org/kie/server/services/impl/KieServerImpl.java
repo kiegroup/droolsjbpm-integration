@@ -1023,16 +1023,16 @@ public class KieServerImpl implements KieServer {
             ListIterator<KieServerConfigItem> listIterator = kieConfigItems.listIterator();
             while (listIterator.hasNext()) {
                 KieServerConfigItem configItem = listIterator.next();
-                if (configItem.getName().equals(KieServerConstants.CFG_KIE_PASSWORD)) {
+                if (KieServerConstants.CFG_KIE_PASSWORD.equals(configItem.getName())) {
                     listIterator.remove();
                 }
-                if (configItem.getName().equals(KieServerConstants.CFG_KIE_TOKEN)) {
+                if (KieServerConstants.CFG_KIE_TOKEN.equals(configItem.getName())) {
                     listIterator.remove();
                 }
-                if (configItem.getName().equals(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD)) {
+                if (KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD.equals(configItem.getName())) {
                     listIterator.remove();
                 }
-                if (configItem.getName().equals(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN)) {
+                if (KieServerConstants.CFG_KIE_CONTROLLER_TOKEN.equals(configItem.getName())) {
                     listIterator.remove();
                 }
             }
