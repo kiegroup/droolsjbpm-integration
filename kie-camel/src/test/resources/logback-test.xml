@@ -24,6 +24,7 @@
     </encoder>
   </appender>
 
+  <logger name="org.kie.test" level="info"/>
   <logger name="org.kie.server.client.impl.AbstractKieServicesClientImpl" level="info"/>
 
   <root level="INFO">
