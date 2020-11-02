@@ -77,7 +77,26 @@
                     "methodName": "getCaseInstancesByContainer",
                     "elementKind": "method",
                     "justification": "https://issues.redhat.com/browse/JBPM-9223"
+                },
+                {
+                  "code": "java.method.addedToInterface",
+                  "new": "method void org.kie.server.client.ProcessServicesClient::signalProcessInstanceByCorrelationKey(java.lang.String, org.kie.internal.process.CorrelationKey, java.lang.String, java.lang.Object)",
+                  "package": "org.kie.server.client",
+                  "classSimpleName": "ProcessServicesClient",
+                  "methodName": "signalProcessInstanceByCorrelationKey",
+                  "elementKind": "method",
+                  "justification": "[JBPM-9405] Provide API method to signal process instance with correlation key"
+                },
+                {
+                  "code": "java.method.addedToInterface",
+                  "new": "method void org.kie.server.client.ProcessServicesClient::signalProcessInstancesByCorrelationKeys(java.lang.String, java.util.List<org.kie.internal.process.CorrelationKey>, java.lang.String, java.lang.Object)",
+                  "package": "org.kie.server.client",
+                  "classSimpleName": "ProcessServicesClient",
+                  "methodName": "signalProcessInstancesByCorrelationKeys",
+                  "elementKind": "method",
+                  "justification": "[JBPM-9405] Provide API method to signal process instance with correlation key"
                 }
+
             ]
         }
     }
