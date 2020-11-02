@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentNotFoundException;
@@ -230,6 +231,36 @@ public class ProcessServiceBase {
 
     }
 
+    public void signalProcessInstanceByCorrelationKey(String containerId,
+                                                      String correlationKey,
+                                                      String signalName,
+                                                      String eventPayload,
+                                                      String marshallingType) {
+
+        String[] correlationProperties = correlationKey.split(":");
+        CorrelationKey actualCorrelationKey = correlationKeyFactory.newCorrelationKey(Arrays.asList(correlationProperties));
+
+        logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
+        Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
+        
+        logger.debug("Calling signal '{}' process instances with correlation key {} on container {} and event {}", signalName, correlationKey, containerId, event);
+        processService.signalProcessInstanceByCorrelationKey(actualCorrelationKey, signalName, event);
+    }
+
+    public void signalProcessInstancesByCorrelationKey(String containerId,
+                                                       List<String> correlationKeys,
+                                                       String signalName,
+                                                       String eventPayload,
+                                                       String marshallingType) {
+        
+        logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
+        Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
+        
+        List<CorrelationKey> keys = correlationKeys.stream().map(e -> correlationKeyFactory.newCorrelationKey(Arrays.asList(e.split(":")))).collect(Collectors.toList());
+        logger.debug("Calling signal '{}' process instances with correlation key {} on container {} and event {}", signalName, keys, containerId, event);
+        processService.signalProcessInstancesByCorrelationKeys(keys, signalName, event);
+    }
+    
     public void signal(String containerId, String signalName, String marshallingType) {
 
         logger.debug("Calling signal '{}' on container {} and event {}", signalName, containerId, null);
@@ -416,6 +447,8 @@ public class ProcessServiceBase {
 
         return processInstanceList;
     }
+
+
 
 
 

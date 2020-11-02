@@ -86,6 +86,7 @@ import static org.kie.server.api.rest.RestURI.PROCESS_INST_HISTORY_TYPE;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_NAME;
+import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_BY_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INSTANCES_PORT_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INST_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_POST_URI;
@@ -430,7 +431,44 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value = "Signals multiple process instances with a specified signal name.", response = Void.class, code = 200)
+    @ApiOperation(value="Signals a specified process instance by correlation key with a specified signal name and optional signal data.",
+            response=Void.class, code=200)
+            @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+    @POST
+    @Path(SIGNAL_PROCESS_BY_CORRELATION_KEY_POST_URI)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response signalProcessInstanceByCorrelationKey(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "correlation key of the process instance to be signaled", required = true, example = "123") @PathParam(CORRELATION_KEY) String correlationKey, 
+            @ApiParam(value = "signal name to be sent to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
+            @ApiParam(value = "optional event data - any type can be provided", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_XML)}))  String eventPayload) {
+
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            processServiceBase.signalProcessInstanceByCorrelationKey(containerId, correlationKey, signalName, eventPayload, type);
+            return createResponse(null, v, Response.Status.OK, conversationIdHeader);
+
+        } catch (ProcessInstanceNotFoundException e) {
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, correlationKey), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
+        }
+    }
+
+    @ApiOperation(value="Signals multiple process instances with a specified signal name.",
+            response=Void.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
@@ -441,6 +479,7 @@ public class ProcessResource  {
     public Response signalProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "list of identifiers of the process instances to be signaled", required = false) @QueryParam("instanceId") List<Long> processInstanceIds, 
+            @ApiParam(value = "list of correlationKeys of the process instances to be signaled", required = false) @QueryParam("correlationKey") List<String> correlationKeys, 
             @ApiParam(value = "signal name to be send to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
             @ApiParam(value = "optional event data - any type can be provided", required = false, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON),
@@ -452,6 +491,9 @@ public class ProcessResource  {
             if (processInstanceIds != null && !processInstanceIds.isEmpty()) {
                 logger.debug("Signaling given process instances - {}", processInstanceIds);
                 processServiceBase.signalProcessInstances(containerId, processInstanceIds, signalName, eventPayload, type);
+            } else if ( correlationKeys != null && !correlationKeys.isEmpty()){
+                logger.debug("Signaling given process instances by correlation key - {}", correlationKeys);
+                processServiceBase.signalProcessInstancesByCorrelationKey(containerId, correlationKeys, signalName, eventPayload, type);
             } else {
                 logger.debug("No process instances given, signal container..");
                 processServiceBase.signal(containerId, signalName, eventPayload, type);
@@ -471,7 +513,8 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified process instance in a specified KIE container.")
+    @ApiOperation(value="Returns information about a specified process instance in a specified KIE container.",
+            response=ProcessInstance.class, code=200)
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 200, response = ProcessInstance.class, message = "Successful response", examples=@Example(value= {

@@ -79,6 +79,10 @@ public interface ProcessServicesClient {
 
     void signalProcessInstances(String containerId, List<Long> processInstanceId, String signalName, Object event);
 
+    void signalProcessInstanceByCorrelationKey(String containerId, CorrelationKey correlationKey, String signalName, Object event);
+
+    void signalProcessInstancesByCorrelationKeys(String containerId, List<CorrelationKey> correlationKeys, String signalName, Object event);
+
     void signal(String containerId, String signalName, Object event);
 
     List<String> getAvailableSignals(String containerId, Long processInstanceId);

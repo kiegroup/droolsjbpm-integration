@@ -90,6 +90,7 @@ public class RestURI {
     public static final String ABORT_PROCESS_INST_DEL_URI = "instances/{" + PROCESS_INST_ID + "}";
     public static final String ABORT_PROCESS_INSTANCES_DEL_URI = "instances";
     public static final String SIGNAL_PROCESS_INST_POST_URI = "instances/{" + PROCESS_INST_ID + "}/signal/{" + SIGNAL_NAME + "}";
+    public static final String SIGNAL_PROCESS_BY_CORRELATION_KEY_POST_URI = "instances/correlation/{" + CORRELATION_KEY + "}/signal/{" + SIGNAL_NAME + "}";
     public static final String SIGNAL_PROCESS_INSTANCES_PORT_URI = "instances/signal/{" + SIGNAL_NAME + "}";
     public static final String PROCESS_INSTANCE_GET_URI = "instances/{" + PROCESS_INST_ID + "}";
     public static final String PROCESS_INSTANCE_VAR_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";

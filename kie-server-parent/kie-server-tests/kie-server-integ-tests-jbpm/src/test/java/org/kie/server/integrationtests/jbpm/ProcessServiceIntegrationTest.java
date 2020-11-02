@@ -54,7 +54,10 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+import org.mockito.Matchers;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -273,6 +276,74 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         }
     }
     
+    @Test
+    public void testSignalProcessInstanceByCorrelationKey() {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
+
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+        
+        ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+        CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
+        CorrelationKey correlationKey = correlationKeyFactory.newCorrelationKey(pi.getCorrelationKey());
+        try {
+            checkAvailableSignals(CONTAINER_ID, processInstanceId);
+
+            Object person = createPersonInstance(USER_JOHN);
+            processClient.signalProcessInstanceByCorrelationKey(CONTAINER_ID, correlationKey, "Signal1", person);
+
+            processClient.signalProcessInstanceByCorrelationKey(CONTAINER_ID, correlationKey, "Signal2", "My custom string event");
+            
+            // only can be completed if they receive both signals
+            assertThat(processClient.getProcessInstance(CONTAINER_ID, processInstanceId).getState(), is(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED));
+        } catch (Exception e) {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSignalProcessInstancesByCorrelationKeys() {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
+
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+        ProcessInstance pi1 = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+
+        Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
+        assertNotNull(processInstanceId2);
+        assertTrue(processInstanceId2.longValue() > 0);
+        ProcessInstance pi2 = processClient.getProcessInstance(CONTAINER_ID, processInstanceId2);
+        
+
+        CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
+        CorrelationKey correlationKey1 = correlationKeyFactory.newCorrelationKey(pi1.getCorrelationKey());
+        CorrelationKey correlationKey2 = correlationKeyFactory.newCorrelationKey(pi2.getCorrelationKey());
+
+        List<CorrelationKey> correlationKeys = new ArrayList<>();
+        correlationKeys.add(correlationKey1);
+        correlationKeys.add(correlationKey2);
+
+        try {
+            checkAvailableSignals(CONTAINER_ID, processInstanceId);
+            checkAvailableSignals(CONTAINER_ID, processInstanceId2);
+
+            Object person = createPersonInstance(USER_JOHN);
+            processClient.signalProcessInstancesByCorrelationKeys(CONTAINER_ID, correlationKeys, "Signal1", person);
+
+            processClient.signalProcessInstancesByCorrelationKeys(CONTAINER_ID, correlationKeys, "Signal2", "My custom string event");
+            
+            // only can be completed if they receive both signals
+            assertThat(processClient.getProcessInstance(CONTAINER_ID, processInstanceId).getState(), is(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED));
+            assertThat(processClient.getProcessInstance(CONTAINER_ID, processInstanceId2).getState(), is(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED));
+        } catch (Exception e) {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
+            fail(e.getMessage());
+        }
+
+    }
+
     @Test
     public void testAvaliableSignalsWrongContainer() {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
