@@ -96,10 +96,9 @@ public class KieServerRestImpl {
     }
 
 
-    @ApiOperation(value="Returns information about the KIE Server. The endpoint for this request is the base URL for the REST API.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Returns information about the KIE Server. The endpoint for this request is the base URL for the REST API.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_SERVER_INF_RESPONSE_JSON)})) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -107,10 +106,9 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.getInfo(), headers);
     }
 
-    @ApiOperation(value="Returns a list of KIE containers on the KIE Server.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Returns a list of KIE containers on the KIE Server.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_CONTAINERS_RESPONSE_JSON)})) })
     @GET
     @Path("containers")
@@ -215,10 +213,9 @@ public class KieServerRestImpl {
         return createCorrectVariant( response, headers, Status.BAD_REQUEST );
     }
 
-    @ApiOperation(value="Returns information about a specified KIE container.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Returns information about a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_CONTAINER_RESPONSE_JSON)})) })
     @GET
     @Path("containers/{" + CONTAINER_ID + "}")
@@ -248,10 +245,9 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.disposeContainer(id), headers, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns information about the KIE scanner used for automatic updates in a specified KIE container, if applicable.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Returns information about the KIE scanner used for automatic updates in a specified KIE container, if applicable.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_SCANNER_RESPONSE_JSON)})) })
     @GET
     @Path("containers/{" + CONTAINER_ID + "}/scanner")
@@ -262,10 +258,9 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.getScannerInfo(id), headers, conversationIdHeader);
     }
     
-    @ApiOperation(value="Starts or stops a KIE scanner that controls polling for updated KIE container deployments, if applicable.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Starts or stops a KIE scanner that controls polling for updated KIE container deployments, if applicable.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=UPDATE_SCANNER_RESPONSE_JSON)})) })
     @POST
     @Path("containers/{" + CONTAINER_ID + "}/scanner")
@@ -289,10 +284,9 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.updateScanner(id, resource), headers, conversationIdHeader);
     };
 
-    @ApiOperation(value="Returns release ID information (group ID, artifact ID, version) for a specified KIE container.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Returns release ID information (group ID, artifact ID, version) for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_RELEASE_ID_RESPONSE_JSON)})) })
     @GET
     @Path("containers/{" + CONTAINER_ID + "}/release-id")
@@ -303,10 +297,9 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.getContainerReleaseId(id), headers, conversationIdHeader);
     }
 
-    @ApiOperation(value="Updates release ID information (group ID, artifact ID, version) for a specified KIE container.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Updates release ID information (group ID, artifact ID, version) for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=UPDATE_RELEASE_RESPONSE_JSON)})) })
     @POST
     @Path("containers/{" + CONTAINER_ID + "}/release-id")
@@ -332,10 +325,9 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.updateContainerReleaseId(id, releaseId, resetBeforeUpdate), headers, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns information about the current state and configurations of the KIE Server.",
-            response=ServiceResponse.class, code=200)
+    @ApiOperation(value="Returns information about the current state and configurations of the KIE Server.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response=ServiceResponse.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_SERVER_STATE_RESPONSE_JSON)})) })
     @GET
     @Path("state")
