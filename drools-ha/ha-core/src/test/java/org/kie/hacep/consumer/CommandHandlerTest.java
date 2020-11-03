@@ -136,7 +136,6 @@ public class CommandHandlerTest {
     public void initTest() {
         when(kieSessionContextMock.getKieSession()).thenReturn(kieSessionMock);
         when(kieSessionContextMock.getFhManager()).thenReturn(factHandlesManagerMock);
-        when(kieSessionMock.fireAllRules()).thenReturn(fireAllRule);
         when(kieSessionMock.getFactCount()).thenReturn(factCount);
         when(kieSessionMock.getEntryPoint(anyString())).thenReturn(entryPointMock);
         when(kieSessionMock.getQueryResults(anyString())).thenReturn(queryResultsMock);
@@ -217,7 +216,7 @@ public class CommandHandlerTest {
                          commandHandler::visit,
                          () -> {
                              verify(factHandlesManagerMock,
-                                    times(1)).registerHandle(eq(remoteFactHandle), any(FactHandle.class));
+                                    times(1)).registerHandle(eq(remoteFactHandle), any());
                              verify(entryPointMock,
                                     times(1)).insert(eq(myObject));
                          });
@@ -336,11 +335,7 @@ public class CommandHandlerTest {
     @Test
     public void visitUpdateKJarCommand() {
         envConfig.withUpdatableKJar("true");
-        when(kieSessionContextMock.getKjarGAVUsed()).thenReturn(Optional.of(kJarGAV));
         when(kieSessionContextMock.getKieContainer()).thenReturn(kieContainerMock);
-        when(kieServicesMock.newReleaseId("org.kie",
-                                          "fake-jar",
-                                          "0.1-SNAPSHOT")).thenReturn(releaseIdMock);
         UpdateKJarCommand command = new UpdateKJarCommand(kJarGAV);
         executeAndVerifyResponseMessage(command,
                                         commandHandler::visit,
