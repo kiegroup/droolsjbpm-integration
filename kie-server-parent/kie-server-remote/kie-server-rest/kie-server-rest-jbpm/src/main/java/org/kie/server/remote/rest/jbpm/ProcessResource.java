@@ -431,7 +431,6 @@ public class ProcessResource  {
         }
     }
 
-<<<<<<< Upstream, based on branch '7.44.x' of https://github.com/kiegroup/droolsjbpm-integration.git
     @ApiOperation(value="Signals a specified process instance by correlation key with a specified signal name and optional signal data.",
             response=Void.class, code=200)
             @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
@@ -468,11 +467,7 @@ public class ProcessResource  {
         }
     }
 
-    @ApiOperation(value="Signals multiple process instances with a specified signal name.",
-            response=Void.class, code=200)
-=======
     @ApiOperation(value = "Signals multiple process instances with a specified signal name.", response = Void.class, code = 200)
->>>>>>> 845c9a5 [JBPM-9410] No Model definition in KIE Server Swagger API
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
             @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
