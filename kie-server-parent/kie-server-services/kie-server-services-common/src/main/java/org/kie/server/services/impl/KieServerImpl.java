@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -51,6 +52,8 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.KieServerStateInfo;
@@ -1026,14 +1029,38 @@ public class KieServerImpl implements KieServer {
         try {
             KieServerInfo kieServerInfo = getInfoInternal();
             KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-            KieServerStateInfo stateInfo = new KieServerStateInfo(currentState.getControllers(), currentState.getConfiguration(), currentState.getContainers());
-            stateInfo.setServerId(kieServerInfo.getServerId());
-            stateInfo.setLocation(kieServerInfo.getLocation());
+            KieServerStateInfo state = new KieServerStateInfo(currentState.getControllers(),
+                                                              currentState.getConfiguration(),
+                                                              currentState.getContainers());
 
-            return stateInfo;
+            KieServerConfig kieServerConfig = state.getConfiguration();
+            List<KieServerConfigItem> kieConfigItems = kieServerConfig.getConfigItems();
+            ListIterator<KieServerConfigItem> listIterator = kieConfigItems.listIterator();
+            while (listIterator.hasNext()) {
+                KieServerConfigItem configItem = listIterator.next();
+                if (KieServerConstants.CFG_KIE_PASSWORD.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+                if (KieServerConstants.CFG_KIE_TOKEN.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+                if (KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+                if (KieServerConstants.CFG_KIE_CONTROLLER_TOKEN.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+            }
+            kieServerConfig.setConfigItems(kieConfigItems);
+            state.setConfiguration(kieServerConfig);
+
+            return new ServiceResponse<KieServerStateInfo>(ServiceResponse.ResponseType.SUCCESS,
+                    "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
+
         } catch (Exception e) {
             logger.error("Error when loading server state due to {}", e.getMessage(), e);
-            return null;
+            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE,
+                    "Error when loading server state due to " + e.getMessage());
         }
     }
 
