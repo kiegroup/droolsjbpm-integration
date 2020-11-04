@@ -15,9 +15,11 @@
 
 package org.kie.server.router.repository;
 
-import java.io.FileReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,10 +60,19 @@ public class ConfigFileWatcher implements Runnable {
             } else {
                 File file = new File(this.toWatch.toString() + "kie-server-router.json");
                 file.createNewFile();
+                FileOutputStream fos = new FileOutputStream(file);
+                String cfg = marshaller.marshall(configuration);
+                try (PrintWriter writer = new PrintWriter(fos)) {
+                    writer.write(cfg);
+                }
+                FileTime lastModified = Files.getLastModifiedTime(toWatch);
+                lastUpdate =  lastModified.toMillis();
                 log.warnv("configuration file does not exist {0} ", this.toWatch);
             }
         } catch (IOException e) {
             log.error("Unable to read last modified date of routers config file", e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
