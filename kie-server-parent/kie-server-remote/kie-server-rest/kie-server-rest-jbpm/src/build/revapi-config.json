@@ -37,6 +37,13 @@
                     "justification": "[JBPM-9410] No Model definition in KIE Server Swagger API"
                  },
                  {
+                     "code": "java.annotation.added",
+                     "annotationType": "io.swagger.annotations.ApiOperation",
+                     "elementKind": "method",
+                     "classSimpleName": "RuntimeDataResource",
+                     "justification": "[JBPM-9410] No Model definition in KIE Server Swagger API"
+                 },
+                 {
                     "code": "java.annotation.attributeRemoved",
                     "annotationType": "io.swagger.annotations.ApiOperation",
                     "attribute": "code",
@@ -63,8 +70,7 @@
                     "attribute": "response",
                     "elementKind": "method",
                     "justification": "[JBPM-9410] No Model definition in KIE Server Swagger API"
-                 }
-                 ,
+                 },
                  {
                    "code": "java.annotation.attributeValueChanged",
                    "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.admin.UserTaskAdminResource::notify(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, boolean, boolean, ===java.lang.String===)",

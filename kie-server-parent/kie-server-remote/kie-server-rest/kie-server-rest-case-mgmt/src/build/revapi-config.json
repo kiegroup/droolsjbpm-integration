@@ -37,6 +37,13 @@
                     "justification": "[JBPM-9410] No Model definition in KIE Server Swagger API"
                 },
                 {
+                    "code": "java.annotation.added",
+                    "annotationType": "io.swagger.annotations.ApiOperation",
+                    "elementKind": "method",
+                    "classSimpleName": "CaseQueryResource",
+                    "justification": "[JBPM-9410] No Model definition in KIE Server Swagger API"
+                },
+                {
                     "code": "java.annotation.attributeRemoved",
                     "annotationType": "io.swagger.annotations.ApiOperation",
                     "attribute": "code",
