@@ -230,7 +230,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         assertEquals(generatedChanges, resultCaptor.getValue().getChanges());
     }
 
-    @Test
+    @Test(timeout = TEST_TIMEOUT)
     public void synchronizeSolutionWithNoChangesTimeout() throws Exception {
         CompletableFuture future = startRunnableBase();
         LocalDateTime startTime = LocalDateTime.now().withNano(0);
