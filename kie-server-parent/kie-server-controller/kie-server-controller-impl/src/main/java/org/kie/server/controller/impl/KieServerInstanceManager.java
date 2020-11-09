@@ -497,6 +497,7 @@ public class KieServerInstanceManager {
 
             Container container = new Container();
             container.setContainerSpecId(containerSpec.getId());
+            container.setResolvedReleasedId(containerSpec.getReleasedId());
             container.setServerTemplateId(serverTemplate.getId());
             container.setServerInstanceId(instanceUrl.getServerInstanceId());
             container.setUrl(instanceUrl.getUrl() + "/containers/" + containerSpec.getId());
