@@ -60,10 +60,6 @@
       <artifactId>kie-server-services-drools</artifactId>
       <exclusions>
         <exclusion>
-          <artifactId>uberfire-commons</artifactId>
-          <groupId>org.uberfire</groupId>
-        </exclusion>
-        <exclusion>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
         </exclusion>

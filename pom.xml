@@ -50,7 +50,6 @@
 
   <modules>
     <module>kie-swagger-ui</module>
-    <module>kie-identity-session-provider</module>
     <module>kie-maven-plugin</module>
     <module>kie-takari-plugin</module>
     <!-- The example can not be in the build because of the chicken-egg problem with depending on the plugin,
@@ -67,8 +66,6 @@
     <module>kie-security</module>
     <module>kie-camel</module>
     <module>kie-tomcat-integration</module>
-    <!-- The Android examples require Android SDK to be installed, so they are excluded from the default build -->
-    <!-- <module>drools-examples-android</module> -->
     <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
     <module>kie-spring-boot</module>
@@ -116,13 +113,6 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-bom</artifactId>
-        <version>${version.org.kie}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
         <groupId>org.kie.soup</groupId>
         <artifactId>kie-soup-bom</artifactId>
         <version>${version.org.kie}</version>
@@ -154,21 +144,6 @@
         <module>droolsjbpm-integration-distribution</module>
         <module>droolsjbpm-bpms-distribution</module>
         <module>droolsjbpm-brms-distribution</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>android</id>
-      <!-- Do not active the profile automatically even if the ANDROID_HOME is set.
-           On most CI machines, the ANDROID_HOME is set, but the SDK is outdated and
-           the build then fails.
-
-           One needs to use "-Pandroid" explicitly to get the profile activated.
-      <activation>
-        <file><exists>${env.ANDROID_HOME}</exists></file>
-      </activation>
-      -->
-      <modules>
-        <module>drools-examples-android</module>
       </modules>
     </profile>
     <profile>
