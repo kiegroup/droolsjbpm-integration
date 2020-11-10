@@ -59,11 +59,13 @@ public class ConfigFileWatcher implements Runnable {
                 lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
             } else {
                 File file = new File(this.toWatch.toString() + "kie-server-router.json");
-                file.createNewFile();
+                if(file.createNewFile());
                 FileOutputStream fos = new FileOutputStream(file);
                 String cfg = marshaller.marshall(configuration);
                 try (PrintWriter writer = new PrintWriter(fos)) {
                     writer.write(cfg);
+                }finally{
+                    fos.close();
                 }
                 FileTime lastModified = Files.getLastModifiedTime(toWatch);
                 lastUpdate =  lastModified.toMillis();
@@ -71,7 +73,7 @@ public class ConfigFileWatcher implements Runnable {
             }
         } catch (IOException e) {
             log.error("Unable to read last modified date of routers config file", e);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
