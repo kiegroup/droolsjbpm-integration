@@ -29,7 +29,7 @@
 
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
     <feature version="${project.version}">drools-module</feature>
-    <feature version="[4,5)">spring-orm</feature>
+    <feature version="[4,6)">spring-orm</feature>
     <feature version="[2,3)">jpa</feature>
     <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
     <bundle>mvn:org.drools/drools-serialization-protobuf/${version.org.drools}</bundle>
@@ -64,9 +64,9 @@
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm</feature>
     <feature version="${project.version}">jbpm-human-task</feature>
-    <feature version="[4,5)">spring</feature>
-    <feature version="[4,5)">spring-jdbc</feature>
-    <feature version="[4,5)">spring-orm</feature>
+    <feature version="[4,6)">spring</feature>
+    <feature version="[4,6)">spring-jdbc</feature>
+    <feature version="[4,6)">spring-orm</feature>
     <bundle>mvn:org.kie/kie-spring/${version.org.drools}</bundle>
   </feature>
 
@@ -102,9 +102,9 @@
     <feature>camel-core</feature>
     <feature>camel-spring</feature>
     <feature>camel-cxf</feature>
-    <feature version="[3.2,3.3)">cxf-specs</feature>
-    <feature version="[3.2,3.3)">cxf-core</feature>
-    <feature version="[3.2,3.3)">cxf-jaxrs</feature>
+    <feature version="[3.2,3.4)">cxf-specs</feature>
+    <feature version="[3.2,3.4)">cxf-core</feature>
+    <feature version="[3.2,3.4)">cxf-jaxrs</feature>
     <bundle>mvn:org.kie/kie-camel/${project.version}</bundle>
   </feature>
 
