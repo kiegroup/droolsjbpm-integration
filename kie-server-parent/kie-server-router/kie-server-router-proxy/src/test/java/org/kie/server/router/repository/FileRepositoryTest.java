@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -212,5 +213,39 @@ public class FileRepositoryTest {
 
         repoWithWatcher.close();
         repoWithWatcher.clean();
+    }
+
+    @Test
+    public void testFileCreation() throws Exception {
+
+        File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
+        Configuration configuration = new Configuration();
+        ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
+        File configFile = new File(repositoryDirectory, "kie-server-router.json");
+
+        configuration.addContainerHost("container1", "http://localhost:8080/server");
+        configuration.addContainerHost("container2", "http://localhost:8180/server");
+        
+        configuration.addServerHost("server1", "http://localhost:8080/server");
+        configuration.addServerHost("server2", "http://localhost:8180/server");
+
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        configuration.addContainerInfo(containerInfo);
+
+        if (configFile.exists()) {
+            try (FileReader reader = new FileReader(configFile)){
+                
+                configuration = marshaller.unmarshall(reader);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        ConfigFileWatcher configFileWatcher = new ConfigFileWatcher(configFile.getParentFile().getAbsolutePath(), marshaller, configuration);
+
+        assertNotNull(configFileWatcher);
+        
+
     }
 }
