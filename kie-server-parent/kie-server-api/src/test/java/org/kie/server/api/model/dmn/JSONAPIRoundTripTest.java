@@ -55,7 +55,7 @@ public class JSONAPIRoundTripTest {
         Assertions.assertThat(applicant2).isEqualTo(applicant);
 
         DMNContext ctx = new DMNContextImpl();
-        ctx.set("Applicant", applicant);
+        ctx.set("Applicant", applicant); // VERY IMPORTANT that the map key is "Applicant" with the capital-A.
 
         DMNContextKS contextKS = new DMNContextKS("ns1", "model1", ctx.getAll());
         DMNContextKS contextKS2 = roundTrip(contextKS);
