@@ -73,7 +73,7 @@ public class DMNResultKS implements DMNResult {
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     @JsonSerialize(using = JSONMarshaller.PassThruSerializer.class)
-    @JsonDeserialize(using = JSONMarshaller.PassThruMapStringObjectDeserializer.class) // keyAs = String.class) // using = JSONMarshaller.PassThruMapStringObjectDeserializer.class)
+    @JsonDeserialize(using = JSONMarshaller.PassThruMapStringObjectDeserializer.class)
     private Map<String, Object> dmnContext = new HashMap<>();
 
     // concrete implementation of DMNMessage and DMNDecisionResult are needed in order to have proper marshalling
