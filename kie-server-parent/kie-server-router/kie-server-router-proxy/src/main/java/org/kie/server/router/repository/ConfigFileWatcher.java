@@ -58,11 +58,13 @@ public class ConfigFileWatcher implements Runnable {
             if(toWatch.toFile().exists()) {
                 lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
             } else {
+                String cfg = marshaller.marshall(configuration);
                 File file = new File(this.toWatch.toString() + "kie-server-router.json");
                 file.createNewFile();
-                String cfg = marshaller.marshall(configuration);
-                try (FileOutputStream fos = new FileOutputStream(file); PrintWriter writer = new PrintWriter(fos)) {
-                    writer.write(cfg);
+                if(file.exists()){
+                    try (FileOutputStream fos = new FileOutputStream(file); PrintWriter writer = new PrintWriter(fos)) {
+                        writer.write(cfg);
+                    }
                 }
                 FileTime lastModified = Files.getLastModifiedTime(toWatch);
                 lastUpdate =  lastModified.toMillis();
