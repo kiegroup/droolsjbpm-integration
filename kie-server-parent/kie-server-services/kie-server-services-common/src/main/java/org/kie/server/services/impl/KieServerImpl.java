@@ -1018,21 +1018,6 @@ public class KieServerImpl implements KieServer {
     public ServiceResponse<KieServerStateInfo> getServerState() {
         KieServerStateInfo state = getInternalServerState();
         if(state != null) {
-            return new ServiceResponse<KieServerStateInfo>(ServiceResponse.ResponseType.SUCCESS, "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
-        } else {
-            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state");
-        }
-
-    }
-
-    public KieServerStateInfo getInternalServerState() {
-        try {
-            KieServerInfo kieServerInfo = getInfoInternal();
-            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-            KieServerStateInfo state = new KieServerStateInfo(currentState.getControllers(),
-                                                              currentState.getConfiguration(),
-                                                              currentState.getContainers());
-
             KieServerConfig kieServerConfig = state.getConfiguration();
             List<KieServerConfigItem> kieConfigItems = kieServerConfig.getConfigItems();
             ListIterator<KieServerConfigItem> listIterator = kieConfigItems.listIterator();
@@ -1053,14 +1038,26 @@ public class KieServerImpl implements KieServer {
             }
             kieServerConfig.setConfigItems(kieConfigItems);
             state.setConfiguration(kieServerConfig);
-
             return new ServiceResponse<KieServerStateInfo>(ServiceResponse.ResponseType.SUCCESS,
                     "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
+        } else {
+            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state");
+        }
 
+    }
+
+    public KieServerStateInfo getInternalServerState() {
+        try {
+            KieServerInfo kieServerInfo = getInfoInternal();
+            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+            KieServerStateInfo stateInfo = new KieServerStateInfo(currentState.getControllers(), currentState.getConfiguration(), currentState.getContainers());
+            stateInfo.setServerId(kieServerInfo.getServerId());
+            stateInfo.setLocation(kieServerInfo.getLocation());
+
+            return stateInfo;
         } catch (Exception e) {
             logger.error("Error when loading server state due to {}", e.getMessage(), e);
-            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE,
-                    "Error when loading server state due to " + e.getMessage());
+            return null;
         }
     }
 
