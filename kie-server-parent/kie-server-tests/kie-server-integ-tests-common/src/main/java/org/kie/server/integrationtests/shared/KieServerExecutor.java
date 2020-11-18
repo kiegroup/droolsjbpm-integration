@@ -39,10 +39,19 @@ public class KieServerExecutor {
     // Need to hold kie server instance because we need to manually handle startup/shutdown behavior defined in
     // context listener org.kie.server.services.Bootstrap. Embedded server doesn't support ServletContextListeners.
     private KieServerImpl kieServer;
+    private int kieServerAllocatedPort;
 
     private String serverActivePolicies = "KeepLatestOnly";
 
     private static SimpleDateFormat serverIdSuffixDateFormat = new SimpleDateFormat("yyyy-MM-DD-HHmmss_SSS");
+
+    public KieServerExecutor() {
+        this(TestConfig.getKieServerAllocatedPort());
+    }
+
+    public KieServerExecutor(int kieServerAllocatedPort) {
+        this.kieServerAllocatedPort = kieServerAllocatedPort;
+    }
 
     public void startKieServer() {
         startKieServer(false);
@@ -58,7 +67,7 @@ public class KieServerExecutor {
         
 
         server = new TJWSEmbeddedJaxrsServer();
-        server.setPort(TestConfig.getKieServerAllocatedPort());
+        server.setPort(kieServerAllocatedPort);
         server.start();
 
         addServerSingletonResources();
@@ -77,7 +86,7 @@ public class KieServerExecutor {
         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, TestConfig.getControllerHttpUrl());
         System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_USER, TestConfig.getUsername());
         System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, TestConfig.getPassword());
-        System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getEmbeddedKieServerHttpUrl());
+        System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, "http://localhost:" + kieServerAllocatedPort + "/server");
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
         System.setProperty(KieServerConstants.CFG_SYNC_DEPLOYMENT, Boolean.toString(syncWithController));
         System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.PRODUCTION.name());

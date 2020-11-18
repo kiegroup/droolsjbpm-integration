@@ -15,7 +15,9 @@
 
 package org.kie.server.integrationtests.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -55,6 +57,8 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
     public static final Logger logger = LoggerFactory.getLogger(WebSocketKieControllerStartupIntegrationTest.class);
 
     private String origControllerUrl;
+    // Need to allocate different port for WebSocket test as using same Kie server URL for both REST and WebSocket tests cause issues (due to client retrieval logic in controller).
+    private int kieServerAllocatedPort = allocatePort();
 
     @Rule
     public TestName testName= new TestName();
@@ -62,7 +66,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
     @Override
     protected KieServicesClient createDefaultClient() {
         // For these tests we use embedded kie server as we need to control turning server off and on.
-        KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(TestConfig.getEmbeddedKieServerHttpUrl(), null, null);
+        KieServicesConfiguration config = KieServicesFactory.newRestConfiguration("http://localhost:" + kieServerAllocatedPort + "/server", null, null);
         config.setMarshallingFormat(marshallingFormat);
         return KieServicesFactory.newKieServicesClient(config);
     }
@@ -80,7 +84,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         
         // Start embedded kie server to be correctly initialized and cleaned before tests.
         if (!TestConfig.isLocalServer()) {
-            server = new KieServerExecutor() {
+            server = new KieServerExecutor(kieServerAllocatedPort) {
                 
                 @Override
                 protected void setKieServerProperties(boolean syncWithController) {
@@ -218,5 +222,17 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertNotNull(containerInfo.getResult());
         assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
         assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+    }
+
+    private static int allocatePort() {
+        try {
+            ServerSocket server = new ServerSocket(0);
+            int port = server.getLocalPort();
+            server.close();
+            return port;
+        } catch (IOException e) {
+            // failed to dynamically allocate port, try to use hard coded one
+            return 9786;
+        }
     }
 }
