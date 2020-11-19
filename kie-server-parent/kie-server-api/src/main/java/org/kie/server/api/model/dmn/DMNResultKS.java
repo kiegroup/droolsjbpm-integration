@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -72,6 +73,7 @@ public class DMNResultKS implements DMNResult {
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     @JsonSerialize(using = JSONMarshaller.PassThruSerializer.class)
+    @JsonDeserialize(using = JSONMarshaller.PassThruMapStringObjectDeserializer.class)
     private Map<String, Object> dmnContext = new HashMap<>();
 
     // concrete implementation of DMNMessage and DMNDecisionResult are needed in order to have proper marshalling

@@ -28,9 +28,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
+import org.kie.server.api.marshalling.json.JSONMarshaller;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-context")
@@ -62,6 +65,8 @@ public class DMNContextKS {
     @XmlElement(name = "dmn-context")
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
+    @JsonSerialize(using = JSONMarshaller.PassThruSerializer.class)
+    @JsonDeserialize(using = JSONMarshaller.PassThruMapStringObjectDeserializer.class)
     private Map<String, Object> dmnContext = new HashMap<>();
 
     public DMNContextKS() {
