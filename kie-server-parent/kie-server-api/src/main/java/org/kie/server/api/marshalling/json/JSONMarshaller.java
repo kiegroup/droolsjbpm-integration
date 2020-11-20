@@ -561,6 +561,17 @@ public class JSONMarshaller implements Marshaller {
         }
     }
 
+    public static class PassThruMapStringObjectDeserializer extends JsonDeserializer<Map<String, Object>> {
+
+        @Override
+        public Map<String, Object> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            @SuppressWarnings("unchecked") // purpose-built (/used) JsonDeserializer
+            HashMap<String, Object> result = p.readValueAs(HashMap.class);
+            return result;
+        }
+
+    }
+
     class CustomObjectSerializer extends JsonSerializer<Object> {
 
         private ObjectMapper customObjectMapper;

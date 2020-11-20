@@ -61,7 +61,6 @@
     <karaf.version.commons-codec>1.10</karaf.version.commons-codec>
     <karaf.version.commons-collections4>4.1</karaf.version.commons-collections4>
     <karaf.version.javax.inject>${version.org.geronimo.atinject}</karaf.version.javax.inject>
-    <karaf.version.org.codehaus.janino>${version.org.codehaus.janino}</karaf.version.org.codehaus.janino>
     <!-- Overwrites with a servicemix version -->
     <karaf.servicemix.version.com.google.protobuf>2.4.1_1</karaf.servicemix.version.com.google.protobuf>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.2.11_1</karaf.servicemix.version.com.sun.xml.bind.jaxb>
@@ -314,6 +313,11 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core-dynamic</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-ecj</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -633,11 +637,6 @@
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
       <artifactId>org.apache.servicemix.specs.jsr303-api-1.1.0</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.janino</groupId>
-      <artifactId>janino</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
