@@ -221,10 +221,8 @@ public class FileRepositoryTest {
         File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
         Configuration configuration = new Configuration();
         ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
-        
+
         ConfigFileWatcher configFileWatcher = new ConfigFileWatcher(repositoryDirectory.getParentFile().getAbsolutePath(), marshaller, configuration);
         assertNotNull(configFileWatcher);
-        
-
     }
 }
