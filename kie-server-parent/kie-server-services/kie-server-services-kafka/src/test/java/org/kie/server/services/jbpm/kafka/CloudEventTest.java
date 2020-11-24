@@ -23,6 +23,7 @@ import java.util.TimeZone;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class CloudEventTest {
@@ -34,7 +35,7 @@ public class CloudEventTest {
         assertEquals("javi",event.getId());
         assertEquals("one",event.getType());
         assertEquals("pepe",event.getSource());
-        assertEquals("1.0",event.getSpecVersion());
+        assertEquals("1.0", event.getSpecversion());
         assertEquals("javierito",event.getData());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(event.getTime());
@@ -47,6 +48,12 @@ public class CloudEventTest {
     private static class Person {
         private String name;
         
+        public Person(String name) {
+            this.name = name;
+        }
+
+        public Person() {}
+
         public String getName() {
             return name;
         }
@@ -59,13 +66,22 @@ public class CloudEventTest {
         assertEquals("javi",event.getId());
         assertEquals("one",event.getType());
         assertEquals("pepe",event.getSource());
-        assertEquals("1.0",event.getSpecVersion());
+        assertEquals("1.0", event.getSpecversion());
         assertEquals("javierito",event.getData().getName());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(event.getTime());
         calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
         assertEquals(17,calendar.get(Calendar.HOUR_OF_DAY));
         assertEquals(2020,calendar.get(Calendar.YEAR));
+    }
+
+    @Test
+    public void testPersonCloudEventSerialization() throws IOException, ParseException {
+        String str = new String(CloudEvent.write("pepe", 1, new Person("Javierito")));
+        assertTrue(str.contains("\"type\":\"org.kie.server.services.jbpm.kafka.CloudEventTest$Person\""));
+        assertTrue(str.contains("\"specversion\":\"1.0\""));
+        assertTrue(str.contains("\"source\":\"/process/pepe/1\""));
+        assertTrue(str.contains("\"data\":{\"name\":\"Javierito\"}"));
     }
 
 }
