@@ -38,15 +38,22 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.IsolationLevel;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.DeploymentEventListener;
 import org.jbpm.services.api.DeploymentService;
@@ -57,6 +64,16 @@ import org.jbpm.services.api.model.MessageDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.SignalDesc;
 import org.jbpm.services.api.model.SignalDescBase;
+import org.kie.api.event.process.MessageEvent;
+import org.kie.api.event.process.ProcessCompletedEvent;
+import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.event.process.ProcessNodeLeftEvent;
+import org.kie.api.event.process.ProcessNodeTriggeredEvent;
+import org.kie.api.event.process.ProcessStartedEvent;
+import org.kie.api.event.process.ProcessVariableChangedEvent;
+import org.kie.api.event.process.SignalEvent;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
@@ -67,16 +84,29 @@ import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KafkaServerExtension implements KieServerExtension, DeploymentEventListener, Runnable {
+public class KafkaServerExtension implements KieServerExtension, DeploymentEventListener, ProcessEventListener,
+                                  Runnable {
 
+    private static final Logger logger = LoggerFactory.getLogger(KafkaServerExtension.class);
+    
     public static final String EXTENSION_NAME = "Kafka";
     static final String KAFKA_EXTENSION_PREFIX = "org.kie.server.jbpm-kafka.ext.";
     static final String TOPIC_PREFIX = KAFKA_EXTENSION_PREFIX + "topics.";
-    private static final Logger logger = LoggerFactory.getLogger(KafkaServerExtension.class);
+    static final String SIGNAL_MAPPING_PROPERTY = KAFKA_EXTENSION_PREFIX + "signals.mapping";
+    static final String MESSAGE_MAPPING_PROPERTY = KAFKA_EXTENSION_PREFIX + "message.mapping";
+    private static final Mapping SIGNAL_MAPPING_DEFAULT = Mapping.NONE;
+    private static final Mapping MESSAGE_MAPPING_DEFAULT = Mapping.AUTO;
+    
+    enum Mapping {
+        AUTO, NONE
+    }
+    
 
     private AtomicBoolean initialized = new AtomicBoolean();
     // Kafka consumer
     private Consumer<String, byte[]> consumer;
+    // Kafka producer
+    private Producer<String, byte[]> producer;
     // JBPM services
     private ListenerSupport deploymentService;
     private ProcessService processService;
@@ -88,6 +118,7 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     private Map<String, Collection<Class<?>>> classes = new ConcurrentHashMap<>();
     // synchronization variables
     private AtomicBoolean consumerReady = new AtomicBoolean();
+    private AtomicBoolean producerReady = new AtomicBoolean();
     private Lock changeRegistrationLock = new ReentrantLock();
     private Lock consumerLock = new ReentrantLock();
     private Condition isSubscribedCond = changeRegistrationLock.newCondition();
@@ -140,13 +171,18 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         if (deploymentService != null) {
             deploymentService.removeListener(this);
         }
+        Duration duration = Duration.ofSeconds(Long.getLong(KAFKA_EXTENSION_PREFIX + "close.timeout", 30L));
+        if (producerReady.compareAndSet(true, false)) {
+            producer.close(duration);
+        }
+
         if (consumerReady.compareAndSet(true, false)) {
             notifyService.getAndSet(null).shutdownNow();
             consumer.wakeup();
             consumerLock.lock();
             try {
                 consumer.unsubscribe();
-                consumer.close(Duration.ofSeconds(Long.getLong(KAFKA_EXTENSION_PREFIX + "close.timeout", 30L)));
+                consumer.close(duration);
             } finally {
                 consumerLock.unlock();
             }
@@ -167,26 +203,53 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     }
 
     protected Consumer<String, byte[]> getKafkaConsumer() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, System.getProperty(
-                KAFKA_EXTENSION_PREFIX + "boopstrap.servers", "localhost:9092"));
+        Map<String, Object> props = initCommonConfig();
         // read only committed events
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, IsolationLevel.READ_COMMITTED.toString().toLowerCase());
-        // do not automatically create topics by default
-        props.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.getBoolean(
-                KAFKA_EXTENSION_PREFIX + "auto.create.topics"));
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, System.getProperty(KAFKA_EXTENSION_PREFIX + "group.id",
-                "jbpm-consumer"));
+        // automatically create topics by default
+        String autoCreateTopics = System.getProperty(KAFKA_EXTENSION_PREFIX +
+                                                     ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG);
+        if (autoCreateTopics != null) {
+            props.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.parseBoolean(autoCreateTopics));
+        }
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, System.getProperty(KAFKA_EXTENSION_PREFIX +
+                                                                     ConsumerConfig.GROUP_ID_CONFIG, "jbpm-consumer"));
         return new KafkaConsumer<>(props, new StringDeserializer(), new ByteArrayDeserializer());
+    }
+
+    protected Producer<String, byte[]> getKafkaProducer() {
+        Map<String, Object> props = initCommonConfig();
+        String acks = System.getProperty(KAFKA_EXTENSION_PREFIX + ProducerConfig.ACKS_CONFIG);
+        if (acks != null) {
+            props.put(ProducerConfig.ACKS_CONFIG, acks);
+        }
+        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.getLong(KAFKA_EXTENSION_PREFIX +
+                                                                   ProducerConfig.MAX_BLOCK_MS_CONFIG, 2000L));
+        return new KafkaProducer<>(props, new StringSerializer(), new ByteArraySerializer());
+    }
+
+    private Map<String, Object> initCommonConfig() {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, System.getProperty(
+                KAFKA_EXTENSION_PREFIX + CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092"));
+        String clientId = System.getProperty(KAFKA_EXTENSION_PREFIX + CommonClientConfigs.CLIENT_ID_CONFIG);
+        if (clientId != null) {
+            configs.put(CommonClientConfigs.CLIENT_ID_CONFIG, clientId);
+        }
+        return configs;
     }
 
     @Override
     public void onDeploy(DeploymentEvent event) {
+        event.getDeployedUnit().getRuntimeManager().getRuntimeEngine(ProcessInstanceIdContext.get()).getKieSession()
+                .addEventListener(this);
         updateRegistration(event, this::updateTopics);
     }
 
     @Override
     public void onUnDeploy(DeploymentEvent event) {
+        event.getDeployedUnit().getRuntimeManager().getRuntimeEngine(ProcessInstanceIdContext.get()).getKieSession()
+                .removeEventListener(this);
         updateRegistration(event, this::removeTopics);
     }
 
@@ -201,21 +264,31 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     }
 
     private void updateTopics(String deploymentId, ProcessDefinition processDefinition) {
-        updateTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
-        updateTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
+        if (processSignals()) {
+            updateTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
+        }
+        if (processMessages()) {
+            updateTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
+        }
     }
 
     private void removeTopics(String deploymentId, ProcessDefinition processDefinition) {
-        removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
-        removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
+        if (processSignals()) {
+            removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
+        }
+        if (processMessages()) {
+            removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
+        }
     }
 
     private <T extends SignalDescBase> void updateTopics(Map<String, Map<T, Collection<String>>> topic2SignalBase,
                                                          String deploymentId,
                                                          Collection<T> signals) {
         for (T signal : signals) {
-            topic2SignalBase.computeIfAbsent(topicFromSignal(signal), k -> new HashMap<>()).computeIfAbsent(
-                    signal, k -> new ArrayList<>()).add(deploymentId);
+            if (!signal.getIncomingNodes().isEmpty()) {
+                topic2SignalBase.computeIfAbsent(topicFromSignal(signal), k -> new HashMap<>()).computeIfAbsent(
+                        signal, k -> new ArrayList<>()).add(deploymentId);
+            }
         }
     }
 
@@ -301,51 +374,19 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     }
 
     private static <T extends SignalDescBase> String topicFromSignal(T signal) {
-        return System.getProperty(TOPIC_PREFIX + signal.getName(), signal.getName());
+        return topicFromSignal(signal.getName());
+    }
+    
+    private static String topicFromSignal(String name) {
+        return System.getProperty(TOPIC_PREFIX + name, name);
     }
 
-    @Override
-    public void serverStarted() {
-        // will use lazy initialization for consumer
-    }
-
-    @Override
-    public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        // will be done by listener
-    }
 
     @Override
     public boolean isUpdateContainerAllowed(String id,
                                             KieContainerInstance kieContainerInstance,
                                             Map<String, Object> parameters) {
         return true;
-    }
-
-    @Override
-    public void prepareContainerUpdate(String id,
-                                       KieContainerInstance kieContainerInstance,
-                                       Map<String, Object> parameters) {
-        // will be done by listener
-    }
-
-    @Override
-    public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        // will be done by listener
-    }
-
-    @Override
-    public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        // will be done by listener
-    }
-
-    @Override
-    public List<Object> getAppComponents(SupportedTransports type) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public <T> T getAppComponents(Class<T> serviceType) {
-        return null;
     }
 
     @Override
@@ -367,6 +408,12 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     public Integer getStartOrder() {
         return 20;
     }
+
+    @Override
+    public String toString() {
+        return EXTENSION_NAME + " KIE Server extension";
+    }
+
 
     @Override
     public void run() {
@@ -453,6 +500,7 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         }
     }
 
+
     private void signalEvent(String deployment, String signalName, Object data) {
         processService.signalEvent(deployment, signalName, data);
     }
@@ -497,8 +545,167 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         return dataClazz.orElse(Object.class);
     }
 
+    
     @Override
-    public String toString() {
-        return EXTENSION_NAME + " KIE Server extension";
+    public void onMessage(MessageEvent event) {
+        if (processMessages()) {
+            sendEvent(event.getProcessInstance(), event.getMessageName(), event.getMessage());
+        }
+        
+       
     }
+
+    @Override
+    public void onSignal(SignalEvent event) {
+        if (processSignals(event)) {
+            sendEvent(event.getProcessInstance(), event.getSignalName(), event.getSignal());
+        }
+    }
+
+    private void sendEvent(ProcessInstance processInstance,
+                           String name,
+                           Object value) {
+
+        if (producerReady.compareAndSet(false, true)) {
+            producer = getKafkaProducer();
+        }
+        try {
+            producer.send(new ProducerRecord<>(topicFromSignal(name), CloudEvent.write(processInstance.getProcessId(),
+                    processInstance.getId(), value)), (m, e) -> {
+                        if (e != null) {
+                            logError(value, e);
+                        }
+                    });
+        } catch (Exception e) {
+            logError(value, e);
+        }
+        
+    }
+
+    private static Mapping getMapping(String propName, Mapping defaultValue) {
+        Mapping result = null;
+        String propValue = System.getProperty(propName);
+        if (propValue != null) {
+            try {
+                result = Mapping.valueOf(propValue.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                logger.warn("Wrong value {} for property {}, using default {}", propValue, propName, defaultValue);
+            }
+        }
+        return result == null ? defaultValue : result;
+    }
+
+    private static boolean processMessages() {
+        return getMapping(MESSAGE_MAPPING_PROPERTY, MESSAGE_MAPPING_DEFAULT) == Mapping.AUTO;
+    }
+
+    private static boolean processSignals() {
+        return getMapping(SIGNAL_MAPPING_PROPERTY, SIGNAL_MAPPING_DEFAULT) == Mapping.AUTO;
+    }
+
+    private static boolean processSignals(SignalEvent event) {
+        Mapping mapping = getMapping(SIGNAL_MAPPING_PROPERTY, SIGNAL_MAPPING_DEFAULT);
+        return mapping == Mapping.AUTO || "##kafka".equalsIgnoreCase((String) event.getNodeInstance().getNode()
+                .getMetaData().get("implementation"));
+    }
+
+    private void logError(Object value, Exception e) {
+        logger.error("Error publishing event {}", value, e);
+    }
+
+    @Override
+    public void serverStarted() {
+        // will use lazy initialization for consumer
+    }
+
+    @Override
+    public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        // will be done by listener
+    }
+
+    @Override
+    public void prepareContainerUpdate(String id,
+                                       KieContainerInstance kieContainerInstance,
+                                       Map<String, Object> parameters) {
+        // will be done by listener
+    }
+
+    @Override
+    public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        // will be done by listener
+    }
+
+    @Override
+    public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        // will be done by listener
+    }
+
+    @Override
+    public List<Object> getAppComponents(SupportedTransports type) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public <T> T getAppComponents(Class<T> serviceType) {
+        return null;
+    }
+
+
+    @Override
+    public void beforeProcessStarted(ProcessStartedEvent event) {
+        // not interested
+    }
+
+    @Override
+    public void afterProcessStarted(ProcessStartedEvent event) {
+        // not interested
+
+    }
+
+    @Override
+    public void beforeProcessCompleted(ProcessCompletedEvent event) {
+        // not interested
+
+    }
+
+    @Override
+    public void afterProcessCompleted(ProcessCompletedEvent event) {
+        // not interested
+
+    }
+
+    @Override
+    public void beforeNodeTriggered(ProcessNodeTriggeredEvent event) {
+        // not interested
+    }
+
+    @Override
+    public void afterNodeTriggered(ProcessNodeTriggeredEvent event) {
+        // not interested
+
+    }
+
+    @Override
+    public void beforeNodeLeft(ProcessNodeLeftEvent event) {
+        // not interested
+    }
+
+    @Override
+    public void afterNodeLeft(ProcessNodeLeftEvent event) {
+        // not interested
+
+    }
+
+    @Override
+    public void beforeVariableChanged(ProcessVariableChangedEvent event) {
+        // not interested
+
+    }
+
+    @Override
+    public void afterVariableChanged(ProcessVariableChangedEvent event) {
+        // not interested
+
+    }
+
 }

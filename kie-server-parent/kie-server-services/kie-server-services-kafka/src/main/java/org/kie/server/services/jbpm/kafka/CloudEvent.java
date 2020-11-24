@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 class CloudEvent<T> {
 
@@ -29,14 +31,28 @@ class CloudEvent<T> {
             .setDateFormat(new SimpleDateFormat(System.getProperty(
                     KafkaServerExtension.KAFKA_EXTENSION_PREFIX + "json.date_format", System.getProperty(
                             "org.kie.server.json.date_format",
-                            "yyyy-MM-dd'T'HH:mm:ss.SSSZ"))));
+                            "yyyy-MM-dd'T'HH:mm:ss.SSSZ"))))
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-    private String specVersion;
+    private static final String SOURCE_FORMATTER = "/process/%s/%s";
+
+    private String specversion;
     private Date time;
     private String id;
     private String type;
     private String source;
     private T data;
+
+    public static byte[] write(String processId, long processInstanceId, Object value) throws IOException {
+        CloudEvent<Object> event = new CloudEvent<>();
+        event.type = value != null ? value.getClass().getTypeName() : "empty";
+        event.source = String.format(SOURCE_FORMATTER, processId, processInstanceId);
+        event.specversion = "1.0";
+        event.time = new Date();
+        event.id = UUID.randomUUID().toString();
+        event.data = value;
+        return mapper.writeValueAsBytes(event);
+    }
 
     public static <T> CloudEvent<T> read(byte[] bytes, Class<T> type) throws IOException, ParseException {
         JsonNode node = mapper.readTree(bytes);
@@ -51,7 +67,7 @@ class CloudEvent<T> {
             cloudEvent.type = node.get("type").asText();
         }
         if (node.has("specversion")) {
-            cloudEvent.specVersion = node.get("specversion").asText();
+            cloudEvent.specversion = node.get("specversion").asText();
         }
         if (node.has("time")) {
             cloudEvent.time = mapper.getDateFormat().parse(node.get("time").asText());
@@ -64,8 +80,8 @@ class CloudEvent<T> {
 
     private CloudEvent() {}
 
-    public String getSpecVersion() {
-        return specVersion;
+    public String getSpecversion() {
+        return specversion;
     }
 
     public Date getTime() {
@@ -90,7 +106,7 @@ class CloudEvent<T> {
 
     @Override
     public String toString() {
-        return "CloudEvent [specversion=" + specVersion + ", time=" + time + ", id=" + id + ", type=" + type +
+        return "CloudEvent [specversion=" + specversion + ", time=" + time + ", id=" + id + ", type=" + type +
                ", source=" + source + ", data=" + data + "]";
     }
 }
