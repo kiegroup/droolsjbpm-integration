@@ -17,8 +17,10 @@ package org.kie.server.router.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -209,6 +211,72 @@ public class FileRepositoryTest {
         assertEquals(2, loaded.getContainerInfosPerContainer().size());
         assertEquals(1, loaded.getHostsPerContainer().get("container1").size());
         assertEquals(1, loaded.getHostsPerContainer().get("container2").size());
+
+        repoWithWatcher.close();
+        repoWithWatcher.clean();
+    }
+
+    @Test
+    public void testFileCreation() throws Exception {
+
+        ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
+        Configuration configuration = new Configuration();
+        // Start watcher service with not existing config file
+        File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
+        repositoryDirectory.mkdirs();
+
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
+
+        FileRepository repoWithWatcher = new FileRepository(repositoryDirectory);
+        Configuration loaded = repoWithWatcher.load();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        loaded.addListener(new ConfigurationListener() {
+
+            @Override
+            public void onConfigurationReloaded() {
+                latch.countDown();
+            }
+        });
+
+        // delay it a bit for the watcher to be triggered
+        Thread.sleep(3000);
+
+        // Create configuration file
+        System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "false");
+
+        Configuration config = new Configuration();
+
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addContainerHost("container2", "http://localhost:8180/server");
+
+        config.addServerHost("server1", "http://localhost:8080/server");
+        config.addServerHost("server2", "http://localhost:8180/server");
+
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        FileRepository repo = new FileRepository(repositoryDirectory);
+        repo.persist(config);
+
+        latch.await(20, TimeUnit.SECONDS);
+
+        File serverStateFile = new File(repositoryDirectory, "kie-server-router" + ".json");
+
+        assertTrue(serverStateFile.exists());
+
+        if (serverStateFile.exists()) {
+            try (FileReader reader = new FileReader(serverStateFile)){
+                
+                configuration = marshaller.unmarshall(reader);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        assertEquals(loaded.toString().trim(), configuration.toString().trim());
 
         repoWithWatcher.close();
         repoWithWatcher.clean();
