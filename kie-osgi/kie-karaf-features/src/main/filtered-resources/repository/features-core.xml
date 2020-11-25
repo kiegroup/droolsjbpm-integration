@@ -16,6 +16,7 @@
     <bundle>mvn:org.drools/drools-model-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
+    <bundle>mvn:org.kie/kie-memory-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-ecj/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-mvel/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-cdi/${version.org.drools}</bundle>
@@ -48,6 +49,7 @@
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
+    <bundle>mvn:org.kie/kie-memory-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-ecj/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-mvel/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-core-reflective/${version.org.drools}</bundle>
