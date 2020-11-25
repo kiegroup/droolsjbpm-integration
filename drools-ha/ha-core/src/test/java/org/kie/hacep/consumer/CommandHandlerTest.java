@@ -26,8 +26,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.KieServices;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.EntryPoint;
@@ -65,23 +63,28 @@ import org.kie.remote.message.GetKJarGAVMessage;
 import org.kie.remote.message.GetObjectMessage;
 import org.kie.remote.message.ListKieSessionObjectMessage;
 import org.kie.remote.message.ResultMessage;
-
 import org.kie.remote.message.UpdateKJarMessage;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CommandHandlerTest {
 
     protected static final EnvConfig envConfig = EnvConfig.getDefaultEnvConfig();
@@ -119,12 +122,6 @@ public class CommandHandlerTest {
     protected QueryResults queryResultsMock;
 
     @Mock
-    protected ReleaseId releaseIdMock;
-
-    @Mock
-    protected KieServices kieServicesMock;
-
-    @Mock
     protected KieContainer kieContainerMock;
 
     @Captor
@@ -136,9 +133,10 @@ public class CommandHandlerTest {
     public void initTest() {
         when(kieSessionContextMock.getKieSession()).thenReturn(kieSessionMock);
         when(kieSessionContextMock.getFhManager()).thenReturn(factHandlesManagerMock);
+        when(kieSessionMock.fireAllRules()).thenReturn(fireAllRule);
         when(kieSessionMock.getFactCount()).thenReturn(factCount);
-        when(kieSessionMock.getEntryPoint(anyString())).thenReturn(entryPointMock);
-        when(kieSessionMock.getQueryResults(anyString())).thenReturn(queryResultsMock);
+        when(kieSessionMock.getEntryPoint(any())).thenReturn(entryPointMock);
+        when(kieSessionMock.getQueryResults(any())).thenReturn(queryResultsMock);
         when(kieSessionContextMock.getKjarGAVUsed()).thenReturn(Optional.of(kJarGAV));
         when(queryResultsMock.iterator()).thenReturn(Collections.emptyIterator());
         doReturn(Collections.singletonList(myObject)).when(entryPointMock).getObjects();
@@ -178,7 +176,7 @@ public class CommandHandlerTest {
         executeAndVerifyResponseMessage(command,
                                         commandHandler::visit,
                                         FireAllRuleMessage.class,
-                                        result -> result.equals(new Long(fireAllRule)));
+                                        result -> result.equals((long) fireAllRule));
 
         reset(producerMock);
         reset(kieSessionMock);
@@ -316,7 +314,7 @@ public class CommandHandlerTest {
                              verify(sessionSnapshooterMock,
                                     times(1))
                                      .serialize(eq(kieSessionContextMock),
-                                                anyString(),
+                                                any(),
                                                 anyLong());
                          });
         logger.info("SnapshotOnDemandCommand:{}", command.toString());
