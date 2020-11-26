@@ -150,10 +150,10 @@
       <artifactId>cxf-core</artifactId>
     </dependency>
 
-    <dependency>
+    <!-- <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
-    </dependency>
+    </dependency> -->
 
     <dependency>
       <groupId>org.apache.camel</groupId>
