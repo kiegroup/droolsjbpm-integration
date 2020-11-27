@@ -54,7 +54,7 @@ public class Container extends ContainerKey {
         this.serverInstanceId = serverInstanceKey.getServerInstanceId();
         this.messages.addAll( messages );
         this.resolvedReleasedId = resolvedReleasedId;
-
+        setUrl(url);
     }
 
     public String getServerInstanceId() {

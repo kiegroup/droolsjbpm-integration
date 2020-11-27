@@ -72,11 +72,14 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         templateStorage.update(serverTemplate);
 
+        
         notificationService.notify(new ServerTemplateUpdated(serverTemplate));
 
         if (containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
             List<Container> containers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
-            notificationService.notify(serverTemplate, containerSpec, containers);
+            if(!kieServerInstanceManager.isAsync()) {
+                notificationService.notify(serverTemplate, containerSpec, containers);
+            }
         }
     }
 
@@ -130,7 +133,9 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         // in case container was started before it was update or update comes with status started update container in running servers
         if (currentVersion.getStatus().equals(KieContainerStatus.STARTED) || containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
             List<Container> containers = kieServerInstanceManager.upgradeAndStartContainer(serverTemplate, containerSpec, resetBeforeUpdate);
-            notificationService.notify(serverTemplate, containerSpec, containers);
+            if(!kieServerInstanceManager.isAsync()) {
+                notificationService.notify(serverTemplate, containerSpec, containers);
+            }
         }
     }
 
@@ -150,7 +155,9 @@ public class SpecManagementServiceImpl implements SpecManagementService {
             for (ContainerSpec containerSpec : containerSpecs) {
                 if (containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
                     List<Container> containers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
-                    notificationService.notify(serverTemplate, containerSpec, containers);
+                    if(!kieServerInstanceManager.isAsync()) {
+                        notificationService.notify(serverTemplate, containerSpec, containers);
+                    }
                 }
             }
         }
@@ -414,7 +421,9 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         List<Container> containers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        if(!kieServerInstanceManager.isAsync()) {
+            notificationService.notify(serverTemplate, containerSpec, containers);
+        }
     }
 
     @Override
@@ -435,7 +444,9 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         List<Container> containers = kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        if(!kieServerInstanceManager.isAsync()) {
+            notificationService.notify(serverTemplate, containerSpec, containers);
+        }
     }
     
     @Override
@@ -460,7 +471,9 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         List<Container> containers = kieServerInstanceManager.activateContainer(serverTemplate, containerSpec);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        if(!kieServerInstanceManager.isAsync()) {
+            notificationService.notify(serverTemplate, containerSpec, containers);
+        }
     }
 
     @Override
@@ -485,7 +498,9 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         List<Container> containers = kieServerInstanceManager.deactivateContainer(serverTemplate, containerSpec);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        if(!kieServerInstanceManager.isAsync()) {
+            notificationService.notify(serverTemplate, containerSpec, containers);
+        }
     }
 
     @Override

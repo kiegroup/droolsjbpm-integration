@@ -322,7 +322,7 @@ public class KieServerImpl implements KieServer {
                                     currentState.getContainers().add(container);
                                 });
                                 eventSupport.fireAfterContainerStarted(this, ci);
-                                getDefaultController().update(getInternalServerState());
+                                notifyStatusToControllers();
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                             } else {
                                 ci.getResource().setStatus(KieContainerStatus.FAILED);
@@ -432,7 +432,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerActivated(this, kci);
-                    getDefaultController().update(getInternalServerState());
+                    notifyStatusToControllers();
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " activated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " activated successfully.", kci.getResource());
                 }
@@ -481,7 +481,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerDeactivated(this, kci);
-                    getDefaultController().update(getInternalServerState());
+                    notifyStatusToControllers();
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " deactivated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " deactivated successfully.", kci.getResource());
                 }
@@ -614,7 +614,7 @@ public class KieServerImpl implements KieServer {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully stopped."));
 
                         eventSupport.fireAfterContainerStopped(this, kci);
-                        getDefaultController().update(getInternalServerState());
+                        notifyStatusToControllers();
                         return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully disposed.");
                     } else {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " was not instantiated."));
@@ -678,7 +678,7 @@ public class KieServerImpl implements KieServer {
                             }
                         });
                     });
-                    getDefaultController().update(getInternalServerState());
+                    notifyStatusToControllers();
                     return scannerResponse;
                 }
             } else {
@@ -955,7 +955,7 @@ public class KieServerImpl implements KieServer {
 
                 logger.info("Container {} successfully updated to release id {}", containerId, releaseId);
                 ks.getRepository().removeKieModule(originalReleaseId);
-                getDefaultController().update(getInternalServerState());
+                notifyStatusToControllers();
                 messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + containerId));
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
             } else {
@@ -1108,6 +1108,17 @@ public class KieServerImpl implements KieServer {
         return controller;
     }
 
+    protected void notifyStatusToControllers() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(Long.getLong(KieServerConstants.KIE_SERVER_NOTIFY_UPDATES_TO_CONTROLLERS_DELAY, 1000L));
+                getDefaultController().update(getInternalServerState());
+            } catch (InterruptedException e) {
+                // do nothing
+            }
+        }).start();
+    }
+    
     protected KieServerController getDefaultController() {
         return new DefaultRestControllerImpl(context);
     }

@@ -16,12 +16,14 @@
 package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.ServiceLoader;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerConfigItem;
@@ -59,6 +61,10 @@ public class KieServerInstanceManager {
 
     public static KieServerInstanceManager getInstance() {
         return INSTANCE;
+    }
+
+    public boolean isAsync() {
+        return false;
     }
 
     public List<Container> startScanner(ServerTemplate serverTemplate,
@@ -551,6 +557,7 @@ public class KieServerInstanceManager {
             container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
             container.setMessages(containerResource.getMessages());
             container.setStatus(containerResource.getStatus());
+            container.setContainerName(containerResource.getContainerAlias());
         }
     }
 
