@@ -167,7 +167,6 @@ public abstract class KieServerControllerImpl implements KieServerController {
         ServerInstance serverInstance = toServerInstance(serverInstanceKey, serverTemplate);
         // we update and notify
         notificationService.notify(new ServerInstanceUpdated(serverInstance));
-        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
 
         for(ContainerSpec currentSpec : serverTemplate.getContainersSpec()) {
             List<Container> specContainerList = new ArrayList<Container>();
