@@ -146,14 +146,19 @@ public class DefaultRestControllerImpl implements KieServerController {
 
         KieServerConfig config = currentState.getConfiguration();
         if (controllers != null && !controllers.isEmpty()) {
+            KieServerSetup kieServerSetup = null;
             for (String controllerUrl : controllers) {
 
                 if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                    KieServerSetup kieServerSetup = connectToSingleController(serverInfo, config, controllerUrl);
-                    if (kieServerSetup != null && kieServerSetup.hasNoErrors()) {
-                        return kieServerSetup;
+                    KieServerSetup kieServerSetupController = connectToSingleController(serverInfo, config, controllerUrl);
+                    if (kieServerSetup == null && kieServerSetupController != null && kieServerSetupController.hasNoErrors()) {
+                        kieServerSetup = kieServerSetupController;
                     }
                 }
+            }
+
+            if (kieServerSetup != null) {
+                return kieServerSetup;
             }
 
             throw new KieControllerNotConnectedException("Unable to connect to any controller");
@@ -170,13 +175,8 @@ public class DefaultRestControllerImpl implements KieServerController {
         KieServerConfig config = currentState.getConfiguration();
 
         for (String controllerUrl : controllers ) {
-
             if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                
-                boolean disconnected = disconnectFromSingleController(serverInfo, config, controllerUrl);
-                if (disconnected) {
-                    break;
-                }
+                disconnectFromSingleController(serverInfo, config, controllerUrl);
             }
         }
     }
@@ -212,9 +212,7 @@ public class DefaultRestControllerImpl implements KieServerController {
                 }
             }
 
-        } else {
-            logger.warn("No controllers found to update to new status {}", serverTemplateUpdate);
-        }
+        } 
         // we return one of them coming fron the controller
         return kieServerSetup;
     }
