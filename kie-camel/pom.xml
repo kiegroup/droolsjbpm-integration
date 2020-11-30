@@ -151,11 +151,6 @@
     </dependency>
 
     <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-cxf</artifactId>
       <exclusions>
@@ -170,6 +165,10 @@
         <exclusion>
           <groupId>org.springframework</groupId>
           <artifactId>spring-jcl</artifactId>
+        </exclusion>
+        <exclusion> <!-- DROOLS-5803 -->
+          <groupId>com.sun.xml.parsers</groupId>
+          <artifactId>jaxp-ri</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
