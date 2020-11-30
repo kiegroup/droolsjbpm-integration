@@ -33,6 +33,7 @@ import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.VariableDesc;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
@@ -45,7 +46,6 @@ import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
-import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
@@ -72,8 +72,6 @@ import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
 import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
 import static org.kie.server.services.jbpm.ConvertUtils.buildTaskStatuses;
-import static org.kie.server.services.jbpm.ConvertUtils.checkSort;
-import static org.kie.server.services.jbpm.ConvertUtils.checkStatus;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstance;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcess;
@@ -116,12 +114,18 @@ public class RuntimeDataServiceBase {
         if (bypassAuthUser) {
             return queryParamUser;
         }
+
         return identityProvider.getName();
     }
 
     public ProcessInstanceList getProcessInstances(List<Integer> status, String initiator, String processName, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-        sort = checkSort(sort);
-        status = checkStatus(status);
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessInstanceId";
+        }
+        if (status == null || status.isEmpty()) {
+            status = new ArrayList<Integer>();
+            status.add(ProcessInstance.STATE_ACTIVE);
+        }
         Collection<ProcessInstanceDesc> instances = null;
 
         if (processName != null && !processName.isEmpty()) {
@@ -142,8 +146,13 @@ public class RuntimeDataServiceBase {
     }
 
     public ProcessInstanceList getProcessInstancesByProcessId(String processId, List<Integer> status, String initiator, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-        sort = checkSort(sort);
-        status = checkStatus(status);
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessInstanceId";
+        }
+        if (status == null || status.isEmpty()) {
+            status = new ArrayList<Integer>();
+            status.add(ProcessInstance.STATE_ACTIVE);
+        }
         logger.debug("About to search for process instances with process id '{}' with page {} and page size {}", processId, page, pageSize);
 
         Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByProcessId(status, processId, nullEmpty(initiator), buildQueryContext(page, pageSize, sort, sortOrder));
@@ -157,8 +166,13 @@ public class RuntimeDataServiceBase {
 
 
     public ProcessInstanceList getProcessInstancesByDeploymentId(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-        sort = checkSort(sort);
-        status = checkStatus(status);
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessInstanceId";
+        }
+        if (status == null || status.isEmpty()) {
+            status = new ArrayList<Integer>();
+            status.add(ProcessInstance.STATE_ACTIVE);
+        }
         logger.debug("About to search for process instance belonging to container '{}' with page {} and page size {}", containerId, page, pageSize);
 
         Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByDeploymentId(containerId, status, buildQueryContext(page, pageSize, sort, sortOrder));
@@ -172,7 +186,9 @@ public class RuntimeDataServiceBase {
 
 
     public ProcessInstanceList getProcessInstancesByCorrelationKey(String correlationKey, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-        sort = checkSort(sort);
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessInstanceId";
+        }
         String[] correlationProperties = correlationKey.split(":");
 
         CorrelationKey actualCorrelationKey = correlationKeyFactory.newCorrelationKey(Arrays.asList(correlationProperties));
@@ -201,7 +217,9 @@ public class RuntimeDataServiceBase {
 
 
     public ProcessInstanceList getProcessInstanceByVariables(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-        sort = checkSort(sort);
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessInstanceId";
+        }
         Collection<ProcessInstanceDesc> instances = null;
         if (variableValue != null && !variableValue.isEmpty()) {
             logger.debug("About to search for process instance that has variable '{}' with value '{}' with page {} and page size {}", variableName, variableValue, page, pageSize);
@@ -236,7 +254,7 @@ public class RuntimeDataServiceBase {
         
         if (Boolean.TRUE.equals(withVars)) {
             Collection<VariableDesc> variableDescs = runtimeDataService.getVariablesCurrentState(processInstanceId);
-            Map<String, Object> vars = new HashMap<>();
+            Map<String, Object> vars = new HashMap<String, Object>();
             for (VariableDesc var : variableDescs) {
                 vars.put(var.getVariableId(), var.getNewValue());
             }
@@ -256,11 +274,8 @@ public class RuntimeDataServiceBase {
         return convertToNodeInstance(nodeInstanceDesc);
     }
 
-    public NodeInstanceList getProcessInstanceHistory(long processInstanceId, Boolean active, Boolean completed, Integer page, Integer pageSize) {
-        return getProcessInstanceHistory(null, processInstanceId, active, completed, page, pageSize);
-    }
 
-    public NodeInstanceList getProcessInstanceHistory(String containerId, long processInstanceId, Boolean active, Boolean completed, Integer page, Integer pageSize) {
+    public NodeInstanceList getProcessInstanceHistory(long processInstanceId, Boolean active, Boolean completed, Integer page, Integer pageSize) {
 
         logger.debug("About to search for node instances with page {} and page size {}", page, pageSize);
         Collection<NodeInstanceDesc> result = null;
@@ -276,51 +291,40 @@ public class RuntimeDataServiceBase {
             result = runtimeDataService.getProcessInstanceHistoryCompleted(processInstanceId, buildQueryContext(page, pageSize));
         }
 
-        NodeInstanceList nodeInstanceList = convertToNodeInstanceList(result, containerId);
+        NodeInstanceList nodeInstanceList = convertToNodeInstanceList(result);
         logger.debug("Returning result of node instances search: {}", nodeInstanceList);
         return nodeInstanceList;
     }
 
     public NodeInstanceList getProcessInstanceFullHistoryByType(long processInstanceId, String entryType, Integer page, Integer pageSize) {
-        return getProcessInstanceFullHistoryByType(null, processInstanceId, entryType, page, pageSize);
-    }
-
-    public NodeInstanceList getProcessInstanceFullHistoryByType(String containerId, long processInstanceId, String entryType, Integer page, Integer pageSize) {
 
         logger.debug("About to search for node instances with page {} and page size {}", page, pageSize);
         Collection<NodeInstanceDesc> result = null;
 
         result = runtimeDataService.getProcessInstanceFullHistoryByType(processInstanceId, EntryType.valueOf(entryType), buildQueryContext(page, pageSize));
-        return convertToNodeInstanceList(result, containerId);
+        return convertToNodeInstanceList(result);
     }
 
     public VariableInstanceList getVariablesCurrentState(long processInstanceId) {
-        return getVariablesCurrentState(null, processInstanceId);
-    }
-
-    public VariableInstanceList getVariablesCurrentState(String containerId, long processInstanceId) {
         logger.debug("About to search for variables within process instance  '{}'", processInstanceId);
 
         Collection<VariableDesc> variableDescs = runtimeDataService.getVariablesCurrentState(processInstanceId);
         logger.debug("Found {} variables within process instance '{}'", variableDescs.size(), processInstanceId);
 
-        VariableInstanceList variableInstanceList = convertToVariablesList(variableDescs, containerId);
+        VariableInstanceList variableInstanceList = convertToVariablesList(variableDescs);
         logger.debug("Returning result of variables search: {}", variableInstanceList);
 
         return variableInstanceList;
     }
 
-    public VariableInstanceList getVariableHistory(long processInstanceId, String variableName, Integer page, Integer pageSize) {
-        return getVariableHistory(null, processInstanceId, variableName, page, pageSize);
-    }
 
-    public VariableInstanceList getVariableHistory(String containerId, long processInstanceId, String variableName, Integer page, Integer pageSize) {
+    public VariableInstanceList getVariableHistory(long processInstanceId,  String variableName, Integer page, Integer pageSize) {
         logger.debug("About to search for variable '{}; history within process instance '{}' with page {} and page size {}", variableName, processInstanceId, page, pageSize);
 
         Collection<VariableDesc> variableDescs = runtimeDataService.getVariableHistory(processInstanceId, variableName, buildQueryContext(page, pageSize));
         logger.debug("Found {} variable {} history entries within process instance '{}'", variableDescs.size(), variableName, processInstanceId);
 
-        VariableInstanceList variableInstanceList = convertToVariablesList(variableDescs, containerId);
+        VariableInstanceList variableInstanceList = convertToVariablesList(variableDescs);
         logger.debug("Returning result of variable '{}; history search: {}", variableName, variableInstanceList);
 
         return variableInstanceList;
@@ -374,7 +378,7 @@ public class RuntimeDataServiceBase {
             logger.debug("About to search for process definitions with page {} and page size {}", page, pageSize);
 
             definitions = runtimeDataService.getProcesses(buildQueryContext(page, pageSize, sort, sortOrder));
-            logger.debug("Found {} process definitions", definitions.size());
+            logger.debug("Found {} process definitions", definitions.size(), filter);
         }
 
         ProcessDefinitionList processDefinitionList = convertToProcessList(definitions);
@@ -440,7 +444,10 @@ public class RuntimeDataServiceBase {
         }
 
         logger.debug("Found {} tasks for user '{}' assigned as business admin", tasks.size(), userId);
-        return convertToTaskSummaryList(tasks);
+        TaskSummaryList result = convertToTaskSummaryList(tasks);
+
+        return result;
+
     }
 
     public TaskSummaryList getTasksAssignedAsPotentialOwner(List<String> status,  List<String> groupIds, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
@@ -470,7 +477,11 @@ public class RuntimeDataServiceBase {
         }
 
         logger.debug("Found {} tasks for user '{}' assigned as potential owner", tasks.size(), userId);
-        return convertToTaskSummaryList(tasks);
+        TaskSummaryList result = convertToTaskSummaryList(tasks);
+
+        return result;
+
+
     }
 
     public TaskSummaryList getTasksOwnedByStatus(List<String> status, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
@@ -489,14 +500,16 @@ public class RuntimeDataServiceBase {
         }
 
         logger.debug("Found {} tasks owned by user '{}'", tasks.size(), userId);
-        return convertToTaskSummaryList(tasks);
+        TaskSummaryList result = convertToTaskSummaryList(tasks);
+
+        return result;
     }
 
     public TaskSummaryList getTasksByStatusByProcessInstanceId(Number processInstanceId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
 
         List<Status> taskStatuses = buildTaskStatuses(status);
         if (taskStatuses == null) {
-            taskStatuses = new ArrayList<>();
+            taskStatuses = new ArrayList<Status>();
             taskStatuses.add(Status.Ready);
             taskStatuses.add(Status.Reserved);
             taskStatuses.add(Status.InProgress);
@@ -505,8 +518,11 @@ public class RuntimeDataServiceBase {
         logger.debug("About to search for tasks attached to process instance with id '{}'", processInstanceId);
         List<TaskSummary> tasks = runtimeDataService.getTasksByStatusByProcessInstanceId(processInstanceId.longValue(), taskStatuses, buildQueryFilter(page, pageSize, sort, sortOrder));
 
+
         logger.debug("Found {} tasks attached to process instance with id '{}'", tasks.size(), processInstanceId);
-        return convertToTaskSummaryList(tasks);
+        TaskSummaryList result = convertToTaskSummaryList(tasks);
+
+        return result;
     }
 
     public TaskSummaryList getAllAuditTask(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
@@ -515,14 +531,16 @@ public class RuntimeDataServiceBase {
         logger.debug("About to search for tasks available for user '{}'", userId);
         List<AuditTask> tasks = runtimeDataService.getAllAuditTask(userId, buildQueryFilter(page, pageSize, sort, sortOrder));
 
+
+        logger.debug("Found {} tasks available for user '{}'", tasks.size(), userId);
         TaskSummaryList result = null;
         if (tasks == null) {
             result = new TaskSummaryList(new org.kie.server.api.model.instance.TaskSummary[0]);
         } else {
-            logger.debug("Found {} tasks available for user '{}'", tasks.size(), userId);
             org.kie.server.api.model.instance.TaskSummary[] instances = new org.kie.server.api.model.instance.TaskSummary[tasks.size()];
             int counter = 0;
             for (AuditTask taskSummary : tasks) {
+
                 org.kie.server.api.model.instance.TaskSummary task = org.kie.server.api.model.instance.TaskSummary.builder()
                         .id(taskSummary.getTaskId())
                         .name(taskSummary.getName())
@@ -559,11 +577,12 @@ public class RuntimeDataServiceBase {
         logger.debug("About to search for task {} events", taskId);
         List<TaskEvent> tasks = runtimeDataService.getTaskEvents(taskId, buildQueryFilter(page, pageSize, sort, sortOrder));
 
+
+        logger.debug("Found {} task events available for task '{}'", tasks.size(), taskId);
         TaskEventInstanceList result = null;
         if (tasks == null) {
             result = new TaskEventInstanceList(new TaskEventInstance[0]);
         } else {
-            logger.debug("Found {} task events available for task '{}'", tasks.size(), taskId);
             TaskEventInstance[] instances = new TaskEventInstance[tasks.size()];
             int counter = 0;
             for (TaskEvent taskSummary : tasks) {
@@ -596,7 +615,7 @@ public class RuntimeDataServiceBase {
         userId = getUser(userId);
         List<Status> taskStatuses = buildTaskStatuses(status);
         if (taskStatuses == null) {
-            taskStatuses = new ArrayList<>();
+            taskStatuses = new ArrayList<Status>();
             taskStatuses.add(Status.Ready);
             taskStatuses.add(Status.Reserved);
             taskStatuses.add(Status.InProgress);
@@ -627,7 +646,7 @@ public class RuntimeDataServiceBase {
             filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
         }
 
-        List<String> params = filter.getAttributesQueryParams().stream().map(QueryParam::getColumn).collect(toList());
+        List<String> params = filter.getAttributesQueryParams().stream().map(e -> e.getColumn()).collect(toList());
         params.removeAll(asList(TASK_ATTR_NAME, TASK_ATTR_OWNER, TASK_ATTR_STATUS));
 
         if (params.size() == filter.getAttributesQueryParams().size() && filter.getTaskVariablesQueryParams().isEmpty()) {
@@ -656,4 +675,7 @@ public class RuntimeDataServiceBase {
                                                                                                       filter.getOwners(),
                                                                                                       queryContext));
     }
+
+
+
 }
