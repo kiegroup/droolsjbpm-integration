@@ -1,0 +1,29 @@
+{
+  "id": "1",
+  "type": "org.jbpm.data.Reimbursement",
+  "source": "external",
+  "data": {
+    "employee": {
+      "name": "William Shakespeare",
+      "seniority": 25
+    },
+    "expenses": [
+      {
+        "money": {
+          "amount": 200,
+          "currency": "EUR"
+        },
+        "concept": "monitor"
+      },
+      {
+        "money": {
+          "amount": 374,
+          "currency": "CZK"
+        },
+        "concept": "keyboard"
+      }
+    ]
+  },
+  "specversion": "1.0",
+  "time": "2020-12-04T10:11:12.000GMT"
+}
