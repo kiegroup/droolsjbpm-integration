@@ -151,6 +151,14 @@ public abstract class KieServerBaseIntegrationTest {
         Assume.assumeTrue(reply.getType().equals(ServiceResponse.ResponseType.SUCCESS));
     }
 
+
+    protected void updateContainer(String containerId, ReleaseId releaseId) {
+        KieServicesClient client = createDefaultStaticClient();
+        ServiceResponse<ReleaseId> reply = client.updateReleaseId(containerId, releaseId);
+        Assume.assumeTrue(reply.getType().equals(ServiceResponse.ResponseType.SUCCESS));
+    }
+
+
     protected void disposeAllServerInstances() {
         // Is done just if we run local server (controller always on) or controller is deployed.
         if (TestConfig.isLocalServer() || TestConfig.isControllerProvided()) {

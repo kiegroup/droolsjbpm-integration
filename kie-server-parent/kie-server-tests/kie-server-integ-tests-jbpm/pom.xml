@@ -251,6 +251,7 @@
               <!-- UserInfo properties for UserTaskEscalationIntegrationTest -->
               <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
               <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
+              <org.kie.server.mode>DEVELOPMENT</org.kie.server.mode>
             </systemProperties>
           </container>
         </configuration>
