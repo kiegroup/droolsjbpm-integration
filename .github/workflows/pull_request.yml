@@ -6,14 +6,11 @@ jobs:
   build-chain:
     strategy:
       matrix:
-        java-version: [8]
+        java-version: [8, 11]
       fail-fast: false
     runs-on: ubuntu-latest
     name: Maven Build
     steps:
-      - name: Echo
-        run: |
-          echo "G"
       - name: Free disk space
         run: |
           df -h
