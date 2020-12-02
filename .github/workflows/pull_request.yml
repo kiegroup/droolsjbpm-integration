@@ -57,4 +57,27 @@ jobs:
           sudo apt-get autoclean -y >/dev/null 2>&1
           sudo rm -rf /usr/local/lib/android >/dev/null 2>&1
           docker rmi $(docker image ls -aq) >/dev/null 2>&1
-          df -h
+          df -h     
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java-version }}
+      - name: Install takari
+        run: |
+          wget -P $M2_HOME/lib/ext https://repo1.maven.org/maven2/io/takari/aether/takari-local-repository/0.11.3/takari-local-repository-0.11.3.jar
+          wget -P $M2_HOME/lib/ext https://repo1.maven.org/maven2/io/takari/takari-filemanager/0.8.3/takari-filemanager-0.8.3.jar
+          wget -P $M2_HOME/lib/ext https://repo1.maven.org/maven2/io/takari/maven/takari-smart-builder/0.6.1/takari-smart-builder-0.6.1.jar
+      # See https://docs.github.com/en/actions/guides/building-and-testing-java-with-maven#caching-dependencies
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build Chain ${{ matrix.java-version }}
+        id: build-chain
+        uses: kiegroup/github-action-build-chain@v2.2
+        with:
+          definition-file: https://raw.githubusercontent.com/${GROUP}/droolsjbpm-build-bootstrap/${BRANCH}/.ci/pull-request-config.yaml
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
