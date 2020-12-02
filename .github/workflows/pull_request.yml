@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Echo
         run: |
-          echo "G"
+          echo "K"
       - name: Free disk space
         run: |
           df -h
