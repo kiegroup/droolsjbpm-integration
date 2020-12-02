@@ -52,4 +52,9 @@ jobs:
             php7.4-tidy php7.4-xml php7.4-xmlrpc php7.4-xsl php7.4-zip php-amqp php-apcu \
             php-igbinary php-memcache php-memcached php-mongodb php-redis php-xdebug \
             php-zmq snmp pollinate libpq-dev postgresql-client powershell ruby-full \
-            sphinxsearch subversion mongodb-org -yq >/dev/null 2>&1            
+            sphinxsearch subversion mongodb-org -yq >/dev/null 2>&1
+          sudo apt-get autoremove -y >/dev/null 2>&1
+          sudo apt-get autoclean -y >/dev/null 2>&1
+          sudo rm -rf /usr/local/lib/android >/dev/null 2>&1
+          docker rmi $(docker image ls -aq) >/dev/null 2>&1
+          df -h
