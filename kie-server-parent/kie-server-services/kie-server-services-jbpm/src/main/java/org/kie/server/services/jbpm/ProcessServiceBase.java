@@ -38,6 +38,7 @@ import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.impl.locator.LatestContainerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
 import org.slf4j.Logger;
@@ -260,8 +261,7 @@ public class ProcessServiceBase {
     public void signal(String containerId, String signalName, String marshallingType) {
 
         logger.debug("Calling signal '{}' on container {} and event {}", signalName, containerId, null);
-        processService.signalEvent(containerId, signalName, null);
-
+        processService.signalEvent(context.getContainerId(containerId, LatestContainerLocator.get()), signalName, null);
     }
 
     public void signal(String containerId, String signalName, String eventPayload, String marshallingType) {
@@ -270,7 +270,8 @@ public class ProcessServiceBase {
         Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
 
         logger.debug("Calling signal '{}' on container {} and event {}", signalName, containerId, event);
-        processService.signalEvent(containerId, signalName, event);
+        processService.signalEvent(context.getContainerId(containerId, LatestContainerLocator.get()), signalName,
+                event);
 
     }
 
