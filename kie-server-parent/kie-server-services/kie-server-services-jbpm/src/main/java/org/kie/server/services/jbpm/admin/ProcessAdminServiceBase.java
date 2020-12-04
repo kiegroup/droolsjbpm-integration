@@ -122,7 +122,7 @@ public class ProcessAdminServiceBase {
         Collection<NodeInstanceDesc> activeNodeInstances = processInstanceAdminService.getActiveNodeInstances(processInstanceId.longValue());
         logger.debug("Found active node instance {} in process instance {}", activeNodeInstances, processInstanceId);
 
-        return ConvertUtils.convertToNodeInstanceList(activeNodeInstances, containerId);
+        return ConvertUtils.convertToNodeInstanceList(activeNodeInstances);
     }
 
     public void triggerNode(String containerId, Number processInstanceId, Number nodeId) {

@@ -18,8 +18,8 @@ package org.kie.server.springboot.autoconfiguration.jbpm;
 
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.jbpm.kafka.KafkaServerExtension;
 import org.kie.server.springboot.autoconfiguration.KieServerProperties;
+import org.kie.server.springboot.autoconfiguration.jbpm.extensions.SpringBootKakfaServerExtension;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -37,6 +37,6 @@ public class KafkaKieServerAutoConfiguration {
     @ConditionalOnMissingBean(name = "kafkaServerExtension")
     @ConditionalOnProperty(name = "kieserver.kafka.enabled")
     public KieServerExtension kafkaServerExtension() {
-        return new KafkaServerExtension();
+        return new SpringBootKakfaServerExtension();
     }
 }

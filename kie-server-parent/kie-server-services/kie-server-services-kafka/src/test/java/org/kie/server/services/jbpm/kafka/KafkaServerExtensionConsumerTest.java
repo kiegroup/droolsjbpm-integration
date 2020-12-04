@@ -37,18 +37,26 @@ import org.jbpm.services.api.ListenerSupport;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.api.model.SignalDesc;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.definition.process.Node;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.Context;
+import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.jbpm.kafka.KafkaServerExtension.Mapping;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -57,7 +65,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-public class KafkaServerExtensionTest {
+public class KafkaServerExtensionConsumerTest {
 
     private static class MockKafkaServerExtension extends KafkaServerExtension {
 
@@ -85,12 +93,13 @@ public class KafkaServerExtensionTest {
     private DeployedUnit deployedUnit;
     private ProcessDefinition processDefinition;
     private MockConsumer<String, byte[]> mockConsumer;
-    private static Logger logger = LoggerFactory.getLogger(KafkaServerExtensionTest.class);
+    private static Logger logger = LoggerFactory.getLogger(KafkaServerExtensionConsumerTest.class);
 
 
     @Before
     public void setup() {
         System.setProperty(KafkaServerExtension.KAFKA_EXTENSION_PREFIX + "poll.interval", Long.toString(TIMEOUT));
+        System.setProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
         mockConsumer = new MockConsumer<>(OffsetResetStrategy.EARLIEST);
         extension = new MockKafkaServerExtension(mockConsumer);
         server = mock(KieServerImpl.class);
@@ -102,6 +111,12 @@ public class KafkaServerExtensionTest {
         processService = mock(ProcessService.class);
         when(serverExtension.getServices()).thenReturn(Arrays.asList(deployService, processService));
         deployedUnit = mock(DeployedUnit.class);
+        RuntimeManager runtimeManager = mock(RuntimeManager.class);
+        when(deployedUnit.getRuntimeManager()).thenReturn(runtimeManager);
+        RuntimeEngine runtimeEngine = mock(RuntimeEngine.class);
+        when(runtimeManager.getRuntimeEngine((Context<?>) any(Context.class))).thenReturn(runtimeEngine);
+        KieSession kieSession = mock(KieSession.class);
+        when(runtimeEngine.getKieSession()).thenReturn(kieSession);
         processDefinition = mock(ProcessDefinition.class);
         when(deployedUnit.getDeployedAssets()).thenReturn(Collections.singletonList(processDefinition));
         extension.init(server, registry);
@@ -111,12 +126,20 @@ public class KafkaServerExtensionTest {
     @After
     public void close() {
         extension.destroy(server, registry);
+        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY);
+    }
+
+    private SignalDesc createSignal(String id, String type) {
+        Signal signal = new Signal(id, id, type);
+        signal.addIncomingNode(mock(Node.class));
+        return SignalDescImpl.from(signal);
     }
 
     @Test
     public void testKafkaServerExecutorSignal() {
-        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(SignalDescImpl.from(
-                new Signal("MySignal", "MySignal", "String"))));
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
+                "String")));
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", "javierito");
@@ -164,8 +187,8 @@ public class KafkaServerExtensionTest {
     }
 
     private void testStructRefEvent(String clazzName) {
-        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(SignalDescImpl.from(
-                new Signal("MySignal", "MySignal", clazzName))));
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
+                clazzName)));
         when(deployedUnit.getDeployedClasses()).thenReturn(Collections.singletonList(Person.class));
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         publishEvent("MySignal",
@@ -187,16 +210,17 @@ public class KafkaServerExtensionTest {
     public void testKafkaServerExecutorSignalWithClassType() {
         testStructRefEvent(Person.class.getTypeName());
     }
+    
 
     @Test
     public void testKafkaSubscriptionChange() {
-        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(SignalDescImpl.from(
-                new Signal("MySignal", "MySignal", "String"))));
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
+                "String")));
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", "javierito");
-        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(SignalDescImpl.from(
-                new Signal("ChangedSignal", "ChangedSignal", "String"))));
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("ChangedSignal",
+                "String")));
         extension.onActivate(new DeploymentEvent("MyDeploy1", deployedUnit));
         publishEvent("ChangedSignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "ChangedSignal", "javierito");
@@ -204,8 +228,8 @@ public class KafkaServerExtensionTest {
 
     @Test
     public void testKafkaSubscriptionEmpty() {
-        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(SignalDescImpl.from(
-                new Signal("MySignal", "MySignal", "String"))));
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
+                "String")));
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", "javierito");
@@ -213,8 +237,8 @@ public class KafkaServerExtensionTest {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.emptyList());
         extension.onActivate(new DeploymentEvent("MyDeploy1", deployedUnit));
         assertTrue(mockConsumer.assignment().isEmpty());
-        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(SignalDescImpl.from(
-                new Signal("MySignal", "NewSignal", "String"))));
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("NewSignal",
+                "String")));
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         publishEvent("NewSignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "NewSignal", "javierito");
@@ -225,6 +249,7 @@ public class KafkaServerExtensionTest {
         Message msg = new Message("MyMessage");
         msg.setName("Hello");
         msg.setType("String");
+        msg.addIncomingNode(mock(Node.class));
         when(processDefinition.getMessagesDesc()).thenReturn(Collections.singletonList(MessageDescImpl.from(msg)));
         extension.onDeploy(new DeploymentEvent("MyDeploy2", deployedUnit));
         publishEvent("Hello", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"pepe\"}");
@@ -239,6 +264,7 @@ public class KafkaServerExtensionTest {
             Message msg = new Message("MyMessage");
             msg.setName("Hello");
             msg.setType("String");
+            msg.addIncomingNode(mock(Node.class));
             when(processDefinition.getMessagesDesc()).thenReturn(Collections.singletonList(MessageDescImpl.from(
                     msg)));
             extension.onDeploy(new DeploymentEvent("MyDeploy3", deployedUnit));
@@ -260,11 +286,12 @@ public class KafkaServerExtensionTest {
 
     @Test
     public void testWithDestroy() {
-        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(SignalDescImpl.from(
-                new Signal("MySignal", "MySignal2", "String"))));
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal2",
+                "String")));
         Message msg = new Message("MyMessage");
         msg.setName("Hello2");
         msg.setType("String");
+        msg.addIncomingNode(mock(Node.class));
         extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
         publishEvent("MySignal2", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy4", "MySignal2", "javierito");
@@ -278,6 +305,24 @@ public class KafkaServerExtensionTest {
         extension.onDeploy(new DeploymentEvent("MyDeploy5", deployedUnit));
         publishEvent("Hello2", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"pepe\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy5", "Message-Hello2", "pepe");
+    }
+
+    @Test
+    public void testSignalDisable() {
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal2",
+                "String")));
+        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
+        extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
+        verify(processDefinition, never()).getSignalsDesc();
+    }
+
+    @Test
+    public void testMessageDisable() {
+        when(processDefinition.getMessagesDesc()).thenReturn(Collections.singletonList(MessageDescImpl.from(new Message(
+                "MyMessage"))));
+        System.setProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
+        extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
+        verify(processDefinition, never()).getMessagesDesc();
     }
 
 
