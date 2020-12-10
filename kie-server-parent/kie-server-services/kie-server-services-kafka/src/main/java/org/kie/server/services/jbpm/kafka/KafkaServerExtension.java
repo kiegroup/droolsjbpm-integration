@@ -73,7 +73,8 @@ import org.kie.api.event.process.ProcessStartedEvent;
 import org.kie.api.event.process.ProcessVariableChangedEvent;
 import org.kie.api.event.process.SignalEvent;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
+import org.kie.internal.runtime.manager.InternalRegisterableItemsFactory;
+import org.kie.internal.runtime.manager.InternalRuntimeManager;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
@@ -241,15 +242,13 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
 
     @Override
     public void onDeploy(DeploymentEvent event) {
-        event.getDeployedUnit().getRuntimeManager().getRuntimeEngine(ProcessInstanceIdContext.get()).getKieSession()
-                .addEventListener(this);
+        ((InternalRegisterableItemsFactory) ((InternalRuntimeManager) event.getDeployedUnit().getRuntimeManager())
+                .getEnvironment().getRegisterableItemsFactory()).addProcessListener(this);
         updateRegistration(event, this::updateTopics);
     }
 
     @Override
     public void onUnDeploy(DeploymentEvent event) {
-        event.getDeployedUnit().getRuntimeManager().getRuntimeEngine(ProcessInstanceIdContext.get()).getKieSession()
-                .removeEventListener(this);
         updateRegistration(event, this::removeTopics);
     }
 

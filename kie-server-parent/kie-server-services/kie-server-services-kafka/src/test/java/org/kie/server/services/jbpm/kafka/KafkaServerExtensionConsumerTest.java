@@ -31,6 +31,7 @@ import org.jbpm.bpmn2.core.Message;
 import org.jbpm.bpmn2.core.Signal;
 import org.jbpm.kie.services.impl.model.MessageDescImpl;
 import org.jbpm.kie.services.impl.model.SignalDescImpl;
+import org.jbpm.runtime.manager.impl.SimpleRegisterableItemsFactory;
 import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ListenerSupport;
@@ -42,10 +43,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.definition.process.Node;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.Context;
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.internal.runtime.manager.InternalRegisterableItemsFactory;
+import org.kie.internal.runtime.manager.InternalRuntimeManager;
+import org.kie.internal.runtime.manager.RuntimeEnvironment;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
@@ -56,7 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -94,6 +93,7 @@ public class KafkaServerExtensionConsumerTest {
     private ProcessDefinition processDefinition;
     private MockConsumer<String, byte[]> mockConsumer;
     private static Logger logger = LoggerFactory.getLogger(KafkaServerExtensionConsumerTest.class);
+    private InternalRegisterableItemsFactory itemsFactory;
 
 
     @Before
@@ -104,6 +104,7 @@ public class KafkaServerExtensionConsumerTest {
         extension = new MockKafkaServerExtension(mockConsumer);
         server = mock(KieServerImpl.class);
         registry = mock(KieServerRegistry.class);
+        itemsFactory = new SimpleRegisterableItemsFactory();
         KieServerExtension serverExtension = mock(KieServerExtension.class);
         when(registry.getServerExtension(Mockito.anyString())).thenReturn(serverExtension);
         ListenerSupport deployService = mock(ListenerSupport.class, withSettings().extraInterfaces(
@@ -111,12 +112,11 @@ public class KafkaServerExtensionConsumerTest {
         processService = mock(ProcessService.class);
         when(serverExtension.getServices()).thenReturn(Arrays.asList(deployService, processService));
         deployedUnit = mock(DeployedUnit.class);
-        RuntimeManager runtimeManager = mock(RuntimeManager.class);
+        InternalRuntimeManager runtimeManager = mock(InternalRuntimeManager.class);
         when(deployedUnit.getRuntimeManager()).thenReturn(runtimeManager);
-        RuntimeEngine runtimeEngine = mock(RuntimeEngine.class);
-        when(runtimeManager.getRuntimeEngine((Context<?>) any(Context.class))).thenReturn(runtimeEngine);
-        KieSession kieSession = mock(KieSession.class);
-        when(runtimeEngine.getKieSession()).thenReturn(kieSession);
+        RuntimeEnvironment runtimeEngine = mock(RuntimeEnvironment.class);
+        when(runtimeManager.getEnvironment()).thenReturn(runtimeEngine);
+        when(runtimeEngine.getRegisterableItemsFactory()).thenReturn(itemsFactory);
         processDefinition = mock(ProcessDefinition.class);
         when(deployedUnit.getDeployedAssets()).thenReturn(Collections.singletonList(processDefinition));
         extension.init(server, registry);
