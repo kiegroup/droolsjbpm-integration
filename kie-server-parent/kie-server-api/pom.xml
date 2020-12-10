@@ -72,6 +72,12 @@
     <dependency>
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-jaxb</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.xml.bind</groupId>
+          <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Needed only for the DMNResult, DMNContext, etc and FEELEvent so should be possible later to migrate to kie-dmn-API -->
@@ -157,6 +163,12 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>kie-pmml</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
