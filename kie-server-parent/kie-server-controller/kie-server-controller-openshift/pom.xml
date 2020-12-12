@@ -158,6 +158,7 @@
             <KUBERNETES_REQUEST_TIMEOUT />
             <KUBERNETES_NAMESPACE />
             <KUBERNETES_TLS_VERSIONS>TLSv1.2,TLSv1.1,TLSv1</KUBERNETES_TLS_VERSIONS>
+            <HOSTNAME>TEST_ENV</HOSTNAME>
           </environmentVariables>
         </configuration>
       </plugin>
