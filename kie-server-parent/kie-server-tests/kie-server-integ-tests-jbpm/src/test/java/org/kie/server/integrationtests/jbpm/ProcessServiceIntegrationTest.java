@@ -32,6 +32,8 @@ import org.kie.internal.executor.api.STATUS;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
@@ -41,15 +43,11 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.config.TestConfig;
-
-import static org.junit.Assert.*;
-import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
@@ -62,6 +60,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
 
 public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -72,6 +71,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     protected static final String SORT_BY_PROCESS_ID = "ProcessId";
 
+    private static final String CONTAINER_ID_ALIAS = "Javierito";
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -80,7 +81,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId, PPI_RUNTIME_STRATEGY);
+        createContainer(CONTAINER_ID, releaseId, CONTAINER_ID_ALIAS, PPI_RUNTIME_STRATEGY);
     }
 
     @Override
@@ -723,11 +724,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     @Category({UnstableOnJenkinsPrBuilder.class})
-    public void testSignalContainer() throws Exception {
+    public void testSignalContainer() {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 
         assertNotNull(processInstanceId);
-        assertTrue(processInstanceId.longValue() > 0);
+        assertTrue(processInstanceId > 0);
 
         try {
             checkAvailableSignals(CONTAINER_ID, processInstanceId);
@@ -739,7 +740,32 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
             assertNotNull(pi);
-            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, pi.getState().intValue());
+            assertEquals(STATE_COMPLETED, pi.getState().intValue());
+        } catch (Exception e) {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @Category({UnstableOnJenkinsPrBuilder.class})
+    public void testSignalContainerAlias() {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
+
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+
+        try {
+            checkAvailableSignals(CONTAINER_ID, processInstanceId);
+
+            Object person = createPersonInstance(USER_JOHN);
+            processClient.signal(CONTAINER_ID_ALIAS, "Signal1", person);
+
+            processClient.signal(CONTAINER_ID_ALIAS, "Signal2", "My custom string event");
+
+            ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            assertNotNull(pi);
+            assertEquals(STATE_COMPLETED, pi.getState().intValue());
         } catch (Exception e) {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             fail(e.getMessage());
