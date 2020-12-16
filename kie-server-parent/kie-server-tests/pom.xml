@@ -96,6 +96,8 @@
     <module>kie-server-integ-tests-custom-extension</module>
     <module>kie-server-integ-tests-task-assigning</module>
     <module>kie-server-integ-tests-dmn-pmml</module>
+    <module>kie-server-integ-tests-dmn-pmml-trusty</module>
+    <module>kie-server-integ-tests-pmml</module>
   </modules>
 
   <dependencyManagement>
