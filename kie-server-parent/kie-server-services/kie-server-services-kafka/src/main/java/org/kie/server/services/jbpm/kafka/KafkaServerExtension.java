@@ -89,7 +89,7 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
                                   Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaServerExtension.class);
-    
+
     public static final String EXTENSION_NAME = "Kafka";
     static final String KAFKA_EXTENSION_PREFIX = "org.kie.server.jbpm-kafka.ext.";
     static final String TOPIC_PREFIX = KAFKA_EXTENSION_PREFIX + "topics.";
@@ -97,11 +97,10 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     static final String MESSAGE_MAPPING_PROPERTY = KAFKA_EXTENSION_PREFIX + "message.mapping";
     private static final Mapping SIGNAL_MAPPING_DEFAULT = Mapping.NONE;
     private static final Mapping MESSAGE_MAPPING_DEFAULT = Mapping.AUTO;
-    
+
     enum Mapping {
         AUTO, NONE
     }
-    
 
     private AtomicBoolean initialized = new AtomicBoolean();
     // Kafka consumer
@@ -176,24 +175,17 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         if (producerReady.compareAndSet(true, false)) {
             producer.close(duration);
         }
-
-        if (consumerReady.compareAndSet(true, false)) {
-            notifyService.getAndSet(null).shutdownNow();
-            consumer.wakeup();
-            consumerLock.lock();
-            try {
-                consumer.unsubscribe();
-                consumer.close(duration);
-            } finally {
-                consumerLock.unlock();
-            }
-            consumer = null;
-        }
         changeRegistrationLock.lock();
         try {
             topic2Signal.clear();
             topic2Message.clear();
             isSubscribedCond.signal();
+            if (consumerReady.compareAndSet(true, false)) {
+                notifyService.getAndSet(null).shutdownNow();
+                unsubscribe();
+                consumer.close(duration);
+                consumer = null;
+            }
         } finally {
             changeRegistrationLock.unlock();
         }
@@ -272,12 +264,8 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     }
 
     private void removeTopics(String deploymentId, ProcessDefinition processDefinition) {
-        if (processSignals()) {
-            removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
-        }
-        if (processMessages()) {
-            removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
-        }
+        removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
+        removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
     }
 
     private <T extends SignalDescBase> void updateTopics(Map<String, Map<T, Collection<String>>> topic2SignalBase,
@@ -322,34 +310,28 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
             }
             topic2Register.addAll(topic2Signal.keySet());
             topic2Register.addAll(topic2Message.keySet());
+            if (topic2Register.isEmpty()) {
+                if (consumerReady.get()) {
+                    unsubscribe();
+                }
+            } else if (consumerReady.compareAndSet(false, true)) {
+                logger.trace("Creating kafka consumer");
+                consumer = getKafkaConsumer();
+                subscribe(topic2Register);
+                notifyService.set(
+                        new ThreadPoolExecutor(1, Integer.getInteger(KAFKA_EXTENSION_PREFIX + "maxNotifyThreads", 10),
+                                60L,
+                                TimeUnit.SECONDS, new LinkedBlockingQueue<>()));
+                new Thread(this).start();
+            } else {
+                consumer.wakeup();
+                subscribe(topic2Register);
+                isSubscribedCond.signal();
+            }
         } finally {
             changeRegistrationLock.unlock();
         }
 
-        if (topic2Register.isEmpty()) {
-            if (consumerReady.get()) {
-                consumer.wakeup();
-                unsubscribe();
-            }
-        }
-        else if (consumerReady.compareAndSet(false, true)) {
-            logger.trace("Creating kafka consumer");
-            consumer = getKafkaConsumer();
-            subscribe(topic2Register);
-            notifyService.set(
-                    new ThreadPoolExecutor(1, Integer.getInteger(KAFKA_EXTENSION_PREFIX + "maxNotifyThreads", 10), 60L,
-                            TimeUnit.SECONDS, new LinkedBlockingQueue<>()));
-            new Thread(this).start();
-        } else {
-            consumer.wakeup();
-            subscribe(topic2Register);
-            changeRegistrationLock.lock();
-            try {
-                isSubscribedCond.signal();
-            } finally {
-                changeRegistrationLock.unlock();
-            }
-        }
     }
 
     private void subscribe(Set<String> topic2Register) {
@@ -363,6 +345,7 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     }
 
     private void unsubscribe() {
+        consumer.wakeup();
         consumerLock.lock();
         try {
             consumer.unsubscribe();
@@ -375,11 +358,10 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     private static <T extends SignalDescBase> String topicFromSignal(T signal) {
         return topicFromSignal(signal.getName());
     }
-    
+
     private static String topicFromSignal(String name) {
         return System.getProperty(TOPIC_PREFIX + name, name);
     }
-
 
     @Override
     public boolean isUpdateContainerAllowed(String id,
@@ -412,7 +394,6 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
     }
-
 
     @Override
     public void run() {
@@ -447,8 +428,8 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     private ConsumerRecords<String, byte[]> pollEvents(Duration duration) {
         ConsumerRecords<String, byte[]> events = ConsumerRecords.empty();
         if (consumerReady.get()) {
-            consumerLock.lock();
             try {
+                consumerLock.lock();
                 events = consumer.poll(duration);
             } catch (WakeupException ex) {
                 logger.trace("Kafka wait interrupted");
@@ -486,8 +467,8 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         void signalEvent(String deploymentId, String signalName, Object data);
     }
 
-    private Signaller messageSignaller = (deployment, signalName, data) -> signalEvent(deployment, "Message-" +
-                                                                                                   signalName, data);
+    private Signaller messageSignaller =
+            (deployment, signalName, data) -> signalEvent(deployment, "Message-" + signalName, data);
 
     private void processEvent(ConsumerRecord<String, byte[]> event) {
         changeRegistrationLock.lock();
@@ -498,7 +479,6 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
             changeRegistrationLock.unlock();
         }
     }
-
 
     private void signalEvent(String deployment, String signalName, Object data) {
         processService.signalEvent(deployment, signalName, data);
@@ -544,14 +524,11 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         return dataClazz.orElse(Object.class);
     }
 
-    
     @Override
     public void onMessage(MessageEvent event) {
         if (processMessages()) {
             sendEvent(event.getProcessInstance(), event.getMessageName(), event.getMessage());
         }
-        
-       
     }
 
     @Override
@@ -564,7 +541,6 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     private void sendEvent(ProcessInstance processInstance,
                            String name,
                            Object value) {
-
         if (producerReady.compareAndSet(false, true)) {
             producer = getKafkaProducer();
         }
@@ -578,7 +554,6 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         } catch (Exception e) {
             logError(value, e);
         }
-        
     }
 
     private static Mapping getMapping(String propName, Mapping defaultValue) {
@@ -648,7 +623,6 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     public <T> T getAppComponents(Class<T> serviceType) {
         return null;
     }
-
 
     @Override
     public void beforeProcessStarted(ProcessStartedEvent event) {
