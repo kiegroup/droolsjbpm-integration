@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -59,7 +58,6 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.Message;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
-import static org.kie.maven.plugin.ExecModelMode.modelParameterEnabled;
 
 /**
  * This goal builds the Drools files belonging to the kproject.
@@ -180,7 +178,9 @@ public class BuildMojo extends AbstractDMNValidationAwareMojo {
         MemoryFileSystem mfs = ((MemoryKieModule )kModule).getMemoryFileSystem();
         kModule.getFileNames()
                 .stream()
-                .filter(name -> name.endsWith(".class") && !name.contains("target/classes") && !name.contains("target\\classes"))
+                .filter(name -> name.endsWith(".class")
+                        && !name.contains("target/classes") && !name.contains("target\\classes")
+                        && !name.contains("target/test-classes") && !name.contains("target\\test-classes"))
                 .forEach( fileName -> {
                     try {
                         saveFile( mfs, fileName );
