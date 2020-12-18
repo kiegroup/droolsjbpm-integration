@@ -71,7 +71,7 @@ public class KieSpringDependencyKarafIntegrationTest extends AbstractKarafIntegr
 
                 // Load Kie-Spring
                 loadKieFeatures("kie-spring"),
-                features(getFeaturesUrl("org.apache.karaf.features", "spring-legacy", getKarafVersion()), "aries-blueprint-spring"),
+                features(getFeaturesUrl("org.apache.karaf.features", "spring", getKarafVersion()), "aries-blueprint-spring"),
 
                 // wrap and install junit bundle - the DRL imports a class from it
                 // (simulates for instance a bundle with domain classes used in rules)
