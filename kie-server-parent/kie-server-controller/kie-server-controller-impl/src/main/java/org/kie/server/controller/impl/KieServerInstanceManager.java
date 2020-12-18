@@ -539,7 +539,7 @@ public class KieServerInstanceManager {
         return alive;
     }
 
-    public KieServicesClient getClient(final String url) {
+    protected KieServicesClient getClient(final String url) {
         KieServicesClientProvider clientProvider = clientProviders.stream().filter(provider -> provider.supports(url)).findFirst().orElseThrow(() -> new KieServerControllerIllegalArgumentException("Kie Services Client Provider not found for url: " + url));
         logger.debug("Using client provider {}", clientProvider);
         KieServicesClient client = clientProvider.get(url);
