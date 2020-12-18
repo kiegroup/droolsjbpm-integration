@@ -101,7 +101,7 @@ public class SimpleKieSpringKarafIntegrationTest extends AbstractKieSpringKarafI
 
                 // Load Kie-Spring
                 loadKieFeatures("kie-spring"),
-                features(getFeaturesUrl("org.apache.karaf.features", "spring-legacy", getKarafVersion()), "aries-blueprint-spring"),
+                features(getFeaturesUrl("org.apache.karaf.features", "spring", getKarafVersion()), "aries-blueprint-spring"),
 
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()

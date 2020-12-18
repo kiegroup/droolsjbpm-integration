@@ -233,7 +233,7 @@ public class KieSpringjBPMPersistenceKarafIntegrationTest extends AbstractKieSpr
 
         // Load Kie-Spring
         options.add(loadKieFeatures("jbpm-spring-persistent"));
-        options.add(features(getFeaturesUrl("org.apache.karaf.features", "spring-legacy", getKarafVersion()), "aries-blueprint-spring"));
+        options.add(features(getFeaturesUrl("org.apache.karaf.features", "spring", getKarafVersion()), "aries-blueprint-spring"));
 
         // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
         options.add(streamBundle(bundle()
