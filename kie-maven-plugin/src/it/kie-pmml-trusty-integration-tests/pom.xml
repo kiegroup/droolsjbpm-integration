@@ -6,7 +6,7 @@
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
     <version>@org.kie.version@</version>
-<!--    <version>7.48.0-SNAPSHOT</version>-->
+<!--    <version>7.49.0-SNAPSHOT</version>-->
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -42,7 +42,6 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-dependencies</artifactId>
-      <type>pom</type>
     </dependency>
     <!-- EXTERNAL -->
     <dependency>
