@@ -38,7 +38,7 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
 
     private static final String CONTAINER_ID = "regression";
 
-    private static final long EXTENDED_TIMEOUT = 300000L;
+    private static final long EXTENDED_TIMEOUT = 30000000L;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -54,6 +54,7 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
     @Test
     public void testApplyPmmlRegressionModel() {
         final PMMLRequestData request = new PMMLRequestData("123", "LinReg");
+        request.setSource("test_regression.pmml");
         request.addRequestParam("fld1", 12.0);
         request.addRequestParam("fld2", 25.0);
         request.addRequestParam("fld3", "x");
@@ -62,15 +63,26 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
                 .newApplyPmmlModel(request);
         final ServiceResponse<ExecutionResults> results = ruleClient.executeCommandsWithResults(CONTAINER_ID, command);
 
+        Assertions.assertThat(results.getResult()).isNotNull();
+        Assertions.assertThat(results.getResult().getValue("results")).isNotNull();
+
         final PMML4Result resultHolder = (PMML4Result) results.getResult().getValue("results");
         Assertions.assertThat(resultHolder).isNotNull();
         Assertions.assertThat(resultHolder.getResultCode()).isEqualTo("OK");
-        final Object obj = resultHolder.getResultValue("Fld4", null);
+
+        String resultObjectName = resultHolder.getResultObjectName();
+        Assertions.assertThat(resultObjectName).isNotNull();
+
+        Assertions.assertThat(resultObjectName).isEqualTo("fld4");
+
+        final Object obj = resultHolder.getResultValue("fld4", null);
         Assertions.assertThat(obj).isNotNull();
 
-        final Double targetValue = resultHolder.getResultValue("Fld4", "value", Double.class)
-                .orElse(null);
-        Assertions.assertThat(targetValue).isNotNull();
-        Assertions.assertThat(targetValue).isEqualTo(1.0);
+        Assertions.assertThat(obj).isEqualTo(1.0);
+//
+//        final Double targetValue = resultHolder.getResultValue("fld4", "value", Double.class)
+//                .orElse(null);
+//        Assertions.assertThat(targetValue).isNotNull();
+//        Assertions.assertThat(targetValue).isEqualTo(1.0);
     }
 }
