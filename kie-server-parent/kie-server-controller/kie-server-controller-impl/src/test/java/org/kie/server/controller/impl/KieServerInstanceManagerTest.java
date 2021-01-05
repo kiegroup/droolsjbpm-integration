@@ -148,7 +148,8 @@ public class KieServerInstanceManagerTest {
                never()).setResolvedReleasedId(any());
         verify(container,
                never()).setServerTemplateId(any());
-        verify(container).setStatus(any());
+        verify(container,
+               never()).setStatus(any());
         verify(container,
                never()).setMessages(any());
     }
