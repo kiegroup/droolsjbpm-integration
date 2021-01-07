@@ -3,36 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.kie.server.testing</groupId>
-    <artifactId>common-parent</artifactId>
-    <version>1.0.0.Final</version>
-  </parent>
-
+  <groupId>org.kie.server.testing</groupId>
   <artifactId>send-project</artifactId>
   <version>1.0.0.Final</version>
   <name>send-project</name>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.jboss.spec.javax.xml.bind</groupId>
-      <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>
