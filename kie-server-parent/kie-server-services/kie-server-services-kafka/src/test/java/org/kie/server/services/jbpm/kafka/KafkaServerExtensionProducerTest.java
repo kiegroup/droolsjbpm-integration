@@ -47,12 +47,14 @@ import org.kie.internal.runtime.manager.RuntimeEnvironment;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.jbpm.kafka.KafkaServerExtension.Mapping;
+import org.kie.server.services.jbpm.kafka.KafkaServerUtils.Mapping;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.MESSAGE_MAPPING_PROPERTY;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.SIGNAL_MAPPING_PROPERTY;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -89,7 +91,7 @@ public class KafkaServerExtensionProducerTest {
 
     @Before
     public void setup() {
-        System.setProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
+        System.setProperty(SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
         itemsFactory = new SimpleRegisterableItemsFactory();
         mockProducer = new MockProducer<>();
         extension = new MockKafkaServerExtension(mockProducer);
@@ -122,8 +124,8 @@ public class KafkaServerExtensionProducerTest {
     @After
     public void close() {
         extension.destroy(server, registry);
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
-        System.clearProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY);
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(MESSAGE_MAPPING_PROPERTY);
     }
 
     
@@ -156,7 +158,7 @@ public class KafkaServerExtensionProducerTest {
     @Test
     public void testSignalSentImplementation() throws IOException, ParseException {
         when(node.getMetaData()).thenReturn(Collections.singletonMap("implementation", "##kafka"));
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onSignal(new SignalEventImpl(
                 pInstance, runtime, nInstance, "MySignal", "Javierito")));
@@ -169,7 +171,7 @@ public class KafkaServerExtensionProducerTest {
 
     @Test
     public void testSignalDisable() throws IOException, ParseException {
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onSignal(new SignalEventImpl(
                 pInstance, runtime, nInstance, "MySignal", "Javierito")));
@@ -178,7 +180,7 @@ public class KafkaServerExtensionProducerTest {
 
     @Test
     public void testMessageDisable() throws IOException, ParseException {
-        System.setProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
+        System.setProperty(MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onMessage(new MessageEventImpl(
                 pInstance, runtime, nInstance, "MyMessage", "Javierito")));

@@ -49,13 +49,17 @@ import org.kie.internal.runtime.manager.RuntimeEnvironment;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.jbpm.kafka.KafkaServerExtension.Mapping;
+import org.kie.server.services.jbpm.kafka.KafkaServerUtils.Mapping;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.MESSAGE_MAPPING_PROPERTY;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.SIGNAL_MAPPING_PROPERTY;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.TOPIC_PREFIX;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -98,8 +102,8 @@ public class KafkaServerExtensionConsumerTest {
 
     @Before
     public void setup() {
-        System.setProperty(KafkaServerExtension.KAFKA_EXTENSION_PREFIX + "poll.interval", Long.toString(TIMEOUT));
-        System.setProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
+        System.setProperty(KAFKA_EXTENSION_PREFIX + "poll.interval", Long.toString(TIMEOUT));
+        System.setProperty(SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
         mockConsumer = new MockConsumer<>(OffsetResetStrategy.EARLIEST);
         extension = new MockKafkaServerExtension(mockConsumer);
         server = mock(KieServerImpl.class);
@@ -126,8 +130,8 @@ public class KafkaServerExtensionConsumerTest {
     @After
     public void close() {
         extension.destroy(server, registry);
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
-        System.clearProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY);
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(MESSAGE_MAPPING_PROPERTY);
     }
 
     private SignalDesc createSignal(String id, String type) {
@@ -258,7 +262,7 @@ public class KafkaServerExtensionConsumerTest {
 
     @Test
     public void testKafkaServerExecutorMessageTopic() {
-        final String topicProperty = KafkaServerExtension.TOPIC_PREFIX + "Hello";
+        final String topicProperty = TOPIC_PREFIX + "Hello";
         System.setProperty(topicProperty, "MyTopic");
         try {
             Message msg = new Message("MyMessage");
@@ -311,7 +315,7 @@ public class KafkaServerExtensionConsumerTest {
     public void testSignalDisable() {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal2",
                 "String")));
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
         extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
         verify(processDefinition, never()).getSignalsDesc();
     }
@@ -320,7 +324,7 @@ public class KafkaServerExtensionConsumerTest {
     public void testMessageDisable() {
         when(processDefinition.getMessagesDesc()).thenReturn(Collections.singletonList(MessageDescImpl.from(new Message(
                 "MyMessage"))));
-        System.setProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
+        System.setProperty(MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
         extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
         verify(processDefinition, never()).getMessagesDesc();
     }
