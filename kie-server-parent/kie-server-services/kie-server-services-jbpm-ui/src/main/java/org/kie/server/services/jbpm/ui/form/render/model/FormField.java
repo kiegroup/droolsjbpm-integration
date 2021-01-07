@@ -17,6 +17,7 @@
 package org.kie.server.services.jbpm.ui.form.render.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,6 +25,9 @@ public class FormField {
 
     private String id;
     private String name;
+    
+    private Set<String> tags;
+    
     private String code;
     private String label;
     @JsonProperty("standaloneClassName")
@@ -219,6 +223,14 @@ public class FormField {
 
     public void setListOfValues(List<String> listOfValues) {
         this.listOfValues = listOfValues;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
+    public Set<String> getTags() {
+        return tags;
     }
 
 }
