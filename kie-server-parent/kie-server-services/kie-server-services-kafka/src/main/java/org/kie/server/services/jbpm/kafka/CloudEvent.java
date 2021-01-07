@@ -25,11 +25,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
+
 class CloudEvent<T> {
 
     private static ObjectMapper mapper = new ObjectMapper()
             .setDateFormat(new SimpleDateFormat(System.getProperty(
-                    KafkaServerExtension.KAFKA_EXTENSION_PREFIX + "json.date_format", System.getProperty(
+                    KAFKA_EXTENSION_PREFIX + "json.date_format", System.getProperty(
                             "org.kie.server.json.date_format",
                             "yyyy-MM-dd'T'HH:mm:ss.SSSZ"))))
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
