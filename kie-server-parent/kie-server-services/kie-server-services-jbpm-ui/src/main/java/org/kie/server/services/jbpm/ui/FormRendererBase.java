@@ -259,6 +259,7 @@ public class FormRendererBase {
                 field.setLabel(entry.getKey());
                 field.setName(entry.getKey());
                 field.setType(entry.getValue());
+                field.setTags(processDesc.getTagsForVariable(entry.getKey()));
                 
                 form.getFields().add(field);
                 
