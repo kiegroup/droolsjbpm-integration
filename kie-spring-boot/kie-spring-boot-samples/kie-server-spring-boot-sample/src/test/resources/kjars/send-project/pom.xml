@@ -4,9 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.kie.server.testing</groupId>
-  <artifactId>user-task-case</artifactId>
-  <version>1.0.0</version>
-
-  <name>UserTaskCase</name>
-  <description>UserTask Case</description>
+  <artifactId>send-project</artifactId>
+  <version>1.0.0.Final</version>
+  <name>send-project</name>
 </project>
