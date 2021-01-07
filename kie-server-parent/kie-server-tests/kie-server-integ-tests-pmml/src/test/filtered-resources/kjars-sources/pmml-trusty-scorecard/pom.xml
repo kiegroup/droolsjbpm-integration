@@ -7,7 +7,7 @@
     <version>1.0.0.Final</version>
   </parent>
 
-  <artifactId>pmml-trusty-regression</artifactId>
+  <artifactId>pmml-trusty-scorecard</artifactId>
   <version>1.0.0.Final</version>
   <packaging>jar</packaging>
 
@@ -19,9 +19,36 @@
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-pmml-models-regression-model</artifactId>
+      <artifactId>kie-pmml-dependencies</artifactId>
       <version>${version.org.kie}</version>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.kie</groupId>-->
+<!--      <artifactId>kie-pmml-models-drools-scorecard-model</artifactId>-->
+<!--      <version>${version.org.kie}</version>-->
+<!--      <exclusions>-->
+<!--        <exclusion>-->
+<!--          <groupId>org.kie</groupId>-->
+<!--          <artifactId>kie-pmml-compiler-commons</artifactId>-->
+<!--        </exclusion>-->
+<!--        <exclusion>-->
+<!--          <groupId>org.kie</groupId>-->
+<!--          <artifactId>kie-pmml-evaluator-core</artifactId>-->
+<!--        </exclusion>-->
+<!--&lt;!&ndash;        <exclusion>&ndash;&gt;-->
+<!--&lt;!&ndash;          <groupId>org.drools</groupId>&ndash;&gt;-->
+<!--&lt;!&ndash;          <artifactId>drools-compiler</artifactId>&ndash;&gt;-->
+<!--&lt;!&ndash;        </exclusion>&ndash;&gt;-->
+<!--&lt;!&ndash;        <exclusion>&ndash;&gt;-->
+<!--&lt;!&ndash;          <groupId>org.drools</groupId>&ndash;&gt;-->
+<!--&lt;!&ndash;          <artifactId>drools-model-compiler</artifactId>&ndash;&gt;-->
+<!--&lt;!&ndash;        </exclusion>&ndash;&gt;-->
+<!--        <exclusion>-->
+<!--          <groupId>org.jpmml</groupId>-->
+<!--          <artifactId>pmml-model</artifactId>-->
+<!--        </exclusion>-->
+<!--      </exclusions>-->
+<!--    </dependency>-->
   </dependencies>
 
   <build>
