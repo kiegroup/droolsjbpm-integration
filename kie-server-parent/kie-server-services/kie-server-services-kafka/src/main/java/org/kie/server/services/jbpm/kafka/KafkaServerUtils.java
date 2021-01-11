@@ -33,6 +33,7 @@ class KafkaServerUtils {
 
     static final String SIGNAL_MAPPING_PROPERTY = KAFKA_EXTENSION_PREFIX + "signals.mapping";
     static final String MESSAGE_MAPPING_PROPERTY = KAFKA_EXTENSION_PREFIX + "message.mapping";
+    static final String FACTORY_PROCESSOR_CLASS_NAME = KAFKA_EXTENSION_PREFIX + "eventProcessorFactoryClass";
     static final String TOPIC_PREFIX = KAFKA_EXTENSION_PREFIX + "topics.";
     private static final Mapping SIGNAL_MAPPING_DEFAULT = Mapping.NONE;
     private static final Mapping MESSAGE_MAPPING_DEFAULT = Mapping.AUTO;
@@ -59,6 +60,29 @@ class KafkaServerUtils {
         return System.getProperty(TOPIC_PREFIX + name, name);
     }
 
+    static String getTopicProperty(String topic, String name) {
+        return System.getProperty(TOPIC_PREFIX + topic + "." + name);
+    }
+
+    static KafkaEventProcessorFactory buildEventProcessorFactory() {
+        final String className = System.getProperty(FACTORY_PROCESSOR_CLASS_NAME);
+        KafkaEventProcessorFactory instance = null;
+        if (className != null) {
+            try {
+                instance = Class.forName(className).asSubclass(KafkaEventProcessorFactory.class).getConstructor()
+                        .newInstance();
+            } catch (ReflectiveOperationException ex) {
+                logger.warn("Error loading KafkaEventProcessorFactory for class name {}. Check value of property {}",
+                        className, FACTORY_PROCESSOR_CLASS_NAME, ex);
+            }
+        }
+        if (instance == null) {
+            instance = new DefaultEventProcessorFactory();
+        }
+        return instance;
+    }
+
+
     private static Mapping getMapping(String propName, Mapping defaultValue) {
         Mapping result = null;
         String propValue = System.getProperty(propName);
@@ -71,5 +95,4 @@ class KafkaServerUtils {
         }
         return result == null ? defaultValue : result;
     }
-
 }

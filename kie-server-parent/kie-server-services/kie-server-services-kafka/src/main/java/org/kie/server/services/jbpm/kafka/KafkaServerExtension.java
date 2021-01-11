@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.buildEventProcessorFactory;
 
 public class KafkaServerExtension implements KieServerExtension, DeploymentEventListener {
 
@@ -104,8 +105,9 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         if (processService == null) {
             throw new IllegalStateException("Cannot find process service");
         }
-        kafkaServerConsumer = new KafkaServerConsumer(this::getKafkaConsumer, processService);
-        kafkaServerProducer = new KafkaServerProducer(this::getKafkaProducer);
+        KafkaEventProcessorFactory factory = buildEventProcessorFactory();
+        kafkaServerConsumer = new KafkaServerConsumer(factory, this::getKafkaConsumer, processService);
+        kafkaServerProducer = new KafkaServerProducer(factory, this::getKafkaProducer);
         deploymentService.addListener(this);
         initialized.set(true);
     }
@@ -117,7 +119,9 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         }
         Duration duration = Duration.ofSeconds(Long.getLong(KAFKA_EXTENSION_PREFIX + "close.timeout", 30L));
         kafkaServerConsumer.close(duration);
+        kafkaServerConsumer = null;
         kafkaServerProducer.close(duration);
+        kafkaServerProducer = null;
         deploymentService = null;
         initialized.set(false);
     }

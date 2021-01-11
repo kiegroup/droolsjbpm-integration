@@ -40,11 +40,14 @@ class KafkaServerProducer extends DefaultProcessEventListener {
 
     // Kafka producer
     private Producer<String, byte[]> producer;
+    private Supplier<Producer<String, byte[]>> producerSupplier;
+    private KafkaEventProcessorFactory factory;
+
     private AtomicBoolean producerReady = new AtomicBoolean();
 
-    private Supplier<Producer<String, byte[]>> producerSupplier;
-
-    public KafkaServerProducer(Supplier<Producer<String, byte[]>> producerSupplier) {
+    public KafkaServerProducer(KafkaEventProcessorFactory factory,
+                               Supplier<Producer<String, byte[]>> producerSupplier) {
+        this.factory = factory;
         this.producerSupplier = producerSupplier;
     }
 
@@ -75,8 +78,10 @@ class KafkaServerProducer extends DefaultProcessEventListener {
             producer = producerSupplier.get();
         }
         try {
-            producer.send(new ProducerRecord<>(topicFromSignal(name), CloudEvent.write(processInstance.getProcessId(),
-                    processInstance.getId(), value)), (m, e) -> {
+            String topic = topicFromSignal(name);
+            producer.send(new ProducerRecord<>(topic, factory.getEventWriter(topic)
+                    .writeEvent(processInstance, value)),
+                    (m, e) -> {
                         if (e != null) {
                             logError(value, e);
                         }

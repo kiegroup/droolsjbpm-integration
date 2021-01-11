@@ -15,12 +15,9 @@
 package org.kie.server.services.jbpm.kafka;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.time.Duration;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +35,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.errors.WakeupException;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.model.MessageDesc;
@@ -54,27 +52,37 @@ class KafkaServerConsumer implements Runnable {
 
     // Kafka consumer
     private Consumer<String, byte[]> consumer;
-
+    private AtomicBoolean consumerReady = new AtomicBoolean();
     // Executor thread for dispatching signals to jbpm core
     private AtomicReference<ExecutorService> notifyService = new AtomicReference<>();
-    // classes information
-    private Map<String, Collection<Class<?>>> classes = new ConcurrentHashMap<>();
-
-    private KafkaServerRegistration registration = new KafkaServerRegistration();
-
     private ProcessService processService;
-
-    // synchronization variables
-    private AtomicBoolean consumerReady = new AtomicBoolean();
-
+    // classes information
+    private Map<String, ClassLoader> classLoaders = new ConcurrentHashMap<>();
+    // topic registration class
+    private KafkaServerRegistration registration = new KafkaServerRegistration();
+    // synchronization 
     private Lock consumerLock = new ReentrantLock(true);
     private Condition isSubscribedCond = consumerLock.newCondition();
 
     private Supplier<Consumer<String, byte[]>> consumerSupplier;
+    private KafkaEventProcessorFactory factory;
 
-    public KafkaServerConsumer(Supplier<Consumer<String, byte[]>> consumerSupplier, ProcessService processService) {
+    public KafkaServerConsumer(KafkaEventProcessorFactory factory, Supplier<Consumer<String, byte[]>> consumerSupplier,
+                               ProcessService processService) {
+        this.factory = factory;
         this.consumerSupplier = consumerSupplier;
         this.processService = processService;
+    }
+
+    void addRegistration(DeploymentEvent event) {
+        classLoaders.put(event.getDeploymentId(), ((KModuleDeploymentUnit) event.getDeployedUnit().getDeploymentUnit())
+                .getKieContainer().getClassLoader());
+        registrationUpdated(event, registration.addRegistration(event));
+    }
+
+    void removeRegistration(DeploymentEvent event) {
+        classLoaders.remove(event.getDeploymentId());
+        registrationUpdated(event, registration.removeRegistration(event));
     }
 
     void close(Duration duration) {
@@ -92,20 +100,13 @@ class KafkaServerConsumer implements Runnable {
                 consumerLock.unlock();
             }
         }
-        classes.clear();
+        classLoaders.clear();
         processService = null;
     }
 
-    void addRegistration(DeploymentEvent event) {
-        registrationUpdated(event, registration.addRegistration(event));
-    }
-
-    void removeRegistration(DeploymentEvent event) {
-        registrationUpdated(event, registration.removeRegistration(event));
-    }
 
     private void registrationUpdated(DeploymentEvent event, Set<String> topics2Register) {
-        classes.put(event.getDeploymentId(), event.getDeployedUnit().getDeployedClasses());
+
         if (consumerReady.compareAndSet(false, true)) {
             consumer = consumerSupplier.get();
             consumer.subscribe(topics2Register);
@@ -220,31 +221,21 @@ class KafkaServerConsumer implements Runnable {
                               Signaller signaller) {
         try {
             String signalName = signal.getName();
-            CloudEvent<?> cloudEvent = CloudEvent.read(event.value(), getDataClass(deploymentId, signal));
+            ClassLoader cl = classLoaders.get(deploymentId);
+            Class<?> valueType = Object.class;
+            String className = signal.getStructureRef();
+            if (className != null) {
+                valueType = cl.loadClass(className.contains(".") ? className : "java.lang." + className);
+            }
+            Object value = factory.getEventReader(event.topic(), cl).readEvent(event
+                    .value(), valueType);
             logger.debug("Sending event with name {} to deployment {} with data {}", signalName,
-                    deploymentId, cloudEvent.getData());
-            signaller.signalEvent(deploymentId, signalName, cloudEvent.getData());
-        } catch (IOException | ClassNotFoundException | ParseException e) {
-            logger.error("Error deserializing event", e);
+                    deploymentId, value);
+            signaller.signalEvent(deploymentId, signalName, value);
+        } catch (ClassNotFoundException ex) {
+            logger.error("Class not found in deployment id {}", deploymentId, ex);
+        } catch (RuntimeException | IOException ex) {
+            logger.error("Exception deserializing event", ex);
         }
-    }
-
-    private <T extends SignalDescBase> Class<?> getDataClass(String deploymentId,
-                                                             T signalDesc) throws ClassNotFoundException {
-        Optional<Class<?>> dataClazz = Optional.empty();
-        String className = signalDesc.getStructureRef();
-        if (className != null) {
-            Collection<Class<?>> deployedClasses = classes.get(deploymentId);
-            if (deployedClasses != null) {
-                dataClazz = deployedClasses.stream().filter(c -> c.getCanonicalName().equals(className) || c
-                        .getSimpleName().equals(className) || c.getTypeName().equals(className)).findAny();
-            }
-            if (!dataClazz.isPresent()) {
-                logger.debug("Class {} has not been found in deployment {}, trying from classloader", className,
-                        deploymentId);
-                dataClazz = Optional.of(Class.forName(className.contains(".") ? className : "java.lang." + className));
-            }
-        }
-        return dataClazz.orElse(Object.class);
     }
 }
