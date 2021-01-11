@@ -15,72 +15,15 @@
  */
 package org.kie.server.services.jbpm.kafka;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
 
 class CloudEvent<T> {
-
-    private static ObjectMapper mapper = new ObjectMapper()
-            .setDateFormat(new SimpleDateFormat(System.getProperty(
-                    KAFKA_EXTENSION_PREFIX + "json.date_format", System.getProperty(
-                            "org.kie.server.json.date_format",
-                            "yyyy-MM-dd'T'HH:mm:ss.SSSZ"))))
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-    private static final String SOURCE_FORMATTER = "/process/%s/%s";
-
     private String specversion;
     private Date time;
     private String id;
     private String type;
     private String source;
     private T data;
-
-    public static byte[] write(String processId, long processInstanceId, Object value) throws IOException {
-        CloudEvent<Object> event = new CloudEvent<>();
-        event.type = value != null ? value.getClass().getTypeName() : "empty";
-        event.source = String.format(SOURCE_FORMATTER, processId, processInstanceId);
-        event.specversion = "1.0";
-        event.time = new Date();
-        event.id = UUID.randomUUID().toString();
-        event.data = value;
-        return mapper.writeValueAsBytes(event);
-    }
-
-    public static <T> CloudEvent<T> read(byte[] bytes, Class<T> type) throws IOException, ParseException {
-        JsonNode node = mapper.readTree(bytes);
-        CloudEvent<T> cloudEvent = new CloudEvent<>();
-        if (node.has("id")) {
-            cloudEvent.id = node.get("id").asText();
-        }
-        if (node.has("source")) {
-            cloudEvent.source = node.get("source").asText();
-        }
-        if (node.has("type")) {
-            cloudEvent.type = node.get("type").asText();
-        }
-        if (node.has("specversion")) {
-            cloudEvent.specversion = node.get("specversion").asText();
-        }
-        if (node.has("time")) {
-            cloudEvent.time = mapper.getDateFormat().parse(node.get("time").asText());
-        }
-        if (node.has("data")) {
-            cloudEvent.data = mapper.treeToValue(node.get("data"), type);
-        }
-        return cloudEvent;
-    }
-
-    private CloudEvent() {}
 
     public String getSpecversion() {
         return specversion;
@@ -104,6 +47,30 @@ class CloudEvent<T> {
 
     public T getData() {
         return data;
+    }
+
+    public void setSpecversion(String specversion) {
+        this.specversion = specversion;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 
     @Override

@@ -44,4 +44,12 @@ public interface Marshaller {
     void setClassLoader(ClassLoader classloader);
 
     ClassLoader getClassLoader();
+
+    default byte[] marshallAsBytes(Object input) {
+        return marshall(input).getBytes();
+    }
+
+    default <T> T unmarshall(byte[] input, Class<T> type) {
+        return unmarshall(new String(input), type);
+    }
 }

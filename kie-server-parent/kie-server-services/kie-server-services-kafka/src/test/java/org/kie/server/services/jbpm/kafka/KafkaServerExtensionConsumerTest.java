@@ -29,6 +29,7 @@ import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.common.TopicPartition;
 import org.jbpm.bpmn2.core.Message;
 import org.jbpm.bpmn2.core.Signal;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.model.MessageDescImpl;
 import org.jbpm.kie.services.impl.model.SignalDescImpl;
 import org.jbpm.runtime.manager.impl.SimpleRegisterableItemsFactory;
@@ -43,6 +44,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.definition.process.Node;
+import org.kie.api.runtime.KieContainer;
 import org.kie.internal.runtime.manager.InternalRegisterableItemsFactory;
 import org.kie.internal.runtime.manager.InternalRuntimeManager;
 import org.kie.internal.runtime.manager.RuntimeEnvironment;
@@ -124,6 +126,11 @@ public class KafkaServerExtensionConsumerTest {
         processDefinition = mock(ProcessDefinition.class);
         when(deployedUnit.getDeployedAssets()).thenReturn(Collections.singletonList(processDefinition));
         extension.init(server, registry);
+        KModuleDeploymentUnit deploymentUnit = mock(KModuleDeploymentUnit.class);
+        when(deployedUnit.getDeploymentUnit()).thenReturn(deploymentUnit);
+        KieContainer kieContainer = mock(KieContainer.class);
+        when(deploymentUnit.getKieContainer()).thenReturn(kieContainer);
+        when(kieContainer.getClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
         extension.serverStarted();
     }
 
@@ -149,51 +156,11 @@ public class KafkaServerExtensionConsumerTest {
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", "javierito");
     }
 
-    private static class Person {
 
-        private String name;
-
-        public Person() {}
-
-        public Person(String name) {
-            super();
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((name == null) ? 0 : name.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            Person other = (Person) obj;
-            if (name == null) {
-                if (other.name != null)
-                    return false;
-            } else if (!name.equals(other.name))
-                return false;
-            return true;
-        }
-    }
 
     private void testStructRefEvent(String clazzName) {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
                 clazzName)));
-        when(deployedUnit.getDeployedClasses()).thenReturn(Collections.singletonList(Person.class));
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         publishEvent("MySignal",
                 "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":{\"name\":\"javierito\"}}");
@@ -201,20 +168,14 @@ public class KafkaServerExtensionConsumerTest {
     }
 
     @Test
-    public void testKafkaServerExecutorSignalWithClassCanonical() {
-        testStructRefEvent(Person.class.getCanonicalName());
-    }
-
-    @Test
-    public void testKafkaServerExecutorSignalWithClassSimple() {
-        testStructRefEvent(Person.class.getSimpleName());
-    }
-
-    @Test
     public void testKafkaServerExecutorSignalWithClassType() {
         testStructRefEvent(Person.class.getTypeName());
     }
-    
+
+    @Test
+    public void testKafkaServerExecutorSignalWithClassName() {
+        testStructRefEvent(Person.class.getName());
+    }
 
     @Test
     public void testKafkaSubscriptionChange() {
