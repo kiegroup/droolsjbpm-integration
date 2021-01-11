@@ -116,6 +116,56 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         assertEquals(serverTemplate.getName(), saved.getName());
         assertEquals(serverTemplate.getId(), saved.getId());
     }
+    
+    @Test
+    public void notabletoCreateContainerWithEmptyid() {
+
+        ServerTemplate serverTemplate = new ServerTemplate();
+
+        serverTemplate.setName("test server");
+        serverTemplate.setId(UUID.randomUUID().toString());
+
+        specManagementService.saveServerTemplate(serverTemplate);
+
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
+        assertNotNull(existing);
+        assertEquals(1, existing.getServerTemplates().length);
+        
+        Map<Capability, ContainerConfig> configs = new HashMap<Capability, ContainerConfig>();
+        RuleConfig ruleConfig = new RuleConfig();
+        ruleConfig.setPollInterval(1000l);
+        ruleConfig.setScannerStatus(KieScannerStatus.STARTED);
+
+        configs.put(Capability.RULE, ruleConfig);
+
+        ProcessConfig processConfig = new ProcessConfig();
+        processConfig.setKBase("defaultKieBase");
+        processConfig.setKSession("defaultKieSession");
+        processConfig.setMergeMode("MERGE_COLLECTION");
+        processConfig.setRuntimeStrategy("PER_PROCESS_INSTANCE");
+
+        configs.put(Capability.PROCESS, processConfig);
+
+        ContainerSpec containerSpec = new ContainerSpec();
+        containerSpec.setId("");
+        containerSpec.setServerTemplateKey(new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()));
+        containerSpec.setReleasedId(new ReleaseId("org.kie", "kie-server-kjar", "1.0"));
+        containerSpec.setStatus(KieContainerStatus.STOPPED);
+        containerSpec.setConfigs(configs);
+
+        try {
+            specManagementService.saveContainerSpec(serverTemplate.getId(), containerSpec);
+            fail("Cannot create container with empty container id.");
+        } catch (Exception ex) {
+            assertEquals("Cannot create container with empty container id.",
+                         ex.getMessage());
+        }
+
+
+        org.kie.server.controller.api.model.spec.ServerTemplate createdServerTemplate = specManagementService.getServerTemplate(serverTemplate.getId());
+        assertEquals(0, createdServerTemplate.getContainersSpec().size());
+
+    }
 
     @Test
     public void testCreateServerTemplateAndContainer() {
@@ -364,6 +414,7 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         assertEquals(containerSpec.getConfigs().size(), container.getConfigs().size());
     }
 
+      
     @Test
     public void testCreateServerTemplateAndUpdateContainerConfig() {
 
@@ -762,6 +813,37 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
     }
 
 
+	@Test
+	public void notabletoUpdateContainerWithEmptyid() {
+		final String serverTemplateId = "serverTemplateId";
+		final String serverTemplateName = "serverTemplateName";
+		final String containerSpecId = "containerSpecId";
+
+		ServerTemplate template = new ServerTemplate(serverTemplateId, serverTemplateName);
+
+		ContainerSpec containerSpec = new ContainerSpec();
+		containerSpec.setId("");
+		containerSpec.setServerTemplateKey(new ServerTemplateKey(template.getId(), template.getName()));
+		containerSpec.setReleasedId(new ReleaseId("org.kie", "kie-server-kjar", "1.0"));
+		containerSpec.setStatus(KieContainerStatus.STARTED);
+
+		template.addContainerSpec(containerSpec);
+
+		when(templateStorage.load(eq(serverTemplateId))).thenReturn(template);
+
+		final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+
+		specManagementService.setTemplateStorage(templateStorage);
+		specManagementService.setNotificationService(notificationService);
+
+		try {
+			specManagementService.updateContainerSpec(serverTemplateId, containerSpecId, containerSpec, true);
+			fail("Cannot update container with empty container id");
+		} catch (Exception ex) {
+			assertEquals("Cannot update container with empty container id.", ex.getMessage());
+		}
+
+	}   
 
     @Test
     public void testUpdateContainerRuleConfigWhenKieScannerStatusIsStarted() {
