@@ -16,18 +16,6 @@
 
 package org.kie.server.springboot.samples;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
-import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -39,6 +27,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.core.io.JsonEOFException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentService;
@@ -49,6 +42,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -58,6 +52,7 @@ import org.junit.runner.RunWith;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.QueryFilter;
+import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.springboot.samples.listeners.CountDownLatchEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,14 +63,17 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.KafkaContainer;
 
-import com.fasterxml.jackson.core.io.JsonEOFException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
+import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class, TestAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -400,7 +398,7 @@ public class KafkaConsumerHappyPathTest extends KafkaFixture {
         
         sendEvent(START_MESSAGE_POJO, USELESS_DATA_EVENT);
         
-        assertExceptionInLogs(listAppender, MismatchedInputException.class);
+        assertExceptionInLogs(listAppender, MarshallingException.class);
     }
     
     @Test(timeout = 60000)
@@ -418,7 +416,7 @@ public class KafkaConsumerHappyPathTest extends KafkaFixture {
         
         sendEvent(START_MESSAGE_POJO, MONEY_DATA_WRONG_TYPE_EVENT);
         
-        assertExceptionInLogs(listAppender, InvalidFormatException.class);
+        assertExceptionInLogs(listAppender, MarshallingException.class);
     }
     
     @Test(timeout = 60000)
@@ -431,6 +429,7 @@ public class KafkaConsumerHappyPathTest extends KafkaFixture {
     }
     
     @Test(timeout = 60000)
+    @Ignore("Wrong dates are ignored since only data field is used in cloud event for now")
     public void testStartMessageParseException() throws InterruptedException {
         countDownListener.configure(START_MESSAGE_POJO_PROCESS_ID, 1);
         

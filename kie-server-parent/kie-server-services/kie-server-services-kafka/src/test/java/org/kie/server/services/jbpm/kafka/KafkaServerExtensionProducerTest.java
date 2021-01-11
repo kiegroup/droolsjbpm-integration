@@ -26,6 +26,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.drools.core.event.MessageEventImpl;
 import org.drools.core.event.SignalEventImpl;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.SimpleRegisterableItemsFactory;
 import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.DeploymentService;
@@ -37,6 +38,7 @@ import org.jbpm.workflow.core.Node;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.NodeInstance;
@@ -88,6 +90,7 @@ public class KafkaServerExtensionProducerTest {
     private Node node;
     private InternalRegisterableItemsFactory itemsFactory;
     private RuntimeEngine runtimeEngine = mock(RuntimeEngine.class);
+    private KafkaEventReader eventReader = new CloudEventReader(Thread.currentThread().getContextClassLoader());
 
     @Before
     public void setup() {
@@ -119,6 +122,11 @@ public class KafkaServerExtensionProducerTest {
         node = mock(Node.class);
         when(nInstance.getNode()).thenReturn(node);
         when(node.getMetaData()).thenReturn(Collections.emptyMap());
+        KModuleDeploymentUnit deploymentUnit = mock(KModuleDeploymentUnit.class);
+        when(deployedUnit.getDeploymentUnit()).thenReturn(deploymentUnit);
+        KieContainer kieContainer = mock(KieContainer.class);
+        when(deploymentUnit.getKieContainer()).thenReturn(kieContainer);
+        when(kieContainer.getClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
     }
 
     @After
@@ -131,7 +139,7 @@ public class KafkaServerExtensionProducerTest {
     
 
     @Test 
-    public void testMessageSent() throws IOException, ParseException {
+    public void testMessageSent() throws IOException, ClassNotFoundException {
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onMessage(new MessageEventImpl(
                 pInstance, runtime, nInstance,
@@ -140,11 +148,11 @@ public class KafkaServerExtensionProducerTest {
         assertFalse(events.isEmpty());
         ProducerRecord<String, byte[]> event = events.get(0);
         assertEquals("MyMessage", event.topic());
-        assertEquals("Javierito", CloudEvent.read(event.value(), String.class).getData());
+        assertEquals("Javierito", eventReader.readEvent(event.value(), String.class));
     }
 
     @Test
-    public void testSignalSent() throws IOException, ParseException {
+    public void testSignalSent() throws IOException, ParseException, ClassNotFoundException {
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onSignal(new SignalEventImpl(
                 pInstance, runtime, nInstance, "MySignal", "Javierito")));
@@ -152,11 +160,11 @@ public class KafkaServerExtensionProducerTest {
         assertFalse(events.isEmpty());
         ProducerRecord<String, byte[]> event = events.get(0);
         assertEquals("MySignal", event.topic());
-        assertEquals("Javierito", CloudEvent.read(event.value(), String.class).getData());
+        assertEquals("Javierito", eventReader.readEvent(event.value(), String.class));
     }
 
     @Test
-    public void testSignalSentImplementation() throws IOException, ParseException {
+    public void testSignalSentImplementation() throws IOException, ClassNotFoundException {
         when(node.getMetaData()).thenReturn(Collections.singletonMap("implementation", "##kafka"));
         System.clearProperty(SIGNAL_MAPPING_PROPERTY);
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
@@ -166,11 +174,11 @@ public class KafkaServerExtensionProducerTest {
         assertFalse(events.isEmpty());
         ProducerRecord<String, byte[]> event = events.get(0);
         assertEquals("MySignal", event.topic());
-        assertEquals("Javierito", CloudEvent.read(event.value(), String.class).getData());
+        assertEquals("Javierito", eventReader.readEvent(event.value(), String.class));
     }
 
     @Test
-    public void testSignalDisable() throws IOException, ParseException {
+    public void testSignalDisable() throws IOException {
         System.clearProperty(SIGNAL_MAPPING_PROPERTY);
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onSignal(new SignalEventImpl(
