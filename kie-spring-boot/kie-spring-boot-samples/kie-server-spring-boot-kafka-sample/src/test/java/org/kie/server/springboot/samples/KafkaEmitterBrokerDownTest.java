@@ -60,6 +60,7 @@ public class KafkaEmitterBrokerDownTest extends KafkaFixture {
 
     @BeforeClass
     public static void beforeClass() {
+        checkRightOSForTestContainers();
         generalSetup(false);
         System.setProperty("org.kie.jbpm.event.emitters.kafka.max.block.ms", "500");
     }
