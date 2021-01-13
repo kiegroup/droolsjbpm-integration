@@ -153,6 +153,8 @@ public class KafkaProducerHappyPathTest extends KafkaFixture {
     public static void teardown() {
         kafka.stop();
         System.clearProperty(KAFKA_EXTENSION_PREFIX+BOOTSTRAP_SERVERS_CONFIG);
+        System.clearProperty(KAFKA_EXTENSION_PREFIX+"topics._2_Message");
+        System.clearProperty(KAFKA_EXTENSION_PREFIX+"topics._2_Signal");
     }
     
     @Test(timeout = 60000)
