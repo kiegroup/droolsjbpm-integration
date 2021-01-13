@@ -26,6 +26,8 @@ import java.util.Set;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.mapper.ElementIgnoringMapper;
+import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -81,10 +83,13 @@ import static org.kie.soup.xstream.XStreamUtils.createNonTrustingXStream;
 
 public class XStreamMarshaller implements Marshaller {
 
+    public static final String XSTREAM_IGNORE_UNKNOWN = "ignore-unknown-elements";
     private static final Logger logger = LoggerFactory.getLogger(XStreamMarshaller.class);
     protected XStream xstream;
     protected ClassLoader classLoader;
-    protected Map<String, Class> classNames = new HashMap<String, Class>();
+    protected Map<String, Class<?>> classNames = new HashMap<>();
+
+    private ThreadLocal<XStreamContext> xstreamContext = ThreadLocal.withInitial(XStreamContext::new);
 
     // Optional marshaller extensions to handle new types / configure custom behavior
     private static final List<XStreamMarshallerExtension> EXTENSIONS;
@@ -113,16 +118,42 @@ public class XStreamMarshaller implements Marshaller {
         EXTENSIONS.forEach(ext -> ext.extend(this));
     }
 
+    private static class XStreamContext {
+
+        private boolean ignoreUnknownElements;
+
+        public boolean isIgnoreUnknownElements() {
+            return ignoreUnknownElements;
+        }
+
+        public void setIgnoreUnknownElements(boolean ignoreUnknownElements) {
+            this.ignoreUnknownElements = ignoreUnknownElements;
+        }
+    }
+
+    protected class CustomElementIgnore extends ElementIgnoringMapper {
+
+        public CustomElementIgnore(Mapper wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public boolean isIgnoredElement(String name) {
+            return xstreamContext.get().isIgnoreUnknownElements();
+        }
+    }
+
     protected void buildMarshaller(Set<Class<?>> classes,
                                    final ClassLoader classLoader) {
         this.xstream = XStreamXML.newXStreamMarshaller(createNonTrustingXStream(
                 new PureJavaReflectionProvider(),
                 next -> {
                     return new MapperWrapper(chainMapperWrappers(new ArrayList<>(EXTENSIONS),
-                                                                 next)) {
-                        public Class realClass(String elementName) {
+                            new CustomElementIgnore(next))) {
 
-                            Class customClass = classNames.get(elementName);
+                        @Override
+                        public Class<?> realClass(String elementName) {
+                            Class<?> customClass = classNames.get(elementName);
                             if (customClass != null) {
                                 return customClass;
                             }
@@ -151,7 +182,7 @@ public class XStreamMarshaller implements Marshaller {
         this.xstream.denyTypes(voidDeny);
 
         this.xstream.addPermission(new KieServerTypePermission(classes));
-        String classWildcards[] = {"org.kie.api.pmml.*", "org.kie.pmml.pmml_4_2.model.*"};
+        String[] classWildcards = {"org.kie.api.pmml.*", "org.kie.pmml.pmml_4_2.model.*"};
         this.xstream.allowTypesByWildcard(classWildcards);
 
         AbstractScoreXStreamConverter.registerScoreConverters(xstream);
@@ -220,12 +251,24 @@ public class XStreamMarshaller implements Marshaller {
     @Override
     public <T> T unmarshall(String input,
                             Class<T> type) {
-        return (T) xstream.fromXML(input);
+        return unmarshall(input, type, Collections.singletonMap(XSTREAM_IGNORE_UNKNOWN, false));
+    }
+
+    @Override
+    public <T> T unmarshall(String input, Class<T> type, Map<String, Object> parameters) {
+        Object ignoreString = parameters.get(XSTREAM_IGNORE_UNKNOWN);
+        xstreamContext.get().setIgnoreUnknownElements(ignoreString != null && Boolean.parseBoolean(ignoreString
+                .toString()));
+        try {
+            return (T) xstream.fromXML(input);
+        } finally {
+            xstreamContext.get().setIgnoreUnknownElements(false);
+        }
     }
 
     @Override
     public void dispose() {
-        // nothing to do
+        xstreamContext.remove();
     }
 
     @Override
