@@ -1,0 +1,20 @@
+/target
+/local
+*.tlog
+SpringBoot.xml
+
+# Eclipse, Netbeans and IntelliJ files
+/.*
+!.gitignore
+/nbproject
+/*.ipr
+/*.iws
+*.iml
+.classpath
+.project
+.settings
+.idea
+target
+
+# Repository wide ignore mac DS_Store files
+.DS_Store
