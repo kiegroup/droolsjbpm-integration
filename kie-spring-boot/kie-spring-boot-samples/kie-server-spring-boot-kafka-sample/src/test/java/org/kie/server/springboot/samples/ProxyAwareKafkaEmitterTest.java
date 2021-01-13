@@ -71,6 +71,7 @@ public class ProxyAwareKafkaEmitterTest extends KafkaFixture{
     
     @BeforeClass
     public static void beforeClass() {
+        checkRightOSForTestContainers();
         System.setProperty("org.kie.jbpm.event.emitters.kafka.topic.processes", CUSTOM_PROCESSES_TOPIC);
         toxiproxy.start();
         kafkaProxy = toxiproxy.getProxy(kafka, TOXY_PROXY_PORT);

@@ -33,6 +33,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -114,6 +115,12 @@ public class KafkaFixture {
     
     protected KModuleDeploymentUnit unit = null;
     
+    public static void checkRightOSForTestContainers() {
+        // Currently testcontainers are not supported out-of-the-box on Windows and RHEL8
+        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("win") 
+                && !System.getProperty("os.version").toLowerCase().contains("el8"));
+    }
+
     public static void generalSetup(boolean configure) {
         EntityManagerFactoryManager.get().clear();
         

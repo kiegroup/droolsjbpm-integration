@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -145,6 +146,10 @@ public abstract class KafkaFixture {
     protected static Properties props = new Properties();
     
     public static void generalSetup() {
+        // Currently testcontainers are not supported out-of-the-box on Windows and RHEL8
+        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("win") 
+                && !System.getProperty("os.version").toLowerCase().contains("el8"));
+        
         //for the transactional tests
         kafka.addEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1");
         kafka.addEnv("KAFKA_TRANSACTION_STATE_LOG_MIN_ISR", "1");
