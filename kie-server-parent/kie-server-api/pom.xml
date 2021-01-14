@@ -168,6 +168,10 @@
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.xml.bind</groupId>
+          <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
