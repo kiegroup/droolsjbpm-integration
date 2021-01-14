@@ -21,22 +21,19 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.kie.server.api.model.ReleaseId;
 
-@RunWith(Parameterized.class)
-public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
+public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest {
 
     private static final String CORRELATION_ID = "123";
-    private static final String MODEL_NAME = "CompoundPredicateScorecard";
-    private static final String FILE_NAME = "CompoundPredicateScorecard.pmml";
-    private static final String TARGET_FIELD = "score";
-    private static final Object EXPECTED_RESULT = -93.0;
+    private static final String MODEL_NAME = "LinReg";
+    private static final String FILE_NAME = "test_regression.pmml";
+    private static final String TARGET_FIELD = "fld4";
+    private static final Object EXPECTED_RESULT = 1.0;
     private static final Map<String, Object> INPUT_DATA;
     private static final long EXTENDED_TIMEOUT = 30000000L;
     // Test setup
-    private static final String MODEL_BASE = "scorecard";
+    private static final String MODEL_BASE = "regression";
     // Compiled
     private static final String CONTAINER_ID_COMPILED = MODEL_BASE + "-compiled";
     private static final String ARTIFACT_ID_COMPILED = "pmml-trusty-" + CONTAINER_ID_COMPILED;
@@ -48,16 +45,17 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
     private static final ReleaseId RELEASE_ID_NOT_COMPILED = new ReleaseId("org.kie.server.testing", ARTIFACT_ID_NOT_COMPILED, "1.0.0.Final");
     private static final String RESOURCE_NOT_COMPILED = "/kjars-sources/" + ARTIFACT_ID_NOT_COMPILED;
 
+
     static {
         INPUT_DATA = new HashMap<>();
-        INPUT_DATA.put("input1", -21.5);
-        INPUT_DATA.put("input2", -7.0);
-        INPUT_DATA.put("input3", "classA");
-        INPUT_DATA.put("input4", "classB");
+        INPUT_DATA.put("fld1", 12.0);
+        INPUT_DATA.put("fld2", 25.0);
+        INPUT_DATA.put("fld3", "x");
     }
 
+
     @BeforeClass
-    public static  void buildAndDeployArtifacts() {
+    public static void buildAndDeployArtifacts() {
         setup(RESOURCE_COMPILED,
               EXTENDED_TIMEOUT,
               CONTAINER_ID_COMPILED,
@@ -69,7 +67,7 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
     }
 
     @Test
-    public void testApplyPmmlScorecardModelCompiled() {
+    public void testApplyPmmlRegressionModelCompiled() {
         execute(CORRELATION_ID,
                 CONTAINER_ID_COMPILED,
                 MODEL_NAME,
@@ -80,7 +78,7 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
     }
 
     @Test
-    public void testApplyPmmlScorecardModelNotCompiled() {
+    public void testApplyPmmlRegressionModelNotCompiled() {
         execute(CORRELATION_ID,
                 CONTAINER_ID_NOT_COMPILED,
                 MODEL_NAME,

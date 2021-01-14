@@ -3,8 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>kie-server-tests</artifactId>
     <groupId>org.kie.server</groupId>
+    <artifactId>kie-server-tests</artifactId>
     <version>7.49.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -17,22 +17,12 @@
   <properties>
     <java.module.name>org.kie.server.itests.pmml</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
-    <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
+    <org.kie.prometheus.server.ext.disabled>true</org.kie.prometheus.server.ext.disabled>
     <org.kie.scenariosimulation.server.ext.disabled>true</org.kie.scenariosimulation.server.ext.disabled>
+    <version.properties.maven.plugin>1.0.0</version.properties.maven.plugin>
   </properties>
 
   <dependencies>
-<!--    <dependency>-->
-<!--      <groupId>org.drools</groupId>-->
-<!--      <artifactId>drools-model-compiler</artifactId>-->
-<!--      <scope>provided</scope>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.kie</groupId>-->
-<!--      <artifactId>kie-pmml-dependencies</artifactId>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
-
     <!-- Common Kie server test classes -->
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -106,7 +96,6 @@
     </dependency>
   </dependencies>
 
-
   <build>
     <pluginManagement>
       <plugins>
@@ -124,12 +113,13 @@
               <kie.server.jndi.response.queue>${kie.server.jndi.response.queue}</kie.server.jndi.response.queue>
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
+              <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
-              <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
-              <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
+              <!-- Added: -->
+              <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -163,29 +153,30 @@
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-maven2-plugin</artifactId>
         <configuration>
-          <configuration>
-            <properties>
-              <cargo.start.jvmargs>
-                -Xdebug
-                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
-                -Xnoagent
-                -Djava.compiler=NONE
-              </cargo.start.jvmargs>
-            </properties>
-          </configuration>
           <container>
             <systemProperties>
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
-              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
+              <!-- Added: -->
+              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <kie-pmml-implementation>new</kie-pmml-implementation>
               <org.drools.server.filter.classes>true</org.drools.server.filter.classes>
             </systemProperties>
           </container>
+          <configuration>
+            <properties>
+              <cargo.start.jvmargs>
+                -Xdebug
+                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787
+                -Xnoagent
+                -Djava.compiler=NONE
+              </cargo.start.jvmargs>
+            </properties>
+          </configuration>
         </configuration>
       </plugin>
     </plugins>
@@ -214,6 +205,12 @@
           <groupId>org.kie.server</groupId>
           <artifactId>kie-server-services-drools</artifactId>
           <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.kie.server</groupId>
+              <artifactId>kie-server-services-jbpm</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
         <dependency>
           <groupId>org.kie.server</groupId>
@@ -225,11 +222,11 @@
           <artifactId>kie-server-rest-drools</artifactId>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-prometheus</artifactId>
-          <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--          <groupId>org.kie.server</groupId>-->
+<!--          <artifactId>kie-server-rest-prometheus</artifactId>-->
+<!--          <scope>test</scope>-->
+<!--        </dependency>-->
         <dependency>
           <groupId>org.kie.server</groupId>
           <artifactId>kie-server-rest-scenario-simulation</artifactId>
@@ -248,12 +245,90 @@
     </profile>
     <profile>
       <id>wildfly</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-common</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
+              <groupId>javax.xml.stream</groupId>
+              <artifactId>stax-api</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-drools</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.kie.server</groupId>
+              <artifactId>kie-server-services-jbpm</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-common</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-drools</artifactId>
+          <scope>test</scope>
+        </dependency>
+<!--        <dependency>-->
+<!--          <groupId>org.kie.server</groupId>-->
+<!--          <artifactId>kie-server-rest-prometheus</artifactId>-->
+<!--          <scope>test</scope>-->
+<!--        </dependency>-->
+        <dependency>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-rest-scenario-simulation</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
       <activation>
         <property>
           <name>container.profile</name>
           <value>wildfly</value>
         </property>
       </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>properties-maven-plugin</artifactId>
+              <version>${version.properties.maven.plugin}</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>set-system-properties</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <property>
+                      <name>kie-pmml-implementation</name>
+                      <value>new</value>
+                    </property>
+                  </properties>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>eap7</id>
@@ -297,5 +372,4 @@
       </properties>
     </profile>
   </profiles>
-
 </project>

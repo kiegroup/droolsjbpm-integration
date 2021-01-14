@@ -7,48 +7,33 @@
     <version>1.0.0.Final</version>
   </parent>
 
-  <artifactId>pmml-trusty-scorecard</artifactId>
+  <artifactId>pmml-trusty-tree-compiled</artifactId>
   <version>1.0.0.Final</version>
-  <packaging>jar</packaging>
+  <packaging>kjar</packaging>
 
   <properties>
     <generateModel>NO</generateModel>
+    <generateDMNModel>NO</generateDMNModel>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <version.properties.maven.plugin>1.0.0</version.properties.maven.plugin>
   </properties>
 
   <dependencies>
     <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-model-compiler</artifactId>
+      <version>${version.org.kie}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-dependencies</artifactId>
       <version>${version.org.kie}</version>
+      <scope>provided</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.kie</groupId>-->
-<!--      <artifactId>kie-pmml-models-drools-scorecard-model</artifactId>-->
-<!--      <version>${version.org.kie}</version>-->
-<!--      <exclusions>-->
-<!--        <exclusion>-->
-<!--          <groupId>org.kie</groupId>-->
-<!--          <artifactId>kie-pmml-compiler-commons</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--          <groupId>org.kie</groupId>-->
-<!--          <artifactId>kie-pmml-evaluator-core</artifactId>-->
-<!--        </exclusion>-->
-<!--&lt;!&ndash;        <exclusion>&ndash;&gt;-->
-<!--&lt;!&ndash;          <groupId>org.drools</groupId>&ndash;&gt;-->
-<!--&lt;!&ndash;          <artifactId>drools-compiler</artifactId>&ndash;&gt;-->
-<!--&lt;!&ndash;        </exclusion>&ndash;&gt;-->
-<!--&lt;!&ndash;        <exclusion>&ndash;&gt;-->
-<!--&lt;!&ndash;          <groupId>org.drools</groupId>&ndash;&gt;-->
-<!--&lt;!&ndash;          <artifactId>drools-model-compiler</artifactId>&ndash;&gt;-->
-<!--&lt;!&ndash;        </exclusion>&ndash;&gt;-->
-<!--        <exclusion>-->
-<!--          <groupId>org.jpmml</groupId>-->
-<!--          <artifactId>pmml-model</artifactId>-->
-<!--        </exclusion>-->
-<!--      </exclusions>-->
-<!--    </dependency>-->
   </dependencies>
 
   <build>

@@ -11,7 +11,8 @@
   <logger name="org.kie.server" level="INFO" />
   <logger name="org.apache.http" level="WARN" />
   <logger name="org.apache.maven" level="WARN" />
-  <logger name="org.kie.server.services.PrometheusMetricsDroolsListener" level="DEBUG" />
+  <logger name="org.kie.server.services.PrometheusMetricsDroolsListener" level="INFO" />
+  <logger name="org.kie.pmml.models.drools.commons.model" level="INFO" />
 
   <root level="INFO">
     <appender-ref ref="STDOUT"/>
