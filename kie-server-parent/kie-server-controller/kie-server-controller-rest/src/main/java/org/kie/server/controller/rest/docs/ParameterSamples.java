@@ -241,6 +241,7 @@ public class ParameterSamples {
     public static final String CONTAINER_SPEC_JSON = "{\n" +
             "  \"container-id\" : \"evaluation_1.0.0-SNAPSHOT\",\n" +
             "  \"container-name\" : \"evaluation\",\n" +
+            "  \"container-alias\" : \"evaluation\",\n" +
             "  \"server-template-key\" : null,\n" +
             "  \"release-id\" : {\n" +
             "    \"group-id\" : \"evaluation\",\n" +
@@ -460,6 +461,7 @@ public class ParameterSamples {
             "<container-spec-details>\n" +
             "    <container-id>evaluation_1.0.0-SNAPSHOT</container-id>\n" +
             "    <container-name>evaluation</container-name>\n" +
+            "    <container-alias>evaluation</container-alias>\n" +
             "    <release-id>\n" +
             "        <artifact-id>evaluation</artifact-id>\n" +
             "        <group-id>evaluation</group-id>\n" +
