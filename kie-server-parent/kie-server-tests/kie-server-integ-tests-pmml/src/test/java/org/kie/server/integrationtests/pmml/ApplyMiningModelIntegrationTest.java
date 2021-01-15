@@ -35,15 +35,15 @@ public class ApplyMiningModelIntegrationTest extends PMMLApplyModelBaseTest {
     // Test setup
     private static final String MODEL_BASE = "mining";
     // Compiled
-    private static final String CONTAINER_ID_COMPILED = MODEL_BASE + "-compiled";
-    private static final String ARTIFACT_ID_COMPILED = "pmml-trusty-" + CONTAINER_ID_COMPILED;
-    private static final ReleaseId RELEASE_ID_COMPILED = new ReleaseId("org.kie.server.testing", ARTIFACT_ID_COMPILED, "1.0.0.Final");
-    private static final String RESOURCE_COMPILED = "/kjars-sources/" + ARTIFACT_ID_COMPILED;
+    private static final String CONTAINER_ID_COMPILED = MODEL_BASE + COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_COMPILED = PMML_TRUSTY_PREFIX + CONTAINER_ID_COMPILED;
+    private static final ReleaseId RELEASE_ID_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_COMPILED, TEST_VERSION);
+    private static final String RESOURCE_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_COMPILED;
     // Not Compiled
-    private static final String CONTAINER_ID_NOT_COMPILED = MODEL_BASE + "-not-compiled";
-    private static final String ARTIFACT_ID_NOT_COMPILED = "pmml-trusty-" + CONTAINER_ID_NOT_COMPILED;
-    private static final ReleaseId RELEASE_ID_NOT_COMPILED = new ReleaseId("org.kie.server.testing", ARTIFACT_ID_NOT_COMPILED, "1.0.0.Final");
-    private static final String RESOURCE_NOT_COMPILED = "/kjars-sources/" + ARTIFACT_ID_NOT_COMPILED;
+    private static final String CONTAINER_ID_NOT_COMPILED = MODEL_BASE + NOT_COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_NOT_COMPILED = PMML_TRUSTY_PREFIX + CONTAINER_ID_NOT_COMPILED;
+    private static final ReleaseId RELEASE_ID_NOT_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_NOT_COMPILED, TEST_VERSION);
+    private static final String RESOURCE_NOT_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_NOT_COMPILED;
 
 
     static {

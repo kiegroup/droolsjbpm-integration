@@ -19,7 +19,14 @@ import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegra
 
 public abstract class PMMLApplyModelBaseTest extends RestJmsSharedBaseIntegrationTest {
 
+    protected static final String TEST_GROUP = "org.kie.server.testing.pmml-trusty";
+    protected static final String TEST_VERSION = "1.0.0.Final";
+    protected static final String PMML_TRUSTY_PREFIX = "pmml-trusty-";
+    protected static final String COMPILED_SUFFIX = "-compiled";
+    protected static final String NOT_COMPILED_SUFFIX = "-not-compiled";
+    protected static final String KJAR_SOURCES_PREFIX = "/kjars-sources/";
     protected RuleServicesClient ruleClient;
+
 
     public static void setup(String resourceDir,
                              long extendedTimeout,
