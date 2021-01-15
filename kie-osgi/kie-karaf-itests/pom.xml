@@ -12,6 +12,8 @@
   <name>KIE :: Karaf Integration Tests</name>
 
   <properties>
+    <skipTests>true</skipTests>
+
     <java.module.name>org.kie.karaf.itests.main</java.module.name>
     <version.org.apache.karaf>4.2.3</version.org.apache.karaf>
     <!-- use global version property from kie-parent -->
@@ -342,6 +344,16 @@
   </build>
 
   <profiles>
+    <profile>
+      <id>java8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+
     <profile>
       <id>fuse7</id>
       <properties>

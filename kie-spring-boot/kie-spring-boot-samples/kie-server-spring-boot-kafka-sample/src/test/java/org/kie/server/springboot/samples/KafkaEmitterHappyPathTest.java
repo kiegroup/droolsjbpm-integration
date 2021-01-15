@@ -87,6 +87,7 @@ public class KafkaEmitterHappyPathTest extends KafkaFixture {
 
     @BeforeClass
     public static void beforeClass() {
+        checkRightOSForTestContainers();
         kafka.start();
         bootstrapServers = kafka.getBootstrapServers();
         generalSetup(true);
