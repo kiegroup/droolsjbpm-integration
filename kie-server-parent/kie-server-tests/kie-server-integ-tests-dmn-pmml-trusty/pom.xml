@@ -105,14 +105,6 @@
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>example-repo</id>
-      <name>Example Repository</name>
-      <url>file://home/gcardosi/.m2</url>
-    </repository>
-  </repositories>
-
   <build>
     <pluginManagement>
       <plugins>

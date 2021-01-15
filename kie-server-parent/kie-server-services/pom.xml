@@ -28,7 +28,7 @@
     <module>kie-server-services-openshift</module>
     <module>kie-server-services-scenario-simulation</module>
     <module>kie-server-services-task-assigning</module>
-<!--    <module>kie-server-services-jbpm-cluster</module>-->
+    <module>kie-server-services-jbpm-cluster</module>
   </modules>
 
 </project>
