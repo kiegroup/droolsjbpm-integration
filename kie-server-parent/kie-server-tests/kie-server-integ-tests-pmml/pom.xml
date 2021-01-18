@@ -94,6 +94,45 @@
       <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-common</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-drools</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-jbpm</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-drools</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-scenario-simulation</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -129,6 +168,7 @@
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <!-- Added: -->
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
+              <kie-pmml-implementation>new</kie-pmml-implementation>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -173,18 +213,9 @@
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <org.drools.server.filter.classes>true</org.drools.server.filter.classes>
+              <kie-pmml-implementation>new</kie-pmml-implementation>
             </systemProperties>
           </container>
-          <configuration>
-            <properties>
-              <cargo.start.jvmargs>
-                -Xdebug
-                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787
-                -Xnoagent
-                -Djava.compiler=NONE
-              </cargo.start.jvmargs>
-            </properties>
-          </configuration>
         </configuration>
       </plugin>
     </plugins>
@@ -196,46 +227,6 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-common</artifactId>
-          <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
-              <groupId>javax.xml.stream</groupId>
-              <artifactId>stax-api</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-drools</artifactId>
-          <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>org.kie.server</groupId>
-              <artifactId>kie-server-services-jbpm</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-common</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-drools</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-scenario-simulation</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
     </profile>
     <profile>
       <id>tomcat9</id>
@@ -248,46 +239,6 @@
     </profile>
     <profile>
       <id>wildfly</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-common</artifactId>
-          <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
-              <groupId>javax.xml.stream</groupId>
-              <artifactId>stax-api</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-drools</artifactId>
-          <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>org.kie.server</groupId>
-              <artifactId>kie-server-services-jbpm</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-common</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-drools</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-scenario-simulation</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
       <activation>
         <property>
           <name>container.profile</name>
