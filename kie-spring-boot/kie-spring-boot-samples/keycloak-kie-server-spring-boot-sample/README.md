@@ -31,6 +31,6 @@ You can run the application by simply starting
 mvn clean spring-boot:run
 
 ```
-There is also a test case that is ignored by default but can be enabled to validate setup
+There is also a test case using keycloak (testcontainers) to validate setup
 
 
