@@ -13,19 +13,12 @@ package org.kie.server.integrationtests.dmn.pmml;/*
  * limitations under the License.
  */
 
-import org.assertj.core.api.Assertions;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.KieServices;
-import org.kie.dmn.api.core.DMNContext;
-import org.kie.dmn.api.core.DMNResult;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 /*
  * This it.test is reportedly not working in the "embedded" EE container,
@@ -33,55 +26,65 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
  */
 public class DMNPMMLTrustyTreeIntegrationTest extends DMNPMMLTrustyKieServerBaseIntegrationTest {
 
-    private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-trusty-tree-kjar",
-            "1.0.0.Final" );
-
-    private static final String CONTAINER_1_ID  = "dmn-pmml-trusty-tree";
-
     private static final String TREE_MODEL_NAMESPACE
             = "https://kiegroup.org/dmn/_FAA4232D-9D61-4089-BB05-5F5D7C1AECE1";
     private static final String TREE_MODEL_NAME = "TestTreeDMN";
     private static final String TREE_DECISION_NAME = "Decision";
-    private static final String TREE_DECISION_RESULT = "decision";
-
+    private static final Object EXPECTED_RESULT = "sunglasses";
+    private static final Map<String, Object> INPUT_DATA;
     private static final long EXTENDED_TIMEOUT = 300000L;
 
-    @BeforeClass
-    public static void deployArtifacts() {
-        KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-trusty-tree");
+    // Test setup
+    private static final String MODEL_BASE = "tree";
+    // Compiled
+    private static final String CONTAINER_ID_COMPILED = MODEL_BASE + COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_COMPILED = DMN_PMML_TRUSTY_PREFIX + CONTAINER_ID_COMPILED;
+    private static final ReleaseId RELEASE_ID_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_COMPILED, TEST_VERSION);
+    private static final String RESOURCE_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_COMPILED;
+    // Not Compiled
+    private static final String CONTAINER_ID_NOT_COMPILED = MODEL_BASE + NOT_COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_NOT_COMPILED = DMN_PMML_TRUSTY_PREFIX + CONTAINER_ID_NOT_COMPILED;
+    private static final ReleaseId RELEASE_ID_NOT_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_NOT_COMPILED, TEST_VERSION);
+    private static final String RESOURCE_NOT_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_NOT_COMPILED;
 
-        kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
-        // Having timeout issues due to pmml -> raised timeout.
-        KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
-        ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1));
-        KieServerAssert.assertSuccess(reply);
+
+    static {
+        INPUT_DATA = new HashMap<>();
+        INPUT_DATA.put("temperature", 30);
+        INPUT_DATA.put("humidity", 10);
     }
 
-    /*
-     * This it.test is reportedly not working in the "embedded" EE container,
-     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
-     */
+
+    @BeforeClass
+    public static void buildAndDeployArtifacts() {
+        setup(RESOURCE_COMPILED,
+              EXTENDED_TIMEOUT,
+              CONTAINER_ID_COMPILED,
+              RELEASE_ID_COMPILED);
+        setup(RESOURCE_NOT_COMPILED,
+              EXTENDED_TIMEOUT,
+              CONTAINER_ID_NOT_COMPILED,
+              RELEASE_ID_NOT_COMPILED);
+    }
+
     @Test
-    public void testDMNWithPMMLTree() {
-        final DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set("temperature", 30);
-        dmnContext.set("humidity", 10);
-        final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
-                CONTAINER_1_ID,
+    public void testApplyDmnPmmlTreeModelCompiled() {
+        execute(CONTAINER_ID_COMPILED,
                 TREE_MODEL_NAMESPACE,
                 TREE_MODEL_NAME,
                 TREE_DECISION_NAME,
-                dmnContext);
+                EXPECTED_RESULT,
+                INPUT_DATA);
+    }
 
-        Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);
-
-        final DMNResult dmnResult = serviceResponse.getResult();
-        Assertions.assertThat(dmnResult).isNotNull();
-        Assertions.assertThat(dmnResult.hasErrors()).isFalse();
-        final String result = (String) dmnResult.getDecisionResultByName(TREE_DECISION_NAME).getResult();
-        Assertions.assertThat(result).isEqualTo("sunglasses");
+    @Test
+    public void testApplyDmnPmmlTreeModelNotCompiled() {
+        execute(CONTAINER_ID_NOT_COMPILED,
+                TREE_MODEL_NAMESPACE,
+                TREE_MODEL_NAME,
+                TREE_DECISION_NAME,
+                EXPECTED_RESULT,
+                INPUT_DATA);
     }
 }

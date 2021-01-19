@@ -43,6 +43,12 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Needed for instantiation of various commands -->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
+
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -103,11 +109,85 @@
       <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-common</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-drools</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.kie.server</groupId>
+          <artifactId>kie-server-services-jbpm</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-dmn</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-drools</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-dmn</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-prometheus</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-prometheus</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-scenario-simulation</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-scenario-simulation</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <kie-pmml-implementation>new</kie-pmml-implementation>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
@@ -130,6 +210,7 @@
               <!-- Added: -->
               <org.kie.dmn.server.ext.disabled>${org.kie.dmn.server.ext.disabled}</org.kie.dmn.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
+              <kie-pmml-implementation>new</kie-pmml-implementation>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -141,11 +222,6 @@
               <nonFilteredFileExtension>xls</nonFilteredFileExtension>
             </nonFilteredFileExtensions>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>properties-maven-plugin</artifactId>
-          <version>${version.properties.maven.plugin}</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -179,43 +255,21 @@
               <org.kie.dmn.server.ext.disabled>${org.kie.dmn.server.ext.disabled}</org.kie.dmn.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
-
-              <!-- Debug -->
-
-
-<!--              <kie-pmml-implementation>new</kie-pmml-implementation>-->
+              <org.drools.server.filter.classes>true</org.drools.server.filter.classes>
+              <kie-pmml-implementation>new</kie-pmml-implementation>
             </systemProperties>
           </container>
           <configuration>
             <properties>
               <cargo.start.jvmargs>
                 -Xdebug
-                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
+                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8787
                 -Xnoagent
                 -Djava.compiler=NONE
               </cargo.start.jvmargs>
             </properties>
           </configuration>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>set-system-properties</goal>
-            </goals>
-            <configuration>
-              <properties>
-                <property>
-                  <name>kie-pmml-implementation</name>
-                  <value>new</value>
-                </property>
-              </properties>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
@@ -226,58 +280,6 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-common</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-drools</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-dmn</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-common</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-drools</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-dmn</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-prometheus</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-prometheus</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-rest-scenario-simulation</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.server</groupId>
-          <artifactId>kie-server-services-scenario-simulation</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
     </profile>
     <profile>
       <id>tomcat9</id>

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.kie.server.testing</groupId>
+  <groupId>org.kie.server.testing.dmn.pmml-trusty</groupId>
   <artifactId>common-parent</artifactId>
   <version>1.0.0.Final</version>
   <packaging>pom</packaging>
@@ -9,11 +9,17 @@
   <properties>
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
+    <version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec}</version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec>
+    <version.properties.maven.plugin>1.0.0</version.properties.maven.plugin>
+
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.properties.maven.plugin>1.0.0</version.properties.maven.plugin>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <generateModel>NO</generateModel>
+
   </properties>
 
   <dependencyManagement>
@@ -23,6 +29,12 @@
         <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
         <version>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec}</version>
       </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-model-compiler</artifactId>
+        <version>${version.org.kie}</version>
+        <scope>provided</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -31,12 +43,14 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-model-compiler</artifactId>
       <version>${version.org.kie}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-dependencies</artifactId>
       <version>${version.org.kie}</version>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
@@ -58,6 +72,10 @@
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>

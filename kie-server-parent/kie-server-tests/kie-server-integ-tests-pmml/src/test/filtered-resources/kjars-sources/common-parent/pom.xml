@@ -39,7 +39,6 @@
     </dependencies>
   </dependencyManagement>
 
-
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
@@ -47,12 +46,14 @@
       <version>${version.org.kie}</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-dependencies</artifactId>
       <version>${version.org.kie}</version>
       <scope>provided</scope>
     </dependency>
+
   </dependencies>
 
   <build>

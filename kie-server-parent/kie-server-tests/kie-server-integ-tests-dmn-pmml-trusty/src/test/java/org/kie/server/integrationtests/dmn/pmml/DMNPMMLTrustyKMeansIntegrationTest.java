@@ -1,5 +1,5 @@
 package org.kie.server.integrationtests.dmn.pmml;/*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,77 +13,76 @@ package org.kie.server.integrationtests.dmn.pmml;/*
  * limitations under the License.
  */
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assume;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.KieServices;
-import org.kie.dmn.api.core.DMNContext;
-import org.kie.dmn.api.core.DMNResult;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DMNPMMLTrustyKMeansIntegrationTest extends DMNPMMLTrustyKieServerBaseIntegrationTest {
-
-    private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-trusty-kmeans-kjar",
-            "1.0.0.Final" );
-
-    private static final String CONTAINER_1_ID  = "dmn-pmml-trusty-kmeans";
 
     private static final String KMEANS_MODEL_NAMESPACE
             = "https://kiegroup.org/dmn/_51A1FD67-8A67-4332-9889-B718BE8B7456";
     private static final String KMEANS_MODEL_NAME = "KMeansDMN";
     private static final String KMEANS_DECISION_NAME = "Decision1";
-
+    private static final Object EXPECTED_RESULT;
+    private static final Map<String, Object> INPUT_DATA;
     private static final long EXTENDED_TIMEOUT = 300000L;
+    // Test setup
+    private static final String MODEL_BASE = "kmeans";
+    // Compiled
+    private static final String CONTAINER_ID_COMPILED = MODEL_BASE + COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_COMPILED = DMN_PMML_TRUSTY_PREFIX + CONTAINER_ID_COMPILED;
+    private static final ReleaseId RELEASE_ID_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_COMPILED, TEST_VERSION);
+    private static final String RESOURCE_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_COMPILED;
+    // Not Compiled
+    private static final String CONTAINER_ID_NOT_COMPILED = MODEL_BASE + NOT_COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_NOT_COMPILED = DMN_PMML_TRUSTY_PREFIX + CONTAINER_ID_NOT_COMPILED;
+    private static final ReleaseId RELEASE_ID_NOT_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_NOT_COMPILED,
+                                                                           TEST_VERSION);
+    private static final String RESOURCE_NOT_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_NOT_COMPILED;
 
-//    @BeforeClass
-    public static void deployArtifacts() {
-        if (DMNPMMLTrustyTestUtils.extendedPMMLTestsEnabled() == true) {
-            KieServerDeployer.buildAndDeployCommonMavenParent();
-            KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-trusty-kmeans");
-
-            kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
-
-            // Having timeout issues due to pmml -> raised timeout.
-            KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
-            ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1));
-            KieServerAssert.assertSuccess(reply);
-        }
+    static {
+        INPUT_DATA = new HashMap<>();
+        INPUT_DATA.put("x", 5);
+        INPUT_DATA.put("y", 5);
+        EXPECTED_RESULT = new HashMap<>();
+        ((Map)EXPECTED_RESULT).put("predictedValue","4");
     }
 
-    /*
-     * This it.test is reportedly not working in the "embedded" EE container,
-     * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
-     */
+    //    @BeforeClass
+    public static void buildAndDeployArtifacts() {
+        setup(RESOURCE_COMPILED,
+              EXTENDED_TIMEOUT,
+              CONTAINER_ID_COMPILED,
+              RELEASE_ID_COMPILED);
+        setup(RESOURCE_NOT_COMPILED,
+              EXTENDED_TIMEOUT,
+              CONTAINER_ID_NOT_COMPILED,
+              RELEASE_ID_NOT_COMPILED);
+    }
+
     @Ignore
     @Test
-    public void testDMNWithPMMLKmeans() {
-        Assume.assumeTrue(DMNPMMLTrustyTestUtils.extendedPMMLTestsEnabled());
-
-        final DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set("x", 5);
-        dmnContext.set("y", 5);
-
-        final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
-                CONTAINER_1_ID,
+    public void testApplyDmnPmmlKmeansModelCompiled() {
+        execute(CONTAINER_ID_COMPILED,
                 KMEANS_MODEL_NAMESPACE,
                 KMEANS_MODEL_NAME,
                 KMEANS_DECISION_NAME,
-                dmnContext);
-
-        Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);
-        Assertions.assertThat(serviceResponse.getResult().getDecisionResultByName("Decision1").getResult()).isNotNull();
-        final Map<String, Object> decisionResult = (Map<String, Object>) serviceResponse.getResult().getDecisionResultByName("Decision1").getResult();
-        Assertions.assertThat((String) decisionResult.get("predictedValue")).isEqualTo("4");
+                EXPECTED_RESULT,
+                INPUT_DATA);
     }
+
+    @Ignore
+    @Test
+    public void testApplyDmnPmmlKMeansModelNotCompiled() {
+        execute(CONTAINER_ID_NOT_COMPILED,
+                KMEANS_MODEL_NAMESPACE,
+                KMEANS_MODEL_NAME,
+                KMEANS_DECISION_NAME,
+                EXPECTED_RESULT,
+                INPUT_DATA);
+    }
+
 }

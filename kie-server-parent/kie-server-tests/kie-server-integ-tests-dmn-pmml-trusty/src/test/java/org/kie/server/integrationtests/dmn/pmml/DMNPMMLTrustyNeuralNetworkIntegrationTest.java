@@ -13,6 +13,8 @@ package org.kie.server.integrationtests.dmn.pmml;/*
  * limitations under the License.
  */
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
@@ -33,54 +35,76 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DMNPMMLTrustyNeuralNetworkIntegrationTest extends DMNPMMLTrustyKieServerBaseIntegrationTest {
 
-    private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "dmn-pmml-trusty-nn-kjar",
-            "1.0.0.Final" );
-
-    private static final String CONTAINER_1_ID  = "dmn-pml-trusty-neuralnetwork";
+//    private static final ReleaseId kjar1 = new ReleaseId(
+//            "org.kie.server.testing", "dmn-pmml-trusty-nn-kjar",
+//            "1.0.0.Final" );
+//
+//    private static final String CONTAINER_1_ID  = "dmn-pml-trusty-neuralnetwork";
 
     private static final String NEURAL_NETWORK_MODEL_NAMESPACE
             = "https://kiegroup.org/dmn/_51A1FD67-8A67-4332-9889-B718BE8B7456";
     private static final String NEURAL_NETWORK_MODEL_NAME = "NeuralNetworkDMN";
     private static final String NEURAL_NETWORK_DECISION_NAME = "Decision1";
-
+    private static final Object EXPECTED_RESULT;
+    private static final Map<String, Object> INPUT_DATA;
     private static final long EXTENDED_TIMEOUT = 300000L;
+    // Test setup
+    private static final String MODEL_BASE = "nn";
+    // Compiled
+    private static final String CONTAINER_ID_COMPILED = MODEL_BASE + COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_COMPILED = DMN_PMML_TRUSTY_PREFIX + CONTAINER_ID_COMPILED;
+    private static final ReleaseId RELEASE_ID_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_COMPILED, TEST_VERSION);
+    private static final String RESOURCE_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_COMPILED;
+    // Not Compiled
+    private static final String CONTAINER_ID_NOT_COMPILED = MODEL_BASE + NOT_COMPILED_SUFFIX;
+    private static final String ARTIFACT_ID_NOT_COMPILED = DMN_PMML_TRUSTY_PREFIX + CONTAINER_ID_NOT_COMPILED;
+    private static final ReleaseId RELEASE_ID_NOT_COMPILED = new ReleaseId(TEST_GROUP, ARTIFACT_ID_NOT_COMPILED, TEST_VERSION);
+    private static final String RESOURCE_NOT_COMPILED = KJAR_SOURCES_PREFIX + ARTIFACT_ID_NOT_COMPILED;
+
+
+
+    static {
+        INPUT_DATA = new HashMap<>();
+        INPUT_DATA.put("Sepal.Length", 5.7);
+        INPUT_DATA.put("Sepal.Width", 3.8);
+        INPUT_DATA.put("Petal.Length", 1.7);
+        INPUT_DATA.put("Petal.Width", 0.3);
+        EXPECTED_RESULT = new HashMap<>();
+        ((Map)EXPECTED_RESULT).put("Predicted_Species","setosa");
+    }
+
 
 //    @BeforeClass
-    public static void deployArtifacts() {
-        if (DMNPMMLTrustyTestUtils.extendedPMMLTestsEnabled() == true) {
-            KieServerDeployer.buildAndDeployCommonMavenParent();
-            KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/dmn-pmml-trusty-nn");
-
-            kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
-
-            // Having timeout issues due to pmml -> raised timeout.
-            KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
-            ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1));
-            KieServerAssert.assertSuccess(reply);
-        }
+    public static void buildAndDeployArtifacts() {
+        setup(RESOURCE_COMPILED,
+              EXTENDED_TIMEOUT,
+              CONTAINER_ID_COMPILED,
+              RELEASE_ID_COMPILED);
+        setup(RESOURCE_NOT_COMPILED,
+              EXTENDED_TIMEOUT,
+              CONTAINER_ID_NOT_COMPILED,
+              RELEASE_ID_NOT_COMPILED);
     }
 
     @Ignore
     @Test
-    public void testDMNWithPMMLNeuralNetwork() {
-        Assume.assumeTrue(DMNPMMLTrustyTestUtils.extendedPMMLTestsEnabled());
-
-        final DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set("Sepal.Length", 5.7);
-        dmnContext.set("Sepal.Width", 3.8);
-        dmnContext.set("Petal.Length", 1.7);
-        dmnContext.set("Petal.Width", 0.3);
-        final ServiceResponse<DMNResult> serviceResponse = dmnClient.evaluateDecisionByName(
-                CONTAINER_1_ID,
+    public void testApplyDmnPmmlNeuralNetworkModelCompiled() {
+        execute(CONTAINER_ID_COMPILED,
                 NEURAL_NETWORK_MODEL_NAMESPACE,
                 NEURAL_NETWORK_MODEL_NAME,
                 NEURAL_NETWORK_DECISION_NAME,
-                dmnContext);
+                EXPECTED_RESULT,
+                INPUT_DATA);
+    }
 
-        Assertions.assertThat(serviceResponse.getType()).isEqualTo(KieServiceResponse.ResponseType.SUCCESS);
-        Assertions.assertThat(serviceResponse.getResult().getDecisionResultByName("Decision1").getResult()).isNotNull();
-        final Map<String, Object> decisionResult = (Map<String, Object>) serviceResponse.getResult().getDecisionResultByName("Decision1").getResult();
-        Assertions.assertThat((String) decisionResult.get("Predicted_Species")).isEqualTo("setosa");
+    @Ignore
+    @Test
+    public void testApplyDmnPmmlNeuralNetworkModelNotCompiled() {
+        execute(CONTAINER_ID_NOT_COMPILED,
+                NEURAL_NETWORK_MODEL_NAMESPACE,
+                NEURAL_NETWORK_MODEL_NAME,
+                NEURAL_NETWORK_DECISION_NAME,
+                EXPECTED_RESULT,
+                INPUT_DATA);
     }
 }
