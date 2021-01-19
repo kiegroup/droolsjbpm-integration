@@ -36,27 +36,17 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
     }
 
     /**
-     * Create a KeycloakContainer by passing the full docker image name and wait up to 2 minutes for being ready
+     * Create a KeycloakContainer by passing the full docker image name
      *
-     * @param dockerImageName Full docker image name, e.g. quay.io/keycloak/keycloak:9.0.3
+     * @param dockerImage Full docker image name, e.g. quay.io/keycloak/keycloak:9.0.3
      */
-    public KeycloakContainer(String dockerImageName) {
-        super(dockerImageName);
+    public KeycloakContainer(String dockerImage) {
+        super(dockerImage);
         withExposedPorts(KEYCLOAK_PORT_HTTP);
-        setWaitStrategy(Wait
-            .forHttp(KEYCLOAK_AUTH_PATH)
-            .forPort(KEYCLOAK_PORT_HTTP)
-            .withStartupTimeout(Duration.ofMinutes(2))
-        );
     }
 
     @Override
     protected void configure() {
-        withCommand(
-            "-c standalone.xml", 
-            "-b 0.0.0.0"
-        );
-
         withEnv("KEYCLOAK_USER", KEYCLOAK_ADMIN_USER);
         withEnv("KEYCLOAK_PASSWORD", KEYCLOAK_ADMIN_PASSWORD);
     }
