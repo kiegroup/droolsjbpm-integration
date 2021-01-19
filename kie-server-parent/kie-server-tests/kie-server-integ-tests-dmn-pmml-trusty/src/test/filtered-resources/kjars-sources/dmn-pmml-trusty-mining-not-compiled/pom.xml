@@ -2,23 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.kie.server.testing</groupId>
+    <groupId>org.kie.server.testing.dmn.pmml-trusty</groupId>
     <artifactId>common-parent</artifactId>
     <version>1.0.0.Final</version>
   </parent>
 
-  <artifactId>dmn-pmml-trusty-mining-kjar</artifactId>
+  <artifactId>dmn-pmml-trusty-mining-not-compiled</artifactId>
   <version>1.0.0.Final</version>
-  <packaging>kjar</packaging>
+  <packaging>jar</packaging>
 
-  <!-- there should be no need for Kie, Kie-DMN, etc dependencies here -->
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>
