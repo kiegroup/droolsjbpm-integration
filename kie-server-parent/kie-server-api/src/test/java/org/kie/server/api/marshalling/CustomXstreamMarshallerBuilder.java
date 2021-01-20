@@ -35,7 +35,8 @@ public class CustomXstreamMarshallerBuilder extends BaseMarshallerBuilder {
             return new XStreamMarshaller(classes, classLoader) {
                 @Override
                 protected void buildMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
-                    xstream = XStreamUtils.createNonTrustingXStream(new PureJavaReflectionProvider(), new DomDriver("UTF-8", new XmlFriendlyNameCoder("_-", "_")));
+                    xstream = XStreamUtils.createNonTrustingXStream(new PureJavaReflectionProvider(), new DomDriver("UTF-8", new XmlFriendlyNameCoder("_-", "_"))
+                            , CustomElementIgnore::new);
                     xstream.addPermission(new WildcardTypePermission(new String[]{"org.kie.server.api.**"}));
                     String[] voidDeny = {"void.class", "Void.class"};
                     xstream.denyTypes(voidDeny);

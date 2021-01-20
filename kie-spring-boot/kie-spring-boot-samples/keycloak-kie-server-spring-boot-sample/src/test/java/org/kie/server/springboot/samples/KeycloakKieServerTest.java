@@ -19,6 +19,7 @@ package org.kie.server.springboot.samples;
 import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.HashMap;
@@ -30,7 +31,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
@@ -48,17 +48,20 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.springboot.samples.utils.KeycloakContainer;
+import org.kie.server.springboot.samples.utils.KeycloakFixture;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@Ignore("This test requires keycloak to be setup and present as defined in application.properties, see readme")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-test.properties")
-public class KieServerTest {
+public class KeycloakKieServerTest {
 
     static final String ARTIFACT_ID = "evaluation";
     static final String GROUP_ID = "org.jbpm.test";
@@ -67,16 +70,20 @@ public class KieServerTest {
     @LocalServerPort
     private int port;    
    
-    private String user = "john";
-    private String password = "john1";
+    private static String user = "john";
+    private static String password = "john1";
 
     private String containerId = "evaluation";
     private String processId = "evaluation";
     
     private KieServicesClient kieServicesClient;
     
+    private static KeycloakContainer keycloak = new KeycloakContainer();
+    
     @BeforeClass
     public static void generalSetup() {
+        setUpKeycloakTestContainers();
+
         System.setProperty(KieServerConstants.KIE_SERVER_MODE, KieServerMode.PRODUCTION.name());
         KieServices ks = KieServices.Factory.get();
         org.kie.api.builder.ReleaseId releaseId = ks.newReleaseId(GROUP_ID, ARTIFACT_ID, VERSION);
@@ -86,8 +93,23 @@ public class KieServerTest {
         repository.installArtifact(releaseId, kjar, pom);
     }
 
+    public static void setUpKeycloakTestContainers() {
+        // Currently testcontainers are not supported out-of-the-box on Windows and RHEL8
+        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("win") 
+                && !System.getProperty("os.version").toLowerCase().contains("el8"));
+        
+        keycloak.start();
+        KeycloakFixture.setup(keycloak.getAuthServerUrl(), user, password);
+    }
+
+    @DynamicPropertySource
+    public static void registerKeycloakProperties(DynamicPropertyRegistry registry) {
+        registry.add("keycloak.auth-server-url", () -> keycloak.getAuthServerUrl());
+    }
+
     @AfterClass
     public static void generalCleanup() {
+        keycloak.stop();
         System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
 
