@@ -5,7 +5,8 @@
     <encoder>
       <!-- %l lowers performance -->
       <!--<pattern>%d [%t] %-5p %l%n  %m%n</pattern>-->
-      <pattern>%d [%t] %-5p %m%n</pattern>
+      <!-- limiting maximum size to 3000 per KafkaProducerHappyPathTest#testEndMessageRecordTooLargeException -->
+      <pattern>%d [%t] %-5p %.-3000m%n</pattern>
     </encoder>
   </appender>
 
