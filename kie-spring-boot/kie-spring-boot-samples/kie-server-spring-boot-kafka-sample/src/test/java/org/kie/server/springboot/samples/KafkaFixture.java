@@ -33,7 +33,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -65,6 +64,7 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.springboot.utils.KieJarBuildHelper;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -115,10 +115,13 @@ public class KafkaFixture {
     
     protected KModuleDeploymentUnit unit = null;
     
-    public static void checkRightOSForTestContainers() {
-        // Currently testcontainers are not supported out-of-the-box on Windows and RHEL8
-        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("win") 
-                && !System.getProperty("os.version").toLowerCase().contains("el8"));
+    public static boolean isDockerAvailable() {
+        try {
+            DockerClientFactory.instance().client();
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
     }
 
     public static void generalSetup(boolean configure) {

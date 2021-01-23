@@ -144,6 +144,7 @@ public class KafkaConsumerHappyPathTest extends KafkaFixture {
 
     @After
     public void cleanup() {
+        abortAllProcesses(runtimeDataService, processService);
         cleanup(deploymentService, unit);
     }
     

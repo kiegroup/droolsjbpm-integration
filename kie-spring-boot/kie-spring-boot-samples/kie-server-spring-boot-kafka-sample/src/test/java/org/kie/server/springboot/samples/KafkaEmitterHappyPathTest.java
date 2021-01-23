@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 import static org.kie.api.task.model.Status.Completed;
@@ -87,7 +88,7 @@ public class KafkaEmitterHappyPathTest extends KafkaFixture {
 
     @BeforeClass
     public static void beforeClass() {
-        checkRightOSForTestContainers();
+        assumeTrue(isDockerAvailable());
         kafka.start();
         bootstrapServers = kafka.getBootstrapServers();
         generalSetup(true);

@@ -32,12 +32,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +66,13 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
+import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.server.services.jbpm.kafka.KafkaServerExtension;
 import org.kie.server.springboot.samples.utils.KieJarBuildHelper;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.KafkaContainer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -146,9 +152,8 @@ public abstract class KafkaFixture {
     protected static Properties props = new Properties();
     
     public static void generalSetup() {
-        // Currently testcontainers are not supported out-of-the-box on Windows and RHEL8
-        assumeTrue(!System.getProperty("os.name").toLowerCase().contains("win") 
-                && !System.getProperty("os.version").toLowerCase().contains("el8"));
+        // Currently, Docker is needed for testcontainers
+        assumeTrue(isDockerAvailable());
         
         //for the transactional tests
         kafka.addEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1");
@@ -195,11 +200,23 @@ public abstract class KafkaFixture {
     }
 
     protected void cleanup(DeploymentService ds, KModuleDeploymentUnit unit) {
-        if (ds!=null) {
+        if (ds!=null && unit!=null) {
             ds.undeploy(unit);
         }
         System.clearProperty(MESSAGE_MAPPING_PROPERTY);
         System.clearProperty(SIGNAL_MAPPING_PROPERTY);
+    }
+
+    protected void abortAllProcesses(RuntimeDataService runtimeDataService, ProcessService processService) {
+        if (runtimeDataService == null || processService == null) {
+            return;
+        }
+        Collection<ProcessInstanceDesc> activeInstances = runtimeDataService.getProcessInstances(singletonList(STATE_ACTIVE), null, null);
+        if (activeInstances != null) {
+            for (ProcessInstanceDesc instance : activeInstances) {
+                processService.abortProcessInstance(instance.getDeploymentId(), instance.getId());
+            }
+        }
     }
 
     protected void waitForConsumerGroupToBeReady() {
@@ -329,5 +346,14 @@ public abstract class KafkaFixture {
         props.setProperty(VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
         props.setProperty(AUTO_OFFSET_RESET_CONFIG, "earliest");
         return props;
+    }
+    
+    private static boolean isDockerAvailable() {
+        try {
+            DockerClientFactory.instance().client();
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
     }
 }
