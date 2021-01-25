@@ -27,11 +27,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter.UnknownFieldException;
 import org.assertj.core.api.Assertions;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
@@ -55,10 +57,12 @@ import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.marshalling.objects.AnotherMessage;
 import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.marshalling.objects.Message;
+import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.api.model.KieContainerResourceFilter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -248,5 +252,31 @@ public class XStreamMarshallerTest {
         assertEquals(LocalDateTime.of(2017, 1, 1, 10, 10, 10), dateObject.getLocalDateTime());
         assertEquals(LocalTime.of(10, 10, 10), dateObject.getLocalTime());
         assertEquals(OffsetDateTime.of(LocalDateTime.of(2017, 1, 1, 10, 10, 10), ZoneOffset.ofHours(1)), dateObject.getOffsetDateTime());
+    }
+
+    @Test
+    public void testUnmarshallDateObjectWithExtraField() {
+        String expectedString = "<date-object>\n" +
+                                "  <localDate>2017-01-01</localDate>\n" +
+                                "  <localDateTime>2017-01-01T10:10:10</localDateTime>\n" +
+                                "  <localTime>10:10:10</localTime>\n" +
+                                "  <offsetDateTime>2017-01-01T10:10:10+01:00</offsetDateTime>\n" +
+                                "  <unknownField>jojojojo</unknownField>\n" +
+                                "</date-object>";
+        Set<Class<?>> extraClasses = new HashSet<>();
+        extraClasses.add(DateObject.class);
+        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.XSTREAM, getClass()
+                .getClassLoader());
+        
+        assertThrows(UnknownFieldException.class, () -> marshaller.unmarshall(expectedString, DateObject.class));
+        DateObject dateObject = marshaller.unmarshall(expectedString, DateObject.class, Collections.singletonMap(
+                XStreamMarshaller.XSTREAM_IGNORE_UNKNOWN, Boolean.TRUE));
+        assertNotNull(dateObject);
+        assertEquals(LocalDate.of(2017, 1, 1), dateObject.getLocalDate());
+        assertEquals(LocalDateTime.of(2017, 1, 1, 10, 10, 10), dateObject.getLocalDateTime());
+        assertEquals(LocalTime.of(10, 10, 10), dateObject.getLocalTime());
+        assertEquals(OffsetDateTime.of(LocalDateTime.of(2017, 1, 1, 10, 10, 10), ZoneOffset.ofHours(1)), dateObject
+                .getOffsetDateTime());
+        assertThrows(UnknownFieldException.class, () -> marshaller.unmarshall(expectedString, DateObject.class));
     }
 }

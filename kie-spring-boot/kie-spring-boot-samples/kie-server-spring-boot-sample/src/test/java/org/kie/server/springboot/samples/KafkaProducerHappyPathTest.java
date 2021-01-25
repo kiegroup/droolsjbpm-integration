@@ -143,6 +143,7 @@ public class KafkaProducerHappyPathTest extends KafkaFixture {
 
     @After
     public void cleanup() {
+        abortAllProcesses(runtimeDataService, processService);
         cleanup(deploymentService, unit);
         if (kieServicesClient != null) {
             kieServicesClient.disposeContainer(SEND_PROJECT);
