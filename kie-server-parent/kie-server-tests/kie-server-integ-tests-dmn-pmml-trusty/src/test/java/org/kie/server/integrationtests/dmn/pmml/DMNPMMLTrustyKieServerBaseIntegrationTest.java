@@ -44,8 +44,6 @@ public abstract class DMNPMMLTrustyKieServerBaseIntegrationTest
                              long extendedTimeout,
                              String containerId,
                              ReleaseId releaseId) {
-        System.out.println("resourceDir **********************************");
-        System.out.println("resourceDir " + resourceDir);
         commandsFactory = KieServices.Factory.get().getCommands();
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProjectFromResource(resourceDir);
