@@ -55,6 +55,10 @@
           <groupId>jakarta.validation</groupId>
           <artifactId>jakarta.validation-api</artifactId>
         </exclusion>
+        <exclusion>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
