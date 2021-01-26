@@ -14,82 +14,91 @@
 */
 package org.kie.server.services.jbpm.kafka;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.getTopicProperty;
 
 class DefaultEventProcessorFactory implements KafkaEventProcessorFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultEventProcessorFactory.class);
-
-    private Map<String, Map<ClassLoader, KafkaEventReader>> topicReaderMap = new ConcurrentHashMap<>();
-    private Map<ClassLoader, KafkaEventReader> readerInstanceMap = new ConcurrentHashMap<>();
+    private Map<ClassLoader, Map<String, KafkaEventReader>> topicReaderMap = new HashMap<>();
+    private Map<KafkaEventReader, Collection<String>> readerInstanceMap = new HashMap<>();
 
     private Map<String, KafkaEventWriter> topicWriterMap = new ConcurrentHashMap<>();
     private Map<String, KafkaEventWriter> writerInstanceMap = new ConcurrentHashMap<>();
 
-    private AtomicBoolean defaultWriterInitialized = new AtomicBoolean(false);
-    private KafkaEventWriter defaultWriterInstance;
-
     public KafkaEventReader getEventReader(String topic, ClassLoader cl) {
-        return topicReaderMap.computeIfAbsent(topic, t -> new ConcurrentHashMap<>()).computeIfAbsent(cl,
-                c -> buildReader(topic, cl));
+        String className = getTopicProperty(topic, "eventReaderClass", CloudEventReader.class.getName());
+        KafkaEventReader instance;
+        synchronized (topicReaderMap) {
+            instance = topicReaderMap.computeIfAbsent(cl, t -> new ConcurrentHashMap<>()).computeIfAbsent(
+                    className, c -> newReaderInstance(className, cl));
+            readerInstanceMap.computeIfAbsent(instance, i -> new HashSet<>()).add(topic);
+        }
+        return instance;
     }
 
     public KafkaEventWriter getEventWriter(String topic) {
         return topicWriterMap.computeIfAbsent(topic, this::buildWriter);
     }
 
-    private KafkaEventReader buildReader(String topic, ClassLoader cl) {
-        String className = getTopicProperty(topic, "eventReaderClass");
-        KafkaEventReader instance = null;
-        if (className != null) {
-            instance = readerInstanceMap.computeIfAbsent(cl, c -> newReaderInstance(className, cl));
-        }
-        return instance == null ? buildDefaultReader(cl) : instance;
-    }
-
     private KafkaEventWriter buildWriter(String topic) {
-        String className = getTopicProperty(topic, "eventWriterClass");
-        KafkaEventWriter instance = null;
-        if (className != null) {
-            instance = writerInstanceMap.computeIfAbsent(className, this::newWriterInstance);
-        }
-        if (defaultWriterInitialized.compareAndSet(false, true)) {
-            defaultWriterInstance = buildDefaultWriter();
-        }
-        return instance == null ? defaultWriterInstance : instance;
+        return writerInstanceMap.computeIfAbsent(getTopicProperty(topic, "eventWriterClass", CloudEventWriter.class
+                .getName()), this::newWriterInstance);
     }
 
     private KafkaEventReader newReaderInstance(String className, ClassLoader cl) {
         try {
             return Class.forName(className).asSubclass(KafkaEventReader.class).getConstructor(ClassLoader.class)
                     .newInstance(cl);
-        } catch (ReflectiveOperationException | ClassCastException ex) {
-            logger.error("Error instantiating class {}", className, ex);
-            return null;
+        } catch (ReflectiveOperationException ex) {
+            throw new IllegalArgumentException("Cannot instantiate KafkaEventReader class " + className +
+                                               ". Please review system property configuration and make sure class has a public constructor that accepts a ClassLoaderInstance",
+                    ex);
         }
     }
 
     private KafkaEventWriter newWriterInstance(String className) {
         try {
             return Class.forName(className).asSubclass(KafkaEventWriter.class).getConstructor().newInstance();
-        } catch (ReflectiveOperationException | ClassCastException ex) {
-            logger.error("Error instantiating class {}", className, ex);
-            return null;
+        } catch (ReflectiveOperationException ex) {
+            throw new IllegalArgumentException("Cannot instantiate KafkaEventWriter class " + className +
+                                               ". Please review system property configuration and make sure class has a default public constructor ",
+                    ex);
         }
     }
 
-    protected KafkaEventReader buildDefaultReader(ClassLoader cl) {
-        return new CloudEventReader(cl);
+    @Override
+    public void readerUndeployed(String topic, ClassLoader cl) {
+        String className = getTopicProperty(topic, "eventReaderClass", CloudEventReader.class.getName());
+        synchronized (topicReaderMap) {
+            Map<String, KafkaEventReader> map = topicReaderMap.get(cl);
+            if (map != null) {
+                KafkaEventReader instanceRemoved = map.get(className);
+                if (instanceRemoved != null) {
+                    Collection<String> topics = readerInstanceMap.get(instanceRemoved);
+                    if (topics.remove(topic) && topics.isEmpty()) {
+                        readerInstanceMap.remove(instanceRemoved);
+                        map.remove(className);
+                        if (map.isEmpty()) {
+                            topicReaderMap.remove(cl);
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    protected KafkaEventWriter buildDefaultWriter() {
-        return new CloudEventWriter();
+    @Override
+    public void close() {
+        synchronized (topicReaderMap) {
+            topicReaderMap.clear();
+            readerInstanceMap.clear();
+        }
+        topicWriterMap.clear();
+        writerInstanceMap.clear();
     }
 }

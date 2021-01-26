@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.jbpm.services.api.DeploymentEvent;
@@ -49,23 +49,26 @@ class KafkaServerRegistration {
     }
 
     Set<String> addRegistration(DeploymentEvent event) {
-        return updateRegistration(event, this::updateTopics);
-    }
-
-    Set<String> removeRegistration(DeploymentEvent event) {
-        return updateRegistration(event, this::removeTopics);
-    }
-
-    private synchronized Set<String> updateRegistration(DeploymentEvent event,
-                                                        BiConsumer<String, ProcessDefinition> updater) {
         for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
-            updater.accept(event.getDeploymentId(), (ProcessDefinition) asset);
+            updateTopics(event.getDeploymentId(), (ProcessDefinition) asset);
         }
+        return getTopicsRegistered();
+    }
+
+    Set<String> removeRegistration(DeploymentEvent event, Consumer<String> topicProcessed) {
+        for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
+            removeTopics(event.getDeploymentId(), (ProcessDefinition) asset, topicProcessed);
+        }
+        return getTopicsRegistered();
+    }
+
+    private Set<String> getTopicsRegistered() {
         Set<String> topics = new HashSet<>();
         topics.addAll(topic2Signal.keySet());
         topics.addAll(topic2Message.keySet());
         return topics;
     }
+
 
     private void updateTopics(String deploymentId, ProcessDefinition processDefinition) {
         if (processSignals()) {
@@ -76,9 +79,11 @@ class KafkaServerRegistration {
         }
     }
 
-    private void removeTopics(String deploymentId, ProcessDefinition processDefinition) {
-        removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
-        removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
+    private void removeTopics(String deploymentId,
+                              ProcessDefinition processDefinition,
+                              Consumer<String> topicProcessed) {
+        removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc(), topicProcessed);
+        removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc(), topicProcessed);
     }
 
     void forEachSignal(ConsumerRecord<String, byte[]> event, KafkaServerEventProcessor<SignalDesc> eventProcessor) {
@@ -117,11 +122,14 @@ class KafkaServerRegistration {
 
     private <T extends SignalDescBase> void removeTopics(Map<String, Map<T, Collection<String>>> topic2SignalBase,
                                                          String deploymentId,
-                                                         Collection<T> signalsDesc) {
+                                                         Collection<T> signalsDesc,
+                                                         Consumer<String> topicProcessed) {
+        Set<String> topicsRemoved = new HashSet<>();
         for (T signal : signalsDesc) {
             String topic = topicFromSignal(signal);
             Map<T, Collection<String>> signals = topic2SignalBase.get(topic);
             if (signals != null) {
+                topicsRemoved.add(topic);
                 Collection<String> deploymentIds = signals.get(signal);
                 if (deploymentIds != null) {
                     deploymentIds.remove(deploymentId);
@@ -133,6 +141,9 @@ class KafkaServerRegistration {
                     }
                 }
             }
+        }
+        for (String removed : topicsRemoved) {
+            topicProcessed.accept(removed);
         }
     }
 }

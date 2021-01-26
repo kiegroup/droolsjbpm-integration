@@ -59,6 +59,7 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
 
     private KafkaServerConsumer kafkaServerConsumer;
     private KafkaServerProducer kafkaServerProducer;
+    private KafkaEventProcessorFactory factory;
 
 
     private AtomicBoolean initialized = new AtomicBoolean();
@@ -105,7 +106,7 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         if (processService == null) {
             throw new IllegalStateException("Cannot find process service");
         }
-        KafkaEventProcessorFactory factory = buildEventProcessorFactory();
+        factory = buildEventProcessorFactory();
         kafkaServerConsumer = new KafkaServerConsumer(factory, this::getKafkaConsumer, processService);
         kafkaServerProducer = new KafkaServerProducer(factory, this::getKafkaProducer);
         deploymentService.addListener(this);
@@ -122,6 +123,8 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         kafkaServerConsumer = null;
         kafkaServerProducer.close(duration);
         kafkaServerProducer = null;
+        factory.close();
+        factory = null;
         deploymentService = null;
         initialized.set(false);
     }

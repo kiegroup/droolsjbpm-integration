@@ -81,8 +81,8 @@ class KafkaServerConsumer implements Runnable {
     }
 
     void removeRegistration(DeploymentEvent event) {
-        classLoaders.remove(event.getDeploymentId());
-        registrationUpdated(event, registration.removeRegistration(event));
+        ClassLoader cl = classLoaders.remove(event.getDeploymentId());
+        registrationUpdated(event, registration.removeRegistration(event, t -> factory.readerUndeployed(t, cl)));
     }
 
     void close(Duration duration) {
