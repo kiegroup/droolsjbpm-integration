@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerConfigItem;
@@ -81,6 +82,7 @@ public class KieServerInstanceManager {
                                                         logger.debug("Scanner failed to start on server instance {} due to {}",
                                                                      container.getUrl(),
                                                                      response.getMsg());
+                                                        container.setStatus(KieContainerStatus.FAILED);
                                                     }
                                                     collectContainerInfo(containerSpec,
                                                                          client,
@@ -140,6 +142,7 @@ public class KieServerInstanceManager {
                                                         logger.debug("Scanner (scan now) failed on server instance {} due to {}",
                                                                      container.getUrl(),
                                                                      response.getMsg());
+                                                        container.setStatus(KieContainerStatus.FAILED);
                                                     }
                                                     collectContainerInfo(containerSpec,
                                                                          client,
@@ -168,6 +171,9 @@ public class KieServerInstanceManager {
 
                 if (response.getType() != ServiceResponse.ResponseType.SUCCESS) {
                     log("Container {} failed to start on server instance {} due to {}", container, response, containerSpec);
+                    if (response.getType() == ServiceResponse.ResponseType.FAILURE) {
+                        container.setStatus(KieContainerStatus.FAILED);
+                    }
                 }
 
                 collectContainerInfo(containerSpec, client, container);
@@ -383,6 +389,10 @@ public class KieServerInstanceManager {
                     container.setServerTemplateId(serverTemplate.getId());
                     container.setStatus(containerResource.getStatus());
                     container.setMessages(containerResource.getMessages());
+                } else {
+                    if (!KieContainerStatus.STOPPED.equals(containerSpec.getStatus())) {
+                        container.setStatus(KieContainerStatus.FAILED);
+                    }
                 }
 
                 return null;
