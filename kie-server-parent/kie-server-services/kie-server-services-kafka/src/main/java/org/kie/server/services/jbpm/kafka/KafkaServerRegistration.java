@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.jbpm.services.api.DeploymentEvent;
@@ -35,6 +35,7 @@ import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.processSignals
 import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.topicFromSignal;
 
 class KafkaServerRegistration {
+
     private Map<String, Map<SignalDesc, Collection<String>>> topic2Signal = new HashMap<>();
     private Map<String, Map<MessageDesc, Collection<String>>> topic2Message = new HashMap<>();
 
@@ -43,24 +44,25 @@ class KafkaServerRegistration {
         topic2Message.clear();
     }
 
-
     synchronized boolean isEmpty() {
         return topic2Signal.isEmpty() && topic2Message.isEmpty();
     }
 
     Set<String> addRegistration(DeploymentEvent event) {
-        return updateRegistration(event, this::updateTopics);
-    }
-
-    Set<String> removeRegistration(DeploymentEvent event) {
-        return updateRegistration(event, this::removeTopics);
-    }
-
-    private synchronized Set<String> updateRegistration(DeploymentEvent event,
-                                                        BiConsumer<String, ProcessDefinition> updater) {
         for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
-            updater.accept(event.getDeploymentId(), (ProcessDefinition) asset);
+            updateTopics(event.getDeploymentId(), (ProcessDefinition) asset);
         }
+        return getTopicsRegistered();
+    }
+
+    Set<String> removeRegistration(DeploymentEvent event, Consumer<String> topicProcessed) {
+        for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
+            removeTopics(event.getDeploymentId(), (ProcessDefinition) asset, topicProcessed);
+        }
+        return getTopicsRegistered();
+    }
+
+    private Set<String> getTopicsRegistered() {
         Set<String> topics = new HashSet<>();
         topics.addAll(topic2Signal.keySet());
         topics.addAll(topic2Message.keySet());
@@ -76,9 +78,11 @@ class KafkaServerRegistration {
         }
     }
 
-    private void removeTopics(String deploymentId, ProcessDefinition processDefinition) {
-        removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc());
-        removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc());
+    private void removeTopics(String deploymentId,
+                              ProcessDefinition processDefinition,
+                              Consumer<String> topicProcessed) {
+        removeTopics(topic2Signal, deploymentId, processDefinition.getSignalsDesc(), topicProcessed);
+        removeTopics(topic2Message, deploymentId, processDefinition.getMessagesDesc(), topicProcessed);
     }
 
     void forEachSignal(ConsumerRecord<String, byte[]> event, KafkaServerEventProcessor<SignalDesc> eventProcessor) {
@@ -89,10 +93,9 @@ class KafkaServerRegistration {
         forEach(topic2Message, event, eventProcessor);
     }
 
-
     private synchronized <T extends SignalDescBase> void forEach(Map<String, Map<T, Collection<String>>> topic2SignalBase,
-                                                    ConsumerRecord<String, byte[]> event,
-                                                    KafkaServerEventProcessor<T> processor) {
+                                                                 ConsumerRecord<String, byte[]> event,
+                                                                 KafkaServerEventProcessor<T> processor) {
         Map<T, Collection<String>> signalInfo = topic2SignalBase.get(event.topic());
         if (signalInfo != null) {
             for (Map.Entry<T, Collection<String>> entry : signalInfo.entrySet()) {
@@ -117,14 +120,16 @@ class KafkaServerRegistration {
 
     private <T extends SignalDescBase> void removeTopics(Map<String, Map<T, Collection<String>>> topic2SignalBase,
                                                          String deploymentId,
-                                                         Collection<T> signalsDesc) {
+                                                         Collection<T> signalsDesc,
+                                                         Consumer<String> topicProcessed) {
+        Set<String> topicsPerDeployment = new HashSet<>();
         for (T signal : signalsDesc) {
             String topic = topicFromSignal(signal);
             Map<T, Collection<String>> signals = topic2SignalBase.get(topic);
             if (signals != null) {
                 Collection<String> deploymentIds = signals.get(signal);
-                if (deploymentIds != null) {
-                    deploymentIds.remove(deploymentId);
+                if (deploymentIds != null && deploymentIds.remove(deploymentId)) {
+                    topicsPerDeployment.add(topic);
                     if (deploymentIds.isEmpty()) {
                         signals.remove(signal);
                         if (signals.isEmpty()) {
@@ -133,6 +138,9 @@ class KafkaServerRegistration {
                     }
                 }
             }
+        }
+        for (String removed : topicsPerDeployment) {
+            topicProcessed.accept(removed);
         }
     }
 }
