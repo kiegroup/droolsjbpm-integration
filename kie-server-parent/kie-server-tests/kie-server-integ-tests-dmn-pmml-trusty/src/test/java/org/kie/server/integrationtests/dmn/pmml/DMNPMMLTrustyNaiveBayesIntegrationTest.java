@@ -1,5 +1,5 @@
-package org.kie.server.integrationtests.dmn.pmml;/*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+/*
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ package org.kie.server.integrationtests.dmn.pmml;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kie.server.integrationtests.dmn.pmml;
 
 import java.util.HashMap;
 import java.util.Map;

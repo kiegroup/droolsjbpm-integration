@@ -1,5 +1,5 @@
-package org.kie.server.integrationtests.dmn.pmml;/*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+/*
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,34 +12,16 @@ package org.kie.server.integrationtests.dmn.pmml;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kie.server.integrationtests.dmn.pmml;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assume;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.KieServices;
-import org.kie.dmn.api.core.DMNContext;
-import org.kie.dmn.api.core.DMNResult;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DMNPMMLTrustyNeuralNetworkIntegrationTest extends DMNPMMLTrustyKieServerBaseIntegrationTest {
-
-//    private static final ReleaseId kjar1 = new ReleaseId(
-//            "org.kie.server.testing", "dmn-pmml-trusty-nn-kjar",
-//            "1.0.0.Final" );
-//
-//    private static final String CONTAINER_1_ID  = "dmn-pml-trusty-neuralnetwork";
 
     private static final String NEURAL_NETWORK_MODEL_NAMESPACE
             = "https://kiegroup.org/dmn/_51A1FD67-8A67-4332-9889-B718BE8B7456";

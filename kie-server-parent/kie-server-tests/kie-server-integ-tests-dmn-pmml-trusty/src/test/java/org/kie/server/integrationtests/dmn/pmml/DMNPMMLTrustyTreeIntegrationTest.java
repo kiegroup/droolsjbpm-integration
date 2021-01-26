@@ -1,5 +1,5 @@
-package org.kie.server.integrationtests.dmn.pmml;/*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+/*
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ package org.kie.server.integrationtests.dmn.pmml;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kie.server.integrationtests.dmn.pmml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +21,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.ReleaseId;
 
-/*
- * This it.test is reportedly not working in the "embedded" EE container,
- * working correctly instead with the proper EE container activated with mvn profiles ("wildfly", etc.)
- */
 public class DMNPMMLTrustyTreeIntegrationTest extends DMNPMMLTrustyKieServerBaseIntegrationTest {
 
     private static final String TREE_MODEL_NAMESPACE
