@@ -16,7 +16,19 @@ package org.kie.server.services.jbpm.kafka;
 
 import java.io.IOException;
 
+/**
+ * Implements the logic to convert the byte[] contained in the value of a Kafka Record to a java object
+ */
 public interface KafkaEventReader {
 
+    /**
+     * Converts a byte[] to an object
+     * @param <T> object type
+     * @param value byte[] to be converted to object
+     * @param valueClazz the class of the result object
+     * @return object of specified type 
+     * @throws IOException if any input output exception class
+     * @throws ClassNotFoundException if any class contained in the object being built cannot be found
+     */
     <T> T readEvent(byte[] value, Class<T> valueClazz) throws IOException, ClassNotFoundException;
 }

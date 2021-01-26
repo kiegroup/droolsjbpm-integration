@@ -60,10 +60,6 @@ class KafkaServerUtils {
         return System.getProperty(TOPIC_PREFIX + name, name);
     }
 
-    static String getTopicProperty(String topic, String name) {
-        return System.getProperty(TOPIC_PREFIX + topic + "." + name);
-    }
-
     static KafkaEventProcessorFactory buildEventProcessorFactory() {
         final String className = System.getProperty(FACTORY_PROCESSOR_CLASS_NAME);
         KafkaEventProcessorFactory instance = null;
@@ -82,6 +78,10 @@ class KafkaServerUtils {
         return instance;
     }
 
+    static String getTopicProperty(String topic, String propName, String defaultValue) {
+        return System.getProperty(TOPIC_PREFIX + topic + "." + propName, System.getProperty(KAFKA_EXTENSION_PREFIX +
+                                                                                            propName, defaultValue));
+    }
 
     private static Mapping getMapping(String propName, Mapping defaultValue) {
         Mapping result = null;
