@@ -19,6 +19,7 @@ package org.kie.server.springboot.samples;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 
@@ -71,7 +72,7 @@ public class ProxyAwareKafkaEmitterTest extends KafkaFixture{
     
     @BeforeClass
     public static void beforeClass() {
-        checkRightOSForTestContainers();
+        assumeTrue(isDockerAvailable());
         System.setProperty("org.kie.jbpm.event.emitters.kafka.topic.processes", CUSTOM_PROCESSES_TOPIC);
         toxiproxy.start();
         kafkaProxy = toxiproxy.getProxy(kafka, TOXY_PROXY_PORT);

@@ -26,6 +26,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.drools.core.event.MessageEventImpl;
 import org.drools.core.event.SignalEventImpl;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.SimpleRegisterableItemsFactory;
 import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.DeploymentService;
@@ -37,6 +38,7 @@ import org.jbpm.workflow.core.Node;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.NodeInstance;
@@ -47,12 +49,14 @@ import org.kie.internal.runtime.manager.RuntimeEnvironment;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.jbpm.kafka.KafkaServerExtension.Mapping;
+import org.kie.server.services.jbpm.kafka.KafkaServerUtils.Mapping;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.MESSAGE_MAPPING_PROPERTY;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.SIGNAL_MAPPING_PROPERTY;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -86,10 +90,11 @@ public class KafkaServerExtensionProducerTest {
     private Node node;
     private InternalRegisterableItemsFactory itemsFactory;
     private RuntimeEngine runtimeEngine = mock(RuntimeEngine.class);
+    private KafkaEventReader eventReader = new CloudEventReader(Thread.currentThread().getContextClassLoader());
 
     @Before
     public void setup() {
-        System.setProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
+        System.setProperty(SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
         itemsFactory = new SimpleRegisterableItemsFactory();
         mockProducer = new MockProducer<>();
         extension = new MockKafkaServerExtension(mockProducer);
@@ -117,19 +122,24 @@ public class KafkaServerExtensionProducerTest {
         node = mock(Node.class);
         when(nInstance.getNode()).thenReturn(node);
         when(node.getMetaData()).thenReturn(Collections.emptyMap());
+        KModuleDeploymentUnit deploymentUnit = mock(KModuleDeploymentUnit.class);
+        when(deployedUnit.getDeploymentUnit()).thenReturn(deploymentUnit);
+        KieContainer kieContainer = mock(KieContainer.class);
+        when(deploymentUnit.getKieContainer()).thenReturn(kieContainer);
+        when(kieContainer.getClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
     }
 
     @After
     public void close() {
         extension.destroy(server, registry);
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
-        System.clearProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY);
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(MESSAGE_MAPPING_PROPERTY);
     }
 
     
 
     @Test 
-    public void testMessageSent() throws IOException, ParseException {
+    public void testMessageSent() throws IOException, ClassNotFoundException {
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onMessage(new MessageEventImpl(
                 pInstance, runtime, nInstance,
@@ -138,11 +148,11 @@ public class KafkaServerExtensionProducerTest {
         assertFalse(events.isEmpty());
         ProducerRecord<String, byte[]> event = events.get(0);
         assertEquals("MyMessage", event.topic());
-        assertEquals("Javierito", CloudEvent.read(event.value(), String.class).getData());
+        assertEquals("Javierito", eventReader.readEvent(event.value(), String.class));
     }
 
     @Test
-    public void testSignalSent() throws IOException, ParseException {
+    public void testSignalSent() throws IOException, ParseException, ClassNotFoundException {
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onSignal(new SignalEventImpl(
                 pInstance, runtime, nInstance, "MySignal", "Javierito")));
@@ -150,13 +160,13 @@ public class KafkaServerExtensionProducerTest {
         assertFalse(events.isEmpty());
         ProducerRecord<String, byte[]> event = events.get(0);
         assertEquals("MySignal", event.topic());
-        assertEquals("Javierito", CloudEvent.read(event.value(), String.class).getData());
+        assertEquals("Javierito", eventReader.readEvent(event.value(), String.class));
     }
 
     @Test
-    public void testSignalSentImplementation() throws IOException, ParseException {
+    public void testSignalSentImplementation() throws IOException, ClassNotFoundException {
         when(node.getMetaData()).thenReturn(Collections.singletonMap("implementation", "##kafka"));
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onSignal(new SignalEventImpl(
                 pInstance, runtime, nInstance, "MySignal", "Javierito")));
@@ -164,12 +174,12 @@ public class KafkaServerExtensionProducerTest {
         assertFalse(events.isEmpty());
         ProducerRecord<String, byte[]> event = events.get(0);
         assertEquals("MySignal", event.topic());
-        assertEquals("Javierito", CloudEvent.read(event.value(), String.class).getData());
+        assertEquals("Javierito", eventReader.readEvent(event.value(), String.class));
     }
 
     @Test
-    public void testSignalDisable() throws IOException, ParseException {
-        System.clearProperty(KafkaServerExtension.SIGNAL_MAPPING_PROPERTY);
+    public void testSignalDisable() throws IOException {
+        System.clearProperty(SIGNAL_MAPPING_PROPERTY);
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onSignal(new SignalEventImpl(
                 pInstance, runtime, nInstance, "MySignal", "Javierito")));
@@ -178,7 +188,7 @@ public class KafkaServerExtensionProducerTest {
 
     @Test
     public void testMessageDisable() throws IOException, ParseException {
-        System.setProperty(KafkaServerExtension.MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
+        System.setProperty(MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
         extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
         itemsFactory.getProcessEventListeners(runtimeEngine).forEach(l -> l.onMessage(new MessageEventImpl(
                 pInstance, runtime, nInstance, "MyMessage", "Javierito")));

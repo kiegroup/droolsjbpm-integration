@@ -94,11 +94,12 @@ public class JSONMarshaller implements Marshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(MarshallerFactory.class);
 
-    private static final boolean STRICT_ID_FORMAT = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_STRICT_ID_FORMAT, "false"));
+    private static final boolean STRICT_ID_FORMAT = Boolean.parseBoolean(
+            KieServerConstants.KIE_SERVER_STRICT_ID_FORMAT);
     private static final String FIELDS = "fields";
     private static final String NOT_NULL = "not_null";
 
-    private boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
+    private boolean formatDate;
     private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
     public static class JSONContext {
@@ -174,7 +175,17 @@ public class JSONMarshaller implements Marshaller {
         EXTENSIONS = Collections.unmodifiableList(loadedPlugins);
     }
 
+    public JSONMarshaller(boolean formatDate) {
+        this(null, null, formatDate);
+    }
+
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
+        this(classes, classLoader, Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date",
+                "false")));
+    }
+
+    public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader, boolean formatDate) {
+        this.formatDate = formatDate;
         this.classLoader = classLoader;
         buildMarshaller(classes, classLoader);
         configureMarshaller(classes, classLoader);
@@ -335,7 +346,6 @@ public class JSONMarshaller implements Marshaller {
         } finally {
             jsonContext.get().reset();
         }
-
     }
 
     @Override
@@ -348,7 +358,31 @@ public class JSONMarshaller implements Marshaller {
     }
 
     @Override
+    public byte[] marshallAsBytes(Object objectInput) {
+        try {
+            return getMapper(objectMapper, notNullObjectMapper).writeValueAsBytes(wrap(objectInput));
+        } catch (IOException e) {
+            throw new MarshallingException("Error marshalling input", e);
+        }
+
+    }
+
+
+    @Override
     public <T> T unmarshall(String serializedInput, Class<T> type) {
+
+        try {
+            Class<?> actualType = classesSet.contains(type) ? Object.class : type;
+            return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
+        } catch (IOException e) {
+            throw new MarshallingException("Error unmarshalling input", e);
+        } finally {
+            jsonContext.get().reset();
+        }
+    }
+
+    @Override
+    public <T> T unmarshall(byte[] serializedInput, Class<T> type) {
 
         try {
             Class<?> actualType = classesSet.contains(type) ? Object.class : type;
