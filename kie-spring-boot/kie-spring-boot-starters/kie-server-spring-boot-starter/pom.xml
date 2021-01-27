@@ -26,10 +26,6 @@
           <groupId>jakarta.validation</groupId>
           <artifactId>jakarta.validation-api</artifactId>
         </exclusion>
-        <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -66,10 +62,6 @@
         <exclusion>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
