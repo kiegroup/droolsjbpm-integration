@@ -16,72 +16,47 @@
 package org.kie.server.services.jbpm.kafka;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.Collections;
 
 import org.junit.Test;
+import org.kie.api.runtime.process.ProcessInstance;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import static org.kie.server.services.jbpm.kafka.KafkaJsonUtils.mapper;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CloudEventTest {
-    
+
     @Test
-    public void testStringCloudEventDeserialization() throws IOException, ParseException {
-        String cloudEventText = "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\",\"specversion\":\"1.0\",\"time\":\"2020-03-21T17:43:34.000GMT\"}";
-        CloudEvent<String> event = CloudEvent.read(cloudEventText.getBytes(), String.class);
-        assertEquals("javi",event.getId());
-        assertEquals("one",event.getType());
-        assertEquals("pepe",event.getSource());
+    public void testStringCloudEventDeserialization() throws IOException {
+        String cloudEventText =
+                "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\",\"specversion\":\"1.0\",\"time\":\"2020-03-21T17:43:34.000GMT\"}";
+        CloudEventReader reader = new CloudEventReader(Thread.currentThread().getContextClassLoader());
+        String event = reader.readEvent(cloudEventText.getBytes(), String.class);
+        assertEquals("javierito", event);
+    }
+
+    @Test
+    public void testPersonCloudEventDeserialization() throws IOException {
+        String cloudEventText =
+                "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":{\"name\":\"javierito\"},\"specversion\":\"1.0\",\"time\":\"2020-03-21T17:43:34.000GMT\"}";
+        CloudEventReader reader = new CloudEventReader(Thread.currentThread().getContextClassLoader());
+        Person event = reader.readEvent(cloudEventText.getBytes(), Person.class);
+        assertEquals("javierito", event.getName());
+    }
+
+    @Test
+    public void testPersonCloudEventSerialization() throws IOException {
+        CloudEventWriter writer = new CloudEventWriter();
+        ProcessInstance processInstance = mock(ProcessInstance.class);
+        when(processInstance.getId()).thenReturn(1L);
+        when(processInstance.getProcessId()).thenReturn("pepe");
+        CloudEvent<?> event = mapper.readValue(writer.writeEvent(processInstance, new Person("Javierito")),
+                CloudEvent.class);
+        assertEquals("org.kie.server.services.jbpm.kafka.Person", event.getType());
         assertEquals("1.0", event.getSpecversion());
-        assertEquals("javierito",event.getData());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(event.getTime());
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
-        assertEquals(17,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(2020,calendar.get(Calendar.YEAR));
+        assertEquals("/process/pepe/1", event.getSource());
+        assertEquals(Collections.singletonMap("name", "Javierito"), event.getData());
     }
-    
-    
-    private static class Person {
-        private String name;
-        
-        public Person(String name) {
-            this.name = name;
-        }
-
-        public Person() {}
-
-        public String getName() {
-            return name;
-        }
-    }
-    
-    @Test
-    public void testPersonCloudEventDeserialization() throws IOException, ParseException {
-        String cloudEventText = "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":{\"name\":\"javierito\"},\"specversion\":\"1.0\",\"time\":\"2020-03-21T17:43:34.000GMT\"}";
-        CloudEvent<Person> event = CloudEvent.read(cloudEventText.getBytes(), Person.class);
-        assertEquals("javi",event.getId());
-        assertEquals("one",event.getType());
-        assertEquals("pepe",event.getSource());
-        assertEquals("1.0", event.getSpecversion());
-        assertEquals("javierito",event.getData().getName());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(event.getTime());
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
-        assertEquals(17,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(2020,calendar.get(Calendar.YEAR));
-    }
-
-    @Test
-    public void testPersonCloudEventSerialization() throws IOException, ParseException {
-        String str = new String(CloudEvent.write("pepe", 1, new Person("Javierito")));
-        assertTrue(str.contains("\"type\":\"org.kie.server.services.jbpm.kafka.CloudEventTest$Person\""));
-        assertTrue(str.contains("\"specversion\":\"1.0\""));
-        assertTrue(str.contains("\"source\":\"/process/pepe/1\""));
-        assertTrue(str.contains("\"data\":{\"name\":\"Javierito\"}"));
-    }
-
 }

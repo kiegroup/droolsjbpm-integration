@@ -60,7 +60,7 @@ public class ConfigFileWatcher implements Runnable {
             } else {
                 log.warnv("configuration file does not exist {0} , creating...", this.toWatch);
                 String cfg = marshaller.marshall(configuration);
-                File file = new File(this.toWatch.toString() + "kie-server-router.json");
+                File file = new File(this.toWatch.toString());
                 if(file.createNewFile()){
                     try (FileOutputStream fos = new FileOutputStream(file); PrintWriter writer = new PrintWriter(fos)) {
                         writer.write(cfg);
