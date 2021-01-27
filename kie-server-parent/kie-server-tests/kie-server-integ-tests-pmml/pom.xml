@@ -128,11 +128,6 @@
       <artifactId>kie-server-rest-drools</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-scenario-simulation</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -283,8 +278,8 @@
       </activation>
       <properties>
         <kieserver.drools.enabled>true</kieserver.drools.enabled>
-        <kieserver.prometheus.enabled>true</kieserver.prometheus.enabled>
-        <kieserver.scenariosimulation.enabled>true</kieserver.scenariosimulation.enabled>
+        <kieserver.prometheus.enabled>false</kieserver.prometheus.enabled>
+        <kieserver.scenariosimulation.enabled>false</kieserver.scenariosimulation.enabled>
       </properties>
     </profile>
   </profiles>
