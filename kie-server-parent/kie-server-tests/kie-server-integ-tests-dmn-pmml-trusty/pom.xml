@@ -259,16 +259,6 @@
               <kie-pmml-implementation>new</kie-pmml-implementation>
             </systemProperties>
           </container>
-          <configuration>
-            <properties>
-              <cargo.start.jvmargs>
-                -Xdebug
-                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8787
-                -Xnoagent
-                -Djava.compiler=NONE
-              </cargo.start.jvmargs>
-            </properties>
-          </configuration>
         </configuration>
       </plugin>
     </plugins>
