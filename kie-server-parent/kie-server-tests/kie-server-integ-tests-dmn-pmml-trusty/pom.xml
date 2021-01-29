@@ -18,8 +18,8 @@
     <java.module.name>org.kie.server.itests.dmn.pmml-trusty</java.module.name>
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.kie.dmn.server.ext.disabled>false</org.kie.dmn.server.ext.disabled>
-    <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
-    <org.kie.scenariosimulation.server.ext.disabled>false</org.kie.scenariosimulation.server.ext.disabled>
+    <org.kie.prometheus.server.ext.disabled>true</org.kie.prometheus.server.ext.disabled>
+    <org.kie.scenariosimulation.server.ext.disabled>true</org.kie.scenariosimulation.server.ext.disabled>
     <version.properties.maven.plugin>1.0.0</version.properties.maven.plugin>
   </properties>
 
