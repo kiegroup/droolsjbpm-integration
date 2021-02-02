@@ -77,12 +77,12 @@ class KafkaServerConsumer implements Runnable {
     void addRegistration(DeploymentEvent event) {
         classLoaders.put(event.getDeploymentId(), ((KModuleDeploymentUnit) event.getDeployedUnit().getDeploymentUnit())
                 .getKieContainer().getClassLoader());
-        registrationUpdated(event, registration.addRegistration(event));
+        registrationUpdated(registration.addRegistration(event));
     }
 
     void removeRegistration(DeploymentEvent event) {
-        classLoaders.remove(event.getDeploymentId());
-        registrationUpdated(event, registration.removeRegistration(event));
+        ClassLoader cl = classLoaders.remove(event.getDeploymentId());
+        registrationUpdated(registration.removeRegistration(event, t -> factory.readerUndeployed(t, cl)));
     }
 
     void close(Duration duration) {
@@ -105,7 +105,7 @@ class KafkaServerConsumer implements Runnable {
     }
 
 
-    private void registrationUpdated(DeploymentEvent event, Set<String> topics2Register) {
+    private void registrationUpdated(Set<String> topics2Register) {
 
         if (consumerReady.compareAndSet(false, true)) {
             consumer = consumerSupplier.get();

@@ -27,6 +27,10 @@ class CloudEventWriter implements KafkaEventWriter {
 
     private Marshaller marshaller = new JSONMarshaller(true);
 
+    public CloudEventWriter() {
+        // need public constructor 
+    }
+
     @Override
     public byte[] writeEvent(ProcessInstance processInstance,
                              Object value) {
