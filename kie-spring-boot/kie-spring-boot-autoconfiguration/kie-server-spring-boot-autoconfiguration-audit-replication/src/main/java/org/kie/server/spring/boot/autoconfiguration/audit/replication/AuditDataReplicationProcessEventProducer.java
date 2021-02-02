@@ -102,7 +102,7 @@ public class AuditDataReplicationProcessEventProducer extends AbstractAuditLogge
     protected void slaProcessInstanceViolated(SLAViolatedEvent event) {
         ProcessInstanceLog log = (ProcessInstanceLog) getProcessInstanceMetadata(event.getProcessInstance(), METADATA_PROCESSINTANCE_LOG);
         if (log != null) {
-            jmsSender.sendMessage(log, NODE_SLA_VIOLATED);
+            jmsSender.sendMessage(log, PROCESS_SLA_VIOLATED);
         }
     }
 
@@ -110,7 +110,7 @@ public class AuditDataReplicationProcessEventProducer extends AbstractAuditLogge
     protected void slaNodeInstanceViolated(SLAViolatedEvent event) {
         NodeInstanceLog log = (NodeInstanceLog) getNodeInstanceMetadata(event.getNodeInstance(), METADATA_NODEINSTANCE_LOG);
         if (log != null) {
-            jmsSender.sendMessage(log, PROCESS_SLA_VIOLATED);
+            jmsSender.sendMessage(log, NODE_SLA_VIOLATED);
         }
     }
 
