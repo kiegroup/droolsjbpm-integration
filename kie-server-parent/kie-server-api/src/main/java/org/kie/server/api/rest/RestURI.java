@@ -246,6 +246,7 @@ public class RestURI {
     public static final String DOCUMENT_INSTANCE_DELETE_URI = "{" + DOCUMENT_ID + "}";
 
     // admin process related
+    public static final String MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/subprocess";
     public static final String MIGRATE_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID + "}";
     public static final String MIGRATE_PROCESS_INSTANCES_PUT_URI = "instances";
     public static final String CANCEL_NODE_INST_PROCESS_INST_DELETE_URI = "instances/{" + PROCESS_INST_ID + "}/nodeinstances/{" + NODE_INSTANCE_ID + "}";
