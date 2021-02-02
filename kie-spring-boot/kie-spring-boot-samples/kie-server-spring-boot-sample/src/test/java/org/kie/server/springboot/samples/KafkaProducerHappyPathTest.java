@@ -34,6 +34,7 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.task.deadlines.notifications.impl.NotificationListenerManager;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -143,6 +144,7 @@ public class KafkaProducerHappyPathTest extends KafkaFixture {
 
     @After
     public void cleanup() {
+        NotificationListenerManager.get().reset();
         abortAllProcesses(runtimeDataService, processService);
         cleanup(deploymentService, unit);
         if (kieServicesClient != null) {
