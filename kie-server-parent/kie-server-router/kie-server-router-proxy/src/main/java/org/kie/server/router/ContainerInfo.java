@@ -51,10 +51,6 @@ public class ContainerInfo {
         this.releaseId = releaseId;
     }
 
-    public String getKey() {
-        return alias + "-" + containerId + "-" + releaseId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
