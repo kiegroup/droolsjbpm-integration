@@ -16,12 +16,16 @@
 
 package org.kie.server.springboot.samples.utils;
 
-import java.time.Duration;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
+
+import com.github.dockerjava.api.DockerClient;
 
 public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
+    private static Logger logger = LoggerFactory.getLogger(KeycloakContainer.class);
+    
     public static final String KEYCLOAK_ADMIN_USER = "admin";
     public static final String KEYCLOAK_ADMIN_PASSWORD = "admin";
     private static final String KEYCLOAK_AUTH_PATH = "/auth";
@@ -31,8 +35,12 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
     private static final int KEYCLOAK_PORT_HTTP = Integer.getInteger("keycloak.http.port");
     
+    /**
+     * Create a KeycloakContainer from image and version at system properties.
+     * If that version is not found, it will use latest
+     */
     public KeycloakContainer() {
-        this(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION);
+        this(findImage());
     }
 
     /**
@@ -53,5 +61,16 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
     public String getAuthServerUrl() {
         return String.format("http://%s:%s%s", getContainerIpAddress(), getMappedPort(KEYCLOAK_PORT_HTTP), KEYCLOAK_AUTH_PATH);
+    }
+    
+    private static String findImage() {
+        DockerClient client = DockerClientFactory.instance().client();
+        String targetImage = KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION;
+        if (!client.listImagesCmd().withImageNameFilter(targetImage).exec().isEmpty()) { 
+            logger.info("Found '{}' image, using it", targetImage);
+            return targetImage;
+        }
+        logger.info("Not Found '{}' image, using latest", targetImage);
+        return KEYCLOAK_IMAGE + ":latest";
     }
 }
