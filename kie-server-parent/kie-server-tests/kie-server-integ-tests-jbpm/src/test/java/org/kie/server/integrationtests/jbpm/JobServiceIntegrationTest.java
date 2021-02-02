@@ -31,20 +31,26 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.internal.executor.api.STATUS;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
-
-import static org.junit.Assert.*;
-import static org.hamcrest.core.AnyOf.*;
-import static org.hamcrest.core.IsEqual.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+
+import static org.hamcrest.core.AnyOf.anyOf;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -250,6 +256,15 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleAndRequeueJob() throws Exception {
+        scheduleAndRequeueJob(0);
+    }
+
+    @Test
+    public void testScheduleAndRequeueJobSplit() throws Exception {
+        scheduleAndRequeueJob(100);
+    }
+
+    private void scheduleAndRequeueJob(int recordsPerTransaction) throws Exception {
         String command = "org.jbpm.executor.commands.LogCleanupCommand";
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -260,6 +275,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         data.put("SkipExecutorLog", "true");
         data.put("SingleRun", "true");
         data.put("retries", 0);
+        data.put("RecordsPerTransaction", recordsPerTransaction);
 
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
         jobRequestInstance.setCommand(command);
