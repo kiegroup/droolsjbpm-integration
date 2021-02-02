@@ -17,6 +17,7 @@
 package org.kie.server.springboot.samples;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,12 +52,15 @@ import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
 import org.kie.server.services.scenariosimulation.ScenarioSimulationKieServerExtension;
 import org.kie.server.springboot.jbpm.ContainerAliasResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -70,11 +74,14 @@ import static org.junit.Assert.assertNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-test.properties")
+@DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class KieServerTest {
 
     static final String ARTIFACT_ID = "evaluation";
     static final String GROUP_ID = "org.jbpm.test";
     static final String VERSION = "1.0.0";
+    
+    private static Logger logger = LoggerFactory.getLogger(KieServerTest.class);
 
     @LocalServerPort
     private int port;
@@ -190,6 +197,9 @@ public class KieServerTest {
 
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
         // find available tasks
+        List<TaskSummary> foundTasks = taskClient.findTasks(user, 0, 10);
+        logger.info("@@ foundTasks:"+foundTasks);
+        
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(user, 0, 10);
         assertEquals(1, tasks.size());
 
