@@ -87,7 +87,7 @@ public class SpringBootJBPMKieServerExtension extends JbpmKieServerExtension {
                                                                                  new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
                                                                                  new RuntimeDataServiceBase(runtimeDataService, advanceRuntimeDataService, context), new ExecutorServiceBase(executorService, context),
                                                                                  new QueryDataServiceBase(queryService, context),
-                                                                                 new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
+                                                                                 new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, runtimeDataService, context),
                                                                                  new UserTaskAdminServiceBase(userTaskAdminService, context));
     }
 
