@@ -341,7 +341,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                                                                                  new ExecutorServiceBase(executorService, context),
                                                                                  new QueryDataServiceBase(queryService, context),
                                                                                  new DocumentServiceBase(context),
-                                                                                 new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
+                                                                                 new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, runtimeDataService, context),
                                                                                  new UserTaskAdminServiceBase(userTaskAdminService, context));
     }
 
