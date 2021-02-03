@@ -233,7 +233,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
             String queryString = getPagingQueryString("?sort=" + sort + "&sortOrder=" + sortOrder, page, pageSize);
 
-            result = makeHttpGetRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
+            result = makeHttpGetRequestAndCreateCustomResponseWithHandleNotFound(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessesByDeploymentId", new Object[]{containerId, page, pageSize, sort, sortOrder})));
@@ -459,7 +459,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String statusQueryString = getAdditionalParams("?sort=" + sort + "&sortOrder=" + sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
-            result = makeHttpGetRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+            result = makeHttpGetRequestAndCreateCustomResponseWithHandleNotFound(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessInstancesByDeploymentId", new Object[]{containerId, safeList(status), page, pageSize, sort, sortOrder})));
