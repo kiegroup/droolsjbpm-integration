@@ -79,7 +79,6 @@ public class CaseQueryResourceTest {
         Integer pageSize= 10;
         String sort = "CorrelationKey";
         boolean sortOrder = true;
-        when(runtimeDataService.getCaseInstances(status, page, pageSize, sort, sortOrder)).thenReturn(new CaseInstanceList());
 
         caseQueryResource.getCaseInstances(httpHeaders, null, null, null, status, page, pageSize, sort, sortOrder, false);
         verify(kieServerRegistry).getContainer("");

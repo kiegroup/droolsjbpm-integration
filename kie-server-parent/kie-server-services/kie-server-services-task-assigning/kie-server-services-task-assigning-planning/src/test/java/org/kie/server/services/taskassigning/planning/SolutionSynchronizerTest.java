@@ -122,7 +122,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         List<TaskAssigningRuntimeDelegate.FindTasksResult> results = mockTasksQueryExecutions(firstQueryTime);
         LocalDateTime firstSuccessfulQueryTime = results.get(results.size() - 1).getQueryTime();
         queryExecutionsCountDown = new CountDownLatch(results.size());
-        prepareQueryExecutions(results);
+        prepareQueryExecutionsWithOutEmptyStatus(results);
 
         when(emptySolution.getTaskList()).thenReturn(Collections.emptyList());
         when(generatedSolution.getTaskList()).thenReturn(Collections.singletonList(new Task()));
@@ -219,9 +219,9 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
             nextQueryTime2 = context.shiftQueryTime(result2.getQueryTime())
         */
 
-        verify(delegate, times(1)).findTasks(anyList(), eq(startTime), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(tasksQueryResults.get(0).getQueryTime())), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(tasksQueryResults.get(1).getQueryTime())), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(startTime), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(tasksQueryResults.get(0).getQueryTime())), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(tasksQueryResults.get(1).getQueryTime())), anyObject());
 
         assertEquals(context.shiftQueryTime(tasksQueryResults.get(2).getQueryTime()), context.getNextQueryTime());
 
@@ -230,7 +230,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         assertEquals(generatedChanges, resultCaptor.getValue().getChanges());
     }
 
-    @Test
+    @Test(timeout = TEST_TIMEOUT)
     public void synchronizeSolutionWithNoChangesTimeout() throws Exception {
         CompletableFuture future = startRunnableBase();
         LocalDateTime startTime = LocalDateTime.now().withNano(0);
@@ -388,11 +388,11 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
             End of loop since results are produced.
         */
 
-        verify(delegate, times(1)).findTasks(anyList(), eq(startTime), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(results.get(0).getQueryTime())), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(results.get(1).getQueryTime())), anyObject());
-        verify(delegate, times(3)).findTasks(anyList(), eq(context.shiftQueryTime(results.get(2).getQueryTime())), anyObject());
-        verify(delegate, times(results.size())).findTasks(anyList(), anyObject(), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(startTime), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(results.get(0).getQueryTime())), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(results.get(1).getQueryTime())), anyObject());
+        verify(delegate, times(3)).findTasks(eq(null), eq(context.shiftQueryTime(results.get(2).getQueryTime())), anyObject());
+        verify(delegate, times(results.size())).findTasks(eq(null), anyObject(), anyObject());
     }
 
     /**
@@ -420,6 +420,11 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
     @SuppressWarnings("unchecked")
     private void prepareQueryExecutions(List<TaskAssigningRuntimeDelegate.FindTasksResult> results) {
+        doAnswer(createExecutions(results)).when(delegate).findTasks(eq(null), anyObject(), anyObject());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void prepareQueryExecutionsWithOutEmptyStatus(List<TaskAssigningRuntimeDelegate.FindTasksResult> results) {
         doAnswer(createExecutions(results)).when(delegate).findTasks(anyList(), anyObject(), anyObject());
     }
 

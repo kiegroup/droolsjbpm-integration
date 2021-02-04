@@ -191,7 +191,6 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         internalUserSystemKieContainerClassLoader = getClass().getClassLoader();
         internalSolverKieContainerClassLoader = getClass().getClassLoader();
         extension = spy(new TaskAssigningPlanningKieServerExtension());
-        when(kieServer.healthCheck(anyBoolean())).thenReturn(new ArrayList<>());
         prepareTaskAssigningServiceProperties();
         doReturn(taskAssigningService).when(extension).createTaskAssigningService(any());
     }
@@ -412,7 +411,6 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     public void serverStartedWithCreateSolverError() {
         System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
         enableExtension();
-        doReturn(userSystemService).when(extension).lookupUserSystem(eq(USER_SYSTEM_NAME), any());
         doThrow(new RuntimeException(ERROR_MESSAGE)).when(extension).createSolver(eq(registry), any());
         extension.init(kieServer, registry);
         extension.serverStarted();
@@ -443,7 +441,6 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     @Test
     public void serverStartedWithSolverContainerExistingButNeedsActivationFailed() {
         prepareServerStartWithSolverContainerConfig();
-        doReturn(solver).when(extension).createSolver(eq(registry), any());
         prepareExistingContainerButNeedsActivationFailed(SOLVER_CONTAINER_ID, solverContainer);
         extension.init(kieServer, registry);
         extension.serverStarted();
@@ -465,7 +462,6 @@ public class TaskAssigningPlanningKieServerExtensionTest {
     @Test
     public void serverStartedWithSolverContainerNotExistingButCreatedFailed() {
         prepareServerStartWithSolverContainerConfig();
-        doReturn(solver).when(extension).createSolver(eq(registry), any());
         prepareContainerNotExistingButCreatedFailed(SOLVER_CONTAINER_ID);
         extension.init(kieServer, registry);
         extension.serverStarted();

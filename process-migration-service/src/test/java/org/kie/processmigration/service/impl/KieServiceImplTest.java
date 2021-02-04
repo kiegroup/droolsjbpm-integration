@@ -41,6 +41,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wildfly.swarm.container.config.ConfigViewFactory;
 
+import static org.mockito.Mockito.times;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(KieServicesFactory.class)
 @PowerMockIgnore("javax.management.*")
@@ -87,7 +89,11 @@ public class KieServiceImplTest extends KieServiceImpl {
         kieService.loadConfigs();
         countDownLatch.await();
 
-        PowerMockito.verifyStatic(KieServicesFactory.class, Mockito.times(2));
+
+        PowerMockito.verifyStatic(KieServicesFactory.class, times(2));
+        KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class));
+        PowerMockito.verifyStatic(KieServicesFactory.class);
+        KieServicesFactory.newKieServicesClient(Mockito.any(KieServicesConfiguration.class));
         Collection<KieServerConfig> configs = kieService.getConfigs();
         Assert.assertNotNull(configs);
         Assert.assertEquals(1, configs.size());

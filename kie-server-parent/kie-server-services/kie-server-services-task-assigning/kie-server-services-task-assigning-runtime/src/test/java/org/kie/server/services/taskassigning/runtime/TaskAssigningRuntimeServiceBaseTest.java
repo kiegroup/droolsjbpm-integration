@@ -60,6 +60,7 @@ import static org.kie.server.services.taskassigning.runtime.TaskAssigningRuntime
 import static org.kie.server.services.taskassigning.runtime.TaskAssigningRuntimeServiceBase.TASK_MODIFIED_ERROR_MSG_3;
 import static org.kie.server.services.taskassigning.runtime.TaskAssigningRuntimeServiceBase.UNEXPECTED_ERROR_DURING_PLAN_CALCULATION;
 import static org.kie.server.services.taskassigning.runtime.TaskAssigningRuntimeServiceBase.UNEXPECTED_ERROR_DURING_PLAN_EXECUTION;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -229,7 +230,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
 
     @Test
     public void unexpectedErrorDuringPlanCalculation() {
-        when(queryHelper.readTasksDataSummary(anyInt(), any(), anyInt())).thenThrow(new RuntimeException(ERROR_MESSAGE));
+        when(queryHelper.readTasksDataSummary(anyLong(), any(), anyInt())).thenThrow(new RuntimeException(ERROR_MESSAGE));
         PlanningExecutionResult result = serviceBase.executePlanning(new PlanningItemList(Collections.emptyList()), USER_ID);
         assertHasError(result, PlanningExecutionResult.ErrorCode.UNEXPECTED_ERROR, String.format(UNEXPECTED_ERROR_DURING_PLAN_CALCULATION, ERROR_MESSAGE), null);
     }
@@ -255,7 +256,7 @@ public class TaskAssigningRuntimeServiceBaseTest {
     }
 
     private void prepareExecution(List<TaskData> taskDataList, String containerId) {
-        when(queryHelper.readTasksDataSummary(anyInt(), any(), anyInt())).thenReturn(taskDataList);
+        when(queryHelper.readTasksDataSummary(anyLong(), any(), anyInt())).thenReturn(taskDataList);
         when(registry.getContainer(containerId)).thenReturn(container);
         when(container.getStatus()).thenReturn(KieContainerStatus.STARTED);
     }
