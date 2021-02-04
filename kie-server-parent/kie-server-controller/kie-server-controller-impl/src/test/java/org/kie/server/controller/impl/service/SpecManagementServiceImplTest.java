@@ -620,7 +620,6 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         specManagementService.setTemplateStorage(templateStorage);
 
         doReturn(serverTemplate).when(templateStorage).load(serverTemplateId);
-        doReturn(null).when(serverTemplate).getContainersSpec();
 
         expectedException.expect(KieServerControllerIllegalArgumentException.class);
         expectedException.expectMessage("No container spec found for id containerSpecId within server template with id serverTemplateId");

@@ -520,7 +520,6 @@ public abstract class AbstractKieServerImplTest {
     @Test
     public void testUpdateContainerWithNullReleaseID() {
         KieServerExtension extension = mock(KieServerExtension.class);
-        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(false);
         extensions.add(extension);
 
         String containerId = "container-to-update";

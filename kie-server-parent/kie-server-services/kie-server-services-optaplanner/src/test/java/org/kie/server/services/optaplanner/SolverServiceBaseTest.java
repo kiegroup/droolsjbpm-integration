@@ -94,7 +94,6 @@ public class SolverServiceBaseTest {
         solverInstance.setSolverId(SOLVER_ID);
         solverInstance.setSolverConfigFile(SOLVER_CONFIG);
 
-        doReturn(CONTAINER_ID).when(containerInstance).getContainerId();
         doReturn(internalKieContainer).when(containerInstance).getKieContainer();
         doReturn(getClass().getClassLoader()).when(internalKieContainer).getClassLoader();
         doReturn(containerInstance).when(context).getContainer(CONTAINER_ID);
