@@ -121,7 +121,9 @@ public class KieServerExecutor {
         if (server == null) {
             throw new RuntimeException("Kie execution server is already stopped!");
         }
-        kieServer.destroy();
+        if (kieServer != null) {
+            kieServer.destroy();
+        }
         // The KieServices instance that was seen by the kieserver, will never be seen again at this point
         ((KieServicesImpl) KieServices.Factory.get()).nullAllContainerIds();
         server.stop();
