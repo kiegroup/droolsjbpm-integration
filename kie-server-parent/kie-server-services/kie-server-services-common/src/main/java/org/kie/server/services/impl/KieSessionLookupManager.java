@@ -47,4 +47,10 @@ public class KieSessionLookupManager {
 
         return commandExecutor;
     }
+
+    public void postLookup(String kieSessionId, KieContainerInstance containerInstance, CommandExecutor ks, KieServerRegistry registry) {
+        for (KieSessionLookupHandler handler : handlers) {
+            handler.postLookupKieSession(kieSessionId, containerInstance, ks, registry);
+        }
+    }
 }
