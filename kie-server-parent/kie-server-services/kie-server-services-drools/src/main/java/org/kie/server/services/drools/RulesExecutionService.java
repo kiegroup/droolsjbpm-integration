@@ -56,6 +56,7 @@ public class RulesExecutionService {
                 // if no session ID is defined, then use default stateful/stateless ksession.
                 ks = KieServerUtils.getDefaultKieSession((KieContainerInstanceImpl)kci);
             }
+            context.getKieSessionLookupManager().postLookup(command.getLookup(), kci, ks, context);
 
             if (ks != null) {
                 applyListeners(ks);

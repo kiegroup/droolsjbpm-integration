@@ -30,6 +30,8 @@ import org.kie.server.services.prometheus.PrometheusMetricsDroolsListener;
 
 public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
 
+    private static final String DEFAULT_KIE_SESSION_ID = "default";
+
     @Override
     public CommandExecutor lookupKieSession(String kieSessionId, KieContainerInstance containerInstance, KieServerRegistry registry) {
         CommandExecutor ks = null;
@@ -42,32 +44,36 @@ public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
                         break;
                     case STATELESS:
                         ks = ((KieContainerImpl)containerInstance.getKieContainer()).getStatelessKieSession(kieSessionId);
-
                         break;
                 }
             }
-
-            PrometheusKieServerExtension extension = (PrometheusKieServerExtension)registry.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
-            if (extension != null && ks != null) {
-                RuleRuntimeEventManager eventManager = (RuleRuntimeEventManager) ks;
-
-                //default handler
-                PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(PrometheusKieServerExtension.getMetrics(),
-                        kieSessionId, containerInstance);
-                eventManager.addEventListener(listener);
-
-                //custom handlers
-                List<AgendaEventListener> droolsListeners = extension.getDroolsListeners(kieSessionId, containerInstance);
-                droolsListeners.forEach(l -> {
-                    if (!eventManager.getAgendaEventListeners().contains(l)) {
-                        eventManager.addEventListener(l);
-                    }
-                });
-
-            }
             return ks;
         }
-
         return null;
+    }
+
+    @Override
+    public void postLookupKieSession(String kieSessionId, KieContainerInstance containerInstance, CommandExecutor ks, KieServerRegistry registry) {
+        PrometheusKieServerExtension extension = (PrometheusKieServerExtension)registry.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
+        if (extension != null && ks instanceof RuleRuntimeEventManager) {
+            RuleRuntimeEventManager eventManager = (RuleRuntimeEventManager) ks;
+
+            if (kieSessionId == null || kieSessionId.isEmpty()) {
+                kieSessionId = DEFAULT_KIE_SESSION_ID;
+            }
+
+            //default handler
+            PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(PrometheusKieServerExtension.getMetrics(),
+                    kieSessionId, containerInstance);
+            eventManager.addEventListener(listener);
+
+            //custom handlers
+            List<AgendaEventListener> droolsListeners = extension.getDroolsListeners(kieSessionId, containerInstance);
+            droolsListeners.forEach(l -> {
+                if (!eventManager.getAgendaEventListeners().contains(l)) {
+                    eventManager.addEventListener(l);
+                }
+            });
+        }
     }
 }

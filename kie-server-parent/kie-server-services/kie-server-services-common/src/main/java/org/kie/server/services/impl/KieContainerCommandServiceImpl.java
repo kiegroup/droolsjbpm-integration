@@ -94,6 +94,8 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     // if no session ID is defined, then use default stateful/stateless ksession.
                     ks = KieServerUtils.getDefaultKieSession(kci);
                 }
+                context.getKieSessionLookupManager().postLookup(sessionId, kci, ks, context);
+
                 if (ks != null) {
                     Class<? extends Command> type =  BatchExecutionCommandImpl.class;
                     if (classType != null && !classType.isEmpty()) {
