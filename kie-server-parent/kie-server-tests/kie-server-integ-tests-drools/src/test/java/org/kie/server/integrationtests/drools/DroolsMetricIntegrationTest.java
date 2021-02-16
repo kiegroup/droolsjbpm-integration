@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -43,7 +44,7 @@ import org.kie.server.integrationtests.shared.KieServerReflections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DroolsMetricIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -111,6 +112,7 @@ public class DroolsMetricIntegrationTest extends DroolsKieServerBaseIntegrationT
             String uriString = TestConfig.getKieServerHttpUrl().replaceAll("/server", "") + "/metrics";
 
             WebTarget clientRequest = newRequest(uriString);
+
             response = clientRequest.request(MediaType.TEXT_PLAIN_TYPE).get();
 
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -121,7 +123,8 @@ public class DroolsMetricIntegrationTest extends DroolsKieServerBaseIntegrationT
             assertThat(res).contains(
                 "drl_match_fired_nanosecond_bucket",
                 "drl_match_fired_nanosecond_count",
-                "drl_match_fired_nanosecond_sum"
+                "drl_match_fired_nanosecond_sum",
+                "ksessionId=\"kbase1.stateless\""
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -132,4 +135,48 @@ public class DroolsMetricIntegrationTest extends DroolsKieServerBaseIntegrationT
         }
     }
 
+    @Test
+    public void testWithoutLookup() {
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        ExecutionResults actualData = reply.getResult();
+        Object value = actualData.getValue(PERSON_OUT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Vader'",
+                PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(value, PERSON_SURNAME_FIELD));
+
+        Response response = null;
+        try {
+            String uriString = TestConfig.getKieServerHttpUrl().replaceAll("/server", "") + "/metrics";
+
+            WebTarget clientRequest = newRequest(uriString);
+
+            response = clientRequest.request(MediaType.TEXT_PLAIN_TYPE).get();
+
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            String res = response.readEntity(String.class);
+            logger.debug("response: " + res);
+            Assert.assertThat(res, not(isEmptyOrNullString()));
+            assertThat(res).contains(
+                "drl_match_fired_nanosecond_bucket",
+                "drl_match_fired_nanosecond_count",
+                "drl_match_fired_nanosecond_sum",
+                "ksessionId=\"default\""
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
 }
