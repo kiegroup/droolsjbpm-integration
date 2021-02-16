@@ -15,6 +15,8 @@
 
 package org.kie.server.client;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.kie.api.command.Command;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
@@ -80,7 +82,19 @@ public interface KieServicesClient {
      * @deprecated
      */
     @Deprecated
-    ServiceResponse<String> executeCommands(String id, Command<?> cmd);
+    default ServiceResponse<String> executeCommands(String id, Command<?> cmd) {
+        return executeCommands(id, cmd, Status.OK);
+    }
+
+    /**
+     * This method is deprecated on KieServicesClient as it was moved to RuleServicesClient
+     * @see RuleServicesClient#executeCommands(String, Command)
+     * @deprecated
+     */
+    @Deprecated
+    default ServiceResponse<String> executeCommands(String id, Command<?> cmd, Status response) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Sets the classloader for user class unmarshalling

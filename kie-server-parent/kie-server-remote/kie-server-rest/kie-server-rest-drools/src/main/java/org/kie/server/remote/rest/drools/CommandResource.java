@@ -15,12 +15,6 @@
 
 package org.kie.server.remote.rest.drools;
 
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
-import static org.kie.server.remote.rest.common.util.RestUtils.getClassType;
-import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
-import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,8 +24,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.rest.RestURI;
@@ -43,11 +43,14 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.OK;
+import static org.kie.server.api.model.KieServiceResponse.ResponseType.FAILURE;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getClassType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 
 @Api(value="KIE session assets")
 @Path("server/containers/instances/{" + RestURI.CONTAINER_ID + "}")
@@ -69,9 +72,11 @@ public class CommandResource {
         this.marshallerHelper = new MarshallerHelper(registry);
     }
 
-    @ApiOperation(value="Executes one or more runtime commands",
-            response=ServiceResponse.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
+    @ApiOperation(value = "Executes one or more runtime commands" )
+    @ApiResponses({@ApiResponse(code = 200, message = "Successful execution", response = ServiceResponse.class),
+                   @ApiResponse(code = 500, message = "Unexpected error", response = ServiceResponse.class),
+                   @ApiResponse(code = 204, message = "Command execute successfully, but without response",
+                                response = ServiceResponse.class)})
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -88,20 +93,22 @@ public class CommandResource {
             format = MarshallingFormat.valueOf(contentType);
         }
         logger.debug("Received request with content '{}'", cmdPayload);
-        Object result = delegate.callContainer(id, cmdPayload, format, classType);
         Header conversationIdHeader = buildConversationIdHeader(id, registry, headers);
+        @SuppressWarnings("squid:S3740")
+        ServiceResponse<?> result = delegate.callContainer(id, cmdPayload, format, classType);
+        Status status = result.getType() == FAILURE ? INTERNAL_SERVER_ERROR : OK;
         try {
-            String response = marshallerHelper.marshal(id, format.getType(), result, ContainerLocatorProvider.get().getLocator());
-            logger.debug("Returning OK response with content '{}'", response);
+            String response = marshallerHelper.marshal(id, format.getType(), result, ContainerLocatorProvider
+                    .get()
+                    .getLocator());
+            logger.debug("Returning {} response with content '{}'", status, response);
 
-            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
+            return createResponse(response, v, status, conversationIdHeader);
         } catch (IllegalArgumentException e) {
             // in case marshalling failed return the call container response to keep backward compatibility
             String response = marshallerHelper.marshal(format.getType(), result);
-            logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
+            logger.debug("Returning {} response with content '{}'", status, response);
+            return createResponse(response, v, status, conversationIdHeader);
         }
-
     }
-
 }

@@ -15,8 +15,6 @@
 
 package org.kie.server.integrationtests.drools.rest;
 
-import static org.junit.Assert.assertEquals;
-
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -34,6 +32,8 @@ import org.kie.server.integrationtests.category.RESTOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
+
+import static org.junit.Assert.assertEquals;
 
 @Category(RESTOnly.class)
 public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -62,7 +62,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
 
             WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/instances/" + CONTAINER_ID);
             response = clientRequest.request(getMediaType()).post(createEntity(body));
-            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
 
             ServiceResponse<KieContainerResource> serviceResponse =
                     response.readEntity(new GenericType<ServiceResponse<KieContainerResource>>(){});
@@ -87,7 +87,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
 
             WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/instances/" + CONTAINER_ID);
             response = clientRequest.request(getMediaType()).post(createEntity(body));
-            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
 
             ServiceResponse<KieContainerResource> serviceResponse =
                     response.readEntity(new GenericType<ServiceResponse<KieContainerResource>>(){});

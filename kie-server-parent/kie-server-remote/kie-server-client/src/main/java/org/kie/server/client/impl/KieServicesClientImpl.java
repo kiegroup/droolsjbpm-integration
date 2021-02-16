@@ -15,10 +15,17 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.kie.api.command.Command;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.commands.GetReleaseIdCommand;
-import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.commands.ActivateContainerCommand;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
@@ -26,13 +33,16 @@ import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DeactivateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
+import org.kie.server.api.commands.GetReleaseIdCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerCommand;
@@ -43,20 +53,12 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.helper.KieServicesClientBuilder;
 import org.kie.server.client.jms.RequestReplyResponseHandler;
 import org.kie.server.client.jms.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
 
 public class KieServicesClientImpl extends AbstractKieServicesClientImpl implements KieServicesClient {
 
@@ -356,9 +358,11 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
      */
     @Deprecated
     @Override
-    public ServiceResponse<String> executeCommands(String id, Command<?> cmd) {
+    public ServiceResponse<String> executeCommands(String id, Command<?> cmd, Status status) {
         if( config.isRest() ) {
-            return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(loadBalancer.getUrl() + "/containers/instances/" + id, cmd, String.class, getHeaders(cmd) );
+            return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(loadBalancer.getUrl() +
+                                                                                 "/containers/instances/" + id, cmd,
+                    String.class, getHeaders(cmd), status);
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CallContainerCommand(id, serialize(cmd))));
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, cmd.getClass().getName(), null, id).getResponses().get(0);

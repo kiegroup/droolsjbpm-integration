@@ -15,6 +15,8 @@
 
 package org.kie.server.client;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.ServiceResponse;
@@ -36,7 +38,11 @@ public interface RuleServicesClient {
 
     ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, String payload);
 
-    ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd);
+    default ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd) {
+        return executeCommandsWithResults(id, cmd, Status.OK);
+    }
+
+    ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd, Status status);
 
     void setResponseHandler(ResponseHandler responseHandler);
 }
