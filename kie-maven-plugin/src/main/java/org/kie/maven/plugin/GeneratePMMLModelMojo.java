@@ -244,7 +244,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         CompositeKnowledgeBuilder batch = modelBuilder.batch();
         List<KiePMMLModel> kiepmmlModels = pmmlResources.getKiePmmlModels();
         addModels(kiepmmlModels, pmmlResources, batch, toReturn);
-        toReturn.addAll(generateRules(modelBuilder, batch));
+//        toReturn.addAll(generateRules(modelBuilder, batch));
         return toReturn;
     }
 
@@ -269,50 +269,60 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 String path = sourceMapEntry.getKey().replace('.', File.separatorChar) + ".java";
                 generatedFiles.add(new GeneratedFile(GeneratedFile.Type.PMML, path, sourceMapEntry.getValue()));
             }
-            if (model instanceof KiePMMLDroolsModelWithSources) {
-                PackageDescr packageDescr = ((KiePMMLDroolsModelWithSources) model).getPackageDescr();
-                batch.add(new DescrResource(packageDescr), ResourceType.DESCR);
+            Map<String, String> rulesSourceMap = ((HasSourcesMap) model).getRulesSourcesMap();
+            if (rulesSourceMap != null) {
+                for (Map.Entry<String, String> rulesSourceMapEntry : rulesSourceMap.entrySet()) {
+                    String path = rulesSourceMapEntry.getKey().replace('.', File.separatorChar) + ".java";
+                    generatedFiles.add(new GeneratedFile(GeneratedFile.Type.RULE, path, rulesSourceMapEntry.getValue()));
+                }
             }
+
+//            if (model instanceof KiePMMLDroolsModelWithSources) {
+//
+//
+//                PackageDescr packageDescr = ((KiePMMLDroolsModelWithSources) model).getPackageDescr();
+//                batch.add(new DescrResource(packageDescr), ResourceType.DESCR);
+//            }
             if (model instanceof HasNestedModels) {
                 addModels(((HasNestedModels) model).getNestedModels(), resource, batch, generatedFiles);
             }
         }
     }
 
-    private List<GeneratedFile> generateRules(ModelBuilderImpl<PackageSources> modelBuilder,
-                                              CompositeKnowledgeBuilder batch) {
-        try {
-            batch.build();
-            if (modelBuilder.hasErrors()) {
-                StringBuilder builder = new StringBuilder();
-                for (DroolsError error : modelBuilder.getErrors().getErrors()) {
-                    logger.error(error.toString());
-                    builder.append(error.toString()).append(" ");
-                }
-                throw new MojoExecutionException(builder.toString());
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            StringBuilder builder = new StringBuilder(e.getMessage()).append(" ");
-            for (DroolsError error : modelBuilder.getErrors().getErrors()) {
-                logger.error(error.toString());
-                builder.append(error.toString()).append(" ");
-            }
-            throw new RuntimeException(builder.toString(), e);
-        }
-        return generateModels(modelBuilder)
-                .stream()
-                .map(f -> new GeneratedFile(GeneratedFile.Type.RULE, f.getPath(), new String(f.getData())))
-                .collect(toList());
-    }
+//    private List<GeneratedFile> generateRules(ModelBuilderImpl<PackageSources> modelBuilder,
+//                                              CompositeKnowledgeBuilder batch) {
+//        try {
+//            batch.build();
+//            if (modelBuilder.hasErrors()) {
+//                StringBuilder builder = new StringBuilder();
+//                for (DroolsError error : modelBuilder.getErrors().getErrors()) {
+//                    logger.error(error.toString());
+//                    builder.append(error.toString()).append(" ");
+//                }
+//                throw new MojoExecutionException(builder.toString());
+//            }
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//            StringBuilder builder = new StringBuilder(e.getMessage()).append(" ");
+//            for (DroolsError error : modelBuilder.getErrors().getErrors()) {
+//                logger.error(error.toString());
+//                builder.append(error.toString()).append(" ");
+//            }
+//            throw new RuntimeException(builder.toString(), e);
+//        }
+//        return generateModels(modelBuilder)
+//                .stream()
+//                .map(f -> new GeneratedFile(GeneratedFile.Type.RULE, f.getPath(), new String(f.getData())))
+//                .collect(toList());
+//    }
 
-    List<org.drools.modelcompiler.builder.GeneratedFile> generateModels(ModelBuilderImpl<PackageSources> modelBuilder) {
-        List<org.drools.modelcompiler.builder.GeneratedFile> toReturn = new ArrayList<>();
-        for (PackageSources pkgSources : modelBuilder.getPackageSources()) {
-            pkgSources.collectGeneratedFiles(toReturn);
-        }
-        return toReturn;
-    }
+//    List<org.drools.modelcompiler.builder.GeneratedFile> generateModels(ModelBuilderImpl<PackageSources> modelBuilder) {
+//        List<org.drools.modelcompiler.builder.GeneratedFile> toReturn = new ArrayList<>();
+//        for (PackageSources pkgSources : modelBuilder.getPackageSources()) {
+//            pkgSources.collectGeneratedFiles(toReturn);
+//        }
+//        return toReturn;
+//    }
 
     private PMMLResource parseResource(Resource resource) {
         final InternalKnowledgeBase knowledgeBase = new KnowledgeBaseImpl("PMML", null);
