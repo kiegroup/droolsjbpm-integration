@@ -87,6 +87,7 @@ public class RestURI {
     // uris
     // process related prefixed by PROCESS_URI
     public static final String START_PROCESS_POST_URI = "{" + PROCESS_ID + "}/instances";
+    public static final String START_SYNC_PROCESS_POST_URI = "{" + PROCESS_ID + "}/syncInstances";
     public static final String START_PROCESS_FROM_NODES_POST_URI = "{" + PROCESS_ID + "}/instances/fromNodes";
     public static final String START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI = "{" + PROCESS_ID + "}/instances/correlation/{" + CORRELATION_KEY + "}/fromNodes";
     public static final String START_PROCESS_WITH_CORRELATION_KEY_POST_URI = "{" + PROCESS_ID + "}/instances/correlation/{" + CORRELATION_KEY + "}";

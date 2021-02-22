@@ -90,6 +90,7 @@ import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
+import static org.kie.server.api.rest.RestURI.START_SYNC_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.TASK_NAME;
 import static org.kie.server.api.rest.RestURI.VAR_NAME;
 import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
@@ -328,6 +329,35 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
         return ((Number) result).longValue();
     }
 
+
+    @Override
+    public Map<String, Object> startSynchronousProcess(String containerId, String processId, Map<String, Object> variables) {
+        Object result = null;
+
+        if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
+            result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + START_SYNC_PROCESS_POST_URI, valuesMap), variables,
+                    Object.class);
+
+        } else {
+            CommandScript script = new CommandScript(singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "startSynchronousProcess", serialize(safeMap(variables)), marshaller.getFormat().getType(), new Object[]{containerId, processId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = deserialize(response.getResult(), Map.class);
+        }
+
+        return (Map<String, Object>) result;
+    }
 
     @Override
     public Long startProcessFromNodeIds(String containerId, String processId, Map<String, Object> variables, String... nodes) {
