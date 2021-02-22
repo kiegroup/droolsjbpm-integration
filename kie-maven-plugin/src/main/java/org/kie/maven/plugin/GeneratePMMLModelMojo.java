@@ -44,19 +44,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.drools.compiler.builder.impl.KnowledgeBuilderConfigurationImpl;
 import org.drools.compiler.builder.impl.KnowledgeBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.io.impl.FileSystemResource;
 import org.drools.modelcompiler.builder.GeneratedFile;
-import org.drools.modelcompiler.builder.ModelBuilderImpl;
-import org.drools.modelcompiler.builder.PackageSources;
 import org.kie.api.KieServices;
 import org.kie.api.io.Resource;
-import org.kie.internal.builder.CompositeKnowledgeBuilder;
 import org.kie.pmml.commons.model.HasNestedModels;
 import org.kie.pmml.commons.model.HasSourcesMap;
 import org.kie.pmml.commons.model.KiePMMLModel;
@@ -230,20 +225,13 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
     private List<GeneratedFile> getGenerateFiles(final PMMLResource pmmlResources) {
         final List<GeneratedFile> toReturn = new ArrayList<>();
-        ModelBuilderImpl<PackageSources> modelBuilder = new ModelBuilderImpl<>(PackageSources::dumpSources,
-                                                                               new KnowledgeBuilderConfigurationImpl(getClass().getClassLoader()),
-                                                                               new ReleaseIdImpl("dummy:dummy:0.0" +
-                                                                                                         ".0"),
-                                                                               true, false);
-        CompositeKnowledgeBuilder batch = modelBuilder.batch();
         List<KiePMMLModel> kiepmmlModels = pmmlResources.getKiePmmlModels();
-        addModels(kiepmmlModels, pmmlResources, batch, toReturn);
+        addModels(kiepmmlModels, pmmlResources, toReturn);
         return toReturn;
     }
 
     private void addModels(final List<KiePMMLModel> kiepmmlModels,
                            final PMMLResource resource,
-                           final CompositeKnowledgeBuilder batch,
                            final List<GeneratedFile> generatedFiles) {
         for (KiePMMLModel model : kiepmmlModels) {
             if (model.getName() == null || model.getName().isEmpty()) {
@@ -270,7 +258,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 }
             }
             if (model instanceof HasNestedModels) {
-                addModels(((HasNestedModels) model).getNestedModels(), resource, batch, generatedFiles);
+                addModels(((HasNestedModels) model).getNestedModels(), resource, generatedFiles);
             }
         }
     }
