@@ -59,8 +59,89 @@
                 "methodName": "startSynchronousProcess",
                 "elementKind": "method",
                 "justification": "[JBPM-9624] Return the process variables for synchronous execution use cases"
+            },
+            {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::addBusinessAdmins(java.lang.String, java.lang.String, java.lang.Long, boolean, org.kie.server.api.model.admin.OrgEntities)",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "addBusinessAdmins",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::addExcludedOwners(java.lang.String, java.lang.String, java.lang.Long, boolean, org.kie.server.api.model.admin.OrgEntities)",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "addExcludedOwners",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::addPotentialOwners(java.lang.String, java.lang.String, java.lang.Long, boolean, org.kie.server.api.model.admin.OrgEntities)",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "addPotentialOwners",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::removeBusinessAdminGroups(java.lang.String, java.lang.String, java.lang.Long, java.lang.String[])",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "removeBusinessAdminGroups",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::removeBusinessAdminUsers(java.lang.String, java.lang.String, java.lang.Long, java.lang.String[])",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "removeBusinessAdminUsers",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::removeExcludedOwnerGroups(java.lang.String, java.lang.String, java.lang.Long, java.lang.String[])",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "removeExcludedOwnerGroups",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::removeExcludedOwnerUsers(java.lang.String, java.lang.String, java.lang.Long, java.lang.String[])",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "removeExcludedOwnerUsers",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::removePotentialOwnerGroups(java.lang.String, java.lang.String, java.lang.Long, java.lang.String[])",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "removePotentialOwnerGroups",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+               "code": "java.method.addedToInterface",
+               "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::removePotentialOwnerUsers(java.lang.String, java.lang.String, java.lang.Long, java.lang.String[])",
+               "package": "org.kie.server.client.admin",
+               "classSimpleName": "UserTaskAdminServicesClient",
+               "methodName": "removePotentialOwnerUsers",
+               "elementKind": "method",
+               "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
              }
-           ]
+            ]
         }
     }
 }
