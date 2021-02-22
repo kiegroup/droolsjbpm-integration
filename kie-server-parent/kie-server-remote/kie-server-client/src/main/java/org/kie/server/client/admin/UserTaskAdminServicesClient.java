@@ -38,6 +38,19 @@ public interface UserTaskAdminServicesClient {
 
     void removeBusinessAdminUsers(String containerId, Long taskId, String ...users);
 
+    void addPotentialOwners(String userId, String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities);
+
+    void addExcludedOwners(String userId, String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities);
+
+    void addBusinessAdmins(String userId, String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities);
+
+    void removePotentialOwnerUsers(String userId, String containerId, Long taskId, String ...users);
+
+    void removeExcludedOwnerUsers(String userId, String containerId, Long taskId, String ...users);
+
+    void removeBusinessAdminUsers(String userId, String containerId, Long taskId, String ...users);
+    
+
     void removePotentialOwnerGroups(String containerId, Long taskId, String ...groups);
 
     void removeExcludedOwnerGroups(String containerId, Long taskId, String ...groups);
@@ -75,5 +88,11 @@ public interface UserTaskAdminServicesClient {
     void acknowledgeError(String containerId, String... errorId);
 
     ExecutionErrorInstance getError(String containerId, String errorId);
+
+    void removePotentialOwnerGroups(String userId, String containerId, Long taskId, String... groups);
+
+    void removeExcludedOwnerGroups(String userId, String containerId, Long taskId, String... groups);
+
+    void removeBusinessAdminGroups(String userId, String containerId, Long taskId, String... groups);
 
 }
