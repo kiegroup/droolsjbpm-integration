@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.integrationtests.dmn;
+package org.kie.server.integrationtests.dmn.modelspecific;
 
 import java.util.Map;
 
