@@ -61,6 +61,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String CONTAINER_ID_NOTIFICATION = "notification-project";
    
     protected static final String PROCESS_ID_RESTART = "restart-project.simple";
+    protected static final String PROCESS_SYNC_ID = "restart-project.syncProcess";
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
     protected static final String PROCESS_ID_USERTASK2 = "definition-project.usertask2";
     protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
