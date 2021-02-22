@@ -16,13 +16,19 @@
 package org.kie.server.services.dmn;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.kie.api.runtime.KieRuntimeFactory;
+import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNModel;
+import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.ast.DecisionServiceNode;
@@ -32,6 +38,7 @@ import org.kie.dmn.core.ast.InputDataNodeImpl;
 import org.kie.dmn.core.ast.ItemDefNodeImpl;
 import org.kie.dmn.core.internal.utils.DMNEvaluationUtils;
 import org.kie.dmn.core.internal.utils.DMNEvaluationUtils.DMNEvaluationResult;
+import org.kie.dmn.core.internal.utils.DynamicDMNContextBuilder;
 import org.kie.dmn.model.api.InputData;
 import org.kie.dmn.model.api.ItemDefinition;
 import org.kie.server.api.model.ServiceResponse;
@@ -46,6 +53,9 @@ import org.kie.server.api.model.dmn.DMNQNameInfo;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.dmn.DMNUnaryTestsInfo;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.dmn.modelspecific.Consts;
+import org.kie.server.services.dmn.modelspecific.DMNFEELComparablePeriodSerializer;
+import org.kie.server.services.dmn.modelspecific.KogitoDMNResult;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -60,6 +70,14 @@ public class ModelEvaluatorServiceBase {
 
     private KieServerRegistry context;
     private MarshallerHelper marshallerHelper;
+    
+    private static final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper()
+            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
+            .registerModule(new com.fasterxml.jackson.databind.module.SimpleModule()
+                            .addSerializer(org.kie.dmn.feel.lang.types.impl.ComparablePeriod.class,
+                                           new DMNFEELComparablePeriodSerializer()))
+            .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
 
     public ModelEvaluatorServiceBase(KieServerRegistry context) {
         this.context = context;
@@ -158,21 +176,7 @@ public class ModelEvaluatorServiceBase {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
             DMNRuntime dmnRuntime = KieRuntimeFactory.of(kContainer.getKieContainer().getKieBase()).get(DMNRuntime.class);
 
-            PrometheusKieServerExtension extension = (PrometheusKieServerExtension)context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
-            if (extension != null) {
-                //default handler
-                PrometheusMetricsDMNListener listener = new PrometheusMetricsDMNListener(PrometheusKieServerExtension.getMetrics(), kContainer);
-                dmnRuntime.addListener(listener);
-
-                //custom handler
-                List<DMNRuntimeEventListener> listeners = extension.getDMNRuntimeListeners(kContainer);
-                listeners.forEach(l -> {
-                    if (!dmnRuntime.getListeners().contains(l)) {
-                        dmnRuntime.addListener(l);
-                    }
-                });
-
-            }
+            wirePrometheus(kContainer, dmnRuntime);
 
             LOG.debug("Will deserialize payload: {}", contextPayload);
             DMNContextKS evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNContextKS.class);
@@ -201,6 +205,63 @@ public class ModelEvaluatorServiceBase {
                     ServiceResponse.ResponseType.FAILURE,
                     "Error from container '" + containerId + "'" + e.getMessage(),
                     null );
+        }
+    }
+
+    public Response evaluateModel(String containerId, String modelId, String contextPayload, boolean asDmnResult) {
+        try {
+            KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
+            DMNRuntime dmnRuntime = KieRuntimeFactory.of(kContainer.getKieContainer().getKieBase()).get(DMNRuntime.class);
+
+            List<DMNModel> modelsWithID = dmnRuntime.getModels().stream().filter(m -> m.getName().equals(modelId)).collect(Collectors.toList());
+            if (modelsWithID.isEmpty()) {
+                return Response.serverError().entity("No model identifies with modelId: " + modelId).build();
+            } else if (modelsWithID.size() > 1) {
+                return Response.serverError().entity("More than one existing DMN model having modelId: " + modelId).build();
+            }
+            DMNModel dmnModel = modelsWithID.get(0);
+
+            Map<String, Object> jsonContextMap = objectMapper.readValue(contextPayload, new TypeReference<Map<String, Object>>() {});
+            DMNContext dmnContext = new DynamicDMNContextBuilder(dmnRuntime.newContext(), dmnModel).populateContextWith(jsonContextMap);
+
+            wirePrometheus(kContainer, dmnRuntime);
+
+            DMNResult evaluateAll = dmnRuntime.evaluateAll(dmnModel, dmnContext);
+
+            // at this point the DMN service has executed the evaluation, so it's full model-specific endpoint semantics.
+            KogitoDMNResult result = new KogitoDMNResult(dmnModel.getNamespace(), dmnModel.getName(), evaluateAll);
+            if (asDmnResult) {
+                return Response.ok().entity(objectMapper.writeValueAsString(result)).build();
+            }
+            String contextAsJson = objectMapper.writeValueAsString(result.getDmnContext());
+            ResponseBuilder response = Response.ok();
+            if (result.hasErrors()) {
+                String infoWarns = result.getMessages().stream().map(m -> m.getLevel() + " " + m.getMessage()).collect(java.util.stream.Collectors.joining(", "));
+                response.header(Consts.KOGITO_DECISION_INFOWARN_HEADER, infoWarns);
+            }
+            response.entity(contextAsJson);
+            return response.build();
+        } catch (Exception e) {
+            LOG.error("Error from container '" + containerId + "'", e);
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    private void wirePrometheus(KieContainerInstanceImpl kContainer, DMNRuntime dmnRuntime) {
+        PrometheusKieServerExtension extension = (PrometheusKieServerExtension) context.getServerExtension(PrometheusKieServerExtension.EXTENSION_NAME);
+        if (extension != null) {
+            //default handler
+            PrometheusMetricsDMNListener listener = new PrometheusMetricsDMNListener(PrometheusKieServerExtension.getMetrics(), kContainer);
+            dmnRuntime.addListener(listener);
+
+            //custom handler
+            List<DMNRuntimeEventListener> listeners = extension.getDMNRuntimeListeners(kContainer);
+            listeners.forEach(l -> {
+                if (!dmnRuntime.getListeners().contains(l)) {
+                    dmnRuntime.addListener(l);
+                }
+            });
+
         }
     }
 
