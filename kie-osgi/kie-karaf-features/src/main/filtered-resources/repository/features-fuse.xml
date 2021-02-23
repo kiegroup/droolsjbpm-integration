@@ -64,6 +64,7 @@
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-audit/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-document/${version.org.jbpm}</bundle>
   </feature>
 
   <feature name="jbpm" version="${project.version}" description="jBPM Engine">

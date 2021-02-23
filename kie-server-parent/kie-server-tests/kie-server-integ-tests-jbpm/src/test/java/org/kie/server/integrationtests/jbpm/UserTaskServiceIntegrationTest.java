@@ -25,6 +25,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import org.jbpm.document.Document;
+import org.jbpm.document.service.impl.DocumentImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -937,6 +939,47 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             taskAttachments = taskClient.getTaskAttachmentsByTaskId(CONTAINER_ID, taskSummary.getId());
             assertEquals(1, taskAttachments.size());
             assertEquals(secondAttachmentId, taskAttachments.get(0).getId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testUserTaskAttachmentsDocumentImpl() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            String attachment1Name = "First attachment";
+
+            // Adding attachments to user task.
+            final String docName = "Real Betis Balompie";
+            final byte[] docContent = "Javierito".getBytes();
+            final int docSize = docContent.length;
+            Document attachmentContent = new DocumentImpl(docName, docSize, new Date());
+            attachmentContent.setContent(docContent);
+            Long attachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA,
+                    attachment1Name, attachmentContent);
+            changeUser(USER_YODA);
+            // start task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+            Document returnedContent = taskClient.getTaskAttachmentContentById(CONTAINER_ID, taskSummary
+                    .getId(), attachmentId, DocumentImpl.class);
+            assertEquals(docName, returnedContent.getName());
+            assertEquals(docSize, returnedContent.getSize());
+            assertNotNull(returnedContent.getLastModified());
+            assertArrayEquals(docContent, returnedContent.getContent());
+            // Delete task attachment.
+            taskClient.deleteTaskAttachment(CONTAINER_ID, taskSummary.getId(), attachmentId);
+
+            List<TaskAttachment> taskAttachments = taskClient.getTaskAttachmentsByTaskId(CONTAINER_ID, taskSummary
+                    .getId());
+            assertEquals(0, taskAttachments.size());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }

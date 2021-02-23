@@ -53,6 +53,7 @@ import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
+import org.jbpm.document.service.impl.DocumentImpl;
 import org.kie.api.pmml.DoubleFieldOutput;
 import org.kie.api.pmml.IntegerFieldOutput;
 import org.kie.api.pmml.PMML4Result;
@@ -419,7 +420,8 @@ public class JaxbMarshaller implements Marshaller {
                                                  ProcessInstanceUserTaskWithVariablesList.class,
                                                  CaseUserTaskWithVariablesList.class,
                                                  CaseInstanceCustomVarsList.class,
-                                                 ProcessStartSpec.class
+                                                 ProcessStartSpec.class,
+                                                 DocumentImpl.class
         };
     }
 

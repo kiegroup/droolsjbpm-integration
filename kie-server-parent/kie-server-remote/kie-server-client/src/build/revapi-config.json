@@ -158,7 +158,16 @@
                 "methodName": "migrateProcessInstanceWithSubprocess",
                 "elementKind": "method",
                 "justification": "https://issues.redhat.com/browse/JBPM-9653"
-             }
+             },
+              {
+              "code": "java.method.addedToInterface",
+              "new": "method <R> R org.kie.server.client.UserTaskServicesClient::getTaskAttachmentContentById(java.lang.String, java.lang.Long, java.lang.Long, java.lang.Class<R>)",
+              "package": "org.kie.server.client",
+              "classSimpleName": "UserTaskServicesClient",
+              "methodName": "getTaskAttachmentContentById",
+              "elementKind": "method",
+              "justification": "https://issues.redhat.com/browse/JBPM-9628"
+           }
             ]
         }
     }
