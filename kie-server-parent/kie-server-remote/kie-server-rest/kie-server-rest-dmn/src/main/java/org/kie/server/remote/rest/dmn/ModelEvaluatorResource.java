@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.DECISIONSERVICE_ID;
 import static org.kie.server.api.rest.RestURI.DMN_MODEL_DMNRESULT_URI;
 import static org.kie.server.api.rest.RestURI.DMN_MODEL_URI;
 import static org.kie.server.api.rest.RestURI.MODEL_ID;
@@ -127,7 +128,7 @@ public class ModelEvaluatorResource {
                                   @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
                                   @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
         LOG.debug("About to evaluateModel() on container {}", containerId);
-        return modelEvaluatorService.evaluateModel(containerId, modelId, payload, false);
+        return modelEvaluatorService.evaluateModel(containerId, modelId, payload, false, null);
     }
 
     @Path(DMN_MODEL_DMNRESULT_URI)
@@ -139,7 +140,33 @@ public class ModelEvaluatorResource {
                                              @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
                                              @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
         LOG.debug("About to evaluateModelAsDmnResult() on container {}", containerId);
-        return modelEvaluatorService.evaluateModel(containerId, modelId, payload, true);
+        return modelEvaluatorService.evaluateModel(containerId, modelId, payload, true, null);
+    }
+
+    @Path(RestURI.DMN_MODEL_DS_URI)
+    @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response evaluateModelDS(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
+                                    @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
+                                    @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(DECISIONSERVICE_ID) String decisionServiceId,
+                                    @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
+        LOG.debug("About to evaluateModelDS() on container {}", containerId);
+        return modelEvaluatorService.evaluateModel(containerId, modelId, payload, false, decisionServiceId);
+    }
+
+    @Path(RestURI.DMN_MODEL_DS_DMNRESULT_URI)
+    @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response evaluateModelDSAsDmnResult(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
+                                               @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
+                                               @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(DECISIONSERVICE_ID) String decisionServiceId,
+                                               @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
+        LOG.debug("About to evaluateModelDSAsDmnResult() on container {}", containerId);
+        return modelEvaluatorService.evaluateModel(containerId, modelId, payload, true, decisionServiceId);
     }
 
 }

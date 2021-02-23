@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.dmn.modelspecific;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpPost;
@@ -27,6 +28,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,23 +45,22 @@ import static org.hamcrest.core.Is.is;
 
 public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
 
+    private static final String X_KOGITO_DECISION_MESSAGES = "X-Kogito-decision-messages";
+
     private static final Logger LOG = LoggerFactory.getLogger(ModelSpecificIntegrationTest.class);
 
-    private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "input-data-string",
-            "1.0.0.Final" );
+    private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "ms-endpoints", "1.0.0.Final");
 
-    private static final String CONTAINER_ID  = "input-data-string";
-    
-    private static final String MODEL_NAMESPACE = "https://github.com/kiegroup/kie-dmn/input-data-string";
+    private static final String CONTAINER_ID = "ms-endpoints";
     private static final String MODEL_NAME = "input-data-string";
+    private static final String MODEL_NAMESPACE = "https://github.com/kiegroup/kie-dmn/input-data-string";
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/input-data-string");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/ms-endpoints");
     }
     
     @Before
@@ -95,19 +96,18 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
 
     private String responseAsString(HttpResponse response) throws Exception {
         String jsonString = EntityUtils.toString(response.getEntity());
-        LOG.info("Response: {}", jsonString);
+        LOG.info("Response:\n\n{}\n\n", jsonString);
         return jsonString;
     }
 
     @Test
     public void test_previousEndpoints_evaluateAll() throws Exception {
         HttpResponse response = makePOST("/dmn",
-                                         "{ \"dmn-context\":  { \"Full Name\" : \"John Doe\" } }");
+                                         "{ \"model-name\": \"" + MODEL_NAME + "\", \"model-namespace\": \"" + MODEL_NAMESPACE + "\", \"dmn-context\":  { \"Full Name\" : \"John Doe\" } }");
         assertThat(response.getStatusLine().getStatusCode(), is(200));
 
         String jsonString = responseAsString(response);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> readValue = mapper.readValue(jsonString, Map.class);
+        Object readValue = mapper.readValue(jsonString, Object.class);
         Assertions.assertThat(readValue).extracting("result").extracting("dmn-evaluation-result").extracting("dmn-context").extracting("Greeting Message").isEqualTo("Hello John Doe");
     }
 
@@ -123,9 +123,19 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         assertThat(response.getStatusLine().getStatusCode(), is(200));
 
         String jsonString = responseAsString(response);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> readValue = mapper.readValue(jsonString, Map.class);
+        Object readValue = mapper.readValue(jsonString, Object.class);
         Assertions.assertThat(readValue).extracting("Greeting Message").isEqualTo("Hello John Doe");
+    }
+
+    @Test
+    public void test_evaluateModel_ERR() throws Exception {
+        HttpResponse response = makePOST("/dmn/models/" + MODEL_NAME,
+                                         "{ \"asd\" : 123 }");
+        assertThat(response.getStatusLine().getStatusCode(), is(200));
+
+        Header[] headers = response.getHeaders(X_KOGITO_DECISION_MESSAGES);
+        Assertions.assertThat(headers).hasSize(1);
+        Assertions.assertThat(headers[0].getValue()).contains("Required dependency 'Full Name' not found");
     }
 
     @Test
@@ -135,8 +145,40 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         assertThat(response.getStatusLine().getStatusCode(), is(200));
 
         String jsonString = responseAsString(response);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> readValue = mapper.readValue(jsonString, Map.class);
+        Object readValue = mapper.readValue(jsonString, Object.class);
+        Assertions.assertThat(readValue).extracting("dmnContext").extracting("Greeting Message").isEqualTo("Hello John Doe");
+    }
+
+    @Test
+    public void test_evaluateModelDS() throws Exception {
+        HttpResponse response = makePOST("/dmn/models/" + MODEL_NAME + "/dsGreetings",
+                                         "{ \"Full Name\" : \"John Doe\" }");
+        assertThat(response.getStatusLine().getStatusCode(), is(200));
+
+        String jsonString = responseAsString(response);
+        Object readValue = mapper.readValue(jsonString, Object.class);
+        Assertions.assertThat(readValue).isEqualTo("Hello John Doe");
+    }
+
+    @Test
+    public void test_evaluateModelDS_2outputs() throws Exception {
+        HttpResponse response = makePOST("/dmn/models/multiple-greetings-ds/ds1",
+                                         "{ \"Full Name\" : \"John Doe\" }");
+        assertThat(response.getStatusLine().getStatusCode(), is(200));
+
+        String jsonString = responseAsString(response);
+        Object readValue = mapper.readValue(jsonString, Object.class);
+        Assertions.assertThat(readValue).asInstanceOf(InstanceOfAssertFactories.MAP).containsKeys("formal", "less formal");
+    }
+
+    @Test
+    public void test_evaluateModelDSAsDmnResult() throws Exception {
+        HttpResponse response = makePOST("/dmn/models/" + MODEL_NAME + "/dsGreetings/dmnresult",
+                                         "{ \"Full Name\" : \"John Doe\" }");
+        assertThat(response.getStatusLine().getStatusCode(), is(200));
+
+        String jsonString = responseAsString(response);
+        Object readValue = mapper.readValue(jsonString, Object.class);
         Assertions.assertThat(readValue).extracting("dmnContext").extracting("Greeting Message").isEqualTo("Hello John Doe");
     }
 

@@ -17,6 +17,7 @@ package org.kie.server.services.dmn;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -53,7 +54,7 @@ import org.kie.server.api.model.dmn.DMNQNameInfo;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.dmn.DMNUnaryTestsInfo;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.dmn.modelspecific.Consts;
+import org.kie.server.services.dmn.modelspecific.MSConsts;
 import org.kie.server.services.dmn.modelspecific.DMNFEELComparablePeriodSerializer;
 import org.kie.server.services.dmn.modelspecific.KogitoDMNResult;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
@@ -208,7 +209,7 @@ public class ModelEvaluatorServiceBase {
         }
     }
 
-    public Response evaluateModel(String containerId, String modelId, String contextPayload, boolean asDmnResult) {
+    public Response evaluateModel(String containerId, String modelId, String contextPayload, boolean asDmnResult, String decisionServiceId) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
             DMNRuntime dmnRuntime = KieRuntimeFactory.of(kContainer.getKieContainer().getKieBase()).get(DMNRuntime.class);
@@ -220,26 +221,44 @@ public class ModelEvaluatorServiceBase {
                 return Response.serverError().entity("More than one existing DMN model having modelId: " + modelId).build();
             }
             DMNModel dmnModel = modelsWithID.get(0);
+            DecisionServiceNode determinedDS = null;
+            if (decisionServiceId != null) {
+                Optional<DecisionServiceNode> dsOpt = dmnModel.getDecisionServices().stream().filter(ds -> ds.getName().equals(decisionServiceId)).findFirst();
+                if (!dsOpt.isPresent()) {
+                    return Response.serverError().entity("No decisionService found: " + decisionServiceId).build();
+                }
+                determinedDS = dsOpt.get();
+            }
 
             Map<String, Object> jsonContextMap = objectMapper.readValue(contextPayload, new TypeReference<Map<String, Object>>() {});
             DMNContext dmnContext = new DynamicDMNContextBuilder(dmnRuntime.newContext(), dmnModel).populateContextWith(jsonContextMap);
 
             wirePrometheus(kContainer, dmnRuntime);
 
-            DMNResult evaluateAll = dmnRuntime.evaluateAll(dmnModel, dmnContext);
+            DMNResult determinedResult = null;
+            if (determinedDS != null) {
+                determinedResult = dmnRuntime.evaluateDecisionService(dmnModel, dmnContext, determinedDS.getName());
+            } else {
+                determinedResult = dmnRuntime.evaluateAll(dmnModel, dmnContext);
+            }
 
             // at this point the DMN service has executed the evaluation, so it's full model-specific endpoint semantics.
-            KogitoDMNResult result = new KogitoDMNResult(dmnModel.getNamespace(), dmnModel.getName(), evaluateAll);
+            KogitoDMNResult result = new KogitoDMNResult(dmnModel.getNamespace(), dmnModel.getName(), determinedResult);
             if (asDmnResult) {
                 return Response.ok().entity(objectMapper.writeValueAsString(result)).build();
             }
-            String contextAsJson = objectMapper.writeValueAsString(result.getDmnContext());
+            String responseJSON = null;
+            if (determinedDS != null && determinedDS.getDecisionService().getOutputDecision().size() == 1) {
+                responseJSON = objectMapper.writeValueAsString(result.getDecisionResults().get(0).getResult());
+            } else {
+                responseJSON = objectMapper.writeValueAsString(result.getDmnContext());
+            }
             ResponseBuilder response = Response.ok();
             if (result.hasErrors()) {
                 String infoWarns = result.getMessages().stream().map(m -> m.getLevel() + " " + m.getMessage()).collect(java.util.stream.Collectors.joining(", "));
-                response.header(Consts.KOGITO_DECISION_INFOWARN_HEADER, infoWarns);
+                response.header(MSConsts.KOGITO_DECISION_INFOWARN_HEADER, infoWarns);
             }
-            response.entity(contextAsJson);
+            response.entity(responseJSON);
             return response.build();
         } catch (Exception e) {
             LOG.error("Error from container '" + containerId + "'", e);

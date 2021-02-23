@@ -1,9 +1,9 @@
 package org.kie.server.services.dmn.modelspecific;
 
 
-public class Consts {
+public class MSConsts {
 
-    private Consts() {
+    private MSConsts() {
         // not available for utility classes.
     }
 

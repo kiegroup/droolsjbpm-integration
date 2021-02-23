@@ -239,6 +239,8 @@ public class RestURI {
     public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";
     public static final String DMN_MODEL_URI = "models/{" + MODEL_ID + "}";
     public static final String DMN_MODEL_DMNRESULT_URI = "models/{" + MODEL_ID + "}/dmnresult";
+    public static final String DMN_MODEL_DS_URI = "models/{" + MODEL_ID + "}/{" + DECISIONSERVICE_ID + "}";
+    public static final String DMN_MODEL_DS_DMNRESULT_URI = "models/{" + MODEL_ID + "}/{" + DECISIONSERVICE_ID + "}/dmnresult";
 
     // Scenario Simulation URI
     public static final String SCENARIO_SIMULATION_URI = "containers/{" + CONTAINER_ID + "}/scesim";
