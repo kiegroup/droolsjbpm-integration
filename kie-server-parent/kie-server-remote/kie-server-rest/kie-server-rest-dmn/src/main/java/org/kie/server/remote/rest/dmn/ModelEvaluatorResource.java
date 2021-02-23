@@ -131,6 +131,16 @@ public class ModelEvaluatorResource {
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, false, null);
     }
 
+    @Path(DMN_MODEL_URI)
+    @ApiOperation(value = "Model-specific definitions get. Reference container-specific Swagger/OAS descriptor")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getModel(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
+                             @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId) {
+        LOG.debug("About to evaluateModel() on container {}", containerId);
+        return modelEvaluatorService.getModel(containerId, modelId);
+    }
+
     @Path(DMN_MODEL_DMNRESULT_URI)
     @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
     @POST

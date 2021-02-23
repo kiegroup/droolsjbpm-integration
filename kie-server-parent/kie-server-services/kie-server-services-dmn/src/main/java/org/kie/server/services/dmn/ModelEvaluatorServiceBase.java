@@ -35,11 +35,16 @@ import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.ast.DecisionServiceNode;
 import org.kie.dmn.api.core.ast.InputDataNode;
 import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
+import org.kie.dmn.backend.marshalling.v1x.DMNMarshallerFactory;
 import org.kie.dmn.core.ast.InputDataNodeImpl;
 import org.kie.dmn.core.ast.ItemDefNodeImpl;
 import org.kie.dmn.core.internal.utils.DMNEvaluationUtils;
 import org.kie.dmn.core.internal.utils.DMNEvaluationUtils.DMNEvaluationResult;
 import org.kie.dmn.core.internal.utils.DynamicDMNContextBuilder;
+import org.kie.dmn.model.api.BusinessKnowledgeModel;
+import org.kie.dmn.model.api.DRGElement;
+import org.kie.dmn.model.api.Decision;
+import org.kie.dmn.model.api.Definitions;
 import org.kie.dmn.model.api.InputData;
 import org.kie.dmn.model.api.ItemDefinition;
 import org.kie.server.api.model.ServiceResponse;
@@ -54,9 +59,9 @@ import org.kie.server.api.model.dmn.DMNQNameInfo;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.dmn.DMNUnaryTestsInfo;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.dmn.modelspecific.MSConsts;
 import org.kie.server.services.dmn.modelspecific.DMNFEELComparablePeriodSerializer;
 import org.kie.server.services.dmn.modelspecific.KogitoDMNResult;
+import org.kie.server.services.dmn.modelspecific.MSConsts;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -286,6 +291,38 @@ public class ModelEvaluatorServiceBase {
 
     public KieServerRegistry getKieServerRegistry() {
         return this.context;
+    }
+
+    public Response getModel(String containerId, String modelId) {
+        try {
+            KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
+            DMNRuntime dmnRuntime = KieRuntimeFactory.of(kContainer.getKieContainer().getKieBase()).get(DMNRuntime.class);
+
+            List<DMNModel> modelsWithID = dmnRuntime.getModels().stream().filter(m -> m.getName().equals(modelId)).collect(Collectors.toList());
+            if (modelsWithID.isEmpty()) {
+                return Response.serverError().entity("No model identifies with modelId: " + modelId).build();
+            } else if (modelsWithID.size() > 1) {
+                return Response.serverError().entity("More than one existing DMN model having modelId: " + modelId).build();
+            }
+            DMNModel dmnModel = modelsWithID.get(0);
+            Definitions definitions = dmnModel.getDefinitions();
+
+            for (DRGElement drg : definitions.getDrgElement()) {
+                if (drg instanceof Decision) {
+                    Decision decision = (Decision) drg;
+                    decision.setExpression(null);
+                } else if (drg instanceof BusinessKnowledgeModel) {
+                    BusinessKnowledgeModel bkm = (BusinessKnowledgeModel) drg;
+                    bkm.setEncapsulatedLogic(null);
+                }
+            }
+            
+            String xml = DMNMarshallerFactory.newDefaultMarshaller().marshal(definitions);
+            return Response.ok().entity(xml).build();
+        } catch (Exception e) {
+            LOG.error("Error from container '" + containerId + "'", e);
+            return Response.serverError().entity(e.getMessage()).build();
+        }
     }
 
 }

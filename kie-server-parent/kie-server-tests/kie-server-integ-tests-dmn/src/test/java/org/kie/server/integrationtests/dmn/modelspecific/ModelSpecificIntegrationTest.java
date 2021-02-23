@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
@@ -94,10 +95,23 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         return response;
     }
 
+    private HttpResponse makeGET(String pathInContainer, String accept) throws Exception {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(TestConfig.getKieServerHttpUrl() + "/containers/" + CONTAINER_ID + pathInContainer);
+
+        httpGet.setHeader("Accept", accept);
+        UsernamePasswordCredentials creds = new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword());
+        httpGet.addHeader(new BasicScheme().authenticate(creds, httpGet, null));
+
+        HttpResponse response = client.execute(httpGet);
+        client.close();
+        return response;
+    }
+
     private String responseAsString(HttpResponse response) throws Exception {
-        String jsonString = EntityUtils.toString(response.getEntity());
-        LOG.info("Response:\n\n{}\n\n", jsonString);
-        return jsonString;
+        String asString = EntityUtils.toString(response.getEntity());
+        LOG.info("Response:\n\n{}\n\n", asString);
+        return asString;
     }
 
     @Test
@@ -125,6 +139,16 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         String jsonString = responseAsString(response);
         Object readValue = mapper.readValue(jsonString, Object.class);
         Assertions.assertThat(readValue).extracting("Greeting Message").isEqualTo("Hello John Doe");
+    }
+
+    @Test
+    public void test_getModel() throws Exception {
+        HttpResponse response = makeGET("/dmn/models/" + MODEL_NAME,
+                                        "application/xml");
+        assertThat(response.getStatusLine().getStatusCode(), is(200));
+
+        String responseAsString = responseAsString(response);
+        Assertions.assertThat(responseAsString).doesNotContain("Hello ");
     }
 
     @Test
