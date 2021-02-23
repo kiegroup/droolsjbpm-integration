@@ -36,8 +36,10 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
@@ -191,6 +193,20 @@ public class KieServerTest {
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
         // find available tasks
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(user, 0, 10);
+        
+        if (tasks.isEmpty()) {
+            ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
+            System.out.println("XXXXXXXXXXXXXXXXXX" + processInstance.getState().intValue());
+           
+            List<NodeInstance> nodeInstances = processClient.findActiveNodeInstances(containerId, processInstanceId, 0, 10);
+            for (NodeInstance nodeInstance : nodeInstances) {
+                System.out.println("XXXXXXXXXXXXXXXXXX" + nodeInstance.toString());
+            }
+            
+            List<WorkItemInstance> wi = processClient.getWorkItemByProcessInstance(containerId, processInstanceId);
+            System.out.println("XXXXXXXXXXXXXXXXXX" + wi.toString());
+        }
+        
         assertEquals(1, tasks.size());
 
         // complete task
