@@ -44,6 +44,7 @@ public class RestURI {
     public static final String SOLVER_ID = "solverId";
     public static final String MODEL_ID = "modelId";
     public static final String DECISIONSERVICE_ID = "decisionServiceId";
+    public static final String OPENAPI = "openapi";
     public static final String DOCUMENT_ID = "documentId";
     public static final String CASE_ID = "caseId";
     public static final String CASE_DEF_ID = "caseDefId";

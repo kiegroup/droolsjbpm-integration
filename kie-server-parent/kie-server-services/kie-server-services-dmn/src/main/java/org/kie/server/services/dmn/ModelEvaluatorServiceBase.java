@@ -15,6 +15,7 @@
 
 package org.kie.server.services.dmn;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieRuntimeFactory;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNModel;
@@ -62,6 +64,7 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.dmn.modelspecific.DMNFEELComparablePeriodSerializer;
 import org.kie.server.services.dmn.modelspecific.KogitoDMNResult;
 import org.kie.server.services.dmn.modelspecific.MSConsts;
+import org.kie.server.services.dmn.modelspecific.OASGenerator;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -324,5 +327,18 @@ public class ModelEvaluatorServiceBase {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
-
+    
+    public Response getOAS(String containerId, boolean asJSON) {
+        try {
+            KieContainerInstanceImpl kContainer = context.getContainer(containerId, ContainerLocatorProvider.get().getLocator());
+            ReleaseId resolvedReleaseId = kContainer.getKieContainer().getResolvedReleaseId();
+            DMNRuntime dmnRuntime = KieRuntimeFactory.of(kContainer.getKieContainer().getKieBase()).get(DMNRuntime.class);
+            Collection<DMNModel> models = dmnRuntime.getModels();
+            String content = new OASGenerator(containerId, resolvedReleaseId).generateOAS(models, asJSON);
+            return Response.ok().entity(content).build();
+        } catch (Exception e) {
+            LOG.error("Error from container '" + containerId + "'", e);
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
 }

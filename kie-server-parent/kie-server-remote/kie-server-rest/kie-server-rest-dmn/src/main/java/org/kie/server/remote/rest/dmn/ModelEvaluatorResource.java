@@ -46,8 +46,11 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.DECISIONSERVICE_ID;
 import static org.kie.server.api.rest.RestURI.DMN_MODEL_DMNRESULT_URI;
+import static org.kie.server.api.rest.RestURI.DMN_MODEL_DS_DMNRESULT_URI;
+import static org.kie.server.api.rest.RestURI.DMN_MODEL_DS_URI;
 import static org.kie.server.api.rest.RestURI.DMN_MODEL_URI;
 import static org.kie.server.api.rest.RestURI.MODEL_ID;
+import static org.kie.server.api.rest.RestURI.OPENAPI;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
@@ -153,7 +156,7 @@ public class ModelEvaluatorResource {
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, true, null);
     }
 
-    @Path(RestURI.DMN_MODEL_DS_URI)
+    @Path(DMN_MODEL_DS_URI)
     @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -166,7 +169,7 @@ public class ModelEvaluatorResource {
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, false, decisionServiceId);
     }
 
-    @Path(RestURI.DMN_MODEL_DS_DMNRESULT_URI)
+    @Path(DMN_MODEL_DS_DMNRESULT_URI)
     @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -179,4 +182,26 @@ public class ModelEvaluatorResource {
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, true, decisionServiceId);
     }
 
+    @Path(OPENAPI + ".{type:json|yaml}")
+    @ApiOperation(value = "Model-specific definitions get. Reference container-specific Swagger/OAS descriptor")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
+    public Response getOASType(@ApiParam(value = "Container id to retrieve the Swagger/OAS descriptor for DMN endpoints", required = true) @PathParam(CONTAINER_ID) String containerId,
+                               @PathParam("type") String type) {
+        LOG.debug("About to getOASType() on container {}", containerId);
+        if (type != null && type.equals("yaml")) {
+            return modelEvaluatorService.getOAS(containerId, false);
+        } else {
+            return modelEvaluatorService.getOAS(containerId, true);
+        }
+    }
+
+    @Path(OPENAPI)
+    @ApiOperation(value = "JSON Model-specific definitions get. Reference container-specific Swagger/OAS descriptor")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
+    public Response getOAS(@ApiParam(value = "Container id to retrieve the Swagger/OAS descriptor for DMN endpoints", required = true) @PathParam(CONTAINER_ID) String containerId) {
+        LOG.debug("About to getOAS() on container {}", containerId);
+        return getOASType(containerId, "json");
+    }
 }
