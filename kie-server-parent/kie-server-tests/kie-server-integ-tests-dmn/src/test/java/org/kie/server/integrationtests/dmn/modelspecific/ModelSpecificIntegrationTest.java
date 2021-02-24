@@ -140,6 +140,7 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
     }
 
     /*    
+            mvn clean install -DskipTests -pl :kie-swagger-ui,:kie-server-wars,:kie-server,:kie-server-distribution
     
             mvn clean install -DskipTests -pl :kie-server-api,:kie-server-rest-dmn,:kie-server-services-dmn,:kie-server-wars,:kie-server,:kie-server-distribution
     
