@@ -18,6 +18,11 @@ package org.kie.server.integrationtests.dmn.modelspecific;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -43,6 +48,7 @@ import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegration
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -221,7 +227,23 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         assertThat(response.getStatusLine().getStatusCode(), is(200));
 
         String responseAsString = responseAsString(response);
-        Assertions.assertThat(responseAsString).doesNotContain("Hello ");
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolve(true);
+        SwaggerParseResult result = new OpenAPIV3Parser().readContents(responseAsString, null, parseOptions);
+
+        assertThat(result.getMessages()).isEmpty();
+        assertOnSwaggerResults(result);
+    }
+
+    private static void assertOnSwaggerResults(SwaggerParseResult result) {
+        OpenAPI openAPI = result.getOpenAPI();
+        PathItem p1 = openAPI.getPaths().get("/server/containers/ms-endpoints/dmn/models/" + MODEL_NAME);
+        assertThat(p1).isNotNull();
+        assertThat(p1.getGet()).isNotNull();
+        assertThat(p1.getPost()).isNotNull();
+        PathItem p2 = openAPI.getPaths().get("/server/containers/ms-endpoints/dmn/models/" + MODEL_NAME + "/dmnresult");
+        assertThat(p2).isNotNull();
+        assertThat(p2.getPost()).isNotNull(); // only POST for ../dmnresult expected.
     }
 
     @Test
@@ -231,7 +253,12 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         assertThat(response.getStatusLine().getStatusCode(), is(200));
 
         String responseAsString = responseAsString(response);
-        Assertions.assertThat(responseAsString).doesNotContain("Hello ");
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolve(true);
+        SwaggerParseResult result = new OpenAPIV3Parser().readContents(responseAsString, null, parseOptions);
+
+        assertThat(result.getMessages()).isEmpty();
+        assertOnSwaggerResults(result);
     }
 
 }

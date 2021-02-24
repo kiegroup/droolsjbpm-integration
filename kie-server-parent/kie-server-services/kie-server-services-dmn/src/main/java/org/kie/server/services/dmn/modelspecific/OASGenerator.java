@@ -99,7 +99,7 @@ public class OASGenerator {
         Operation operation = buildOperationWithIORefs(description, inputRef, "#/components/schemas/MSDMNE_KogitoDMNResult").summary(description).addTag(dmnModel.getName());
         PathItem pathItem = OASFactory.createObject(PathItem.class);
         pathItem.POST(operation);
-        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/" + dmnModel.getName() + "/" + ds.getName() + "/dmnresult", pathItem);
+        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/models/" + dmnModel.getName() + "/" + ds.getName() + "/dmnresult", pathItem);
     }
 
     private void pathModelDS(OpenAPI openAPI, DMNModel dmnModel, DecisionService ds, DMNOASResult dmnoas) {
@@ -112,7 +112,7 @@ public class OASGenerator {
         Operation operation = buildOperationWithIORefs(description, inputRef, outputRef).summary(description).addTag(dmnModel.getName());
         PathItem pathItem = OASFactory.createObject(PathItem.class);
         pathItem.POST(operation);
-        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/" + dmnModel.getName() + "/" + ds.getName(), pathItem);
+        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/models/" + dmnModel.getName() + "/" + ds.getName(), pathItem);
     }
 
     private void pathModelDMNResult(OpenAPI openAPI, DMNModel dmnModel, DMNOASResult dmnoas) {
@@ -123,12 +123,12 @@ public class OASGenerator {
         Operation operation = buildOperationWithIORefs(description, inputRef, "#/components/schemas/MSDMNE_KogitoDMNResult").summary(description).addTag(dmnModel.getName());
         PathItem pathItem = OASFactory.createObject(PathItem.class);
         pathItem.POST(operation);
-        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/" + dmnModel.getName() + "/dmnresult", pathItem);
+        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/models/" + dmnModel.getName() + "/dmnresult", pathItem);
     }
 
     private void pathModel(OpenAPI openAPI, DMNModel dmnModel, DMNOASResult dmnoas) {
         PathItem pathItem = OASFactory.createObject(PathItem.class);
-        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/" + dmnModel.getName(), pathItem);
+        openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/models/" + dmnModel.getName(), pathItem);
         pathModelGET(pathItem, dmnModel);
         pathModelPOST(pathItem, dmnModel, dmnoas);
     }
