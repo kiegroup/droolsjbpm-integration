@@ -17,29 +17,6 @@
     <org.kie.prometheus.server.ext.disabled>false</org.kie.prometheus.server.ext.disabled>
     <org.kie.scenariosimulation.server.ext.disabled>false</org.kie.scenariosimulation.server.ext.disabled>
   </properties>
-  
-  <dependencyManagement>
-    <dependencies>
-        <dependency>
-          <groupId>io.swagger.parser.v3</groupId>
-          <artifactId>swagger-parser</artifactId>
-          <version>2.0.24</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>io.rest-assured</groupId>
-          <artifactId>rest-assured</artifactId>
-          <version>4.3.3</version>
-          <scope>test</scope>
-          <exclusions>
-            <exclusion>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <!-- Common Kie server test classes -->

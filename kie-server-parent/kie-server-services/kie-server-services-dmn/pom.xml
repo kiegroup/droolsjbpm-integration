@@ -14,16 +14,6 @@
     <java.module.name>org.kie.server.services.dmn</java.module.name>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-dmn-openapi</artifactId>
-        <version>${version.org.kie}</version> <!-- this is not part of the User BOM -->
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
