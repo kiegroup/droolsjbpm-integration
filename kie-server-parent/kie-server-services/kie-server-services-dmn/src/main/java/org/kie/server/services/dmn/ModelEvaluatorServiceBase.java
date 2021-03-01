@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
@@ -224,16 +225,16 @@ public class ModelEvaluatorServiceBase {
 
             List<DMNModel> modelsWithID = dmnRuntime.getModels().stream().filter(m -> m.getName().equals(modelId)).collect(Collectors.toList());
             if (modelsWithID.isEmpty()) {
-                return Response.serverError().entity("No model identifies with modelId: " + modelId).build();
+                return Response.status(Status.NOT_FOUND).entity("No model identifies with modelId: " + modelId).build();
             } else if (modelsWithID.size() > 1) {
-                return Response.serverError().entity("More than one existing DMN model having modelId: " + modelId).build();
+                return Response.status(Status.NOT_FOUND).entity("More than one existing DMN model having modelId: " + modelId).build();
             }
             DMNModel dmnModel = modelsWithID.get(0);
             DecisionServiceNode determinedDS = null;
             if (decisionServiceId != null) {
                 Optional<DecisionServiceNode> dsOpt = dmnModel.getDecisionServices().stream().filter(ds -> ds.getName().equals(decisionServiceId)).findFirst();
                 if (!dsOpt.isPresent()) {
-                    return Response.serverError().entity("No decisionService found: " + decisionServiceId).build();
+                    return Response.status(Status.NOT_FOUND).entity("No decisionService found: " + decisionServiceId).build();
                 }
                 determinedDS = dsOpt.get();
             }
@@ -303,9 +304,9 @@ public class ModelEvaluatorServiceBase {
 
             List<DMNModel> modelsWithID = dmnRuntime.getModels().stream().filter(m -> m.getName().equals(modelId)).collect(Collectors.toList());
             if (modelsWithID.isEmpty()) {
-                return Response.serverError().entity("No model identifies with modelId: " + modelId).build();
+                return Response.status(Status.NOT_FOUND).entity("No model identifies with modelId: " + modelId).build();
             } else if (modelsWithID.size() > 1) {
-                return Response.serverError().entity("More than one existing DMN model having modelId: " + modelId).build();
+                return Response.status(Status.NOT_FOUND).entity("More than one existing DMN model having modelId: " + modelId).build();
             }
             DMNModel dmnModel = modelsWithID.get(0);
             Definitions definitions = dmnModel.getDefinitions();
