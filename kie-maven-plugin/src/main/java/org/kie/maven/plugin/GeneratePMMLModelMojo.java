@@ -93,9 +93,9 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (!isNewInvoked()) {
+        if (isLegacyInvoked()) {
             getLog().warn("Skipping `generatePMMLModel` because " + KIE_PMML_IMPLEMENTATION.getName() +
-                                  " is not " + NEW.getName());
+                                  " is " + LEGACY.getName());
             return;
         }
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
@@ -109,9 +109,9 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         }
     }
 
-    static boolean isNewInvoked() {
-        final String property = System.getProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
-        return property.equals(NEW.getName());
+    static boolean isLegacyInvoked() {
+        final String property = System.getProperty(KIE_PMML_IMPLEMENTATION.getName(), NEW.getName());
+        return property.equals(LEGACY.getName());
     }
 
     private void generateModel() throws MojoExecutionException {

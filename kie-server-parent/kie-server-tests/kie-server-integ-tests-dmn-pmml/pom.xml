@@ -109,6 +109,15 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <kie-pmml-implementation>legacy</kie-pmml-implementation>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
@@ -129,6 +138,7 @@
               <!-- Added: -->
               <org.kie.dmn.server.ext.disabled>${org.kie.dmn.server.ext.disabled}</org.kie.dmn.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
+              <kie-pmml-implementation>legacy</kie-pmml-implementation>
             </systemPropertyVariables>
           </configuration>
         </plugin>

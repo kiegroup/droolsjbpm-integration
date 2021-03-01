@@ -34,6 +34,9 @@ import org.kie.api.definition.KiePackage;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
+import static org.kie.api.pmml.PMMLConstants.KIE_PMML_IMPLEMENTATION;
+import static org.kie.api.pmml.PMMLConstants.LEGACY;
+
 public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
     private static final String PROJECT_NAME = "kjar-6-with-pmml";
@@ -54,6 +57,7 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
     @Test
     public void testUseBuildKjarWithPMML() throws Exception {
+        System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
         buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
 
         final KieServices kieServices = KieServices.Factory.get();
@@ -68,12 +72,13 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
         Assertions.assertThat(kiePackageWithPMML).isNotNull();
         Assertions.assertThat(kiePackageWithPMML.getRules()).isNotEmpty();
         kieSession.dispose();
+        System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
     }
 
     @Test
     public void testContentKjarWithPMML() throws Exception {
+        System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
         final MavenExecutionResult result = buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
-
         final File basedir = result.getBasedir();
         final File kjarFile = new File(basedir, "target/" + GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
         Assertions.assertThat(kjarFile).exists();
@@ -89,5 +94,6 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
         Assertions.assertThat(jarContent).isNotEmpty();
         Assertions.assertThat(jarContent).contains(PMML_FILE_NAME);
         Assertions.assertThat(jarContent).contains(EXAMPLE_PMML_CLASS);
+        System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
     }
 }
