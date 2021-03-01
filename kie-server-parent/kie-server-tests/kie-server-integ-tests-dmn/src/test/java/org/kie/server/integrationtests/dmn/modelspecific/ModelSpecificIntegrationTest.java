@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,9 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         return asString;
     }
 
+    /**
+     * Testing the PREVIOUS endpoint, but manually with this style of tests.
+     */
     @Test
     public void test_previousEndpoints_evaluateAll() throws Exception {
         HttpResponse response = makePOST("/dmn",
@@ -155,12 +158,7 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         Assertions.assertThat(readValue).extracting("result").extracting("dmn-evaluation-result").extracting("dmn-context").extracting("Greeting Message").isEqualTo("Hello John Doe");
     }
 
-    /*    
-            mvn clean install -DskipTests -pl :kie-swagger-ui,:kie-server-wars,:kie-server,:kie-server-distribution
-    
-            mvn clean install -DskipTests -pl :kie-server-api,:kie-server-rest-dmn,:kie-server-services-dmn,:kie-server-wars,:kie-server,:kie-server-distribution
-    
-    */
+    /* --- NEW ENDPOINTs tests: --- */
     @Test
     public void test_getModel() throws Exception {
         HttpResponse response = makeGET("/dmn/models/" + MODEL_NAME,
