@@ -201,14 +201,8 @@ public class KieControllerStartupIntegrationTest extends KieControllerManagement
         controllerClient.startContainer(containerSpec);
 
         // Check that there is one container deployed.
-        try {
-            KieServerSynchronization.waitForKieServerSynchronization(client, 1);
-        } catch (TimeoutException e) {
-            // Sometimes creating container fails in embedded server (unknown Socket timeout error, tends to happen here).
-            // Retrigger container creation. These tests should be refactored to use more reliable container instead of embedded TJWSEmbeddedJaxrsServer.
-            controllerClient.startContainer(containerSpec);
-            KieServerSynchronization.waitForKieServerSynchronization(client, 1);
-        }
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+
         ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
         assertNotNull(containersList.getResult().getContainers());
