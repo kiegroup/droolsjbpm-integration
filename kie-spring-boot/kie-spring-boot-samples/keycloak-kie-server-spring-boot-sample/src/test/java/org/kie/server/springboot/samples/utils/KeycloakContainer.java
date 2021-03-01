@@ -22,6 +22,7 @@ import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.exception.NotFoundException;
 
 public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
     private static Logger logger = LoggerFactory.getLogger(KeycloakContainer.class);
@@ -66,11 +67,13 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
     private static String findImage() {
         DockerClient client = DockerClientFactory.instance().client();
         String targetImage = KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION;
-        if (!client.listImagesCmd().withImageNameFilter(targetImage).exec().isEmpty()) { 
+        try {
+            client.inspectImageCmd(targetImage).exec().getId();
             logger.info("Found '{}' image, using it", targetImage);
             return targetImage;
+        } catch (NotFoundException e) {
+            logger.info("Not Found '{}' image, using latest", targetImage);
+            return KEYCLOAK_IMAGE + ":latest";
         }
-        logger.info("Not Found '{}' image, using latest", targetImage);
-        return KEYCLOAK_IMAGE + ":latest";
     }
 }
