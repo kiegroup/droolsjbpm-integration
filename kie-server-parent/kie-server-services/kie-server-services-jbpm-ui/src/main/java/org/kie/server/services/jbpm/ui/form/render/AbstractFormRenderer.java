@@ -24,16 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.jbpm.casemgmt.api.model.CaseDefinition;
@@ -449,9 +440,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                     item.setValue((value != null) ? value.toString() : "");
                                     break;
                             }
-
-                            item.setReadOnly(field.isReadOnly());
-                            item.setRequired(field.isRequired());
+                            Set<String> tags = field.getTags();
+                            if(tags != null) {
+                                item.setRequired(tags.contains("required"));
+                                item.setReadOnly(tags.contains("readonly"));
+                            } else {
+                                item.setRequired(field.isRequired());
+                                item.setReadOnly(field.isReadOnly());
+                            }
 
                             // generate column content                    
                             Map<String, Object> parameters = new HashMap<>();

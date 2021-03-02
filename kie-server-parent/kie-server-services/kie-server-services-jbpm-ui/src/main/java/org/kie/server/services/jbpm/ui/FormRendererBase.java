@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -260,6 +261,9 @@ public class FormRendererBase {
                 field.setName(entry.getKey());
                 field.setType(entry.getValue());
                 field.setTags(processDesc.getTagsForVariable(entry.getKey()));
+                Set<String> tags = processDesc.getTagsForVariable(entry.getKey());
+                field.setRequired(tags.contains("required"));
+                field.setRequired(tags.contains("readonly"));
                 
                 form.getFields().add(field);
                 
