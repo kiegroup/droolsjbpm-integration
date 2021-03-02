@@ -148,7 +148,7 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
 
     private String responseAsString(HttpResponse response) throws Exception {
         String asString = EntityUtils.toString(response.getEntity());
-        LOG.info("Response:\n\n{}\n\n", asString);
+        LOG.debug("Response:\n\n{}\n\n", asString);
         return asString;
     }
 
