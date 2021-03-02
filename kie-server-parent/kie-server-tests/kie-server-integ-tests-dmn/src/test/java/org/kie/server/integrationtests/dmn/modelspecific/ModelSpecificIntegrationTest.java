@@ -117,7 +117,11 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
     }
 
     private HttpResponse makePOST(String pathInContainer, String payload) throws Exception {
-        HttpPost httpPost = new HttpPost(baseContainerPath() + pathInContainer);
+        return rawPOST(baseContainerPath() + pathInContainer, payload);
+    }
+
+    private HttpResponse rawPOST(String path, String payload) throws Exception {
+        HttpPost httpPost = new HttpPost(path);
         httpPost.setEntity(new StringEntity(payload));
         httpPost.setHeader("Accept", "application/json");
         httpPost.setHeader("Content-type", "application/json");
@@ -129,7 +133,11 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
     }
 
     private HttpResponse makeGET(String pathInContainer, String accept) throws Exception {
-        HttpGet httpGet = new HttpGet(baseContainerPath() + pathInContainer);
+        return rawGET(baseContainerPath() + pathInContainer, accept);
+    }
+
+    private HttpResponse rawGET(String path, String accept) throws Exception {
+        HttpGet httpGet = new HttpGet(path);
         httpGet.setHeader("Accept", accept);
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword());
         httpGet.addHeader(new BasicScheme().authenticate(creds, httpGet, null));
@@ -140,7 +148,7 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
 
     private String responseAsString(HttpResponse response) throws Exception {
         String asString = EntityUtils.toString(response.getEntity());
-        LOG.debug("Response:\n\n{}\n\n", asString);
+        LOG.info("Response:\n\n{}\n\n", asString);
         return asString;
     }
 
@@ -170,6 +178,26 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
     }
 
     @Test
+    public void test_getModel_ERR_noContainer() throws Exception {
+        HttpResponse response = rawGET(TestConfig.getKieServerHttpUrl() + "/containers/" + "unexistent" + "/dmn/models/" + MODEL_NAME,
+                                       "application/xml");
+        assertThat(response.getStatusLine().getStatusCode(), is(500));
+
+        String responseAsString = responseAsString(response);
+        Assertions.assertThat(responseAsString).contains("Container 'unexistent' is not instantiated or cannot find container for alias 'unexistent'");
+    }
+
+    @Test
+    public void test_getModel_ERR_noModel() throws Exception {
+        HttpResponse response = makeGET("/dmn/models/" + "unexistent",
+                                        "application/xml");
+        assertThat(response.getStatusLine().getStatusCode(), is(404));
+
+        String responseAsString = responseAsString(response);
+        Assertions.assertThat(responseAsString).contains("No model identifies with modelId: unexistent");
+    }
+
+    @Test
     public void test_evaluateModel() throws Exception {
         HttpResponse response = makePOST("/dmn/models/" + MODEL_NAME,
                                          "{ \"Full Name\" : \"John Doe\" }");
@@ -178,6 +206,26 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         String jsonString = responseAsString(response);
         Object readValue = mapper.readValue(jsonString, Object.class);
         Assertions.assertThat(readValue).extracting("Greeting Message").isEqualTo("Hello John Doe");
+    }
+
+    @Test
+    public void test_evaluateModel_ERR_noContainer() throws Exception {
+        HttpResponse response = rawPOST(TestConfig.getKieServerHttpUrl() + "/containers/" + "unexistent" + "/dmn/models/" + MODEL_NAME,
+                                        "{ \"Full Name\" : \"John Doe\" }");
+        assertThat(response.getStatusLine().getStatusCode(), is(500));
+
+        String responseAsString = responseAsString(response);
+        Assertions.assertThat(responseAsString).contains("Container 'unexistent' is not instantiated or cannot find container for alias 'unexistent'");
+    }
+
+    @Test
+    public void test_evaluateModel_ERR_noModel() throws Exception {
+        HttpResponse response = makePOST("/dmn/models/" + "unexistent",
+                                         "{ \"Full Name\" : \"John Doe\" }");
+        assertThat(response.getStatusLine().getStatusCode(), is(404));
+
+        String responseAsString = responseAsString(response);
+        Assertions.assertThat(responseAsString).contains("No model identifies with modelId: unexistent");
     }
 
     @Test
@@ -211,6 +259,16 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
         String jsonString = responseAsString(response);
         Object readValue = mapper.readValue(jsonString, Object.class);
         Assertions.assertThat(readValue).isEqualTo("Hello John Doe");
+    }
+
+    @Test
+    public void test_evaluateModelDS_ERR_noDS() throws Exception {
+        HttpResponse response = makePOST("/dmn/models/" + MODEL_NAME + "/unexistent",
+                                         "{ \"Full Name\" : \"John Doe\" }");
+        assertThat(response.getStatusLine().getStatusCode(), is(404));
+
+        String responseAsString = responseAsString(response);
+        Assertions.assertThat(responseAsString).contains("No decisionService found: unexistent");
     }
 
     @Test
@@ -278,6 +336,16 @@ public class ModelSpecificIntegrationTest extends KieServerBaseIntegrationTest {
 
         assertThat(result.getMessages()).isEmpty();
         assertOnSwaggerResults(result);
+    }
+
+    @Test
+    public void test_getOAS_ERR_noContainer() throws Exception {
+        HttpResponse response = rawGET(TestConfig.getKieServerHttpUrl() + "/containers/" + "unexistent" + "/dmn/openapi",
+                                       "application/json");
+        assertThat(response.getStatusLine().getStatusCode(), is(500));
+
+        String responseAsString = responseAsString(response);
+        Assertions.assertThat(responseAsString).contains("Container 'unexistent' is not instantiated or cannot find container for alias 'unexistent'");
     }
 
     private static void assertOnSwaggerResults(SwaggerParseResult result) {
