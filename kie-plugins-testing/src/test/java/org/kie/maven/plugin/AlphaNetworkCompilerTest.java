@@ -25,6 +25,7 @@ import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.reteoo.ObjectSinkPropagator;
 import org.drools.core.reteoo.ObjectTypeNode;
 import org.drools.core.reteoo.Rete;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
@@ -34,6 +35,7 @@ import org.kie.api.runtime.KieSession;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Ignore("AlphaNetworkCompiler is disabled for this release")
 public class AlphaNetworkCompilerTest extends KieMavenPluginBaseIntegrationTest {
 
     private final static String GROUP_ID = "org.kie";
