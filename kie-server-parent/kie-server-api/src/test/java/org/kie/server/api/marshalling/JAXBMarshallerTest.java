@@ -26,11 +26,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.model.definition.QueryParam;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class JAXBMarshallerTest {
@@ -94,4 +96,20 @@ public class JAXBMarshallerTest {
         QueryParam param2 = marshaller.unmarshall(converted, QueryParam.class);
         assertTrue(param2.getValue().get(0) instanceof QueryParam);
     }
+
+    @Test
+    public void testMarshallError() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JAXB, getClass()
+                .getClassLoader());
+        assertEquals(13, marshaller.unmarshall("<int-type><value>13</value></int-type>", int.class).intValue());
+        assertEquals(0, marshaller.unmarshall("<int-type><value>2kkbk</value></int-type>", int.class).intValue());
+        System.setProperty(KieServerConstants.KIE_SERVER_STRICT_JAXB_FORMAT, "true");
+        try {
+            assertThrows(MarshallingException.class, () -> marshaller.unmarshall(
+                    "<int-type><value>13ab</value></int-type>", int.class));
+        } finally {
+            System.clearProperty(KieServerConstants.KIE_SERVER_STRICT_JAXB_FORMAT);
+        }
+    }
+
 }
