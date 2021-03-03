@@ -42,6 +42,9 @@ public class RestURI {
     public static final String JOB_KEY = "key";
     public static final String QUERY_NAME = "queryName";
     public static final String SOLVER_ID = "solverId";
+    public static final String MODEL_ID = "modelId";
+    public static final String DECISIONSERVICE_ID = "decisionServiceId";
+    public static final String OPENAPI = "openapi";
     public static final String DOCUMENT_ID = "documentId";
     public static final String CASE_ID = "caseId";
     public static final String CASE_DEF_ID = "caseDefId";
@@ -235,6 +238,10 @@ public class RestURI {
 
     // DMN URI
     public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";
+    public static final String DMN_MODEL_URI = "models/{" + MODEL_ID + "}";
+    public static final String DMN_MODEL_DMNRESULT_URI = "models/{" + MODEL_ID + "}/dmnresult";
+    public static final String DMN_MODEL_DS_URI = "models/{" + MODEL_ID + "}/{" + DECISIONSERVICE_ID + "}";
+    public static final String DMN_MODEL_DS_DMNRESULT_URI = "models/{" + MODEL_ID + "}/{" + DECISIONSERVICE_ID + "}/dmnresult";
 
     // Scenario Simulation URI
     public static final String SCENARIO_SIMULATION_URI = "containers/{" + CONTAINER_ID + "}/scesim";
