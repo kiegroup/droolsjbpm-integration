@@ -73,7 +73,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     private static final Logger logger = LoggerFactory.getLogger(GeneratePMMLModelMojo.class);
 
     private static final String PMML = "pmml";
-    private static final String generatedSourcesPath = "/generated-sources/";
+    private static final String PMML_COMPILER_PATH = "/generated-sources/pmml-compiler/main/java";
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
     @Parameter(required = true, defaultValue = "${project.build.directory}")
@@ -155,7 +155,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         KieServices ks = KieServices.Factory.get();
         final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
         kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
-        final String newCompileSourceRoot = targetDirectory.getPath() + generatedSourcesPath;
+        final String newCompileSourceRoot = targetDirectory.getPath() + PMML_COMPILER_PATH;
         project.addCompileSourceRoot(newCompileSourceRoot);
         for (GeneratedFile generatedFile : generatedFiles) {
             writeFile(generatedFile);
@@ -164,7 +164,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
     void writeFile(final GeneratedFile generatedFile) throws MojoExecutionException {
         final Path newFile = Paths.get(targetDirectory.getPath(),
-                                       generatedSourcesPath,
+                                       PMML_COMPILER_PATH,
                                        generatedFile.getPath());
         try {
             Files.deleteIfExists(newFile);
