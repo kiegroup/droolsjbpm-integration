@@ -428,6 +428,79 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         }
 
     }
+    
+    @Test
+    public void testProcessVariablesDataTypes() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, "variables.types");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId>0);
+        try {
+            
+            short age = 44;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "age", age );
+            assertEquals( age, ((Short)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "age")).shortValue());
+            
+            boolean married = true;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "married", married );
+            assertEquals( married, ((Boolean)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "married")).booleanValue());
+            
+            String name = "Javierito";
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "name", name );
+            assertEquals( name, (String)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "percentage"));
+            
+            float percentage = 99.9f;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "percentage", percentage);
+            assertEquals( percentage, ((Float)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "percentage")).floatValue(), 0.001f);
+            
+            int casualities = 23232;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "casualities", casualities);
+            assertEquals( casualities, ((Integer)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "casualities")).intValue());
+            
+            long population = 7600000123L;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "population", population);
+            assertEquals( population, ((Long)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "population")).longValue());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    public void testProcessVariablesConversionDataTypes() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, "variables.types");
+
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId>0);
+        try {
+            
+            short age = 44;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "age", Short.toString(age) );
+            assertEquals( age, ((Short)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "age")).shortValue());
+            
+            boolean married = true;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "married", Boolean.toString(married));
+            assertEquals( married, ((Boolean)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "married")).booleanValue());
+            
+            String name = "Javierito";
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "name", new StringBuilder(name));
+            assertEquals( name, (String)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "percentage"));
+            
+            float percentage = 99.9f;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "percentage", Float.toString(percentage));
+            assertEquals( percentage, ((Float)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "percentage")).floatValue(), 0.001f);
+            
+            int casualities = 23232;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "casualities", Integer.toString(casualities));
+            assertEquals( casualities, ((Integer)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "casualities")).intValue());
+            
+            long population = 7600000123L;
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "population", Long.toString(population));
+            assertEquals( population, ((Long)processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "population")).longValue());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    
+
 
     @Test
     public void testManipulateProcessVariables() throws Exception {
