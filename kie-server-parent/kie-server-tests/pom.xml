@@ -310,6 +310,15 @@
                   </roles>
                 </user>
                 <user>
+                  <name>second-administrator</name>
+                  <password>usetheforce123@</password>
+                  <roles>
+                    <role>kie-server</role>
+                    <role>guest</role>
+                    <role>Administrators</role>
+                  </roles>
+                </user>
+                <user>
                   <name>john</name>
                   <password>usetheforce123@</password>
                   <roles>
