@@ -46,6 +46,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String USER_YODA = "yoda";
     protected static final String USER_JOHN = "john";
     protected static final String USER_ADMINISTRATOR = "administrator";
+    protected static final String USER_SECOND_ADMINISTRATOR = "second-administrator";
     protected static final String USER_MARY = "mary";
 
     protected static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
