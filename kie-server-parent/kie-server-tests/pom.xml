@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.41.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -95,6 +95,9 @@
     <module>kie-server-integ-tests-scenario-simulation</module>
     <module>kie-server-integ-tests-custom-extension</module>
     <module>kie-server-integ-tests-task-assigning</module>
+    <module>kie-server-integ-tests-dmn-pmml</module>
+    <module>kie-server-integ-tests-dmn-pmml-trusty</module>
+    <module>kie-server-integ-tests-pmml</module>
   </modules>
 
   <dependencyManagement>
@@ -407,6 +410,10 @@
             <configuration>
               <portNames>
                 <portName>container.port</portName>
+                <portName>cargo.jboss.ajp.port</portName>
+                <portName>cargo.jboss.https.port</portName>
+                <portName>cargo.jboss.management-http.port</portName>
+                <portName>cargo.jboss.management-https.port</portName>
               </portNames>
             </configuration>
           </execution>
@@ -813,6 +820,10 @@
                        cargo.resource.id=mail|
                        cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
                     </cargo.resource.resource.mail>
+                    <cargo.jboss.ajp.port>${cargo.jboss.ajp.port}</cargo.jboss.ajp.port>
+                    <cargo.jboss.https.port>${cargo.jboss.https.port}</cargo.jboss.https.port>
+                    <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
+                    <cargo.jboss.management-https.port>${cargo.jboss.management-https.port}</cargo.jboss.management-https.port>
                   </properties>
                   <datasources>
                     <datasource>
@@ -835,6 +846,7 @@
                   <!-- Reuse yoda user for deploying and undeploying Kie server from within the test -->
                   <cargo.remote.username>yoda</cargo.remote.username>
                   <cargo.remote.password>usetheforce123@</cargo.remote.password>
+                  <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
                 </systemPropertyVariables>
               </configuration>
             </plugin>
@@ -974,6 +986,10 @@
                        cargo.resource.id=mail|
                        cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
                     </cargo.resource.resource.mail>
+                    <cargo.jboss.ajp.port>${cargo.jboss.ajp.port}</cargo.jboss.ajp.port>
+                    <cargo.jboss.https.port>${cargo.jboss.https.port}</cargo.jboss.https.port>
+                    <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
+                    <cargo.jboss.management-https.port>${cargo.jboss.management-https.port}</cargo.jboss.management-https.port>
                   </properties>
                 </configuration>
               </configuration>
@@ -986,6 +1002,7 @@
                   <!-- Reuse yoda user for deploying and undeploying Kie server from within the test -->
                   <cargo.remote.username>yoda</cargo.remote.username>
                   <cargo.remote.password>usetheforce123@</cargo.remote.password>
+                  <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
                 </systemPropertyVariables>
               </configuration>
             </plugin>

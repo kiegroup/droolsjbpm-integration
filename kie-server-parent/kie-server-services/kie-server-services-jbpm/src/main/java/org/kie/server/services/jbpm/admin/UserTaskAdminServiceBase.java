@@ -24,6 +24,7 @@ import java.util.function.Function;
 import org.jbpm.services.api.admin.TaskNotification;
 import org.jbpm.services.api.admin.TaskReassignment;
 import org.jbpm.services.api.admin.UserTaskAdminService;
+import org.kie.api.task.model.Email;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.User;
@@ -59,6 +60,7 @@ public class UserTaskAdminServiceBase {
 
     private Function<String, OrganizationalEntity> mapToUser = id -> factory.newUser(id);
     private Function<String, OrganizationalEntity> mapToGroup = id -> factory.newGroup(id);
+    private Function<String, OrganizationalEntity> mapToEmails = id -> factory.newEmail(id);
 
     public UserTaskAdminServiceBase(UserTaskAdminService userTaskAdminService, KieServerRegistry context) {
         this.userTaskAdminService = userTaskAdminService;
@@ -239,7 +241,29 @@ public class UserTaskAdminServiceBase {
         containerId = context.getContainerId(containerId, new ByTaskIdContainerLocator(taskId.longValue()));
         Collection<TaskNotification> notifications = userTaskAdminService.getTaskNotifications(containerId, taskId.longValue(), activeOnly);
 
-        List<org.kie.server.api.model.admin.TaskNotification> converted = notifications.stream().map(r -> org.kie.server.api.model.admin.TaskNotification.builder().id(r.getId()).active(r.isActive()).name(r.getName()).subject(r.getSubject()).content(r.getContent()).notifyAt(r.getDate()).users(r.getRecipients().stream().filter(oe -> oe instanceof User).map(oe -> oe.getId()).collect(toList())).groups(r.getRecipients().stream().filter(oe -> oe instanceof Group).map(oe -> oe.getId()).collect(toList())).build()).collect(toList());
+        List<org.kie.server.api.model.admin.TaskNotification> converted = notifications.stream()
+                                                                                       .map(r -> org.kie.server.api.model.admin.TaskNotification.builder()
+                                                                                                                                                .id(r.getId())
+                                                                                                                                                .active(r.isActive())
+                                                                                                                                                .name(r.getName())
+                                                                                                                                                .subject(r.getSubject())
+                                                                                                                                                .content(r.getContent())
+                                                                                                                                                .notifyAt(r.getDate())
+                                                                                                                                                .users(r.getRecipients().stream()
+                                                                                                                                                        .filter(oe -> oe instanceof User)
+                                                                                                                                                        .map(OrganizationalEntity::getId)
+                                                                                                                                                        .collect(toList()))
+                                                                                                                                                .groups(r.getRecipients()
+                                                                                                                                                         .stream()
+                                                                                                                                                         .filter(oe -> oe instanceof Group)
+                                                                                                                                                         .map(OrganizationalEntity::getId)
+                                                                                                                                                         .collect(toList()))
+                                                                                                                                                .emails(r.getRecipients()
+                                                                                                                                                         .stream()
+                                                                                                                                                         .filter(oe -> oe instanceof Email)
+                                                                                                                                                         .map(OrganizationalEntity::getId)
+                                                                                                                                                         .collect(toList()))
+                                                                                                                                                .build()).collect(toList());
 
         return new TaskNotificationList(converted);
     }
@@ -287,7 +311,7 @@ public class UserTaskAdminServiceBase {
     }
 
     /*
-     * Helper methods
+     * Helper methods / only for task onwers
      */
 
     protected OrganizationalEntity[] convert(List<String> orgEntities, boolean isUser) {
@@ -303,6 +327,10 @@ public class UserTaskAdminServiceBase {
         if (emailNotification.getGroups() != null) {
             recipients.addAll(emailNotification.getGroups().stream().map(mapToGroup).collect(toList()));
         }
+        if (emailNotification.getEmails() != null) {
+            recipients.addAll(emailNotification.getEmails().stream().map(mapToEmails).collect(toList()));
+        }
+
         org.kie.internal.task.api.model.EmailNotification email = userTaskAdminService.buildEmailNotification(emailNotification.getSubject(), recipients, emailNotification.getBody(), emailNotification.getFrom(), emailNotification.getReplyTo());
 
         return email;

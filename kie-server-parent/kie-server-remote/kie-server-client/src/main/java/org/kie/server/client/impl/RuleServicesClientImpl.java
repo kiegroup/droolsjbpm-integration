@@ -17,6 +17,8 @@ package org.kie.server.client.impl;
 
 import java.util.Collections;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
@@ -61,9 +63,10 @@ public class RuleServicesClientImpl extends AbstractKieServicesClientImpl implem
 
 
     @Override
-    public ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd) {
+    public ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd, Status status) {
         if( config.isRest() ) {
-            return makeHttpPostRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/instances/" + id, cmd, (Class)ExecutionResultImpl.class, getHeaders(cmd) );
+            return makeHttpPostRequestAndCreateServiceResponse(loadBalancer.getUrl() + "/containers/instances/" + id,
+                    cmd, (Class) ExecutionResultImpl.class, getHeaders(cmd), status);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, serialize(cmd) ) ) );
             ServiceResponse response = executeJmsCommand( script, cmd.getClass().getName(), null, id ).getResponses().get( 0 );

@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-wars</artifactId>
-    <version>7.41.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server</artifactId>
@@ -59,10 +59,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-drools</artifactId>
       <exclusions>
-        <exclusion>
-          <artifactId>uberfire-commons</artifactId>
-          <groupId>org.uberfire</groupId>
-        </exclusion>
         <exclusion>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
@@ -371,6 +367,10 @@
       <artifactId>jaxb-xjc</artifactId>
     </dependency>
 
+    <dependency>
+    	<groupId>org.kie.server</groupId>
+    	<artifactId>kie-server-services-kafka</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

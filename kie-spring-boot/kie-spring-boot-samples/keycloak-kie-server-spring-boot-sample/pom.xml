@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-samples</artifactId>
-    <version>7.41.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
   <artifactId>keycloak-kie-server-spring-boot-sample</artifactId>
 
@@ -13,14 +13,18 @@
 
   <properties>
     <start-class>org.kie.server.springboot.samples.KieServerApplication</start-class>
-
-    <version.org.keycloak>3.4.3.Final</version.org.keycloak>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>javax.activation-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -33,6 +37,10 @@
         <exclusion>
           <artifactId>commons-logging</artifactId>
           <groupId>commons-logging</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sun.activation</groupId>
+          <artifactId>jakarta.activation</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -67,6 +75,14 @@
           <groupId>jakarta.xml.bind</groupId>
           <artifactId>jakarta.xml.bind-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.junit.vintage</groupId>
+          <artifactId>junit-vintage-engine</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -86,6 +102,42 @@
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-admin-client</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.keycloak</groupId>
+          <artifactId>keycloak-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.keycloak</groupId>
+          <artifactId>keycloak-common</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-multipart-provider</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxb-provider</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -121,6 +173,18 @@
               </configuration>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <keycloak.http.port>8080</keycloak.http.port>
+              <keycloak.image>quay.io/keycloak/keycloak</keycloak.image>
+              <keycloak.version>${version.org.keycloak}</keycloak.version>
+            </systemPropertyVariables>
+            <reuseForks>false</reuseForks>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

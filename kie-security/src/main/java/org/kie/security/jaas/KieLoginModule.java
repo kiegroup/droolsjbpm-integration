@@ -29,7 +29,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.uberfire.security.backend.BasicAuthorizationPrincipal;
+import org.kie.soup.security.utils.BasicAuthorizationPrincipal;
 
 public class KieLoginModule implements LoginModule {
 

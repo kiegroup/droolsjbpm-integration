@@ -50,8 +50,10 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerMode;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.KieServiceResponse;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
@@ -518,7 +520,6 @@ public abstract class AbstractKieServerImplTest {
     @Test
     public void testUpdateContainerWithNullReleaseID() {
         KieServerExtension extension = mock(KieServerExtension.class);
-        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(false);
         extensions.add(extension);
 
         String containerId = "container-to-update";
@@ -550,6 +551,58 @@ public abstract class AbstractKieServerImplTest {
         ServiceResponse<KieContainerResource> getResponse = kieServer.getContainerInfo(containerId);
         Assertions.assertThat(getResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
         Assertions.assertThat(getResponse.getResult().getScanner()).isEqualTo(kieScannerResource);
+    }
+    
+    @Test
+    //https://issues.redhat.com/browse/JBPM-9435
+    public void kieServerStateResponseTest() {
+        System.setProperty(KieServerConstants.CFG_KIE_USER, "kieserver");
+        System.setProperty(KieServerConstants.CFG_KIE_PASSWORD, "kieserver1!");
+        System.setProperty(KieServerConstants.CFG_KIE_TOKEN, "abcd-abcd-abcd-abcd");
+        System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_USER, "ControllerUser");
+        System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "ControllerUser1234");
+        System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN, "abcd-abcd-abcd-abcd");
+
+        try {
+            kieServer.destroy();
+            kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
+            kieServer.init();
+
+            ServiceResponse<KieServerStateInfo> kieServerStateResponse = kieServer.getServerState();
+
+            assertNotNull(kieServerStateResponse);
+            Assertions.assertThat(kieServerStateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+
+            List<KieServerConfigItem> configItems = kieServerStateResponse.getResult().getConfiguration()
+                    .getConfigItems();
+            assertTrue(configItems.contains(new KieServerConfigItem(KieServerConstants.CFG_KIE_USER,
+                                                                    "kieserver",
+                                                                    "java.lang.String")));
+            assertFalse(configItems.contains(new KieServerConfigItem(KieServerConstants.CFG_KIE_PASSWORD,
+                                                                     "kieserver1!",
+                                                                     "java.lang.String")));
+            assertFalse(configItems.contains(new KieServerConfigItem(KieServerConstants.CFG_KIE_TOKEN,
+                                                                     "abcd-abcd-abcd-abcd",
+                                                                     "java.lang.String")));
+            assertTrue(configItems.contains(new KieServerConfigItem(KieServerConstants.CFG_KIE_CONTROLLER_USER,
+                                                                    "ControllerUser",
+                                                                    "java.lang.String")));
+            assertFalse(configItems.contains(new KieServerConfigItem(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD,
+                                                                     "ControllerUser1234",
+                                                                     "java.lang.String")));
+            assertFalse(configItems.contains(new KieServerConfigItem(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN,
+                                                                     "abcd-abcd-abcd-abcd",
+                                                                     "java.lang.String")));
+
+        } finally {
+            System.clearProperty(KieServerConstants.CFG_KIE_USER);
+            System.clearProperty(KieServerConstants.CFG_KIE_PASSWORD);
+            System.clearProperty(KieServerConstants.CFG_KIE_TOKEN);
+            System.clearProperty(KieServerConstants.CFG_KIE_CONTROLLER_USER);
+            System.clearProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD);
+            System.clearProperty(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+        }
+
     }
 
     @Test
@@ -622,7 +675,7 @@ public abstract class AbstractKieServerImplTest {
             }
 
             @Override
-            protected KieServerController getController() {
+            public KieServerController getController() {
                 return new DefaultRestControllerImpl(getServerRegistry()) {
                     @Override
                     public KieServerSetup connect(KieServerInfo serverInfo) {

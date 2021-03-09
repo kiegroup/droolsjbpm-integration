@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
+import static org.kie.server.router.utils.TrustStoreHelper.getCurrentTrustStore;
 
 public class SSLContextBuilderTest {
 
@@ -29,8 +30,8 @@ public class SSLContextBuilderTest {
     private static final String KEYSTORE_ALIAS_TWO = "jason";
 
     private static final String KEYSTORE_PATH = SSLContextBuilder.class.getClassLoader().getResource("keystores/router.keystore").getFile();
-    private static final String TRUSTSTORE_PATH = SSLContextBuilder.class.getClassLoader().getResource("keystores/router.truststore").getFile();
-
+    private static final String TRUSTSTORE_PATH = SSLContextBuilder.class.getClassLoader().getResource(getCurrentTrustStore()).getFile();
+    
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

@@ -27,10 +27,15 @@ public enum ExecModelMode {
     NO,
     YES_WITHDRL,
     WITHMVEL,
-    WITHDRL_MVEL;
+    WITHDRL_MVEL,
+    WITHANC;
 
     public static boolean modelParameterEnabled(String s) {
-        return asList(YES, YES_WITHDRL, WITHMVEL, WITHDRL_MVEL).contains(valueOf(s.toUpperCase()));
+        return asList(YES, YES_WITHDRL, WITHMVEL, WITHDRL_MVEL, WITHANC).contains(valueOf(s.toUpperCase()));
+    }
+
+    public static boolean ancEnabled(String s) {
+        return asList(WITHANC).contains(valueOf(s.toUpperCase()));
     }
 
     public static boolean isModelCompilerInClassPath(List<Dependency> dependencies) {

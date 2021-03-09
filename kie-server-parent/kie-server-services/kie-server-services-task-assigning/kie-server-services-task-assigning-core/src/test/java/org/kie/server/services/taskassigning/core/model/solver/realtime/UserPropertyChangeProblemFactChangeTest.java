@@ -82,7 +82,6 @@ public class UserPropertyChangeProblemFactChangeTest {
         newEnabled = false;
         user = new User(1, USER_ID);
         workingSolution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
-        when(scoreDirector.getWorkingSolution()).thenReturn(workingSolution);
         change = new UserPropertyChangeProblemFactChange(user, newEnabled, newAttributes, newLabelValues, newGroups);
     }
 

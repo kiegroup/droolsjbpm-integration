@@ -58,6 +58,10 @@ public class SpecManagementServiceImpl implements SpecManagementService {
             throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
+        if (containerSpec.getId() == null || containerSpec.getId().isEmpty()) {
+            throw new KieServerControllerException("Cannot create container with empty container id.");
+        }
+        
         if (serverTemplate.hasContainerSpec(containerSpec.getId())) {
             throw new KieServerControllerException("Server template with id " + serverTemplateId + " associated already with container " + containerSpec.getId());
         }
@@ -94,6 +98,12 @@ public class SpecManagementServiceImpl implements SpecManagementService {
             throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
 
+
+        if (containerSpec.getId() == null || containerSpec.getId().isEmpty()) {
+            throw new KieServerControllerException("Cannot update container with empty container id.");
+        }
+        
+        
         if (!containerSpec.getId().equals(containerId)) {
             throw new KieServerControllerException("Cannot update container " + containerSpec.getId() + " on container " + containerId);
         }

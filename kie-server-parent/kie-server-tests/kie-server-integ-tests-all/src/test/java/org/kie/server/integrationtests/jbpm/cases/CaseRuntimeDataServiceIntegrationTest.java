@@ -525,6 +525,38 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(hrCaseId, caseInstances.get(0).getCaseId());
         assertEquals(claimCaseId, caseInstances.get(1).getCaseId());
     }
+    
+    @Test
+    public void testGetCaseInstancesWithData() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        List<String> statuses = Collections.singletonList(CaseStatus.OPEN.getName());
+        List<CaseInstance> caseInstances = caseClient.getCaseInstances(statuses, 0, 1, "", false, false);
+        assertEquals(1, caseInstances.size());
+        CaseInstance instance = caseInstances.get(0);
+        assertEquals(caseId, instance.getCaseId());
+        assertNull(instance.getCaseFile());
+        caseInstances = caseClient.getCaseInstances(statuses, 0, 1, "", false, true);
+        instance = caseInstances.get(0);
+        assertEquals(caseId, instance.getCaseId());
+        assertNotNull (instance.getCaseFile());
+        assertEquals("first case started", instance.getCaseFile().getData().get("s"));
+    }
+    
+    @Test
+    public void testGetCaseOwnedWithData() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        List<String> statuses = Collections.singletonList(CaseStatus.OPEN.getName());
+        List<CaseInstance> caseInstances = caseClient.getCaseInstancesOwnedBy(USER_YODA,statuses, 0, 1, "", false, false);
+        assertEquals(1, caseInstances.size());
+        CaseInstance instance = caseInstances.get(0);
+        assertEquals(caseId, instance.getCaseId());
+        assertNull(instance.getCaseFile());
+        caseInstances = caseClient.getCaseInstancesOwnedBy(USER_YODA,statuses, 0, 1, "", false, true);
+        instance = caseInstances.get(0);
+        assertEquals(caseId, instance.getCaseId());
+        assertNotNull (instance.getCaseFile());
+        assertEquals("first case started", instance.getCaseFile().getData().get("s"));
+    }
 
     @Test
     public void testGetCaseInstancesByNotExistingContainer() {
@@ -568,11 +600,13 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, caseInstances.size());
         assertHrCaseInstance(caseInstances.get(0), caseId, USER_YODA);
 
-        caseInstances = caseClient.getCaseInstancesByContainer(CONTAINER_ID, Arrays.asList(CaseStatus.OPEN.getName()), 0, 10, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, false);
+        caseInstances = caseClient.getCaseInstancesByContainer(CONTAINER_ID, Arrays.asList(CaseStatus.OPEN.getName()), 0, 10, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, false, true);
         assertNotNull(caseInstances);
         assertEquals(2, caseInstances.size());
         assertHrCaseInstance(caseInstances.get(0), caseId, USER_YODA);
+        assertNotNull(caseInstances.get(0).getCaseFile());
         assertCarInsuranceCaseInstance(caseInstances.get(1), caseId2, USER_YODA);
+        assertNotNull(caseInstances.get(1).getCaseFile());
     }
 
     @Test
@@ -628,11 +662,13 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, caseInstances.size());
         assertHrCaseInstance(caseInstances.get(0), caseId2, USER_YODA);
 
-        caseInstances = caseClient.getCaseInstancesByDefinition(CONTAINER_ID, CASE_HR_DEF_ID, Arrays.asList(CaseStatus.OPEN.getName()), 0, 10, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, false);
+        caseInstances = caseClient.getCaseInstancesByDefinition(CONTAINER_ID, CASE_HR_DEF_ID, Arrays.asList(CaseStatus.OPEN.getName()), 0, 10, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, false, true);
         assertNotNull(caseInstances);
         assertEquals(2, caseInstances.size());
         assertHrCaseInstance(caseInstances.get(0), caseId2, USER_YODA);
+        assertNotNull(caseInstances.get(0).getCaseFile());
         assertHrCaseInstance(caseInstances.get(1), caseId, USER_YODA);
+        assertNotNull(caseInstances.get(1).getCaseFile());
     }
 
     @Test
@@ -1774,20 +1810,23 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue(mappedDefinitions.contains("DataVerification"));
         assertTrue(mappedDefinitions.contains("hiring"));
 
-        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1);
+        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1,
+                CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, true);
         assertNotNull(definitions);
         assertEquals(1, definitions.size());
         assertEquals("DataVerification", definitions.get(0).getId());
 
-        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 1, 1);
-        assertNotNull(definitions);
-        assertEquals(1, definitions.size());
-        assertEquals(USER_TASK_DEF_ID, definitions.get(0).getId());
-
-        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1, CaseServicesClient.SORT_BY_PROCESS_NAME, false);
+        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 1, 1,
+                CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, true);
         assertNotNull(definitions);
         assertEquals(1, definitions.size());
         assertEquals("hiring", definitions.get(0).getId());
+
+        definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1,
+                CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, false);
+        assertNotNull(definitions);
+        assertEquals(1, definitions.size());
+        assertEquals(USER_TASK_DEF_ID, definitions.get(0).getId());
     }
 
     @Test
@@ -1797,7 +1836,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, definitions.size());
         assertEquals("hiring", definitions.get(0).getId());
 
-        definitions = caseClient.findProcesses(0, 1, CaseServicesClient.SORT_BY_PROCESS_NAME, false);
+        definitions = caseClient.findProcesses(1, 1, CaseServicesClient.SORT_BY_CASE_DEFINITION_NAME, false);
         assertNotNull(definitions);
         assertEquals(1, definitions.size());
         assertEquals("hiring", definitions.get(0).getId());

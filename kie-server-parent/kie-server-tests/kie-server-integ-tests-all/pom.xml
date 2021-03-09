@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.41.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-all</artifactId>
@@ -107,6 +107,14 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-parser</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    
   </dependencies>
 
   <build>

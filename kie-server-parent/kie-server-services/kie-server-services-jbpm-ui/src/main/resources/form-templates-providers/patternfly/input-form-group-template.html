@@ -1,4 +1,3 @@
-
 <#if item.type == "textarea">
   <div class="form-group">
 	<label for="${item.id}">${item.label}</label>
@@ -61,6 +60,69 @@
 	<strong style="color: red">*</strong>
 	</#if>
     <input id="${item.id}" name="${item.name}" type="date" class="form-control" value="${item.value}" ${(item.required)?string('required', '')} pattern="${item.pattern}"/>    
+</div>
+<#elseif item.type == "documentCollection">
+<div class="form-group">
+	<label for="${item.id}">${item.label}</label> 
+    <div id="${item.id}" data-field="documentCollection">
+    	<#if item.value?size gt 0>
+    	    <#assign documents=item.value>
+			<#list documents as file>
+			<div class="document"> 
+				<span data-field="state"></span>
+				<span class="kie-wb-common-forms-docs-upload-content vertical-">
+				        <a data-field="document" target="_blank" data-name="${file.name}" data-bytes="${file.content}">${file.name}</a>
+				</span>
+				<span data-field="actions" class="kie-wb-common-forms-docs-upload-content"><span aria-hidden="true" class="close">×</span></span>
+			</div>
+			</#list>
+		    <div class="kie-wb-common-forms-docs-upload" data-field="dropRegion" >
+			<div class="kie-wb-common-forms-docs-upload-dropHere"  data-field="dropHere">
+	            <div class="kie-wb-common-forms-docs-upload-dropHere-content">
+	                <h3 data-i18n-key="dropFilesHere">Drop files here</h3>
+	            </div>
+	        </div>
+	        </div>
+		<#else>
+		    <div class="kie-wb-common-forms-docs-upload" data-field="dropRegion" >
+	        	<div class="kie-wb-common-forms-docs-upload-empty" data-field="emptyState">
+	            	<div class="kie-wb-common-forms-docs-upload-empty-content"  data-field="dragHere" >
+		                <h3>
+		                    <span data-i18n-key="dragFilesText">Drag files here to upload</span>
+		                </h3>
+		            </div>
+		        </div>
+		        <div class="kie-wb-common-forms-docs-upload-dropHere"  data-field="dropHere" style="display: none;">
+		            <div class="kie-wb-common-forms-docs-upload-dropHere-content">
+		                <h3 data-i18n-key="dropFilesHere">Drop files here</h3>
+		            </div>
+		        </div>
+		    </div>
+		</#if>
+    </div>
+</div>
+<#elseif item.type == "multipleSelector">
+<div class="form-group">
+  <label for="${item.id}">${item.label}</label>
+  <#if item.required>
+    <strong style="color: red">*</strong>
+  </#if>
+    <select multiple class="form-control" id="${item.id}" ${(item.readOnly)?string('disabled', '')}>
+        <#if item.options?size gt 0>
+            <#assign itemList=item.options>
+            <#list itemList as option>
+                <option value="${option.value}" ${(item.value?seq_contains(option.value))?string('selected','')}>${option.text}</option> 
+            </#list>
+        </#if>
+    </select>
+</div>
+<#elseif item.type == "multipleInput">
+<div class="form-group">
+  <label for="${item.id}">${item.label}</label>
+  <#if item.required>
+    <strong style="color: red">*</strong>
+  </#if>
+  <input type="text" multiple class="form-control" id="${item.id}" ${(item.readOnly)?string('disabled', '')} data-role="tagsinput" value="${item.value}" />
 </div>
 <#elseif item.type == "slider">
 <div class="form-group">

@@ -40,6 +40,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 
 public class TaskAssigningIntegrationTest extends KieServerBaseIntegrationTest {
 
@@ -69,6 +70,10 @@ public class TaskAssigningIntegrationTest extends KieServerBaseIntegrationTest {
 
     @Test
     public void task_assigning_with_skills() {
+        // Skip for MySQL and MariaDB until PLANNER-2079 is fixed
+        assumeFalse(TestConfig.isMySqlDataSource());
+        assumeFalse(TestConfig.isMariaDbDataSource());
+
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("cardType", "VISA");
         parameters.put("language", "ZH");

@@ -112,9 +112,6 @@ public class JSONMarshallerPMMLRequest implements JSONMarshallerExtension {
                         }
                     } while (tok != JsonToken.END_OBJECT);
                     p.nextToken();
-                    values.entrySet().forEach(e -> {
-                        System.out.println(e.getKey() + ": " + e.getValue());
-                    });
                     String pitype = values.get("type");
                     if (pitype != null && !pitype.trim().isEmpty()) {
                         if (pitype.equals(String.class.getName())) {
@@ -140,6 +137,13 @@ public class JSONMarshallerPMMLRequest implements JSONMarshallerExtension {
                             pi.setName(values.get("name"));
                             pi.setType(Double.class);
                             pi.setValue(Double.valueOf(values.get("value")));
+                            request.addRequestParam(pi);
+                        } else if (pitype.equals(Boolean.class.getName())) {
+                            ParameterInfo<Boolean> pi = new ParameterInfo<>();
+                            pi.setCorrelationId(values.get("correlationId"));
+                            pi.setName(values.get("name"));
+                            pi.setType(Boolean.class);
+                            pi.setValue(Boolean.valueOf(values.get("value")));
                             request.addRequestParam(pi);
                         }
                     }

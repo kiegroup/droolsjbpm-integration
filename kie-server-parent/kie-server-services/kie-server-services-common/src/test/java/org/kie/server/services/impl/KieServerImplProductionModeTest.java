@@ -61,7 +61,6 @@ public class KieServerImplProductionModeTest extends AbstractKieServerImplTest {
     @Test
     public void testUpdateContainerWithGAVConflict() {
         KieServerExtension extension = mock(KieServerExtension.class);
-        when(extension.isUpdateContainerAllowed(any(), any(), any())).thenReturn(false);
         extensions.add(extension);
 
         String containerId = "container-to-update";

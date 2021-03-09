@@ -35,6 +35,7 @@ import org.springframework.context.event.EventListener;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.kie.server.api.KieServerConstants.KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_PWD;
@@ -44,6 +45,7 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_RUNTIME_DELEGATE_PAGE_SIZE;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_ARTIFACT_ID;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SOLVER_CONTAINER_GROUP_ID;
@@ -110,6 +112,8 @@ public class TaskAssigningPlanningKieServerAutoConfiguration {
         setIfConfigured(TASK_ASSIGNING_SYNC_INTERVAL, properties.getSolutionSyncInterval());
         setIfConfigured(TASK_ASSIGNING_SYNC_QUERIES_SHIFT, properties.getSolutionSyncQueriesShift());
         setIfConfigured(TASK_ASSIGNING_USERS_SYNC_INTERVAL, properties.getUsersSyncInterval());
+        setIfConfigured(TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION, properties.getWaitForImprovedSolutionDuration());
+        setIfConfigured(TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION, properties.getImproveSolutionOnBackgroundDuration());
 
         setIfConfigured(TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE, properties.getSolver().getConfigResource());
         setIfConfigured(TASK_ASSIGNING_SOLVER_MOVE_THREAD_COUNT, properties.getSolver().getMoveThreadCount());

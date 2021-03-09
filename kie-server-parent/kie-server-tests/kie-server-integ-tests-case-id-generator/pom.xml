@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.41.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-case-id-generator</artifactId>
@@ -17,6 +17,7 @@
     <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
     <org.jbpm.case.server.ext.disabled>false</org.jbpm.case.server.ext.disabled>
+    <skip-prepare-kie-server>true</skip-prepare-kie-server>
   </properties>
 
   <dependencies>
@@ -35,6 +36,11 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mvel</groupId>
+      <artifactId>mvel2</artifactId>
     </dependency>
 
     <!-- Logging -->
@@ -98,8 +104,9 @@
               <id>prepare-kie-server</id>
               <phase>pre-integration-test</phase>
               <configuration>
+                <skip>${skip-prepare-kie-server}</skip>
                 <target>
-                  <unzip src="${maven.dependency.org.kie.server.kie-server.ee7.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
+                  <unzip src="${kie-server.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
                   <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
                   <zip destfile="${project.build.directory}/kie-server.war" basedir="${project.build.directory}/unzipped-kie-server"/>
                 </target>
@@ -186,32 +193,62 @@
           <value>tomcat9</value>
         </property>
       </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-antrun-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>prepare-kie-server</id>
-                  <phase>pre-integration-test</phase>
-                  <configuration>
-                    <target>
-                      <unzip src="${maven.dependency.org.kie.server.kie-server.webc.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
-                      <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
-                      <zip destfile="${project.build.directory}/kie-server.war" basedir="${project.build.directory}/unzipped-kie-server"/>
-                    </target>
-                  </configuration>
-                  <goals>
-                    <goal>run</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.webc.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
+    </profile>
+    <profile>
+      <id>wildfly</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>wildfly</value>
+        </property>
+      </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee8.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
+    </profile>
+    <profile>
+      <id>eap7</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>eap7</value>
+        </property>
+      </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee8.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
+    </profile>
+    <profile>
+      <id>oracle-wls-12</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>oracle-wls-12</value>
+        </property>
+      </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee7.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
+    </profile>
+    <profile>
+      <id>websphere9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>websphere9</value>
+        </property>
+      </activation>
+      <properties>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee7.war.path}</kie-server.war.path>
+        <skip-prepare-kie-server>false</skip-prepare-kie-server>
+      </properties>
     </profile>
   </profiles>
 </project>

@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.kie.internal.process.CorrelationKey;
 import org.kie.server.api.commands.CommandScript;
@@ -82,12 +83,14 @@ import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_COMPLET
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_NAME;
+import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_BY_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INSTANCES_PORT_URI;
 import static org.kie.server.api.rest.RestURI.SIGNAL_PROCESS_INST_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
+import static org.kie.server.api.rest.RestURI.START_SYNC_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.TASK_NAME;
 import static org.kie.server.api.rest.RestURI.VAR_NAME;
 import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
@@ -326,6 +329,35 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
         return ((Number) result).longValue();
     }
 
+
+    @Override
+    public Map<String, Object> startSynchronousProcess(String containerId, String processId, Map<String, Object> variables) {
+        Object result = null;
+
+        if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
+            result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + START_SYNC_PROCESS_POST_URI, valuesMap), variables,
+                    Object.class);
+
+        } else {
+            CommandScript script = new CommandScript(singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "startSynchronousProcess", serialize(safeMap(variables)), marshaller.getFormat().getType(), new Object[]{containerId, processId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = deserialize(response.getResult(), Map.class);
+        }
+
+        return (Map<String, Object>) result;
+    }
 
     @Override
     public Long startProcessFromNodeIds(String containerId, String processId, Map<String, Object> variables, String... nodes) {
@@ -587,6 +619,56 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
         } else {
             CommandScript script = new CommandScript(singletonList(
                     (KieServerCommand) new DescriptorCommand( "ProcessService", "signalProcessInstances", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceIds, signalName})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void signalProcessInstanceByCorrelationKey(String containerId,
+                                                      CorrelationKey correlationKey,
+                                                      String signalName,
+                                                      Object event) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
+            valuesMap.put(SIGNAL_NAME, signalName);
+
+            Map<String, String> headers = new HashMap<String, String>();
+
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + SIGNAL_PROCESS_BY_CORRELATION_KEY_POST_URI, valuesMap), event, String.class, headers);
+        } else {
+            CommandScript script = new CommandScript(singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "signalProcessInstanceByCorrelationKey", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, correlationKey.toExternalForm(), signalName})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void signalProcessInstancesByCorrelationKeys(String containerId,
+                                                        List<CorrelationKey> correlationKeys,
+                                                        String signalName,
+                                                        Object event) {
+        List<String> keys = correlationKeys.stream().map(CorrelationKey::toExternalForm).collect(Collectors.toList());
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(SIGNAL_NAME, signalName);
+
+
+            String queryStr = buildQueryString("correlationKeys", keys);
+
+
+            Map<String, String> headers = new HashMap<String, String>();
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap) + queryStr
+                    , event, String.class, headers);
+        } else {
+            CommandScript script = new CommandScript(singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "signalProcessInstancesByCorrelationKey", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, keys, signalName})));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -1098,6 +1180,5 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
 
         return Collections.emptyList();
     }
-
 
 }
