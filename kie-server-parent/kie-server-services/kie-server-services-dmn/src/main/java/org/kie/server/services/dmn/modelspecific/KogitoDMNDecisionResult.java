@@ -19,10 +19,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.core.internal.utils.MarshallingStubUtils;
 
+@Schema(name="MSDMNE_KogitoDMNDecisionResult")
 public class KogitoDMNDecisionResult implements Serializable,
                                                 DMNDecisionResult {
 

@@ -87,6 +87,7 @@ public class RestURI {
     // uris
     // process related prefixed by PROCESS_URI
     public static final String START_PROCESS_POST_URI = "{" + PROCESS_ID + "}/instances";
+    public static final String START_SYNC_PROCESS_POST_URI = "{" + PROCESS_ID + "}/syncInstances";
     public static final String START_PROCESS_FROM_NODES_POST_URI = "{" + PROCESS_ID + "}/instances/fromNodes";
     public static final String START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI = "{" + PROCESS_ID + "}/instances/correlation/{" + CORRELATION_KEY + "}/fromNodes";
     public static final String START_PROCESS_WITH_CORRELATION_KEY_POST_URI = "{" + PROCESS_ID + "}/instances/correlation/{" + CORRELATION_KEY + "}";
@@ -253,6 +254,7 @@ public class RestURI {
     public static final String DOCUMENT_INSTANCE_DELETE_URI = "{" + DOCUMENT_ID + "}";
 
     // admin process related
+    public static final String MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/subprocess";
     public static final String MIGRATE_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID + "}";
     public static final String MIGRATE_PROCESS_INSTANCES_PUT_URI = "instances";
     public static final String CANCEL_NODE_INST_PROCESS_INST_DELETE_URI = "instances/{" + PROCESS_INST_ID + "}/nodeinstances/{" + NODE_INSTANCE_ID + "}";

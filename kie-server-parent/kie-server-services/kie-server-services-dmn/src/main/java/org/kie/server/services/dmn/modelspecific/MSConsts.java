@@ -19,9 +19,11 @@ package org.kie.server.services.dmn.modelspecific;
 
 public class MSConsts {
 
+    public static final String MSDMNE_KOGITO_DMN_RESULT = "MSDMNE_KogitoDMNResult";
+    public static final String KOGITO_DECISION_INFOWARN_HEADER = "X-Kogito-decision-messages";
+
     private MSConsts() {
         // not available for utility classes.
     }
 
-    public static final String KOGITO_DECISION_INFOWARN_HEADER = "X-Kogito-decision-messages";
 }
