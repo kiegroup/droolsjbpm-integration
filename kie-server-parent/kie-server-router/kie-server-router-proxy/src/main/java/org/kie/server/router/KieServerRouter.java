@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -73,6 +72,8 @@ import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.HttpUtils;
 import org.kie.server.router.utils.SSLContextBuilder;
 
+import static org.kie.server.router.KieServerRouterConstants.DEFAULT_PORT_NUM;
+import static org.kie.server.router.KieServerRouterConstants.DEFAULT_PORT_TLS_NUM;
 import static org.kie.server.router.KieServerRouterConstants.KIE_CONTROLLER;
 import static org.kie.server.router.KieServerRouterConstants.KIE_ROUTER_MANAGEMENT_SECURED;
 import static org.kie.server.router.KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL;
@@ -87,10 +88,8 @@ public class KieServerRouter {
 
     private static final String HOST = System.getProperty(ROUTER_HOST,
                                                           "localhost");
-    private static final int DEFAULT_PORT_NUM = 9000;
     private static final int PORT = Integer.parseInt(System.getProperty(ROUTER_PORT,
                                                                         String.valueOf(DEFAULT_PORT_NUM)));
-    private static final int DEFAULT_PORT_TLS_NUM = 9443;
     private static final int PORT_TLS = Integer.parseInt(System.getProperty(ROUTER_PORT_TLS,
                                                                             String.valueOf(DEFAULT_PORT_TLS_NUM)));
     private static final String KEYSTORE_PATH = System.getProperty(ROUTER_KEYSTORE);
@@ -127,6 +126,7 @@ public class KieServerRouter {
     private ScheduledFuture<?> controllerConnectionAttempts;
     private boolean isSecured;
     private String identityServiceName;
+    private boolean isHttpEnabled;
 
     public KieServerRouter() {
         this(reloadManagementSecured(), reloadIdentityProvider()); //Reload for easier testing
@@ -177,6 +177,7 @@ public class KieServerRouter {
                      PORT_TLS);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 router.stop();
             }
@@ -202,6 +203,8 @@ public class KieServerRouter {
                            port.toString());
         System.setProperty(ROUTER_PORT_TLS,
                            portTls.toString());
+        
+        isHttpEnabled = isValidPort(port);
 
         Configuration configuration = repository.load();
 
@@ -271,9 +274,13 @@ public class KieServerRouter {
         HttpHandler blockingHandler = new BlockingHandler(pathHandler);
 
         // main server configuration
-        Undertow.Builder undertowBuilder = Undertow.builder()
-                .addHttpListener(port,
-                                 host);
+        Undertow.Builder undertowBuilder = Undertow.builder();
+        
+        
+        
+        if (isHttpEnabled) {
+            undertowBuilder.addHttpListener(port, host);
+        }
 
         if (TLS_ENABLED) {
             SSLContext sslContext = SSLContextBuilder.builder()
@@ -284,29 +291,29 @@ public class KieServerRouter {
                                                                host,
                                                                sslContext);
         }
-
+        
+        if (!isHttpEnabled && !TLS_ENABLED) {
+            throw new IllegalStateException(
+                    "HTTP listener was disabled (by setting HTTP port to 0 or lower ) and TLS wasn't configured, no listener is available to handle requests");
+        }
+        
         server = undertowBuilder
                 .setHandler(blockingHandler)
                 .build();
-
         server.start();
-
-        if (TLS_ENABLED) {
-            log.infof("KieServerRouter started on %s:%s and %s:%s (TLS) at %s",
-                      host,
-                      port,
-                      host,
-                      portTls,
-                      new Date());
-        } else {
-            log.infof("KieServerRouter started on %s:%s at %s",
-                      host,
-                      port,
-                      new Date());
+        
+        
+        if (log.isInfoEnabled()) {
+            logServerInfo("KieServerRouter started on: ", host, port, portTls);
         }
-
+        
         connectToController(adminHandler);
     }
+    
+    public static boolean isValidPort (int port) {
+        return port > 0;
+    }
+    
 
     public void stop() {
         stop(false);
@@ -321,14 +328,28 @@ public class KieServerRouter {
             if (clean) {
                 repository.clean();
             }
-            log.infof("KieServerRouter stopped on %s:%s at %s",
-                      System.getProperty(ROUTER_HOST),
-                      System.getProperty(ROUTER_PORT),
-                      new Date());
+            if (log.isInfoEnabled()) {
+                logServerInfo("KieServerRouter stopped on: ", System.getProperty(ROUTER_HOST),
+                        Integer.getInteger(ROUTER_PORT), Integer.getInteger(ROUTER_PORT_TLS));
+            }
+            
+            
         } else {
             log.error("KieServerRouter was not started");
         }
     }
+    
+    private void logServerInfo(String prefix, String host, int port, int portTls) {
+        StringBuilder sb = new StringBuilder(prefix);
+        if (isHttpEnabled) {
+            sb.append(host).append(':').append(port);
+        }
+        if (TLS_ENABLED) {
+            sb.append(" (TLS) ").append(host).append(':').append(portTls);
+        }
+        log.info(sb);
+    }
+
 
     protected void connectToController(AdminHttpHandler adminHandler) {
         if (CONTROLLER == null) {
