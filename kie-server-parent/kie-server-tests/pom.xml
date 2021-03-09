@@ -208,10 +208,6 @@
         <version>${version.org.kie}</version>
         <type>war</type>
       </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -458,7 +454,7 @@
       <id>mysql</id>
       <properties>
         <org.kie.server.persistence.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</org.kie.server.persistence.dialect>
-        <org.kie.server.datasource.driver.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</org.kie.server.datasource.driver.class>
+        <org.kie.server.datasource.driver.class>com.mysql.cj.jdbc.MysqlXADataSource</org.kie.server.datasource.driver.class>
         <!-- Connection URL, format example: jdbc:mysql://localhost:3306/mydb -->
         <org.kie.server.datasource.connection.url>specify-mysql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
         <springboot.jdbc.driver.jar>${mysql:mysql-connector-java:jar}</springboot.jdbc.driver.jar>
