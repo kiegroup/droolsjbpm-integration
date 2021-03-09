@@ -11,7 +11,7 @@
   <packaging>kjar</packaging>
 
   <properties>
-<!--    <kie.version>7.51.0-SNAPSHOT</kie.version>-->
+<!--    <kie.version>7.52.0-SNAPSHOT</kie.version>-->
     <generateModel>NO</generateModel>
     <generateDMNModel>NO</generateDMNModel>
     <maven.compiler.target>1.8</maven.compiler.target>
