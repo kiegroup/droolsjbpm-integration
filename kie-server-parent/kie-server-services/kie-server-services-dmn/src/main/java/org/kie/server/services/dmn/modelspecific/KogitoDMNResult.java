@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
@@ -32,6 +33,7 @@ import org.kie.dmn.api.core.DMNMessage.Severity;
 import org.kie.dmn.core.internal.utils.MapBackedDMNContext;
 import org.kie.dmn.core.internal.utils.MarshallingStubUtils;
 
+@Schema(name=MSConsts.MSDMNE_KOGITO_DMN_RESULT)
 public class KogitoDMNResult implements Serializable,
                                         org.kie.dmn.api.core.DMNResult {
 

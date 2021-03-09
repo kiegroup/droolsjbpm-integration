@@ -18,13 +18,16 @@ package org.kie.server.services.dmn.modelspecific;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.DMNMessageType;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent;
 import org.kie.internal.builder.InternalMessage;
 
+@Schema(name="MSDMNE_KogitoDMNMessage")
 public class KogitoDMNMessage implements Serializable, DMNMessage {
 
+    @Schema(name="MSDMNE_DMNMessageSeverityKS")
     public static enum DMNMessageSeverityKS {
         INFO,
         WARN,

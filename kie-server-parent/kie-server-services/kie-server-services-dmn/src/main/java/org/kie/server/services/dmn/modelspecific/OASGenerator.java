@@ -96,7 +96,7 @@ public class OASGenerator {
         DMNModelIOSets ioSets = dmnoas.lookupIOSetsByModel(dmnModel);
         DMNType identifyInputSet = ioSets.lookupDSIOSetsByName(ds.getName()).getDSInputSet();
         String inputRef = dmnoas.getNamingPolicy().getRef(identifyInputSet);
-        Operation operation = buildOperationWithIORefs(description, inputRef, "#/components/schemas/MSDMNE_KogitoDMNResult").summary(description).addTag(dmnModel.getName());
+        Operation operation = buildOperationWithIORefs(description, inputRef, "#/components/schemas/" + MSConsts.MSDMNE_KOGITO_DMN_RESULT).summary(description).addTag(dmnModel.getName());
         PathItem pathItem = OASFactory.createObject(PathItem.class);
         pathItem.POST(operation);
         openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/models/" + dmnModel.getName() + "/" + ds.getName() + "/dmnresult", pathItem);
@@ -120,7 +120,7 @@ public class OASGenerator {
         DMNModelIOSets ioSets = dmnoas.lookupIOSetsByModel(dmnModel);
         DMNType identifyInputSet = ioSets.getInputSet();
         String inputRef = dmnoas.getNamingPolicy().getRef(identifyInputSet);
-        Operation operation = buildOperationWithIORefs(description, inputRef, "#/components/schemas/MSDMNE_KogitoDMNResult").summary(description).addTag(dmnModel.getName());
+        Operation operation = buildOperationWithIORefs(description, inputRef, "#/components/schemas/" + MSConsts.MSDMNE_KOGITO_DMN_RESULT).summary(description).addTag(dmnModel.getName());
         PathItem pathItem = OASFactory.createObject(PathItem.class);
         pathItem.POST(operation);
         openAPI.getPaths().addPathItem("/server/containers/" + containerId + "/dmn/models/" + dmnModel.getName() + "/dmnresult", pathItem);
