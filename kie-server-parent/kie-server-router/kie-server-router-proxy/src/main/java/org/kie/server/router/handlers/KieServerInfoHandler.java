@@ -17,13 +17,13 @@ package org.kie.server.router.handlers;
 
 import java.util.stream.Collectors;
 
-import org.kie.server.router.KieServerRouterConstants;
-
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import org.kie.server.router.KieServerRouter;
+import org.kie.server.router.KieServerRouterConstants;
 
 
 public class KieServerInfoHandler implements HttpHandler {
@@ -120,19 +120,29 @@ public class KieServerInfoHandler implements HttpHandler {
         exchange.getResponseSender().send(response);
 
     }
-
+    
+    
     public static String getLocationUrl() {
         String externalUrl = System.getProperty(KieServerRouterConstants.ROUTER_EXTERNAL_URL);
-
-        if(externalUrl == null) {
+        int port = Integer.getInteger(KieServerRouterConstants.ROUTER_PORT, KieServerRouterConstants.DEFAULT_PORT_NUM);
+        boolean httpEnabled = KieServerRouter.isValidPort(port);
+        if (externalUrl == null) {
             StringBuilder sb = new StringBuilder();
-            sb.append("http://");
+            if (httpEnabled) {
+                sb.append("http://");
+            } else {
+                sb.append("https://");
+            }
             sb.append(System.getProperty(KieServerRouterConstants.ROUTER_HOST, "localhost"));
             sb.append(":");
-            sb.append(System.getProperty(KieServerRouterConstants.ROUTER_PORT, "9000"));
+            if (httpEnabled) {
+                sb.append(port);
+            } else {
+                sb.append(Integer.getInteger(KieServerRouterConstants.ROUTER_PORT_TLS,
+                        KieServerRouterConstants.DEFAULT_PORT_TLS_NUM));
+            }
             externalUrl = sb.toString();
         }
-
         return externalUrl;
     }
 
