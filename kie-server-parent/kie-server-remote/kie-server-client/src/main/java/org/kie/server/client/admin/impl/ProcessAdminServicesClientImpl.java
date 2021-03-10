@@ -120,6 +120,39 @@ public class ProcessAdminServicesClientImpl extends AbstractKieServicesClientImp
     }
 
     @Override
+    public MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId) {
+        return migrateProcessInstanceWithSubprocess(containerId, processInstanceId, targetContainerId, targetProcessId, new HashMap<>());
+    }
+
+    @Override
+    public MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId, Map<String, String> nodeMapping) {
+        MigrationReportInstance reportInstance;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            Map<String, String> headers = new HashMap<>();
+
+            String queryString = "?targetContainerId=" + targetContainerId + "&targetProcessId=" + targetProcessId;
+
+            reportInstance = makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI, valuesMap) + queryString, nodeMapping, MigrationReportInstance.class, headers);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "migrateProcessInstanceWithAllSubprocess", serialize(safeMap(nodeMapping)), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, targetContainerId, targetProcessId})));
+            ServiceResponse<MigrationReportInstance> response = (ServiceResponse<MigrationReportInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            reportInstance = response.getResult();
+        }
+
+        return reportInstance;
+    }
+
+    @Override
     public List<ProcessNode> getProcessNodes(String containerId, Long processInstanceId) {
         ProcessNodeList result = null;
         if( config.isRest() ) {

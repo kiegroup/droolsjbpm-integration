@@ -140,6 +140,24 @@
                "methodName": "removePotentialOwnerUsers",
                "elementKind": "method",
                "justification": "[JBPM-9625]  Allow to bypass the authenticated user in the KIE REST API that is adding users or groups as potential owners"
+             },
+             {
+                "code": "java.method.addedToInterface",
+                "new": "method org.kie.server.api.model.admin.MigrationReportInstance org.kie.server.client.admin.ProcessAdminServicesClient::migrateProcessInstanceWithSubprocess(java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
+                "package": "org.kie.server.client.admin",
+                "classSimpleName": "ProcessAdminServicesClient",
+                "methodName": "migrateProcessInstanceWithSubprocess",
+                "elementKind": "method",
+                "justification": "https://issues.redhat.com/browse/JBPM-9653"
+             },
+             {
+                "code": "java.method.addedToInterface",
+                "new": "method org.kie.server.api.model.admin.MigrationReportInstance org.kie.server.client.admin.ProcessAdminServicesClient::migrateProcessInstanceWithSubprocess(java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.String>)",
+                "package": "org.kie.server.client.admin",
+                "classSimpleName": "ProcessAdminServicesClient",
+                "methodName": "migrateProcessInstanceWithSubprocess",
+                "elementKind": "method",
+                "justification": "https://issues.redhat.com/browse/JBPM-9653"
              }
             ]
         }

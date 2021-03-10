@@ -34,6 +34,10 @@ public interface ProcessAdminServicesClient {
 
     List<MigrationReportInstance> migrateProcessInstances(String containerId, List<Long> processInstancesId, String targetContainerId, String targetProcessId, Map<String, String> nodeMapping);
 
+    MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId);
+
+    MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId, Map<String, String> nodeMapping);
+
     List<ProcessNode> getProcessNodes(String containerId, Long processInstanceId);
 
     void cancelNodeInstance(String containerId, Long processInstanceId, Long nodeInstanceId);
