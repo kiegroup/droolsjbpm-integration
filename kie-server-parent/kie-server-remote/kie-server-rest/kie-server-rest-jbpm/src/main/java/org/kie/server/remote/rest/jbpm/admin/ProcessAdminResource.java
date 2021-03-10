@@ -174,7 +174,7 @@ public class ProcessAdminResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response migrateProcessInstanceWithSubprocess(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instances belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "list of identifiers of process instance to be migrated", required = true) @QueryParam(PROCESS_INST_ID) Long processInstanceId,
+            @ApiParam(value = "list of identifiers of process instance to be migrated", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
             @ApiParam(value = "process definition that process instances should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
             @ApiParam(value = "node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
