@@ -65,8 +65,7 @@ public class DefaultKafkaConsumerTest {
     lastControlMessage.setId("1");
     lastControlMessage.setOffset(1l);
     when(consumerUtilsCoreMock.getLastEvent(envConfigTest.getControlTopicName(), envConfigTest.getPollTimeout())).thenReturn(lastControlMessage);
-    when(defaultSessionSnapShooterMock.getLastSnapshotTime()).thenReturn(LocalDateTime.now());
-    when(handlerMock.initializeKieSessionFromSnapshotOnDemand(any(EnvConfig.class), any(SnapshotInfos.class))).thenReturn(Boolean.TRUE);
+    when(handlerMock.initializeKieSessionFromSnapshotOnDemand(any(), any())).thenReturn(Boolean.TRUE);
 
     spy = Mockito.spy(new DefaultKafkaConsumer(){
       {
@@ -117,7 +116,7 @@ public class DefaultKafkaConsumerTest {
     spy.updateStatus(State.REPLICA);
     verify(spy).updateStatus(State.REPLICA);
     verify(spy, never()).updateOnRunningConsumer(any(State.class));
-    verify(spy, times(1)).askAndProcessSnapshotOnDemand(any(SnapshotInfos.class));
+    verify(spy, times(1)).askAndProcessSnapshotOnDemand(any());
     verify(spy, times(1)).enableConsumeAndStartLoop(eq(State.REPLICA));
     verify(spy, times(1)).setLastProcessedKey();
     verify(spy, times(1)).assignAndStartConsume();

@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import javax.websocket.*;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.kie.server.controller.websocket.common.auth.WebSocketAuthConfigurator;
 import org.kie.server.controller.websocket.common.config.WebSocketClientConfiguration;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ public abstract class WebSocketClientImpl<T extends MessageHandler> extends Endp
     private WebSocketContainer container = null;
 
     private Session session = null;
+
+    private URI endpoint = null;
 
     private ClientEndpointConfig config = null;
 
@@ -54,37 +57,45 @@ public abstract class WebSocketClientImpl<T extends MessageHandler> extends Endp
         this.onReconnect = onReconnect;
     }
 
+    
+    public URI getEndpoint() {
+        return endpoint;
+    }
+
     @Override
     public void onClose(Session session, CloseReason reason) {
         if (!session.getId().equals(this.session.getId())) {
             LOGGER.info("Session closed does not match this session... ignoring");
             return;
         }
-        LOGGER.info("Session {} is closed due to {}", session.getId(), reason);
+        LOGGER.info("Session {} is closed due to {}. Trying to reconnect...", session.getId(), reason);
 
-        if (!closed.get()) {
+        MutableBoolean reconnect = new MutableBoolean(false);
+        reconnectThread = new Thread(() -> {
 
-            reconnectThread = new Thread(() -> {
+            while (reconnect.isFalse()) {
+                try {
+                    LOGGER.debug("Waiting 10 seconds before attempting to reconnect to controller {}", this.endpoint);
+                    Thread.sleep(10000);
 
-                while (!session.isOpen()) {
-                    try {
-                        LOGGER.debug("Waiting 10 seconds before attempting to reconnect to controller {}", session.getRequestURI());
-                        Thread.sleep(10000);
-
-                        this.session = container.connectToServer(this, this.config, session.getRequestURI());
-                        if (onReconnect != null) {
-                            onReconnect.accept(this);
-                        }
-                        break;
-                    } catch (InterruptedException e) {
-                        break;
-                    } catch (RuntimeException|DeploymentException|IOException e) {
-                        LOGGER.warn("Unable to reconnect to controller over Web Socket {} due to {}", session.getRequestURI(), e.getMessage());
+                    this.session = container.connectToServer(this, this.config, this.endpoint);
+                    if (onReconnect != null) {
+                        onReconnect.accept(this);
                     }
+                    if(this.session.isOpen()) {
+                        reconnect.setTrue();
+                    }
+                    LOGGER.info("Reconnected to {} with session {}", this.endpoint, this.session.getId());
+                    break;
+                } catch (InterruptedException e) {
+                    break;
+                } catch (RuntimeException|DeploymentException|IOException e) {
+                    LOGGER.warn("Unable to reconnect to controller over Web Socket {} due to {}", this.endpoint, e.getMessage());
                 }
-            }, "Kie Server - Web Socket reconnect");
-            reconnectThread.start();
-        }
+            }
+        }, "Kie Server - Web Socket reconnect");
+        reconnectThread.start();
+
     }
 
     @Override
@@ -102,7 +113,8 @@ public abstract class WebSocketClientImpl<T extends MessageHandler> extends Endp
                     .encoders(clientConfig.getEncoders())
                     .decoders(clientConfig.getDecoders())
                     .build();
-            session = container.connectToServer(this, this.config, URI.create(clientConfig.getControllerUrl()));
+            this.endpoint =  URI.create(clientConfig.getControllerUrl());
+            session = container.connectToServer(this, this.config, this.endpoint);
             LOGGER.info("New Web Socket Session with id: {}, started", session.getId());
         } catch (Exception e) {
             throw new RuntimeException(e);

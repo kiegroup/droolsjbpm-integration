@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services</artifactId>
-    <version>7.41.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-openshift</artifactId>
@@ -34,6 +34,12 @@
         <groupId>io.fabric8</groupId>
         <artifactId>kubernetes-model</artifactId>
         <version>${version.kubernetes-client}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>io.fabric8</groupId>
@@ -90,6 +96,12 @@
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-model</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.fabric8</groupId>

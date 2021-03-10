@@ -15,14 +15,13 @@
 
 package org.kie.maven.plugin;
 
-import org.drools.compiler.commons.jci.stores.ResourceStore;
+import org.kie.memorycompiler.resources.ResourceStore;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 

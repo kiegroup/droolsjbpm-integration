@@ -32,10 +32,12 @@ public class KieServerConstants {
     public static final String KIE_CASE_SERVER_EXT_DISABLED = "org.jbpm.case.server.ext.disabled";
     public static final String KIE_DMN_SERVER_EXT_DISABLED = "org.kie.dmn.server.ext.disabled";
     public static final String KIE_SWAGGER_SERVER_EXT_DISABLED = "org.kie.swagger.server.ext.disabled";
+    public static final String KIE_KAFKA_SERVER_EXT_DISABLED = "org.kie.kafka.server.ext.disabled";
     public static final String KIE_PROMETHEUS_SERVER_EXT_DISABLED = "org.kie.prometheus.server.ext.disabled";
     public static final String KIE_SCENARIO_SIMULATION_SERVER_EXT_DISABLED = "org.kie.scenariosimulation.server.ext.disabled";
     public static final String KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED = "org.kie.server.taskAssigning.planning.ext.disabled";
     public static final String KIE_TASK_ASSIGNING_RUNTIME_EXT_DISABLED = "org.kie.server.taskAssigning.runtime.ext.disabled";
+    public static final String KIE_JBPM_CLUSTER_SERVER_EXT_DISABLED = "org.kie.jbpm.cluster.server.ext.disabled";
 
     public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";
 
@@ -59,7 +61,8 @@ public class KieServerConstants {
     public static final String KIE_SERVER_INCLUDE_STACKTRACE = "org.kie.server.stacktrace.included";
     public static final String KIE_SERVER_STRICT_ID_FORMAT = "org.kie.server.strict.id.format";
     public static final String KIE_SERVER_IMAGESERVICE_MAX_NODES = "org.kie.server.service.image.max_nodes";
-
+    public static final String KIE_SERVER_REST_MODE_READONLY = "org.kie.server.rest.mode.readonly";
+    public static final String KIE_SERVER_NOTIFY_UPDATES_TO_CONTROLLERS = "org.kie.server.update.notifications.rest.enabled";
     // configuration parameters
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";
     public static final String CFG_PERSISTANCE_TM = "org.kie.server.persistence.tm";
@@ -134,10 +137,12 @@ public class KieServerConstants {
     public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
     public static final String CAPABILITY_DMN = "DMN"; // DMN
     public static final String CAPABILITY_SWAGGER = "Swagger"; // Swagger
+    public static final String CAPABILITY_BPM_KAFKA = "BPM-KAFKA"; // Business Process Management Kafka
     public static final String CAPABILITY_PROMETHEUS = "Prometheus"; // Prometheus
     public static final String CAPABILITY_SCENARIO_SIMULATION = "Scenario Simulation"; // Scenario Simulation
     public static final String CAPABILITY_TASK_ASSIGNING_RUNTIME = "TaskAssigningRuntime"; //Task Assigning Runtime
-
+    public static final String CAPABILITY_JBPM_CLUSTER = "BPM-Cluster"; // Business Process Management cluster support
+    
     public static final String FAILURE_REASON_PROP = "failure-reason";
 
     // case management constants

@@ -16,10 +16,13 @@
 
 package org.kie.server.springboot.autoconfiguration;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.kie.server.springboot.EmbeddedKieJar;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -32,10 +35,25 @@ public class KieServerProperties implements InitializingBean {
     private String controllers = "";
     private String serverId = "SpringBoot";
     private String serverName = "KieServer-SpringBoot";
+    private boolean classPathContainer;
 
     private Swagger swagger = new Swagger();
     
+    private List<EmbeddedKieJar> deployments;
+
     private Map<String, String> addons = new HashMap<>(); 
+
+    
+    public List<EmbeddedKieJar> getDeployments() {
+        if(deployments == null) {
+            return Collections.emptyList();
+        }
+        return deployments;
+    }
+
+    public void setDeployments(List<EmbeddedKieJar> deployments) {
+        this.deployments = deployments;
+    }
 
     public String getServerId() {
         return serverId;
@@ -85,6 +103,7 @@ public class KieServerProperties implements InitializingBean {
         this.addons = addons;
     }
 
+
     @Override
     public void afterPropertiesSet() throws Exception {
         if (!this.addons.isEmpty()) {
@@ -93,6 +112,16 @@ public class KieServerProperties implements InitializingBean {
             }
         }
     }
+
+
+    public boolean isClassPathContainer() {
+        return classPathContainer;
+    }
+
+    public void setClassPathContainer(boolean classPathContainer) {
+        this.classPathContainer = classPathContainer;
+    }
+
 
     public static class Swagger {
 

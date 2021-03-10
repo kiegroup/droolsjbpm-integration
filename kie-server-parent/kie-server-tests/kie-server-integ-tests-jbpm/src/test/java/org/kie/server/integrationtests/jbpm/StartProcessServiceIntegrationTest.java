@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,9 +81,14 @@ public class StartProcessServiceIntegrationTest extends JbpmKieServerBaseIntegra
 
             processInstanceId = null;
             processInstanceId = processClient.startProcessFromNodeIds(CONTAINER_ID_RESTART, PROCESS_ID_RESTART, parameters, nodeIds);
+
             assertNotNull(processInstance);
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
 
+            list = this.processClient.findNodeInstancesByType(CONTAINER_ID_RESTART, processInstanceId, "START", 0, 10);
+            assertNotNull(list);
+            assertThat(list.size(), is(1));
+            assertThat(list.get(0).getName(), is("Human Task"));
             processClient.abortProcessInstance(CONTAINER_ID_RESTART, processInstanceId);
         } catch (Exception e) {
             if (processInstanceId != null) {
@@ -127,5 +133,13 @@ public class StartProcessServiceIntegrationTest extends JbpmKieServerBaseIntegra
             }
             fail(e.getMessage());
         }
+    }
+
+    @Test()
+    public void testStartSyncProcess() {
+        Map<String, Object> outcome = processClient.startSynchronousProcess(CONTAINER_ID_RESTART, PROCESS_SYNC_ID, Collections.singletonMap("name", "hello"));
+        assertNotNull(outcome);
+        assertEquals("bye", outcome.get("name"));
+
     }
 }

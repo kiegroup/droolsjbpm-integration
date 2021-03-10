@@ -18,6 +18,7 @@ package org.jbpm.springboot.samples;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 import org.jbpm.springboot.samples.handlers.WidWorkItemHandler;
 import org.kie.api.runtime.process.WorkItemHandler;
@@ -30,6 +31,17 @@ public class TestAutoConfiguration {
     public IdentityProvider identityProvider() {
         
         return new IdentityProvider() {
+            private Stack<String> contextUsers = new Stack<>();
+            
+            @Override
+            public void setContextIdentity(String userId) {
+                contextUsers.push(userId);
+            }
+
+            @Override
+            public void removeContextIdentity() {
+                contextUsers.pop();
+            }
             
             private List<String> roles = Arrays.asList("PM", "HR");
             
@@ -40,12 +52,14 @@ public class TestAutoConfiguration {
             
             @Override
             public List<String> getRoles() {
-                
                 return roles;
             }
             
             @Override
             public String getName() {
+                if(!contextUsers.isEmpty()) {
+                   return contextUsers.peek();
+                }
                 return "john";
             }
         };

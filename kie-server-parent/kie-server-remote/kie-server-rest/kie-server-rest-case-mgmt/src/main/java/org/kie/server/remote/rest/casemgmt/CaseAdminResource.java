@@ -15,18 +15,6 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
-import static org.kie.server.api.rest.RestURI.ADMIN_CASE_ALL_INSTANCES_GET_URI;
-import static org.kie.server.api.rest.RestURI.ADMIN_CASE_URI;
-import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
-import static org.kie.server.api.rest.RestURI.MIGRATE_CASE_INST_PUT_URI;
-import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_INSTANCES_JSON;
-import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_JSON;
-import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_XML;
-import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_REPORT_JSON;
-import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.JSON;
-import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.XML;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -42,6 +30,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 import org.kie.server.remote.rest.common.Header;
@@ -51,13 +46,17 @@ import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+import static org.kie.server.api.rest.RestURI.ADMIN_CASE_ALL_INSTANCES_GET_URI;
+import static org.kie.server.api.rest.RestURI.ADMIN_CASE_URI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.MIGRATE_CASE_INST_PUT_URI;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_INSTANCES_JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_MAP_XML;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_MIGRATION_REPORT_JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.XML;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 
 @Api(value="Case instance administration")
 @Path("server/" + ADMIN_CASE_URI)
@@ -80,10 +79,9 @@ public class CaseAdminResource extends AbstractCaseResource {
         this.caseAdminServiceBase = caseAdminServiceBase;
     }
 
-    @ApiOperation(value="Returns case instances without authentication checks.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns case instances without authentication checks.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(ADMIN_CASE_ALL_INSTANCES_GET_URI)
@@ -93,8 +91,8 @@ public class CaseAdminResource extends AbstractCaseResource {
                                      @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
                                      @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
                                      @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
-                                     @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
-
+                                     @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+                                     @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
         return invokeCaseOperation(headers,
                                    "",
                                    null,
@@ -108,7 +106,8 @@ public class CaseAdminResource extends AbstractCaseResource {
                                                                                                                    page,
                                                                                                                    pageSize,
                                                                                                                    sort,
-                                                                                                                   sortOrder);
+                                                                                                                   sortOrder,
+                                                                                                                   withData);
 
                                        logger.debug("Returning OK response with content '{}'",
                                                     responseObject);
@@ -119,11 +118,10 @@ public class CaseAdminResource extends AbstractCaseResource {
                                    });
     }
     
-    @ApiOperation(value="Migrates a specified case instance to another KIE container and case definition.",
-            response=CaseMigrationReportInstance.class, code=201)
+    @ApiOperation(value="Migrates a specified case instance to another KIE container and case definition.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Case instance or Container Id not found"), 
-            @ApiResponse(code = 201, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = CaseMigrationReportInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_MIGRATION_REPORT_JSON)})) })
     @PUT
     @Path(MIGRATE_CASE_INST_PUT_URI)

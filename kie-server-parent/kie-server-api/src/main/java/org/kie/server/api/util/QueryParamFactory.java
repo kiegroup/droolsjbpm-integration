@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 import org.kie.server.api.model.definition.QueryParam;
 
+import static java.util.Collections.emptyList;
+
 public final class QueryParamFactory {
 
     private QueryParamFactory() {}
@@ -100,6 +102,14 @@ public final class QueryParamFactory {
      */
     public static QueryParam type(String column, Comparable<?> type) {
         return new QueryParam(column, "TYPE", Arrays.asList(type));
+    }
+
+    public static QueryParam history() {
+        return new QueryParam("TABLE", "MODE", Arrays.asList("HISTORY"));
+    }
+
+    public static QueryParam exclude(String collection) {
+        return new QueryParam(collection, "EXCLUDE", emptyList());
     }
 
     public static QueryParam onlyActiveTasks() {

@@ -15,8 +15,11 @@
 
 package org.kie.server.router.repository;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,10 +58,21 @@ public class ConfigFileWatcher implements Runnable {
             if(toWatch.toFile().exists()) {
                 lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
             } else {
-                log.warnv("configuration file does not exists {0} ", this.toWatch);
+                log.warnv("configuration file does not exist {0} , creating...", this.toWatch);
+                String cfg = marshaller.marshall(configuration);
+                File file = new File(this.toWatch.toString());
+                if(file.createNewFile()){
+                    try (FileOutputStream fos = new FileOutputStream(file); PrintWriter writer = new PrintWriter(fos)) {
+                        writer.write(cfg);
+                    }
+                }
+                FileTime lastModified = Files.getLastModifiedTime(toWatch);
+                lastUpdate =  lastModified.toMillis();
             }
         } catch (IOException e) {
             log.error("Unable to read last modified date of routers config file", e);
+        } catch (final Exception e) {
+            log.error("Unable to writer config file", e);
         }
     }
 
@@ -72,7 +86,7 @@ public class ConfigFileWatcher implements Runnable {
             while(active.get()) {
                 try {
                     if(!toWatch.toFile().exists()) {
-                       log.warnv("configuration file does not exists {0} ", this.toWatch);
+                       log.warnv("configuration file does not exist {0} ", this.toWatch);
                        Thread.sleep(sleepTime);
                        continue;
                     }
@@ -90,7 +104,7 @@ public class ConfigFileWatcher implements Runnable {
                         lastUpdate = lastModified.toMillis();
                     }
                 } catch(IOException ioe) {
-                    log.warn("Unexpected exception while watching config file, maybe file does not exist ?", ioe);
+                    log.warn("Unexpected exception while watching config file, maybe file does not exist? ", ioe);
                 }
                 Thread.sleep(sleepTime);
             }

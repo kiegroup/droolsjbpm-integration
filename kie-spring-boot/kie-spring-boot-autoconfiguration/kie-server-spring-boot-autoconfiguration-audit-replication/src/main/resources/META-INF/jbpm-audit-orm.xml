@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+  xmlns="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+  version="2.0">
+
+  <entity class="org.jbpm.process.audit.ProcessInstanceLog">
+
+    <attributes>
+      <id name="id">
+        <generated-value strategy="SEQUENCE" generator="OverrideId" />
+      </id>
+    </attributes>
+  </entity>
+  <entity class="org.jbpm.process.audit.NodeInstanceLog">
+    <attributes>
+      <id name="id">
+        <generated-value strategy="SEQUENCE" generator="OverrideId" />
+      </id>
+    </attributes>
+  </entity>
+  <entity class="org.jbpm.process.audit.VariableInstanceLog">
+    <attributes>
+      <id name="id">
+        <generated-value strategy="SEQUENCE" generator="OverrideId" />
+      </id>
+    </attributes>
+  </entity>
+
+
+  <entity
+    class="org.jbpm.services.task.audit.impl.model.BAMTaskSummaryImpl">
+    <attributes>
+      <id name="pk">
+        <generated-value strategy="SEQUENCE"  generator="OverrideId" />
+      </id>
+    </attributes>
+  </entity>
+
+
+  <entity
+    class="org.jbpm.services.task.audit.impl.model.TaskVariableImpl">
+    <attributes>
+      <id name="id">
+        <generated-value strategy="SEQUENCE" generator="OverrideId" />
+      </id>
+    </attributes>
+  </entity>
+
+
+  <entity
+    class="org.jbpm.services.task.audit.impl.model.AuditTaskImpl">
+    <attributes>
+      <id name="id">
+        <generated-value strategy="SEQUENCE" generator="OverrideId" />
+      </id>
+    </attributes>
+  </entity>
+
+
+  <entity
+    class="org.jbpm.services.task.audit.impl.model.TaskEventImpl">
+    <attributes>
+      <id name="id">
+        <generated-value strategy="SEQUENCE"  generator="OverrideId" />
+      </id>
+    </attributes>
+  </entity>
+
+</entity-mappings>

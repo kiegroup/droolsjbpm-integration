@@ -155,6 +155,7 @@ public class ParameterSamples {
             "  \"from\" : \"test@jbpm.org\",\n" + 
             "  \"reply-to\" : \"no-reply@jbpm.org\",\n" + 
             "  \"users\" : [ \"john\" ],\n" + 
+                                                         "  \"emails\" : [ \"emails@jbpm.org\" ],\n" +
             "  \"groups\" : null,\n" + 
             "  \"subject\" : \"reminder\",\n" + 
             "  \"body\" : \"my test content\"\n" + 
@@ -1250,13 +1251,14 @@ public class ParameterSamples {
             "    <users>john</users>\n" + 
             "</org-entities>";
     public static final String EMAIL_NOTIFICATION_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" + 
-            "<email-notification>\n" + 
-            "    <from>test@jbpm.org</from>\n" + 
-            "    <reply-to>no-reply@jbpm.org</reply-to>\n" + 
-            "    <users>john</users>\n" + 
-            "    <subject>reminder</subject>\n" + 
-            "    <body>my test content</body>\n" + 
-            "</email-notification>";
+                                                        "<email-notification>\n" +
+                                                        "    <from>test@jbpm.org</from>\n" +
+                                                        "    <reply-to>no-reply@jbpm.org</reply-to>\n" +
+                                                        "    <users>john</users>\n" +
+                                                        "    <emails>email@jbpm.olrg</emails>" +
+                                                        "    <subject>reminder</subject>\n" +
+                                                        "    <body>my test content</body>\n" +
+                                                        "</email-notification>";
     
     
     /*

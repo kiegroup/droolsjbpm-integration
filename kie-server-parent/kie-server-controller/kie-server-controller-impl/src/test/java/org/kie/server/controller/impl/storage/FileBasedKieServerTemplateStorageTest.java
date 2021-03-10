@@ -14,12 +14,6 @@
 */
 package org.kie.server.controller.impl.storage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
@@ -48,7 +43,11 @@ import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class FileBasedKieServerTemplateStorageTest {
     private static final Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorageTest.class);
@@ -142,7 +141,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @BeforeClass
     public static void beforeClass() {
-        templateMap = Maps.newConcurrentMap();
+        templateMap = new ConcurrentHashMap<>();
         for (int x = 0; x < 3; x++) {
             StringBuilder templateName = new StringBuilder("test server : ").append(x);
             ServerTemplate template = createServerTemplateWithContainer(templateName.toString(),x+1);

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -51,6 +52,8 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.KieServerStateInfo;
@@ -100,7 +103,7 @@ public class KieServerImpl implements KieServer {
 
     private KieServerEventSupport eventSupport = new KieServerEventSupport();
 
-    private KieServices ks;
+    protected KieServices ks;
     
     private long startTimestamp;
     
@@ -130,11 +133,13 @@ public class KieServerImpl implements KieServer {
             logger.warn("Unable to parse value of " + KieServerConstants.KIE_SERVER_MODE + " = " + modeParam + "; supported values are 'DEVELOPMENT' or 'PRODUCTION'. Falling back to 'DEVELOPMENT' mode.");
         }
     }
-    
-    public void init() {
-        StartupStrategy startupStrategy = StartupStrategyProvider.get().getStrategy();
-        logger.info("Selected startup strategy {}", startupStrategy);
 
+    public void init() {
+        init(StartupStrategyProvider.get().getStrategy());
+    }
+
+    protected void init(StartupStrategy startupStrategy) {
+        logger.info("Selected startup strategy {}", startupStrategy);
         for (KieServerStateRepository repo : serverStateRepos) {
             if (repo.getClass().getSimpleName().equals(startupStrategy.getRepositoryType())) {
                 this.repository = repo;
@@ -190,7 +195,6 @@ public class KieServerImpl implements KieServer {
         
         eventSupport.fireAfterServerStarted(this);
     }
-    
 
     public KieServerRegistry getServerRegistry() {
         return context;
@@ -201,7 +205,7 @@ public class KieServerImpl implements KieServer {
         kieServerActive.set(false);
         policyManager.stop();
         // disconnect from controller
-        KieServerController kieController = getController();
+        KieServerController kieController = getDefaultController();
         kieController.disconnect(getInfoInternal());
 
         for (KieServerExtension extension : context.getServerExtensions()) {
@@ -267,7 +271,7 @@ public class KieServerImpl implements KieServer {
         container.setContainerId(containerId);
         ReleaseId releaseId = container.getReleaseId();
         try {
-            KieContainerInstanceImpl ci = new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId, this);
+            KieContainerInstanceImpl ci = createContainerInstanceImpl(containerId, releaseId);
             ci.getResource().setContainerAlias(container.getContainerAlias());
             KieContainerInstanceImpl previous = null;
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
@@ -278,7 +282,8 @@ public class KieServerImpl implements KieServer {
                     try {
                         eventSupport.fireBeforeContainerStarted(this, ci);
 
-                        InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
+                        KieModuleMetaData metadata = buildKieModuleMetadata(releaseId);
+                        InternalKieContainer kieContainer = createInternalKieContainer(containerId, releaseId, metadata);
                         if (kieContainer != null) {
                             previous = context.registerContainer(containerId, ci);
                             ci.setKieContainer(kieContainer);
@@ -286,7 +291,7 @@ public class KieServerImpl implements KieServer {
                             ci.getResource().setMessages(messages);
                             logger.debug("Container {} (for release id {}) general initialization: DONE", containerId, releaseId);
 
-                            Map<String, Object> parameters = getContainerParameters(releaseId, messages);
+                            Map<String, Object> parameters = getContainerParameters(metadata, messages);
                             // process server extensions
                             List<KieServerExtension> extensions = getServerExtensions();
                             for (KieServerExtension extension : extensions) {
@@ -317,7 +322,7 @@ public class KieServerImpl implements KieServer {
                                     currentState.getContainers().add(container);
                                 });
                                 eventSupport.fireAfterContainerStarted(this, ci);
-
+                                getDefaultController().update(getInternalServerState());
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                             } else {
                                 ci.getResource().setStatus(KieContainerStatus.FAILED);
@@ -360,6 +365,14 @@ public class KieServerImpl implements KieServer {
         }
     }
 
+    protected KieContainerInstanceImpl createContainerInstanceImpl(String containerId, ReleaseId releaseId) {
+        return new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId, this);
+    }
+
+    protected InternalKieContainer createInternalKieContainer(String containerId, ReleaseId releaseId, KieModuleMetaData metadata) {
+        return (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
+    }
+
     private boolean canBeDeployed(KieContainerInstanceImpl previous) {
         return previous == null || previous.getStatus().equals(KieContainerStatus.FAILED);
     }
@@ -397,8 +410,9 @@ public class KieServerImpl implements KieServer {
                 
                 synchronized (kci) {
                     eventSupport.fireBeforeContainerActivated(this, kci);
-                    
-                    Map<String, Object> parameters = getContainerParameters(kci.getKieContainer().getContainerReleaseId(), messages);
+
+                    KieModuleMetaData metadata = buildKieModuleMetadata(kci.getKieContainer().getReleaseId());
+                    Map<String, Object> parameters = getContainerParameters(metadata, messages);
                     // process server extensions
                     List<KieServerExtension> extensions = context.getServerExtensions();
                     for (KieServerExtension extension : extensions) {
@@ -418,7 +432,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerActivated(this, kci);
-                    
+                    getDefaultController().update(getInternalServerState());
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " activated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " activated successfully.", kci.getResource());
                 }
@@ -446,7 +460,8 @@ public class KieServerImpl implements KieServer {
                 synchronized (kci) {
                     eventSupport.fireBeforeContainerDeactivated(this, kci);
                     
-                    Map<String, Object> parameters = getContainerParameters(kci.getKieContainer().getContainerReleaseId(), messages);
+                    KieModuleMetaData metadata = buildKieModuleMetadata(kci.getKieContainer().getReleaseId());
+                    Map<String, Object> parameters = getContainerParameters(metadata, messages);
                     // process server extensions
                     List<KieServerExtension> extensions = context.getServerExtensions();
                     for (KieServerExtension extension : extensions) {
@@ -466,7 +481,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerDeactivated(this, kci);
-                    
+                    getDefaultController().update(getInternalServerState());
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " deactivated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " deactivated successfully.", kci.getResource());
                 }
@@ -559,8 +574,8 @@ public class KieServerImpl implements KieServer {
                             logger.warn("Dispose of container {} failed, putting it back to started state by recreating container on {}", containerId, disposedExtensions);
 
                             // since the dispose fail rollback must take place to put it back to running state
-
-                            Map<String, Object> parameters = getContainerParameters(releaseId, messages);
+                            KieModuleMetaData metadata = buildKieModuleMetadata(kci.getKieContainer().getReleaseId());
+                            Map<String, Object> parameters = getContainerParameters(metadata, messages);
                             for (KieServerExtension extension : disposedExtensions) {
                                 extension.createContainer(containerId, kci, parameters);
                                 logger.debug("Container {} (for release id {}) {} restart: DONE", containerId, kci.getResource().getReleaseId(), extension);
@@ -599,7 +614,7 @@ public class KieServerImpl implements KieServer {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully stopped."));
 
                         eventSupport.fireAfterContainerStopped(this, kci);
-
+                        getDefaultController().update(getInternalServerState());
                         return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully disposed.");
                     } else {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " was not instantiated."));
@@ -663,6 +678,7 @@ public class KieServerImpl implements KieServer {
                             }
                         });
                     });
+                    getDefaultController().update(getInternalServerState());
                     return scannerResponse;
                 }
             } else {
@@ -879,7 +895,8 @@ public class KieServerImpl implements KieServer {
             // call do dispose() is executed.
             if (kci != null && kci.getKieContainer() != null) {
                 // before upgrade check with all extensions if that is allowed
-                Map<String, Object> parameters = getReleaseUpdateParameters(releaseId, messages, resetBeforeUpdate);
+                KieModuleMetaData metadata = buildKieModuleMetadata(releaseId);
+                Map<String, Object> parameters = getReleaseUpdateParameters(metadata, releaseId, kci.getKieContainer(), messages, resetBeforeUpdate);
 
                 // process server extensions
                 List<KieServerExtension> extensions = getServerExtensions();
@@ -896,7 +913,7 @@ public class KieServerImpl implements KieServer {
                     logger.debug("Container {} (for release id {}) on {} ready to be updated", containerId, releaseId, extension);
                 }
 
-                prepareUpdateExtensions(kci, releaseId, messages, resetBeforeUpdate);
+                prepareUpdateExtensions(metadata, kci, releaseId, messages, resetBeforeUpdate);
 
                 ReleaseId originalReleaseId = kci.getResource().getReleaseId();
                 Message updateMessage = updateKieContainerToVersion(kci, releaseId);
@@ -904,7 +921,9 @@ public class KieServerImpl implements KieServer {
                     messages.add(updateMessage);
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + containerId + " to " + releaseId, kci.getResource().getReleaseId());
                 }
-                updateExtensions(kci, releaseId, messages, resetBeforeUpdate);
+
+                updateExtensions(metadata, kci, releaseId, messages, resetBeforeUpdate);
+
 
                 // If extension update fails then restore previous container
                 if (messages.stream().anyMatch(m -> m.getSeverity().equals(Severity.ERROR))) {
@@ -915,7 +934,7 @@ public class KieServerImpl implements KieServer {
                         messages.add(updateMessage);
                         return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error reverting release id update on container " + containerId + " to original release id " + originalReleaseId, kci.getResource().getReleaseId());
                     }
-                    updateExtensions(kci, originalReleaseId, messages, resetBeforeUpdate);
+                    updateExtensions(metadata, kci, originalReleaseId, messages, resetBeforeUpdate);
 
                     messages.add(new Message(Severity.WARN, "Error updating release id on container " + containerId + " to " + releaseId + ", release id returned back to " + kci.getResource().getReleaseId()));
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + containerId + " to " + releaseId + ", release id returned back to " + kci.getResource().getReleaseId(), kci.getResource().getReleaseId());
@@ -936,7 +955,7 @@ public class KieServerImpl implements KieServer {
 
                 logger.info("Container {} successfully updated to release id {}", containerId, releaseId);
                 ks.getRepository().removeKieModule(originalReleaseId);
-
+                getDefaultController().update(getInternalServerState());
                 messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + containerId));
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
             } else {
@@ -974,8 +993,8 @@ public class KieServerImpl implements KieServer {
         return response;
     }
 
-    private void prepareUpdateExtensions(KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
-        Map<String, Object> parameters = getReleaseUpdateParameters(releaseId, messages, resetBeforeUpdate);
+    private void prepareUpdateExtensions(KieModuleMetaData metadata, KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
+        Map<String, Object> parameters = getReleaseUpdateParameters(metadata, releaseId, kci.getKieContainer(), messages, resetBeforeUpdate);
 
         // some extensions may require to do some operations before updating the container.
         for (KieServerExtension extension : getServerExtensions()) {
@@ -984,10 +1003,10 @@ public class KieServerImpl implements KieServer {
         }
     }
 
-    private void updateExtensions(KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
+    private void updateExtensions(KieModuleMetaData metadata, KieContainerInstanceImpl kci, ReleaseId releaseId, List<Message> messages, boolean resetBeforeUpdate) {
         String containerId = kci.getContainerId();
         List<KieServerExtension> extensions = getServerExtensions();
-        Map<String, Object> parameters = getReleaseUpdateParameters(releaseId, messages, resetBeforeUpdate);
+        Map<String, Object> parameters = getReleaseUpdateParameters(metadata, releaseId, kci.getKieContainer(), messages, resetBeforeUpdate);
 
         // once the upgrade was successful, notify all extensions so they can be upgraded (if needed)
         for (KieServerExtension extension : extensions) {
@@ -997,30 +1016,72 @@ public class KieServerImpl implements KieServer {
     }
 
     public ServiceResponse<KieServerStateInfo> getServerState() {
-        try {
-            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-            KieServerStateInfo state = new KieServerStateInfo(currentState.getControllers(), currentState.getConfiguration(), currentState.getContainers());
+        KieServerStateInfo state = getInternalServerState();
+        if (state != null) {
+            KieServerConfig kieServerConfig = state.getConfiguration();
+            List<KieServerConfigItem> kieConfigItems = kieServerConfig.getConfigItems();
+            ListIterator<KieServerConfigItem> listIterator = kieConfigItems.listIterator();
+            while (listIterator.hasNext()) {
+                KieServerConfigItem configItem = listIterator.next();
+                if (KieServerConstants.CFG_KIE_PASSWORD.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+                if (KieServerConstants.CFG_KIE_TOKEN.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+                if (KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+                if (KieServerConstants.CFG_KIE_CONTROLLER_TOKEN.equals(configItem.getName())) {
+                    listIterator.remove();
+                }
+            }
+            kieServerConfig.setConfigItems(kieConfigItems);
+            state.setConfiguration(kieServerConfig);
             return new ServiceResponse<KieServerStateInfo>(ServiceResponse.ResponseType.SUCCESS,
-                                                           "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
+                    "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
+        } else {
+            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state");
+        }
+
+    }
+
+    public KieServerStateInfo getInternalServerState() {
+        try {
+            KieServerInfo kieServerInfo = getInfoInternal();
+            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+            KieServerStateInfo stateInfo = new KieServerStateInfo(currentState.getControllers(), currentState.getConfiguration(), currentState.getContainers());
+            stateInfo.setServerId(kieServerInfo.getServerId());
+            stateInfo.setLocation(kieServerInfo.getLocation());
+
+            return stateInfo;
         } catch (Exception e) {
             logger.error("Error when loading server state due to {}", e.getMessage(), e);
-            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state due to " + e.getMessage());
+            return null;
         }
     }
 
-    protected Map<String, Object> getContainerParameters(org.kie.api.builder.ReleaseId releaseId, List<Message> messages) {
-        KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
+    protected KieModuleMetaData buildKieModuleMetadata(org.kie.api.builder.ReleaseId releaseId) {
+        return KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
+    }
 
+    public Map<String, Object> getContainerParameters(InternalKieContainer kieContainer, List<Message> messagesForContainer) {
+        KieModuleMetaData metadata = buildKieModuleMetadata(kieContainer.getReleaseId());
+        return getContainerParameters(metadata, messagesForContainer);
+    }
+
+    protected Map<String, Object> getContainerParameters(KieModuleMetaData metaData, List<Message> messages) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
         parameters.put(KieServerConstants.KIE_SERVER_PARAM_MESSAGES, messages);
         return parameters;
     }
 
-    protected Map<String, Object> getReleaseUpdateParameters(final org.kie.api.builder.ReleaseId releaseId, final List<Message> messages, final boolean resetBeforeUpdate) {
-        Map<String, Object> parameters = getContainerParameters(releaseId, messages);
+    protected Map<String, Object> getReleaseUpdateParameters(KieModuleMetaData metaData, ReleaseId releaseId, InternalKieContainer kieContainer, final List<Message> messages, final boolean resetBeforeUpdate) {
+        Map<String, Object> parameters = getContainerParameters(metaData, messages);
+        parameters.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
 
-        if(mode.equals(KieServerMode.DEVELOPMENT) && KieServerUtils.isSnapshot(releaseId)) {
+        if (mode.equals(KieServerMode.DEVELOPMENT) && KieServerUtils.isSnapshot(releaseId)) {
             parameters.put(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, resetBeforeUpdate);
         } else {
             parameters.put(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, false);
@@ -1045,6 +1106,10 @@ public class KieServerImpl implements KieServer {
         }
 
         return controller;
+    }
+
+    protected KieServerController getDefaultController() {
+        return new DefaultRestControllerImpl(context);
     }
 
     protected ContainerManager getContainerManager() {
@@ -1195,5 +1260,6 @@ public class KieServerImpl implements KieServer {
                 "location='" + kieServerLocation + '\'' +
                 '}';
     }
+
 
 }

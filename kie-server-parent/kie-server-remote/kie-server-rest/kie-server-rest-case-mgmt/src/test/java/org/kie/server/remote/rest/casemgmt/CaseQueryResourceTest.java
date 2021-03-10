@@ -17,10 +17,10 @@
 package org.kie.server.remote.rest.casemgmt;
 
 import java.util.List;
+
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CaseQueryResourceTest {
@@ -78,12 +79,16 @@ public class CaseQueryResourceTest {
         Integer pageSize= 10;
         String sort = "CorrelationKey";
         boolean sortOrder = true;
-        when(runtimeDataService.getCaseInstances(status, page, pageSize, sort, sortOrder)).thenReturn(new CaseInstanceList());
 
-        caseQueryResource.getCaseInstances(httpHeaders, null, null, null, status, page, pageSize, sort, sortOrder);
-
+        caseQueryResource.getCaseInstances(httpHeaders, null, null, null, status, page, pageSize, sort, sortOrder, false);
         verify(kieServerRegistry).getContainer("");
-        verify(runtimeDataService).getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder);
+        verify(runtimeDataService).getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder, false);
+        
+        caseQueryResource.getCaseInstances(httpHeaders, null, null, "pepe", status, page, pageSize, sort, sortOrder, true);
+        verify(runtimeDataService).getCaseInstancesOwnedBy("pepe", status, page, pageSize, sort, sortOrder, true);
+        
+        caseQueryResource.getCaseInstances(httpHeaders, "key", "value", null , status, page, pageSize, sort, sortOrder, true);
+        verify(runtimeDataService).getCaseInstancesByCaseFileData("key", "value", status, page, pageSize, sort, sortOrder, true);
     }
 
 }

@@ -57,31 +57,13 @@ public class LocalContainersStartupStrategy implements StartupStrategy {
                                                                                         kieController,
                                                                                         kieServerInfo,
                                                                                         currentState,
-                                                                                        new ContainerManager(){
-
-                                                                                            @Override
-                                                                                            public void installContainers(KieServerImpl kieServer,
-                                                                                                                          Set<KieContainerResource> containers,
-                                                                                                                          KieServerState currentState,
-                                                                                                                          KieServerSetup kieServerSetup) {
-                                                                                                // no-op containers are already deployed but allow it to be connected to controller
-                                                                                            }
-
-                                                                                            @Override
-                                                                                            public void installContainersSync(KieServerImpl kieServer,
-                                                                                                                              Set<KieContainerResource> containers,
-                                                                                                                              KieServerState currentState,
-                                                                                                                              KieServerSetup kieServerSetup) {
-                                                                                                //no-op containers are already deployed but allow it to be connected to controller
-                                                                                            }
-                
-                                                                                        },
+                                                                                        new DummyContainerManager(),
                                                                                         kieServer, 
                                                                                         this), "KieServer-ControllerConnect");
             connectToControllerThread.start();
 
-        }       
-        
+        }
+
     }
     
     @Override

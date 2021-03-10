@@ -48,6 +48,7 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.impl.util.KieServerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,9 +91,11 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                 if( sessionId != null ) {
                     ks = context.getKieSessionLookupManager().lookup(sessionId, kci, context);
                 } else {
-                    // if no session ID is defined, then the default is a stateful session
-                    ks = kci.getKieContainer().getKieSession();
+                    // if no session ID is defined, then use default stateful/stateless ksession.
+                    ks = KieServerUtils.getDefaultKieSession(kci);
                 }
+                context.getKieSessionLookupManager().postLookup(sessionId, kci, ks, context);
+
                 if (ks != null) {
                     Class<? extends Command> type =  BatchExecutionCommandImpl.class;
                     if (classType != null && !classType.isEmpty()) {

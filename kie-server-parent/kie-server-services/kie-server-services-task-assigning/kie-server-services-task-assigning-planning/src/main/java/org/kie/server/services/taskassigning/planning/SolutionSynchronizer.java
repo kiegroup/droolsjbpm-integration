@@ -41,6 +41,8 @@ import static org.kie.api.task.model.Status.Reserved;
 import static org.kie.api.task.model.Status.Suspended;
 import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STARTED;
 import static org.kie.server.services.taskassigning.planning.RunnableBase.Status.STOPPED;
+import static org.kie.soup.commons.validation.PortablePreconditions.checkGreaterOrEqualTo;
+import static org.kie.soup.commons.validation.PortablePreconditions.checkGreaterThan;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 /**
@@ -65,6 +67,8 @@ public class SolutionSynchronizer extends RunnableBase {
     private final Duration syncInterval;
     private final Duration usersSyncInterval;
     private long nextUsersSyncTime;
+    private Duration unchangedPeriodTimeout;
+    private long nextUnchangedPeriodTime;
     private final SolverHandlerContext context;
     private final Consumer<Result> resultConsumer;
     private int solverExecutorStarts = 0;
@@ -75,10 +79,37 @@ public class SolutionSynchronizer extends RunnableBase {
 
     public static class Result {
 
+        private enum ResultType {
+            CHANGES_FOUND,
+            UNCHANGED_PERIOD_TIMEOUT
+        }
+
         private List<ProblemFactChange<TaskAssigningSolution>> changes;
 
-        public Result(List<ProblemFactChange<TaskAssigningSolution>> changes) {
+        private ResultType type;
+
+        private Result() {
+        }
+
+        private Result(ResultType type) {
+            this.type = type;
+        }
+
+        private Result(List<ProblemFactChange<TaskAssigningSolution>> changes) {
+            this(ResultType.CHANGES_FOUND);
             this.changes = changes;
+        }
+
+        static Result forChanges(List<ProblemFactChange<TaskAssigningSolution>> changes) {
+            return new Result(changes);
+        }
+
+        static Result forUnchangedPeriodTimeout() {
+            return new Result(ResultType.UNCHANGED_PERIOD_TIMEOUT);
+        }
+
+        public boolean hasChanges() {
+            return ResultType.CHANGES_FOUND == type;
         }
 
         public List<ProblemFactChange<TaskAssigningSolution>> getChanges() {
@@ -96,11 +127,10 @@ public class SolutionSynchronizer extends RunnableBase {
         checkNotNull("solverExecutor", solverExecutor);
         checkNotNull("delegate", delegate);
         checkNotNull("userSystem", userSystem);
-        checkNotNull("syncInterval", syncInterval);
-        checkNotNull("usersSyncInterval", usersSyncInterval);
         checkNotNull("context", context);
         checkNotNull("resultConsumer", resultConsumer);
-
+        checkGreaterThan("syncInterval", syncInterval, Duration.ZERO);
+        checkGreaterOrEqualTo("usersSyncInterval", usersSyncInterval, Duration.ZERO);
         this.solverExecutor = solverExecutor;
         this.delegate = delegate;
         this.userSystemService = userSystem;
@@ -119,12 +149,32 @@ public class SolutionSynchronizer extends RunnableBase {
         startPermit.release();
     }
 
+    /**
+     * Starts the synchronization of the solution from the indicated last modification date.
+     * @param solution a non null solution instance to synchronize.
+     * @param fromLastModificationDate filtering parameter for reading the modifications.
+     */
     public void synchronizeSolution(TaskAssigningSolution solution, LocalDateTime fromLastModificationDate) {
+        synchronizeSolution(solution, fromLastModificationDate, Duration.ofMillis(0));
+    }
+
+    /**
+     * Starts the synchronization of the solution from the indicated last modification date.
+     * @param solution a non null solution instance to synchronize.
+     * @param fromLastModificationDate filtering parameter for reading the modifications.
+     * @param unchangedPeriodTimeout a non null period of time for returning from the synchronization if no changes were
+     * produced during that period. A negative or zero period is ignored.
+     */
+    public void synchronizeSolution(TaskAssigningSolution solution, LocalDateTime fromLastModificationDate, Duration unchangedPeriodTimeout) {
+        checkNotNull("solution", solution);
+        checkGreaterOrEqualTo("unchangedPeriodTimeout", unchangedPeriodTimeout, Duration.ZERO);
         if (!status.compareAndSet(STOPPED, STARTED)) {
             throw new IllegalStateException("SolutionSynchronizer synchronizeSolution method can only be invoked when the status is STOPPED");
         }
         this.solution = solution;
         this.fromLastModificationDate = fromLastModificationDate;
+        this.unchangedPeriodTimeout = unchangedPeriodTimeout;
+        this.nextUnchangedPeriodTime = calculateNextUnchangedPeriodTime(unchangedPeriodTimeout);
         action.set(Action.SYNCHRONIZE_SOLUTION);
         LOGGER.debug("Start synchronizeSolution fromLastModificationDate: {}", fromLastModificationDate);
         startPermit.release();
@@ -143,23 +193,18 @@ public class SolutionSynchronizer extends RunnableBase {
     @Override
     public void run() {
         LOGGER.debug("Solution Synchronizer Started");
-        Action nextAction;
+        Pair<Action, Result> nextActionOrResult;
         while (isAlive()) {
             try {
                 startPermit.acquire();
                 if (isAlive()) {
-                    if (action.get() == Action.INIT_SOLVER_EXECUTOR) {
-                        nextAction = doInitSolverExecutor();
-                        action.set(nextAction);
-                    } else if (action.get() == Action.SYNCHRONIZE_SOLUTION) {
-                        nextAction = doSynchronizeSolution();
-                        action.set(nextAction);
-                    }
+                    nextActionOrResult = executeAction(action.get());
+                    action.set(nextActionOrResult.getLeft());
                     if (action.get() != null) {
                         Thread.sleep(syncInterval.toMillis());
                         startPermit.release();
-                    } else if (isAlive()) {
-                        status.compareAndSet(STARTED, STOPPED);
+                    } else if (isAlive() && status.compareAndSet(STARTED, STOPPED) && nextActionOrResult.getRight() != null) {
+                        applyResult(nextActionOrResult.getRight());
                     }
                 }
             } catch (InterruptedException e) {
@@ -172,14 +217,24 @@ public class SolutionSynchronizer extends RunnableBase {
         LOGGER.debug("Solution Synchronizer finished");
     }
 
-    Action doInitSolverExecutor() {
-        Action nextAction = null;
+    Pair<Action, Result> executeAction(Action action) {
+        Pair<Action, Result> resultPair = Pair.of(null, null);
+        if (action == Action.INIT_SOLVER_EXECUTOR) {
+            resultPair = doInitSolverExecutor();
+        } else if (action == Action.SYNCHRONIZE_SOLUTION) {
+            resultPair = doSynchronizeSolution();
+        }
+        return resultPair;
+    }
+
+    Pair<Action, Result> doInitSolverExecutor() {
+        Pair<Action, Result> nextActionOrResult = Pair.of(null, null);
         try {
             LOGGER.debug("Solution Synchronizer will recover the solution from the jBPM runtime for starting the solver.");
             if (!solverExecutor.isStopped()) {
                 LOGGER.debug("Previous solver instance has not yet finished, let's wait for it to stop." +
                                      " Next attempt will be in a period of {}.", syncInterval);
-                nextAction = Action.INIT_SOLVER_EXECUTOR;
+                nextActionOrResult = Pair.of(Action.INIT_SOLVER_EXECUTOR, null);
             } else {
                 final TaskAssigningSolution recoveredSolution = recoverSolution();
                 if (isAlive() && !solverExecutor.isDestroyed()) {
@@ -191,7 +246,7 @@ public class SolutionSynchronizer extends RunnableBase {
                                                  " have been caused due to errors during the solution applying in the jBPM runtime");
                         }
                     } else {
-                        nextAction = Action.INIT_SOLVER_EXECUTOR;
+                        nextActionOrResult = Pair.of(Action.INIT_SOLVER_EXECUTOR, null);
                         LOGGER.debug("It looks like there are no tasks for recovering the solution at this moment." +
                                              " Next attempt will be in a period of {}.", syncInterval);
                     }
@@ -202,13 +257,13 @@ public class SolutionSynchronizer extends RunnableBase {
                                                      " Next attempt will be in a period of %s, error: %s", syncInterval, e.getMessage());
             LOGGER.warn(msg);
             LOGGER.debug(msg, e);
-            nextAction = Action.INIT_SOLVER_EXECUTOR;
+            nextActionOrResult = Pair.of(Action.INIT_SOLVER_EXECUTOR, null);
         }
-        return nextAction;
+        return nextActionOrResult;
     }
 
-    Action doSynchronizeSolution() {
-        Action nextAction = null;
+    Pair<Action, Result> doSynchronizeSolution() {
+        Pair<Action, Result> nextActionOrResult = Pair.of(null, null);
         try {
             if (solverExecutor.isStarted()) {
                 LOGGER.debug("Synchronizing solution status from the jBPM runtime.");
@@ -225,11 +280,14 @@ public class SolutionSynchronizer extends RunnableBase {
                     context.setNextQueryTime(nextQueryTime);
                     if (!changes.isEmpty()) {
                         LOGGER.debug("Current solution will be updated with {} changes from last synchronization", changes.size());
-                        resultConsumer.accept(new Result(changes));
+                        nextActionOrResult = Pair.of(null, Result.forChanges(changes));
+                    } else if (isUnchangedPeriodTime()) {
+                        LOGGER.debug("There were no changes during the unchangedPeriodTimeout period of: {}, notify consumer.", unchangedPeriodTimeout);
+                        nextActionOrResult = Pair.of(null, Result.forUnchangedPeriodTimeout());
                     } else {
                         LOGGER.debug("There are no changes to apply from last synchronization.");
                         fromLastModificationDate = nextQueryTime;
-                        nextAction = Action.SYNCHRONIZE_SOLUTION;
+                        nextActionOrResult = Pair.of(Action.SYNCHRONIZE_SOLUTION, null);
                     }
                 }
             }
@@ -238,9 +296,13 @@ public class SolutionSynchronizer extends RunnableBase {
                                                      " Next attempt will be in a period of %s, error: %s", syncInterval, e.getMessage());
             LOGGER.warn(msg);
             LOGGER.debug(msg, e);
-            nextAction = Action.SYNCHRONIZE_SOLUTION;
+            nextActionOrResult = Pair.of(Action.SYNCHRONIZE_SOLUTION, null);
         }
-        return nextAction;
+        return nextActionOrResult;
+    }
+
+    protected void applyResult(Result result) {
+        resultConsumer.accept(result);
     }
 
     private Pair<Boolean, List<User>> loadUsersForUpdate() {
@@ -263,11 +325,23 @@ public class SolutionSynchronizer extends RunnableBase {
     }
 
     protected boolean isUsersSyncTime() {
-        return System.currentTimeMillis() > nextUsersSyncTime;
+        return usersSyncInterval.toMillis() > 0 && getSystemTime() > nextUsersSyncTime;
     }
 
     protected long calculateNextUsersSyncTime() {
-        return System.currentTimeMillis() + usersSyncInterval.toMillis();
+        return getSystemTime() + usersSyncInterval.toMillis();
+    }
+
+    protected boolean isUnchangedPeriodTime() {
+        return unchangedPeriodTimeout.toMillis() > 0 && getSystemTime() > nextUnchangedPeriodTime;
+    }
+
+    protected long calculateNextUnchangedPeriodTime(Duration unchangedPeriodTimeoutShift) {
+        return getSystemTime() + unchangedPeriodTimeoutShift.toMillis();
+    }
+
+    protected long getSystemTime() {
+        return System.currentTimeMillis();
     }
 
     protected List<ProblemFactChange<TaskAssigningSolution>> buildChanges(TaskAssigningSolution solution,

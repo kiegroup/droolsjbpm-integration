@@ -33,7 +33,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.drools.core.util.MVELSafeHelper;
+import org.drools.mvel.MVELSafeHelper;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.form.provider.AbstractFormProvider;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;

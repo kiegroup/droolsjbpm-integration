@@ -16,9 +16,11 @@
 
 package org.jbpm.springboot.security;
 
+import static java.util.Collections.emptyList;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 
 import org.kie.internal.identity.IdentityProvider;
 import org.springframework.security.core.Authentication;
@@ -27,16 +29,38 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SpringSecurityIdentityProvider implements IdentityProvider {
 
+    private Stack<String> contextUsers;
+    
+    public SpringSecurityIdentityProvider() {
+        contextUsers = new Stack<>();
+    }
+    @Override
+    public void setContextIdentity(String userId) {
+        contextUsers.push(userId);
+    }
+
+    @Override
+    public void removeContextIdentity() {
+        contextUsers.pop();
+    }
+
     public String getName() {
+        if(!contextUsers.isEmpty()) {
+            return contextUsers.peek();
+        }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()) {
             return auth.getName();
         }
-        return "unknown";
+        return UNKNOWN_USER_IDENTITY;
     }
 
     public List<String> getRoles() {
+        if(!contextUsers.isEmpty()) {
+            return emptyList();
+        }
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()) {
             List<String> roles = new ArrayList<String>();
@@ -52,7 +76,7 @@ public class SpringSecurityIdentityProvider implements IdentityProvider {
             return roles;
         }
 
-        return Collections.emptyList();
+        return emptyList();
     }
 
     public boolean hasRole(String role) {

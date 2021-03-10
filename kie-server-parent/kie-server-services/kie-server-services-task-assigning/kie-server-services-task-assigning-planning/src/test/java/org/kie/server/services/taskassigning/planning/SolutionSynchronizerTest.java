@@ -27,6 +27,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.kie.server.api.model.taskassigning.TaskData;
 import org.kie.server.services.taskassigning.core.model.Task;
@@ -41,13 +42,17 @@ import org.mockito.stubbing.Answer;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +62,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
     private static final Duration SYNCH_INTERVAL = Duration.ofMillis(2);
     private static final Duration USERS_SYNCH_INTERVAL = Duration.ofMillis(4000);
     private static final Duration QUERY_SHIFT = Duration.parse("PT2S");
+    private static final long SYSTEM_TIME = 0;
 
     @Mock
     private SolverExecutor solverExecutor;
@@ -90,13 +96,18 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
     private boolean usersSyncTime;
 
+    private boolean unchangedPeriodTime;
+
     private CountDownLatch queryExecutionsCountDown;
+
+    private CountDownLatch applyResultCountDown;
 
     private SolverHandlerContext context;
 
     @Override
     protected SolutionSynchronizer createRunnableBase() {
         context = new SolverHandlerContext(QUERY_SHIFT);
+        applyResultCountDown = new CountDownLatch(1);
         return new SolutionSynchronizerMock(solverExecutor, delegate, userSystemService,
                                             SYNCH_INTERVAL, USERS_SYNCH_INTERVAL, context, resultConsumer);
     }
@@ -111,7 +122,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         List<TaskAssigningRuntimeDelegate.FindTasksResult> results = mockTasksQueryExecutions(firstQueryTime);
         LocalDateTime firstSuccessfulQueryTime = results.get(results.size() - 1).getQueryTime();
         queryExecutionsCountDown = new CountDownLatch(results.size());
-        prepareQueryExecutions(results);
+        prepareQueryExecutionsWithOutEmptyStatus(results);
 
         when(emptySolution.getTaskList()).thenReturn(Collections.emptyList());
         when(generatedSolution.getTaskList()).thenReturn(Collections.singletonList(new Task()));
@@ -151,6 +162,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         // no users query executions were produced.
         verify(userSystemService, never()).findAllUsers();
         verify(resultConsumer).accept(resultCaptor.capture());
+        assertTrue(resultCaptor.getValue().hasChanges());
         assertEquals(generatedChanges, resultCaptor.getValue().getChanges());
     }
 
@@ -170,6 +182,7 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         // user executions were produced executionsCount-2 times since the tasks queries fails two times.
         verify(userSystemService, times(executionsCount - 2)).findAllUsers();
 
+        assertTrue(resultCaptor.getValue().hasChanges());
         verify(resultConsumer).accept(resultCaptor.capture());
         assertEquals(generatedChanges, resultCaptor.getValue().getChanges());
     }
@@ -206,14 +219,58 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
             nextQueryTime2 = context.shiftQueryTime(result2.getQueryTime())
         */
 
-        verify(delegate, times(1)).findTasks(anyList(), eq(startTime), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(tasksQueryResults.get(0).getQueryTime())), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(tasksQueryResults.get(1).getQueryTime())), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(startTime), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(tasksQueryResults.get(0).getQueryTime())), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(tasksQueryResults.get(1).getQueryTime())), anyObject());
 
         assertEquals(context.shiftQueryTime(tasksQueryResults.get(2).getQueryTime()), context.getNextQueryTime());
 
+        assertTrue(resultCaptor.getValue().hasChanges());
         verify(resultConsumer).accept(resultCaptor.capture());
         assertEquals(generatedChanges, resultCaptor.getValue().getChanges());
+    }
+
+    @Test(timeout = TEST_TIMEOUT)
+    public void synchronizeSolutionWithNoChangesTimeout() throws Exception {
+        CompletableFuture future = startRunnableBase();
+        LocalDateTime startTime = LocalDateTime.now().withNano(0);
+        List<TaskAssigningRuntimeDelegate.FindTasksResult> tasksQueryResults = mockNoChangesTasksQueryExecutions(startTime);
+        int executionsCount = tasksQueryResults.size();
+
+        unchangedPeriodTime = true;
+        executeSynchronizeSolutionWithNoChangesTimeout(future, startTime, Duration.ofMillis(100), tasksQueryResults, executionsCount);
+
+        verify(resultConsumer).accept(resultCaptor.capture());
+        assertFalse(resultCaptor.getValue().hasChanges());
+        assertNull(resultCaptor.getValue().getChanges());
+    }
+
+    @Test
+    public void calculateNextUsersSyncTime() {
+        long expectedValue = SYSTEM_TIME + 4000;
+        calculateNextUsersSyncTime(USERS_SYNCH_INTERVAL, SYSTEM_TIME, expectedValue);
+    }
+
+    @Test
+    public void calculateNextUnchangedPeriodTime() {
+        long expectedValue = SYSTEM_TIME + 5000;
+        calculateNextUnchangedPeriodTime(Duration.ofMillis(5000), SYSTEM_TIME, expectedValue);
+    }
+
+    private void calculateNextUsersSyncTime(Duration duration, long systemTime, long expectedValue) {
+        runnableBase = spy(new SolutionSynchronizer(solverExecutor, delegate, userSystemService,
+                                                    SYNCH_INTERVAL, duration, context, resultConsumer));
+        doReturn(systemTime).when(runnableBase).getSystemTime();
+        long nextUsersSyncTime = runnableBase.calculateNextUsersSyncTime();
+        assertEquals(expectedValue, nextUsersSyncTime);
+    }
+
+    private void calculateNextUnchangedPeriodTime(Duration duration, long systemTime, long expectedValue) {
+        runnableBase = spy(new SolutionSynchronizer(solverExecutor, delegate, userSystemService,
+                                                    SYNCH_INTERVAL, duration, context, resultConsumer));
+        doReturn(systemTime).when(runnableBase).getSystemTime();
+        long nextUnchangedPeriodTime = runnableBase.calculateNextUnchangedPeriodTime(duration);
+        assertEquals(expectedValue, nextUnchangedPeriodTime);
     }
 
     private void executeSynchronizeSolution(CompletableFuture future, LocalDateTime startTime,
@@ -233,9 +290,34 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
         // wait for the query executions to happen
         queryExecutionsCountDown.await();
+        applyResultCountDown.await();
 
         verify(resultConsumer).accept(resultCaptor.capture());
         assertEquals(generatedChanges, resultCaptor.getValue().getChanges());
+        runnableBase.destroy();
+        future.get();
+        assertTrue(runnableBase.isDestroyed());
+    }
+
+    private void executeSynchronizeSolutionWithNoChangesTimeout(CompletableFuture future, LocalDateTime startTime,
+                                                                Duration unchangedPeriodTimeout,
+                                                                List<TaskAssigningRuntimeDelegate.FindTasksResult> tasksQueryResults,
+                                                                int executionsCount) throws Exception {
+
+        TaskAssigningSolution solution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
+        queryExecutionsCountDown = new CountDownLatch(executionsCount);
+        prepareQueryExecutions(tasksQueryResults);
+
+        when(generatedChanges.isEmpty()).thenReturn(false);
+        when(emptyChanges.isEmpty()).thenReturn(true);
+        when(solverExecutor.isStarted()).thenReturn(true);
+        runnableBase.synchronizeSolution(solution, startTime, unchangedPeriodTimeout);
+
+        // wait for the query executions to happen
+        queryExecutionsCountDown.await();
+        applyResultCountDown.await();
+
+        verify(resultConsumer).accept(resultCaptor.capture());
         runnableBase.destroy();
         future.get();
         assertTrue(runnableBase.isDestroyed());
@@ -262,6 +344,10 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         TaskAssigningRuntimeDelegate.FindTasksResult result5 = mockFindTaskResult(startTime.plusMinutes(4), new ArrayList<>());
         TaskAssigningRuntimeDelegate.FindTasksResult result6 = mockFindTaskResult(startTime.plusMinutes(5), taskDataList);
         return Arrays.asList(result0, result1, result2, resultFailure3, resultFailure4, result5, result6);
+    }
+
+    private List<TaskAssigningRuntimeDelegate.FindTasksResult> mockNoChangesTasksQueryExecutions(LocalDateTime startTime) {
+        return Collections.singletonList(mockFindTaskResult(startTime.plusMinutes(1), new ArrayList<>()));
     }
 
     /**
@@ -302,11 +388,11 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
             End of loop since results are produced.
         */
 
-        verify(delegate, times(1)).findTasks(anyList(), eq(startTime), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(results.get(0).getQueryTime())), anyObject());
-        verify(delegate, times(1)).findTasks(anyList(), eq(context.shiftQueryTime(results.get(1).getQueryTime())), anyObject());
-        verify(delegate, times(3)).findTasks(anyList(), eq(context.shiftQueryTime(results.get(2).getQueryTime())), anyObject());
-        verify(delegate, times(results.size())).findTasks(anyList(), anyObject(), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(startTime), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(results.get(0).getQueryTime())), anyObject());
+        verify(delegate, times(1)).findTasks(eq(null), eq(context.shiftQueryTime(results.get(1).getQueryTime())), anyObject());
+        verify(delegate, times(3)).findTasks(eq(null), eq(context.shiftQueryTime(results.get(2).getQueryTime())), anyObject());
+        verify(delegate, times(results.size())).findTasks(eq(null), anyObject(), anyObject());
     }
 
     /**
@@ -334,6 +420,11 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
 
     @SuppressWarnings("unchecked")
     private void prepareQueryExecutions(List<TaskAssigningRuntimeDelegate.FindTasksResult> results) {
+        doAnswer(createExecutions(results)).when(delegate).findTasks(eq(null), anyObject(), anyObject());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void prepareQueryExecutionsWithOutEmptyStatus(List<TaskAssigningRuntimeDelegate.FindTasksResult> results) {
         doAnswer(createExecutions(results)).when(delegate).findTasks(anyList(), anyObject(), anyObject());
     }
 
@@ -400,17 +491,28 @@ public class SolutionSynchronizerTest extends RunnableBaseTest<SolutionSynchroni
         }
 
         @Override
-        Action doInitSolverExecutor() {
-            Action result = super.doInitSolverExecutor();
+        protected boolean isUnchangedPeriodTime() {
+            return unchangedPeriodTime;
+        }
+
+        @Override
+        Pair<Action, Result> doInitSolverExecutor() {
+            Pair<Action, Result> result = super.doInitSolverExecutor();
             queryExecutionsCountDown.countDown();
             return result;
         }
 
         @Override
-        Action doSynchronizeSolution() {
-            Action result = super.doSynchronizeSolution();
+        Pair<Action, Result> doSynchronizeSolution() {
+            Pair<Action, Result> result = super.doSynchronizeSolution();
             queryExecutionsCountDown.countDown();
             return result;
+        }
+
+        @Override
+        protected void applyResult(Result result) {
+            super.applyResult(result);
+            applyResultCountDown.countDown();
         }
     }
 }

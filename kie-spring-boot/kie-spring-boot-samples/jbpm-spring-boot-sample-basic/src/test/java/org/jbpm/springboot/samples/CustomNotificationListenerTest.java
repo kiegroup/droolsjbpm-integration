@@ -23,7 +23,7 @@ import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
-import org.jbpm.springboot.samples.listeners.CountDownLatchNotificationListener;
+import org.jbpm.springboot.samples.events.listeners.CountDownLatchNotificationListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

@@ -16,14 +16,14 @@
 
 package org.kie.spring.timer;
 
-import static org.junit.Assert.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import org.drools.core.base.MapGlobalResolver;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -35,8 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MyDroolsBean {
 
@@ -65,7 +65,7 @@ public class MyDroolsBean {
 
             ksession.getWorkItemManager().registerWorkItemHandler("testWorkItemHandler", workItemHandler);
 
-            ksession.startProcess("timer-flow", null);
+            ksession.startProcess("timer-flow");
          
             // wait for process to start and for first timer to finish
             waitForOtherThread();

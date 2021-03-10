@@ -16,7 +16,12 @@
 
 package org.kie.server.services.impl.util;
 
+import org.drools.compiler.kie.builder.impl.KieContainerImpl;
+import org.drools.compiler.kie.builder.impl.KieProject;
+import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.runtime.CommandExecutor;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
 
 public class KieServerUtils {
 
@@ -32,5 +37,19 @@ public class KieServerUtils {
 
     public static boolean isSnapshot(final String version) {
         return version.toUpperCase().endsWith(SNAPSHOT);
+    }
+
+    public static CommandExecutor getDefaultKieSession(KieContainerInstanceImpl kci) {
+        KieProject kieProject = ((KieContainerImpl) kci.getKieContainer()).getKieProject();
+        KieSessionModel defaultStatefulModel = kieProject.getDefaultKieSession();
+        KieSessionModel defaultStatelessModel = kieProject.getDefaultStatelessKieSession();
+        // If both stateful and statelss default ksession exist, stateful is used.
+        if (defaultStatefulModel != null) {
+            return kci.getKieContainer().getKieSession();
+        } else if (defaultStatelessModel != null) {
+            return kci.getKieContainer().getStatelessKieSession();
+        } else {
+            throw new IllegalStateException("No default KieSession found on container '" + kci.getContainerId() + "'.");
+        }
     }
 }

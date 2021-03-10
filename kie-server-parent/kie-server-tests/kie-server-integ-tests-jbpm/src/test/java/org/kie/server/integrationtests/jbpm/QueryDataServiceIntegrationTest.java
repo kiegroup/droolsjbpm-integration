@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
@@ -1050,6 +1051,32 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         }
 
 
+    }
+    
+    @Test
+    public void testDefaultQueryJbpmProcessInstances() {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition registeredQuery = queryClient.getQuery("jbpmProcessInstances");
+        
+        try {
+            List<ProcessInstance> instances = queryClient.query(registeredQuery.getName(), QueryServicesClient.QUERY_MAP_PI, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
+    }
+    
+    @Test
+    public void testDefaultQueryJbpmHumanTasksWithAdmin() {
+        QueryDefinition registeredQuery = queryClient.getQuery("jbpmHumanTasksWithAdmin");
+        
+        List<TaskInstance> tasks = queryClient.query(registeredQuery.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+        assertNotNull(tasks);
     }
 
     protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {

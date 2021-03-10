@@ -16,6 +16,8 @@
 
 package org.kie.server.services.jbpm.ui.form.render;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,22 +36,27 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import freemarker.cache.StringTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import org.jbpm.casemgmt.api.model.CaseDefinition;
 import org.jbpm.casemgmt.api.model.CaseRole;
+import org.jbpm.document.Document;
+import org.jbpm.document.DocumentCollection;
+import org.jbpm.document.service.impl.DocumentImpl;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.task.model.Task;
 import org.kie.server.services.jbpm.ui.form.render.model.FormField;
 import org.kie.server.services.jbpm.ui.form.render.model.FormInstance;
 import org.kie.server.services.jbpm.ui.form.render.model.FormLayout;
+import org.kie.server.services.jbpm.ui.form.render.model.ItemOption;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutColumn;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutItem;
 import org.kie.server.services.jbpm.ui.form.render.model.LayoutRow;
 import org.kie.server.services.jbpm.ui.form.render.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 
 public abstract class AbstractFormRenderer implements FormRenderer {
     
@@ -61,7 +69,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     public static final String PROCESS_LAYOUT_TEMPLATE = "process-layout";
     public static final String TASK_LAYOUT_TEMPLATE = "task-layout";
     public static final String TABLE_LAYOUT_TEMPLATE = "table";
-    
+
     private Map<String, String> inputTypes;
     private StringTemplateLoader stringLoader = new StringTemplateLoader();
     private Configuration cfg;
@@ -89,6 +97,9 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("Document", "file");
         this.inputTypes.put("DatePicker", "date");
         this.inputTypes.put("Slider", "slider");
+        this.inputTypes.put("DocumentCollection", "documentCollection");
+        this.inputTypes.put("MultipleSelector", "multipleSelector");
+        this.inputTypes.put("MultipleInput", "multipleInput");
 
         
         cfg = new Configuration(Configuration.VERSION_2_3_26);
@@ -253,9 +264,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         
         scriptDataList.add(buildFunctionWithBody("getData", "return " + jsonTemplate.toString()));
         scriptDataList.add(buildFunctionWithBody("getTaskEndpoint", "return '" + taskEndpoint.toString() + "';"));
-        scriptDataList.add(buildFunctionWithBody("initializeForm", "taskStatus = '" + task.getTaskData().getStatus().name() + "';" +
-                                                                   "$('input[data-slider-id]').slider({});" +
-                                                                   "initTaskButtons();"));
+        scriptDataList.add(buildFunctionWithBody("initializeForm", "taskStatus = '" + task.getTaskData().getStatus().name() + "';\n" +
+                                                                   "$('input[data-slider-id]').slider({});\n" +
+                                                                   "$('input[data-role=tagsinput').tagsinput();\n" + 
+                                                                   "initTaskButtons();\n"));
         scriptDataList.add(buildFunctionWithBody("endpointSuffix", "return '" + getEndpointSuffix() + "';"));
         
         // render layout with data
@@ -275,6 +287,24 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         return finalOutput;
     }
     
+    public static class DocumentItem {
+        String name;
+        String content;
+
+        DocumentItem(String name, String content) {
+            this.name = name;
+            this.content = content;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getContent() {
+            return content;
+        }
+    }
+
     /**
      * Renders the entire form (including any subforms if found as nested forms)
      * @param topLevelForm - the top level form to be rendered, if needed it should include all nested forms inside or lookup mechanism
@@ -379,14 +409,59 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                 value = outputs.get(field.getBinding());
                             }
                             
-                            item.setValue(value);
+                            
+                            switch(fieldType) {
+                                case "documentCollection":
+                                    if (value instanceof DocumentCollection) {
+                                        DocumentCollection<Document> docCollection = (DocumentCollection<Document>) value;
+                                        docCollection.getDocuments().stream()
+                                                .map(e -> (DocumentImpl) e)
+                                                .forEach(DocumentImpl::load);
+
+                                        List<DocumentItem> items = docCollection.getDocuments()
+                                                .stream()
+                                                .map(e -> new DocumentItem(e.getName(), Base64.getEncoder().encodeToString(e.getContent())))
+                                                .collect(toList());
+                                        item.setValue(items);
+                                    } else {
+                                        // In case there is no document collection, just provide an empty one
+                                        item.setValue(Collections.emptyList());
+                                    }
+                                    break;
+                                case "multipleSelector":
+                                    item.setOptions(field.getListOfValues().stream().map(ItemOption::new).collect(toList()));
+                                    if(value instanceof String) {
+                                        item.setValue(Collections.singletonList(value));
+                                    } else {
+                                        item.setValue(value);
+                                    }
+                                    break;
+                                case "multipleInput":
+                                    if(value instanceof String) {
+                                        item.setValue(value);
+                                    } else if (value instanceof List){
+                                        item.setValue(String.join(",", (List) value));
+                                    } else {
+                                        item.setValue("");
+                                    }
+                                    break;
+                                default:
+                                    item.setValue((value != null) ? value.toString() : "");
+                                    break;
+                            }
+
                             item.setReadOnly(field.isReadOnly());
                             item.setRequired(field.isRequired());
-                            
+
                             // generate column content                    
                             Map<String, Object> parameters = new HashMap<>();
                             parameters.put("item", item);
-                            parameters.put("documentPath", getDocumentPath()); // used to generate link for documents
+                            if (("file".equals(fieldType) || "documentCollection".equals(fieldType)) && !item.getValue().equals("{}")) {
+                                parameters.put("documentPath", getDocumentPath()); // used to generate link for documents
+                            } else if ("file".equals(fieldType) && item.getValue().equals("{}")) {
+                                item.setValue("");
+                            }
+                            parameters.put("maxItems", field.getMaxLength());
                             String output = renderTemplate(FORM_GROUP_LAYOUT_TEMPLATE, parameters);
                             // append rendered content to the column content
                             content.append(output);
@@ -597,17 +672,21 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     }
 
     protected String getFieldType(String type) {
+
         if (type.contains("Integer") || type.contains("Double") || type.contains("Float")) {
             return "Number(";
         } else if (type.contains("Boolean")) {
             return "Boolean(";
         } else if (type.contains("Date")) {
             return "Object(";
+        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("multipleSelector") || type.contains("multipleInput")) {
+            return "Object(";
         } else if (type.contains("slider")) {
             return " { \"java.lang.Double\" : Number(";
         } else {
             return "String(";
         }
+
     }
 
     protected String wrapEndFieldType(String type) {
@@ -621,31 +700,39 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     protected String appendExtractionExpression(String type, String name, String id, String jsType) {
         StringBuilder jsonTemplate = new StringBuilder();
         if (type.equals("radio")) {
-            jsonTemplate            
-                .append("$('input[name=")
-                .append(name)
-                .append("]:checked').val()");
+            jsonTemplate
+                        .append("$('input[name=")
+                        .append(name)
+                        .append("]:checked').val()");
         } else if (type.equals("select")) {
-            jsonTemplate            
-                .append("$('#")
-                .append(id)
-                .append("').val()");                
+            jsonTemplate.append("$('#")
+                        .append(id)
+                        .append("').val()");
         } else if (type.equals("file")) {
-            jsonTemplate            
-                .append("getDocumentData('")
-                .append(id)
-                .append("')");                
+            jsonTemplate.append("getDocumentData('")
+                        .append(id)
+                        .append("')");
         } else if (type.equals("date")) {
-            jsonTemplate            
-                .append("getDateFormated('")
-                .append(id)
-                .append("')");                
-        }  else {
-            jsonTemplate            
-                .append("document.getElementById('")
-                .append(id)
-                .append("')")
-                .append(getExtractionValue(jsType));
+            jsonTemplate.append("getDateFormated('")
+                        .append(id)
+                        .append("')");
+        } else if (type.equals("documentCollection")) {
+            jsonTemplate.append("getDocumentCollectionData('")
+                        .append(id)
+                        .append("')");
+        } else if(type.equals("multipleSelector")) {
+            jsonTemplate.append("getMultipleSelectorData('")
+                        .append(id)
+                        .append("')");
+        } else if(type.equals("multipleInput")) {
+            jsonTemplate.append("getMultipleInputData('")
+                        .append(id)
+                        .append("')");
+        } else {
+            jsonTemplate.append("document.getElementById('")
+                        .append(id)
+                        .append("')")
+                        .append(getExtractionValue(jsType));
         }
         
         return jsonTemplate.toString();

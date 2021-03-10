@@ -28,6 +28,7 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.common.rest.KieServerHttpRequest;
 import org.kie.server.common.rest.KieServerHttpResponse;
 import org.kie.server.controller.api.KieServerController;
@@ -51,7 +52,7 @@ public class DefaultRestControllerImpl implements KieServerController {
         this.context = context;
     }
 
-    @SuppressWarnings("unchecked")
+
     protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password, String token) {
         logger.debug("About to send PUT request to '{}' with payload '{}' by thread {}", uri, body, Thread.currentThread().getId());
         KieServerHttpRequest request = newRequest( uri, user, password, token ).body(body).put();
@@ -67,7 +68,6 @@ public class DefaultRestControllerImpl implements KieServerController {
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected <T> T makeHttpPostRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password, String token) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieServerHttpRequest request = newRequest( uri, user, password, token ).body(body).post();
@@ -84,7 +84,7 @@ public class DefaultRestControllerImpl implements KieServerController {
         }
     }
 
-    @SuppressWarnings("unchecked")
+
     protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType, String user, String password, String token) {
         logger.debug("About to send DELETE request to '{}' ", uri);
         KieServerHttpRequest request = newRequest( uri, user, password, token ).delete();
@@ -181,7 +181,45 @@ public class DefaultRestControllerImpl implements KieServerController {
         }
     }
     
-    public KieServerSetup connectToSingleController(KieServerInfo serverInfo, KieServerConfig config, String controllerUrl) {
+    @Override
+    public KieServerSetup update(KieServerStateInfo serverTemplateUpdate) {
+        if(!Boolean.valueOf(System.getProperty(KieServerConstants.KIE_SERVER_NOTIFY_UPDATES_TO_CONTROLLERS, "true"))) {
+            return new KieServerSetup();
+        }
+        KieServerState currentState = context.getStateRepository().load(KieServerEnvironment.getServerId());
+        Set<String> controllers = currentState.getControllers();
+        KieServerSetup kieServerSetup = null;
+        KieServerConfig config = currentState.getConfiguration();
+        if (controllers != null && !controllers.isEmpty()) {
+
+            for (String controllerUrl : controllers) {
+                if (controllerUrl != null && !controllerUrl.isEmpty()) {
+                    String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
+
+                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                    String password = loadControllerPassword(config);
+                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+                    
+                    try {
+                       kieServerSetup = makeHttpPostRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverTemplateUpdate), KieServerSetup.class, userName, password, token);
+                    } catch (Exception e) {
+                        // let's check all other controllers in case of running in cluster of controllers
+                        logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+                        logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
+                                    
+                    }
+
+                }
+            }
+
+        } else {
+            logger.warn("No controllers found to update to new status {}", serverTemplateUpdate);
+        }
+        // we return one of them coming fron the controller
+        return kieServerSetup;
+    }
+
+    public KieServerSetup connectToSingleController(Object info, KieServerConfig config, String controllerUrl) {
         String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
 
         String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
@@ -189,7 +227,7 @@ public class DefaultRestControllerImpl implements KieServerController {
         String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
         try {
-            KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password, token);
+            KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(info), KieServerSetup.class, userName, password, token);
 
             if (kieServerSetup != null && kieServerSetup.hasNoErrors()) {
                 // once there is non null list let's return it
@@ -287,4 +325,6 @@ public class DefaultRestControllerImpl implements KieServerController {
             }
         }
     }
+
+
 }

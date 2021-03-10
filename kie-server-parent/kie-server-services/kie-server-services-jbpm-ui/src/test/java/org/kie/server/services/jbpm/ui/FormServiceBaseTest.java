@@ -91,14 +91,12 @@ public class FormServiceBaseTest {
 
         when(userTaskService.execute(any(), any())).thenReturn(task);
         when(task.getName()).thenReturn("task");
-        when(task.getId()).thenReturn(1L);
         when(task.getTaskData()).thenReturn(taskData);
         when(task.getFormName()).thenReturn("form");
         when(taskData.getProcessId()).thenReturn(PROCESS_ID);
         when(taskData.getDeploymentId()).thenReturn(CONTAINER_ID);
 
         when(dataService.getProcessesByDeploymentIdProcessId(eq(CONTAINER_ID), eq(PROCESS_ID))).thenReturn(processDefinition);
-        when(processDefinition.getName()).thenReturn("test");
         when(formManagerService.getFormByKey(eq(CONTAINER_ID), eq("form-taskform.frm"))).thenReturn(dummyForm);
     }
 

@@ -46,7 +46,6 @@ public class DisableUserProblemFactChangeTest {
     public void setUp() {
         user = new User(1, USER_ID);
         workingSolution = new TaskAssigningSolution(1, new ArrayList<>(), new ArrayList<>());
-        when(scoreDirector.getWorkingSolution()).thenReturn(workingSolution);
         change = new DisableUserProblemFactChange(user);
     }
 

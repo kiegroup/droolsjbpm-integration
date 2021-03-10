@@ -48,6 +48,8 @@ import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
+import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.slf4j.Logger;
@@ -94,10 +96,9 @@ public class CaseQueryResource extends AbstractCaseResource {
         super(caseManagementRuntimeDataServiceBase, context);
     }
 
-    @ApiOperation(value="Returns cases instances with authentication checks.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns cases instances with authentication checks.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
@@ -110,7 +111,8 @@ public class CaseQueryResource extends AbstractCaseResource {
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -120,17 +122,17 @@ public class CaseQueryResource extends AbstractCaseResource {
                     CaseInstanceList responseObject = null;
                     if (dataItemName != null && !dataItemName.isEmpty() && dataItemValue != null && !dataItemValue.isEmpty()) {
                         logger.debug("About to look for case instances by data item name {} and value {} with status {}", dataItemName, dataItemValue, status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByCaseFileData(dataItemName, dataItemValue, status, page, pageSize, sort, sortOrder);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByCaseFileData(dataItemName, dataItemValue, status, page, pageSize, sort, sortOrder, withData);
                     } else if (dataItemName != null && !dataItemName.isEmpty()) {
-                        logger.debug("About to look for case instances by data item name {} with status {}", dataItemName, dataItemValue, status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByCaseFileData(dataItemName, null, status, page, pageSize, sort, sortOrder);
+                        logger.debug("About to look for case instances by data item name {} with status {}", dataItemName, status);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByCaseFileData(dataItemName, null, status, page, pageSize, sort, sortOrder, withData);
                     } else if (owner != null && !owner.isEmpty()) {
                         logger.debug("About to look for case instances owned by {} with status {}", owner, status);
                         responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesOwnedBy(owner,
-                                                                                                           status, page, pageSize, sort, sortOrder);
+                                                                                                           status, page, pageSize, sort, sortOrder, withData);
                     } else {
                         logger.debug("About to look for case instances with status {}", status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder, withData);
                     }
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
@@ -138,10 +140,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns cases instances that involve the querying user in a specified role.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns cases instances that involve the querying user in a specified role.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
@@ -152,7 +153,8 @@ public class CaseQueryResource extends AbstractCaseResource {
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -160,7 +162,7 @@ public class CaseQueryResource extends AbstractCaseResource {
                 (Variant v, String type, Header... customHeaders) -> {
 
                     logger.debug("About to look for case instances with status {}", status);
-                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByRole(roleName, status, page, pageSize, sort, sortOrder);
+                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByRole(roleName, status, page, pageSize, sort, sortOrder, withData);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
@@ -171,10 +173,9 @@ public class CaseQueryResource extends AbstractCaseResource {
      * case definition methods
      */
     
-    @ApiOperation(value="Returns a specified case definition from all KIE containers.",
-            response=CaseDefinitionList.class, code=200)
+    @ApiOperation(value="Returns a specified case definition from all KIE containers.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, message = "Successful response", response = CaseDefinitionList.class, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -201,10 +202,9 @@ public class CaseQueryResource extends AbstractCaseResource {
     /*
      * process definition methods
      */
-    @ApiOperation(value="Returns a specified process associated with case definitions from all KIE containers.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns a specified process associated with case definitions from all KIE containers.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_ALL_PROCESSES_INSTANCES_GET_URI)
@@ -229,10 +229,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns processes associated with case definitions in a specified KIE container.",
-            response=ProcessDefinitionList.class, code=200)
+    @ApiOperation(value="Returns processes associated with case definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI)
@@ -261,10 +260,9 @@ public class CaseQueryResource extends AbstractCaseResource {
      * Case tasks
      */
 
-    @ApiOperation(value="Returns tasks for potential owners in a specified case instance.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns tasks for potential owners in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_POT_OWNER_GET_URI)
@@ -290,10 +288,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns tasks for business administrators in a specified case instance.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns tasks for business administrators in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_ADMIN_GET_URI)
@@ -319,10 +316,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns tasks for stakeholders in a specified case instance.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns tasks for stakeholders in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_STAKEHOLDER_GET_URI)
@@ -348,10 +344,9 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns case file data items for a specified case instance.",
-            response=CaseInstanceList.class, code=200)
+    @ApiOperation(value="Returns case file data items for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = CaseFileDataItemList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_CASE_FILE_DATA_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_FILE_GET_URI)
@@ -374,10 +369,12 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    @ApiOperation(value = "Queries cases by variables and tasks", response = CaseInstanceCustomVarsList.class)
     @POST
     @Path(RestURI.VARIABLES_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryCaseByVariables(@Context HttpHeaders headers, String payload,
                                          @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
                                          @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
@@ -398,10 +395,12 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     }
 
+    @ApiOperation(value = "Queries cases tasks by variables", response = CaseUserTaskWithVariablesList.class)
     @POST
     @Path(RestURI.VARIABLES_TASKS_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryCaseUserTasksByVariables(@Context HttpHeaders headers,
                                                   String payload,
                                                   @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 

@@ -57,6 +57,8 @@ import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.common.Header;
+import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
+import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.slf4j.Logger;
@@ -135,10 +137,9 @@ public class RuntimeDataResource {
     }
 
 
-    @ApiOperation(value="Returns all process instances filtered by optional parameters.",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns all process instances filtered by optional parameters.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, message = "Successful response", response = ProcessInstanceList.class, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCES_GET_URI)
@@ -155,15 +156,13 @@ public class RuntimeDataResource {
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstances(status, initiator, processName, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process instance search: {}", processInstanceList);
-
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
 
-    @ApiOperation(value="Returns all process instances for a specified process.",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns all process instances for a specified process.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI)
@@ -185,11 +184,10 @@ public class RuntimeDataResource {
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process instances for a specified KIE container.",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns all process instances for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
                             @ApiResponse(code = 404, message = "Container Id not found"), 
-                            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                            @ApiResponse(code = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI)
@@ -219,10 +217,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a single process instance with a specified correlation key.",
-            response=ProcessInstance.class, code=200)
+    @ApiOperation(value="Returns information about a single process instance with a specified correlation key.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI)
@@ -242,10 +239,9 @@ public class RuntimeDataResource {
 
     }
 
-    @ApiOperation(value="Returns process instances with a specified correlation key.",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns process instances with a specified correlation key.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, message = "Successful response", response = ProcessInstanceList.class, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI)
@@ -266,10 +262,9 @@ public class RuntimeDataResource {
 
     }
 
-    @ApiOperation(value="Returns process instances with a specified variable.",
-            response=ProcessInstanceList.class, code=200)
+    @ApiOperation(value="Returns process instances with a specified variable.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, message = "Successful response", response = ProcessInstanceList.class, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_BY_VAR_NAME_GET_URI)
@@ -292,10 +287,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns information about a specified process instance.",
-            response=ProcessInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Process instance id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI)
@@ -316,10 +310,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(processInstanceDesc, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns node instances for a specified work item in a specified process instance.",
-            response=NodeInstance.class, code=200)
+    @ApiOperation(value="Returns node instances for a specified work item in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Node instance id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = NodeInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODE_RESPONSE_JSON)})) })
     @GET
     @Path(NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI)
@@ -340,10 +333,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(nodeInstanceDesc, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns node instances for a specified process instance.",
-            response=NodeInstanceList.class, code=200)
+    @ApiOperation(value="Returns node instances for a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = NodeInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)}))})
     @GET
     @Path(NODE_INSTANCES_BY_INSTANCE_ID_GET_URI)
@@ -363,10 +355,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(nodeInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns current variable values of a specified process instance.",
-            response=VariableInstanceList.class, code=200)
+    @ApiOperation(value="Returns current variable values of a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = VariableInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
     @GET
     @Path(VAR_INSTANCES_BY_INSTANCE_ID_GET_URI)
@@ -383,10 +374,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns the history of a specified variable in a specified process instance.",
-            response=VariableInstanceList.class, code=200)
+    @ApiOperation(value="Returns the history of a specified variable in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = VariableInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
     @GET
     @Path(VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI)
@@ -406,10 +396,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process definitions in a specified KIE container.",
-            response=ProcessDefinitionList.class, code=200)
+    @ApiOperation(value="Returns all process definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI)
@@ -428,10 +417,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process definitions.",
-            response=ProcessDefinitionList.class, code=200)
+    @ApiOperation(value="Returns all process definitions.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_DEFINITIONS_GET_URI)
@@ -452,10 +440,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process definitions for a specified process.",
-            response=ProcessDefinitionList.class, code=200)
+    @ApiOperation(value="Returns all process definitions for a specified process.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_DEFINITIONS_BY_ID_GET_URI)
@@ -472,10 +459,9 @@ public class RuntimeDataResource {
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns information about a specified process definition in a specified KIE container.",
-            response=ProcessDefinition.class, code=200)
+    @ApiOperation(value="Returns information about a specified process definition in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ProcessDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEF_RESPONSE_JSON)}))})
     @GET
     @Path(PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI)
@@ -486,20 +472,18 @@ public class RuntimeDataResource {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-        org.kie.server.api.model.definition.ProcessDefinition processDesc = null;
+        ProcessDefinition processDesc = null;
         try {
-
             processDesc = runtimeDataServiceBase.getProcessesByDeploymentIdProcessId(containerId, processId);
+            return createCorrectVariant(processDesc, headers, Response.Status.OK, conversationIdHeader);
         } catch (IllegalArgumentException e) {
             return notFound(MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         }
-        return createCorrectVariant(processDesc, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns task instances with a specified work item.",
-            response=TaskInstance.class, code=200)
+    @ApiOperation(value="Returns task instances with a specified work item.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task not found for given work item id"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_RESPONSE_JSON)}))})
     @GET
     @Path(TASK_BY_WORK_ITEM_ID_GET_URI)
@@ -522,10 +506,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified task instance.",
-            response=TaskInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task not found for given id"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                           @ApiResponse(code = 200, response = TaskInstance.class, message = "Successful response", examples = @Example(value = {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_RESPONSE_JSON)}))})
     @GET
     @Path(TASK_GET_URI)
@@ -548,10 +531,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns task instances assigned to business administrators.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns task instances assigned to business administrators.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                           @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples = @Example(value = {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI)
@@ -578,10 +560,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns tasks with a user defined as a potential owner.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns tasks with a user defined as a potential owner.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+                           @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples = @Example(value = {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(TASKS_ASSIGN_POT_OWNERS_GET_URI)
@@ -613,10 +594,9 @@ public class RuntimeDataResource {
 
     }
 
-    @ApiOperation(value="Returns task instances that the querying user owns.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns task instances that the querying user owns.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(TASKS_OWNED_GET_URI)
@@ -644,10 +624,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns task instances associated with a specified process instance.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns task instances associated with a specified process instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(TASK_BY_PROCESS_INST_ID_GET_URI)
@@ -674,10 +653,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns all task instances.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns all task instances.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(TASKS_GET_URI)
@@ -704,10 +682,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns events for a specified task instance.",
-            response=TaskEventInstanceList.class, code=200)
+    @ApiOperation(value="Returns events for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskEventInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_EVENTS_RESPONSE_JSON)}))})
     @GET
     @Path(TASKS_EVENTS_GET_URI)
@@ -732,10 +709,9 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns task instances with a specified variable.",
-            response=TaskSummaryList.class, code=200)
+    @ApiOperation(value="Returns task instances with a specified variable.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(TASKS_BY_VAR_NAME_GET_URI)
@@ -766,10 +742,12 @@ public class RuntimeDataResource {
         }
     }
 
+    @ApiOperation(value = "Queries processes by variables and tasks", response = ProcessInstanceCustomVarsList.class)
     @POST
     @Path(RestURI.VARIABLES_PROCESSES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryProcessesByVariables(@Context HttpHeaders headers, String payload,
                                               @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
                                               @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
@@ -790,10 +768,12 @@ public class RuntimeDataResource {
 
     }
 
+    @ApiOperation(value = "Queries process tasks by variables", response = ProcessInstanceUserTaskWithVariablesList.class)
     @POST
     @Path(RestURI.VARIABLES_TASKS_PROCESSES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryUserTasksByVariables(@Context HttpHeaders headers, String payload,
                                               @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
                                               @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {

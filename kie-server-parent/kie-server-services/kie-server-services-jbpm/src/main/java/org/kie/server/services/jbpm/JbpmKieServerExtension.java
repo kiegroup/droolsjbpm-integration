@@ -101,6 +101,7 @@ import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorImpl;
 import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorManager;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
@@ -340,7 +341,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                                                                                  new ExecutorServiceBase(executorService, context),
                                                                                  new QueryDataServiceBase(queryService, context),
                                                                                  new DocumentServiceBase(context),
-                                                                                 new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context),
+                                                                                 new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, runtimeDataService, context),
                                                                                  new UserTaskAdminServiceBase(userTaskAdminService, context));
     }
 
@@ -401,12 +402,15 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 return;
             }
             ReleaseId releaseId = kieContainerInstance.getKieContainer().getReleaseId();
+            if (releaseId == null) {
+                releaseId = kieContainerInstance.getResource().getReleaseId();
+            }
 
             KModuleDeploymentUnit unit = new CustomIdKmoduleDeploymentUnit(id, releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion());
 
             if (!hasDefaultSession) {
-                unit.setKbaseName(kbaseNames.iterator().next());
-                unit.setKsessionName(ksessionNames.iterator().next());
+                unit.setKbaseName(kieContainer.getKieBaseModel(id).getName());
+                unit.setKsessionName(kieContainer.getKieSessionNamesInKieBase(id).iterator().next());
             }
             // override defaults if config options are given
             KieServerConfig config = new KieServerConfig(kieContainerInstance.getResource().getConfigItems());
@@ -420,9 +424,13 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 unit.setMergeMode(MergeMode.valueOf(mergeMode));
             }
             String ksession = config.getConfigItemValue(KieServerConstants.PCFG_KIE_SESSION);
-            unit.setKsessionName(ksession);
+            if (ksession != null) {
+                unit.setKsessionName(ksession);
+            }
             String kbase = config.getConfigItemValue(KieServerConstants.PCFG_KIE_BASE);
-            unit.setKbaseName(kbase);
+            if (kbase != null && !kbase.isEmpty()) {
+                unit.setKbaseName(kbase);
+            }
 
             // reuse kieContainer to avoid unneeded bootstrap
             unit.setKieContainer(kieContainer);
@@ -701,12 +709,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
     protected void addTaskBAMEventListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
         final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
         if (descriptor.getAuditMode() != AuditMode.NONE) {
-            descriptor.getBuilder().addTaskEventListener(
-                    new ObjectModel(
+            List<ObjectModel> oldList = descriptor.getTaskEventListeners();
+            ObjectModel model = new ObjectModel(
                             "mvel",
                             "new org.jbpm.services.task.lifecycle.listeners.BAMTaskEventListener(false)"
-                    )
             );
+            if(!oldList.contains(model)) {
+                if(!oldList.isEmpty()) {
+                    oldList.add(0, model);
+                } else {
+                    oldList.add(model);
+                }
+            }
+            descriptor.getBuilder().setTaskEventListeners(oldList);
             unit.setDeploymentDescriptor(descriptor);
         }
     }
@@ -736,8 +751,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     protected DeploymentDescriptor getDeploymentDescriptor(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
         DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
         if (descriptor == null) {
-            List<DeploymentDescriptor> descriptorHierarchy = DeploymentDescriptorManagerUtil.getDeploymentDescriptorHierarchy(deploymentDescriptorManager, kieContainer);
-            descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
+            return DeploymentDescriptorManagerUtil.getDeploymentDescriptor(deploymentDescriptorManager, kieContainer, MergeMode.MERGE_COLLECTIONS);
         }
         return descriptor;
     }

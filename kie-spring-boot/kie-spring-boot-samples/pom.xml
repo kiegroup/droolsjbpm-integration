@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot</artifactId>
-    <version>7.41.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-spring-boot-samples</artifactId>
@@ -37,6 +37,7 @@
     <module>kie-server-spring-boot-sample</module>
     <module>keycloak-kie-server-spring-boot-sample</module>
     <module>kie-server-spring-boot-integ-tests-sample</module>
+    <module>kie-server-spring-boot-kafka-sample</module>
   </modules>
 
   <dependencyManagement>
