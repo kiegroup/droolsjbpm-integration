@@ -485,7 +485,7 @@ public class LoadBalancerClientTest {
         try {
             response = client.getServerState();
             fail("Unexpected successful request");
-        } catch (NoEndpointFoundException e) {
+        } catch (KieServerHttpRequestException e) {
             // expect failure
         }
 

@@ -55,6 +55,7 @@ import org.kie.server.client.jms.ResponseHandler;
 import org.kie.server.common.rest.KieServerHttpRequest;
 import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.common.rest.KieServerHttpResponse;
+import org.kie.server.common.rest.NoEndpointFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -861,9 +862,13 @@ public abstract class AbstractKieServicesClientImpl {
                 if (e.getCause() instanceof IOException) {
                     logger.warn("Marking endpoint '{}' as failed due to {}", url, e.getCause().getMessage());
                     String failedBaseUrl = loadBalancer.markAsFailed(url);
-                    nextUrl = loadBalancer.getUrl();
-                    url = url.replace(failedBaseUrl, nextUrl);
-                    logger.debug("Selecting next endpoint from load balancer - '{}'", url);
+                    try {
+                        nextUrl = loadBalancer.getUrl();
+                        url = url.replace(failedBaseUrl, nextUrl);
+                        logger.debug("Selecting next endpoint from load balancer - '{}'", url);
+                    } catch (NoEndpointFoundException noEndpointFoundException) {
+                        logger.warn("Cannot invoke request - '{}'", noEndpointFoundException.getMessage());
+                    }
                 } else {
                     throw e;
                 }
