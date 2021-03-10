@@ -59,6 +59,24 @@
                 "methodName": "startSynchronousProcess",
                 "elementKind": "method",
                 "justification": "[JBPM-9624] Return the process variables for synchronous execution use cases"
+             },
+             {
+                "code": "java.method.addedToInterface",
+                "new": "method org.kie.server.api.model.admin.MigrationReportInstance org.kie.server.client.admin.ProcessAdminServicesClient::migrateProcessInstanceWithSubprocess(java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
+                "package": "org.kie.server.client.admin",
+                "classSimpleName": "ProcessAdminServicesClient",
+                "methodName": "migrateProcessInstanceWithSubprocess",
+                "elementKind": "method",
+                "justification": "https://issues.redhat.com/browse/JBPM-9649"
+             },
+             {
+                "code": "java.method.addedToInterface",
+                "new": "method org.kie.server.api.model.admin.MigrationReportInstance org.kie.server.client.admin.ProcessAdminServicesClient::migrateProcessInstanceWithSubprocess(java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.util.Map<java.lang.String, java.lang.String>)",
+                "package": "org.kie.server.client.admin",
+                "classSimpleName": "ProcessAdminServicesClient",
+                "methodName": "migrateProcessInstanceWithSubprocess",
+                "elementKind": "method",
+                "justification": "https://issues.redhat.com/browse/JBPM-9649"
              }
            ]
         }

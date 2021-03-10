@@ -25,12 +25,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.MigrationReportInstance;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -39,8 +42,15 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
     private static final ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.1.Final");
 
-    protected static final String CONTAINER_ID_2 = "definition-project-2";
-    protected static final String PROCESS_ID_EVALUATION_2 = "definition-project.evaluation2";
+    private static final String CONTAINER_ID_2 = "definition-project-2";
+    private static final String PROCESS_ID_EVALUATION_2 = "definition-project.evaluation2";
+    private static final String PARENT_WITH_INDEPENDENT_SUBPROCESS_ID = "definition-project.parentWithIndependentSubProcess";
+    private static final String PARENT_WITH_INDEPENDENT_SUBPROCESS_ID2 = "definition-project.parentWithIndependentSubProcess2";
+    private static final String PARENT_WITH_NON_INDEPENDENT_SUBPROCESS_ID = "definition-project.parentWithNonIndependentSubProcess";
+    private static final String PARENT_WITH_MULTIPLE_INDEPENDENT_SUBPROCESS_ID = "definition-project.parentWithMultipleIndependentSubProcesses";
+    private static final String SUBPROCESS_ID = "definition-project.subprocess";
+    private static final String SUBPROCESS_CALLING_ANOTHER_SUBPROCESS_ID = "definition-project.subprocessCallingAnotherSubProcess";
+
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -58,7 +68,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
     }
 
     @Test
-    public void testUpgradeProcessInstance() throws Exception {
+    public void testUpgradeProcessInstance() {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION);
 
         try {
@@ -110,7 +120,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
     }
 
     @Test
-    public void testUpgradeProcessInstanceWithNodeMapping() throws Exception {
+    public void testUpgradeProcessInstanceWithNodeMapping() {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION);
         try {
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
@@ -151,7 +161,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
     }
 
     @Test
-    public void testUpgradeProcessInstances() throws Exception {
+    public void testUpgradeProcessInstances() {
 
         List<Long> ids = new ArrayList<Long>();
 
@@ -215,7 +225,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
     }
 
     @Test
-    public void testUpgradeProcessInstancesWithNodeMapping() throws Exception {
+    public void testUpgradeProcessInstancesWithNodeMapping() {
 
         List<Long> ids = new ArrayList<Long>();
 
@@ -265,5 +275,92 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
                 }
             }
         }
+    }
+
+    @Test
+    public void testUpgradeParentInstanceWithIndependentSubprocess() {
+        Long processParentInstanceId = processClient.startProcess(CONTAINER_ID, PARENT_WITH_INDEPENDENT_SUBPROCESS_ID);
+        assertNotNull(processParentInstanceId);
+        assertTrue(processParentInstanceId > 0);
+
+        try {
+
+            List<ProcessInstance> childrenProcessInstances = processClient.findProcessInstancesByParent(CONTAINER_ID, processParentInstanceId, 0, 10);
+            assertEquals(2, childrenProcessInstances.size());
+            for (ProcessInstance processInstance : childrenProcessInstances) {
+                assertEquals("1.0", processInstance.getProcessVersion());
+                assertEquals(CONTAINER_ID, processInstance.getContainerId());
+                assertEquals(SUBPROCESS_ID, processInstance.getProcessId());
+                assertEquals(processParentInstanceId, processInstance.getParentId());
+            }
+
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertEquals(2, tasks.size());
+            for (TaskSummary task : tasks) {
+                assertEquals("Evaluate items?", task.getName());
+                assertEquals(CONTAINER_ID, task.getContainerId());
+                assertEquals(SUBPROCESS_ID, task.getProcessId());
+            }
+
+            MigrationReportInstance report = processAdminClient.migrateProcessInstanceWithSubprocess(CONTAINER_ID, processParentInstanceId, CONTAINER_ID_2, PARENT_WITH_INDEPENDENT_SUBPROCESS_ID2);
+            assertNotNull(report);
+            assertTrue(report.isSuccessful());
+
+            childrenProcessInstances = processClient.findProcessInstancesByParent(CONTAINER_ID_2, processParentInstanceId, 0, 10);
+            assertEquals(2, childrenProcessInstances.size());
+            for (ProcessInstance processInstance : childrenProcessInstances) {
+                assertEquals("Evaluate items?", processInstance.getProcessName());
+                assertEquals(CONTAINER_ID_2, processInstance.getContainerId());
+                assertEquals(SUBPROCESS_ID, processInstance.getProcessId());
+                assertEquals(processParentInstanceId, processInstance.getParentId());
+            }
+
+            // it stays in the same task
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertEquals(2, tasks.size());
+
+            for (TaskSummary task : tasks) {
+                assertEquals("Evaluate items?", task.getName());
+                assertEquals(CONTAINER_ID_2, task.getContainerId());
+                assertEquals(SUBPROCESS_ID, task.getProcessId());
+                assertEquals(processParentInstanceId, task.getParentId());
+                taskClient.completeAutoProgress(CONTAINER_ID_2, task.getId(), USER_YODA, null);
+            }
+
+            // but next task should be Approve user task
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertEquals(2, tasks.size());
+
+            for (TaskSummary task : tasks) {
+                assertEquals("Approve", task.getName());
+                assertEquals(CONTAINER_ID_2, task.getContainerId());
+                assertEquals(SUBPROCESS_ID, task.getProcessId());
+                assertEquals(processParentInstanceId, task.getParentId());
+            }
+
+        } finally {
+            try {
+                processClient.getProcessInstance(CONTAINER_ID_2, processParentInstanceId);
+
+                processClient.abortProcessInstance(CONTAINER_ID_2, processParentInstanceId);
+            } catch (KieServicesException e){
+                processClient.abortProcessInstance(CONTAINER_ID, processParentInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testUpgradeParentInstanceWithNonIndependentSubprocess() {
+
+    }
+
+    @Test
+    public void testUpgradeParentInstanceWithMultipleIndependentSubprocess() {
+
+    }
+
+    @Test
+    public void testUpgradeParentInstanceWithMultipleNonIndependentSubprocess() {
+
     }
 }
