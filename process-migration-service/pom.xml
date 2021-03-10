@@ -381,6 +381,16 @@
               <arguments>test</arguments>
             </configuration>
           </execution>
+          <execution>
+            <id>run cypress scripts</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run test:it</arguments>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

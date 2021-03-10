@@ -14,10 +14,7 @@
     "test": "jest",
     "precommit": "lint-staged",
     "locktt": "locktt",
-    "cypress:run": "cypress run --project ./frontend",
-    "cypress:run-with-dev-server": "start-server-and-test cypress:run'",
-    "cypress:open": "cypress open",
-    "cypress:open-with-dev-server": "start-server-and-test cypress:open'"
+    "test:it": "cypress run"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,json,css,md}": [
