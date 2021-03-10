@@ -26,6 +26,8 @@ import java.util.jar.JarFile;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.assertj.core.api.Assertions;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -55,11 +57,19 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
         super(builder);
     }
 
+    @BeforeClass
+    public static void setup() {
+        System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
+    }
+
+    @AfterClass
+    public static void cleanup() {
+        System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
+    }
+
     @Test
     public void testUseBuildKjarWithPMML() throws Exception {
-        System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
         buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
-
         final KieServices kieServices = KieServices.Factory.get();
         final ReleaseId releaseId = kieServices.newReleaseId(GAV_GROUP_ID, GAV_ARTIFACT_ID, GAV_VERSION);
         final KieContainer kieContainer = kieServices.newKieContainer(releaseId);
@@ -72,12 +82,10 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
         Assertions.assertThat(kiePackageWithPMML).isNotNull();
         Assertions.assertThat(kiePackageWithPMML.getRules()).isNotEmpty();
         kieSession.dispose();
-        System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
     }
 
     @Test
     public void testContentKjarWithPMML() throws Exception {
-        System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
         final MavenExecutionResult result = buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
         final File basedir = result.getBasedir();
         final File kjarFile = new File(basedir, "target/" + GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
@@ -94,6 +102,5 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
         Assertions.assertThat(jarContent).isNotEmpty();
         Assertions.assertThat(jarContent).contains(PMML_FILE_NAME);
         Assertions.assertThat(jarContent).contains(EXAMPLE_PMML_CLASS);
-        System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
     }
 }
