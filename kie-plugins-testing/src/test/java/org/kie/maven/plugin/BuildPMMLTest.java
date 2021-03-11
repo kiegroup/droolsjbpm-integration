@@ -69,7 +69,7 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
 
     @Test
     public void testUseBuildKjarWithPMML() throws Exception {
-        buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
+        final MavenExecutionResult result =buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
         final KieServices kieServices = KieServices.Factory.get();
         final ReleaseId releaseId = kieServices.newReleaseId(GAV_GROUP_ID, GAV_ARTIFACT_ID, GAV_VERSION);
         final KieContainer kieContainer = kieServices.newKieContainer(releaseId);
@@ -82,11 +82,6 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
         Assertions.assertThat(kiePackageWithPMML).isNotNull();
         Assertions.assertThat(kiePackageWithPMML.getRules()).isNotEmpty();
         kieSession.dispose();
-    }
-
-    @Test
-    public void testContentKjarWithPMML() throws Exception {
-        final MavenExecutionResult result = buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
         final File basedir = result.getBasedir();
         final File kjarFile = new File(basedir, "target/" + GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
         Assertions.assertThat(kjarFile).exists();
