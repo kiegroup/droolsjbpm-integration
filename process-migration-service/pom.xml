@@ -373,7 +373,7 @@
               <arguments>run build</arguments>
             </configuration>
           </execution>
-          <execution>
+           <execution>
             <id>run tests</id>
             <phase>test</phase>
             <goals>
