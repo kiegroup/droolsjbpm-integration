@@ -13,6 +13,7 @@ jobs:
     name: Maven Build
     steps:
       - name: Free disk space
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           df -h
           sudo apt-get remove aria2 ansible azure-cli shellcheck rpm xorriso zsync \
