@@ -35,6 +35,7 @@ import org.kie.server.api.model.dmn.DMNContextKS;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -188,7 +189,7 @@ public class DMNContextKSMarshallingTest {
     @Test
     public void testJsonMarshalling() {
         final String result = jsonMarshaller.marshall(BEAN);
-        assertEquals(JSON, result); // TODO: jsonpath?
+        assertThat(result).isEqualToIgnoringWhitespace(JSON);
     }
 
     @Test

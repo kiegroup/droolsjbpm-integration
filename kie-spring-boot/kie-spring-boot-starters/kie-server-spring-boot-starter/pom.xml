@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-starters</artifactId>
-    <version>7.44.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-starter</artifactId>
 
@@ -25,6 +25,10 @@
         <exclusion>
           <groupId>jakarta.validation</groupId>
           <artifactId>jakarta.validation-api</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -62,6 +66,10 @@
         <exclusion>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

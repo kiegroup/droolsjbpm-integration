@@ -6,7 +6,7 @@
   <parent>
     <artifactId>kie-server-controller</artifactId>
     <groupId>org.kie.server</groupId>
-    <version>7.44.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-controller-openshift</artifactId>
@@ -32,6 +32,12 @@
         <groupId>io.fabric8</groupId>
         <artifactId>kubernetes-model</artifactId>
         <version>${version.kubernetes-client}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>io.fabric8</groupId>
@@ -82,6 +88,12 @@
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-model</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -146,6 +158,7 @@
             <KUBERNETES_REQUEST_TIMEOUT />
             <KUBERNETES_NAMESPACE />
             <KUBERNETES_TLS_VERSIONS>TLSv1.2,TLSv1.1,TLSv1</KUBERNETES_TLS_VERSIONS>
+            <HOSTNAME>TEST_ENV</HOSTNAME>
           </environmentVariables>
         </configuration>
       </plugin>

@@ -8,7 +8,6 @@
   <repository>mvn:org.apache.camel.karaf/apache-camel/${karaf.version.org.apache.camel}/xml/features</repository>
 
   <feature name="drools-common" version="${project.version}" description="Drools Commons">
-    <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream-java8/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.3/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
@@ -16,7 +15,6 @@
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
     <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
     <bundle>wrap:mvn:org.eclipse.jdt/ecj/${karaf.version.org.eclipse.jdt}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt}</bundle>
-    <bundle>wrap:mvn:org.codehaus.janino/janino/${karaf.version.org.codehaus.janino}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${karaf.version.org.codehaus.janino}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
     <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>
     <bundle>mvn:org.jboss.spec.javax.el/jboss-el-api_3.0_spec/${karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec}</bundle>
@@ -26,7 +24,6 @@
   </feature>
 
   <feature name="drools-decisiontable" description="Drools Decision Tables" version="${project.version}">
-    <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-templates</feature>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>

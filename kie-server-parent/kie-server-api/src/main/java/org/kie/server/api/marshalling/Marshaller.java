@@ -25,19 +25,31 @@ public interface Marshaller {
 
     static String MARSHALLER_PARAMETER_STRICT = "strict";
 
-    public default String marshall(Object input, Map<String, Object> parameters) {
+    default String marshall(Object input, Map<String, Object> parameters) {
         return marshall(input);
     }
 
-    public String marshall(Object input);
+    String marshall(Object input);
 
-    public <T> T unmarshall(String input, Class<T> type);
+    <T> T unmarshall(String input, Class<T> type);
 
-    public void dispose();
+    default <T> T unmarshall(String input, Class<T> type, Map<String, Object> parameters) {
+        return unmarshall(input, type);
+    }
 
-    public MarshallingFormat getFormat();
+    void dispose();
 
-    public void setClassLoader(ClassLoader classloader);
+    MarshallingFormat getFormat();
 
-    public ClassLoader getClassLoader();
+    void setClassLoader(ClassLoader classloader);
+
+    ClassLoader getClassLoader();
+
+    default byte[] marshallAsBytes(Object input) {
+        return marshall(input).getBytes();
+    }
+
+    default <T> T unmarshall(byte[] input, Class<T> type) {
+        return unmarshall(new String(input), type);
+    }
 }

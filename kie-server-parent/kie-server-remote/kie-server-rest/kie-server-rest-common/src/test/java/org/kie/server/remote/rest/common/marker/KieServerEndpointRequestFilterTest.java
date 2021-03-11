@@ -107,7 +107,6 @@ public class KieServerEndpointRequestFilterTest {
     public void testOtherNoPassAnnotationPass() throws Exception {
         ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
         when(resourceInfo.getResourceMethod()).thenReturn(TestAnnotationOperations.class.getMethod("test1"));
-        when(resourceInfo.getResourceClass()).thenReturn((Class) TestAnnotationOperations.class);
 
         when(requestContext.getMethod()).thenReturn("POST");
 
@@ -120,7 +119,6 @@ public class KieServerEndpointRequestFilterTest {
     public void testOtherAlwaysPassAnnotationPass() throws Exception {
         ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
         when(resourceInfo.getResourceMethod()).thenReturn(TestAnnotationOperations.class.getMethod("test2"));
-        when(resourceInfo.getResourceClass()).thenReturn((Class) TestAnnotationOperations.class);
 
         when(requestContext.getMethod()).thenReturn("POST");
 
@@ -133,7 +131,6 @@ public class KieServerEndpointRequestFilterTest {
     public void testOtherOverrideBadPassAnnotationPass() throws Exception {
         ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
         when(resourceInfo.getResourceMethod()).thenReturn(TestTypeAnnotationOperations.class.getMethod("test1"));
-        when(resourceInfo.getResourceClass()).thenReturn((Class) TestTypeAnnotationOperations.class);
 
         when(requestContext.getMethod()).thenReturn("POST");
 
@@ -146,7 +143,6 @@ public class KieServerEndpointRequestFilterTest {
     public void testOtherTypePassAnnotationPass() throws Exception {
         ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
         when(resourceInfo.getResourceMethod()).thenReturn(TestAnnotationOperations.class.getMethod("test2"));
-        when(resourceInfo.getResourceClass()).thenReturn((Class) TestAnnotationOperations.class);
 
         when(requestContext.getMethod()).thenReturn("POST");
 

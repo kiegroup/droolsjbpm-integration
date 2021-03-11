@@ -5,19 +5,21 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-osgi</artifactId>
-    <version>7.44.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-karaf-itests</artifactId>
   <name>KIE :: Karaf Integration Tests</name>
 
   <properties>
+    <skipTests>true</skipTests>
+
     <java.module.name>org.kie.karaf.itests.main</java.module.name>
     <version.org.apache.karaf>4.2.3</version.org.apache.karaf>
     <!-- use global version property from kie-parent -->
     <!-- <version.org.apache.cxf>3.2.8</version.org.apache.cxf> -->
     <version.org.apache.camel>2.21.5</version.org.apache.camel>
-    <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
+    <version.org.ops4j.pax.exam>4.13.4</version.org.ops4j.pax.exam>
     <version.org.apache.servicemix.bundles.javax-inject>1_2</version.org.apache.servicemix.bundles.javax-inject>
 
     <maven.hibernate.dialect>org.hibernate.dialect.H2Dialect</maven.hibernate.dialect>
@@ -342,6 +344,16 @@
   </build>
 
   <profiles>
+    <profile>
+      <id>java8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+
     <profile>
       <id>fuse7</id>
       <properties>

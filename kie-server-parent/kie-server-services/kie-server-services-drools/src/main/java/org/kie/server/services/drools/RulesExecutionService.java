@@ -27,6 +27,7 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.util.KieServerUtils;
 
 /**
  * Direct rules execution service that allow use of typed objects instead of string only
@@ -52,9 +53,10 @@ public class RulesExecutionService {
             if( command.getLookup() != null ) {
                 ks = context.getKieSessionLookupManager().lookup(command.getLookup(), kci, context);
             } else {
-                // if no session ID is defined, then the default is a stateful session
-                ks = ((KieContainerInstanceImpl)kci).getKieContainer().getKieSession();
+                // if no session ID is defined, then use default stateful/stateless ksession.
+                ks = KieServerUtils.getDefaultKieSession((KieContainerInstanceImpl)kci);
             }
+            context.getKieSessionLookupManager().postLookup(command.getLookup(), kci, ks, context);
 
             if (ks != null) {
                 applyListeners(ks);

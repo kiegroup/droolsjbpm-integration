@@ -20,7 +20,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.admin.MigrationEntry;
 import org.jbpm.services.api.admin.MigrationReport;
 import org.jbpm.services.api.admin.ProcessInstanceAdminService;
@@ -28,6 +30,9 @@ import org.jbpm.services.api.admin.ProcessInstanceMigrationService;
 import org.jbpm.services.api.admin.ProcessNode;
 import org.jbpm.services.api.admin.TimerInstance;
 import org.jbpm.services.api.model.NodeInstanceDesc;
+import org.jbpm.services.api.model.ProcessInstanceDesc;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.internal.runtime.error.ExecutionError;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
@@ -42,6 +47,9 @@ import org.kie.server.services.jbpm.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstance;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
@@ -52,12 +60,14 @@ public class ProcessAdminServiceBase {
 
     private ProcessInstanceMigrationService processInstanceMigrationService;
     private ProcessInstanceAdminService processInstanceAdminService;
+    private RuntimeDataService runtimeDataService;
     private MarshallerHelper marshallerHelper;
     private KieServerRegistry context;
 
-    public ProcessAdminServiceBase(ProcessInstanceMigrationService processInstanceMigrationService, ProcessInstanceAdminService processInstanceAdminService, KieServerRegistry context) {
+    public ProcessAdminServiceBase(ProcessInstanceMigrationService processInstanceMigrationService, ProcessInstanceAdminService processInstanceAdminService, RuntimeDataService runtimeDataService, KieServerRegistry context) {
         this.processInstanceMigrationService = processInstanceMigrationService;
         this.processInstanceAdminService = processInstanceAdminService;
+        this.runtimeDataService = runtimeDataService;
         this.marshallerHelper = new MarshallerHelper(context);
         this.context = context;
     }
@@ -88,6 +98,24 @@ public class ProcessAdminServiceBase {
 
         logger.debug("Migration of process instances {} finished with reports {}", processInstancesId, reports);
         return convertMigrationReports(reports);
+    }
+
+    public MigrationReportInstanceList migrateProcessInstanceWithAllSubprocess(String containerId,
+                                                                               Long processInstanceId,
+                                                                               String targetContainerId,
+                                                                               String targetProcessId,
+                                                                               String payload, 
+                                                                               String marshallingType) {
+
+        ProcessInstanceDesc pi = runtimeDataService.getProcessInstanceById(processInstanceId);
+        if(pi.getParentId() > 0) {
+            throw new IllegalArgumentException("Only root process can invoke this migration with all subprocesses");
+        }
+        List<Long> processInstancesId =  runtimeDataService.getProcessInstancesWithSubprocessByProcessInstanceId(processInstanceId, 
+                                                                                                                 singletonList(ProcessInstance.STATE_ACTIVE), 
+                                                                                                                 new QueryContext(0, -1)).stream().map(ProcessInstanceDesc::getId).collect(Collectors.toList());
+
+        return migrateProcessInstances(containerId, processInstancesId, targetContainerId, targetProcessId, payload, marshallingType);
     }
 
 
@@ -122,7 +150,7 @@ public class ProcessAdminServiceBase {
         Collection<NodeInstanceDesc> activeNodeInstances = processInstanceAdminService.getActiveNodeInstances(processInstanceId.longValue());
         logger.debug("Found active node instance {} in process instance {}", activeNodeInstances, processInstanceId);
 
-        return ConvertUtils.convertToNodeInstanceList(activeNodeInstances, containerId);
+        return ConvertUtils.convertToNodeInstanceList(activeNodeInstances);
     }
 
     public void triggerNode(String containerId, Number processInstanceId, Number nodeId) {
@@ -329,4 +357,6 @@ public class ProcessAdminServiceBase {
 
         return result;
     }
+
+
 }

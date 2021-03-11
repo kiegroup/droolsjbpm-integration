@@ -15,6 +15,46 @@
 
 package org.kie.server.remote.rest.jbpm.admin;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.TaskNotFoundException;
+import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.TaskNotificationList;
+import org.kie.server.api.model.admin.TaskReassignmentList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.kie.server.api.rest.RestURI.ACK_ERRORS_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ACK_ERROR_PUT_URI;
 import static org.kie.server.api.rest.RestURI.ADMIN_TASK_URI;
@@ -42,12 +82,12 @@ import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
-import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.EMAIL_NOTIFICATION_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_EXEC_ERRORS_RESPONSE_JSON;
@@ -63,47 +103,6 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
-
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.TaskNotFoundException;
-import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
-import org.kie.server.api.model.admin.ExecutionErrorInstance;
-import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
-import org.kie.server.api.model.admin.TaskNotificationList;
-import org.kie.server.api.model.admin.TaskReassignmentList;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Api(value="Task instance administration")
 @Path("server/" + ADMIN_TASK_URI)
@@ -138,12 +137,13 @@ public class UserTaskAdminResource {
     public Response addPotentialOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "optional flag that indicates if existing potential owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
             @ApiParam(value = "list of users/groups to be added as potential owners, as OrgEntities type", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
                     @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
 
-        return addToTask(headers, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
+        return addToTask(headers, userId, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
     }
 
     @ApiOperation(value="Adds users and groups to be excluded from being owners for a specified task instance.",
@@ -157,12 +157,13 @@ public class UserTaskAdminResource {
     public Response addExcludedOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "optional flag that indicates if existing excluded owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
             @ApiParam(value = "list of users/groups to be added as excluded owners, as OrgEntities type", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
                     @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
 
-        return addToTask(headers, containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
+        return addToTask(headers, userId,  containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
     }
 
     @ApiOperation(value="Adds business administrator users or groups to a specified task instance.",
@@ -176,12 +177,13 @@ public class UserTaskAdminResource {
     public Response addAdmins(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "optional flag that indicates if existing business admins should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
             @ApiParam(value = "list of users/groups to be added as business admins, as OrgEntities type", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
                     @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
 
-        return addToTask(headers, containerId, tInstanceId, removeExisting, payload, ADMIN);
+        return addToTask(headers, userId, containerId, tInstanceId, removeExisting, payload, ADMIN);
     }
 
     
@@ -195,9 +197,10 @@ public class UserTaskAdminResource {
     public Response removePotentialOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of users to be removed from potantial owners list", required = true, example = "john") @PathParam("entityId") String users) {
 
-        return removeFromTask(headers, containerId, tInstanceId, true, users, POT_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, true, users, POT_OWNER);
     }
 
     @ApiOperation(value="Deletes specified users previously added as excluded owners for a specified task instance. ",
@@ -210,9 +213,10 @@ public class UserTaskAdminResource {
     public Response removeExcludedOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of users to be removed from excluded owners list", required = true, example = "john") @PathParam("entityId") String users) {
 
-        return removeFromTask(headers, containerId, tInstanceId, true, users, EXL_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, true, users, EXL_OWNER);
     }
 
     @ApiOperation(value="Deletes specified users previously added as business administrators for a specified task instance.",
@@ -225,9 +229,10 @@ public class UserTaskAdminResource {
     public Response removeAdminsUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of users to be removed from business admin list", required = true, example = "john") @PathParam("entityId") String users) {
 
-        return removeFromTask(headers, containerId, tInstanceId, true, users, ADMIN);
+        return removeFromTask(headers, userId, containerId, tInstanceId, true, users, ADMIN);
     }
 
     @ApiOperation(value="Deletes specified groups previously added as potential owners for a specified task instance.",
@@ -240,9 +245,10 @@ public class UserTaskAdminResource {
     public Response removePotentialOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of groups to be removed from potantial owners list", required = true, example = "HR") @PathParam("entityId") String groups) {
 
-        return removeFromTask(headers, containerId, tInstanceId, false, groups, POT_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, POT_OWNER);
     }
 
     @ApiOperation(value="Deletes specified groups previously added as excluded owners for a specified task instance.",
@@ -255,9 +261,10 @@ public class UserTaskAdminResource {
     public Response removeExcludedOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of groups to be removed from excluded owners list", required = true, example = "HR") @PathParam("entityId") String groups) {
 
-        return removeFromTask(headers, containerId, tInstanceId, false, groups, EXL_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, EXL_OWNER);
     }
 
     @ApiOperation(value="Deletes specified groups previously added as business administrators for a specified task instance.",
@@ -270,9 +277,10 @@ public class UserTaskAdminResource {
     public Response removeAdminsGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of groups to be removed from business admin list", required = true, example = "HR") @PathParam("entityId") String groups) {
 
-        return removeFromTask(headers, containerId, tInstanceId, false, groups, ADMIN);
+        return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, ADMIN);
     }
 
     @ApiOperation(value="Adds input data to a specified task instance.",
@@ -360,11 +368,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Schedules a specified task instance to be reassigned to specified users or groups and returns the ID of the reassignment.",
-            response=Long.class, code=201)
+    @ApiOperation(value="Schedules a specified task instance to be reassigned to specified users or groups and returns the ID of the reassignment.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = Long.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
@@ -411,11 +418,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Creates an email notification for the specified task instance and returns the ID of the new notification.",
-            response=Long.class, code=201)
+    @ApiOperation(value="Creates an email notification for the specified task instance and returns the ID of the new notification.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 201, response = Long.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
@@ -513,11 +519,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns task reassignments for a specified task instance.",
-            response=TaskReassignmentList.class, code=200)
+    @ApiOperation(value="Returns task reassignments for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskReassignmentList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_REASSIGNMENTS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
@@ -542,11 +547,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns notifications created for a specified task instance.",
-            response=TaskNotificationList.class, code=200)
+    @ApiOperation(value="Returns notifications created for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = TaskNotificationList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_NOTIFICATIONS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
@@ -623,11 +627,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified task execution error.",
-            response=ExecutionErrorInstance.class, code=200)
+    @ApiOperation(value="Returns information about a specified task execution error.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstance.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERROR_RESPONSE_JSON)})) })
     @GET
     @Path(ERROR_GET_URI)
@@ -651,11 +654,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns task execution errors for a specified task instance.",
-            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiOperation(value="Returns task execution errors for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
@@ -684,11 +686,10 @@ public class UserTaskAdminResource {
         }
     }
 
-    @ApiOperation(value="Returns all task execution errors for a specified KIE container.",
-            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiOperation(value="Returns all task execution errors for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Container Id not found"), 
-            @ApiResponse(code = 200, message = "Successfull response", examples=@Example(value= {
+            @ApiResponse(code = 200, response = ExecutionErrorInstanceList.class, message = "Successfull response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_GET_URI)
@@ -722,22 +723,22 @@ public class UserTaskAdminResource {
      * internal methods
      */
 
-    protected Response addToTask(HttpHeaders headers, String containerId, Long tInstanceId, boolean removeExisting, String payload, int operation) {
+    protected Response addToTask(HttpHeaders headers, String userId, String containerId, Long tInstanceId, boolean removeExisting, String payload, int operation) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             switch (operation) {
                 case POT_OWNER:
-                    userTaskAdminServiceBase.addPotentialOwners(containerId, tInstanceId, removeExisting, payload, type);
+                    userTaskAdminServiceBase.addPotentialOwners(userId, containerId, tInstanceId, removeExisting, payload, type);
                     break;
 
                 case EXL_OWNER:
-                    userTaskAdminServiceBase.addExcludedOwners(containerId, tInstanceId, removeExisting, payload, type);
+                    userTaskAdminServiceBase.addExcludedOwners(userId, containerId, tInstanceId, removeExisting, payload, type);
                     break;
 
                 case ADMIN:
-                    userTaskAdminServiceBase.addBusinessAdmins(containerId, tInstanceId, removeExisting, payload, type);
+                    userTaskAdminServiceBase.addBusinessAdmins(userId, containerId, tInstanceId, removeExisting, payload, type);
                     break;
             }
 
@@ -752,7 +753,7 @@ public class UserTaskAdminResource {
         }
     }
 
-    protected Response removeFromTask(HttpHeaders headers, String containerId, Long tInstanceId, boolean isUser, String entities, int operation) {
+    protected Response removeFromTask(HttpHeaders headers, String userId, String containerId, Long tInstanceId, boolean isUser, String entities, int operation) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -762,15 +763,15 @@ public class UserTaskAdminResource {
 
             switch (operation) {
                 case POT_OWNER:
-                    userTaskAdminServiceBase.removePotentialOwners(containerId, tInstanceId, listOfEntities, isUser);
+                    userTaskAdminServiceBase.removePotentialOwners(userId, containerId, tInstanceId, listOfEntities, isUser);
                     break;
 
                 case EXL_OWNER:
-                    userTaskAdminServiceBase.removeExcludedOwners(containerId, tInstanceId, listOfEntities, isUser);
+                    userTaskAdminServiceBase.removeExcludedOwners(userId, containerId, tInstanceId, listOfEntities, isUser);
                     break;
 
                 case ADMIN:
-                    userTaskAdminServiceBase.removeBusinessAdmins(containerId, tInstanceId, listOfEntities, isUser);
+                    userTaskAdminServiceBase.removeBusinessAdmins(userId, containerId, tInstanceId, listOfEntities, isUser);
                     break;
             }
 

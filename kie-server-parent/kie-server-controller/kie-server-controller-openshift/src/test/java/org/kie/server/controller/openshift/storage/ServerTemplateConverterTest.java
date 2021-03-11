@@ -71,7 +71,6 @@ public class ServerTemplateConverterTest {
         // Get client from MockKubernetes Server
         server.init();
         client = server.createOpenShiftClient();
-
         // The default namespace for MockKubernetes Server is 'test'
         testNamespace = "test";
 

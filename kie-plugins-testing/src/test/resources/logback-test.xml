@@ -12,6 +12,7 @@
 
   <logger name="org.drools.compiler.xpath.tobeinstrumented" level="INFO"/>
   <logger name="org.kie" level="INFO"/>
+  <logger name="org.drools.ancompiler" level="debug"/>
 
   <root level="INFO">
     <appender-ref ref="consoleAppender"/>

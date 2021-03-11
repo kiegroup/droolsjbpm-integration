@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.json.JSONException;
 import org.junit.Test;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -153,7 +155,17 @@ public class MarshallerHelperTest {
 		QueryFilterSpec unmarshalledQFS = helper.unmarshal(marshalledQFS, MarshallingFormat.JAXB.toString(), QueryFilterSpec.class);
 
 		// QueryFilterSpec does not implement equals method, so using Mockito ReflectionEquals.
-		assertThat(expectedQueryFilterSpec, new ReflectionEquals(unmarshalledQFS));
+		assertThat(expectedQueryFilterSpec, new BaseMatcher<QueryFilterSpec>() {
+			@Override
+			public void describeTo(Description description) {
+
+			}
+
+			@Override
+			public boolean matches(Object item) {
+				return new ReflectionEquals(unmarshalledQFS).matches(item);
+			}
+		});
 	}
 
 	@Test
@@ -193,7 +205,17 @@ public class MarshallerHelperTest {
 		QueryFilterSpec unmarshalledQFS = helper.unmarshal(marshalledQFS, MarshallingFormat.JAXB.toString(), QueryFilterSpec.class);
 
 		// QueryFilterSpec does not implement equals method, so using Mockito ReflectionEquals.
-		assertThat(expectedQueryFilterSpec, new ReflectionEquals(unmarshalledQFS));
+		assertThat(expectedQueryFilterSpec, new BaseMatcher<QueryFilterSpec>() {
+			@Override
+			public void describeTo(Description description) {
+
+			}
+
+			@Override
+			public boolean matches(Object item) {
+				return new ReflectionEquals(unmarshalledQFS).matches(item);
+			}
+		});
 	}
 	
 	@Test
@@ -215,7 +237,17 @@ public class MarshallerHelperTest {
 		String marshalledQFS = "{\"order-by\" : null,\"order-asc\" : false,\"query-params\" : null}";
 		
 		ProcessInstanceQueryFilterSpec unmarshalledPiQfs = helper.unmarshal(marshalledQFS, MarshallingFormat.JSON.toString(), ProcessInstanceQueryFilterSpec.class);
-		assertThat(expectedPiQfs, new ReflectionEquals(unmarshalledPiQfs));
+		assertThat(expectedPiQfs, new BaseMatcher<QueryFilterSpec>() {
+			@Override
+			public void describeTo(Description description) {
+
+			}
+
+			@Override
+			public boolean matches(Object item) {
+				return new ReflectionEquals(unmarshalledPiQfs).matches(item);
+			}
+		});
 	}
 	
 	
@@ -242,7 +274,17 @@ public class MarshallerHelperTest {
 		String marshalledQFS = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null}";
 		
 		TaskQueryFilterSpec unmarshalledTaskQfs = helper.unmarshal(marshalledQFS, MarshallingFormat.JSON.toString(), TaskQueryFilterSpec.class);
-		assertThat(expectedTaskQfs, new ReflectionEquals(unmarshalledTaskQfs));
+		assertThat(expectedTaskQfs, new BaseMatcher<QueryFilterSpec>() {
+			@Override
+			public void describeTo(Description description) {
+
+			}
+
+			@Override
+			public boolean matches(Object item) {
+				return new ReflectionEquals(unmarshalledTaskQfs).matches(item);
+			}
+		});
 	}
 	
 	

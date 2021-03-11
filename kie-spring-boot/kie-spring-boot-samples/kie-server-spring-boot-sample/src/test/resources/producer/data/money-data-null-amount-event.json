@@ -1,0 +1,10 @@
+{
+  "id": "1",
+  "type": "org.jbpm.data.Money",
+  "source": "external",
+  "data": {
+    "currency": "EUR"
+  },
+  "specversion": "1.0",
+  "time": "2020-12-04T10:11:12.000GMT"
+}

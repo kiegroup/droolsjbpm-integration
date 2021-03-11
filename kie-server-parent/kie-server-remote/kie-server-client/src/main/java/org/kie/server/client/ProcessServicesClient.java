@@ -57,6 +57,8 @@ public interface ProcessServicesClient {
 
     Long startProcess(String containerId, String processId, Map<String, Object> variables);
 
+    Map<String, Object> startSynchronousProcess(String containerId, String processId, Map<String, Object> variables);
+
     Long startProcess(String containerId, String processId, CorrelationKey correlationKey);
 
     Long startProcess(String containerId, String processId, CorrelationKey correlationKey, Map<String, Object> variables);
@@ -78,6 +80,10 @@ public interface ProcessServicesClient {
     void signalProcessInstance(String containerId, Long processInstanceId, String signalName, Object event);
 
     void signalProcessInstances(String containerId, List<Long> processInstanceId, String signalName, Object event);
+
+    void signalProcessInstanceByCorrelationKey(String containerId, CorrelationKey correlationKey, String signalName, Object event);
+
+    void signalProcessInstancesByCorrelationKeys(String containerId, List<CorrelationKey> correlationKeys, String signalName, Object event);
 
     void signal(String containerId, String signalName, Object event);
 
