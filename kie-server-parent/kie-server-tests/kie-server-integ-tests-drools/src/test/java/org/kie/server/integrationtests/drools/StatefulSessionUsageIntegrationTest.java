@@ -22,7 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.command.runtime.rule.GetFactHandlesCommand;
+import javax.ws.rs.core.Response.Status;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,10 +37,12 @@ import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-
-import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -89,13 +92,14 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand,
+                Status.OK);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         // now dispose the container
         ServiceResponse<Void> disposeReply = client.disposeContainer(CONTAINER_ID);
         assertEquals("Dispose reply response type.", ServiceResponse.ResponseType.SUCCESS, disposeReply.getType());
         // and try to call the container again. The call should fail as the container no longer exists
-        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand, Status.INTERNAL_SERVER_ERROR);
         assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
         assertTrue("Expected message about non-instantiated container. Got: " + reply.getMsg(),
                 reply.getMsg().contains(String.format("Container '%s' is not instantiated", CONTAINER_ID)));

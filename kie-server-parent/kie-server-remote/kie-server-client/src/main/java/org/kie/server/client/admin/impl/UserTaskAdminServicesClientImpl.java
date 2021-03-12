@@ -55,6 +55,11 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void addPotentialOwners(String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities) {
+        addPotentialOwners(null, containerId, taskId, removeExisting, orgEntities);
+    }
+
+    @Override
+    public void addPotentialOwners(String userId, String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
@@ -62,12 +67,20 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
             Map<String, String> headers = new HashMap<String, String>();
             String queryString = "?remove=" + removeExisting;
+            if(BYPASS_AUTH_USER && userId != null) {
+                queryString += "&user=" + userId;
+            }
 
             makeHttpPutRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_POT_OWNERS_USERS_URI, valuesMap) + queryString, orgEntities, null, headers);
         } else {
+            Object[] argvs = new Object[]{containerId, taskId, removeExisting};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, removeExisting};
+            }
+            
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("UserTaskAdminService", "addPotentialOwners", serialize(orgEntities), marshaller.getFormat().getType(), new Object[]{containerId, taskId, removeExisting})));
+                    (KieServerCommand) new DescriptorCommand("UserTaskAdminService", "addPotentialOwners", serialize(orgEntities), marshaller.getFormat().getType(), argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -75,6 +88,11 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void addExcludedOwners(String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities) {
+        addExcludedOwners(null, containerId, taskId, removeExisting, orgEntities);
+    }
+
+    @Override
+    public void addExcludedOwners(String userId, String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
@@ -82,12 +100,18 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
             Map<String, String> headers = new HashMap<String, String>();
             String queryString = "?remove=" + removeExisting;
-
+            if(BYPASS_AUTH_USER && userId != null) {
+                queryString += "&user=" + userId;
+            }
             makeHttpPutRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_EXL_OWNERS_USERS_URI, valuesMap) + queryString, orgEntities, null, headers);
         } else {
+            Object[] argvs = new Object[]{containerId, taskId, removeExisting};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, removeExisting};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("UserTaskAdminService", "addExcludedOwners", serialize(orgEntities), marshaller.getFormat().getType(), new Object[]{containerId, taskId, removeExisting})));
+                    (KieServerCommand) new DescriptorCommand("UserTaskAdminService", "addExcludedOwners", serialize(orgEntities), marshaller.getFormat().getType(), argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -95,6 +119,10 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void addBusinessAdmins(String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities) {
+        addBusinessAdmins(null, containerId, taskId, removeExisting, orgEntities);
+    }
+    @Override
+    public void addBusinessAdmins(String userId, String containerId, Long taskId, boolean removeExisting, OrgEntities orgEntities) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
@@ -102,12 +130,18 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
             Map<String, String> headers = new HashMap<String, String>();
             String queryString = "?remove=" + removeExisting;
-
+            if(BYPASS_AUTH_USER && userId != null) {
+                queryString += "&user=" + userId;
+            }
             makeHttpPutRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_ADMINS_USERS_URI, valuesMap) + queryString, orgEntities, null, headers);
         } else {
+            Object[] argvs = new Object[]{containerId, taskId, removeExisting};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, removeExisting};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("UserTaskAdminService", "addBusinessAdmins", serialize(orgEntities), marshaller.getFormat().getType(), new Object[]{containerId, taskId, removeExisting})));
+                    (KieServerCommand) new DescriptorCommand("UserTaskAdminService", "addBusinessAdmins", serialize(orgEntities), marshaller.getFormat().getType(), argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -115,6 +149,10 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void removePotentialOwnerUsers(String containerId, Long taskId, String... users) {
+        removePotentialOwnerUsers(null, containerId, taskId, users);
+    }
+    @Override
+    public void removePotentialOwnerUsers(String userId, String containerId, Long taskId, String... users) {
 
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -122,12 +160,19 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ENTITY_ID, Arrays.stream(users).collect(Collectors.joining(",")));
 
+            String queryString = this.getUserQueryStr(BYPASS_AUTH_USER && userId != null ? userId : null);
+
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI, valuesMap), null);
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI, valuesMap) + queryString, null);
         } else {
+
             List<String> entities = new ArrayList<>(Arrays.asList(users));
+            Object[] argvs = new Object[]{containerId, taskId, entities, true};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, entities, true};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removePotentialOwners", new Object[]{containerId, taskId, entities, true})));
+                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removePotentialOwners", argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -135,18 +180,27 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void removeExcludedOwnerUsers(String containerId, Long taskId, String... users) {
+        removeExcludedOwnerUsers(null, containerId, taskId, users);
+    }
+    @Override
+    public void removeExcludedOwnerUsers(String userId, String containerId, Long taskId, String... users) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ENTITY_ID, Arrays.stream(users).collect(Collectors.joining(",")));
 
+            String queryString = this.getUserQueryStr(BYPASS_AUTH_USER && userId != null ? userId : null);
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI, valuesMap), null);
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI, valuesMap) + queryString, null);
         } else {
             List<String> entities = new ArrayList<>(Arrays.asList(users));
+            Object[] argvs = new Object[]{containerId, taskId, entities, true};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, entities, true};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeExcludedOwners", new Object[]{containerId, taskId, entities, true})));
+                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeExcludedOwners", argvs)));
             ServiceResponse<?> response = (ServiceResponse<MigrationReportInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -154,18 +208,26 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void removeBusinessAdminUsers(String containerId, Long taskId, String... users) {
+        removeBusinessAdminUsers(null, containerId, taskId, users);
+    }
+    @Override
+    public void removeBusinessAdminUsers(String userId, String containerId, Long taskId, String... users) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ENTITY_ID, Arrays.stream(users).collect(Collectors.joining(",")));
-
+            String queryString = this.getUserQueryStr(BYPASS_AUTH_USER && userId != null ? userId : null);
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_ADMINS_USERS_DELETE_URI, valuesMap), null);
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_ADMINS_USERS_DELETE_URI, valuesMap) + queryString, null);
         } else {
             List<String> entities = new ArrayList<>(Arrays.asList(users));
+            Object[] argvs = new Object[]{containerId, taskId, entities, true};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, entities, true};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeBusinessAdmins", new Object[]{containerId, taskId, entities, true})));
+                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeBusinessAdmins", argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -173,18 +235,27 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void removePotentialOwnerGroups(String containerId, Long taskId, String... groups) {
+        removePotentialOwnerGroups(null, containerId, taskId, groups);
+    }
+
+    @Override
+    public void removePotentialOwnerGroups(String userId, String containerId, Long taskId, String... groups) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ENTITY_ID, Arrays.stream(groups).collect(Collectors.joining(",")));
-
+            String queryString = this.getUserQueryStr(BYPASS_AUTH_USER && userId != null ? userId : null);
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI, valuesMap), null);
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI, valuesMap) + queryString, null);
         } else {
             List<String> entities = new ArrayList<>(Arrays.asList(groups));
+            Object[] argvs = new Object[]{containerId, taskId, entities, true};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, entities, true};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removePotentialOwners", new Object[]{containerId, taskId, entities, false})));
+                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removePotentialOwners", argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -192,18 +263,27 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void removeExcludedOwnerGroups(String containerId, Long taskId, String... groups) {
+        removeExcludedOwnerGroups(null, containerId, taskId, groups);
+    }
+
+    @Override
+    public void removeExcludedOwnerGroups(String userId, String containerId, Long taskId, String... groups) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ENTITY_ID, Arrays.stream(groups).collect(Collectors.joining(",")));
-
+            String queryString = this.getUserQueryStr(BYPASS_AUTH_USER && userId != null ? userId : null);
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI, valuesMap), null);
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI, valuesMap) + queryString, null);
         } else {
             List<String> entities = new ArrayList<>(Arrays.asList(groups));
+            Object[] argvs = new Object[]{containerId, taskId, entities, true};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, entities, true};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeExcludedOwners", new Object[]{containerId, taskId, entities, false})));
+                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeExcludedOwners", argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
@@ -211,22 +291,32 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
     @Override
     public void removeBusinessAdminGroups(String containerId, Long taskId, String... groups) {
+        removeBusinessAdminGroups(null, containerId, taskId, groups);
+    }
+
+    @Override
+    public void removeBusinessAdminGroups(String userId, String containerId, Long taskId, String... groups) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ENTITY_ID, Arrays.stream(groups).collect(Collectors.joining(",")));
-
+            String queryString = this.getUserQueryStr(BYPASS_AUTH_USER && userId != null ? userId : null);
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI, valuesMap), null);
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI, valuesMap) + queryString, null);
         } else {
             List<String> entities = new ArrayList<>(Arrays.asList(groups));
+            Object[] argvs = new Object[]{containerId, taskId, entities, true};
+            if(BYPASS_AUTH_USER && userId != null) {
+                argvs = new Object[]{userId, containerId, taskId, entities, true};
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeBusinessAdmins", new Object[]{containerId, taskId, entities, false})));
+                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "removeBusinessAdmins", argvs)));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
     }
+
 
     @Override
     public void addTaskInputs(String containerId, Long taskId, Map<String, Object> data) {

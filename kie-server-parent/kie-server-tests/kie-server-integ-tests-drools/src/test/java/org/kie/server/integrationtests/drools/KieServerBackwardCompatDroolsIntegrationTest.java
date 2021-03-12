@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -156,7 +158,8 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "xyz");
 
-        ServiceResponse<String> reply = client.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<String> reply = client.executeCommands(CONTAINER_ID, batchExecution,
+                Status.INTERNAL_SERVER_ERROR);
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 }

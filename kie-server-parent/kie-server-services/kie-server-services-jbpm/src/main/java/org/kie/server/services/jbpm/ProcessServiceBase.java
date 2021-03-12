@@ -85,6 +85,21 @@ public class ProcessServiceBase {
         return response;
     }
 
+    public String startSynchronousProcess(String containerId, String processId, String payload, String marshallingType) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+        // check validity of deployment and process id
+        definitionService.getProcessDefinition(containerId, processId);
+
+        logger.debug("About to unmarshal parameters from start spec parameters: '{}'", payload);
+        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+
+        logger.debug("Calling start sync process with id {} on container {} and parameters {}", processId, containerId, null);
+        Map<String, Object> outcome = processService.startSynchronousProcess(containerId, processId, parameters);
+
+        // return response
+        return marshallerHelper.marshal(containerId, marshallingType, outcome);
+    }
+
 
     public String startProcess(String containerId, String processId, String payload, String marshallingType) {
         containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());

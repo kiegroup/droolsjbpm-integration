@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.50.0-SNAPSHOT</version>
+    <version>7.52.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-common</artifactId>
@@ -87,19 +87,11 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
     </dependency>
-
-    <!-- Embedded application server dependencies, placed as a direct dependency as this common module specifies embedded components -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>tjws</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>resteasy-undertow</artifactId>
     </dependency>
- 
+
     <!-- test -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
