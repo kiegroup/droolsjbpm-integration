@@ -29,12 +29,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.KieBase;
-import org.kie.api.KieServices;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.definition.KiePackage;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 
 import static org.kie.api.pmml.PMMLConstants.KIE_PMML_IMPLEMENTATION;
 import static org.kie.api.pmml.PMMLConstants.LEGACY;
@@ -68,20 +62,8 @@ public class BuildPMMLTest extends KieMavenPluginBaseIntegrationTest {
     }
 
     @Test
-    public void testUseBuildKjarWithPMML() throws Exception {
-        final MavenExecutionResult result =buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
-        final KieServices kieServices = KieServices.Factory.get();
-        final ReleaseId releaseId = kieServices.newReleaseId(GAV_GROUP_ID, GAV_ARTIFACT_ID, GAV_VERSION);
-        final KieContainer kieContainer = kieServices.newKieContainer(releaseId);
-        Assertions.assertThat(kieContainer).isNotNull();
-        final KieSession kieSession = kieContainer.newKieSession(KIE_SESSION_NAME);
-        Assertions.assertThat(kieSession).isNotNull();
-        final KieBase kieBase = kieSession.getKieBase();
-        Assertions.assertThat(kieBase).isNotNull();
-        final KiePackage kiePackageWithPMML = kieBase.getKiePackage(KIE_PACKAGE_WITH_PMML);
-        Assertions.assertThat(kiePackageWithPMML).isNotNull();
-        Assertions.assertThat(kiePackageWithPMML.getRules()).isNotEmpty();
-        kieSession.dispose();
+    public void testBuildKjarWithPMML() throws Exception {
+        final MavenExecutionResult result = buildKJarProject(PROJECT_NAME, new String[]{"-Dorg.kie.version=" + TestUtil.getProjectVersion()}, "clean", "install");
         final File basedir = result.getBasedir();
         final File kjarFile = new File(basedir, "target/" + GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
         Assertions.assertThat(kjarFile).exists();
