@@ -121,7 +121,8 @@ public class KeycloakKieServerTest {
 
     @AfterClass
     public static void generalCleanup() {
-        keycloak.stop();
+        if (keycloak!=null)
+            keycloak.stop();
         System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
 
