@@ -91,7 +91,8 @@ public class ScenarioSimulationIntegrationTest
         assertEquals(1, dmnResponseFail.getResult().getRunCount());
         assertEquals("Test Scenario execution failed", dmnResponseFail.getMsg());
         assertFalse(dmnResponseFail.getResult().getFailures().isEmpty());
-        assertEquals("#1: Scenario 'KO scenario' failed", dmnResponseFail.getResult().getFailures().get(0).getErrorMessage());
+        assertEquals("#1 KO scenario: Failed in \"Greeting Message\": The expected value is \"\"Hello John\"\" but the actual one is \"\"Hello John 1\"\"",
+                     dmnResponseFail.getResult().getFailures().get(0).getErrorMessage());
 
         ServiceResponse<ScenarioSimulationResult> ruleResponseSuccess = methodToTest.apply(CONTAINER_1_ID, RULE_SCESIM_SUCCESS_PATH);
 
@@ -105,7 +106,8 @@ public class ScenarioSimulationIntegrationTest
         assertEquals(1, ruleResponseFail.getResult().getRunCount());
         assertEquals("Test Scenario execution failed", ruleResponseFail.getMsg());
         assertFalse(ruleResponseFail.getResult().getFailures().isEmpty());
-        assertEquals("#1: Scenario 'KO scenario' failed", ruleResponseFail.getResult().getFailures().get(0).getErrorMessage());
+        assertEquals("#1 KO scenario: Failed in \"String\": The expected value is \"John\" but the actual one is \"John 1\"",
+                     ruleResponseFail.getResult().getFailures().get(0).getErrorMessage());
     }
 
     private static String loadResource(String path) throws IOException {
