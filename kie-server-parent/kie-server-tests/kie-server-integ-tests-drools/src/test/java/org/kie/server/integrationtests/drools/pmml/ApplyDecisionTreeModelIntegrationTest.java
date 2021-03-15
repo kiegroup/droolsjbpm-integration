@@ -84,6 +84,7 @@ public class ApplyDecisionTreeModelIntegrationTest extends PMMLApplyModelBaseTes
         ClassLoader currentCL = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(classLoader);
         PMMLRequestData request = new PMMLRequestData("123", "TreeTest");
+        request.setSource("test_tree_simple.pmml");
         request.addRequestParam("fld1", 30.0);
         request.addRequestParam("fld2", 60.0);
         request.addRequestParam("fld3", "false");
