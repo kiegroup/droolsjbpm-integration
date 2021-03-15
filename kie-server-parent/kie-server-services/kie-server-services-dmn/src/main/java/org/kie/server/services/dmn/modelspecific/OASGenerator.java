@@ -20,10 +20,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map.Entry;
 
-import io.smallrye.openapi.runtime.OpenApiProcessor;
-import io.smallrye.openapi.runtime.OpenApiStaticFile;
-import io.smallrye.openapi.runtime.io.Format;
-import io.smallrye.openapi.runtime.io.OpenApiSerializer;
 import org.eclipse.microprofile.openapi.OASFactory;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
@@ -45,7 +41,13 @@ import org.kie.dmn.model.api.DecisionService;
 import org.kie.dmn.openapi.DMNOASGeneratorFactory;
 import org.kie.dmn.openapi.model.DMNModelIOSets;
 import org.kie.dmn.openapi.model.DMNOASResult;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+
+import io.smallrye.openapi.runtime.OpenApiProcessor;
+import io.smallrye.openapi.runtime.OpenApiStaticFile;
+import io.smallrye.openapi.runtime.io.Format;
+import io.smallrye.openapi.runtime.io.OpenApiSerializer;
 
 public class OASGenerator {
 
@@ -65,12 +67,13 @@ public class OASGenerator {
                               .description("DMN model-specific OAS generated for container " + containerId + " as " + releaseId)
                               .version(releaseId.getVersion());
         openAPI.info(info);
-        Server server = OASFactory.createObject(Server.class);
         String contextRoot = KieServerEnvironment.getContextRoot();
+        String sbRoot = System.getProperty(KieServerConstants.CFG_SB_CXF_PATH);
         if (contextRoot != null) {
-            server.url(contextRoot + "/services/rest");
+            openAPI.addServer(OASFactory.createObject(Server.class).url(contextRoot + "/services/rest"));
+        } else if (sbRoot != null) {
+            openAPI.addServer(OASFactory.createObject(Server.class).url(sbRoot));
         }
-        openAPI.addServer(server);
         for (Entry<DMNType, Schema> kv : dmnoas.getSchemas().entrySet()) {
             openAPI.getComponents().addSchema(dmnoas.getNamingPolicy().getName(kv.getKey()), kv.getValue());
         }
