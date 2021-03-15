@@ -24,7 +24,7 @@
           <goalPrefix>kie</goalPrefix>
         </configuration>
       </plugin>
-      <!-- plugin>
+       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
         <configuration>
@@ -45,7 +45,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin -->
+      </plugin>
     </plugins>
   </build>
 
