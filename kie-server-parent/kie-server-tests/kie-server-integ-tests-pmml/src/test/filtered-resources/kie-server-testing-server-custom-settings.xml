@@ -10,9 +10,6 @@
   <profiles>
     <profile>
       <id>additional-maven-repos</id>
-      <properties>
-        <kie-pmml-implementation>new</kie-pmml-implementation>
-      </properties>
       <repositories>
         <repository>
           <id>remote-testing-repo</id>

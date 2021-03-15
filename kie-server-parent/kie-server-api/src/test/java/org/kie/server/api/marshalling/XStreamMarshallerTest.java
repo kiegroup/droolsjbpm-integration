@@ -65,6 +65,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.kie.api.pmml.PMMLConstants.KIE_PMML_IMPLEMENTATION;
+import static org.kie.api.pmml.PMMLConstants.LEGACY;
 
 public class XStreamMarshallerTest {
 
@@ -121,7 +123,8 @@ public class XStreamMarshallerTest {
     }
 
     @Test
-    public void testPMMLResult() {
+    public void testPMMLLegacyResult() {
+        System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
         System.out.println(System.getProperties().keySet());
         PMML4ExecutionHelper helper = PMML4ExecutionHelperFactory.getExecutionHelper("Sample Score",
                                                                                      ResourceFactory.newClassPathResource("test_scorecard.pmml"),
@@ -196,6 +199,7 @@ public class XStreamMarshallerTest {
         assertEquals("LX00", iter.next());
         assertEquals("RES", iter.next());
         assertEquals("CX2", iter.next());
+        System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
     }
 
     @Test

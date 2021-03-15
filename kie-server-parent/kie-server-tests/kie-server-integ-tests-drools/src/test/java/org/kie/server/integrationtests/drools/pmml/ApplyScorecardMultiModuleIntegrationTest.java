@@ -65,6 +65,7 @@ public class ApplyScorecardMultiModuleIntegrationTest extends PMMLApplyModelBase
     public void buildAndDeployTest() {
         Thread.currentThread().setContextClassLoader(classLoader);
         PMMLRequestData request = new PMMLRequestData("123", "SimpleScorecard");
+        request.setSource("test_scorecard_simple.pmml");
         request.addRequestParam("param1", 10.0);
         request.addRequestParam("param2", 15.0);
 

@@ -62,6 +62,7 @@ public class ApplyPmmlMultipleTimesIntegrationTest extends PMMLApplyModelBaseTes
         double fld2 = 25.0;
         String fld3 = "x";
         PMMLRequestData request = new PMMLRequestData("123", "LinReg");
+        request.setSource("test_regression.pmml");
         request.addRequestParam("fld1", fld1);
         request.addRequestParam("fld2", fld2);
         request.addRequestParam("fld3", fld3);

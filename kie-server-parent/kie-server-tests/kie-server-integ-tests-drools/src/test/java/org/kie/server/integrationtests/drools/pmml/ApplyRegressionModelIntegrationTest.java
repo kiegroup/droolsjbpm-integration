@@ -56,6 +56,7 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
     @Test
     public void testApplyPmmlRegressionModel() {
         final PMMLRequestData request = new PMMLRequestData("123", "LinReg");
+        request.setSource("test_regression.pmml");
         request.addRequestParam("fld1", 12.0);
         request.addRequestParam("fld2", 25.0);
         request.addRequestParam("fld3", "x");
