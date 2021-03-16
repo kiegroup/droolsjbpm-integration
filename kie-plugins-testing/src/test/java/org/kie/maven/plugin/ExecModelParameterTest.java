@@ -15,9 +15,12 @@
  */
 package org.kie.maven.plugin;
 
+import java.util.Set;
+
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
+import org.drools.modelcompiler.ExecModelTestUtil;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieModule;
@@ -54,6 +57,9 @@ public class ExecModelParameterTest extends KieMavenPluginBaseIntegrationTest {
                          "clean", "install");
         KieModule kieModule = fireRule(ARTIFACT_ID_WITH_EXEC_MODEL, KBASE_NAME_WITH_EXEC_MODEL);
         assertTrue(kieModule instanceof CanonicalKieModule);
+        CanonicalKieModule canonicalKieModule = (CanonicalKieModule) kieModule;
+        Set<String> generatedClassNames = ExecModelTestUtil.getGeneratedClassNames(canonicalKieModule);
+        assertGeneratedClassNames(generatedClassNames);
     }
 
     @Test
@@ -63,6 +69,25 @@ public class ExecModelParameterTest extends KieMavenPluginBaseIntegrationTest {
                          "clean", "install");
         KieModule kieModule = fireRule(ARTIFACT_ID_WITH_EXEC_MODEL, KBASE_NAME_WITH_EXEC_MODEL);
         assertTrue(kieModule instanceof CanonicalKieModule);
+        CanonicalKieModule canonicalKieModule = (CanonicalKieModule) kieModule;
+        Set<String> generatedClassNames = ExecModelTestUtil.getGeneratedClassNames(canonicalKieModule);
+        assertGeneratedClassNames(generatedClassNames);
+    }
+
+    private void assertGeneratedClassNames(Set<String> generatedClassNames) {
+        String[] nameFragments = new String[] {"Rules", "LambdaConsequence", "DomainClassesMetadata"};
+        for (String nameFragment : nameFragments) {
+            boolean contains = false;
+            for (String generatedClassName : generatedClassNames) {
+                if (generatedClassName.contains(nameFragment)) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (!contains) {
+                fail("generatedClassNames doesn't contain [" + nameFragment + "] class. : " + generatedClassNames);
+            }
+        }
     }
 
     @Test

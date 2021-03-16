@@ -56,6 +56,7 @@ import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
 import org.drools.compiler.kie.builder.impl.ResultsImpl;
+import org.drools.core.util.ClassUtils;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
 import org.drools.modelcompiler.builder.ModelBuilderImpl;
@@ -200,6 +201,21 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                 throw new MojoExecutionException("Unable to write file", e);
             }
 
+            // copy META-INF "generated-class-names" file
+            try {
+                final String genClassNamesPathStr = CanonicalKieModule.getGeneratedClassNamesFile(kieModule.getReleaseId());
+                final MemoryFile genClassNamesMemoryFile = (MemoryFile) mfs.getFile(genClassNamesPathStr);
+                final String genClassNamesMemoryFolderPath = genClassNamesMemoryFile.getFolder().getPath().toPortableString();
+                final Path genClassNamesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", genClassNamesMemoryFolderPath, genClassNamesMemoryFile.getName());
+
+                if (!Files.exists(genClassNamesDestinationPath)) {
+                    Files.createDirectories(genClassNamesDestinationPath.getParent());
+                }
+                Files.copy(genClassNamesMemoryFile.getContents(), genClassNamesDestinationPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                getLog().warn("Failed to produce generated-class-names file. But it's not critical so you can still use the created kjar", e);
+            }
+
             if (shallPerformDMNDTAnalysis()) {
                 performDMNDTAnalysis(kieModule);
             }
@@ -245,6 +261,8 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
 
         public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
 
+            private static final String SRC_FOLDER = "src/main/java";
+
             public ExecutableModelMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
                 super(true, kieModule, classLoader);
             }
@@ -252,7 +270,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
             @Override
             public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
-                Folder sourceFolder = srcMfs.getFolder("src/main/java");
+                Folder sourceFolder = srcMfs.getFolder(SRC_FOLDER);
 
                 List<String> modelFiles = new ArrayList<>();
                 ModelWriter modelWriter = new ModelWriter();
@@ -263,6 +281,15 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                     modelFiles.addAll( result.getModelFiles() );
                     modelsByKBase.put( modelBuilder.getKey(), result.getModelFiles() );
                 }
+
+                // Note: this doesn't cover inner classes but performance impact should be negligible
+                Set<String> generatedClassPaths = new HashSet<>(srcMfs.getFileNames());
+                Set<String> generatedClassNames = generatedClassPaths.stream()
+                                   .filter(path -> path.startsWith(SRC_FOLDER) && path.endsWith(".java"))
+                                   .map(path -> path.substring(SRC_FOLDER.length() + 1))
+                                   .map(ClassUtils::convertResourceToClassName)
+                                   .collect(Collectors.toSet());
+                modelWriter.writeGeneratedClassNamesFile(generatedClassNames, trgMfs, getInternalKieModule().getReleaseId());
 
                 InternalKieModule kieModule = getInternalKieModule();
                 ModelSourceClass modelSourceClass = new ModelSourceClass( kieModule.getReleaseId(), kieModule.getKieModuleModel().getKieBaseModels(), modelsByKBase, hasDynamicClassLoader() );
