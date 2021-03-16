@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,10 @@ public class BuildPMMLTrustyTestIT {
 
     @Test
     public void testContentKjarWithPMML() throws Exception {
-        URL targetLocation = BuildPMMLTrustyTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println("targetLocation " + targetLocation);
+        final URL targetLocation = BuildPMMLTrustyTestIT.class.getProtectionDomain().getCodeSource().getLocation();
         final File basedir = new File(targetLocation.getFile().replace("/test-classes/", ""));
-        System.out.println("basedir " + basedir);
         final File kjarFile = new File(basedir, GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
-        System.out.println("kjarFile " + kjarFile);
         Assertions.assertThat(kjarFile).exists();
-
 
         final JarFile jarFile = new JarFile(kjarFile);
         final Set<String> jarContent = new HashSet<>();
