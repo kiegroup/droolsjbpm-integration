@@ -106,6 +106,7 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     @Bean(destroyMethod="destroy")
     @ConditionalOnMissingBean(name = "kieServer")
     public KieServer kieServer(List<KieServerExtension> extensions, List<KieContainerResource> containers) {
+        System.setProperty(KieServerConstants.CFG_SB_CXF_PATH, cxfPath);
         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, properties.getControllers());
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, properties.getLocation());
         if (KieServerEnvironment.getServerId() == null) {

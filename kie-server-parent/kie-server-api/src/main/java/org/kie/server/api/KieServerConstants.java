@@ -113,6 +113,8 @@ public class KieServerConstants {
 
     public static final String CFG_SYNC_DEPLOYMENT = "org.kie.server.sync.deploy";
 
+    public static final String CFG_SB_CXF_PATH = "org.kie.server.sb.cfg.cxf.path";
+
     public static final String KIE_SERVER_PARAM_MODULE_METADATA = "KieModuleMetaData";
     public static final String KIE_SERVER_PARAM_MESSAGES = "ContainerMessages";
     public static final String KIE_SERVER_PARAM_RESET_BEFORE_UPDATE = "KieServerResetBeforeUpdate";
