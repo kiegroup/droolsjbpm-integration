@@ -49,7 +49,7 @@ public class MultiModuleTestIT {
         final URL targetLocation = MultiModuleTestIT.class.getProtectionDomain().getCodeSource().getLocation();
         KieContainer kContainer =  null;
         try {
-            kContainer = (KieContainerImpl) ITTestsUtils.getKieContainer(getClass().getClassLoader(), targetLocation, GAV_ARTIFACT_ID, GAV_VERSION);
+            kContainer = (KieContainerImpl) ITTestsUtils.getKieContainer(targetLocation, GAV_ARTIFACT_ID, GAV_VERSION);
 
             Collection<String> kieBaseNames = kContainer.getKieBaseNames();
             assertThat(kieBaseNames).hasSameElementsAs(asList("modC", "modB", "modA"));

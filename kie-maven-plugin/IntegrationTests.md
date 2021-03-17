@@ -14,6 +14,32 @@ Test compilation and reports may be found under _target/it/{module_name}_ direct
 _target/it/{module_name}/build.log_ will contain overall build output, while additionally test reports may be found under
 _target/it/{module_name}/target/failsafe-reports_ and _target/it/{module_name}/target/surefire_
 
+Common code and overall setup
+=============================
+All those tests share some common code, mostly related to the _KieContainer/KieBase/KieSession_ instantiation.
+To avoid duplication and enforce consistency, a couple of shared modules have been created: 
+1) kie-maven-plugin-test-kjar-parent
+2) kie-maven-plugin-test-kjar-common
+
+The former define common dependencies and build setup; all the tests declare this as parent and may override/extend it.
+The latter contains the shared code, it is optional, and it is used by tests that actually require it.
+
+To ensure that those twos are built and installed before the other, there are the following details
+
+1) their _invoker.properties_ file declares the _clean install_ goals
+2) they are nested under _kie-maven-plugin-test-kjar-setup_
+3) inside kie-maven-plugin/pom.xml, the invoker configuration define _kie-maven-plugin-test-kjar-setup_ to be invoked before the others
+   (see [here](https://maven.apache.org/plugins/maven-invoker-plugin/examples/prepare-build-env.html) for more details)
+
+   `<artifactId>maven-invoker-plugin</artifactId>
+   <configuration>
+        <setupIncludes>
+            <setupInclude>kie-maven-plugin-test-kjar-setup/pom.xml</setupInclude>
+        </setupIncludes>
+        <pomIncludes>
+            <pomInclude>*/pom.xml</pomInclude>
+        </pomIncludes>`
+
 
 Ignored tests
 =============
@@ -44,4 +70,41 @@ Here's an example on how to achieve that (_DeclaredTypesTestIT_ is the class thi
         try {
             final KieBase kieBase = kieContainer.getKieBase("DeclaredTypeKBase");
             kSession = kieBase.newKieSession();
-        ....
+        ....`
+
+Write and debug tips
+====================
+
+To start with, a useful starting point would be to create, inside _it_ directory, vanilla maven module containing the definition of the kjar project to test, with defined version (i.e. without version' placeholder).
+After that, look at other tests and at _org.kie.maven.plugin.ittests.public class ITTestsUtils_ to see what kind of tests have already been implemented.
+If the scope of the integration test is only the successful packaging of the kjar, no test class is needed.
+At that phase the compilation and test execution can be done invoking standard maven commands from the root of the integration test module. Debug fomr IDE is also possible.
+Next step is to enable the integration test inside the invoker lifecycle; to do that 
+
+1) add _invoker.properties_ file to the integration test
+2) replace the static version with the placeholder
+   
+Then, issue 
+
+    mvn clean install
+
+from kie-maven-plugin directory.
+
+There are different ways to debug the integration test after it is enabled as invoker module
+
+1) inside _invoker.properties_ file, enable remote debugging with the line 
+
+    invoker.mavenOpts=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+2) launch maven build inside the _target/it/{module_name}_ 
+3) add _target/it/{module_name}_ as maven project inside IDE; this will allow IDE debugging.
+
+The last two methods may be useful to debug/fix code; be aware to delete the sources file inside _target/it/{module_name}/src/test/java-filtered_ before.
+The fixed code/pom may then be copied back to the original integration test.
+
+
+
+
+
+
+
+

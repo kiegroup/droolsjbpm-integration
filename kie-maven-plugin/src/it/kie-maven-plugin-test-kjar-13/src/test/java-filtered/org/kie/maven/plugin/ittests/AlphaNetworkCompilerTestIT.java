@@ -44,7 +44,7 @@ public class AlphaNetworkCompilerTestIT {
     @Test
     public void testAlphaNetworkCompiler() throws Exception {
         final URL targetLocation = AlphaNetworkCompilerTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        final KieContainer kieContainer = ITTestsUtils.getKieContainer(getClass().getClassLoader(), targetLocation, GAV_ARTIFACT_ID, GAV_VERSION);
+        final KieContainer kieContainer = ITTestsUtils.getKieContainer(targetLocation, GAV_ARTIFACT_ID, GAV_VERSION);
         final KieBase kieBase = kieContainer.getKieBase(KBASE_NAME);
         Assertions.assertThat(kieBase).isNotNull();
         KieSession kSession = null;

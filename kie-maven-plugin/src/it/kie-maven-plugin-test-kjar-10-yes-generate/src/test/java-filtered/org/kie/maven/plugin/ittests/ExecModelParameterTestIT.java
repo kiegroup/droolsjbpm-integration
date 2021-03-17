@@ -46,6 +46,6 @@ public class ExecModelParameterTestIT {
 
     private KieModule fireRule() throws Exception {
         final URL targetLocation = ExecModelParameterTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        return ITTestsUtils.fireRule(getClass().getClassLoader(), targetLocation, GAV_ARTIFACT_ID, GAV_VERSION, KBASE_NAME, RULE_NAME);
+        return ITTestsUtils.fireRule(targetLocation, GAV_ARTIFACT_ID, GAV_VERSION, KBASE_NAME, RULE_NAME);
     }
 }

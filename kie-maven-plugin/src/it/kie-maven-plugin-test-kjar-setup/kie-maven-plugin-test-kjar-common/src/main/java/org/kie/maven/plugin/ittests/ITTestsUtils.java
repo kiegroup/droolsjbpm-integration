@@ -44,7 +44,7 @@ public class ITTestsUtils {
         return toReturn;
     }
 
-    public static KieContainer getKieContainer(final ClassLoader classLoader, final URL targetLocation, final String gavArtifactId, final  String gavVersion) throws Exception {
+    public static KieContainer getKieContainer(final URL targetLocation, final String gavArtifactId, final  String gavVersion) throws Exception {
         final File kjarFile = getKjarFile(targetLocation, gavArtifactId, gavVersion);
         Set<URL> urls = new HashSet<>();
         urls.add(kjarFile.toURI().toURL());
@@ -56,22 +56,22 @@ public class ITTestsUtils {
         return toReturn;
     }
 
-    public static KieBase getKieBase(final ClassLoader classLoader, final URL targetLocation, final String gavArtifactId, final  String gavVersion, final String kieBaseName) throws Exception {
-        final KieContainer kieContainer = getKieContainer(classLoader, targetLocation, gavArtifactId, gavVersion);
+    public static KieBase getKieBase(final URL targetLocation, final String gavArtifactId, final  String gavVersion, final String kieBaseName) throws Exception {
+        final KieContainer kieContainer = getKieContainer(targetLocation, gavArtifactId, gavVersion);
         KieBase toReturn = kieContainer.getKieBase(kieBaseName);
         Assertions.assertThat(toReturn).isNotNull();
         return toReturn;
     }
 
-    public static KieSession getKieSession(final ClassLoader classLoader, final URL targetLocation, final String gavArtifactId, final  String gavVersion, final String kieBaseName) throws Exception {
-        final KieBase kieBase = getKieBase(classLoader, targetLocation, gavArtifactId, gavVersion, kieBaseName);
+    public static KieSession getKieSession(final URL targetLocation, final String gavArtifactId, final  String gavVersion, final String kieBaseName) throws Exception {
+        final KieBase kieBase = getKieBase(targetLocation, gavArtifactId, gavVersion, kieBaseName);
         KieSession toReturn = kieBase.newKieSession();
         Assertions.assertThat(toReturn).isNotNull();
         return toReturn;
     }
 
-    public static KieModule fireRule(final ClassLoader classLoader, final URL targetLocation, final String gavArtifactId, final  String gavVersion, final String kieBaseName, final String ruleName) throws Exception {
-        final KieContainer kieContainer = getKieContainer(classLoader, targetLocation, gavArtifactId, gavVersion);
+    public static KieModule fireRule(final URL targetLocation, final String gavArtifactId, final  String gavVersion, final String kieBaseName, final String ruleName) throws Exception {
+        final KieContainer kieContainer = getKieContainer(targetLocation, gavArtifactId, gavVersion);
         final KieBase kieBase = kieContainer.getKieBase(kieBaseName);
         Assertions.assertThat(kieBase).isNotNull();
 
