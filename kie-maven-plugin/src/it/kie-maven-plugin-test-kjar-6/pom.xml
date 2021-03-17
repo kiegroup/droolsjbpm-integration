@@ -7,7 +7,7 @@
     <groupId>org.kie</groupId>
     <artifactId>kie-maven-plugin-test-kjar-parent</artifactId>
     <version>@org.kie.version@</version>
-    <relativePath>../kie-maven-plugin-test-kjar-parent/pom.xml</relativePath>
+    <relativePath>../kie-maven-plugin-test-kjar-setup/kie-maven-plugin-test-kjar-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>kie-maven-plugin-test-kjar-6</artifactId>
@@ -27,6 +27,11 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>kie-pmml</artifactId>
+      <version>@org.kie.version@</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-maven-plugin-test-kjar-common</artifactId>
       <version>@org.kie.version@</version>
     </dependency>
   </dependencies>

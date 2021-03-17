@@ -16,17 +16,11 @@
 
 package org.kie.maven.plugin.ittests;
 
-import java.io.File;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.junit.Test;
-import org.kie.api.KieBase;
-import org.kie.api.KieServices;
 import org.kie.api.builder.KieModule;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -40,6 +34,7 @@ public class ExecModelParameterTestIT {
     private static final String GAV_ARTIFACT_ID = "kie-maven-plugin-test-kjar-10-default";
     private static final String GAV_VERSION = "${org.kie.version}";
     private final static String KBASE_NAME = "SimpleKBase";
+    private final static String RULE_NAME = "Hello";
     private static final String CANONICAL_KIE_MODULE = "org.drools.modelcompiler.CanonicalKieModule";
 
     @Test
@@ -51,30 +46,6 @@ public class ExecModelParameterTestIT {
 
     private KieModule fireRule() throws Exception {
         final URL targetLocation = ExecModelParameterTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        final File basedir = new File(targetLocation.getFile().replace("/test-classes/", ""));
-        final File kjarFile = new File(basedir, GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
-        Assertions.assertThat(kjarFile).exists();
-        Set<URL> urls = new HashSet<>();
-        urls.add(kjarFile.toURI().toURL());
-        URLClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
-
-        final KieServices kieServices = KieServices.get();
-        final KieContainer kieContainer =  kieServices.getKieClasspathContainer(projectClassLoader);
-        final KieBase kieBase = kieContainer.getKieBase(KBASE_NAME);
-        KieSession kSession = null;
-        try {
-
-            kSession = kieBase.newKieSession();
-
-            kSession.insert("Hello");
-            int rulesFired = kSession.fireAllRules();
-            kSession.dispose();
-
-            assertEquals(1, rulesFired);
-        } finally {
-            kSession.dispose();
-        }
-
-        return ((KieContainerImpl) kieContainer).getKieModuleForKBase(KBASE_NAME);
+        return ITTestsUtils.fireRule(getClass().getClassLoader(), targetLocation, GAV_ARTIFACT_ID, GAV_VERSION, KBASE_NAME, RULE_NAME);
     }
 }

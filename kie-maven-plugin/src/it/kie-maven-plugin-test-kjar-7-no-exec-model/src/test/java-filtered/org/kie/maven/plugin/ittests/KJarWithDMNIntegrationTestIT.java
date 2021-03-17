@@ -50,17 +50,7 @@ public class KJarWithDMNIntegrationTestIT {
     @Test
     public void testComplexDMNModel() throws Exception {
         final URL targetLocation = KJarWithDMNIntegrationTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        final File basedir = new File(targetLocation.getFile().replace("/test-classes/", ""));
-        final File kjarFile = new File(basedir, GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
-        Assertions.assertThat(kjarFile).exists();
-        Set<URL> urls = new HashSet<>();
-        urls.add(kjarFile.toURI().toURL());
-        URLClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
-
-        final KieServices kieServices = KieServices.get();
-        final KieContainer kieContainer =  kieServices.getKieClasspathContainer(projectClassLoader);
-        final KieBase kieBase = kieContainer.getKieBase(KBASE_NAME);
-        final KieSession kieSession = kieBase.newKieSession();
+        final KieSession kieSession = ITTestsUtils.getKieSession(getClass().getClassLoader(), targetLocation, GAV_ARTIFACT_ID, GAV_VERSION, KBASE_NAME);
         try {
             final DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
             final DMNModel dmnModel = dmnRuntime.getModel("http://www.trisotech.com/definitions/_3068644b-d2c7-4b81-ab9d-64f011f81f47",

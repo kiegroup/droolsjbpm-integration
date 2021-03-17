@@ -16,25 +16,19 @@
 
 package org.kie.maven.plugin.ittests;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.HashSet;
-import java.util.Set;
-
 import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.drools.ancompiler.CompiledNetwork;
 import org.drools.ancompiler.ObjectTypeNodeCompiler;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.reteoo.ObjectSinkPropagator;
 import org.drools.core.reteoo.ObjectTypeNode;
 import org.drools.core.reteoo.Rete;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.api.KieBase;
-import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
@@ -50,20 +44,14 @@ public class AlphaNetworkCompilerTestIT {
     @Test
     public void testAlphaNetworkCompiler() throws Exception {
         final URL targetLocation = AlphaNetworkCompilerTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        final File basedir = new File(targetLocation.getFile().replace("/test-classes/", ""));
-        final File kjarFile = new File(basedir, GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
-        Assertions.assertThat(kjarFile).exists();
-        Set<URL> urls = new HashSet<>();
-        urls.add(kjarFile.toURI().toURL());
-        URLClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
-
-        final KieServices kieServices = KieServices.get();
-        final KieContainer kieContainer =  kieServices.getKieClasspathContainer(projectClassLoader);
+        final KieContainer kieContainer = ITTestsUtils.getKieContainer(getClass().getClassLoader(), targetLocation, GAV_ARTIFACT_ID, GAV_VERSION);
         final KieBase kieBase = kieContainer.getKieBase(KBASE_NAME);
+        Assertions.assertThat(kieBase).isNotNull();
         KieSession kSession = null;
         try {
 
             kSession = kieBase.newKieSession();
+            Assertions.assertThat(kSession).isNotNull();
 
             ClassLoader classLoader = kieContainer.getClassLoader();
             Class<?> aClass = Class.forName("org.compiledalphanetwork.Person", true, classLoader);

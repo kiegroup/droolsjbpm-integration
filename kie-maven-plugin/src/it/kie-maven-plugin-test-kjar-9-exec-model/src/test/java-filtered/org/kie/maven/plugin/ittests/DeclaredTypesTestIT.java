@@ -22,11 +22,12 @@ import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.kie.api.KieBase;
-import org.kie.api.KieServices;
-import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
 import static org.junit.Assert.assertEquals;
@@ -36,24 +37,20 @@ public class DeclaredTypesTestIT {
     private final static String GROUP_ID = "org.kie";
     private final static String GAV_ARTIFACT_ID = "kie-maven-plugin-test-kjar-9-exec-model";
     private static final String GAV_VERSION = "${org.kie.version}";
+    private final static String KBASE_NAME = "DeclaredTypeKBase";
+
 
     @Test
     public void testDeclaredTypeWithJavaField() throws Exception {
         final URL targetLocation = DeclaredTypesTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        final File basedir = new File(targetLocation.getFile().replace("/test-classes/", ""));
-        final File kjarFile = new File(basedir, GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
-        Assertions.assertThat(kjarFile).exists();
-        Set<URL> urls = new HashSet<>();
-        urls.add(kjarFile.toURI().toURL());
-        URLClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
-
-        final KieServices kieServices = KieServices.get();
-        final KieContainer kieContainer =  kieServices.getKieClasspathContainer(projectClassLoader);
-
+        final KieContainer kieContainer = ITTestsUtils.getKieContainer(getClass().getClassLoader(), targetLocation, GAV_ARTIFACT_ID, GAV_VERSION);
+        final KieBase kieBase = kieContainer.getKieBase(KBASE_NAME);
+        Assertions.assertThat(kieBase).isNotNull();
         KieSession kSession = null;
         try {
-            final KieBase kieBase = kieContainer.getKieBase("DeclaredTypeKBase");
+
             kSession = kieBase.newKieSession();
+            Assertions.assertThat(kSession).isNotNull();
 
             ClassLoader classLoader = kieContainer.getClassLoader();
             Class<?> aClass = Class.forName("org.declaredtype.FactA", true, classLoader);

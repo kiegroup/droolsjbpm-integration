@@ -39,9 +39,7 @@ public class BuildPMMLTrustyTestIT {
     @Test
     public void testContentKjarWithPMML() throws Exception {
         final URL targetLocation = BuildPMMLTrustyTestIT.class.getProtectionDomain().getCodeSource().getLocation();
-        final File basedir = new File(targetLocation.getFile().replace("/test-classes/", ""));
-        final File kjarFile = new File(basedir, GAV_ARTIFACT_ID + "-" + GAV_VERSION + ".jar");
-        Assertions.assertThat(kjarFile).exists();
+        final File kjarFile = ITTestsUtils.getKjarFile(targetLocation, GAV_ARTIFACT_ID, GAV_VERSION);
 
         final JarFile jarFile = new JarFile(kjarFile);
         final Set<String> jarContent = new HashSet<>();

@@ -28,6 +28,12 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
         <configuration>
+          <setupIncludes>
+            <setupInclude>kie-maven-plugin-test-kjar-setup/pom.xml</setupInclude>
+          </setupIncludes>
+          <pomIncludes>
+            <pomInclude>*/pom.xml</pomInclude>
+          </pomIncludes>
           <projectsDirectory>src/it</projectsDirectory>
           <debug>true</debug>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
