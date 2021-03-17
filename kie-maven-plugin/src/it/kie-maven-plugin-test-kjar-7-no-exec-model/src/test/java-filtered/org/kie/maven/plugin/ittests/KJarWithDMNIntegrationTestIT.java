@@ -45,6 +45,7 @@ public class KJarWithDMNIntegrationTestIT {
     private final static String GROUP_ID = "org.kie";
     private final static String GAV_ARTIFACT_ID = "kie-maven-plugin-test-kjar-7-no-exec-model";
     private static final String GAV_VERSION = "${org.kie.version}";
+    private final static String KBASE_NAME = "dmnkiebase";
 
     @Test
     public void testComplexDMNModel() throws Exception {
@@ -58,7 +59,7 @@ public class KJarWithDMNIntegrationTestIT {
 
         final KieServices kieServices = KieServices.get();
         final KieContainer kieContainer =  kieServices.getKieClasspathContainer(projectClassLoader);
-        final KieBase kieBase = kieContainer.getKieBase("dmnkiebase");
+        final KieBase kieBase = kieContainer.getKieBase(KBASE_NAME);
         final KieSession kieSession = kieBase.newKieSession();
         try {
             final DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
