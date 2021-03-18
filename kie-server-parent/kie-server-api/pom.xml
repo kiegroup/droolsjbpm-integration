@@ -163,10 +163,6 @@
       <artifactId>kie-ci</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-        <groupId>org.jbpm</groupId>
-        <artifactId>jbpm-document</artifactId>
-    </dependency>
   </dependencies>
 
   <build>

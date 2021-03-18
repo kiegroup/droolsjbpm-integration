@@ -748,8 +748,8 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public <R> R getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId, Class<R> type) {
-        R result = null;
+    public Object getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId) {
+        Object result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
@@ -757,8 +757,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(ATTACHMENT_ID, attachmentId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI, valuesMap),
-                    type);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI, valuesMap), Object.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -769,10 +768,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             if (shouldReturnWithNullResponse(response)) {
                 return null;
             }
-            result = deserialize(response.getResult(), type);
+            result = deserialize(response.getResult(), Object.class);
         }
         if (result instanceof Wrapped) {
-            return type.cast(((Wrapped) result).unwrap());
+            return ((Wrapped) result).unwrap();
         }
 
         return result;

@@ -95,11 +95,7 @@ public interface UserTaskServicesClient {
 
     TaskAttachment getTaskAttachmentById(String containerId, Long taskId, Long attachmentId);
 
-    default Object getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId) {
-        return getTaskAttachmentContentById(containerId, taskId, attachmentId, Object.class);
-    }
-
-    <R> R getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId, Class<R> outputClass);
+    Object getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId);
 
     List<TaskAttachment> getTaskAttachmentsByTaskId(String containerId, Long taskId);
 

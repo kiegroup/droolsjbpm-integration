@@ -945,6 +945,32 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     }
 
     @Test
+    public void testUserTaskAttachmentsAsByteArray() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            // Adding attachments to user task.
+            byte[] attachmentContent = new String("This is first attachment.").getBytes();
+            Long attachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, "my attachment", attachmentContent);
+
+            // start task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            // Verifying attachment returned by getTaskAttachmentById().
+            Object taskAttachmentContent = taskClient.getTaskAttachmentContentById(CONTAINER_ID, taskSummary.getId(), attachmentId);
+            assertArrayEquals(attachmentContent, (byte[])taskAttachmentContent);
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    @Test
     public void testUserTaskAttachmentsDocumentImpl() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
@@ -968,44 +994,14 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             changeUser(USER_YODA);
             // start task
             taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
-            Document returnedContent = taskClient.getTaskAttachmentContentById(CONTAINER_ID, taskSummary
-                    .getId(), attachmentId, DocumentImpl.class);
-            assertEquals(docName, returnedContent.getName());
-            assertEquals(docSize, returnedContent.getSize());
-            assertNotNull(returnedContent.getLastModified());
-            assertArrayEquals(docContent, returnedContent.getContent());
+            assertArrayEquals(docContent, (byte[])taskClient.getTaskAttachmentContentById(CONTAINER_ID, taskSummary
+                    .getId(), attachmentId));
             // Delete task attachment.
             taskClient.deleteTaskAttachment(CONTAINER_ID, taskSummary.getId(), attachmentId);
 
             List<TaskAttachment> taskAttachments = taskClient.getTaskAttachmentsByTaskId(CONTAINER_ID, taskSummary
                     .getId());
             assertEquals(0, taskAttachments.size());
-        } finally {
-            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-        }
-    }
-
-    @Test
-    public void testUserTaskAttachmentsAsByteArray() throws Exception {
-        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
-        assertNotNull(processInstanceId);
-        assertTrue(processInstanceId.longValue() > 0);
-        try {
-            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertNotNull(taskList);
-            assertEquals(1, taskList.size());
-            TaskSummary taskSummary = taskList.get(0);
-
-            // Adding attachments to user task.
-            byte[] attachmentContent = new String("This is first attachment.").getBytes();
-            Long attachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, "my attachment", attachmentContent);
-
-            // start task
-            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
-
-            // Verifying attachment returned by getTaskAttachmentById().
-            Object taskAttachmentContent = taskClient.getTaskAttachmentContentById(CONTAINER_ID, taskSummary.getId(), attachmentId);
-            assertArrayEquals(attachmentContent, (byte[])taskAttachmentContent);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
