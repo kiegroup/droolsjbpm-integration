@@ -20,18 +20,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.assertj.core.api.Assertions;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,9 +52,12 @@ import org.kie.server.integrationtests.category.Unstable;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @Category(Email.class)
 public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -66,8 +70,10 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     private static final KieServerConfigItem PPI_RUNTIME_STRATEGY = new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, RuntimeStrategy.PER_PROCESS_INSTANCE.name(), String.class.getName());
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", CONTAINER_ID,
             "1.0.0.Final");
+    private static ReleaseId releaseNotificationId = new ReleaseId("org.kie.server.testing", CONTAINER_ID_NOTIFICATION,
+                                                       "1.0.0.Final");
 
     private final static Map<String, Object> params = new HashMap<String, Object>();
 
@@ -110,9 +116,11 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/definition-project");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/" + CONTAINER_ID);
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/" + CONTAINER_ID_NOTIFICATION);
 
         createContainer(CONTAINER_ID, releaseId, PPI_RUNTIME_STRATEGY);
+        createContainer(CONTAINER_ID_NOTIFICATION, releaseNotificationId, PPI_RUNTIME_STRATEGY);
     }
 
     @Test
@@ -151,14 +159,15 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(taskInstance);
             assertEquals(USER_JOHN, taskInstance.getActualOwner());
 
-            waitForEmailsRecieve(wiser);
+            waitForEmailsReceive(wiser);
             taskClient.completeTask(CONTAINER_ID, taskId, USER_JOHN, new HashMap<String, Object>());
 
             ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
             assertNotNull(processInstance);
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
 
-            assertEmails("Escalation");
+            assertTotalOfEmails(1);
+            assertEmails("Escalation", ESCALATION_TEXT, USER_JOHN, 1);
         } catch (Exception e) {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             throw e;
@@ -189,45 +198,104 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
         assertNotNull(processInstance);
         assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
 
-        KieServerAssert.assertNullOrEmpty("Email recieved!", wiser.getMessages());
+        KieServerAssert.assertNullOrEmpty("Email received!", wiser.getMessages());
 
         //wait while, cause email is sent 6s after task start
-        Thread.sleep(8000l);
-        KieServerAssert.assertNullOrEmpty("Email recieved!", wiser.getMessages());
+        Thread.sleep(8000L);
+        KieServerAssert.assertNullOrEmpty("Email received!", wiser.getMessages());
     }
 
-    private void assertEmails(final String subj) throws MessagingException, IOException {
-        //wiser shoudl catch 2 messages (one for John and one for Administrator)
-        List<WiserMessage> messages = wiser.getMessages();
-        assertNotNull(messages);
-        assertEquals(2, messages.size());
+    @Test(timeout = 35000)
+    @Category(Unstable.class) // Potentially unstable on slow DBs.
+    public void testRepeatedEscalations() throws Exception {
+        Long processInstanceId = null;
+        processInstanceId = processClient.startProcess(CONTAINER_ID_NOTIFICATION, "repeatedEmailNotificationProcess");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
 
-        for (WiserMessage message : messages) {
-            MimeMessage receivedMessage = message.getMimeMessage();
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        Assertions.assertThat(tasks).hasSize(1);
+
+        Thread.sleep(6000L);
+        assertTotalOfEmails(3);
+        assertEmails("NotStarted at 1secs", "NotStarted at 1secs", USER_YODA, 1);
+        assertEmails("NotStarted at 5secs", "NotStarted at 5secs", USER_YODA, 1);
+        assertEmails("NotStarted repeated notification every 5secs", "NotStarted repeated notification every 5secs", USER_YODA, 1);
+
+        Thread.sleep(5000L);
+        assertTotalOfEmails(4);
+        assertEmails("NotStarted repeated notification every 5secs", "NotStarted repeated notification every 5secs", USER_YODA, 2);
+
+        taskClient.startTask(CONTAINER_ID_NOTIFICATION, tasks.get(0).getId(), USER_YODA);
+
+        Thread.sleep(5000L);
+        assertTotalOfEmails(5);
+        assertEmails("NotStarted repeated notification every 5secs", "NotStarted repeated notification every 5secs", USER_YODA, 2);
+        assertEmails("NotCompleted repeated notification every 15secs", "NotCompleted repeated notification every 15secs", USER_YODA, 1);
+        taskClient.completeTask(CONTAINER_ID_NOTIFICATION, tasks.get(0).getId(), USER_YODA, new HashMap<>());
+
+        Thread.sleep(16000L);
+        assertTotalOfEmails(5);
+        assertEmails("NotCompleted repeated notification every 15secs", "NotCompleted repeated notification every 15secs", USER_YODA, 1);
+
+        ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID_NOTIFICATION, processInstanceId);
+        assertNotNull(processInstance);
+        assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
+    }
+
+    private void assertEmails(String subj, String content, String userTo, long totalMessages) throws IOException, MessagingException {
+        assertEquals(totalMessages, getEmails().stream()
+                .filter(message -> subj.equals(message.subject))
+                .filter(message -> content.equals(message.content))
+                .filter(message -> FROM_EMAIL.equals(message.from))
+                .filter(message -> (userTo + EMAIL_DOMAIN).equals(message.to))
+                .count());
+    }
+
+    private List<Message> getEmails() throws MessagingException, IOException {
+        List<WiserMessage> wiserMessages = wiser.getMessages();
+        assertNotNull(wiserMessages);
+        List<Message> messages = new ArrayList<>(wiserMessages.size());
+
+        for (WiserMessage wiserMessage : wiserMessages) {
+
+            MimeMessage receivedMessage = wiserMessage.getMimeMessage();
             assertNotNull(receivedMessage);
-
-            assertEquals(subj, receivedMessage.getSubject());
-            assertEquals(ESCALATION_TEXT, (String) receivedMessage.getContent());
+            Message message = new Message();
+            message.subject = receivedMessage.getSubject();
+            message.content = receivedMessage.getContent();
+            message.sentDate = receivedMessage.getSentDate();
 
             InternetAddress[] from = (InternetAddress[]) receivedMessage.getFrom();
             assertEquals(1, from.length);
-            assertEquals(FROM_EMAIL, from[0].getAddress());
+            message.from = from[0].getAddress();
             InternetAddress[] to = (InternetAddress[]) receivedMessage.getAllRecipients();
             assertEquals(2, to.length);
-            if (to[0].getAddress().equals(USER_JOHN + EMAIL_DOMAIN)) {
-                assertEquals(USER_JOHN + EMAIL_DOMAIN, to[0].getAddress());
-                assertEquals(USER_ADMINISTRATOR + EMAIL_DOMAIN, to[1].getAddress());
+            InternetAddress[] toAddrs = (InternetAddress[]) receivedMessage.getAllRecipients();
+            if (!toAddrs[0].getAddress().equals(USER_ADMINISTRATOR + EMAIL_DOMAIN)) {
+                assertEquals(USER_ADMINISTRATOR + EMAIL_DOMAIN, toAddrs[1].getAddress());
+                message.to = toAddrs[0].getAddress();
             } else {
-                assertEquals(USER_ADMINISTRATOR + EMAIL_DOMAIN, to[0].getAddress());
-                assertEquals(USER_JOHN + EMAIL_DOMAIN, to[1].getAddress());
+                assertEquals(USER_ADMINISTRATOR + EMAIL_DOMAIN, toAddrs[0].getAddress());
+                message.to = toAddrs[1].getAddress();
+            }
+            if (!messages.contains(message)) { //wiser should catch 2 messages (one for user and one for Administrator)
+                messages.add(message);
             }
         }
+        return messages;
+    }
+
+    private void assertTotalOfEmails(int totalMessages) throws IOException, MessagingException {
+        List<WiserMessage> messages = wiser.getMessages();
+        assertNotNull(messages);
+        assertEquals(totalMessages, getEmails().size());
     }
 
     private static final long SERVICE_TIMEOUT = 30000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
-    protected void waitForEmailsRecieve(Wiser wiser) throws Exception {
+    protected void waitForEmailsReceive(Wiser wiser) throws Exception {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
             if (wiser.getMessages().isEmpty()) {
@@ -249,5 +317,62 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
             }
         }
         throw new TimeoutException("Timeout while waiting for process instance to finish.");
+    }
+
+    private static class Message {
+        public String subject;
+        public Object content;
+        public String from;
+        public String to;
+        public Date sentDate;
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Message other = (Message) obj;
+            if (!Objects.equals(this.subject, other.subject)) {
+                return false;
+            }
+            if (!Objects.equals(this.content, other.content)) {
+                return false;
+            }
+            if (!Objects.equals(this.from, other.from)) {
+                return false;
+            }
+            if (!Objects.equals(this.to, other.to)) {
+                return false;
+            }
+            if (!Objects.equals(this.sentDate, other.sentDate)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 41 * hash + (this.subject != null ? this.subject.hashCode() : 0);
+            hash = 41 * hash + (this.content != null ? this.content.hashCode() : 0);
+            hash = 41 * hash + (this.from != null ? this.from.hashCode() : 0);
+            hash = 41 * hash + (this.to != null ? this.to.hashCode() : 0);
+            hash = 41 * hash + (this.sentDate != null ? this.sentDate.hashCode() : 0);
+            return hash;
+        }
+
+        @Override
+        public String toString() {
+            return "Message{" +
+                    "subject='" + subject + '\'' +
+                    ", content=" + content +
+                    ", from='" + from + '\'' +
+                    ", to='" + to + '\'' +
+                    ", sentDate=" + sentDate +
+                    '}';
+        }
     }
 }

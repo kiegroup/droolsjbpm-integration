@@ -17,11 +17,16 @@
 package org.jbpm.springboot.samples;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+
 import org.appformer.maven.integration.MavenRepository;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.UserTaskService;
 import org.jbpm.springboot.samples.events.listeners.CountDownLatchNotificationListener;
 import org.junit.After;
 import org.junit.Before;
@@ -31,6 +36,8 @@ import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.query.QueryFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -38,7 +45,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -52,6 +59,7 @@ public class DeadlinesNotificationTest {
     static final String ARTIFACT_ID = "notification";
     static final String GROUP_ID = "org.jbpm";
     static final String VERSION = "1.0";
+    static final String USER_YODA = "yoda";
 
     private KModuleDeploymentUnit unit = null;
 
@@ -63,6 +71,12 @@ public class DeadlinesNotificationTest {
     
     @Autowired
     private CountDownLatchNotificationListener countDownListener;
+
+    @Autowired
+    private RuntimeDataService runtimeDataService;
+
+    @Autowired
+    private UserTaskService userTaskService;
 
     @BeforeClass
     public static void generalSetup() {
@@ -107,6 +121,37 @@ public class DeadlinesNotificationTest {
 
         ProcessInstance pi = processService.getProcessInstance(processInstanceId);
         assertNull(pi);
+    }
+
+    @Test(timeout = 30000)
+    public void testRepeatedNotificationsAfterDeadlines() throws Exception {
+        assertNotNull(unit);
+        Long processInstanceId = processService.startProcess(unit.getIdentifier(), "repeated-notifications");
+
+        assertTrue(processInstanceId > 0);
+
+        assertNotificationEventReceived(4000, 3);
+        assertNotificationEventReceived(3000, 1); // 1 "Not started" repeated notification after 3 sec
+
+        List<TaskSummary> task = runtimeDataService.getTasksOwned(USER_YODA, new QueryFilter());
+        assertEquals(1, task.size());
+        userTaskService.start(task.get(0).getId(), USER_YODA);
+
+        assertNotificationEventReceived(4000, 1); // 1 "Not completed" repeated notification after 12 secs
+
+        userTaskService.complete(task.get(0).getId(), USER_YODA, new HashMap<>());
+        assertNotificationEventReceived(12000, 0);
+
+        ProcessInstance pi = processService.getProcessInstance(processInstanceId);
+        assertNull(pi);
+    }
+
+    private void assertNotificationEventReceived(long millisToWait, int totalNotifications) throws InterruptedException {
+        countDownListener.reset();
+        countDownListener.configure(totalNotifications);
+        Thread.sleep(millisToWait);
+        countDownListener.getCountDown().await();
+        assertEquals(totalNotifications, countDownListener.getEventsReceived().size());
     }
 
 }
