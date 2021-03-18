@@ -96,10 +96,31 @@ There are different ways to debug the integration test after it is enabled as in
 
     invoker.mavenOpts=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
 2) launch maven build inside the _target/it/{module_name}_ 
-3) add _target/it/{module_name}_ as maven project inside IDE; this will allow IDE debugging.
+3) add _target/it/{module_name}_ as maven project inside IDE; this will allow IDE debugging (see [below](#adding-_targetitmodule_name_-as-maven-project-inside-ide) for detailed instructions).
 
 The last two methods may be useful to debug/fix code; be aware to delete the sources file inside _target/it/{module_name}/src/test/java-filtered_ before.
 The fixed code/pom may then be copied back to the original integration test.
+
+Adding _target/it/{module_name}_ as maven project inside IDE
+------------------------------------------------------------
+This method has been tested on _IntelliJ IDEA 2020.3.3 (Ultimate Edition)_, but should work on other versions and also inside different IDEs (with appropriate commands).
+
+1) expand the left panel "Project"
+2) right click on _target/it/{module_name}/pom.xml_
+3) in the opened menu, click "Add as Maven Project"
+
+The project should now appear on the right panel "Maven".
+
+This a screenshot before adding a project:
+
+![Before](./MavenProjectsBeforeAdding.png)
+
+And this after it has been successfully added.
+
+![After](./MavenProjectsAfterAdding.png)
+
+To remove a project from Maven panel, right click on it and select "Unlink Maven Projects".
+
 
 
 
