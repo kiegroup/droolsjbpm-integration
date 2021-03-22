@@ -103,8 +103,10 @@ import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.MigrationProcessSpecification;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.MigrationSpecification;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.ProcessNodeList;
@@ -365,6 +367,8 @@ public class JaxbMarshaller implements Marshaller {
                                                  TaskReassignmentList.class,
                                                  ExecutionErrorInstance.class,
                                                  ExecutionErrorInstanceList.class,
+                                                 MigrationSpecification.class,
+                                                 MigrationProcessSpecification.class,
 
                                                  // case management
                                                  CaseMilestone.class,
