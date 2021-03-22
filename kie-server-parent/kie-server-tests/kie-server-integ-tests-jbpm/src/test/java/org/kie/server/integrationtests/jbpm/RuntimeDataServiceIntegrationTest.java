@@ -105,7 +105,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
-        assertEquals(18, definitions.size());
+        assertEquals(20, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -127,7 +127,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20, QueryServicesClient.SORT_BY_NAME, false);
         assertNotNull(definitions);
 
-        assertEquals(18, definitions.size());
+        assertEquals(20, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -196,7 +196,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20);
         assertNotNull(definitions);
 
-        Assertions.assertThat(definitions).hasSize(18);
+        Assertions.assertThat(definitions).hasSize(20);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -222,7 +222,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        Assertions.assertThat(definitions).hasSize(18);
+        Assertions.assertThat(definitions).hasSize(20);
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -1908,11 +1908,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
 
     private void checkProcessDefinitions(List<String> processIds) {
-        assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
         assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
         assertTrue(processIds.contains(PROCESS_ID_GROUPTASK));
         assertTrue(processIds.contains(PROCESS_ID_SIGNAL_PROCESS));
-        assertTrue(processIds.contains(PROCESS_ID_USERTASK));
         assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
         assertTrue(processIds.contains(PROCESS_ID_SIGNAL_START));
         assertTrue(processIds.contains(PROCESS_ID_ASYNC_SCRIPT));
