@@ -16,6 +16,7 @@
 package org.kie.maven.plugin;
 
 import io.takari.maven.testing.executor.MavenRuntime;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.junit.Test;
@@ -26,7 +27,9 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
 import static java.lang.String.format;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.kie.maven.plugin.TestUtil.getProjectVersion;
 
 public class ExecModelParameterTest extends KieMavenPluginBaseIntegrationTest {
@@ -54,6 +57,12 @@ public class ExecModelParameterTest extends KieMavenPluginBaseIntegrationTest {
                          "clean", "install");
         KieModule kieModule = fireRule(ARTIFACT_ID_WITH_EXEC_MODEL, KBASE_NAME_WITH_EXEC_MODEL);
         assertTrue(kieModule instanceof CanonicalKieModule);
+
+        InternalKieModule internalKieModule = ((CanonicalKieModule) kieModule).getInternalKieModule();
+
+        String modelFileName = CanonicalKieModule.getModelFileWithGAV(internalKieModule.getReleaseId());
+        assertEquals("META-INF/kie/org/kie/" + ARTIFACT_ID_WITH_EXEC_MODEL + "/drools-model", modelFileName);
+        assertTrue(internalKieModule.isAvailable(modelFileName));
     }
 
     @Test
@@ -63,6 +72,12 @@ public class ExecModelParameterTest extends KieMavenPluginBaseIntegrationTest {
                          "clean", "install");
         KieModule kieModule = fireRule(ARTIFACT_ID_WITH_EXEC_MODEL, KBASE_NAME_WITH_EXEC_MODEL);
         assertTrue(kieModule instanceof CanonicalKieModule);
+
+        InternalKieModule internalKieModule = ((CanonicalKieModule) kieModule).getInternalKieModule();
+
+        String modelFileName = CanonicalKieModule.getModelFileWithGAV(internalKieModule.getReleaseId());
+        assertEquals("META-INF/kie/org/kie/" + ARTIFACT_ID_WITH_EXEC_MODEL + "/drools-model", modelFileName);
+        assertTrue(internalKieModule.isAvailable(modelFileName));
     }
 
     @Test

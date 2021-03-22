@@ -21,12 +21,16 @@ import java.util.List;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.drools.ancompiler.CompiledNetwork;
 import org.drools.ancompiler.ObjectTypeNodeCompiler;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.reteoo.ObjectSinkPropagator;
 import org.drools.core.reteoo.ObjectTypeNode;
 import org.drools.core.reteoo.Rete;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieModule;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -57,6 +61,16 @@ public class AlphaNetworkCompilerTest extends KieMavenPluginBaseIntegrationTest 
         final KieContainer kieContainer = kieServices.newKieContainer(releaseId);
         KieSession kSession = null;
         try {
+            KieModule kieModule = ((KieContainerImpl)kieContainer).getKieModuleForKBase("kbase-compiled-alphanetwork");
+            InternalKieModule internalKieModule;
+            if (kieModule instanceof CanonicalKieModule) {
+                internalKieModule = ((CanonicalKieModule) kieModule).getInternalKieModule();
+            } else {
+                internalKieModule = (InternalKieModule) kieModule;
+            }
+            String ancFileName = CanonicalKieModule.getANCFile(releaseId);
+            assertEquals("META-INF/kie/org/kie/" + ARTIFACT_ID + "/alpha-network-compiler", ancFileName);
+            assertTrue(internalKieModule.isAvailable(ancFileName));
 
             kSession = kieContainer.newKieSession("kbase-compiled-alphanetwork.session");
 
