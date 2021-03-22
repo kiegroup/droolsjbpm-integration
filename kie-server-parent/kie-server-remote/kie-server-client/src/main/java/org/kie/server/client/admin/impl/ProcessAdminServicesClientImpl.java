@@ -30,6 +30,7 @@ import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.MigrationSpecification;
 import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.ProcessNodeList;
 import org.kie.server.api.model.admin.TimerInstance;
@@ -119,14 +120,10 @@ public class ProcessAdminServicesClientImpl extends AbstractKieServicesClientImp
         return Collections.emptyList();
     }
 
-    @Override
-    public MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId) {
-        return migrateProcessInstanceWithSubprocess(containerId, processInstanceId, targetContainerId, targetProcessId, new HashMap<>());
-    }
 
     @Override
-    public MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId, Map<String, String> nodeMapping) {
-        MigrationReportInstance reportInstance;
+    public List<MigrationReportInstance> migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, MigrationSpecification migrationSpecification) {
+        MigrationReportInstanceList reportInstanceList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<>();
             valuesMap.put(CONTAINER_ID, containerId);
@@ -134,22 +131,25 @@ public class ProcessAdminServicesClientImpl extends AbstractKieServicesClientImp
 
             Map<String, String> headers = new HashMap<>();
 
-            String queryString = "?targetContainerId=" + targetContainerId + "&targetProcessId=" + targetProcessId;
+            String queryString = "?targetContainerId=" + targetContainerId;
 
-            reportInstance = makeHttpPutRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI, valuesMap) + queryString, nodeMapping, MigrationReportInstance.class, headers);
+            reportInstanceList = makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI, valuesMap) + queryString, migrationSpecification, MigrationReportInstanceList.class, headers);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "migrateProcessInstanceWithAllSubprocess", serialize(safeMap(nodeMapping)), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, targetContainerId, targetProcessId})));
-            ServiceResponse<MigrationReportInstance> response = (ServiceResponse<MigrationReportInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "migrateProcessInstanceWithAllSubprocess", serialize(migrationSpecification), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, targetContainerId})));
+            ServiceResponse<MigrationReportInstanceList> response = (ServiceResponse<MigrationReportInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
             if (shouldReturnWithNullResponse(response)) {
                 return null;
             }
-            reportInstance = response.getResult();
+            reportInstanceList = response.getResult();
         }
 
-        return reportInstance;
+        if (reportInstanceList != null) {
+            return reportInstanceList.getItems();
+        }
+        return Collections.emptyList();
     }
 
     @Override

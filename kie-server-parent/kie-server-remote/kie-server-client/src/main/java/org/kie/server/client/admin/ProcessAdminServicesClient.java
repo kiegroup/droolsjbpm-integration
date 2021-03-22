@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.MigrationReportInstance;
+import org.kie.server.api.model.admin.MigrationSpecification;
 import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.TimerInstance;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -34,9 +35,8 @@ public interface ProcessAdminServicesClient {
 
     List<MigrationReportInstance> migrateProcessInstances(String containerId, List<Long> processInstancesId, String targetContainerId, String targetProcessId, Map<String, String> nodeMapping);
 
-    MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId);
 
-    MigrationReportInstance migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, String targetProcessId, Map<String, String> nodeMapping);
+    List<MigrationReportInstance> migrateProcessInstanceWithSubprocess(String containerId, Long processInstanceId, String targetContainerId, MigrationSpecification migrationSpecification);
 
     List<ProcessNode> getProcessNodes(String containerId, Long processInstanceId);
 

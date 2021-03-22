@@ -94,6 +94,8 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_NODES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TIMERS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.MIGRATION_VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.MIGRATION_VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.SIMPLE_VAR_MAP_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.SIMPLE_VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TIMER_VAR_MAP_JSON;
@@ -177,14 +179,14 @@ public class ProcessAdminResource {
             @ApiParam(value = "list of identifiers of process instance to be migrated", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
             @ApiParam(value = "process definition that process instances should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
-            @ApiParam(value = "node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=SIMPLE_VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=SIMPLE_VAR_MAP_XML)})) String payload) {
+            @ApiParam(value = "migration specifcation. It contains process mapping and node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=MIGRATION_VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=MIGRATION_VAR_MAP_XML)})) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            MigrationReportInstanceList reportInstances = processAdminServiceBase.migrateProcessInstanceWithAllSubprocess(containerId, processInstanceId, targetContainerId, targetProcessId, payload, type);
+            MigrationReportInstanceList reportInstances = processAdminServiceBase.migrateProcessInstanceWithAllSubprocess(containerId, processInstanceId, targetContainerId, payload, type);
 
             return createCorrectVariant(reportInstances, headers, Response.Status.CREATED, conversationIdHeader);
         } catch (ProcessInstanceNotFoundException e) {

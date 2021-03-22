@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jbpm.services.api.RuntimeDataService;
@@ -36,8 +37,10 @@ import org.kie.api.runtime.query.QueryContext;
 import org.kie.internal.runtime.error.ExecutionError;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.MigrationProcessSpecification;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.MigrationSpecification;
 import org.kie.server.api.model.admin.ProcessNodeList;
 import org.kie.server.api.model.admin.TimerInstanceList;
 import org.kie.server.api.model.instance.NodeInstanceList;
@@ -47,8 +50,6 @@ import org.kie.server.services.jbpm.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstance;
@@ -101,21 +102,42 @@ public class ProcessAdminServiceBase {
     }
 
     public MigrationReportInstanceList migrateProcessInstanceWithAllSubprocess(String containerId,
-                                                                               Long processInstanceId,
+                                                                               Number processInstanceId,
                                                                                String targetContainerId,
-                                                                               String targetProcessId,
                                                                                String payload, 
                                                                                String marshallingType) {
 
-        ProcessInstanceDesc pi = runtimeDataService.getProcessInstanceById(processInstanceId);
+        ProcessInstanceDesc pi = runtimeDataService.getProcessInstanceById(processInstanceId.longValue());
         if(pi.getParentId() > 0) {
             throw new IllegalArgumentException("Only root process can invoke this migration with all subprocesses");
         }
-        List<Long> processInstancesId =  runtimeDataService.getProcessInstancesWithSubprocessByProcessInstanceId(processInstanceId, 
-                                                                                                                 singletonList(ProcessInstance.STATE_ACTIVE), 
-                                                                                                                 new QueryContext(0, -1)).stream().map(ProcessInstanceDesc::getId).collect(Collectors.toList());
 
-        return migrateProcessInstances(containerId, processInstancesId, targetContainerId, targetProcessId, payload, marshallingType);
+        MigrationSpecification migrationSpecification = new MigrationSpecification();
+        if (payload != null) {
+            logger.debug("About to unmarshal node mapping from payload: '{}' using container {} marshaller", payload, containerId);
+            migrationSpecification = marshallerHelper.unmarshal(containerId, payload, marshallingType, MigrationSpecification.class);
+        }
+
+        
+        List<Long> processInstancesId =  new ArrayList<>(runtimeDataService.getProcessInstancesWithSubprocessByProcessInstanceId(processInstanceId.longValue(), 
+                                                                                                                 singletonList(ProcessInstance.STATE_ACTIVE), 
+                                                                                                                 new QueryContext(0, -1)).stream().map(ProcessInstanceDesc::getId).collect(Collectors.toList()));
+
+        processInstancesId.add(processInstanceId.longValue());
+        List<MigrationReport> reports = new ArrayList<>();
+        for(Long processInstanceToMigrateId : processInstancesId) {
+            ProcessInstanceDesc piToMigrate = runtimeDataService.getProcessInstanceById(processInstanceToMigrateId);
+            Optional<MigrationProcessSpecification> spec = migrationSpecification.getProcesses().stream().filter(e -> piToMigrate.getProcessId().equals(e.getSourceProcessId())).findFirst();
+            if(!spec.isPresent()) {
+                logger.error("MigrationProcessSpecification is not correct. Process Instance Id " + processInstanceToMigrateId + " won't be migrated");
+                continue;
+            }
+            String targetProcessId = spec.get().getTargetProcessId();
+            Map<String, String> nodeMapping = spec.get().getNodes();
+            reports.add(processInstanceMigrationService.migrate(containerId, processInstanceToMigrateId, targetContainerId, targetProcessId, nodeMapping));
+        }
+
+        return convertMigrationReports(reports);
     }
 
 
