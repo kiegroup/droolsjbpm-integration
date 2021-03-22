@@ -120,12 +120,3 @@ And this after it has been successfully added.
 ![After](./MavenProjectsAfterAdding.png)
 
 To remove a project from Maven panel, right click on it and select "Unlink Maven Projects".
-
-
-
-
-
-
-
-
-
