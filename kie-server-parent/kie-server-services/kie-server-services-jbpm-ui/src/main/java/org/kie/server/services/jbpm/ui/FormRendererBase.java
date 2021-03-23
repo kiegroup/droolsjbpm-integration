@@ -263,7 +263,7 @@ public class FormRendererBase {
                 field.setTags(processDesc.getTagsForVariable(entry.getKey()));
                 Set<String> tags = processDesc.getTagsForVariable(entry.getKey());
                 field.setRequired(tags.contains("required"));
-                field.setRequired(tags.contains("readonly"));
+                field.setReadOnly(tags.contains("readonly"));
                 
                 form.getFields().add(field);
                 

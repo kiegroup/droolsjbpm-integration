@@ -24,7 +24,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jbpm.casemgmt.api.model.CaseDefinition;
@@ -110,7 +120,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     }
     
     public String renderCase(String containerId, CaseDefinition caseDefinition, FormInstance form) {
-        List<String> scriptDataList = new ArrayList<>();        
+        List<String> scriptDataList = new ArrayList<>();
         
         
         StringBuilder jsonTemplate = new StringBuilder();
@@ -441,7 +451,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                     break;
                             }
                             Set<String> tags = field.getTags();
-                            if(tags != null) {
+                            if (tags != null) {
                                 item.setRequired(tags.contains("required"));
                                 item.setReadOnly(tags.contains("readonly"));
                             } else {
