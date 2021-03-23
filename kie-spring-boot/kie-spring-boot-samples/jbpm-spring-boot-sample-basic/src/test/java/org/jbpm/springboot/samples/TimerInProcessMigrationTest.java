@@ -31,6 +31,7 @@ import org.jbpm.runtime.manager.impl.migration.MigrationManager;
 import org.jbpm.runtime.manager.impl.migration.MigrationSpec;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.task.deadlines.notifications.impl.NotificationListenerManager;
 import org.jbpm.springboot.samples.events.listeners.CountDownLatchEventListener;
 import org.junit.After;
 import org.junit.Before;
@@ -126,6 +127,7 @@ public class TimerInProcessMigrationTest {
 
     @After
     public void cleanup() {
+        NotificationListenerManager.get().reset();
         deploymentService.undeploy(unit);
         deploymentService.undeploy(unitV2);
         
