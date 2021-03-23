@@ -22,12 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.drools.core.runtime.rule.impl.FlatQueryResultRow;
+import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -98,4 +101,86 @@ public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseInt
         assertEquals("Expected surname to be set to 'Vader'",
                 PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(value, PERSON_SURNAME_FIELD));
     }
+
+
+    @Test
+    public void testQuery() {
+        List<Command<?>> commands = new ArrayList<>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
+
+        commands.add(commandsFactory.newQuery("personQueryResult", "query1"));
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        ExecutionResults actualData = reply.getResult();
+
+        FlatQueryResults personQueryResult = (FlatQueryResults) actualData.getValue("personQueryResult");
+
+        for(QueryResultsRow r : personQueryResult) {
+            FlatQueryResultRow flatQueryResultRow = (FlatQueryResultRow) r;
+
+            assertEquals(1, flatQueryResultRow.getIdentifiers().size());
+            assertEquals(1, flatQueryResultRow.getIdResultMap().size());
+            assertEquals(1, flatQueryResultRow.getIdFacthandleMap().size());
+
+        }
+    }
+
+    @Test
+    public void testQueryHideFactHandleMap() {
+        List<Command<?>> commands = new ArrayList<>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
+
+        commands.add(commandsFactory.newQuery("personQueryResult", "query1", false, true, new Object[0]));
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        ExecutionResults actualData = reply.getResult();
+
+        FlatQueryResults personQueryResult = (FlatQueryResults) actualData.getValue("personQueryResult");
+
+        for(QueryResultsRow r : personQueryResult) {
+            FlatQueryResultRow flatQueryResultRow = (FlatQueryResultRow) r;
+
+            assertEquals(1, flatQueryResultRow.getIdentifiers().size());
+            assertEquals(1, flatQueryResultRow.getIdResultMap().size());
+            assertEquals(0, flatQueryResultRow.getIdFacthandleMap().size());
+
+        }
+    }
+
+//    @Test
+//    public void testQueryHideResultsMap() {
+//        List<Command<?>> commands = new ArrayList<>();
+//        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+//
+//        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+//        commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
+//
+//        commands.add(commandsFactory.newQuery("personQueryResult", "query1", true, false, new Object[0]));
+//
+//        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+//        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+//
+//        ExecutionResults actualData = reply.getResult();
+//
+//        FlatQueryResults personQueryResult = (FlatQueryResults) actualData.getValue("personQueryResult");
+//
+//        for(QueryResultsRow r : personQueryResult) {
+//            FlatQueryResultRow flatQueryResultRow = (FlatQueryResultRow) r;
+//
+//            assertEquals(1, flatQueryResultRow.getIdentifiers().size());
+//            assertEquals(0, flatQueryResultRow.getIdResultMap().size());
+//            assertEquals(1, flatQueryResultRow.getIdFacthandleMap().size());
+//
+//        }
+//    }
 }
