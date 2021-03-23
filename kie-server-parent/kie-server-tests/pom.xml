@@ -1583,5 +1583,25 @@
    </mirrors>]]></maven.settings.mirror>
       </properties>
     </profile>
+
+    <profile>
+      <id>fuse-on-springboot</id>
+      <activation>
+        <property>
+          <name>fuse.springboot.version</name>
+        </property>
+      </activation>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.redhat-fuse</groupId>
+            <artifactId>fuse-springboot-bom</artifactId>
+            <version>${fuse.springboot.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+    </profile>
   </profiles>
 </project>
