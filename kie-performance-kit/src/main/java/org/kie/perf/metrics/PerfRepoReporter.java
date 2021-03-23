@@ -111,6 +111,9 @@ public class PerfRepoReporter extends ScheduledReporter {
         }
 
         String testUid = tc.getProjectName().toLowerCase().replaceAll(" ", "_") + "_" + tc.getSuite().toLowerCase() + "_" + tc.getScenario().toLowerCase();
+        if (tc.getTestUIDSuffix() != null && !tc.getTestUIDSuffix().isEmpty()) {
+            testUid = testUid + "_" + tc.getTestUIDSuffix();
+        }
 
         TestExecutionBuilder testExecution = TestExecution.builder().testUid(testUid).name(testExecutionName + " - Result").started(new Date());
 
