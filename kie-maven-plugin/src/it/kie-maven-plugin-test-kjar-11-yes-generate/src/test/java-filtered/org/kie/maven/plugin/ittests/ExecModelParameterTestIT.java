@@ -19,6 +19,7 @@ package org.kie.maven.plugin.ittests;
 import java.net.URL;
 
 import org.assertj.core.api.Assertions;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.junit.Test;
@@ -42,6 +43,12 @@ public class ExecModelParameterTestIT {
         KieModule kieModule = fireRule();
         assertNotNull(kieModule);
         assertTrue(kieModule instanceof CanonicalKieModule);
+
+        InternalKieModule internalKieModule = ((CanonicalKieModule) kieModule).getInternalKieModule();
+
+        String modelFileName = CanonicalKieModule.getModelFileWithGAV(internalKieModule.getReleaseId());
+        assertEquals("META-INF/kie/org/kie/" + GAV_ARTIFACT_ID + "/drools-model", modelFileName);
+        assertTrue(internalKieModule.isAvailable(modelFileName));
     }
 
     private KieModule fireRule() throws Exception {

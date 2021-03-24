@@ -23,12 +23,16 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.drools.ancompiler.CompiledNetwork;
 import org.drools.ancompiler.ObjectTypeNodeCompiler;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.reteoo.ObjectSinkPropagator;
 import org.drools.core.reteoo.ObjectTypeNode;
 import org.drools.core.reteoo.Rete;
+import org.drools.modelcompiler.CanonicalKieModule;
 import org.junit.Test;
 import org.kie.api.KieBase;
+import org.kie.api.builder.KieModule;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
@@ -50,6 +54,13 @@ public class AlphaNetworkCompilerTestIT {
         KieSession kSession = null;
         try {
 
+            KieModule kieModule = ((KieContainerImpl)kieContainer).getKieModuleForKBase(KBASE_NAME);
+            InternalKieModule internalKieModule = ((CanonicalKieModule) kieModule).getInternalKieModule();
+
+            String ancFileName = CanonicalKieModule.getANCFile(internalKieModule.getReleaseId());
+            assertEquals("META-INF/kie/org/kie/" + GAV_ARTIFACT_ID + "/alpha-network-compiler", ancFileName);
+            assertTrue(internalKieModule.isAvailable(ancFileName));
+
             kSession = kieBase.newKieSession();
             Assertions.assertThat(kSession).isNotNull();
 
@@ -65,7 +76,6 @@ public class AlphaNetworkCompilerTestIT {
             assertEquals(1, rulesFired);
 
             assertReteIsAlphaNetworkCompiled(kSession);
-
         } finally {
             kSession.dispose();
         }
