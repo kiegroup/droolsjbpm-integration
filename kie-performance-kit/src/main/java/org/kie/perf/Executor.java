@@ -102,20 +102,6 @@ public class Executor {
                 metrics.registerAll(new MemoryUsageGaugeSet(scenario.getClass()));
             } else if (m == Measure.FILEDESCRIPTORS) {
                 metrics.register(MetricRegistry.name(scenario.getClass(), "file.descriptors.usage"), new FileDescriptorRatioGauge());
-                metrics.register(MetricRegistry.name(scenario.getClass(), "file.descriptors.used"), new Gauge<Long>() {
-                    @Override
-                    public Long getValue() {
-                        try {
-                            OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-                            Method method = os.getClass().getDeclaredMethod("getOpenFileDescriptorCount");
-                            method.setAccessible(true);
-                            return (Long) method.invoke(os);
-                        } catch (Exception e) {
-
-                        }
-                        return -1L;
-                    }
-                });
             } else if (m == Measure.THREADSTATES) {
                 metrics.registerAll(new ThreadStatesGaugeSet(scenario.getClass()));
             } else if (m == Measure.CPUUSAGE) {
