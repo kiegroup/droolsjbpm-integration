@@ -49,7 +49,9 @@ public class TestConfig {
     protected String perfRepoUrlPath;
     protected String perfRepoUsername;
     protected String perfRepoPassword;
-    
+
+    protected String testUIDSuffix;
+
     protected String version = Executor.class.getPackage().getImplementationVersion();
 
     protected List<Measure> measure;
@@ -157,6 +159,10 @@ public class TestConfig {
         perfRepoPassword = System.getProperty("perfRepo.password");
         if (perfRepoPassword != null) {
             properties.put("perfRepo.password", perfRepoPassword);
+        }
+        testUIDSuffix = System.getProperty("testUIDSuffix");
+        if (testUIDSuffix != null) {
+            properties.put("testUIDSuffix", testUIDSuffix);
         }
 
         return properties;
@@ -280,6 +286,10 @@ public class TestConfig {
         return perfRepoPassword;
     }
 
+    public String getTestUIDSuffix() {
+        return testUIDSuffix;
+    }
+
     public static enum ReporterType {
         CONSOLE, CSV, CSVSINGLE, PERFREPO
     }
@@ -307,5 +317,4 @@ public class TestConfig {
             return instance;
         }
     }
-
 }
