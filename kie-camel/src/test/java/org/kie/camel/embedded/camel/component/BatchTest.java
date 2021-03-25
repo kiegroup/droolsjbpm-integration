@@ -40,8 +40,10 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.drools.core.common.DisconnectedFactHandle;
 import org.drools.core.common.InternalFactHandle;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
+import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.drools.core.util.StringUtils;
 import org.drools.modelcompiler.ExecutableModelProject;
 import org.jbpm.process.core.context.variable.VariableScope;
@@ -1267,7 +1269,8 @@ public abstract class BatchTest extends CamelTestSupport {
 
             outXml = execContent("testInsertObjectWithDeclaredFactAndQuery.in.2");
 
-            assertXMLEqual(getContent("testInsertObjectWithDeclaredFactAndQuery.expected.1", fh.toExternalForm()), outXml);
+            DisconnectedFactHandle disconnectedFactHandle = FlatQueryResults.newFrom(fh);
+            assertXMLEqual(getContent("testInsertObjectWithDeclaredFactAndQuery.expected.1", disconnectedFactHandle.toExternalForm()), outXml);
         } finally {
             Thread.currentThread().setContextClassLoader(orig);
         }

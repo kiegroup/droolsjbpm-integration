@@ -27,6 +27,9 @@ then
     }
 end
 
+query "query1"
+    $person : Person()
+end
 
 
 
