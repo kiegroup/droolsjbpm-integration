@@ -23,7 +23,7 @@
   <bpmn2:itemDefinition id="__061073B3-7132-4583-8B6E-70495FF36F6D_NotCompletedReassignInputXItem" structureRef="Object"/>
   <bpmn2:itemDefinition id="__061073B3-7132-4583-8B6E-70495FF36F6D_NotStartedNotifyInputXItem" structureRef="Object"/>
   <bpmn2:itemDefinition id="__061073B3-7132-4583-8B6E-70495FF36F6D_NotCompletedNotifyInputXItem" structureRef="Object"/>
-  <bpmn2:process id="definition-project.subprocess2" drools:packageName="com.myspace.subprocess" drools:version="1.0" drools:adHoc="false" name="subprocess" isExecutable="true" processType="Public">
+  <bpmn2:process id="definition-project.subprocess2" drools:packageName="com.myspace.subprocess" drools:version="1.0.1" drools:adHoc="false" name="subprocess2" isExecutable="true" processType="Public">
     <bpmn2:sequenceFlow id="_B8B0AA37-B3B5-410D-BF02-6246070EE005" sourceRef="_061073B3-7132-4583-8B6E-70495FF36F6D" targetRef="_0BFBC9F1-DED7-42AC-A537-ACEF6B456D56"/>
     <bpmn2:sequenceFlow id="_173B0FC8-16C2-4BD5-B534-244758CBC665" sourceRef="_43CFB5DA-5BEB-40A7-811B-E656C6EB07A0" targetRef="_061073B3-7132-4583-8B6E-70495FF36F6D"/>
     <bpmn2:sequenceFlow id="_782749E7-F270-4BE5-BBFA-5B86AE6DC731" sourceRef="_14199733-7830-46B9-9E4B-4DFE865F1FF2" targetRef="_43CFB5DA-5BEB-40A7-811B-E656C6EB07A0"/>

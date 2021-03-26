@@ -7,7 +7,7 @@
   <bpmn2:itemDefinition id="__D3D48EEE-D84F-414C-8E3C-913CA0F8C521_CreatedByInputXItem" structureRef="Object"/>
   <bpmn2:itemDefinition id="__D3D48EEE-D84F-414C-8E3C-913CA0F8C521_TaskNameInputXItem" structureRef="Object"/>
   <bpmn2:itemDefinition id="__D3D48EEE-D84F-414C-8E3C-913CA0F8C521_GroupIdInputXItem" structureRef="Object"/>
-  <bpmn2:process id="definition-project.parentWithNonIndependentSubProcess2" drools:packageName="com.myspace.subprocess" drools:version="1.0" drools:adHoc="false" name="parentWithNonIndependentSubProcess" isExecutable="true">
+  <bpmn2:process id="definition-project.parentWithSubProcesses2" drools:packageName="com.myspace.subprocess" drools:version="1.0.1" drools:adHoc="false" name="parentWithSubProcesses2" isExecutable="true">
     <bpmn2:sequenceFlow id="_4FC40EA7-1854-40EE-ACD2-626C135322BD" sourceRef="_D3D48EEE-D84F-414C-8E3C-913CA0F8C521" targetRef="_13C16741-DF4E-481E-B904-5F98AB7CE884"/>
     <bpmn2:sequenceFlow id="_DA947D60-C6B2-4652-9019-9AD4DF100FC4" sourceRef="_24D0526E-DFDA-41CF-86A7-40992D700F53" targetRef="_1746A62C-D506-425F-996C-FF83BEAEDF55"/>
     <bpmn2:sequenceFlow id="_9F065B3B-9E53-4621-A67B-ED63B4405848" sourceRef="_1746A62C-D506-425F-996C-FF83BEAEDF55" targetRef="_08560F47-632B-4D13-83F3-07995E41598A"/>
@@ -95,7 +95,7 @@
     </bpmn2:parallelGateway>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="_JDwu6xJIEemDeKEPI702PQ">
-    <bpmndi:BPMNPlane id="_JDwu7BJIEemDeKEPI702PQ" bpmnElement="definition-project.parentWithNonIndependentSubProcess2">
+    <bpmndi:BPMNPlane id="_JDwu7BJIEemDeKEPI702PQ" bpmnElement="definition-project.parentWithSubProcesses2">
       <bpmndi:BPMNShape id="shape__B27F63E7-39BD-4738-8D3B-81B336F3F855" bpmnElement="_B27F63E7-39BD-4738-8D3B-81B336F3F855">
         <dc:Bounds height="56.0" width="56.0" x="628.0" y="171.0"/>
       </bpmndi:BPMNShape>
