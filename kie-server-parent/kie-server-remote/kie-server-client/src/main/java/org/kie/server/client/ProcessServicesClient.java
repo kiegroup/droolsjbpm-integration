@@ -57,7 +57,7 @@ public interface ProcessServicesClient {
 
     Long startProcess(String containerId, String processId, Map<String, Object> variables);
 
-    Map<String, Object> startSynchronousProcess(String containerId, String processId, Map<String, Object> variables);
+    Map<String, Object> computeProcessOutcome(String containerId, String processId, Map<String, Object> variables);
 
     Long startProcess(String containerId, String processId, CorrelationKey correlationKey);
 
