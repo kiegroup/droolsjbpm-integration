@@ -656,8 +656,13 @@ public class RuntimeDataServiceBase {
             return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                             convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                             queryContext));
+        } else if (filter.getOwnersQueryParam() != null) {
+            return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                                   convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                                   convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                                   filter.getOwnersQueryParam(),
+                                                                                                                   queryContext));
         } else {
-
             return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                                    convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                                    convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
@@ -672,11 +677,19 @@ public class RuntimeDataServiceBase {
         if (payload != null) {
             filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
         }
-        return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+        if(filter.getOwnersQueryParam() != null) {
+            return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                      convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                      convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                      filter.getOwnersQueryParam(),
+                                                                                                      queryContext));
+        } else {
+            return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                       convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
                                                                                                       convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                       filter.getOwners(),
                                                                                                       queryContext));
+        }
     }
 
 
