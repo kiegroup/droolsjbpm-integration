@@ -93,7 +93,7 @@ import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
-import static org.kie.server.api.rest.RestURI.START_SYNC_PROCESS_POST_URI;
+import static org.kie.server.api.rest.RestURI.COMPUTE_PROCESS_OUTCOME_POST_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
@@ -210,7 +210,7 @@ public class ProcessResource  {
             @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
             @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
     @POST
-    @Path(START_SYNC_PROCESS_POST_URI)
+    @Path(COMPUTE_PROCESS_OUTCOME_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response startSynchronousProcess(@javax.ws.rs.core.Context HttpHeaders headers, 
@@ -224,7 +224,7 @@ public class ProcessResource  {
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         
         try {
-            String response = processServiceBase.startSynchronousProcess(containerId, processId, payload, type);
+            String response = processServiceBase.computeProcessOutcome(containerId, processId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);

@@ -136,8 +136,8 @@ public class StartProcessServiceIntegrationTest extends JbpmKieServerBaseIntegra
     }
 
     @Test()
-    public void testStartSyncProcess() {
-        Map<String, Object> outcome = processClient.startSynchronousProcess(CONTAINER_ID_RESTART, PROCESS_SYNC_ID, Collections.singletonMap("name", "hello"));
+    public void testComputeProcessOutcome() {
+        Map<String, Object> outcome = processClient.computeProcessOutcome(CONTAINER_ID_RESTART, PROCESS_SYNC_ID, Collections.singletonMap("name", "hello"));
         assertNotNull(outcome);
         assertEquals("bye", outcome.get("name"));
 
