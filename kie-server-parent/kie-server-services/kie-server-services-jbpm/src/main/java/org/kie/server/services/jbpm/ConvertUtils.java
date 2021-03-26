@@ -577,6 +577,7 @@ public class ConvertUtils {
             ProcessInstanceUserTaskWithVariables var = new ProcessInstanceUserTaskWithVariables();
             var.setId(desc.getTaskId());
             var.setName(desc.getName());
+            var.setDescription(desc.getDescription());
             var.setCorrelationKey(desc.getCorrelationKey());
             var.setActualOwner(desc.getActualOwner());
             var.setProcessDefinitionId(desc.getProcessId());
