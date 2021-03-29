@@ -98,6 +98,7 @@
     <module>kie-server-integ-tests-dmn-pmml</module>
     <module>kie-server-integ-tests-dmn-pmml-trusty</module>
     <module>kie-server-integ-tests-pmml</module>
+    <module>kie-server-integ-tests-pmml-legacy</module>
   </modules>
 
   <dependencyManagement>
