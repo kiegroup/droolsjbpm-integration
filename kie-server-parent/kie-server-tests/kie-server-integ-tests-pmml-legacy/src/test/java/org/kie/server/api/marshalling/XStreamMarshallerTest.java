@@ -56,82 +56,85 @@ public class XStreamMarshallerTest {
 
     @Test
     public void testPMMLLegacyResult() {
-        System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
-        System.out.println(System.getProperties().keySet());
-        PMML4ExecutionHelper helper = PMML4ExecutionHelperFactory.getExecutionHelper("Sample Score",
-                                                                                     ResourceFactory.newClassPathResource("test_scorecard.pmml"),
-                                                                                     null);
-        PMMLRequestData request = new PMMLRequestDataBuilder("123", "Sample Score")
-                                                                                   .addParameter("age", 33.0, Double.class)
-                                                                                   .addParameter("occupation", "SKYDIVER", String.class)
-                                                                                   .addParameter("residenceState", "KN", String.class)
-                                                                                   .addParameter("validLicense", true, Boolean.class)
-                                                                                   .build();
-        helper.addPossiblePackageName("org.drools.scorecards.example");
-        PMML4Result resultHolder = helper.submitRequest(request);
-        KieBase kb = helper.getKbase();
-        KieServices ks = KieServices.Factory.get();
-        KieRepository repo = ks.getRepository();
-        ReleaseId relid = ((InternalKnowledgeBase) kb).getResolvedReleaseId();
-        KieModule m = repo.getKieModule(relid);
-
-        KieMavenRepository kmp = KieMavenRepository.getKieMavenRepository();
-        String pomFileName = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "pom.xml";
-        try (FileOutputStream fos = new FileOutputStream(pomFileName)) {
-            ByteArrayInputStream bais = (ByteArrayInputStream) ((MemoryKieModule) m).getMemoryFileSystem().getFile("META-INF/maven/org.default/artifact/pom.xml").getContents();
-            int readVal;
-            do {
-                readVal = bais.read();
-                if (readVal >= 0) {
-                    fos.write(readVal);
-                }
-            } while (readVal >= 0);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            fail();
-        }
-        File pomFile = new File(pomFileName);
-        kmp.installArtifact(relid, (InternalKieModule) m, pomFile);
-
-        Set<Class<?>> extraClasses = new HashSet<>();
-        ClassLoader clParent = this.getClass().getClassLoader();
-        URL urls[] = new URL[1];
         try {
-            File f = kmp.resolveArtifact(relid).getFile();
-            urls[0] = f.toURI().toURL();
-        } catch (MalformedURLException mux) {
+            System.setProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
+            System.out.println(System.getProperties().keySet());
+            PMML4ExecutionHelper helper = PMML4ExecutionHelperFactory.getExecutionHelper("Sample Score",
+                                                                                         ResourceFactory.newClassPathResource("test_scorecard.pmml"),
+                                                                                         null);
+            PMMLRequestData request = new PMMLRequestDataBuilder("123", "Sample Score")
+                    .addParameter("age", 33.0, Double.class)
+                    .addParameter("occupation", "SKYDIVER", String.class)
+                    .addParameter("residenceState", "KN", String.class)
+                    .addParameter("validLicense", true, Boolean.class)
+                    .build();
+            helper.addPossiblePackageName("org.drools.scorecards.example");
+            PMML4Result resultHolder = helper.submitRequest(request);
+            KieBase kb = helper.getKbase();
+            KieServices ks = KieServices.Factory.get();
+            KieRepository repo = ks.getRepository();
+            ReleaseId relid = ((InternalKnowledgeBase) kb).getResolvedReleaseId();
+            KieModule m = repo.getKieModule(relid);
 
+            KieMavenRepository kmp = KieMavenRepository.getKieMavenRepository();
+            String pomFileName = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "pom.xml";
+            try (FileOutputStream fos = new FileOutputStream(pomFileName)) {
+                ByteArrayInputStream bais = (ByteArrayInputStream) ((MemoryKieModule) m).getMemoryFileSystem().getFile("META-INF/maven/org.default/artifact/pom.xml").getContents();
+                int readVal;
+                do {
+                    readVal = bais.read();
+                    if (readVal >= 0) {
+                        fos.write(readVal);
+                    }
+                } while (readVal >= 0);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                fail();
+            }
+            File pomFile = new File(pomFileName);
+            kmp.installArtifact(relid, (InternalKieModule) m, pomFile);
+
+            Set<Class<?>> extraClasses = new HashSet<>();
+            ClassLoader clParent = this.getClass().getClassLoader();
+            URL urls[] = new URL[1];
+            try {
+                File f = kmp.resolveArtifact(relid).getFile();
+                urls[0] = f.toURI().toURL();
+            } catch (MalformedURLException mux) {
+
+            }
+            ClassLoader clToUse = new KieURLClassLoader(urls, clParent);
+
+            Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.XSTREAM, clToUse);
+            String marshalled = marshaller.marshall(resultHolder);
+            System.out.println(marshalled);
+
+            PMML4Result result = marshaller.unmarshall(marshalled, PMML4Result.class);
+            Object o = result.getResultValue("CalculatedScore", null);
+            Object o1 = result.getResultValue("CalculatedScore", "value");
+
+            o = result.getResultValue("ScoreCard", null);
+            assertNotNull(o);
+            o1 = result.getResultValue("ScoreCard", "ranking");
+            assertNotNull(o1);
+            assertTrue(LinkedHashMap.class.isAssignableFrom(o1.getClass()));
+            @SuppressWarnings("rawtypes")
+            LinkedHashMap map = (LinkedHashMap) o1;
+            assertTrue(map.containsKey("LX00"));
+            assertTrue(map.containsKey("RES"));
+            assertTrue(map.containsKey("CX2"));
+            assertEquals(-1.0, map.get("LX00"));
+            assertEquals(-10.0, map.get("RES"));
+            assertEquals(-30.0, map.get("CX2"));
+            @SuppressWarnings("rawtypes")
+            Iterator iter = map.keySet().iterator();
+            assertEquals("LX00", iter.next());
+            assertEquals("RES", iter.next());
+            assertEquals("CX2", iter.next());
+        } finally {
+            System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
         }
-        ClassLoader clToUse = new KieURLClassLoader(urls, clParent);
-
-        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.XSTREAM, clToUse);
-        String marshalled = marshaller.marshall(resultHolder);
-        System.out.println(marshalled);
-
-        PMML4Result result = marshaller.unmarshall(marshalled, PMML4Result.class);
-        Object o = result.getResultValue("CalculatedScore", null);
-        Object o1 = result.getResultValue("CalculatedScore", "value");
-
-        o = result.getResultValue("ScoreCard", null);
-        assertNotNull(o);
-        o1 = result.getResultValue("ScoreCard", "ranking");
-        assertNotNull(o1);
-        assertTrue(LinkedHashMap.class.isAssignableFrom(o1.getClass()));
-        @SuppressWarnings("rawtypes")
-        LinkedHashMap map = (LinkedHashMap) o1;
-        assertTrue(map.containsKey("LX00"));
-        assertTrue(map.containsKey("RES"));
-        assertTrue(map.containsKey("CX2"));
-        assertEquals(-1.0, map.get("LX00"));
-        assertEquals(-10.0, map.get("RES"));
-        assertEquals(-30.0, map.get("CX2"));
-        @SuppressWarnings("rawtypes")
-        Iterator iter = map.keySet().iterator();
-        assertEquals("LX00", iter.next());
-        assertEquals("RES", iter.next());
-        assertEquals("CX2", iter.next());
-        System.clearProperty(KIE_PMML_IMPLEMENTATION.getName());
     }
 
 }
