@@ -16,12 +16,6 @@
 
 package org.kie.server.api.marshalling;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,30 +23,13 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Set;
 
 import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter.UnknownFieldException;
 import org.assertj.core.api.Assertions;
-import org.drools.compiler.kie.builder.impl.InternalKieModule;
-import org.drools.compiler.kie.builder.impl.MemoryKieModule;
-import org.drools.core.impl.InternalKnowledgeBase;
 import org.junit.Test;
-import org.kie.api.KieBase;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieModule;
-import org.kie.api.builder.KieRepository;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.pmml.PMML4Result;
 import org.kie.api.pmml.PMMLRequestData;
 import org.kie.api.pmml.ParameterInfo;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.pmml.pmml_4_2.PMML4ExecutionHelper;
-import org.kie.pmml.pmml_4_2.PMML4ExecutionHelper.PMML4ExecutionHelperFactory;
-import org.kie.pmml.pmml_4_2.PMMLRequestDataBuilder;
-import org.kie.scanner.KieMavenRepository;
-import org.kie.scanner.KieURLClassLoader;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.marshalling.objects.AnotherMessage;
 import org.kie.server.api.marshalling.objects.DateObject;
@@ -63,10 +40,6 @@ import org.kie.server.api.model.KieContainerResourceFilter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.kie.api.pmml.PMMLConstants.KIE_PMML_IMPLEMENTATION;
-import static org.kie.api.pmml.PMMLConstants.LEGACY;
 
 public class XStreamMarshallerTest {
 
