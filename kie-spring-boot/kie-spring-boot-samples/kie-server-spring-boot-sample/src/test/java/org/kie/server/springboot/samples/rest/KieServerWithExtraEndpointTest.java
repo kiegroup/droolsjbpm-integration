@@ -49,7 +49,7 @@ public class KieServerWithExtraEndpointTest {
         KieServerHttpRequest httpRequest =
                 KieServerHttpRequest.newRequest(extraEndpoint, user, password)
                 .followRedirects(true)
-                .timeout(1000)
+                .timeout(5000)
                 .contentType("application/json")
                 .accept("application/json");
         httpRequest.get();
