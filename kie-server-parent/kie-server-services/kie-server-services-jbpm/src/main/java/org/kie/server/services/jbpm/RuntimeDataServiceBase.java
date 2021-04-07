@@ -660,7 +660,7 @@ public class RuntimeDataServiceBase {
             return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                                    convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                                    convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                                   filter.getOwnersQueryParam(),
+                                                                                                                   convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
                                                                                                                    queryContext));
         } else {
             return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
@@ -681,7 +681,7 @@ public class RuntimeDataServiceBase {
             return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                       convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
                                                                                                       convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                      filter.getOwnersQueryParam(),
+                                                                                                      convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
                                                                                                       queryContext));
         } else {
             return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
