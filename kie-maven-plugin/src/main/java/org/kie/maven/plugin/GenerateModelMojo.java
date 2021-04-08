@@ -246,7 +246,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
         public static class ExecutableModelMavenPluginKieProject extends CanonicalModelKieProject {
 
             public ExecutableModelMavenPluginKieProject(InternalKieModule kieModule, ClassLoader classLoader) {
-                super(true, kieModule, classLoader);
+                super(kieModule, classLoader);
             }
 
             @Override
