@@ -58,7 +58,7 @@ public class QueryDataServiceBaseTest {
         List<UserTaskInstanceWithPotOwnerDesc> result = new ArrayList<UserTaskInstanceWithPotOwnerDesc>();
         UserTaskInstanceWithPotOwnerDesc resultPO = new org.jbpm.kie.services.impl.model.UserTaskInstanceWithPotOwnerDesc(
                 "mcivantos", "mcivantos", today, today,
-                Long.valueOf(1), "test-task", 0,
+                Long.valueOf(1), "test-task", "task description", 0,
                 Long.valueOf(1), "processId", "Reserved",
                 "salaboy", "formName", "correlation-123",
                 "subject", "container-1","processDescription");
