@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- origin at X=0.0 Y=0.0 -->
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmn20="http://www.omg.org/bpmn20" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools" xmlns:java="http://www.java.com/javaTypes" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="_GgtfMItEEeiO7cOOapYI8w" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.5.2.SNAPSHOT-v20200602-1600-B1" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.omg.org/bpmn20" typeLanguage="http://www.java.com/javaTypes">
+  <bpmn2:itemDefinition id="_requestFlightItem" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.FlightRequest"/>
+  <bpmn2:itemDefinition id="_resultFlightItem" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.Flight"/>
+  <bpmn2:itemDefinition id="_memFlightItem" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.Flight"/>
+  <bpmn2:itemDefinition id="_serviceUrlItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ParameterInputXItem" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.FlightRequest"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_NamespaceInputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ModeInputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_UrlInputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_InterfaceInputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_OperationInputXItem" isCollection="false" structureRef="String"/>
+  <bpmn2:itemDefinition id="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputXItem" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.Flight"/>
+  <bpmn2:itemDefinition id="ItemDefinition_181" isCollection="false" structureRef="java.lang.Boolean"/>
+  <bpmn2:itemDefinition id="ItemDefinition_1237" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.ListAvailablePlanes"/>
+  <bpmn2:itemDefinition id="ItemDefinition_2084" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.ListAvailablePlanesResponse"/>
+  <bpmn2:itemDefinition id="ItemDefinition_8" isCollection="false" structureRef="java.lang.String"/>
+  <bpmn2:process id="org.specialtripsagency.travelAgencyWrappedParamsProcess" drools:packageName="org.specialtripsagency" drools:version="1.0" name="travelAgencyWrappedParamsProcess" isExecutable="true">
+    <bpmn2:property id="serviceUrl" itemSubjectRef="_serviceUrlItem" name="serviceUrl"/>
+    <bpmn2:property id="requestFlight" itemSubjectRef="_requestFlightItem" name="requestFlight"/>
+    <bpmn2:property id="resultFlight" itemSubjectRef="_resultFlightItem" name="resultFlight"/>
+    <bpmn2:property id="memFlight" itemSubjectRef="_memFlightItem" name="memFlight"/>
+    <bpmn2:property id="listPlanes" itemSubjectRef="ItemDefinition_1237" name="listPlanes"/>
+    <bpmn2:property id="listResponse" itemSubjectRef="ItemDefinition_2084" name="listResponse"/>
+    <bpmn2:property id="ratePerPerson" itemSubjectRef="ItemDefinition_8" name="ratePerPerson"/>
+    <bpmn2:startEvent id="_553B4C08-C4D4-4337-86A7-274F96A12773" drools:selectable="true" color:background-color="#99CC00" color:border-color="#000000" color:color="#000000" name="Start">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[Start]]></drools:metaValue>
+        </drools:metaData>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>_F62E19E4-6F3B-45FB-8B6B-730D10233A9E</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:scriptTask id="_3FD70F6B-AD40-4887-A3BA-B02C5093B685" drools:selectable="true" color:background-color="#99CC00" color:border-color="#000000" color:color="#000000" name="Prepare Web Service Data" scriptFormat="http://www.java.com/java">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[Prepare Web Service Data]]></drools:metaValue>
+        </drools:metaData>
+        <drools:onEntry-script scriptFormat="http://www.java.com/java">
+          <drools:script>System.out.println(&quot;[Prepare Data Script - Before] Before Prepare Data Script&quot;);
+</drools:script>
+        </drools:onEntry-script>
+        <drools:onExit-script scriptFormat="http://www.java.com/java">
+          <drools:script>System.out.println(&quot;[Prepare Data Script - After] After Prepare Data Script&quot;);
+</drools:script>
+        </drools:onExit-script>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>_F62E19E4-6F3B-45FB-8B6B-730D10233A9E</bpmn2:incoming>
+      <bpmn2:outgoing>_492148F7-AB4F-4064-A972-AAAAF2B0D5A0</bpmn2:outgoing>
+      <bpmn2:script>System.out.println(&quot;Entering &quot; + kcontext.getNodeInstance().getNodeName() +&quot; Node&quot;);
+
+/* Setting WS variables */
+
+com.jboss.soap.service.acmedemo.FlightRequest _flightReq = new com.jboss.soap.service.acmedemo.FlightRequest();
+_flightReq.setStartCity(&quot;Paris&quot;);
+_flightReq.setEndCity(&quot;Berlin&quot;);
+_flightReq.setStartDate(&quot;10-10-2018&quot;);
+_flightReq.setEndDate(&quot;10-11-2018&quot;);
+/*kcontext.setVariable(&quot;requestFlight&quot;, _flightReq);*/
+com.jboss.soap.service.acmedemo.ListAvailablePlanes _listPlanes = new com.jboss.soap.service.acmedemo.ListAvailablePlanes();
+_listPlanes.setIn(_flightReq);
+kcontext.setVariable(&quot;listPlanes&quot;, _listPlanes);
+System.out.println(&quot;Completed setting WS variables for both. moving on now!!.....&quot;);
+/* end WS variables */
+
+System.out.println(&quot;Leaving &quot; + kcontext.getNodeInstance().getNodeName() +&quot; Node&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:sequenceFlow id="_F62E19E4-6F3B-45FB-8B6B-730D10233A9E" drools:selectable="true" color:background-color="#000000" color:border-color="#000000" color:color="#000000" sourceRef="_553B4C08-C4D4-4337-86A7-274F96A12773" targetRef="_3FD70F6B-AD40-4887-A3BA-B02C5093B685"/>
+    <bpmn2:task id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F" drools:selectable="true" drools:taskName="WebService" color:background-color="#00FFFF" color:border-color="#000000" color:color="#000000" name="Flight Web Service">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[Flight Web Service]]></drools:metaValue>
+        </drools:metaData>
+        <drools:onEntry-script scriptFormat="http://www.java.com/java">
+          <drools:script>System.out.println(&quot;Entering &quot; + kcontext.getNodeInstance().getNodeName() +&quot; Node&quot;);
+</drools:script>
+        </drools:onEntry-script>
+        <drools:onExit-script scriptFormat="http://www.java.com/java">
+          <drools:script>kcontext.setVariable(&quot;ratePerPerson&quot;,listResponse.getReturn().getRatePerPerson().toString());
+System.out.println(&quot;[Flight Web Service Task] YOU will be flying soon..YIPEEE.....your rate: &quot; + listResponse.getReturn().getRatePerPerson()); 
+kcontext.setVariable(&quot;listPlanes&quot;, null);
+kcontext.setVariable(&quot;listResponse&quot;, null);
+System.out.println(&quot;Leaving &quot; + kcontext.getNodeInstance().getNodeName() +&quot; Node&quot;);
+
+</drools:script>
+        </drools:onExit-script>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>_492148F7-AB4F-4064-A972-AAAAF2B0D5A0</bpmn2:incoming>
+      <bpmn2:outgoing>_E0F59797-6B00-4B4C-9E74-04FBCD671914</bpmn2:outgoing>
+      <bpmn2:ioSpecification id="_GgtfMYtEEeiO7cOOapYI8w">
+        <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputXItem" name="TaskName"/>
+        <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ParameterInputX" drools:dtype="com.jboss.soap.service.acmedemo.ListAvailablePlanes" itemSubjectRef="ItemDefinition_1237" name="Parameter"/>
+        <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_NamespaceInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_NamespaceInputXItem" name="Namespace"/>
+        <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ModeInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ModeInputXItem" name="Mode"/>
+        <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_UrlInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_UrlInputXItem" name="Url"/>
+        <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_InterfaceInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_InterfaceInputXItem" name="Interface"/>
+        <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_OperationInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_OperationInputXItem" name="Operation"/>
+        <bpmn2:dataInput id="DataInput_1" itemSubjectRef="ItemDefinition_181" name="Wrapped"/>
+        <bpmn2:dataOutput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputX" drools:dtype="com.jboss.soap.service.acmedemo.ListAvailablePlanesResponse" itemSubjectRef="ItemDefinition_2084" name="Result"/>
+        <bpmn2:inputSet id="_GgtfMotEEeiO7cOOapYI8w">
+          <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ParameterInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_NamespaceInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ModeInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_UrlInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_InterfaceInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_OperationInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputX</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>DataInput_1</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet id="_GgtfM4tEEeiO7cOOapYI8w">
+          <bpmn2:dataOutputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputX</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation id="_GgtfNItEEeiO7cOOapYI8w">
+        <bpmn2:targetRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_GgtfNYtEEeiO7cOOapYI8w">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_GgtfNotEEeiO7cOOapYI8w"><![CDATA[WebService]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_GgtfN4tEEeiO7cOOapYI8w">_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_GgtfOItEEeiO7cOOapYI8w">
+        <bpmn2:sourceRef>listPlanes</bpmn2:sourceRef>
+        <bpmn2:targetRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ParameterInputX</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_GgtfOYtEEeiO7cOOapYI8w">
+        <bpmn2:targetRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_NamespaceInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_GgtfOotEEeiO7cOOapYI8w">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_GgtfO4tEEeiO7cOOapYI8w"><![CDATA[http://service.soap.jboss.com/AcmeDemo/]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_GgtfPItEEeiO7cOOapYI8w">_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_NamespaceInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_GgtfPYtEEeiO7cOOapYI8w">
+        <bpmn2:targetRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ModeInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_GgtfPotEEeiO7cOOapYI8w">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_GgtfP4tEEeiO7cOOapYI8w"><![CDATA[SYNC]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_GgtfQItEEeiO7cOOapYI8w">_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ModeInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_GgtfQYtEEeiO7cOOapYI8w">
+        <bpmn2:targetRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_UrlInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_GgtfQotEEeiO7cOOapYI8w">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_GgtfQ4tEEeiO7cOOapYI8w"><![CDATA[#{serviceUrl}]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_GgtfRItEEeiO7cOOapYI8w">_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_UrlInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_GgtfRYtEEeiO7cOOapYI8w">
+        <bpmn2:targetRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_InterfaceInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_GgtfRotEEeiO7cOOapYI8w">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_GgtfR4tEEeiO7cOOapYI8w"><![CDATA[AcmeDemoService]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_GgtfSItEEeiO7cOOapYI8w">_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_InterfaceInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="_GgtfSYtEEeiO7cOOapYI8w">
+        <bpmn2:targetRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_OperationInputX</bpmn2:targetRef>
+        <bpmn2:assignment id="_GgtfSotEEeiO7cOOapYI8w">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_GgtfS4tEEeiO7cOOapYI8w"><![CDATA[listAvailablePlanes]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_GgtfTItEEeiO7cOOapYI8w">_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_OperationInputX</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="DataInputAssociation_1">
+        <bpmn2:targetRef>DataInput_1</bpmn2:targetRef>
+        <bpmn2:assignment id="Assignment_1">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_3">true</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="FormalExpression_1">DataInput_1</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataOutputAssociation id="_GgtfTYtEEeiO7cOOapYI8w">
+        <bpmn2:sourceRef>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputX</bpmn2:sourceRef>
+        <bpmn2:targetRef>listResponse</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="_492148F7-AB4F-4064-A972-AAAAF2B0D5A0" drools:selectable="true" color:background-color="#000000" color:border-color="#000000" color:color="#000000" sourceRef="_3FD70F6B-AD40-4887-A3BA-B02C5093B685" targetRef="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F"/>
+    <bpmn2:endEvent id="_F96CBCA0-9371-42DC-9BEB-56AA9A12F443" drools:selectable="true" color:background-color="#ff6347" color:border-color="#000000" color:color="#000000" name="">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[]]></drools:metaValue>
+        </drools:metaData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>_E0F59797-6B00-4B4C-9E74-04FBCD671914</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="_E0F59797-6B00-4B4C-9E74-04FBCD671914" drools:selectable="true" color:background-color="#000000" color:border-color="#000000" color:color="#000000" sourceRef="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F" targetRef="_F96CBCA0-9371-42DC-9BEB-56AA9A12F443"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="_GgtfTotEEeiO7cOOapYI8w">
+    <bpmndi:BPMNPlane id="_GgtfT4tEEeiO7cOOapYI8w" bpmnElement="org.specialtripsagency.travelAgencyWrappedParamsProcess">
+      <bpmndi:BPMNShape id="_GgtfUItEEeiO7cOOapYI8w" bpmnElement="_553B4C08-C4D4-4337-86A7-274F96A12773">
+        <dc:Bounds height="30.0" width="30.0" x="15.0" y="133.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1">
+          <dc:Bounds height="18.0" width="31.0" x="15.0" y="163.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_GgtfUYtEEeiO7cOOapYI8w" bpmnElement="_3FD70F6B-AD40-4887-A3BA-B02C5093B685">
+        <dc:Bounds height="80.0" width="100.0" x="120.0" y="105.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2">
+          <dc:Bounds height="36.0" width="98.0" x="121.0" y="127.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_GgtfUotEEeiO7cOOapYI8w" bpmnElement="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F">
+        <dc:Bounds height="80.0" width="100.0" x="285.0" y="110.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3">
+          <dc:Bounds height="36.0" width="81.0" x="294.0" y="132.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_GgtfU4tEEeiO7cOOapYI8w" bpmnElement="_F96CBCA0-9371-42DC-9BEB-56AA9A12F443">
+        <dc:Bounds height="28.0" width="28.0" x="465.0" y="136.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="_GgtfVItEEeiO7cOOapYI8w" bpmnElement="_F62E19E4-6F3B-45FB-8B6B-730D10233A9E" sourceElement="_GgtfUItEEeiO7cOOapYI8w" targetElement="_GgtfUYtEEeiO7cOOapYI8w">
+        <di:waypoint xsi:type="dc:Point" x="30.0" y="148.0"/>
+        <di:waypoint xsi:type="dc:Point" x="170.0" y="145.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_5"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="_GgtfVYtEEeiO7cOOapYI8w" bpmnElement="_492148F7-AB4F-4064-A972-AAAAF2B0D5A0" sourceElement="_GgtfUYtEEeiO7cOOapYI8w" targetElement="_GgtfUotEEeiO7cOOapYI8w">
+        <di:waypoint xsi:type="dc:Point" x="170.0" y="145.0"/>
+        <di:waypoint xsi:type="dc:Point" x="335.0" y="150.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_6"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="_GgtfVotEEeiO7cOOapYI8w" bpmnElement="_E0F59797-6B00-4B4C-9E74-04FBCD671914" sourceElement="_GgtfUotEEeiO7cOOapYI8w" targetElement="_GgtfU4tEEeiO7cOOapYI8w">
+        <di:waypoint xsi:type="dc:Point" x="335.0" y="150.0"/>
+        <di:waypoint xsi:type="dc:Point" x="479.0" y="150.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_7"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
