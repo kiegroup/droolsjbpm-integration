@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,31 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.kie.api.KieServices;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.integrationtests.category.JEEOnly;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 @Category({JEEOnly.class})
-public class WebServiceIntegrationTest extends WebServiceBase {
+public class WebServiceWrappedParamsIntegrationTest extends WebServiceBase {
 
-    protected static final String PROCESS_ID_WS = "org.specialtripsagency.specialtripsagencyprocess";
+    protected static final String PROCESS_ID_WRAPPED_WS = "org.specialtripsagency.travelAgencyWrappedParamsProcess";
 
     @Test
-    public void testCallWebServiceFromProcess() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("serviceUrl", TestConfig.getWebServiceHttpURL());
-        Long pid = processClient.startProcess(WS_CONTAINER_ID, PROCESS_ID_WS, params);
-
-        assertThat(pid).isNotNull();
-        ProcessInstance pi = queryClient.findProcessInstanceById(pid);
-        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
-
+    public void testCallWebServiceWrappedParams() {
+        Map<String, Object> inputParams = new HashMap<>();
+        inputParams.put("serviceUrl", TestConfig.getWebServiceHttpURL());
+        Map<String, Object> outputParams = processClient.computeProcessOutcome(WS_CONTAINER_ID, PROCESS_ID_WRAPPED_WS, inputParams);
+        assertEquals("525", outputParams.get("ratePerPerson"));
     }
-
 }
