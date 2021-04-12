@@ -34,6 +34,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.KieServicesClient;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -55,10 +57,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-test.properties")
+@DirtiesContext(classMode= AFTER_CLASS)
 public class KieServerMigrationTest {
     
     private static final Logger logger = LoggerFactory.getLogger(KieServerMigrationTest.class);
@@ -122,8 +126,12 @@ public class KieServerMigrationTest {
     
     @After
     public void cleanup() {
-        kieServicesClient.disposeContainer(containerId);
-        kieServicesClient.disposeContainer(containerId2); 
+        if (kieServicesClient != null) {
+            ServiceResponse<Void> response = kieServicesClient.disposeContainer(containerId);
+            logger.info("Container {} disposed with response - {}", containerId, response.getMsg());
+            response = kieServicesClient.disposeContainer(containerId2);
+            logger.info("Container {} disposed with response - {}", containerId2, response.getMsg());
+        }
     }
     
     @Test

@@ -11,15 +11,18 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-task-assigning-test.properties")
+@DirtiesContext(classMode= AFTER_CLASS)
 public class TaskAssigningKieServerTest {
 
     private static final String TASK_ASSIGNING_RUNTIME = "TaskAssigningRuntime";

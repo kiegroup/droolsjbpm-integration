@@ -19,6 +19,7 @@ package org.kie.server.springboot.samples;
 import static org.appformer.maven.integration.MavenRepository.getMavenRepository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,17 +52,23 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.springboot.samples.listeners.SampleAgendaEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-rules.properties")
+@DirtiesContext(classMode= AFTER_CLASS)
 public class RulesOnlyKieServerTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(RulesOnlyKieServerTest.class);
     
     static final String ARTIFACT_ID = "rules";
     static final String GROUP_ID = "org.jbpm.test";
@@ -108,7 +115,10 @@ public class RulesOnlyKieServerTest {
     
     @After
     public void cleanup() {
-        kieServicesClient.disposeContainer(containerId);       
+        if (kieServicesClient != null) {
+            ServiceResponse<Void> response = kieServicesClient.disposeContainer(containerId);
+            logger.info("Container {} disposed with response - {}", containerId, response.getMsg());
+        }
     }
   
     @Test

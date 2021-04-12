@@ -35,6 +35,7 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerMode;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
@@ -51,12 +52,15 @@ import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.prometheus.PrometheusKieServerExtension;
 import org.kie.server.services.scenariosimulation.ScenarioSimulationKieServerExtension;
 import org.kie.server.springboot.jbpm.ContainerAliasResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -66,11 +70,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-test.properties")
+@DirtiesContext(classMode= AFTER_CLASS)
 public class KieServerTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerTest.class);
 
     static final String ARTIFACT_ID = "evaluation";
     static final String GROUP_ID = "org.jbpm.test";
@@ -130,7 +138,8 @@ public class KieServerTest {
     @After
     public void cleanup() {
         if (kieServicesClient != null) {
-            kieServicesClient.disposeContainer(containerId);
+            ServiceResponse<Void> response = kieServicesClient.disposeContainer(containerId);
+            logger.info("Container {} disposed with response - {}", containerId, response.getMsg());
         }
     }
 
