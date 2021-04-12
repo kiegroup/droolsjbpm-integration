@@ -110,6 +110,7 @@ public class ScenarioSimulationIntegrationTest
                      ruleResponseFail.getResult().getFailures().get(0).getErrorMessage());
     }
 
+
     private static String loadResource(String path) throws IOException {
         return Files.lines(
                 loadPathFromResource(path),
