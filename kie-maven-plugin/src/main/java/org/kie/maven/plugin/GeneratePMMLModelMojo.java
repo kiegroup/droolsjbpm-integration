@@ -208,7 +208,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         final List<GeneratedFile> toReturn = new ArrayList<>();
         try (Stream<Path> stream = Files
                 .walk(resourceDirectory.toPath(), Integer.MAX_VALUE)
-                .filter(path -> path.toString().endsWith(PMML))) {
+                .filter(path -> path.toFile().isFile() && path.toString().endsWith(PMML))) {
             return stream
                     .map(Path::toFile)
                     .map(FileSystemResource::new)
