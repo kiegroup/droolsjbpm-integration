@@ -20,12 +20,13 @@ import java.util.function.Supplier;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.jbpm.bpmn2.handler.SendTaskHandler;
+import org.jbpm.runtime.manager.impl.SimpleRegisterableItemsFactory;
 import org.jbpm.services.api.DeploymentEvent;
 import org.kie.api.event.process.DefaultProcessEventListener;
 import org.kie.api.event.process.MessageEvent;
 import org.kie.api.event.process.SignalEvent;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.internal.runtime.manager.InternalRegisterableItemsFactory;
 import org.kie.internal.runtime.manager.InternalRuntimeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,10 +95,13 @@ class KafkaServerProducer extends DefaultProcessEventListener {
     private void logError(Object value, Exception e) {
         logger.error("Error publishing event {}", value, e);
     }
-
+    
+    
     public void activate(DeploymentEvent event) {
-        ((InternalRegisterableItemsFactory) ((InternalRuntimeManager) event.getDeployedUnit().getRuntimeManager())
-                .getEnvironment().getRegisterableItemsFactory()).addProcessListener(this);
+        SimpleRegisterableItemsFactory itemsFactory = (SimpleRegisterableItemsFactory) ((InternalRuntimeManager) event
+                .getDeployedUnit().getRuntimeManager()).getEnvironment().getRegisterableItemsFactory();
+        itemsFactory.addWorkItemHandler("Send Task", SendTaskHandler.class);
+        itemsFactory.addProcessListener(this);
     }
 
     public void deactivate(DeploymentEvent event) {
