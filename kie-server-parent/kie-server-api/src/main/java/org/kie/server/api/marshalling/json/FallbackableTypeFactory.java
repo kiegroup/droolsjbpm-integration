@@ -22,11 +22,11 @@ import com.fasterxml.jackson.databind.type.TypeModifier;
 import com.fasterxml.jackson.databind.type.TypeParser;
 import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import com.fasterxml.jackson.databind.util.ClassUtil;
-import com.fasterxml.jackson.databind.util.LRUMap;
+import com.fasterxml.jackson.databind.util.LookupCache;
 
 public class FallbackableTypeFactory extends TypeFactory {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     protected final transient ClassLoader fallbackClassLoader;
 
@@ -37,18 +37,18 @@ public class FallbackableTypeFactory extends TypeFactory {
         this.fallbackClassLoader = null;
     }
 
-    protected FallbackableTypeFactory(LRUMap<Object, JavaType> typeCache) {
+    protected FallbackableTypeFactory(LookupCache<Object, JavaType> typeCache) {
         super(typeCache);
         this.fallbackClassLoader = null;
     }
 
-    protected FallbackableTypeFactory(LRUMap<Object, JavaType> typeCache, TypeParser p,
+    protected FallbackableTypeFactory(LookupCache<Object, JavaType> typeCache, TypeParser p,
                                       TypeModifier[] mods, ClassLoader classLoader) {
         super(typeCache, p, mods, classLoader);
         this.fallbackClassLoader = null;
     }
 
-    protected FallbackableTypeFactory(LRUMap<Object, JavaType> typeCache, TypeParser p,
+    protected FallbackableTypeFactory(LookupCache<Object, JavaType> typeCache, TypeParser p,
                                       TypeModifier[] mods, ClassLoader classLoader, ClassLoader fallbackClassLoader) {
         super(typeCache, p, mods, classLoader);
         this.fallbackClassLoader = fallbackClassLoader;
@@ -69,7 +69,7 @@ public class FallbackableTypeFactory extends TypeFactory {
      */
     @Override
     public FallbackableTypeFactory withModifier(TypeModifier mod) {
-        LRUMap<Object, JavaType> typeCache = _typeCache;
+        LookupCache<Object, JavaType> typeCache = _typeCache;
         TypeModifier[] mods;
         if (mod == null) { // mostly for unit tests
             mods = null;
@@ -105,7 +105,7 @@ public class FallbackableTypeFactory extends TypeFactory {
      * @since 2.8
      */
     @Override
-    public FallbackableTypeFactory withCache(LRUMap<Object, JavaType> cache) {
+    public FallbackableTypeFactory withCache(LookupCache<Object, JavaType> cache) {
         return new FallbackableTypeFactory(cache, _parser, _modifiers, _classLoader, fallbackClassLoader);
     }
 
