@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.naming.Context;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.custommonkey.xmlunit.Diff;
@@ -78,6 +79,16 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
     protected CommandExecutor exec;
     protected CommandExecutor exec2;
+
+    private XStream getXStreamMarshaller() {
+        XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
+        String[] allowList = new String[]{
+                                          "org.kie.camel.embedded.camel.testdomain.Cheese",
+                                          "org.foo.Whee"
+        };
+        xstream.addPermission( new WildcardTypePermission( allowList ) );
+        return xstream;
+    }
 
     @Override
     protected Context createJndiContext() throws Exception {
@@ -524,7 +535,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         outXml = template.requestBody("direct:exec", inXml, String.class);
         result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
 
-        result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
 
     }
 
@@ -681,7 +692,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         Collection<? extends FactHandle> factHandles = ksession.getFactHandles();
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
 
         List list = (List)result.getValue("list");
         Cheese stilton25 = new Cheese("stilton", 30);
@@ -758,7 +769,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         assertXMLEqual(expectedXml, outXml);
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         Cheese stilton = new Cheese("stilton", 30);
 
         assertNull(result.getValue("list1"));
@@ -949,7 +960,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         assertXMLEqual(expectedXml, outXml);
 
-        ExecutionResults batchResult = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults batchResult = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
 
         Cheese stilton1 = new Cheese("stilton", 1);
         Cheese cheddar1 = new Cheese("cheddar", 1);
@@ -1035,7 +1046,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         assertXMLEqual(expectedXml, outXml);
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         List list = (List)result.getValue("list");
         Cheese stilton25 = new Cheese("stilton", 30);
         Cheese stilton30 = new Cheese("stilton", 35);
@@ -1094,7 +1105,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         String outXml = template.requestBody("direct:exec", inXml, String.class);
 
-        FactHandle factHandle = (FactHandle)((ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml)).getFactHandle("outBrie");
+        FactHandle factHandle = (FactHandle)((ExecutionResults) getXStreamMarshaller().fromXML(outXml)).getFactHandle("outBrie");
 
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
@@ -1123,7 +1134,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         expectedXml += "</execution-results>\n";
         assertXMLEqual(expectedXml, outXml);
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
 
         // brie should not have been added to the list
         List list = (List)result.getValue("list");
@@ -1604,7 +1615,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         String outXml = template.requestBody("direct:exec", inXml, String.class);
 
         ClassLoader cl = ((StatefulKnowledgeSessionImpl)ksession).getKnowledgeBase().getRootClassLoader();
-        XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
+        XStream xstream = getXStreamMarshaller();
         xstream.setClassLoader(cl);
         FactHandle factHandle = (FactHandle)((ExecutionResults)xstream.fromXML(outXml)).getFactHandle("outStilton");
 
