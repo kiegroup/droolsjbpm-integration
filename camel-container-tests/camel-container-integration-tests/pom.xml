@@ -204,6 +204,7 @@
                   <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
                   <kie.server.port>${container.port}</kie.server.port>
                 </systemProperties>
+                <timeout>300000</timeout>
               </container>
               <deployables>
                 <deployable>
