@@ -16,10 +16,10 @@
 
 package org.kie.camel.container.integration.tests;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.core.runtime.help.impl.BatchExecutionHelperProviderImpl;
@@ -47,6 +47,10 @@ public class AbstractKieCamelIntegrationTest {
 
         final BatchExecutionHelperProviderImpl batchExecutionHelperProvider = new BatchExecutionHelperProviderImpl();
         xstreamMarshaller = batchExecutionHelperProvider.newXStreamMarshaller();
+        String[] allowList = new String[]{
+                                          "org.kie.camel.container.api.model.Person"
+        };
+        xstreamMarshaller.addPermission( new WildcardTypePermission( allowList ) );
     }
 
     protected ExecutionResults runCommand(Command command) {
