@@ -6,11 +6,11 @@ kie-maven-plugin integrations tests are tests that:
 2) uses the generated kjar
 
 They are written following the maven standard layout and they features the maven-invoker-plugin.
-For each of those test, there is a specific directory under _src/it_.
+For each of those tests, there is a specific directory under _src/it_.
 Poms and sources are filtered to have the current drools version during execution.
-Surefire (unit) tests are excluded, while integration (falsafe) ones are executed. To allow that, test classes must be named with trailing "IT" (e.g. _BuildPMMLTrustyTestIT_).
-If java tests classes needs to be filtered, they have to be put under _src/test/java-filtered_ directory (from here, they will be filtered and pasted under _scr/test/java_ one).
-Test compilation and reports may be found under _target/it/{module_name}_ directory.
+Surefire (unit) tests are excluded, while integration (failsafe) ones are executed. To allow that, test classes must be named with trailing "IT" (e.g. _BuildPMMLTrustyTestIT_).
+If java tests classes needs to be filtered, they have to be put under _src/test/java-filtered_ directory (from here, they will be filtered and copied under _scr/test/java_ one).
+Test compilations and reports may be found under _target/it/{module_name}_ directory.
 _target/it/{module_name}/build.log_ will contain overall build output, while additionally test reports may be found under
 _target/it/{module_name}/target/failsafe-reports_ and _target/it/{module_name}/target/surefire_
 
@@ -24,7 +24,7 @@ To avoid duplication and enforce consistency, a couple of shared modules have be
 The former define common dependencies and build setup; all the tests declare this as parent and may override/extend it.
 The latter contains the shared code, it is optional, and it is used by tests that actually require it.
 
-To ensure that those twos are built and installed before the other, there are the following details
+To ensure that those twos are built and installed before the others, there are the following details
 
 1) their _invoker.properties_ file declares the _clean install_ goals
 2) they are nested under _kie-maven-plugin-test-kjar-setup_
@@ -93,8 +93,9 @@ from kie-maven-plugin directory.
 There are different ways to debug the integration test after it is enabled as invoker module
 
 1) inside _invoker.properties_ file, enable remote debugging with the line 
-
+    
     invoker.mavenOpts=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+
 2) launch maven build inside the _target/it/{module_name}_ 
 3) add _target/it/{module_name}_ as maven project inside IDE; this will allow IDE debugging (see [below](#adding-_targetitmodule_name_-as-maven-project-inside-ide) for detailed instructions).
 
