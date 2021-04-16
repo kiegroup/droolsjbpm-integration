@@ -475,6 +475,7 @@ public class ConvertUtils {
             CaseUserTaskWithVariables var = new CaseUserTaskWithVariables();
             var.setId(desc.getTaskId());
             var.setName(desc.getName());
+            var.setDescription(desc.getDescription());
             var.setProcessInstanceId(desc.getProcessInstanceId());
             var.setCorrelationKey(desc.getCorrelationKey());
             var.setActualOwner(desc.getActualOwner());
