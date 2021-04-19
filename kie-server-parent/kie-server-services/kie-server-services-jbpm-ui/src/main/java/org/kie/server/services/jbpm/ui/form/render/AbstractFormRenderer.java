@@ -29,10 +29,11 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -119,7 +120,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     }
     
     public String renderCase(String containerId, CaseDefinition caseDefinition, FormInstance form) {
-        List<String> scriptDataList = new ArrayList<>();        
+        List<String> scriptDataList = new ArrayList<>();
         
         
         StringBuilder jsonTemplate = new StringBuilder();
@@ -449,9 +450,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                     item.setValue((value != null) ? value.toString() : "");
                                     break;
                             }
-
-                            item.setReadOnly(field.isReadOnly());
-                            item.setRequired(field.isRequired());
+                            Set<String> tags = field.getTags();
+                            if (tags != null) {
+                                item.setRequired(tags.contains("required"));
+                                item.setReadOnly(tags.contains("readonly"));
+                            } else {
+                                item.setRequired(field.isRequired());
+                                item.setReadOnly(field.isReadOnly());
+                            }
 
                             // generate column content                    
                             Map<String, Object> parameters = new HashMap<>();

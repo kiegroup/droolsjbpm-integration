@@ -62,6 +62,7 @@ public class DefinitionServiceBase {
                 .serviceTasks(procDef.getServiceTasks())
                 .subprocesses(procDef.getReusableSubProcesses())
                 .variables(procDef.getProcessVariables())
+                .tagsByVariables(procDef.getTagsInfo())
                 .dynamic(procDef.isDynamic())
                 .nodes(procDef.getNodes().stream().map(node -> NodeDefinition.builder().id(node.getId()).name(node.getName()).type(node.getNodeType()).uniqueId(node.getUniqueId()).build()).collect(toSet()))
                 .timers(procDef.getTimers().stream().map(timer -> TimerDefinition.builder().id(timer.getId()).nodeId(timer.getNodeId()).nodeName(timer.getNodeName()).uniqueId(timer.getUniqueId()).build()).collect(toSet()))

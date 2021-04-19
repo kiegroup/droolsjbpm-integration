@@ -32,7 +32,7 @@ function clearNotifications() {
 }
 
 function startProcess(button) {
-	if (validate()) {
+	if (validate('')) {
 		button.disabled = true;
 		
 		console.log('Process started with data ' + JSON.stringify(getData()));
@@ -61,7 +61,7 @@ function startProcess(button) {
 }
 
 function startCase(button) {
-	if (validate()) {
+	if (validate('')) {
 		button.disabled = true;
 			
 		$.ajax({

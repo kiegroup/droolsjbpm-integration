@@ -27,10 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FormRendererBaseTest {
 
@@ -82,13 +87,22 @@ public class FormRendererBaseTest {
         ProcessDefinition processDefinition = mock(ProcessDefinition.class);
         when(processDefinition.getId()).thenReturn("testprocess");
         when(processDefinition.getName()).thenReturn("Test Process");
-        
+
         Map<String, String> variables = new HashMap<>();
         variables.put("name", "java.lang.String");
         variables.put("age", "java.lang.Integer");
         variables.put("maried", "java.lang.Boolean");
         when(processDefinition.getProcessVariables()).thenReturn(variables);
-        
+        Map<String, Set<String>> tags = new HashMap<>();
+        Set<String> tags1 = new HashSet<>();
+        tags1.add("required");
+        Set<String> tags2 = new HashSet<>();
+        tags2.add("readonly");
+        tags.put("name", tags1);
+        tags.put("maried", tags2);
+        when(processDefinition.getTagsInfo()).thenReturn(tags);
+        when(processDefinition.getTagsForVariable(eq("name"))).thenReturn(tags1);
+        when(processDefinition.getTagsForVariable(eq("maried"))).thenReturn(tags2);
         FormRendererBase rendererBase = new FormRendererBase(definitionService, userTaskService, formManagerService, caseRuntimeDataService, registry);
         
         when(registry.getContainerId(any(), any())).thenReturn("test");
@@ -108,8 +122,12 @@ public class FormRendererBaseTest {
         assertThat(result).contains("<h3 class=\"panel-title\">Default form - Test Process</h3>");
         
         // it has all three variables rendered
-        assertThat(result).contains("<input name=\"maried\" type=\"checkbox\" class=\"form-control\" ");
-        assertThat(result).contains("<input name=\"name\" type=\"text\" class=\"form-control\" ");
+        Pattern namePattern = Pattern.compile("<input name=\"name\" type=\"text\" class=\"form-control\".*required.*>");
+        Matcher nameMatcher = namePattern.matcher(result);
+        assertTrue(nameMatcher.find());
+        Pattern mariedPattern = Pattern.compile("<input name=\"maried\" type=\"checkbox\" class=\"form-control\".*readonly.*>");
+        Matcher mariedMatcher = mariedPattern.matcher(result);
+        assertTrue(mariedMatcher.find());
         assertThat(result).contains("<input name=\"age\" type=\"text\" class=\"form-control\" ");
         // it has start process button
         assertThat(result).contains("<button type=\"button\" class=\"btn btn-primary\" onclick=\"startProcess(this);\">Submit</button>");
