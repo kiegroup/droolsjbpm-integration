@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
 import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.jbpm.executor.AsynchronousJobListener;
@@ -35,6 +34,7 @@ import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorManager;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.Severity;
@@ -63,7 +63,6 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PrometheusKieServerExtension.class);
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_PROMETHEUS_SERVER_EXT_DISABLED, "true"));
-    private static final String DESCRIPTOR = "org.kie.deployment.desc.location";
     private static PrometheusMetrics METRICS = null;
     
     private KieServerRegistry context;
@@ -169,12 +168,7 @@ public class PrometheusKieServerExtension implements KieServerExtension {
     }
 
     protected void registerDefaultDescriptor() {
-        final String desc = System.getProperty(DESCRIPTOR);
-        if(StringUtils.isBlank(desc)) {
-            System.setProperty(DESCRIPTOR, "classpath:/META-INF/prometheus-deployment-descriptor-defaults.xml");
-        } else {
-            LOGGER.warn("{} property already defined, Case Mgmt, Process and Task metrics might not be available if listeners are not declared on {}", DESCRIPTOR, desc);
-        }
+        DeploymentDescriptorManager.addDescriptorLocation("classpath:/META-INF/prometheus-deployment-descriptor-defaults.xml");
     }
 
     @Override
