@@ -19,8 +19,16 @@ import org.w3c.dom.NodeList;
 
 public class StunnerSVGProcessor extends AbstractSVGProcessor {
 
+    private static String SPECIAL_SUB_PROCESS_INSTANCE_ID = "_subProcessReusableNormalReusableIcon";
+
     public StunnerSVGProcessor(Document svgDocument) {
         super(svgDocument, true);
+    }
+
+    private Map<String, String> subProcessLinks;
+
+    public void setSubProcessLinks(final Map<String, String> subProcessLinks){
+        this.subProcessLinks = subProcessLinks;
     }
 
     @Override
@@ -87,8 +95,12 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
                         Element border = Objects.equals(parameters.get("shapeType"), "BORDER") ? (Element) node : nodeSummary.getBorder();
                         Element background = Objects.equals(parameters.get("shapeType"), "BACKGROUND") ? (Element) node : nodeSummary.getBackground();
                         RenderType renderType = RenderType.valueOf(Optional.ofNullable(parameters.get("renderType")).orElse(nodeSummary.getRenderType().orElse(RenderType.STROKE).name()));
+                        Element plusButton = null;
+                        if (subProcessLinks != null && subProcessLinks.containsKey(nodeId) && value.equals(nodeId + SPECIAL_SUB_PROCESS_INSTANCE_ID)) {
+                            plusButton = (Element) node;
+                        }
 
-                        summary.addNode(new NodeSummary(nodeId, border, background, null, null, renderType));
+                        summary.addNode(new NodeSummary(nodeId, border, background, null, null, renderType, plusButton));
                     }
                     break;
                 }
