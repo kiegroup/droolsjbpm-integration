@@ -16,7 +16,7 @@
     <DataField name="petal_width" optype="continuous" dataType="double">
       <Interval closure="closedClosed" leftMargin="0.1" rightMargin="2.5"/>
     </DataField>
-    <DataField name="class" optype="continuous" dataType="integer"/>
+    <DataField name="class" optype="continuous" dataType="string"/>
   </DataDictionary>
   <ClusteringModel modelName="SingleIrisKMeansClustering" functionName="clustering" modelClass="centerBased" numberOfClusters="4">
     <MiningSchema>
