@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-autoconfiguration</artifactId>
-    <version>7.53.0-SNAPSHOT</version>
+    <version>7.54.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-autoconfiguration-task-assigning-runtime</artifactId>
   <name>KIE :: Spring :: Boot :: KIE Server Auto Configuration :: TaskAssigningRuntime</name>

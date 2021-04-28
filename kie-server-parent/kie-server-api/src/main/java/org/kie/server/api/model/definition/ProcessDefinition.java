@@ -19,6 +19,7 @@ package org.kie.server.api.model.definition;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -57,6 +58,8 @@ public class ProcessDefinition {
     private Collection<NodeDefinition> nodes;
     @XmlElementWrapper(name = "timers")
     private Collection<TimerDefinition> timers;
+    @XmlElementWrapper(name = "tags")
+    private Map<String, String[]> tagsByVariable;
 
     @XmlElement(name = "dynamic")
     private boolean dynamic;
@@ -132,6 +135,14 @@ public class ProcessDefinition {
         this.processVariables = processVariables;
     }
 
+    public Map<String, String[]> getTagsByVariable() {
+        return tagsByVariable;
+    }
+
+    public void setTagsByVariable(Map<String, String[]> tagsByVariable) {
+        this.tagsByVariable = tagsByVariable;
+    }
+
     public Collection<String> getReusableSubProcesses() {
         return reusableSubProcesses;
     }
@@ -178,6 +189,7 @@ public class ProcessDefinition {
                 ", reusableSubProcesses=" + reusableSubProcesses +
                 ", nodes=" + nodes +
                 ", timers=" + timers +
+                ", tagsByVariable=" + tagsByVariable +
                 ", dynamic=" + dynamic +
                 '}';
     }
@@ -244,6 +256,16 @@ public class ProcessDefinition {
 
         public Builder subprocesses(Collection<String> subprocesses) {
             definition.setReusableSubProcesses(subprocesses);
+            return this;
+        }
+
+        public Builder tagsByVariables(Map<String, Set<String>> tagsByVariables) {
+            Map<String, String[]> data = new HashMap<String, String[]>();
+
+            for (Map.Entry<String, Set<String>> entry : tagsByVariables.entrySet()) {
+                data.put(entry.getKey(), entry.getValue().toArray(new String[entry.getValue().size()]));
+            }
+            definition.setTagsByVariable(data);
             return this;
         }
 

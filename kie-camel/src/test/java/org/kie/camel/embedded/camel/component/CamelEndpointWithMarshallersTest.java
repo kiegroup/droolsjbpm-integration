@@ -56,6 +56,18 @@ import org.kie.pipeline.camel.Person;
 public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
     private String handle;
 
+    private XStream getXStreamMarshaller() {
+        XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
+        xstream.allowTypes(new Class[] {org.kie.pipeline.camel.Person.class});
+        return xstream;
+    }
+
+    private XStream getJSonMarshaller() {
+        XStream xstream = BatchExecutionHelper.newJSonMarshaller();
+        xstream.allowTypes(new Class[] {org.kie.pipeline.camel.Person.class});
+        return xstream;
+    }
+
     @Test
     public void testSimple() {
     }
@@ -75,7 +87,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
 
         String outXml = new String((byte[])template.requestBody("direct:test-with-session", cmd));
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("salaboy");
         assertEquals("salaboy", person.getName());
 
@@ -105,7 +117,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
 
         String outXml = new String((byte[])template.requestBody("direct:test-with-session-json", inXml));
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getJSonMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("salaboy");
         assertEquals("salaboy", person.getName());
     }
@@ -125,7 +137,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
 
         String outXml = new String((byte[])template.requestBody("direct:test-no-session", cmd));
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("salaboy");
         assertEquals("salaboy", person.getName());
 
@@ -156,7 +168,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
 
         String outXml = new String((byte[])template.requestBody("direct:test-no-session-custom", cmd));
 
-        XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
+        XStream xstream = getXStreamMarshaller();
         PersonConverter converter = new PersonConverter();
         xstream.registerConverter(converter);
 
@@ -184,7 +196,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
 
         String outXml = new String((byte[])template.requestBody("direct:test-with-session", cmd));
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("rider");
         assertEquals("Hadrian", person.getName());
 

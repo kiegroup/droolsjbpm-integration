@@ -5,7 +5,7 @@
   <parent>
     <artifactId>camel-container-tests</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.53.0-SNAPSHOT</version>
+    <version>7.54.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -204,6 +204,7 @@
                   <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
                   <kie.server.port>${container.port}</kie.server.port>
                 </systemProperties>
+                <timeout>300000</timeout>
               </container>
               <deployables>
                 <deployable>
