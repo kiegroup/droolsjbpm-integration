@@ -895,7 +895,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryDataService", "unregisterQuery", new Object[]{queryName})));
-            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+            ServiceResponse<?> response = executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
             throwExceptionOnFailure(response);
         }
     }
@@ -1187,11 +1187,19 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstanceCustomVars> queryProcessesByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize) {
+    public List<ProcessInstanceCustomVars> queryProcessesByVariables(SearchQueryFilterSpec spec,
+                                                                     Integer page,
+                                                                     Integer pageSize,
+                                                                     String orderBy,
+                                                                     boolean asc) {
         if (config.isRest()) {
             String queryString = getPagingQueryString("", page, pageSize);
-            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + RestURI.VARIABLES_PROCESSES_URI + queryString, Collections.emptyMap()), spec,
-                                                              ProcessInstanceCustomVarsList.class).getItems();
+            queryString = getSortingQueryString(queryString, orderBy, asc);
+            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" +
+                                                                                           RestURI.VARIABLES_PROCESSES_URI +
+                                                                                           queryString, Collections
+                                                                                                   .emptyMap()), spec,
+                    ProcessInstanceCustomVarsList.class).getItems();
         } else {
             throw new UnsupportedOperationException("JMS Not supported for this operation");
         }
@@ -1199,15 +1207,37 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstanceUserTaskWithVariables> queryUserTaskByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize) {
+    public List<ProcessInstanceUserTaskWithVariables> queryUserTaskByVariables(SearchQueryFilterSpec spec,
+                                                                               Integer page,
+                                                                               Integer pageSize,
+                                                                               String orderBy,
+                                                                               boolean asc) {
         if (config.isRest()) {
             String queryString = getPagingQueryString("", page, pageSize);
-            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + RestURI.VARIABLES_TASKS_PROCESSES_URI + queryString, Collections.emptyMap()), spec,
-                                                              ProcessInstanceUserTaskWithVariablesList.class).getItems();
+            queryString = getSortingQueryString(queryString, orderBy, asc);
+            return makeHttpPostRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" +
+                                                                                           RestURI.VARIABLES_TASKS_PROCESSES_URI +
+                                                                                           queryString, Collections
+                                                                                                   .emptyMap()), spec,
+                    ProcessInstanceUserTaskWithVariablesList.class).getItems();
         } else {
             throw new UnsupportedOperationException("JMS Not supported for this operation");
         }
 
+    }
+
+    @Override
+    public List<ProcessInstanceCustomVars> queryProcessesByVariables(SearchQueryFilterSpec spec,
+                                                                     Integer page,
+                                                                     Integer pageSize) {
+        return queryProcessesByVariables(spec, page, pageSize, null, false);
+    }
+
+    @Override
+    public List<ProcessInstanceUserTaskWithVariables> queryUserTaskByVariables(SearchQueryFilterSpec spec,
+                                                                               Integer page,
+                                                                               Integer pageSize) {
+        return queryUserTaskByVariables(spec, page, pageSize, null, false);
     }
 
 }
