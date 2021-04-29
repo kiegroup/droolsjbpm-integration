@@ -1867,13 +1867,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         SearchQueryFilterSpec specHistory = new SearchQueryFilterSpec();
         specHistory.setAttributesQueryParams(list(history(), equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
-        List<ProcessInstanceCustomVars> listHistoryProcesses = queryClient.queryProcessesByVariables(specHistory, 0, 2);
+        List<ProcessInstanceCustomVars> listHistoryProcesses = queryClient.queryProcessesByVariables(specHistory, 0, 2, "processInstanceId" , false);
         assertNotNull(listHistoryProcesses);
         listHistoryProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
         
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
-        List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2, "processInstanceId", true);
         Assertions.assertThat(listTasks).hasSize(1).extracting(ProcessInstanceUserTaskWithVariables::getProcessDefinitionId).containsOnly(PROCESS_ID_USERTASK);
 
         this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
@@ -1882,13 +1882,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyCompletedTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
 
-        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2, "task.id", false);
         Assertions.assertThat(listTasks).hasSize(1);
 
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
 
-        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2, "task.id", true);
         Assertions.assertThat(listTasks).hasSize(1);
 
         this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
