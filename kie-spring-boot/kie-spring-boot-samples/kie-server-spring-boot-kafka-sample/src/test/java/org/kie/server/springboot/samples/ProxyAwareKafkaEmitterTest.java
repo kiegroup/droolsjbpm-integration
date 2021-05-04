@@ -73,7 +73,7 @@ public class ProxyAwareKafkaEmitterTest extends KafkaFixture{
     @BeforeClass
     public static void beforeClass() {
         assumeTrue(isDockerAvailable());
-        System.setProperty("org.kie.jbpm.event.emitters.kafka.topic.processes", CUSTOM_PROCESSES_TOPIC);
+        System.setProperty(TOPIC_PROCESSES, CUSTOM_PROCESSES_TOPIC);
         toxiproxy.start();
         kafkaProxy = toxiproxy.getProxy(kafka, TOXY_PROXY_PORT);
         
@@ -96,9 +96,9 @@ public class ProxyAwareKafkaEmitterTest extends KafkaFixture{
     public static void teardown() {
         kafka.stop();
         toxiproxy.stop();
-        System.clearProperty("org.kie.jbpm.event.emitters.kafka.topic.processes");
-        System.clearProperty("org.kie.jbpm.event.emitters.kafka.boopstrap.servers");
-        System.clearProperty("org.kie.jbpm.event.emitters.kafka.client.id");
+        System.clearProperty(TOPIC_PROCESSES);
+        System.clearProperty(BOOTSTRAP_SERVERS);
+        System.clearProperty(CLIENT_ID);
     }
     
     @Test(timeout = 30000)
