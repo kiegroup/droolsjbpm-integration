@@ -20,7 +20,7 @@ jobs:
             esl-erlang firefox g++-8 g++-9 gfortran-8 gfortran-9 google-chrome-stable \
             google-cloud-sdk ghc-8.0.2 ghc-8.2.2 ghc-8.4.4 ghc-8.6.2 ghc-8.6.3 ghc-8.6.4 \
             ghc-8.6.5 ghc-8.8.1 ghc-8.8.2 ghc-8.8.3 ghc-8.10.1 cabal-install-2.0 cabal-install-2.2 \
-            cabal-install-2.4 cabal-install-3.0 cabal-install-3.2 heroku imagemagick \
+            cabal-install-2.4 cabal-install-3.0 cabal-install-3.2 imagemagick \
             libmagickcore-dev libmagickwand-dev libmagic-dev ant ant-optional kubectl \
             mercurial apt-transport-https mono-complete mysql-client libmysqlclient-dev \
             mysql-server mssql-tools unixodbc-dev yarn bazel chrpath libssl-dev libxft-dev \
