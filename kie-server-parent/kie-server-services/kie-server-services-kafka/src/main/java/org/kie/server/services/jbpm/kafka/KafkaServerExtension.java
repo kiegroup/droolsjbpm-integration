@@ -38,6 +38,7 @@ import org.jbpm.services.api.DeploymentEventListener;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ListenerSupport;
 import org.jbpm.services.api.ProcessService;
+import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorManager;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
@@ -83,7 +84,10 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
             logger.warn("Kafka extension already initialized");
             return;
         }
-
+        
+        DeploymentDescriptorManager.addDescriptorLocation(
+                "classpath:/META-INF/kafka-deployment-descriptor-defaults.xml");
+        
         KieServerExtension jbpmExt = registry.getServerExtension(JbpmKieServerExtension.EXTENSION_NAME);
         if (jbpmExt == null) {
             logger.warn("Extension " + JbpmKieServerExtension.EXTENSION_NAME + " is required");
