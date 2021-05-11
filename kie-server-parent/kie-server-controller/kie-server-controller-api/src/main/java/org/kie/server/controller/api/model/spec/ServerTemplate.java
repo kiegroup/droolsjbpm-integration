@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -31,6 +32,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.KieServerMode;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+
+import static java.util.stream.Collectors.toList;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "server-template-details")
@@ -46,6 +49,16 @@ public class ServerTemplate extends ServerTemplateKey {
     private List<String> capabilities = new ArrayList<String>();
     @XmlElement(name="mode")
     private KieServerMode mode;
+
+    public ServerTemplate(ServerTemplate current) {
+        super(current.getId(), current.getName());
+        this.containersSpec = current.getContainersSpec().stream().map(ContainerSpec::new).collect(Collectors.toCollection(ArrayList::new));
+        this.capabilities = new ArrayList<>(current.getCapabilities());
+        this.configs = current.getConfigs().isEmpty() ? new EnumMap<>(Capability.class) : new EnumMap<>(current.getConfigs());
+        this.serverInstances = current.getServerInstanceKeys().stream().map(ServerInstanceKey::new).collect(Collectors.toCollection(ArrayList::new));
+        this.mode = current.getMode(); 
+
+    }
 
     public ServerTemplate() {
     }
@@ -92,6 +105,22 @@ public class ServerTemplate extends ServerTemplateKey {
     }
 
     public Collection<ServerInstanceKey> getServerInstanceKeys() {
+        return new ArrayList<ServerInstanceKey>( getAllServerInstanceKeys().stream().filter(ServerInstanceKey::isOnline).collect(toList()));
+    }
+
+    public void clearOfflineServerInstances() {
+        if(serverInstances == null) {
+            return;
+        }
+        Iterator<ServerInstanceKey> keyIterator = serverInstances.iterator();
+        while(keyIterator.hasNext()) {
+            if(!keyIterator.next().isOnline()) {
+                keyIterator.remove();
+            }
+        }
+    }
+
+    public Collection<ServerInstanceKey> getAllServerInstanceKeys() {
         if (serverInstances == null) {
             serverInstances = new ArrayList<ServerInstanceKey>();
         }
@@ -172,6 +201,25 @@ public class ServerTemplate extends ServerTemplateKey {
         if (!serverInstances.contains(serverInstance)) {
             serverInstances.add(serverInstance);
         }
+    }
+
+    public boolean markAsOnline(String serverInstanceId, boolean online) {
+        if (serverInstances == null) {
+            return false;
+        }
+        Iterator<ServerInstanceKey> iterator = serverInstances.iterator();
+
+        while(iterator.hasNext()) {
+            ServerInstanceKey serverInstanceKey = iterator.next();
+            if (serverInstanceId.equals(serverInstanceKey.getServerInstanceId())) {
+                if(online != serverInstanceKey.isOnline()) {
+                    serverInstanceKey.setOnline(online);
+                    return true;
+                }
+                break;
+            }
+        }
+        return false;
     }
 
     public void deleteServerInstance(String serverInstanceId) {

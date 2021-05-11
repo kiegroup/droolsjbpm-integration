@@ -34,6 +34,8 @@ public class ServerTemplateUpdated implements KieServerControllerEvent {
     public ServerTemplateUpdated(ServerTemplate serverTemplate, boolean resetBeforeUpdate) {
         this.serverTemplate = serverTemplate;
         this.resetBeforeUpdate = resetBeforeUpdate;
+        this.serverTemplate = new ServerTemplate(serverTemplate);
+        this.serverTemplate.clearOfflineServerInstances();
     }
 
     public ServerTemplate getServerTemplate() {

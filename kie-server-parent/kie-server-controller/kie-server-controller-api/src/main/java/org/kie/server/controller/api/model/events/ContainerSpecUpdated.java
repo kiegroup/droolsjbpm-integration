@@ -39,6 +39,8 @@ public class ContainerSpecUpdated implements KieServerControllerEvent {
         this.serverTemplate = serverTemplate;
         this.containerSpec = containerSpec;
         this.containers = containers;
+        this.serverTemplate = new ServerTemplate(serverTemplate);
+        this.serverTemplate.clearOfflineServerInstances();
     }
 
     public ServerTemplate getServerTemplate() {

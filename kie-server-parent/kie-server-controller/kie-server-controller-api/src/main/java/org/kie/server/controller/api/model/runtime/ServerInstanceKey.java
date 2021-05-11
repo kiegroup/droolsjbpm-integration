@@ -17,6 +17,7 @@ package org.kie.server.controller.api.model.runtime;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -33,7 +34,20 @@ public class ServerInstanceKey {
     @XmlElement(name = "server-url")
     private String url;
 
+    @XmlAttribute(name = "online")
+    private boolean online;
+
+    
     public ServerInstanceKey() {
+
+    }
+
+    public ServerInstanceKey(ServerInstanceKey key) {
+        this.serverTemplateId = key.serverTemplateId;
+        this.serverName = key.serverName;
+        this.serverInstanceId = key.serverInstanceId;
+        this.url = key.url;
+        this.online = key.online;
     }
 
     public ServerInstanceKey(String serverTemplateId, String serverName, String serverInstanceId, String url) {
@@ -41,6 +55,7 @@ public class ServerInstanceKey {
         this.serverName = serverName;
         this.serverInstanceId = serverInstanceId;
         this.url = url;
+        this.online = true;
     }
 
     public String getServerTemplateId() {
@@ -75,6 +90,15 @@ public class ServerInstanceKey {
         this.url = url;
     }
 
+    
+    public Boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(Boolean online) {
+        this.online = online;
+    }
+
     @Override
     public String toString() {
         return "ServerInstanceKey{" +
@@ -82,6 +106,7 @@ public class ServerInstanceKey {
                 ", serverName='" + serverName + '\'' +
                 ", serverTemplateId='" + serverTemplateId + '\'' +
                 ", url='" + url + '\'' +
+                ", online='" + online + '\'' +
                 '}';
     }
 
