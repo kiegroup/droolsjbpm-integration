@@ -14,6 +14,19 @@ Test compilations and reports may be found under _target/it/{module_name}_ direc
 _target/it/{module_name}/build.log_ will contain overall build output, while additionally test reports may be found under
 _target/it/{module_name}/target/failsafe-reports_ and _target/it/{module_name}/target/surefire_
 
+
+Skipping/selecting tests
+========================
+To completely disable execution of those tests, set the _invoker.skip_ parameter to false:
+
+    mvn clean install -Dinvoker.skip=true
+
+To run only certain of those tests, use the _invoker.test_ parameter with a pattern of the directory to be executed, e.g.:
+
+    mvn clean install -Dinvoker.test=kie-maven-plugin-test-kjar-1*
+
+    mvn clean install -Dinvoker.test=*-default
+
 Common code and overall setup
 =============================
 All those tests share some common code, mostly related to the _KieContainer/KieBase/KieSession_ instantiation.
@@ -78,7 +91,7 @@ Write and debug tips
 To start with, a useful starting point would be to create, inside _it_ directory, vanilla maven module containing the definition of the kjar project to test, with defined version (i.e. without version' placeholder).
 After that, look at other tests and at _org.kie.maven.plugin.ittests.public class ITTestsUtils_ to see what kind of tests have already been implemented.
 If the scope of the integration test is only the successful packaging of the kjar, no test class is needed.
-At that phase the compilation and test execution can be done invoking standard maven commands from the root of the integration test module. Debug fomr IDE is also possible.
+At that phase the compilation and test execution can be done invoking standard maven commands from the root of the integration test module. Debug from IDE is also possible.
 Next step is to enable the integration test inside the invoker lifecycle; to do that 
 
 1) add _invoker.properties_ file to the integration test
