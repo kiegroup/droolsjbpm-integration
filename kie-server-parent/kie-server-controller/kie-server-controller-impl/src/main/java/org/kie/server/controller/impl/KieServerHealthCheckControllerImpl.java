@@ -73,12 +73,9 @@ public class KieServerHealthCheckControllerImpl extends KieServerControllerImpl 
                 while (!stop.get()) {
                     for (KieServerInfo kieServerInfo : getServerInfoList()) {
                         ServerInstanceKey serverInstanceKey = ModelFactory.newServerInstanceKey(kieServerInfo.getServerId(), kieServerInfo.getLocation());
-                        if (!KieServerInstanceManager.getInstance().isAlive(serverInstanceKey)) {
-                            logger.debug("ping isAlive " + kieServerInfo.getLocation() + ": KO. disconnected.");
-                            disconnect(kieServerInfo);
-                        } else {
-                            logger.debug("ping isAlive " + kieServerInfo.getLocation() + ": OK");
-                        }
+                        boolean isAlive = KieServerInstanceManager.getInstance().isAlive(serverInstanceKey);
+                        markOnlineAs(kieServerInfo, isAlive);
+                        logger.debug("ping isAlive to location {}: {}.", kieServerInfo.getLocation(), isAlive ? "connected" : "disconnected");
                     }
                     Thread.sleep(PING_INTERVAL);
                 }
@@ -118,7 +115,7 @@ public class KieServerHealthCheckControllerImpl extends KieServerControllerImpl 
         List<ServerTemplateKey> templateKeys = getTemplateStorage().loadKeys();
         for (ServerTemplateKey templateKey : templateKeys) {
             ServerTemplate template = getTemplateStorage().load(templateKey.getId());
-            for (ServerInstanceKey serverInstanceKey : template.getServerInstanceKeys()) {
+            for (ServerInstanceKey serverInstanceKey : template.getAllServerInstanceKeys()) {
                 KieServerInfo serverInfo = new KieServerInfo(template.getId(), template.getName());
                 serverInfo.setLocation(serverInstanceKey.getUrl());
                 serversInfo.add(serverInfo);
