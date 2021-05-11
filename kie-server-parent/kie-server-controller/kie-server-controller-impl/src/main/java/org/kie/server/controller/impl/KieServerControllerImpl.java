@@ -163,6 +163,32 @@ public abstract class KieServerControllerImpl implements KieServerController {
             return new KieServerSetup();
         }
 
+
+        ServerInstance serverInstance = toServerInstance(serverInstanceKey, serverTemplate);
+        // we update and notify
+        notificationService.notify(new ServerInstanceUpdated(serverInstance));
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
+
+        for(ContainerSpec currentSpec : serverTemplate.getContainersSpec()) {
+            List<Container> specContainerList = new ArrayList<Container>();
+            for(ServerInstanceKey currentServerInstanceKey : serverTemplate.getServerInstanceKeys()) {
+               Container container = new Container(currentSpec.getId(),
+                                                currentSpec.getContainerName(),
+                                                currentServerInstanceKey,
+                                                new ArrayList<Message>(),
+                                                currentSpec.getReleasedId(),
+                                                currentServerInstanceKey.getUrl() + "/containers/" + currentSpec.getId());
+               container.setStatus(currentSpec.getStatus());
+               specContainerList.add(container);
+            }
+            notificationService.notify(serverTemplate, currentSpec, specContainerList);
+        }
+
+
+        return toKieServerSetup(serverTemplate);
+    }
+
+    private ServerInstance toServerInstance(ServerInstanceKey serverInstanceKey, ServerTemplate serverTemplate) {
         // we update the server instance with the containers
         List<Container> containerList = new ArrayList<Container>();
         List<KieContainerStatus> invalidStatus = Collections.singletonList(KieContainerStatus.STOPPED);
@@ -186,28 +212,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
         serverInstance.setServerInstanceId(serverInstanceKey.getServerInstanceId());
         serverInstance.setUrl(serverInstanceKey.getUrl());
         serverInstance.setContainers(containerList);
-
-        // we update and notify
-        notificationService.notify(new ServerInstanceUpdated(serverInstance));
-        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
-
-        for(ContainerSpec currentSpec : serverTemplate.getContainersSpec()) {
-            List<Container> specContainerList = new ArrayList<Container>();
-            for(ServerInstanceKey currentServerInstanceKey : serverTemplate.getServerInstanceKeys()) {
-               Container container = new Container(currentSpec.getId(),
-                                                currentSpec.getContainerName(),
-                                                currentServerInstanceKey,
-                                                new ArrayList<Message>(),
-                                                currentSpec.getReleasedId(),
-                                                currentServerInstanceKey.getUrl() + "/containers/" + currentSpec.getId());
-               container.setStatus(currentSpec.getStatus());
-               specContainerList.add(container);
-            }
-            notificationService.notify(serverTemplate, currentSpec, specContainerList);
-        }
-
-
-        return toKieServerSetup(serverTemplate);
+        return serverInstance;
     }
 
     private KieServerSetup toKieServerSetup(ServerTemplate serverTemplate) {
@@ -346,6 +351,30 @@ public abstract class KieServerControllerImpl implements KieServerController {
             logger.info("Server {} disconnected from controller", serverInstanceKey);
 
             notifyOnDisconnect(serverInstanceKey, serverTemplate);
+        }
+    }
+
+
+    public void markOnlineAs(KieServerInfo serverInfo, boolean online) {
+        String id = serverInfo.getServerId();
+        ServerTemplate serverTemplate = templateStorage.load(id);
+        ServerInstanceKey serverInstanceKey = new ServerInstanceKey(id, id, id, "");
+        if (serverTemplate != null) {
+            logger.debug("Server id {} known to the controller, checking if given server exists", serverInfo.getServerId());
+            if (!isKieServerLocationAvailable(serverInfo)) {
+                serverInstanceKey = ModelFactory.newServerInstanceKey(id, serverInfo.getLocation());
+                if(serverTemplate.markAsOnline(serverInstanceKey.getServerInstanceId(), online)) {
+                    serverInstanceKey.setOnline(online);
+                    templateStorage.update(serverTemplate);
+                    logger.info("Server {} is marked as {} from controller", serverInstanceKey, online ? "online" : "offline");
+                    if(online) {
+                        ServerInstance serverInstance = toServerInstance(serverInstanceKey, serverTemplate);
+                        notifyOnConnect(serverInstance);
+                    } else {
+                        notifyOnDisconnect(serverInstanceKey, serverTemplate);
+                    }
+                }
+            }
         }
     }
 

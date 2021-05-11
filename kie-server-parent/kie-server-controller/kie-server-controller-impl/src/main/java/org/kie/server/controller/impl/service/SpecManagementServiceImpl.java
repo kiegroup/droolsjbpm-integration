@@ -158,10 +158,11 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
     @Override
     public ServerTemplate getServerTemplate(String serverTemplateId) {
-        final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
         if (serverTemplate == null) {
             throw new KieServerControllerIllegalArgumentException("No server template found for id " + serverTemplateId);
         }
+        serverTemplate = new ServerTemplate(serverTemplate);
         return serverTemplate;
     }
 
