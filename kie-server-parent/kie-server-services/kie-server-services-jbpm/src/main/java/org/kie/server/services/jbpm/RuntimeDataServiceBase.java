@@ -662,13 +662,12 @@ public class RuntimeDataServiceBase {
                                                                                                                    convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
                                                                                                                    convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
                                                                                                                    queryContext));
-        } else {
-            return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                                   filter.getOwners(),
-                                                                                                                   queryContext));
         }
+        return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                               convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                               convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                               filter.getOwners(),
+                                                                                                               queryContext));
     }
 
 
@@ -683,13 +682,12 @@ public class RuntimeDataServiceBase {
                                                                                                       convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                       convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
                                                                                                       queryContext));
-        } else {
-            return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                      convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                      convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                      filter.getOwners(),
-                                                                                                      queryContext));
         }
+        return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                  convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                  convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                  filter.getOwners(),
+                                                                                                  queryContext));
     }
 
 
