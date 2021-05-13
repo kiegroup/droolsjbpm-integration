@@ -25,6 +25,7 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.jbpm.process.svg.model.Transformation;
 import org.jbpm.process.svg.processor.SVGProcessor;
 import org.jbpm.process.svg.processor.SVGProcessorFactory;
+import org.jbpm.process.svg.processor.StunnerSVGProcessor;
 import org.w3c.dom.Document;
 
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
@@ -38,7 +39,25 @@ public class SVGImageProcessor {
     public SVGImageProcessor(InputStream svg) {
         this(svg, true);
     }
-    
+
+    public SVGImageProcessor(InputStream svg, Map<String, String> subProcessLinks) {
+        try {
+            String parser = XMLResourceDescriptor.getXMLParserClassName();
+            SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+            factory.setValidating(false);
+            Document svgDocument = factory.createDocument("http://jbpm.org", svg);
+
+            svgProcessor = new SVGProcessorFactory().create(svgDocument, true);
+            if (svgProcessor instanceof StunnerSVGProcessor) {
+                ((StunnerSVGProcessor) svgProcessor).setSubProcessLinks(subProcessLinks);
+            }
+            svgProcessor.processNodes(svgDocument.getChildNodes());
+
+        } catch (IOException e) {
+            throw new RuntimeException("Could not parse svg", e);
+        }
+    }
+
     public SVGImageProcessor(InputStream svg, boolean mapById) {
 
         try {
@@ -72,7 +91,7 @@ public class SVGImageProcessor {
     public static String transform(InputStream svg, List<String> completed, List<String> active,
                                    Map<String, String> subProcessLinks, String completedNodeColor,
                                    String completedNodeBorderColor, String activeNodeBorderColor) {
-        SVGProcessor processor = new SVGImageProcessor(svg).getProcessor();
+        SVGProcessor processor = new SVGImageProcessor(svg, subProcessLinks).getProcessor();
 
         for (String nodeId : completed) {
             if (!active.contains(nodeId)) {
