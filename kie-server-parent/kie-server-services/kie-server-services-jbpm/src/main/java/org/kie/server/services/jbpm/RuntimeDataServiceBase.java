@@ -33,6 +33,7 @@ import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.VariableDesc;
+import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
@@ -68,6 +69,7 @@ import static java.util.stream.Collectors.toList;
 import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_NAME;
 import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_OWNER;
 import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_STATUS;
+import static org.jbpm.services.api.query.model.QueryParam.all;
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
 import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
@@ -656,40 +658,28 @@ public class RuntimeDataServiceBase {
             return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                             convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                             queryContext));
-        } else if (filter.getOwnersQueryParam() != null) {
-            return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
-                                                                                                                   queryContext));
         }
         return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                                convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                                convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                               filter.getOwners(),
+                                                                                                               filter.getOwnersQueryParam() == null ?
+                                                                                                                       all(filter.getOwners()) :
+                                                                                                                       convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
                                                                                                                queryContext));
     }
-
 
     public ProcessInstanceUserTaskWithVariablesList queryUserTasksByVariables(String payload, String payloadType, QueryContext queryContext) {
         SearchQueryFilterSpec filter = new SearchQueryFilterSpec();
         if (payload != null) {
             filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
         }
-        if(filter.getOwnersQueryParam() != null) {
-            return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                      convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                      convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                      convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
-                                                                                                      queryContext));
-        }
         return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                   convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
                                                                                                   convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                  filter.getOwners(),
+                                                                                                  filter.getOwnersQueryParam() == null ?
+                                                                                                          all(filter.getOwners()) :
+                                                                                                          convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
                                                                                                   queryContext));
     }
-
-
 
 }
