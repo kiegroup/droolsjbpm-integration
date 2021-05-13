@@ -17,9 +17,13 @@ _target/it/{module_name}/target/failsafe-reports_ and _target/it/{module_name}/t
 
 Skipping/selecting tests
 ========================
-To completely disable execution of those tests, set the _invoker.skip_ parameter to false:
+To completely disable execution of those tests, the standard approach is to set the _invoker.skip_ parameter to false:
 
     mvn clean install -Dinvoker.skip=true
+
+A specific configuration has also been implemented to disable those tests with the _skiptITs_ parameter:
+
+    mvn clean install -DskipITs
 
 To run only certain of those tests, use the _invoker.test_ parameter with a pattern of the directory to be executed, e.g.:
 
