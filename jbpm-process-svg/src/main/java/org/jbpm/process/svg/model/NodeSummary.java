@@ -27,6 +27,7 @@ public class NodeSummary {
     private final Element background;
     private final Element subProcessLink;
     private final Optional<RenderType> renderType;
+    private Element plusButton;
 
     public NodeSummary(String nodeId, Element border, Element background, Element borderSubProcess, Element subProcessLink) {
         this(nodeId, border, background, borderSubProcess, subProcessLink, null);
@@ -44,7 +45,10 @@ public class NodeSummary {
         this.subProcessLink = subProcessLink;
         this.renderType = Optional.ofNullable(renderType);
     }
-
+    public NodeSummary(String nodeId, Element border, Element background, Element borderSubProcess, Element subProcessLink, RenderType renderType, Element plusButton) {
+        this(nodeId,border,background,borderSubProcess,subProcessLink,renderType);
+        this.plusButton = plusButton;
+    }
     public String getNodeId() {
         return nodeId;
     }
@@ -67,5 +71,9 @@ public class NodeSummary {
 
     public Optional<RenderType> getRenderType() {
         return renderType;
+    }
+
+    public Element getPlusButton() {
+        return plusButton;
     }
 }

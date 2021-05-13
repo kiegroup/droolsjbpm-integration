@@ -108,6 +108,30 @@ public class TestEvalutionSVG {
     }
 
     @Test
+    public void testStunnerSubProcessLink() throws Exception {
+        String elementId = "_D254259B-8C23-4498-9BE1-995E2DC66726";
+        List<String> completed = new ArrayList<String>();
+        List<String> active = new ArrayList<String>();
+        active.add(elementId);
+
+        Map<String, String> links = new HashMap<>();
+        links.put(elementId, "http://localhost/processes/1");
+        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/stunner.parentP-svg.svg"), completed, active, links);
+
+        // verify transformation
+        Document svgDocument = readSVG(svg);
+
+        Element subprocessPlusIcon = svgDocument.getElementById(elementId+"_subProcessReusableNormalReusableIcon");
+        String onclick = subprocessPlusIcon.getAttribute("onclick");
+        assertNotNull(onclick);
+        assertEquals("window.open('http://localhost/processes/1')", onclick);
+        String style = subprocessPlusIcon.getAttribute("style");
+        assertNotNull(style);
+        assertEquals("cursor: pointer;", style);
+
+    }
+
+    @Test
     public void testCustomColor() throws Exception {
         String completedNodeColor = "#888888";
         String completedNodeBorderColor = "#888887";
