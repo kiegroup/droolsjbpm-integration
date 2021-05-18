@@ -55,7 +55,7 @@ import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
-import org.drools.compiler.kie.builder.impl.ResultsImpl;
+import org.drools.compiler.kie.builder.impl.BuildContext;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
 import org.drools.modelcompiler.builder.ModelBuilderImpl;
@@ -250,7 +250,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
             }
 
             @Override
-            public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
+            public void writeProjectOutput(MemoryFileSystem trgMfs, BuildContext buildContext) {
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
                 Folder sourceFolder = srcMfs.getFolder("src/main/java");
 
