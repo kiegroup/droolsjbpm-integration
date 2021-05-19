@@ -96,9 +96,9 @@ public class SpringRegisterableItemsFactory extends KModuleRegisterableItemsFact
     }
 
     @Override
-    public List<TaskLifeCycleEventListener> getTaskListeners() {
+    public List<TaskLifeCycleEventListener> getTaskListeners(RuntimeEngine runtime) {
         
-        List<TaskLifeCycleEventListener> listeners = super.getTaskListeners();
+        List<TaskLifeCycleEventListener> listeners = super.getTaskListeners(runtime);
         processTaskEventListeners();
         
         listeners.addAll(taskListeners);

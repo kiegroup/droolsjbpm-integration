@@ -17,12 +17,6 @@ package org.kie.spring.persistence;
 
 import javax.persistence.EntityManager;
 
-import org.drools.persistence.api.PersistenceContext;
-import org.drools.persistence.api.TransactionManager;
-import org.drools.persistence.jpa.JpaPersistenceContext;
-import org.jbpm.persistence.JpaProcessPersistenceContext;
-import org.jbpm.persistence.api.ProcessPersistenceContext;
-import org.jbpm.persistence.api.ProcessPersistenceContextManager;
 import org.jbpm.services.task.persistence.JPATaskPersistenceContext;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
@@ -41,7 +35,7 @@ public class KieSpringTaskJpaManager extends AbstractKieSpringJpaManager
 
     @Override
     public TaskPersistenceContext getPersistenceContext() {
-        return new JPATaskPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), isJTA);
+        return new JPATaskPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), this.env, isJTA);
     }
 
     @Override
@@ -53,6 +47,7 @@ public class KieSpringTaskJpaManager extends AbstractKieSpringJpaManager
         }
     }
 
+    @Override
     public void endCommandScopedEntityManager() {
         if (TransactionSynchronizationManager.hasResource("cmdEM")) {
             // Code formerly in the clearPersistenceContext method.
