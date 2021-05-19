@@ -113,7 +113,7 @@ public class RuntimeDataServiceBase {
     protected String getUser(String queryParamUser) {
         if (bypassAuthUser) {
             if (queryParamUser == null || queryParamUser.isEmpty()) {
-        	    return identityProvider.getName();
+        	     return identityProvider.getName();
             }
             return queryParamUser;
         }
