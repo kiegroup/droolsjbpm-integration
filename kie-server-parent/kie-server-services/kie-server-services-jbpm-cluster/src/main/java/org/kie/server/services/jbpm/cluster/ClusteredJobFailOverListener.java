@@ -51,6 +51,7 @@ public class ClusteredJobFailOverListener implements ClusterListener, Asynchrono
         // all the jobs belonging to the partition need to be requeued
         List<Long> jobs = clusterService.getDataFromPartition(ClusterAwareService.CLUSTER_JOBS_KEY, node.toKey());
         if(jobs == null || jobs.isEmpty()) {
+            logger.info("Node left cluster {}, no failing over jobs", node);
             return;
         }
 
