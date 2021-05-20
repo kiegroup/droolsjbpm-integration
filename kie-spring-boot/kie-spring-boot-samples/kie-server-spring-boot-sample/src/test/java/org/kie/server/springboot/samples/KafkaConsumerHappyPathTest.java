@@ -79,7 +79,7 @@ import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class, TestAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-kafka.properties")
-@DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class KafkaConsumerHappyPathTest extends KafkaFixture {
     
     private static final String USELESS_DATA_EVENT = "useless-data-event.json";
@@ -313,8 +313,20 @@ public class KafkaConsumerHappyPathTest extends KafkaFixture {
     @Test(timeout = 60000)
     public void testStartMessagePojo() throws InterruptedException {
         startMessagePojoParam(MONEY_DATA_EVENT, AMOUNT_294, CURRENCY_EUR);
+    }
+    
+    @Test(timeout = 60000)
+    public void testStartMessagePojoFirstParamNull() throws InterruptedException {
         startMessagePojoParam(MONEY_DATA_NULL_AMOUNT_EVENT, null, CURRENCY_EUR);
+    }
+    
+    @Test(timeout = 60000)
+    public void testStartMessagePojoSecondParamNull() throws InterruptedException {
         startMessagePojoParam(MONEY_DATA_NULL_CURRENCY_EVENT, AMOUNT_294, null);
+    }
+    
+    @Test(timeout = 60000)
+    public void testStartMessagePojoBothParamsNull() throws InterruptedException {
         startMessagePojoParam(MONEY_DATA_NULL_BOTH_EVENT, null, null);
     }
     
