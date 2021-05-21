@@ -39,7 +39,7 @@ public class ServerInstanceKey {
 
     
     public ServerInstanceKey() {
-
+        this.online = true;
     }
 
     public ServerInstanceKey(ServerInstanceKey key) {
