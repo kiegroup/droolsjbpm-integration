@@ -662,9 +662,7 @@ public class RuntimeDataServiceBase {
         return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                                convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                                convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                               filter.getOwnersQueryParam() == null ?
-                                                                                                                       all(filter.getOwners()) :
-                                                                                                                       convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
+                                                                                                               getOwnersQueryParam(filter),
                                                                                                                queryContext));
     }
 
@@ -676,10 +674,18 @@ public class RuntimeDataServiceBase {
         return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                   convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
                                                                                                   convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                  filter.getOwnersQueryParam() == null ?
-                                                                                                          all(filter.getOwners()) :
-                                                                                                          convertToServiceApiQueryParam(filter.getOwnersQueryParam()),
+                                                                                                  getOwnersQueryParam(filter),
                                                                                                   queryContext));
+    }
+
+    private QueryParam getOwnersQueryParam(SearchQueryFilterSpec filter) {
+        if(filter.getOwnersQueryParam() != null) {
+            return convertToServiceApiQueryParam(filter.getOwnersQueryParam());
+        }
+        if(filter.getOwners() == null) {
+            return null;
+        }
+        return all(filter.getOwners());
     }
 
 }
