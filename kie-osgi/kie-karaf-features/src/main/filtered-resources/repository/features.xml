@@ -74,6 +74,7 @@
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm-commons</feature>
     <bundle>mvn:com.google.guava/guava/${version.com.google.guava}</bundle>
+    <bundle>mvn:com.google.guava/failureaccess/${version.com.google.guava.failureaccess}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
     <bundle>mvn:javax.mail/mail/${version.javax.mail}</bundle>
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
@@ -113,6 +114,7 @@
     <bundle>mvn:org.apache.commons/commons-math3/${version.org.apache.commons.math3}</bundle>
     <bundle>mvn:commons-io/commons-io/${version.commons-io}</bundle>
     <bundle>mvn:com.google.guava/guava/${version.com.google.guava}</bundle>
+    <bundle>mvn:com.google.guava/failureaccess/${version.com.google.guava.failureaccess}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/${karaf.version.org.apache.servicemix.bundles.reflections}</bundle>
   </feature>
 
