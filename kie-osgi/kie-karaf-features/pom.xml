@@ -40,7 +40,7 @@
     <karaf.version.org.apache.geronimo.specs.jms>1.1.1</karaf.version.org.apache.geronimo.specs.jms>
     <karaf.version.org.apache.geronimo.specs.jpa>1.0-alpha-1</karaf.version.org.apache.geronimo.specs.jpa>
     <karaf.version.org.apache.geronimo.specs.jta>1.1.1</karaf.version.org.apache.geronimo.specs.jta>
-    <karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec>${version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec}</karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec>
+    <karaf.version.jakarta.el.jakarta.el-api.3.0_spec>${version.jakarta.el.jakarta.el-api.3.0_spec}</karaf.version.jakarta.el.jakarta.el-api.3.0_spec>
     <!-- used by optaplanner -->
     <karaf.version.org.apache.servicemix.bundles.reflections>0.9.10_2</karaf.version.org.apache.servicemix.bundles.reflections>
 
@@ -234,8 +234,8 @@
         <version>${karaf.version.org.jboss.jandex}</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.spec.javax.security.jacc</groupId>
-        <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+        <groupId>jakarta.security.jacc</groupId>
+        <artifactId>jakarta.security.jacc-api</artifactId>
         <version>${karaf.version.org.jboss.spec.javax.security.jacc}</version>
       </dependency>
       <dependency>
@@ -710,8 +710,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+      <groupId>jakarta.security.jacc</groupId>
+      <artifactId>jakarta.security.jacc-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -720,13 +720,13 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.el</groupId>
-      <artifactId>jboss-el-api_3.0_spec</artifactId>
+      <groupId>jakarta.el</groupId>
+      <artifactId>jakarta.el-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

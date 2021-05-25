@@ -21,9 +21,9 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.jboss.spec.javax.xml.bind</groupId>
-        <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
-        <version>${version.org.jboss.spec.javax.xml.bind.jboss-jaxb-api_2.3_spec}</version>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>${version.jakarta.xml.bind-api}</version>
       </dependency>
       <dependency>
         <groupId>javax.jws</groupId>
@@ -31,9 +31,9 @@
         <version>${version.javax.jws}</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.spec.javax.xml.ws</groupId>
-        <artifactId>jboss-jaxws-api_2.3_spec</artifactId>
-        <version>${version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.3_spec}</version>
+        <groupId>jakarta.xml.ws</groupId>
+        <artifactId>jakarta.xml.ws-api</artifactId>
+        <version>${version.jakarta.xml.ws.jakarta.xml.ws-api_2.3_spec}</version>
       </dependency>
       <dependency>
         <groupId>org.drools</groupId>
