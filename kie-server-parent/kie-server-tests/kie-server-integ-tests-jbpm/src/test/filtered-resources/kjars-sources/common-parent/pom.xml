@@ -33,7 +33,7 @@
       <dependency>
         <groupId>jakarta.xml.ws</groupId>
         <artifactId>jakarta.xml.ws-api</artifactId>
-        <version>${version.jakarta.xml.ws.jakarta.xml.ws-api_2.3_spec}</version>
+        <version>${version.jakarta.xml.ws.jakarta.xml.ws-api}</version>
       </dependency>
       <dependency>
         <groupId>org.drools</groupId>
