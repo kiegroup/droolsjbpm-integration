@@ -80,6 +80,12 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-persistence-api</artifactId>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -256,6 +262,12 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-test-util</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

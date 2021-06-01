@@ -99,8 +99,12 @@
       <artifactId>jaxrs</artifactId>
       <exclusions>
         <exclusion>
-          <artifactId>thorntail-jdk-specific</artifactId>
           <groupId>io.thorntail.jdk-specific</groupId>
+          <artifactId>thorntail-jdk-specific</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -119,6 +123,10 @@
         <exclusion>
           <artifactId>narayana-jts-idlj</artifactId>
           <groupId>org.jboss.narayana.jts</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.3_spec</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -143,6 +151,12 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>ejb</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.3_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- External dependencies -->
@@ -161,6 +175,10 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
