@@ -130,7 +130,7 @@
           <artifactId>cargo-maven3-plugin</artifactId>
           <configuration>
             <container>
-              <containerId>wildfly19x</containerId>
+              <containerId>wildfly23x</containerId>
               <type>installed</type>
               <artifactInstaller>
                 <groupId>org.wildfly</groupId>

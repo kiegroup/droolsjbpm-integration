@@ -625,7 +625,7 @@
         </property>
       </activation>
       <properties>
-        <cargo.container.id>wildfly19x</cargo.container.id>
+        <cargo.container.id>wildfly23x</cargo.container.id>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
       </properties>
       <build>
