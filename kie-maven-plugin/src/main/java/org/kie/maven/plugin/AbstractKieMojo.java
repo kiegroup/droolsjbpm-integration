@@ -16,6 +16,7 @@
 package org.kie.maven.plugin;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 
 import java.util.List;
@@ -23,6 +24,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class AbstractKieMojo extends AbstractMojo {
+
+    @Parameter(property = "dumpGeneratedSources", defaultValue = "false") // DROOLS-5663 align kie-maven-plugin default value for generateModel configuration flag
+    private boolean dumpGeneratedSources;
+
+    protected boolean isDumpGeneratedSources() {
+        return dumpGeneratedSources;
+    }
 
     protected void setSystemProperties(Map<String, String> properties) {
 
