@@ -109,12 +109,12 @@ public class GenerateCodeUtil {
     }
 
     public static String toClassName(String source) {
-        if (source.startsWith("./")) {
+        if (source.startsWith("./") || source.startsWith(".\\")) {
             source = source.substring(2);
         }
         if (source.endsWith(".java")) {
             source = source.substring(0, source.length()-5);
         }
-        return source.replace('/', '.');
+        return source.replace('/', '.').replace('\\', '.');
     }
 }
