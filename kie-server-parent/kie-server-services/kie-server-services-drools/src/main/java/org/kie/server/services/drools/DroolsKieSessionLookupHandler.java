@@ -63,9 +63,11 @@ public class DroolsKieSessionLookupHandler implements KieSessionLookupHandler {
             }
 
             //default handler
-            PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(PrometheusKieServerExtension.getMetrics(),
-                    kieSessionId, containerInstance);
-            eventManager.addEventListener(listener);
+            if (eventManager.getAgendaEventListeners().stream().noneMatch(PrometheusMetricsDroolsListener.class::isInstance)) {
+                PrometheusMetricsDroolsListener listener = new PrometheusMetricsDroolsListener(PrometheusKieServerExtension.getMetrics(),
+                                                                                               kieSessionId, containerInstance);
+                eventManager.addEventListener(listener);
+            }
 
             //custom handlers
             List<AgendaEventListener> droolsListeners = extension.getDroolsListeners(kieSessionId, containerInstance);
