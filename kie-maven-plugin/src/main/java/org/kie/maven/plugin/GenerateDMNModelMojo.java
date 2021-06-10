@@ -121,7 +121,8 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                 compileDMNFile(kieModule, assemblerService, knowledgeBuilder, dmnFile);
             }
 
-            compileAndWriteClasses(targetDirectory, ((InternalKieModule) kieBuilder.getKieModule()).getModuleClassLoader(), javaCompilerSettings, classNameSourceMap, isDumpGeneratedSources());
+            compileAndWriteClasses(targetDirectory, ((InternalKieModule) kieBuilder.getKieModule()).getModuleClassLoader(),
+                    javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpGeneratedSources);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

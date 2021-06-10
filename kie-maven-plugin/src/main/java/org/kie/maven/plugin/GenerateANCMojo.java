@@ -128,11 +128,11 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
                 for (CompiledNetworkSource generatedFile : ancSourceFiles) {
                     String className = toClassName(generatedFile.getSourceName());
                     classNameSourceMap.put(className, generatedFile.getSource());
-                    getLog().info("Written Compiled Alpha Network: " + className);
+                    getLog().info("Generated Alpha Network class: " + className);
                 }
             }
 
-            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, classNameSourceMap, isDumpGeneratedSources());
+            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpGeneratedSources);
 
             // generate the ANC file
             String ancFile = CanonicalKieModule.getANCFile(new ReleaseIdImpl(

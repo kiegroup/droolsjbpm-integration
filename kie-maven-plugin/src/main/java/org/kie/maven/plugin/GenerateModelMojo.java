@@ -154,7 +154,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                 getLog().info("Generating " + className);
             }
 
-            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, classNameSourceMap, isDumpGeneratedSources());
+            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpGeneratedSources);
 
             // copy the META-INF packages file
             final String path = CanonicalKieModule.getModelFileWithGAV(kieModule.getReleaseId());

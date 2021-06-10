@@ -17,6 +17,7 @@ package org.kie.maven.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -36,6 +37,8 @@ import org.apache.maven.project.MavenProject;
 import org.kie.memorycompiler.JavaCompilerSettings;
 import org.kie.memorycompiler.JavaConfiguration;
 import org.kie.memorycompiler.KieMemoryCompiler;
+
+import static org.kie.memorycompiler.JavaConfiguration.findJavaVersion;
 
 public class GenerateCodeUtil {
 
@@ -65,12 +68,13 @@ public class GenerateCodeUtil {
         }
     }
 
-    public static void compileAndWriteClasses(File targetDirectory, ClassLoader projectClassLoader, JavaCompilerSettings javaCompilerSettings, Map<String, String> classNameSourceMap, boolean dumpGeneratedSources) {
+    public static void compileAndWriteClasses(File targetDirectory, ClassLoader projectClassLoader, JavaCompilerSettings javaCompilerSettings,
+                                              JavaConfiguration.CompilerType compilerType, Map<String, String> classNameSourceMap, boolean dumpGeneratedSources) {
         if (dumpGeneratedSources) {
             dumpGeneratedSources(targetDirectory, classNameSourceMap);
         }
 
-        Map<String, byte[]> compiledClassesMap = KieMemoryCompiler.compileNoLoad(classNameSourceMap, projectClassLoader, javaCompilerSettings, JavaConfiguration.CompilerType.ECLIPSE);
+        Map<String, byte[]> compiledClassesMap = KieMemoryCompiler.compileNoLoad(classNameSourceMap, projectClassLoader, javaCompilerSettings, compilerType);
 
         for (Map.Entry<String, byte[]> entry : compiledClassesMap.entrySet()) {
             Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", entry.getKey().replace('.', '/') + ".class");
@@ -92,25 +96,16 @@ public class GenerateCodeUtil {
             }
             Files.write(packagesDestinationPath, value);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
     }
 
     public static JavaCompilerSettings createJavaCompilerSettings() {
         JavaCompilerSettings javaCompilerSettings = new JavaCompilerSettings();
-        String javaVersion = findJavaVersion();
+        String javaVersion = findJavaVersion(System.getProperty("java.version"));
         javaCompilerSettings.setSourceVersion(javaVersion);
         javaCompilerSettings.setTargetVersion(javaVersion);
         return javaCompilerSettings;
-    }
-
-    public static String findJavaVersion() {
-        String javaVersion = System.getProperty("java.version");
-        if (javaVersion.startsWith("1.8")) {
-            return "1.8";
-        }
-        int dot = javaVersion.indexOf('.');
-        return dot > 0 ? javaVersion.substring(0, dot) : javaVersion;
     }
 
     public static String toClassName(String source) {
