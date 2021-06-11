@@ -63,7 +63,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     
     private static final Logger logger = LoggerFactory.getLogger(AbstractFormRenderer.class);
     
-    public static final String MASTER_LAYOUT_TEMPLATE = "master";
+    public static final String MAIN_LAYOUT_TEMPLATE = "main";
     public static final String HEADER_LAYOUT_TEMPLATE = "header";
     public static final String FORM_GROUP_LAYOUT_TEMPLATE = "form-group";
     public static final String CASE_LAYOUT_TEMPLATE = "case-layout";
@@ -179,7 +179,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);        
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -230,7 +230,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);        
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -283,7 +283,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
