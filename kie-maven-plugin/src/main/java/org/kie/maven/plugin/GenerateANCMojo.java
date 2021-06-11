@@ -132,7 +132,7 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
                 }
             }
 
-            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpGeneratedSources);
+            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpKieSourcesFolder);
 
             // generate the ANC file
             String ancFile = CanonicalKieModule.getANCFile(new ReleaseIdImpl(

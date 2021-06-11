@@ -69,9 +69,9 @@ public class GenerateCodeUtil {
     }
 
     public static void compileAndWriteClasses(File targetDirectory, ClassLoader projectClassLoader, JavaCompilerSettings javaCompilerSettings,
-                                              JavaConfiguration.CompilerType compilerType, Map<String, String> classNameSourceMap, boolean dumpGeneratedSources) {
-        if (dumpGeneratedSources) {
-            dumpGeneratedSources(targetDirectory, classNameSourceMap);
+                                              JavaConfiguration.CompilerType compilerType, Map<String, String> classNameSourceMap, String dumpKieSourcesFolder) {
+        if (dumpKieSourcesFolder != null && !dumpKieSourcesFolder.isEmpty()) {
+            dumpGeneratedSources(targetDirectory, classNameSourceMap, dumpKieSourcesFolder);
         }
 
         Map<String, byte[]> compiledClassesMap = KieMemoryCompiler.compileNoLoad(classNameSourceMap, projectClassLoader, javaCompilerSettings, compilerType);
@@ -82,9 +82,9 @@ public class GenerateCodeUtil {
         }
     }
 
-    private static void dumpGeneratedSources(File targetDirectory, Map<String, String> classNameSourceMap) {
+    private static void dumpGeneratedSources(File targetDirectory, Map<String, String> classNameSourceMap, String dumpKieSourcesFolder) {
         for (Map.Entry<String, String> entry : classNameSourceMap.entrySet()) {
-            Path sourceDestinationPath = Paths.get(targetDirectory.getPath(), "generated-sources", entry.getKey().replace('.', '/') + ".java");
+            Path sourceDestinationPath = Paths.get(targetDirectory.getPath(), dumpKieSourcesFolder, entry.getKey().replace('.', '/') + ".java");
             writeFile(sourceDestinationPath, entry.getValue().getBytes(StandardCharsets.UTF_8));
         }
     }

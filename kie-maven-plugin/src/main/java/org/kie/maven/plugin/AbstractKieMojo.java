@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractKieMojo extends AbstractMojo {
 
-    @Parameter(property = "dumpGeneratedSources", defaultValue = "false")
-    protected boolean dumpGeneratedSources;
+    @Parameter(property = "dumpKieSourcesFolder", defaultValue = "")
+    protected String dumpKieSourcesFolder;
 
     @Parameter(property = "javaCompiler", defaultValue = "ecj")
     private String javaCompiler;

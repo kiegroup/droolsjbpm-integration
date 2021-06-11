@@ -127,7 +127,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         Thread.currentThread().setContextClassLoader(projectClassLoader);
 
         try {
-            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), generateFiles(), dumpGeneratedSources);
+            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), generateFiles(), dumpKieSourcesFolder);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
             if (projectClassLoader != null) {

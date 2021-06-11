@@ -122,7 +122,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             }
 
             compileAndWriteClasses(targetDirectory, ((InternalKieModule) kieBuilder.getKieModule()).getModuleClassLoader(),
-                    javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpGeneratedSources);
+                    javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpKieSourcesFolder);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
