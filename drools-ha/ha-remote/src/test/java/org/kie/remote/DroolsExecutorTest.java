@@ -37,10 +37,10 @@ public class DroolsExecutorTest {
     }
 
     @Test
-    public void testGetSlave() {
-        final DroolsExecutor slave = getSlaveExecutor();
+    public void testGetSecondary() {
+        final DroolsExecutor secondary = getSecondaryExecutor();
 
-        Assertions.assertThat(slave).isInstanceOf(DroolsExecutor.Slave.class);
+        Assertions.assertThat(secondary).isInstanceOf(DroolsExecutor.Secondary.class);
     }
 
     @Test
@@ -76,16 +76,16 @@ public class DroolsExecutorTest {
     }
 
     @Test
-    public void testExecuteOnSlave() {
-        final DroolsExecutor slave = getSlaveExecutor();
+    public void testExecuteOnSecondary() {
+        final DroolsExecutor secondary = getSecondaryExecutor();
         final Queue<Serializable> sideEffects = new ArrayDeque<>(Arrays.asList(TEST_SIDE_EFFECTS));
-        slave.appendSideEffects(sideEffects);
+        secondary.appendSideEffects(sideEffects);
 
-        slave.execute(new DummyRunnable());
-        Assertions.assertThat(slave.execute(() -> "test"))
+        secondary.execute(new DummyRunnable());
+        Assertions.assertThat(secondary.execute(() -> "test"))
                 .isNotNull()
                 .isEqualTo(TEST_SIDE_EFFECTS[1]);
-        Assertions.assertThat(slave.execute(() -> "test")).isNull();
+        Assertions.assertThat(secondary.execute(() -> "test")).isNull();
     }
 
     private static DroolsExecutor getMainExecutor() {
@@ -93,7 +93,7 @@ public class DroolsExecutorTest {
         return DroolsExecutor.getInstance();
     }
 
-    private static DroolsExecutor getSlaveExecutor() {
+    private static DroolsExecutor getSecondaryExecutor() {
         DroolsExecutor.setAsReplica();
         return DroolsExecutor.getInstance();
     }
