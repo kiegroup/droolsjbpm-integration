@@ -36,9 +36,9 @@ import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.core.compiler.execmodelbased.DMNRuleClassFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class KJarWithDMNIntegrationTestIT {
 
@@ -54,7 +54,7 @@ public class KJarWithDMNIntegrationTestIT {
         final KieSession kieSession = ITTestsUtils.getKieSession(targetLocation, GAV_ARTIFACT_ID, GAV_VERSION, KBASE_NAME);
 
         // verify DMN file is present
-        assertThat(getClass().getClassLoader().getResourceAsStream("META-INF/kie/dmn")).isNotNull();
+        assertThat(getClass().getClassLoader().getResourceAsStream(DMNRuleClassFile.RULE_CLASS_FILE_NAME)).isNotNull();
 
         try {
             final DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
