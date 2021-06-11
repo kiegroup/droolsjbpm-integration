@@ -54,6 +54,11 @@ public class FallbackableTypeFactory extends TypeFactory {
         this.fallbackClassLoader = fallbackClassLoader;
     }
 
+    public FallbackableTypeFactory(ClassLoader classLoader) {
+        super(null);
+        this.fallbackClassLoader = classLoader;
+    }
+
     /**
      * "Mutant factory" method which will construct a new instance with specified fallback
      * {@link ClassLoader} to use by {@link #findClass} only when main classloader or thread context classloader can not resolve.
