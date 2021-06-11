@@ -124,7 +124,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
             createDMNFile(classNameSourceMap.keySet());
 
-            compileAndWriteClasses(targetDirectory, ((InternalKieModule) kieBuilder.getKieModule()).getModuleClassLoader(),
+            compileAndWriteClasses(targetDirectory, contextClassLoader,
                     javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpKieSourcesFolder);
 
         } catch (Exception e) {
@@ -162,7 +162,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                 }, b -> {
                 });
 
-        assemblerService.addResources(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
+        assemblerService.addResourcesAfterRules(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
     }
 
     private String getCompiledClassName(Path fileNameRelative) {

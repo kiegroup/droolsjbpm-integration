@@ -52,6 +52,10 @@ public class KJarWithDMNIntegrationTestIT {
     public void testComplexDMNModel() throws Exception {
         final URL targetLocation = KJarWithDMNIntegrationTestIT.class.getProtectionDomain().getCodeSource().getLocation();
         final KieSession kieSession = ITTestsUtils.getKieSession(targetLocation, GAV_ARTIFACT_ID, GAV_VERSION, KBASE_NAME);
+
+        // verify DMN file is present
+        assertThat(getClass().getClassLoader().getResourceAsStream("META-INF/kie/dmn")).isNotNull();
+
         try {
             final DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
             final DMNModel dmnModel = dmnRuntime.getModel("http://www.trisotech.com/definitions/_3068644b-d2c7-4b81-ab9d-64f011f81f47",
