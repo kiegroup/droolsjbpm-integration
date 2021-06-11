@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +122,8 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                 compileDMNFile(kieModule, assemblerService, knowledgeBuilder, dmnFile);
             }
 
+            createDMNFile(classNameSourceMap.keySet());
+
             compileAndWriteClasses(targetDirectory, ((InternalKieModule) kieBuilder.getKieModule()).getModuleClassLoader(),
                     javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpKieSourcesFolder);
 
@@ -131,6 +134,19 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
         }
 
         getLog().info("DMN Model successfully generated");
+    }
+
+    private void createDMNFile(Collection<String> compiledClassNames) {
+        final Path dmnCompiledClassFile = Paths.get(targetDirectory.getPath(), "classes", DMNRuleClassFile.RULE_CLASS_FILE_NAME);
+
+        try {
+            if (!Files.exists(dmnCompiledClassFile)) {
+                Files.createDirectories(dmnCompiledClassFile.getParent());
+            }
+            Files.write(dmnCompiledClassFile, compiledClassNames);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to write file", e);
+        }
     }
 
     private List<String> getDMNFIles(InternalKieModule kieModule) {
