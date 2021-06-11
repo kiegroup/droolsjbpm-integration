@@ -108,7 +108,13 @@ class KafkaServerConsumer implements Runnable {
     private void registrationUpdated(Set<String> topics2Register) {
 
         if (consumerReady.compareAndSet(false, true)) {
-            consumer = consumerSupplier.get();
+            try {
+                consumer = consumerSupplier.get();
+            }
+            catch (Exception ex) {
+                consumerReady.set(false);
+                throw ex;
+            }
             consumer.subscribe(topics2Register);
             logger.debug("Created kafka consumer with these topics registered {}", topics2Register);
             notifyService.set(

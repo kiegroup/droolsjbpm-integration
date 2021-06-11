@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -57,6 +56,7 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     private static final Logger logger = LoggerFactory.getLogger(KafkaServerExtension.class);
 
     public static final String EXTENSION_NAME = "Kafka";
+    private static final String DEFAULT_HOST= "localhost:9092";
 
     private KafkaServerConsumer kafkaServerConsumer;
     private KafkaServerProducer kafkaServerProducer;
@@ -66,6 +66,9 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     private AtomicBoolean initialized = new AtomicBoolean();
     // JBPM services
     private ListenerSupport deploymentService;
+    
+    private Map<String,Object> consumerProperties = new HashMap<>();
+    private Map<String,Object> producerProperties = new HashMap<>();
 
 
     @Override
@@ -84,7 +87,9 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
             logger.warn("Kafka extension already initialized");
             return;
         }
-        
+
+        initProperties();
+
         DeploymentDescriptorManager.addDescriptorLocation(
                 "classpath:/META-INF/kafka-deployment-descriptor-defaults.xml");
         
@@ -131,43 +136,22 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
         factory = null;
         deploymentService = null;
         initialized.set(false);
+        consumerProperties.clear();
+        producerProperties.clear();
     }
 
     protected Consumer<String, byte[]> getKafkaConsumer() {
-        Map<String, Object> props = initCommonConfig();
+        consumerProperties.putIfAbsent(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, DEFAULT_HOST);
         // read only committed events
-        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, IsolationLevel.READ_COMMITTED.toString().toLowerCase());
-        // automatically create topics by default
-        String autoCreateTopics = System.getProperty(KAFKA_EXTENSION_PREFIX +
-                                                     ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG);
-        if (autoCreateTopics != null) {
-            props.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.parseBoolean(autoCreateTopics));
-        }
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, System.getProperty(KAFKA_EXTENSION_PREFIX +
-                                                                     ConsumerConfig.GROUP_ID_CONFIG, "jbpm-consumer"));
-        return new KafkaConsumer<>(props, new StringDeserializer(), new ByteArrayDeserializer());
+        consumerProperties.putIfAbsent(ConsumerConfig.ISOLATION_LEVEL_CONFIG, IsolationLevel.READ_COMMITTED.toString().toLowerCase());
+        consumerProperties.putIfAbsent(ConsumerConfig.GROUP_ID_CONFIG, "jbpm-consumer");
+        return new KafkaConsumer<>(consumerProperties, new StringDeserializer(), new ByteArrayDeserializer());
     }
 
     protected Producer<String, byte[]> getKafkaProducer() {
-        Map<String, Object> props = initCommonConfig();
-        String acks = System.getProperty(KAFKA_EXTENSION_PREFIX + ProducerConfig.ACKS_CONFIG);
-        if (acks != null) {
-            props.put(ProducerConfig.ACKS_CONFIG, acks);
-        }
-        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.getLong(KAFKA_EXTENSION_PREFIX +
-                                                                   ProducerConfig.MAX_BLOCK_MS_CONFIG, 2000L));
-        return new KafkaProducer<>(props, new StringSerializer(), new ByteArraySerializer());
-    }
-
-    private Map<String, Object> initCommonConfig() {
-        Map<String, Object> configs = new HashMap<>();
-        configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, System.getProperty(
-                KAFKA_EXTENSION_PREFIX + CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092"));
-        String clientId = System.getProperty(KAFKA_EXTENSION_PREFIX + CommonClientConfigs.CLIENT_ID_CONFIG);
-        if (clientId != null) {
-            configs.put(CommonClientConfigs.CLIENT_ID_CONFIG, clientId);
-        }
-        return configs;
+        producerProperties.putIfAbsent(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, DEFAULT_HOST);
+        producerProperties.putIfAbsent(ProducerConfig.MAX_BLOCK_MS_CONFIG, 2000L);
+        return new KafkaProducer<>(producerProperties, new StringSerializer(), new ByteArraySerializer());
     }
 
     @Override
@@ -259,5 +243,28 @@ public class KafkaServerExtension implements KieServerExtension, DeploymentEvent
     @Override
     public <T> T getAppComponents(Class<T> serviceType) {
         return null;
+    }
+    
+    protected final Map<String, Object> getConsumerProperties() {
+        return Collections.unmodifiableMap(consumerProperties);
+    }
+
+    protected final Map<String, Object> getProducerProperties() {
+        return Collections.unmodifiableMap(producerProperties);
+    }
+
+    protected final void initProperties() {
+        for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+            String key = entry.getKey().toString();
+            if (key.startsWith(KAFKA_EXTENSION_PREFIX)) {
+                String propName = key.substring(KAFKA_EXTENSION_PREFIX.length());
+                if (ConsumerConfig.configNames().contains(propName)) {
+                    consumerProperties.put(propName, entry.getValue());
+                }
+                if (ProducerConfig.configNames().contains(propName)) {
+                    producerProperties.put(propName, entry.getValue());
+                }
+            }
+        }
     }
 }
