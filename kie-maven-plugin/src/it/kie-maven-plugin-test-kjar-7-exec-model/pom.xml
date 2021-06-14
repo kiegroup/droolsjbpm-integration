@@ -30,6 +30,10 @@
 
   <packaging>kjar</packaging>
 
+  <properties>
+    <generateDMNModel>YES</generateDMNModel>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>

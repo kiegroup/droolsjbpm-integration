@@ -20,11 +20,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -48,8 +48,11 @@ import org.kie.dmn.core.compiler.execmodelbased.DMNRuleClassFile;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceWithConfigurationImpl;
+import org.kie.memorycompiler.JavaCompilerSettings;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
+import static org.kie.maven.plugin.GenerateCodeUtil.compileAndWriteClasses;
+import static org.kie.maven.plugin.GenerateCodeUtil.createJavaCompilerSettings;
 
 @Mojo(name = "generateDMNModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -84,6 +87,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
     private void generateDMNModel() throws MojoExecutionException {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        JavaCompilerSettings javaCompilerSettings = createJavaCompilerSettings();
 
         KieServices ks = KieServices.Factory.get();
 
@@ -94,22 +98,14 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
 
             DMNCompilerConfigurationImpl dmnCompilerConfiguration = (DMNCompilerConfigurationImpl) DMNFactory.newCompilerConfiguration();
 
-            final List<String> compiledClassNames = new ArrayList<>();
+            Map<String, String> classNameSourceMap = new HashMap<>();
+
             dmnCompilerConfiguration.setDeferredCompilation(true);
             dmnCompilerConfiguration.addListener(generatedSource -> {
-                final String droolsModelCompilerPath = "/generated-sources/dmn/main/java";
-                addNewCompileRoot(droolsModelCompilerPath);
-
                 for (GeneratedSource generatedFile : generatedSource) {
                     final Path fileNameRelative = transformPathToMavenPath(generatedFile);
-
-                    compiledClassNames.add(getCompiledClassName(fileNameRelative));
-
-                    final Path newFile = Paths.get(targetDirectory.getPath(),
-                                                   droolsModelCompilerPath,
-                                                   fileNameRelative.toString());
-
-                    createInvokerSourceFile(newFile, generatedFile.getSourceContent());
+                    getLog().info("Generating new DMN file: " + generatedFile);
+                    classNameSourceMap.put(getCompiledClassName(fileNameRelative), generatedFile.getSourceContent());
                 }
             });
 
@@ -123,7 +119,12 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             for (String dmnFile : dmnFiles) {
                 compileDMNFile(kieModule, assemblerService, knowledgeBuilder, dmnFile);
             }
-            createDMNFile(compiledClassNames);
+
+            createDMNFile(classNameSourceMap.keySet());
+
+            compileAndWriteClasses(targetDirectory, contextClassLoader,
+                    javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpKieSourcesFolder);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -133,7 +134,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
         getLog().info("DMN Model successfully generated");
     }
 
-    private void createDMNFile(List<String> compiledClassNames) {
+    private void createDMNFile(Collection<String> compiledClassNames) {
         final Path dmnCompiledClassFile = Paths.get(targetDirectory.getPath(), "classes", DMNRuleClassFile.RULE_CLASS_FILE_NAME);
 
         try {
@@ -159,19 +160,7 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
                 }, b -> {
                 });
 
-        assemblerService.addResources(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
-    }
-
-    private void createInvokerSourceFile(Path newFile, String sourceContent) {
-        try {
-            Files.deleteIfExists(newFile);
-            Files.createDirectories(newFile.getParent());
-            Path newFilePath = Files.createFile(newFile);
-            Files.write(newFilePath, sourceContent.getBytes());
-            getLog().info("Generating new DMN file" + newFilePath);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to write file", e);
-        }
+        assemblerService.addResourcesAfterRules(knowledgeBuilder, Collections.singletonList(resourceWithConfiguration), ResourceType.DMN);
     }
 
     private String getCompiledClassName(Path fileNameRelative) {
@@ -190,11 +179,6 @@ public class GenerateDMNModelMojo extends AbstractKieMojo {
             fileNameRelative = fileName;
         }
         return fileNameRelative;
-    }
-
-    private void addNewCompileRoot(String droolsModelCompilerPath) {
-        final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
-        project.addCompileSourceRoot(newCompileSourceRoot);
     }
 }
 
