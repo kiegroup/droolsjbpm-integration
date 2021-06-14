@@ -25,52 +25,8 @@
 
   "ignores": {
     "revapi": {
-      "_comment": "Changes between 7.48.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": [
-    {
-   "code": "java.annotation.attributeRemoved",
-   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.drools.CommandResource::manageContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
-   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.drools.CommandResource::manageContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
-   "annotationType": "io.swagger.annotations.ApiOperation",
-   "annotation": "@io.swagger.annotations.ApiOperation(\"Executes one or more runtime commands\")",
-   "attribute": "response",
-   "value": "org.kie.server.api.model.ServiceResponse.class",
-   "package": "org.kie.server.remote.rest.drools",
-   "classSimpleName": "CommandResource",
-   "methodName": "manageContainer",
-   "elementKind": "method",
-   "justification": "https://issues.redhat.com/browse/RHPAM-3463"
- },
- {
-   "code": "java.annotation.attributeRemoved",
-   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.drools.CommandResource::manageContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
-   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.drools.CommandResource::manageContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
-   "annotationType": "io.swagger.annotations.ApiOperation",
-   "annotation": "@io.swagger.annotations.ApiOperation(\"Executes one or more runtime commands\")",
-   "attribute": "code",
-   "value": "200",
-   "package": "org.kie.server.remote.rest.drools",
-   "classSimpleName": "CommandResource",
-   "methodName": "manageContainer",
-   "elementKind": "method",
-   "justification": "https://issues.redhat.com/browse/RHPAM-3463"
- },
- {
-   "code": "java.annotation.attributeValueChanged",
-   "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.drools.CommandResource::manageContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
-   "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.drools.CommandResource::manageContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String)",
-   "annotationType": "io.swagger.annotations.ApiResponses",
-   "annotation": "@io.swagger.annotations.ApiResponses({@io.swagger.annotations.ApiResponse(code = 200, message = \"Successful execution\", response = org.kie.server.api.model.ServiceResponse.class), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\", response = org.kie.server.api.model.ServiceResponse.class), @io.swagger.annotations.ApiResponse(code = 204, message = \"Command execute successfully, but without response\", response = org.kie.server.api.model.ServiceResponse.class)})",
-   "attribute": "value",
-   "oldValue": "{@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\")}",
-   "newValue": "{@io.swagger.annotations.ApiResponse(code = 200, message = \"Successful execution\", response = org.kie.server.api.model.ServiceResponse.class), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\", response = org.kie.server.api.model.ServiceResponse.class), @io.swagger.annotations.ApiResponse(code = 204, message = \"Command execute successfully, but without response\", response = org.kie.server.api.model.ServiceResponse.class)}",
-   "package": "org.kie.server.remote.rest.drools",
-   "classSimpleName": "CommandResource",
-   "methodName": "manageContainer",
-   "elementKind": "method",
-   "justification": "https://issues.redhat.com/browse/RHPAM-3463"
- }
-      ]
+      "_comment": "Changes between 7.52.0.Final and the current branch. These changes are desired and thus ignored.",
+      "ignore": []
      }
   }
 }
