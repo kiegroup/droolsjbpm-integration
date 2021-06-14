@@ -13,6 +13,7 @@ jobs:
     name: Maven Build
     steps:
       - name: Free disk space
+        if: ${{ matrix.os == 'ubuntu-18.04' }}
         shell: bash
         run: |
           sudo rm -rf /usr/share/dotnet
