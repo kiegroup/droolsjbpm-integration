@@ -13,8 +13,8 @@ jobs:
     name: Maven Build
     steps:
       - name: Support longpaths
-            if: ${{ matrix.os == 'windows-latest' }}
-            run: git config --system core.longpaths true
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: git config --system core.longpaths true
       - name: Free disk space
         if: ${{ matrix.os == 'ubuntu-18.04' }}
         shell: bash
