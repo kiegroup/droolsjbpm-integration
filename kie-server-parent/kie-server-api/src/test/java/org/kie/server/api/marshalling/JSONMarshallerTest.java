@@ -171,6 +171,25 @@ public class JSONMarshallerTest {
             this.r = r;
         }
     }
+    
+    public static class Order {
+
+        private String ORDER_ID;
+        
+        public Order() {}
+        
+        public Order(String o){
+            this.ORDER_ID = o;
+        }
+
+        public String getORDER_ID() {
+            return ORDER_ID;
+        }
+
+        public void setORDER_ID(String o) {
+            this.ORDER_ID = o;
+        }
+    }
 
     @Test
     public void testRecursiveMap() {
@@ -229,6 +248,16 @@ public class JSONMarshallerTest {
         QueryParam[] params = marshaller.unmarshall(input, QueryParam[].class);
         assertEquals(1, params.length);
         assertThat(Arrays.asList(params), everyItem(instanceOf(QueryParam.class)));
+    }
+    
+    @Test
+    public void testCapitalizedFieldnames() throws Exception {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JSON, getClass().getClassLoader());
+        
+        Order order = new Order("all");
+        String converted = marshaller.marshall(order);
+        Order unconverted = marshaller.unmarshall(converted, Order.class);
+        assertEquals("all", unconverted.getORDER_ID());
     }
 
 }
