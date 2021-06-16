@@ -56,6 +56,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -225,6 +226,9 @@ public class JSONMarshaller implements Marshaller {
                 .with(introspectorPair)
                 .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+
+        objectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, true);
+        deserializeObjectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, true);
 
         // setup custom serialization mapper with jaxb adapters
         customSerializationMapper.setConfig(customSerializationMapper.getDeserializationConfig().with(introspectorPair));
