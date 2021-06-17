@@ -40,17 +40,17 @@ public interface CloudClientFactory {
 
     default Config setupConfig() {
         final Logger logger = LoggerFactory.getLogger(CloudClientFactory.class);
-        String masterUrl = System.getProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY);
+        String mainUrl = System.getProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY);
         String token = System.getProperty(Config.KUBERNETES_OAUTH_TOKEN_SYSTEM_PROPERTY);
 
-        if (masterUrl == null) {
-            masterUrl = new StringBuilder("https://")
+        if (mainUrl == null) {
+            mainUrl = new StringBuilder("https://")
                     .append(System.getenv(CloudClientConstants.ENV_VAR_API_SERVICE_HOST))
                     .append(":")
                     .append(System.getenv(CloudClientConstants.ENV_VAR_API_SERVER_PORT))
                     .toString();
-            System.setProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY, masterUrl);
-            logger.debug("MasterUrl: {}", masterUrl);
+            System.setProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY, mainUrl);
+            logger.debug("MainUrl: {}", mainUrl);
         }
         
         if (token == null || token.length() == 0) {
@@ -63,6 +63,6 @@ public interface CloudClientFactory {
             logger.debug("Token: [{}]", token);
         }
 
-        return new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).build();
+        return new ConfigBuilder().withMasterUrl(mainUrl).withOauthToken(token).build();
     }
 }

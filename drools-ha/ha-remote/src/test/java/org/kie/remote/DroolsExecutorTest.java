@@ -30,70 +30,70 @@ public class DroolsExecutorTest {
     private static final String[] TEST_SIDE_EFFECTS = { "effect1", "effect2" };
 
     @Test
-    public void testGetMaster() {
-        final DroolsExecutor master = getMasterExecutor();
+    public void testGetmain() {
+        final DroolsExecutor mainExecutor = getMainExecutor();
 
-        Assertions.assertThat(master).isInstanceOf( DroolsExecutor.Leader.class);
+        Assertions.assertThat(mainExecutor).isInstanceOf( DroolsExecutor.Leader.class);
     }
 
     @Test
-    public void testGetSlave() {
-        final DroolsExecutor slave = getSlaveExecutor();
+    public void testGetSecondary() {
+        final DroolsExecutor secondary = getSecondaryExecutor();
 
-        Assertions.assertThat(slave).isInstanceOf(DroolsExecutor.Slave.class);
+        Assertions.assertThat(secondary).isInstanceOf(DroolsExecutor.Secondary.class);
     }
 
     @Test
-    public void testExecuteRunnableOnMaster() {
-        final DroolsExecutor master = getMasterExecutor();
+    public void testExecuteRunnableOnMain() {
+        final DroolsExecutor main = getMainExecutor();
 
         for (int i = 0; i < ITERATIONS; i++) {
-            master.execute(new DummyRunnable());
+            main.execute(new DummyRunnable());
         }
 
-        final Queue<Serializable> results = master.getAndReset();
+        final Queue<Serializable> results = main.getAndReset();
         Assertions.assertThat(results).isNotNull();
         Assertions.assertThat(results.size()).isEqualTo(ITERATIONS);
         Assertions.assertThat(results).containsOnly(DroolsExecutor.EmptyResult.INSTANCE);
 
-        Assertions.assertThat(master.getAndReset()).isEmpty();
+        Assertions.assertThat(main.getAndReset()).isEmpty();
     }
 
     @Test
-    public void testExecuteSupplierOnMaster() {
-        final DroolsExecutor master = getMasterExecutor();
+    public void testExecuteSupplierOnMain() {
+        final DroolsExecutor main = getMainExecutor();
 
         final String testString = "test string";
-        final String resultString = master.execute(() -> testString);
+        final String resultString = main.execute(() -> testString);
         Assertions.assertThat(resultString).isEqualTo(testString);
 
-        final Queue<Serializable> results = master.getAndReset();
+        final Queue<Serializable> results = main.getAndReset();
         Assertions.assertThat(results).isNotNull();
         Assertions.assertThat(results).hasSize(1);
         Assertions.assertThat(results.poll()).isEqualTo(testString);
 
-        Assertions.assertThat(master.getAndReset()).isEmpty();
+        Assertions.assertThat(main.getAndReset()).isEmpty();
     }
 
     @Test
-    public void testExecuteOnSlave() {
-        final DroolsExecutor slave = getSlaveExecutor();
+    public void testExecuteOnSecondary() {
+        final DroolsExecutor secondary = getSecondaryExecutor();
         final Queue<Serializable> sideEffects = new ArrayDeque<>(Arrays.asList(TEST_SIDE_EFFECTS));
-        slave.appendSideEffects(sideEffects);
+        secondary.appendSideEffects(sideEffects);
 
-        slave.execute(new DummyRunnable());
-        Assertions.assertThat(slave.execute(() -> "test"))
+        secondary.execute(new DummyRunnable());
+        Assertions.assertThat(secondary.execute(() -> "test"))
                 .isNotNull()
                 .isEqualTo(TEST_SIDE_EFFECTS[1]);
-        Assertions.assertThat(slave.execute(() -> "test")).isNull();
+        Assertions.assertThat(secondary.execute(() -> "test")).isNull();
     }
 
-    private static DroolsExecutor getMasterExecutor() {
+    private static DroolsExecutor getMainExecutor() {
         DroolsExecutor.setAsLeader();
         return DroolsExecutor.getInstance();
     }
 
-    private static DroolsExecutor getSlaveExecutor() {
+    private static DroolsExecutor getSecondaryExecutor() {
         DroolsExecutor.setAsReplica();
         return DroolsExecutor.getInstance();
     }
