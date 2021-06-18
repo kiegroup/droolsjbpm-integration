@@ -693,13 +693,16 @@ public abstract class AbstractKieServicesClientImpl {
 
         return headers;
     }
+    
+    protected String getUserQueryStr(String userId, char prefix) {
+        if (BYPASS_AUTH_USER && userId != null) {
+            return prefix + "user=" + userId;
+        }
+        return "";
+    }
 
     protected String getUserQueryStr(String userId) {
-        if (BYPASS_AUTH_USER && userId != null) {
-            return "?user=" + userId;
-        }
-
-        return "";
+        return getUserQueryStr(userId, '?');
     }
 
     protected String getUserAndPagingQueryString(String userId, Integer page, Integer pageSize) {

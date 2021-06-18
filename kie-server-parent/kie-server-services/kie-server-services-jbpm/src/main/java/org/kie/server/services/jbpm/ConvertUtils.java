@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
@@ -603,5 +604,9 @@ public class ConvertUtils {
         }
 
         return value;
+    }
+
+    public static List<Long> convert(Collection<? extends Number> input) {
+        return input.stream().map(Number::longValue).collect(Collectors.toList());
     }
 }

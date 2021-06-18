@@ -62,6 +62,7 @@ import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_ADD_POST_
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_DELETE_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CLAIM_BULK_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CLAIM_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENTS_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_ADD_POST_URI;
@@ -129,6 +130,20 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "claim", new Object[]{containerId, taskId, userId}) ) );
             ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
+            throwExceptionOnFailure(response);
+        }
+    }
+    
+    @Override
+    public void claimTasks(String containerId, List<Long> taskIds, String userId) {
+        if( config.isRest() ) {
+            String queryString = buildQueryString("taskId",taskIds);
+            queryString+= getUserQueryStr(userId,'&');
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_CLAIM_BULK_URI, Collections.singletonMap(CONTAINER_ID, containerId)) + queryString, null, String.class, getHeaders(null));
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "claim", new Object[]{containerId, taskIds, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
     }

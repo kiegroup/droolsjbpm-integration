@@ -32,6 +32,8 @@ public interface UserTaskServicesClient {
     void activateTask(String containerId, Long taskId, String userId);
 
     void claimTask(String containerId, Long taskId, String userId);
+    
+    void claimTasks(String containerId, List<Long> taskIds, String userId);
 
     void completeTask(String containerId, Long taskId, String userId, Map<String, Object> params);
 
