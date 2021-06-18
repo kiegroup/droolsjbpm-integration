@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convert;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
 
@@ -181,15 +182,7 @@ public class ProcessServiceBase {
     }
 
 
-    protected List<Long> convert(List<? extends Number> input) {
-        List<Long> result = new ArrayList<Long>();
-
-        for (Number n : input) {
-            result.add(n.longValue());
-        }
-
-        return result;
-    }
+   
 
     public Object abortProcessInstances(String containerId, List<Long> processInstanceIds) {
 
