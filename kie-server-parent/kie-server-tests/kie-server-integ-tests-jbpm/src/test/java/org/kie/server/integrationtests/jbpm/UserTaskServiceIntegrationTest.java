@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.jbpm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -226,6 +227,53 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             checkTaskNameAndStatus(taskSummary, "First task", Status.Ready);
 
             taskClient.claimTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+
+            //Try to claim task which is already reserved by different user (Code 403)
+            changeUser(USER_JOHN);
+            Long taskId = taskList.get(0).getId();
+            assertClientException(
+                                  () -> taskClient.claimTask(CONTAINER_ID, taskId, USER_JOHN),
+                                  403,
+                                  "User '[UserImpl:'"+ USER_JOHN +"']' was unable to execute operation 'Claim' on task id "+ taskId +" due to a no 'current status' match");
+
+        } finally {
+            changeUser(TestConfig.getUsername());
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+    
+    
+    @Test
+    public void testReleaseAndBulkClaim() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+
+            // release task
+            taskClient.releaseTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Ready);
+
+            taskClient.claimTasks(CONTAINER_ID, Collections.singletonList(taskSummary.getId()), USER_YODA);
 
             taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);

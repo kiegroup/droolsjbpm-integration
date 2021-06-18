@@ -16,6 +16,7 @@
 package org.kie.server.services.jbpm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,8 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.jbpm.ConvertUtils.convert;
 
 
 public class UserTaskServiceBase {
@@ -85,11 +88,16 @@ public class UserTaskServiceBase {
     }
 
     public void claim(String containerId, Number taskId, String userId) {
-
         userId = getUser(userId);
         logger.debug("About to claim task with id '{}' as user '{}'", taskId, userId);
-        userTaskService.claim(taskId.longValue(), userId);
-
+        userTaskService.claim(containerId, taskId.longValue(), userId);
+    }
+    
+    public void claim(String containerId, Collection<Long> taskIds, String userId) {
+        userId = getUser(userId);
+        taskIds = convert(taskIds);
+        logger.debug("About to claim task with ids '{}' as user '{}'", taskIds, userId);
+        userTaskService.claim(containerId, taskIds, userId);
     }
 
     public void complete(String containerId, Number taskId, String userId, String payload, String marshallerType) {
