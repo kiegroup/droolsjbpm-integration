@@ -96,7 +96,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("ListBox", "select");
         this.inputTypes.put("RadioGroup", "radio");
         this.inputTypes.put("Document", "file");
-        this.inputTypes.put("DatePicker", "date");
+        this.inputTypes.put("DatePicker", "Date");
         this.inputTypes.put("Slider", "slider");
         this.inputTypes.put("DocumentCollection", "documentCollection");
         this.inputTypes.put("MultipleSelector", "multipleSelector");
