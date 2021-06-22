@@ -73,6 +73,7 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm-commons</feature>
+    <feature version="${project.version}">kie-dmn</feature>
     <bundle>mvn:com.google.guava/guava/${version.com.google.guava}</bundle>
     <bundle>mvn:com.google.guava/failureaccess/${version.com.google.guava.failureaccess}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
@@ -94,6 +95,7 @@
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm-commons</feature>
     <feature version="${project.version}">jbpm-human-task</feature>
+    <feature version="${project.version}">jackson</feature>
     <bundle>mvn:org.jbpm/jbpm-flow-builder/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-bpmn2/${version.org.jbpm}</bundle>
@@ -103,9 +105,6 @@
     <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-runtime-manager/${version.org.jbpm}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${version.com.fasterxml.jackson}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${version.com.fasterxml.jackson.databind}</bundle>
   </feature>
 
   <feature name="optaplanner-engine" version="${project.version}" description="OptaPlanner Engine">
@@ -154,9 +153,18 @@
     <bundle start-level="100">mvn:commons-pool/commons-pool/${version.commons-pool}</bundle>
   </feature>
 
+  <feature name="jackson" version="${project.version}">
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${version.com.fasterxml.jackson.databind}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${version.com.fasterxml.jackson.annotations}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${version.com.fasterxml.jackson}</bundle>
+  </feature>
+
   <feature name="kie-server-client" version="${project.version}" description="KIE Server Client">
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">optaplanner-engine</feature>
+    <feature version="${project.version}">jackson</feature>
     <bundle>mvn:org.kie.server/kie-server-api/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie.server/kie-server-common/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie.server/kie-server-client/${version.org.drools.droolsjbpm-integration}</bundle>
@@ -166,11 +174,6 @@
     <bundle>mvn:org.drools/kie-pmml/${version.org.kie}</bundle>
     <bundle>wrap:mvn:org.jboss.spec.javax.ws.rs/jboss-jaxrs-api_2.1_spec/${version.org.jboss.spec.javax.ws.rs.jboss-jaxrs-api_2.1_spec}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${version.com.fasterxml.jackson}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${version.com.fasterxml.jackson.databind}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${version.com.fasterxml.jackson.annotations}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${version.com.fasterxml.jackson}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${karaf.servicemix.version.com.thoughtworks.xmlpull}</bundle>
