@@ -54,11 +54,8 @@ public class ByPassUserTaskServiceIntegrationTest extends JbpmKieServerBaseInteg
         assertTrue(processInstanceId > 0);
         try {
             List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertNotNull(taskList);
-
-            assertEquals(1, taskList.size());
+            assertTaskList(taskList, "First task", 1);
             TaskSummary taskSummary = taskList.get(0);
-            assertEquals("First task", taskSummary.getName());
 
             // startTask and completeTask task
             taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
@@ -83,14 +80,47 @@ public class ByPassUserTaskServiceIntegrationTest extends JbpmKieServerBaseInteg
             assertEquals("my custom data", stringVar);
 
             taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertNotNull(taskList);
-
-            assertEquals(1, taskList.size());
-            taskSummary = taskList.get(0);
-            assertEquals("Second task", taskSummary.getName());
-
+            assertTaskList(taskList, "Second task", 1);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testByPassAuthUserTasks() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK2);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertTaskList(taskList, "First task", 1);
+
+            // Get tasks as potential owner by using the authenticated user
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("", 0, 10);
+            assertTaskList(taskList, "First task", 1);
+
+            changeUser(USER_JOHN);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("", 0, 10);
+            assertTaskList(taskList, null, 0);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_MARY, 0, 10);
+            assertTaskList(taskList, null, 0);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("other", 0, 10);
+            assertTaskList(taskList, "First task", 1);
+
+        } finally {
+            changeUser(USER_YODA);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    private void assertTaskList(List<TaskSummary> taskList, String expectedTaskName, int size) {
+        assertNotNull(taskList);
+        assertEquals(size, taskList.size());
+        if (taskList.size() > 0) {
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals(expectedTaskName, taskSummary.getName());
         }
     }
 
