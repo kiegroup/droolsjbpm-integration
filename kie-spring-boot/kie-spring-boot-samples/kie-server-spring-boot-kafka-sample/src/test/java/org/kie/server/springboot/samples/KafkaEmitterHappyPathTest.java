@@ -103,8 +103,8 @@ public class KafkaEmitterHappyPathTest extends KafkaFixture {
     @AfterClass
     public static void teardown() {
         kafka.stop();
-        System.clearProperty("org.kie.jbpm.event.emitters.kafka.boopstrap.servers");
-        System.clearProperty("org.kie.jbpm.event.emitters.kafka.client.id");
+        System.clearProperty(BOOTSTRAP_SERVERS);
+        System.clearProperty(CLIENT_ID);
     }
 
     @Test(timeout = 30000)
