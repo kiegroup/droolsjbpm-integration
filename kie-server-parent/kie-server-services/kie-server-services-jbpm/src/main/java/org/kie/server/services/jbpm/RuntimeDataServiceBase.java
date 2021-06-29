@@ -682,7 +682,7 @@ public class RuntimeDataServiceBase {
         if(filter.getOwnersQueryParam() != null) {
             return convertToServiceApiQueryParam(filter.getOwnersQueryParam());
         }
-        if(filter.getOwners() == null) {
+        if(filter.getOwners() == null || filter.getOwners().isEmpty()) {
             return null;
         }
         return all(filter.getOwners());
