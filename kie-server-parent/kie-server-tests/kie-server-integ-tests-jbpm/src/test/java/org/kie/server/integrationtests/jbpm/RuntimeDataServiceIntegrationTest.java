@@ -1854,9 +1854,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         parameters.put("personData", createPersonInstance(USER_JOHN));
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
-
-
-
+        
         List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
         Assertions.assertThat(tasks).hasSize(1);
 
