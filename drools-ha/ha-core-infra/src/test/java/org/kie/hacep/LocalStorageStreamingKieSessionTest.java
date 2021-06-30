@@ -63,6 +63,7 @@ public class LocalStorageStreamingKieSessionTest {
         Bootstrap.stopEngine();
     }
 
+    @Ignore("https://issues.redhat.com/browse/DROOLS-6459")
     @Test(timeout = 10000)
     public void insertTest() throws ExecutionException, InterruptedException {
 
