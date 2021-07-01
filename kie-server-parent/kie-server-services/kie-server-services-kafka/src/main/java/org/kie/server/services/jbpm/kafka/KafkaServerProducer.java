@@ -15,12 +15,12 @@
 package org.kie.server.services.jbpm.kafka;
 
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.KafkaException;
 import org.jbpm.services.api.DeploymentEvent;
 import org.kie.api.event.process.DefaultProcessEventListener;
 import org.kie.api.event.process.MessageEvent;
@@ -44,7 +44,7 @@ class KafkaServerProducer extends DefaultProcessEventListener {
     private Supplier<Producer<String, byte[]>> producerSupplier;
     private KafkaEventProcessorFactory factory;
 
-    private AtomicBoolean producerReady = new AtomicBoolean();
+    private Lock producerLock = new ReentrantLock();
 
     public KafkaServerProducer(KafkaEventProcessorFactory factory,
                                Supplier<Producer<String, byte[]>> producerSupplier) {
@@ -53,8 +53,14 @@ class KafkaServerProducer extends DefaultProcessEventListener {
     }
 
     void close(Duration duration) {
-        if (producerReady.compareAndSet(true, false)) {
-            producer.close(duration);
+        producerLock.lock();
+        try {
+            if (producer != null) {
+                producer.close(duration);
+                producer = null;
+            }
+        } finally {
+            producerLock.unlock();
         }
     }
 
@@ -75,14 +81,14 @@ class KafkaServerProducer extends DefaultProcessEventListener {
     private void sendEvent(ProcessInstance processInstance,
                            String name,
                            Object value) {
-        if (producerReady.compareAndSet(false, true)) {
-            try {
+        producerLock.lock();
+        try {
+            if (producer == null) {
                 producer = producerSupplier.get();
             }
-            catch (KafkaException ex) {
-                producerReady.set(false);
-                throw ex;
-            }
+        }
+         finally {
+             producerLock.unlock();
         }
         try {
             String topic = topicFromSignal(name);
