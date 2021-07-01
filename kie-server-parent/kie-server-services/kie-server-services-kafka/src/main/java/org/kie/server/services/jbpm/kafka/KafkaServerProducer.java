@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.KafkaException;
 import org.jbpm.services.api.DeploymentEvent;
 import org.kie.api.event.process.DefaultProcessEventListener;
 import org.kie.api.event.process.MessageEvent;
@@ -78,7 +79,7 @@ class KafkaServerProducer extends DefaultProcessEventListener {
             try {
                 producer = producerSupplier.get();
             }
-            catch (Exception ex) {
+            catch (KafkaException ex) {
                 producerReady.set(false);
                 throw ex;
             }
