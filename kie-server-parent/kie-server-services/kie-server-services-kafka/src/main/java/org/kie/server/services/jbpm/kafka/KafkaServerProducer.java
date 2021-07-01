@@ -75,7 +75,13 @@ class KafkaServerProducer extends DefaultProcessEventListener {
                            String name,
                            Object value) {
         if (producerReady.compareAndSet(false, true)) {
-            producer = producerSupplier.get();
+            try {
+                producer = producerSupplier.get();
+            }
+            catch (KafkaException ex) {
+                producerReady.set(false);
+                throw ex;
+            }
         }
         try {
             String topic = topicFromSignal(name);
