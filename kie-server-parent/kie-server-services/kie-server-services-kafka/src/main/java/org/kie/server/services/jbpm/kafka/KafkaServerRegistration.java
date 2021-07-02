@@ -48,14 +48,14 @@ class KafkaServerRegistration {
         return topic2Signal.isEmpty() && topic2Message.isEmpty();
     }
 
-    Set<String> addRegistration(DeploymentEvent event) {
+    synchronized Set<String> addRegistration(DeploymentEvent event) {
         for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
             updateTopics(event.getDeploymentId(), (ProcessDefinition) asset);
         }
         return getTopicsRegistered();
     }
 
-    Set<String> removeRegistration(DeploymentEvent event, Consumer<String> topicProcessed) {
+    synchronized Set<String> removeRegistration(DeploymentEvent event, Consumer<String> topicProcessed) {
         for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
             removeTopics(event.getDeploymentId(), (ProcessDefinition) asset, topicProcessed);
         }

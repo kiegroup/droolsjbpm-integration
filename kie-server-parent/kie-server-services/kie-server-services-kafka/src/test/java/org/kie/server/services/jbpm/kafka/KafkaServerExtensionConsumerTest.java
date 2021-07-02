@@ -21,6 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -52,11 +56,16 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.kafka.KafkaServerUtils.Mapping;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
 import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.MESSAGE_MAPPING_PROPERTY;
@@ -70,6 +79,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+
+
 public class KafkaServerExtensionConsumerTest {
 
     private static class MockKafkaServerExtension extends KafkaServerExtension {
@@ -80,6 +91,7 @@ public class KafkaServerExtensionConsumerTest {
             this.consumer = consumer;
         }
 
+        @Override
         protected Consumer<String, byte[]> getKafkaConsumer() {
             return consumer;
         }
@@ -190,6 +202,28 @@ public class KafkaServerExtensionConsumerTest {
         publishEvent("ChangedSignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "ChangedSignal", "javierito");
     }
+    
+    @Test
+    public void testMultiDeployment () throws InterruptedException, ExecutionException {
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
+                "String")));
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        Future<?> future1 = executorService.submit(() -> extension.onDeploy(new DeploymentEvent("MyDeploy1",
+                deployedUnit)));
+        Future<?> future2 = executorService.submit(() -> extension.onDeploy(new DeploymentEvent("MyDeploy2",
+                deployedUnit)));
+        future1.get();
+        future2.get();
+        publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
+        ArgumentCaptor<String> deploymentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> signalCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> dataCaptor = ArgumentCaptor.forClass(String.class);
+        verify(processService, getTimeout(2, 2)).signalEvent(deploymentCaptor.capture(), signalCaptor.capture(),
+                dataCaptor.capture());
+        assertEquals("MySignal", signalCaptor.getValue());
+        assertEquals("javierito", dataCaptor.getValue());
+        assertThat(deploymentCaptor.getValue(), anyOf(is("MyDeploy1"),is("MyDeploy2")));
+    }
 
     @Test
     public void testKafkaSubscriptionEmpty() {
@@ -296,7 +330,11 @@ public class KafkaServerExtensionConsumerTest {
     }
 
     private VerificationMode getTimeout(int times) {
-        return timeout(TIMEOUT * 1000).times(times);
+        return getTimeout(times, TIMEOUT);
+    }
+
+    private VerificationMode getTimeout(int times, long timeout) {
+        return timeout(timeout * 1000).times(times);
     }
 
     private void publishEvent(String topic, String cloudEventText) {
