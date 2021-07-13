@@ -120,7 +120,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             assertEquals(query.getExpression(), registered.getExpression());
             assertEquals(query.getTarget(), registered.getTarget());
             assertNotNull(registered.getColumns());
-            assertEquals(registered.getColumns().size(), 19);
+            assertEquals(registered.getColumns().size(), 18);
 
             List<QueryDefinition> queries = queryClient.getQueries(0, 100);
 
@@ -415,7 +415,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             assertEquals(query.getExpression(), replaced.getExpression());
             assertEquals(query.getTarget(), replaced.getTarget());
             assertNotNull(replaced.getColumns());
-            assertEquals(replaced.getColumns().size(), 18);
+            assertEquals(replaced.getColumns().size(), 19);
 
             tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
             assertNotNull(tasks);
