@@ -88,6 +88,7 @@
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-audit/${version.org.jbpm}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.datatype.jsr310/${version.com.fasterxml.jackson}</bundle>
   </feature>
 
   <feature name="jbpm" version="${project.version}" description="jBPM Engine">
