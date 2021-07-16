@@ -100,8 +100,10 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
                         if (subProcessLinks != null && subProcessLinks.containsKey(nodeId) && (value.equals(nodeId + SPECIAL_SUB_PROCESS_INSTANCE_ID) || value.equals(nodeId + OLD_SPECIAL_SUB_PROCESS_INSTANCE_ID))) {
                             plusButton = (Element) node;
                         }
-
-                        summary.addNode(new NodeSummary(nodeId, border, background, null, null, renderType, plusButton));
+                        /** JBPM-9820 **/
+                        if (value.contains(nodeId)) {
+                            summary.addNode(new NodeSummary(nodeId, border, background, null, null, renderType, plusButton));
+                        }
                     }
                     break;
                 }
