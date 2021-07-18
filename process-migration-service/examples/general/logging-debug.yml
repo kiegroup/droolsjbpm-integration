@@ -1,4 +1,0 @@
-thorntail:
-  logging:
-    root-logger:
-        level: DEBUG
