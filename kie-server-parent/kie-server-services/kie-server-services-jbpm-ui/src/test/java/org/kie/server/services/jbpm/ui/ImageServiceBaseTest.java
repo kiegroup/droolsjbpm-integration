@@ -16,6 +16,8 @@
 package org.kie.server.services.jbpm.ui;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -25,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +37,7 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.server.api.model.KieServerConfig;
@@ -136,5 +140,55 @@ public class ImageServiceBaseTest {
         Document svgDocument = factory.createDocument("http://jbpm.org", new StringReader(svgContent));
 
         return svgDocument;
+    }
+
+    @Test
+    public void testLoopSubProcess() throws Exception {
+        String containerId = "test-container";
+        String processId = "test-processId";
+        long processInstanceId = 10;
+
+        byte[] byteArray = getInputStreamAsByteArray(ImageServiceBaseTest.class.getResourceAsStream("/reusable-loop-svg-test-svg.svg"));
+
+        when(dataService.getProcessesByDeploymentIdProcessId(containerId, processId)).thenReturn(mock(ProcessDefinition.class));
+        when(imageReference.getImageContent(anyString(), anyString())).thenReturn(byteArray);
+        when(kieServerRegistry.getConfig()).thenReturn(config);
+        when(config.getConfigItemValue(anyString(), anyString())).thenReturn("");
+        final String nodeId = "_D2EEB1C1-4C06-4FDC-A0CA-73DFDA3A068D";
+
+        NodeInstanceDesc nodeInstanceDescCompleted1 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("1", nodeId, "", "SubProcessNode", "", 1L, null,
+                                                                                                            "", 0, 1L, 3L, "", null, 1);
+
+        NodeInstanceDesc nodeInstanceDescCompleted2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("2", nodeId, "", "", "", 1L, null,
+                                                                                                            "", 0, 1L, 1L, "", null, 1);
+
+        NodeInstanceDesc nodeInstanceDescActive1 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("3", nodeId, "", "SubProcessNode", "", 1L, null,
+                                                                                                         "", 0, 1L, 4L, "", null, 1);
+
+        NodeInstanceDesc nodeInstanceDescActive2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("4", nodeId, "", "", "", 1L, null,
+                                                                                                         "", 0, 1L, 1L, "", null, 1);
+
+        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2));
+        when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(Arrays.asList(nodeInstanceDescActive1, nodeInstanceDescActive2));
+        Map<String, ImageReference> imageReferenceMap = new HashMap<>();
+        imageReferenceMap.put(containerId, imageReference);
+
+        ProcessInstanceDesc processInstanceDesc = new org.jbpm.kie.services.impl.model.ProcessInstanceDesc(processInstanceId, processId, "", "", 1, containerId, null
+                , "", "", "");
+
+        when(dataService.getProcessInstanceById(processInstanceId)).thenReturn(processInstanceDesc);
+
+        ImageServiceBase imageServiceBase = new ImageServiceBase(dataService, imageReferenceMap, kieServerRegistry);
+        String processImageStr = imageServiceBase.getActiveProcessImage(containerId, processInstanceId);
+
+        Document svgDocument = readSVG(processImageStr);
+
+        Element subprocessPlusIcon = svgDocument.getElementById(nodeId + "_subProcessReusableNormalReusableIcon");
+        String onclick = subprocessPlusIcon.getAttribute("onclick");
+        assertNotNull(onclick);
+        assertEquals("window.open('/containers/test-container/images/processes/instances/4')", onclick);
+        String style = subprocessPlusIcon.getAttribute("style");
+        assertNotNull(style);
+        assertEquals("cursor: pointer;", style);
     }
 }
