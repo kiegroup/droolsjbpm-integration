@@ -82,8 +82,8 @@
       <artifactId>jbpm-human-task-core</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -331,7 +331,7 @@
           <scope>test</scope>
           <exclusions>
             <exclusion>
-              <groupId>javax.activation</groupId>
+              <groupId>jakarta.activation</groupId>
               <artifactId>javax.activation-api</artifactId>
             </exclusion>
             <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->

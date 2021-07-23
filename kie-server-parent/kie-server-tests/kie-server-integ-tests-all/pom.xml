@@ -304,7 +304,7 @@
               <artifactId>jaxb-runtime</artifactId>
             </exclusion>
             <exclusion>
-              <groupId>javax.activation</groupId>
+              <groupId>jakarta.activation</groupId>
               <artifactId>javax.activation-api</artifactId>
             </exclusion>
           </exclusions>

@@ -28,19 +28,15 @@
     <karaf.version.org.jboss.seam>${version.org.jboss.seam}</karaf.version.org.jboss.seam>
     <karaf.version.org.jboss.weld>${version.org.jboss.weld.weld}</karaf.version.org.jboss.weld>
     <karaf.version.org.mvel>${version.org.mvel}</karaf.version.org.mvel>
-    <karaf.version.javax.enterprise.cdi>${version.javax.enterprise}</karaf.version.javax.enterprise.cdi>
     <karaf.version.org.eclipse.jdt>${version.org.eclipse.jdt}</karaf.version.org.eclipse.jdt>
 
     <!-- used by jbpm-commons -->
-    <karaf.version.org.jboss.spec.javax.security.jacc>1.0.0.Final</karaf.version.org.jboss.spec.javax.security.jacc>
-    <karaf.version.org.jboss.spec.javax.interceptor>1.0.0.Final</karaf.version.org.jboss.spec.javax.interceptor>
     <!-- Geronimo servlet-api bundle is needed by Fuse 6.2.x and javax-servlet by Fuse 6.3.x+ -->
     <karaf.version.org.apache.geronimo.specs.servlet>1.0</karaf.version.org.apache.geronimo.specs.servlet>
     <karaf.version.javax.servlet>3.1.0</karaf.version.javax.servlet>
     <karaf.version.org.apache.geronimo.specs.jms>1.1.1</karaf.version.org.apache.geronimo.specs.jms>
     <karaf.version.org.apache.geronimo.specs.jpa>1.0-alpha-1</karaf.version.org.apache.geronimo.specs.jpa>
     <karaf.version.org.apache.geronimo.specs.jta>1.1.1</karaf.version.org.apache.geronimo.specs.jta>
-    <karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec>${version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec}</karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec>
     <!-- used by optaplanner -->
     <karaf.version.org.apache.servicemix.bundles.reflections>0.9.10_2</karaf.version.org.apache.servicemix.bundles.reflections>
 
@@ -234,14 +230,14 @@
         <version>${karaf.version.org.jboss.jandex}</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.spec.javax.security.jacc</groupId>
-        <artifactId>jboss-jacc-api_1.5_spec</artifactId>
-        <version>${karaf.version.org.jboss.spec.javax.security.jacc}</version>
+        <groupId>jakarta.security.jacc</groupId>
+        <artifactId>jakarta.security.jacc-api</artifactId>
+        <version>${version.jakarta.security.jacc.jakarta.security.jacc-api}</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.spec.javax.interceptor</groupId>
-        <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-        <version>${karaf.version.org.jboss.spec.javax.interceptor}</version>
+        <groupId>jakarta.interceptor</groupId>
+        <artifactId>jakarta.interceptor-api</artifactId>
+        <version>${version.jakarta.interceptor.jakarta.interceptor-api}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.osgi</groupId>
@@ -385,8 +381,8 @@
       <artifactId>jbpm-human-task-core</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
       <scope>provided</scope>
@@ -530,8 +526,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -710,23 +706,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+      <groupId>jakarta.security.jacc</groupId>
+      <artifactId>jakarta.security.jacc-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.interceptor</groupId>
-      <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
+      <groupId>jakarta.el</groupId>
+      <artifactId>jakarta.el-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.el</groupId>
-      <artifactId>jboss-el-api_3.0_spec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
