@@ -232,40 +232,17 @@
       <dependency>
         <groupId>jakarta.security.jacc</groupId>
         <artifactId>jakarta.security.jacc-api</artifactId>
-        <version>${version.jakarta.security.jacc.jakarta.security.jacc-api}</version>
+        <version>${version.jakarta.security.jacc-api}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.interceptor</groupId>
         <artifactId>jakarta.interceptor-api</artifactId>
-        <version>${version.jakarta.interceptor.jakarta.interceptor-api}</version>
+        <version>${version.jakarta.interceptor-api}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.osgi</groupId>
         <artifactId>spring-osgi-extender</artifactId>
         <version>${version.org.springframework.osgi}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.osgi</groupId>
-        <artifactId>spring-osgi-core</artifactId>
-        <version>${version.org.springframework.osgi}</version>
-        <exclusions>
-           <exclusion>
-             <groupId>org.springframework</groupId>
-             <artifactId>org.springframework.aop</artifactId>
-           </exclusion>
-           <exclusion>
-             <groupId>org.springframework</groupId>
-             <artifactId>org.springframework.beans</artifactId>
-           </exclusion>
-           <exclusion>
-             <groupId>org.springframework</groupId>
-             <artifactId>org.springframework.context</artifactId>
-           </exclusion>
-           <exclusion>
-             <groupId>org.springframework</groupId>
-             <artifactId>org.springframework.core</artifactId>
-           </exclusion>
-         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework.osgi</groupId>
@@ -723,11 +700,6 @@
     <dependency>
       <groupId>org.mvel</groupId>
       <artifactId>mvel2</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-osgi-core</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
