@@ -34,6 +34,10 @@
       <artifactId>kie-server-services-common</artifactId>
       <exclusions>
         <exclusion>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>jakarta.ws.rs</groupId>
           <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>

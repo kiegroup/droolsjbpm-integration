@@ -17,41 +17,6 @@
     <java.module.name>org.kie.server.controller.openshift</java.module.name>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>kubernetes-client-bom</artifactId>
-        <version>${version.kubernetes-client}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <!-- Override fabric8 dependencies specified from parent pom with newer version -->
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>kubernetes-model</artifactId>
-        <version>${version.kubernetes-client}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>kubernetes-client</artifactId>
-        <version>${version.kubernetes-client}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>openshift-client</artifactId>
-        <version>${version.kubernetes-client}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- kie server dependencies -->
     <dependency>

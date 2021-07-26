@@ -38,6 +38,10 @@
       <artifactId>kie-server-services-common</artifactId>
       <exclusions>
         <exclusion>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>aopalliance</groupId>
           <artifactId>aopalliance</artifactId>
         </exclusion>

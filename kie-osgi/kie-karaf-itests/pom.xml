@@ -186,12 +186,6 @@
       <artifactId>wiremock</artifactId>
       <classifier>standalone</classifier>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Karaf distribution-->
