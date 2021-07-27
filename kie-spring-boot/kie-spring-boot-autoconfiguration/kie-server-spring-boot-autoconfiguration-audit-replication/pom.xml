@@ -224,16 +224,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-artemis</artifactId>
         <scope>test</scope>
-        <exclusions>
-            <exclusion>
-                <groupId>jakarta.jms</groupId>
-                <artifactId>jakarta.jms-api</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-            </exclusion>
-        </exclusions>
     </dependency>
     <dependency>
         <groupId>org.apache.activemq</groupId>
@@ -289,8 +279,8 @@
         <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>javax.json</groupId>
-        <artifactId>javax.json-api</artifactId>
+        <groupId>jakarta.json</groupId>
+        <artifactId>jakarta.json-api</artifactId>
          <scope>test</scope>
     </dependency>
   </dependencies>

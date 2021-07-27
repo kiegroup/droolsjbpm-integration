@@ -30,13 +30,6 @@
     <karaf.version.org.mvel>${version.org.mvel}</karaf.version.org.mvel>
     <karaf.version.org.eclipse.jdt>${version.org.eclipse.jdt}</karaf.version.org.eclipse.jdt>
 
-    <!-- used by jbpm-commons -->
-    <!-- Geronimo servlet-api bundle is needed by Fuse 6.2.x and javax-servlet by Fuse 6.3.x+ -->
-    <karaf.version.org.apache.geronimo.specs.servlet>1.0</karaf.version.org.apache.geronimo.specs.servlet>
-    <karaf.version.javax.servlet>3.1.0</karaf.version.javax.servlet>
-    <karaf.version.org.apache.geronimo.specs.jms>1.1.1</karaf.version.org.apache.geronimo.specs.jms>
-    <karaf.version.org.apache.geronimo.specs.jpa>1.0-alpha-1</karaf.version.org.apache.geronimo.specs.jpa>
-    <karaf.version.org.apache.geronimo.specs.jta>1.1.1</karaf.version.org.apache.geronimo.specs.jta>
     <!-- used by optaplanner -->
     <karaf.version.org.apache.servicemix.bundles.reflections>0.9.10_2</karaf.version.org.apache.servicemix.bundles.reflections>
 
@@ -56,7 +49,6 @@
     <!-- Overwrites with a different Maven version. Apache POI 3.11+ needs version >=1.9 -->
     <karaf.version.commons-codec>1.10</karaf.version.commons-codec>
     <karaf.version.commons-collections4>4.1</karaf.version.commons-collections4>
-    <karaf.version.javax.inject>${version.org.geronimo.atinject}</karaf.version.javax.inject>
     <!-- Overwrites with a servicemix version -->
     <karaf.servicemix.version.com.google.protobuf>2.4.1_1</karaf.servicemix.version.com.google.protobuf>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.2.11_1</karaf.servicemix.version.com.sun.xml.bind.jaxb>
@@ -106,31 +98,6 @@
         <version>${karaf.version.javax.validation}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-servlet_3.0_spec</artifactId>
-        <version>${karaf.version.org.apache.geronimo.specs.servlet}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>${karaf.version.javax.servlet}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jms_1.1_spec</artifactId>
-        <version>${karaf.version.org.apache.geronimo.specs.jms}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jpa_2.1_spec</artifactId>
-        <version>${karaf.version.org.apache.geronimo.specs.jpa}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jta_1.1_spec</artifactId>
-        <version>${karaf.version.org.apache.geronimo.specs.jta}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.ant</artifactId>
         <version>${karaf.version.org.apache.servicemix.bundles.ant}</version>
@@ -168,6 +135,12 @@
         <groupId>org.apache.servicemix.specs</groupId>
         <artifactId>org.apache.servicemix.specs.jaxb-api-2.3</artifactId>
         <version>${karaf.servicemix.version.javax.xml.bind.jaxb}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-activation_1.1_spec</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.specs</groupId>
@@ -178,6 +151,20 @@
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.jaxb-xjc</artifactId>
         <version>${karaf.servicemix.version.com.sun.xml.bind.jaxb}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-activation_1.1_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
@@ -189,6 +176,10 @@
         <artifactId>org.apache.servicemix.bundles.poi</artifactId>
         <version>${karaf.servicemix.version.org.apache.poi}</version>
         <exclusions>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -213,6 +204,12 @@
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
         <version>${karaf.servicemix.version.org.quartz-scheduler}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.specs</groupId>
@@ -223,6 +220,12 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-osgi</artifactId>
         <version>${version.org.hibernate}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.interceptor</groupId>
+            <artifactId>javax.interceptor-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.jboss</groupId>
@@ -528,28 +531,28 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-atinject_1.0_spec</artifactId>
+      <groupId>jakarta.inject</groupId>
+      <artifactId>jakarta.inject-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-servlet_3.0_spec</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jms_1.1_spec</artifactId>
+      <groupId>jakarta.jms</groupId>
+      <artifactId>jakarta.jms-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jpa_2.1_spec</artifactId>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jta_1.1_spec</artifactId>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

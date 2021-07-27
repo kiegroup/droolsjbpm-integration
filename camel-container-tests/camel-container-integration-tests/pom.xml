@@ -56,6 +56,11 @@
     </dependency>
 
     <dependency>
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>camel-container-tests-api</artifactId>
     </dependency>

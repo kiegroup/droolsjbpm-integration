@@ -10,7 +10,7 @@
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
     <version.jakarta.xml.bind-api>${version.jakarta.xml.bind-api}</version.jakarta.xml.bind-api>
-    <version.javax.jws>${version.javax.jws}</version.javax.jws>
+    <version.jakarta.jws-api>${version.jakarta.jws-api}</version.jakarta.jws-api>
     <version.jakarta.xml.ws-api>${version.jakarta.xml.ws-api}</version.jakarta.xml.ws-api>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -26,9 +26,9 @@
         <version>${version.jakarta.xml.bind-api}</version>
       </dependency>
       <dependency>
-        <groupId>javax.jws</groupId>
-        <artifactId>jsr181-api</artifactId>
-        <version>${version.javax.jws}</version>
+        <groupId>jakarta.jws</groupId>
+        <artifactId>jakarta.jws-api</artifactId>
+        <version>${version.jakarta.jws-api}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.ws</groupId>
