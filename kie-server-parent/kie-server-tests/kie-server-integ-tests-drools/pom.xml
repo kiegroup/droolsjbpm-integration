@@ -116,6 +116,7 @@
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
+              <org.kie.server.json.fallbackClassLoader.enabled>true</org.kie.server.json.fallbackClassLoader.enabled>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -159,6 +160,7 @@
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <kie-pmml-implementation>legacy</kie-pmml-implementation>
+              <org.kie.server.json.fallbackClassLoader.enabled>true</org.kie.server.json.fallbackClassLoader.enabled>
             </systemProperties>
           </container>
         </configuration>
