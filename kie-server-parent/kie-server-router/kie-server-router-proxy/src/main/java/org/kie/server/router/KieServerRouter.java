@@ -33,21 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.security.api.AuthenticationMechanism;
-import io.undertow.security.api.AuthenticationMode;
-import io.undertow.security.handlers.AuthenticationCallHandler;
-import io.undertow.security.handlers.AuthenticationConstraintHandler;
-import io.undertow.security.handlers.AuthenticationMechanismsHandler;
-import io.undertow.security.handlers.SecurityInitialHandler;
-import io.undertow.security.idm.IdentityManager;
-import io.undertow.security.impl.BasicAuthenticationMechanism;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.BlockingHandler;
-import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.ResponseCodeHandler;
-import io.undertow.server.handlers.proxy.ProxyHandler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -72,74 +57,61 @@ import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.HttpUtils;
 import org.kie.server.router.utils.SSLContextBuilder;
 
-import static org.kie.server.router.KieServerRouterConstants.DEFAULT_PORT_NUM;
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.security.api.AuthenticationMechanism;
+import io.undertow.security.api.AuthenticationMode;
+import io.undertow.security.handlers.AuthenticationCallHandler;
+import io.undertow.security.handlers.AuthenticationConstraintHandler;
+import io.undertow.security.handlers.AuthenticationMechanismsHandler;
+import io.undertow.security.handlers.SecurityInitialHandler;
+import io.undertow.security.idm.IdentityManager;
+import io.undertow.security.impl.BasicAuthenticationMechanism;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.BlockingHandler;
+import io.undertow.server.handlers.PathHandler;
+import io.undertow.server.handlers.ResponseCodeHandler;
+import io.undertow.server.handlers.proxy.ProxyHandler;
+
 import static org.kie.server.router.KieServerRouterConstants.DEFAULT_PORT_TLS_NUM;
-import static org.kie.server.router.KieServerRouterConstants.KIE_CONTROLLER;
-import static org.kie.server.router.KieServerRouterConstants.KIE_ROUTER_MANAGEMENT_SECURED;
-import static org.kie.server.router.KieServerRouterConstants.KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL;
 import static org.kie.server.router.KieServerRouterConstants.ROUTER_HOST;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_KEYALIAS;
-import static org.kie.server.router.KieServerRouterConstants.ROUTER_KEYSTORE_PASSWORD;
 import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT;
 import static org.kie.server.router.KieServerRouterConstants.ROUTER_PORT_TLS;
+import static org.kie.server.router.KieServerRouterResponsesUtil.buildServerInfo;
 
 public class KieServerRouter {
-
-    private static final String HOST = System.getProperty(ROUTER_HOST,
-                                                          "localhost");
-    private static final int PORT = Integer.parseInt(System.getProperty(ROUTER_PORT,
-                                                                        String.valueOf(DEFAULT_PORT_NUM)));
-    private static final int PORT_TLS = Integer.parseInt(System.getProperty(ROUTER_PORT_TLS,
-                                                                            String.valueOf(DEFAULT_PORT_TLS_NUM)));
-    private static final String KEYSTORE_PATH = System.getProperty(ROUTER_KEYSTORE);
-    private static final String KEYSTORE_PASSWORD = System.getProperty(ROUTER_KEYSTORE_PASSWORD);
-    private static final String KEYSTORE_KEYALIAS = System.getProperty(ROUTER_KEYSTORE_KEYALIAS);
-    private static final boolean TLS_ENABLED = KEYSTORE_PATH != null && !KEYSTORE_PATH.isEmpty();
-    private int failedAttemptsInterval = Integer.parseInt(System.getProperty(KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "10"));
-
-    private static boolean MANAGEMENT_SECURED = isManagementSecured();
-    private static String IDENTITY_PROVIDER = getIdentityProvider();
 
     public static final String CMD_ADD_USER = "addUser";
     public static final String CMD_REMOVE_USER = "removeUser";
 
-    private String CONTROLLER = System.getProperty(KIE_CONTROLLER);
-
     private static final Logger log = Logger.getLogger(KieServerRouter.class);
-
-    private static final String SERVER_INFO_JSON = "{\n" +
-            "      \"version\" : \"LATEST\",\n" +
-            "      \"name\" : \"" + KieServerInfoHandler.getRouterName() + "\",\n" +
-            "      \"location\" : \"" + KieServerInfoHandler.getLocationUrl() + "\",\n" +
-            "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\", \"BRP\" ],\n" +
-            "      \"id\" : \"" + KieServerInfoHandler.getRouterId() + "\"\n" +
-            "}";
-
 
     private ServiceLoader<ConfigRepository> configRepositoryServiceLoader = ServiceLoader.load(ConfigRepository.class);
 
     private Undertow server;
-    private ConfigRepository repository = new FileRepository();
+    private ConfigRepository repository;
 
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> controllerConnectionAttempts;
-    private boolean isSecured;
-    private String identityServiceName;
-    private boolean isHttpEnabled;
+    private KieServerRouterEnvironment env;
 
     public KieServerRouter() {
-        this(reloadManagementSecured(), reloadIdentityProvider()); //Reload for easier testing
+        this(new KieServerRouterEnvironment());
     }
 
-    public KieServerRouter(boolean isSecured, String identityServiceName) {
+    public KieServerRouter(KieServerRouterEnvironment env) {
         configRepositoryServiceLoader.forEach(repo -> repository = repo);
+        this.env = env;
+        this.repository = new FileRepository(env);
         log.info("KIE Server router repository implementation is " + repository);
-        this.isSecured = isSecured;
-        this.identityServiceName = identityServiceName;
+    }
+
+    private KieServerRouterEnvironment environment() {
+        return env;
     }
 
     public static void main(String[] args) throws Exception {
+
         Options options = new Options();
 
         Option addInstanceOption = Option.builder(CMD_ADD_USER)
@@ -172,9 +144,7 @@ public class KieServerRouter {
         }
 
         // default behavior
-        router.start(HOST,
-                     PORT,
-                     PORT_TLS);
+        router.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -193,18 +163,19 @@ public class KieServerRouter {
               listeners);
     }
 
+    public void start(ConfigurationListener... listeners) {
+        start(environment().getRouterHost(), environment().getPort(), environment().getSslPort(), listeners);
+    }
+
     public void start(String host,
                       Integer port,
                       Integer portTls,
                       ConfigurationListener... listeners) {
-        System.setProperty(ROUTER_HOST,
-                           host);
-        System.setProperty(ROUTER_PORT,
-                           port.toString());
-        System.setProperty(ROUTER_PORT_TLS,
-                           portTls.toString());
+        System.setProperty(ROUTER_HOST, host);
+        System.setProperty(ROUTER_PORT, port.toString());
+        System.setProperty(ROUTER_PORT_TLS, portTls.toString());
         
-        isHttpEnabled = isValidPort(port);
+        boolean isHttpEnabled = environment().isHttpEnabled();
 
         Configuration configuration = repository.load();
 
@@ -212,7 +183,8 @@ public class KieServerRouter {
             configuration.addListener(listener);
         }
 
-        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration,
+        AdminHttpHandler adminHandler = new AdminHttpHandler(environment(),
+                                                             configuration,
                                                              repository,
                                                              executorService);
         final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration,
@@ -254,7 +226,7 @@ public class KieServerRouter {
                                  new ContainersHttpHandler(notFoundHandler,
                                                            adminHandler));
 
-        if (isSecured) {
+        if (environment().isManagementSecured()) {
             IdentityManager idm = getIdentityService();
             HttpHandler authenticationCallHandler = new AuthenticationCallHandler(adminHandler);
             HttpHandler authenticationConstraintHandler = new AuthenticationConstraintHandler(authenticationCallHandler);
@@ -268,8 +240,7 @@ public class KieServerRouter {
 
 
         
-        pathHandler.addExactPath("/",
-                                 new KieServerInfoHandler());
+        pathHandler.addExactPath("/", new KieServerInfoHandler(environment()));
 
         HttpHandler blockingHandler = new BlockingHandler(pathHandler);
 
@@ -282,17 +253,17 @@ public class KieServerRouter {
             undertowBuilder.addHttpListener(port, host);
         }
 
-        if (TLS_ENABLED) {
+        if (environment().isTlsEnabled()) {
             SSLContext sslContext = SSLContextBuilder.builder()
-                    .setKeyStorePath(KEYSTORE_PATH)
-                    .setKeyStorePassword(KEYSTORE_PASSWORD)
-                    .setKeyAlias(KEYSTORE_KEYALIAS).build();
+                    .setKeyStorePath(environment().getKeystorePath())
+                    .setKeyStorePassword(environment().getKeystorePassword())
+                    .setKeyAlias(environment().getKeystoreKey()).build();
             undertowBuilder = undertowBuilder.addHttpsListener(portTls,
                                                                host,
                                                                sslContext);
         }
         
-        if (!isHttpEnabled && !TLS_ENABLED) {
+        if (!isHttpEnabled && !environment().isTlsEnabled()) {
             throw new IllegalStateException(
                     "HTTP listener was disabled (by setting HTTP port to 0 or lower ) and TLS wasn't configured, no listener is available to handle requests");
         }
@@ -310,11 +281,6 @@ public class KieServerRouter {
         connectToController(adminHandler);
     }
     
-    public static boolean isValidPort (int port) {
-        return port > 0;
-    }
-    
-
     public void stop() {
         stop(false);
     }
@@ -341,10 +307,10 @@ public class KieServerRouter {
     
     private void logServerInfo(String prefix, String host, int port, int portTls) {
         StringBuilder sb = new StringBuilder(prefix);
-        if (isHttpEnabled) {
+        if (environment().isHttpEnabled()) {
             sb.append(host).append(':').append(port);
         }
-        if (TLS_ENABLED) {
+        if (environment().isTlsEnabled()) {
             sb.append(" (TLS) ").append(host).append(':').append(portTls);
         }
         log.info(sb);
@@ -352,56 +318,49 @@ public class KieServerRouter {
 
 
     protected void connectToController(AdminHttpHandler adminHandler) {
-        if (CONTROLLER == null) {
+        if (!environment().hasKieControllerUrl()) {
             return;
         }
         try {
-            String jsonResponse = HttpUtils.putHttpCall(CONTROLLER + "/server/" + KieServerInfoHandler.getRouterId(),
-                                                        SERVER_INFO_JSON);
+            String jsonResponse = HttpUtils.putHttpCall(environment(), environment().getKieControllerUrl() + "/server/" + environment().getRouterId(),  buildServerInfo(environment()));
+            log.debugf("Controller response :: ", jsonResponse);
+            boostrapFromControllerResponse(jsonResponse, adminHandler);
+            log.infof("KieServerRouter connected to controller at " + environment().getKieControllerUrl());
+        } catch (Exception e) {
+            log.error("Error when connecting to controller at " + environment().getKieControllerUrl() + " due to " + e.getMessage());
+            log.debug(e);
+            controllerConnectionAttempts = executorService.scheduleAtFixedRate(() -> tryToConnectToController(adminHandler),
+                    environment().getKieControllerAttemptInterval(),
+                    environment().getKieControllerAttemptInterval(),
+                    TimeUnit.SECONDS);
+        }
+    }
+
+    private void tryToConnectToController(AdminHttpHandler adminHandler) {
+        try {
+            String jsonResponse = HttpUtils.putHttpCall(environment(), environment().getKieControllerUrl() + "/server/" + environment().getRouterId(), buildServerInfo(environment()));
             log.debugf("Controller response :: ",
                        jsonResponse);
-            boostrapFromControllerResponse(jsonResponse,
-                                           adminHandler);
+            boostrapFromControllerResponse(jsonResponse, adminHandler);
 
-            log.infof("KieServerRouter connected to controller at " + CONTROLLER);
-        } catch (Exception e) {
-            log.error("Error when connecting to controller at " + CONTROLLER + " due to " + e.getMessage());
-            log.debug(e);
-
-            controllerConnectionAttempts = executorService.scheduleAtFixedRate(() -> {
-
-                                                                                   try {
-                                                                                       String jsonResponse = HttpUtils.putHttpCall(CONTROLLER + "/server/" + KieServerInfoHandler.getRouterId(),
-                                                                                                                                   SERVER_INFO_JSON);
-                                                                                       log.debugf("Controller response :: ",
-                                                                                                  jsonResponse);
-                                                                                       boostrapFromControllerResponse(jsonResponse,
-                                                                                                                      adminHandler);
-
-                                                                                       controllerConnectionAttempts.cancel(false);
-                                                                                       log.infof("KieServerRouter connected to controller at " + CONTROLLER);
-                                                                                   } catch (Exception ex) {
-                                                                                       log.error("Error when connecting to controller at " + CONTROLLER +
-                                                                                                         " next attempt in " + failedAttemptsInterval + " " + TimeUnit.SECONDS.toString());
-                                                                                       log.debug(ex);
-                                                                                   }
-                                                                               },
-                                                                               failedAttemptsInterval,
-                                                                               failedAttemptsInterval,
-                                                                               TimeUnit.SECONDS);
+            controllerConnectionAttempts.cancel(false);
+            log.infof("KieServerRouter connected to controller at " + environment().getKieControllerUrl());
+        } catch (Exception ex) {
+            log.error("Error when connecting to controller at " + environment().getKieControllerUrl() +
+                              " next attempt in " + environment().getKieControllerAttemptInterval() + " " + TimeUnit.SECONDS.toString());
+            log.debug(ex);
         }
     }
 
     protected void disconnectToController() {
-        if (CONTROLLER == null) {
+        if (!environment().hasKieControllerUrl()) {
             return;
         }
         try {
-            HttpUtils.deleteHttpCall(CONTROLLER + "/server/" + KieServerInfoHandler.getRouterId() + "/?location=" + URLEncoder.encode(KieServerInfoHandler.getLocationUrl(),
-                                                                                                                                      "UTF-8"));
-            log.infof("KieServerRouter disconnected from controller at " + CONTROLLER);
+            HttpUtils.deleteHttpCall(environment(), environment().getKieControllerUrl() + "/server/" + environment().getRouterId() + "/?location=" + URLEncoder.encode(environment().getRouterExternalUrl(), "UTF-8"));
+            log.infof("KieServerRouter disconnected from controller at " + environment().getKieControllerUrl());
         } catch (Exception e) {
-            log.error("Error when disconnecting from controller at " + CONTROLLER,
+            log.error("Error when disconnecting from controller at " + environment().getKieControllerUrl(),
                       e);
         }
     }
@@ -441,28 +400,11 @@ public class KieServerRouter {
         Iterator<IdentityService> iterator = services.iterator();
         while (iterator.hasNext()) {
             IdentityService identityService = iterator.next();
-            if (identityServiceName.contentEquals(identityService.id())) {
+            if (env.getIdentityProvider().contentEquals(identityService.id())) {
                 return identityService;
             }
         }
-        throw new IdentityServiceNotFound("Identity Provider " + identityServiceName + " not found !");
+        throw new IdentityServiceNotFound("Identity Provider " + env.getIdentityProvider() + " not found !");
     }
 
-    private static boolean isManagementSecured() {
-        return Boolean.parseBoolean(System.getProperty(KIE_ROUTER_MANAGEMENT_SECURED, "false"));
-    }
-
-    private static boolean reloadManagementSecured() {
-        MANAGEMENT_SECURED = isManagementSecured();
-        return MANAGEMENT_SECURED;
-    }
-
-    private static String getIdentityProvider() {
-        return System.getProperty(KieServerRouterConstants.KIE_ROUTER_IDENTITY_PROVIDER, "default");
-    }
-
-    private static String reloadIdentityProvider() {
-        IDENTITY_PROVIDER = getIdentityProvider();
-        return IDENTITY_PROVIDER;
-    }
 }

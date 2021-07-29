@@ -26,18 +26,26 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.ConfigurationListener;
 import org.kie.server.router.ContainerInfo;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 
 public class FileRepositoryTest {
+
+    @Before
+    public void init () {
+        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, "target");
+    }
 
     @After
     public void cleanup() {
         System.clearProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED);
         System.clearProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL);
+        System.clearProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR);
     }
     
     @Test
@@ -53,8 +61,8 @@ public class FileRepositoryTest {
 
         ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
-        
-        FileRepository repo = new FileRepository(new File("target"));
+
+        FileRepository repo = new FileRepository(new KieServerRouterEnvironment());
         
         repo.persist(config);
         
@@ -103,18 +111,18 @@ public class FileRepositoryTest {
 
         ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
-        
+
         File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
         repositoryDirectory.mkdirs();
         
-        FileRepository repo = new FileRepository(repositoryDirectory);
+        FileRepository repo = new FileRepository(new KieServerRouterEnvironment());
         
         repo.persist(config);
         
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
-        
-        FileRepository repoWithWatcher = new FileRepository(repositoryDirectory);
+
+        FileRepository repoWithWatcher = new FileRepository(new KieServerRouterEnvironment());
         Configuration loaded = repoWithWatcher.load();
         
         CountDownLatch latch = new CountDownLatch(1);
@@ -170,7 +178,7 @@ public class FileRepositoryTest {
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
 
-        FileRepository repoWithWatcher = new FileRepository(repositoryDirectory);
+        FileRepository repoWithWatcher = new FileRepository(new KieServerRouterEnvironment());
         Configuration loaded = repoWithWatcher.load();
 
         CountDownLatch latch = new CountDownLatch(1);
@@ -199,7 +207,7 @@ public class FileRepositoryTest {
         ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
 
-        FileRepository repo = new FileRepository(repositoryDirectory);
+        FileRepository repo = new FileRepository(new KieServerRouterEnvironment());
         repo.persist(config);
 
         latch.await(20, TimeUnit.SECONDS);
@@ -222,13 +230,15 @@ public class FileRepositoryTest {
         ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
         Configuration configuration = new Configuration();
         // Start watcher service with not existing config file
-        File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
+        String fileDir = "target" + File.separator + UUID.randomUUID().toString();
+        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, fileDir);
+        File repositoryDirectory = new File(fileDir);
         repositoryDirectory.mkdirs();
 
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
 
-        FileRepository repoWithWatcher = new FileRepository(repositoryDirectory);
+        FileRepository repoWithWatcher = new FileRepository(new KieServerRouterEnvironment());
         Configuration loaded = repoWithWatcher.load();
 
         CountDownLatch latch = new CountDownLatch(1);
@@ -257,7 +267,7 @@ public class FileRepositoryTest {
         ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
 
-        FileRepository repo = new FileRepository(repositoryDirectory);
+        FileRepository repo = new FileRepository(new KieServerRouterEnvironment());
         repo.persist(config);
 
         latch.await(20, TimeUnit.SECONDS);
