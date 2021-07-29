@@ -21,19 +21,17 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 
-import io.undertow.util.Headers;
 import org.jboss.logging.Logger;
-import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
+
+import io.undertow.util.Headers;
 
 public class HttpUtils {
 
     private static final Logger log = Logger.getLogger(HttpUtils.class);
 
-    private static final String USER_NAME = System.getProperty(KieServerRouterConstants.KIE_CONTROLLER_USER, "kieserver");
-    private static final String PASSWORD = System.getProperty(KieServerRouterConstants.KIE_CONTROLLER_PASSWORD, "kieserver1!");
-    private static final String TOKEN = System.getProperty(KieServerRouterConstants.KIE_CONTROLLER_TOKEN);
 
-    public static void deleteHttpCall(String url) throws Exception {
+    public static void deleteHttpCall(KieServerRouterEnvironment env, String url) throws Exception {
 
         URL controllerURL = new URL(url);
         HttpURLConnection con = (HttpURLConnection) controllerURL.openConnection();
@@ -41,7 +39,7 @@ public class HttpUtils {
 
         con.setRequestProperty(Headers.ACCEPT_STRING, "application/json");
         con.setRequestProperty(Headers.CONTENT_TYPE_STRING, "application/json");
-        con.setRequestProperty(Headers.AUTHORIZATION_STRING, getAuthorization());
+        con.setRequestProperty(Headers.AUTHORIZATION_STRING, getAuthorization(env));
 
         con.setDoOutput(true);
 
@@ -54,7 +52,7 @@ public class HttpUtils {
 
     }
     
-    public static void getHttpCall(String url) throws Exception {
+    public static void getHttpCall(KieServerRouterEnvironment env, String url) throws Exception {
 
         URL controllerURL = new URL(url);
         HttpURLConnection con = (HttpURLConnection) controllerURL.openConnection();
@@ -62,7 +60,7 @@ public class HttpUtils {
 
         con.setRequestProperty(Headers.ACCEPT_STRING, "application/json");
         con.setRequestProperty(Headers.CONTENT_TYPE_STRING, "application/json");
-        con.setRequestProperty(Headers.AUTHORIZATION_STRING, getAuthorization());
+        con.setRequestProperty(Headers.AUTHORIZATION_STRING, getAuthorization(env));
 
         con.setDoOutput(true);
 
@@ -76,7 +74,7 @@ public class HttpUtils {
 
     }
 
-    public static String putHttpCall(String url, String body) throws Exception {
+    public static String putHttpCall(KieServerRouterEnvironment env, String url, String body) throws Exception {
 
         URL controllerURL = new URL(url);
         HttpURLConnection con = (HttpURLConnection) controllerURL.openConnection();
@@ -84,7 +82,7 @@ public class HttpUtils {
 
         con.setRequestProperty(Headers.ACCEPT_STRING, "application/json");
         con.setRequestProperty(Headers.CONTENT_TYPE_STRING, "application/json");
-        con.setRequestProperty(Headers.AUTHORIZATION_STRING, getAuthorization());
+        con.setRequestProperty(Headers.AUTHORIZATION_STRING, getAuthorization(env));
 
         con.setDoOutput(true);
         if (body != null) {
@@ -111,11 +109,11 @@ public class HttpUtils {
     }
 
 
-    protected static String getAuthorization() throws Exception{
-        if (TOKEN != null) {
-            return "Bearer " + TOKEN;
+    protected static String getAuthorization(KieServerRouterEnvironment env) throws Exception{
+        if (env.hasKieControllerToken()) {
+            return "Bearer " + env.getKieControllerToken();
         } else {
-            return "Basic " + Base64.getEncoder().encodeToString((USER_NAME + ":" + PASSWORD).getBytes("UTF-8"));
+            return "Basic " + Base64.getEncoder().encodeToString((env.getKieControllerUser() + ":" + env.getKieControllerPwd()).getBytes("UTF-8"));
         }
     }
 }

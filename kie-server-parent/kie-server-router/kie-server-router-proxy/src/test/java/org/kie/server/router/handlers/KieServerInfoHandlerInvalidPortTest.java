@@ -19,6 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,7 +39,7 @@ public class KieServerInfoHandlerInvalidPortTest {
 
     @Test
     public void testGetLocationUrl() {
-        String locationUrl = KieServerInfoHandler.getLocationUrl();
+        String locationUrl = new KieServerRouterEnvironment().getRouterExternalUrl();
         assertEquals("https://localhost:" + KieServerRouterConstants.DEFAULT_PORT_TLS_NUM, locationUrl);
     }
 }

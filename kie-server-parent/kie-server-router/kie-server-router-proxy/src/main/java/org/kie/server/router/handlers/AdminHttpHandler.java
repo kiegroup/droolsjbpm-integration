@@ -31,6 +31,7 @@ import org.jboss.logging.Logger;
 import org.json.JSONObject;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.ContainerInfo;
+import org.kie.server.router.KieServerRouterEnvironment;
 import org.kie.server.router.proxy.aggragate.JSONResponseAggregator;
 import org.kie.server.router.proxy.aggragate.JaxbXMLResponseAggregator;
 import org.kie.server.router.proxy.aggragate.ResponseAggregator;
@@ -45,17 +46,10 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.Headers;
 
-import static org.kie.server.router.KieServerRouterConstants.*;
-
 public class AdminHttpHandler implements HttpHandler {
-    
+
     private static final Logger log = Logger.getLogger(AdminHttpHandler.class);
 
-    private String CONTROLLER = System.getProperty(KIE_CONTROLLER);
-    private int interval = Integer.parseInt(System.getProperty(KIE_SERVER_CONTROLLER_ATTEMPT_INTERVAL, "5"));
-    private int attemptsLimit = Integer.parseInt(System.getProperty(KIE_SERVER_RECOVERY_ATTEMPT_LIMIT, "100"));
-    
-//    private KieServerProxyClient proxyClient;
     private Configuration configuration = new Configuration();
     private List<ResponseAggregator> aggregators = new ArrayList<>();
     
@@ -74,6 +68,8 @@ public class AdminHttpHandler implements HttpHandler {
     private CopyOnWriteArrayList<ContainerInfo> containersToAddToController = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<String> containersToRemoveFromController = new CopyOnWriteArrayList<>();
 
+    private KieServerRouterEnvironment env;
+
     private static final String CONTAINER_SPEC_JSON = "{\n" +
             "    \"container-id\" : \"#1@\",\n" +
             "    \"container-name\" : \"#2@\",\n" +
@@ -90,7 +86,8 @@ public class AdminHttpHandler implements HttpHandler {
             "    \"status\" : \"STARTED\"\n" +
             "  }";
         
-    public AdminHttpHandler(Configuration configuration, ConfigRepository repository, ScheduledExecutorService executorService) {
+    public AdminHttpHandler(KieServerRouterEnvironment env, Configuration configuration, ConfigRepository repository, ScheduledExecutorService executorService) {
+        this.env = env;
         this.configuration = configuration;
         this.repository = repository;
         this.executorService = executorService;
@@ -98,6 +95,10 @@ public class AdminHttpHandler implements HttpHandler {
         this.aggregators.add(new JSONResponseAggregator());
         this.aggregators.add(new XstreamXMLResponseAggregator());
         this.aggregators.add(new JaxbXMLResponseAggregator());
+    }
+
+    private KieServerRouterEnvironment environment() {
+        return env;
     }
 
     @Override
@@ -206,13 +207,13 @@ public class AdminHttpHandler implements HttpHandler {
                 Iterator<FailedHostInfo> it = failedHosts.iterator();
                 while (it.hasNext()) {
                     FailedHostInfo fHost = (FailedHostInfo) it.next();
-                    if (attemptsLimit == fHost.getAttempts()) {
+                    if (environment().getKieControllerRecoveryAttemptLimit() == fHost.getAttempts()) {
                         it.remove();
-                        log.info("Host " + fHost.getServerUrl() + " has reached reconnect attempts limit " + attemptsLimit + " quiting");
+                        log.info("Host " + fHost.getServerUrl() + " has reached reconnect attempts limit " + environment().getKieControllerRecoveryAttemptLimit() + " quiting");
                         continue;
                     }
                     try {
-                        HttpUtils.getHttpCall(fHost.getServerUrl());
+                        HttpUtils.getHttpCall(environment(), fHost.getServerUrl());
                         log.info("Server at " + fHost.getServerUrl() + " is back online");
                         failedHostsReconnects.cancel(false);
                         
@@ -226,13 +227,13 @@ public class AdminHttpHandler implements HttpHandler {
                             repository.persist(configuration);
                         }                        
                     } catch (Exception e) {
-                        log.debug("Host " + fHost.getServerUrl() + " is still not available, attempting to reconnect in " + interval + " seconds, error " + e.getMessage());
+                        log.debug("Host " + fHost.getServerUrl() + " is still not available, attempting to reconnect in " + environment().getKieControllerAttemptInterval() + " seconds, error " + e.getMessage());
                     } finally {
                         fHost.attempted();
                     }
                 }
             },
-            interval, interval, TimeUnit.SECONDS);
+            environment().getKieControllerAttemptInterval(), environment().getKieControllerAttemptInterval(), TimeUnit.SECONDS);
         }
     }
     
@@ -244,18 +245,18 @@ public class AdminHttpHandler implements HttpHandler {
                 .replaceFirst("#3@", gav[0])
                 .replaceFirst("#4@", gav[1])
                 .replaceFirst("#5@", gav[2]);
-        HttpUtils.putHttpCall(CONTROLLER + "/management/servers/" + KieServerInfoHandler.getRouterId() + "/containers/" + containerId, jsonPayload);        
-        log.infof("Added %s container into controller at %s ", containerId, CONTROLLER);        
+        HttpUtils.putHttpCall(environment(), environment().getKieControllerUrl() + "/management/servers/" + environment().getRouterId() + "/containers/" + containerId, jsonPayload);        
+        log.infof("Added %s container into controller at %s ", containerId, environment().getKieControllerUrl());        
     }
     
     protected void dropFromController(String containerId) throws Exception {
-        HttpUtils.deleteHttpCall(CONTROLLER + "/management/servers/" + KieServerInfoHandler.getRouterId() + "/containers/" + containerId);
+        HttpUtils.deleteHttpCall(environment(), environment().getKieControllerUrl() + "/management/servers/" + environment().getRouterId() + "/containers/" + containerId);
         
-        log.infof("Removed %s container from controller at %s ", containerId, CONTROLLER);
+        log.infof("Removed %s container from controller at %s ", containerId, environment().getKieControllerUrl());
     }
     
     protected void updateControllerOnRemove(String containerId) {
-        if (CONTROLLER != null && controllerContainers.contains(containerId)) {
+        if (environment().hasKieControllerUrl() && controllerContainers.contains(containerId)) {
             List<String> hostsPerContainer = configuration.getHostsPerContainer().getOrDefault(containerId, Collections.emptyList());
             if (hostsPerContainer.isEmpty()) {
                 
@@ -282,11 +283,11 @@ public class AdminHttpHandler implements HttpHandler {
                                 removeFromControllerAttempts = null;
                             }
                         } catch (Exception e) {
-                            log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + interval + " seconds");
+                            log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + environment().getKieControllerAttemptInterval() + " seconds");
                             log.debug(e);
                         }
                     },
-                    interval, interval, TimeUnit.SECONDS);
+                    environment().getKieControllerAttemptInterval(), environment().getKieControllerAttemptInterval(), TimeUnit.SECONDS);
                 }
             }
             
@@ -294,7 +295,7 @@ public class AdminHttpHandler implements HttpHandler {
     }
     
     protected void updateControllerOnAdd(String containerId, String releaseId, String alias, ContainerInfo containerInfo) {
-        if (CONTROLLER != null && releaseId != null && !controllerContainers.contains(containerId)) {
+        if (environment().hasKieControllerUrl() && releaseId != null && !controllerContainers.contains(containerId)) {
             
             controllerContainers.add(containerId);
             containersToAddToController.add(containerInfo);
@@ -320,11 +321,11 @@ public class AdminHttpHandler implements HttpHandler {
                             addToControllerAttempts = null;
                         }
                     } catch (Exception e) {
-                        log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + interval + " seconds");
+                        log.warn("Exception when notifying controller about deleted containers " + e.getMessage() + " next attempt in " + environment().getKieControllerAttemptInterval() + " seconds");
                         log.debug("Stacktrace", e);
                     }
                 },
-                interval, interval, TimeUnit.SECONDS);
+                environment().getKieControllerAttemptInterval(), environment().getKieControllerAttemptInterval(), TimeUnit.SECONDS);
             }
             
         }

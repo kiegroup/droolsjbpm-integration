@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.kie.server.router.Configuration;
+import org.kie.server.router.KieServerRouterEnvironment;
 import org.kie.server.router.handlers.AdminHttpHandler;
 import org.kie.server.router.proxy.CaptureHostLoadBalancingProxyClient;
 import org.kie.server.router.proxy.KieServerProxyClient;
@@ -47,7 +48,7 @@ public class KieServerProxyClientTest {
 
     private static final String TRUSTSTORE_PASSWORD = "mykeystorepass";
 
-    private ConfigRepository repository = new FileRepository();
+    private ConfigRepository repository = new FileRepository(new KieServerRouterEnvironment());
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     @After
@@ -61,7 +62,7 @@ public class KieServerProxyClientTest {
     public void testAddHost() throws URISyntaxException, NoSuchFieldException, IllegalAccessException {
 
         Configuration configuration = repository.load();
-        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository, executorService);
+        AdminHttpHandler adminHandler = new AdminHttpHandler(new KieServerRouterEnvironment(), configuration, repository, executorService);
         KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
 
         // clean ssl properties
@@ -93,7 +94,7 @@ public class KieServerProxyClientTest {
         System.setProperty("javax.net.ssl.trustStorePassword", TRUSTSTORE_PASSWORD);
 
         Configuration configuration = repository.load();
-        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository, executorService);
+        AdminHttpHandler adminHandler = new AdminHttpHandler(new KieServerRouterEnvironment(), configuration, repository, executorService);
         KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
 
         String containerId = "my-container-ssl";

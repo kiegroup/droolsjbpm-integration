@@ -45,6 +45,7 @@ import org.kie.server.router.ConfigurationListener;
 import org.kie.server.router.ContainerInfo;
 import org.kie.server.router.KieServerRouter;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 import org.kie.server.router.repository.FileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,7 @@ public class KieServerRouterUnavailabilityRecoveryTest {
         ContainerInfo containerInfo = new ContainerInfo("container1", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
         
-        FileRepository repo = new FileRepository(repository);
+        FileRepository repo = new FileRepository(new KieServerRouterEnvironment());
         repo.persist(config);
 
         // setup and start router
