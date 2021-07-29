@@ -30,6 +30,7 @@ import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.KieServerRouter;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 
 public class KieServerRouterAuthTest {
 
@@ -50,7 +51,7 @@ public class KieServerRouterAuthTest {
 
         // setup and start router
         Integer port = allocatePort();
-        router = new KieServerRouter(true, "mock");
+        router = new KieServerRouter(new KieServerRouterEnvironment());
         router.start("localhost", port);
 
         serverUrl = "http://localhost:" + port;

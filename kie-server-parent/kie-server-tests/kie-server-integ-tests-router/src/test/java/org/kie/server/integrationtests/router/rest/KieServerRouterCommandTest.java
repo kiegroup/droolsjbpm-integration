@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.server.router.KieServerRouter;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 import org.kie.server.router.identity.IdentityService;
 
 public class KieServerRouterCommandTest {
@@ -45,7 +46,7 @@ public class KieServerRouterCommandTest {
 
         // setup and start router
         Integer port = allocatePort();
-        router = new KieServerRouter(true, "default");
+        router = new KieServerRouter(new KieServerRouterEnvironment());
         router.start("localhost", port);
     }
 

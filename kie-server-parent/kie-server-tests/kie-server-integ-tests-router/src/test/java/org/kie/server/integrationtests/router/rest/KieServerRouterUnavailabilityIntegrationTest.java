@@ -39,6 +39,7 @@ import org.kie.server.router.Configuration;
 import org.kie.server.router.ContainerInfo;
 import org.kie.server.router.KieServerRouter;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 import org.kie.server.router.repository.FileRepository;
 
 public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -78,7 +79,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
         ContainerInfo containerInfo3 = new ContainerInfo("container3", "test3", "org.kie:test:3.0");
         config.addContainerInfo(containerInfo3);
 
-        FileRepository repo = new FileRepository(repository);
+        FileRepository repo = new FileRepository(new KieServerRouterEnvironment());
         repo.persist(config);
 
         // setup and start router
