@@ -153,6 +153,10 @@
         <version>${karaf.servicemix.version.com.sun.xml.bind.jaxb}</version>
         <exclusions>
           <exclusion>
+            <groupId>javax.xml.stream</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+          <exclusion>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-activation_1.1_spec</artifactId>
           </exclusion>
@@ -170,6 +174,12 @@
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId>
         <version>${karaf.servicemix.version.com.sun.xml.bind.jaxb}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.xml.stream</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>

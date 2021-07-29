@@ -67,13 +67,6 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-decisiontables</artifactId>
-      <exclusions>
-        <exclusion>
-          <!-- Collides with 'xml-apis:xml-apis' -->
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

@@ -167,6 +167,10 @@
         <version>${version.org.apache.cxf}</version>
         <exclusions>
           <exclusion>
+            <groupId>org.jboss.spec.javax.rmi</groupId>
+            <artifactId>jboss-rmi-api_1.0_spec</artifactId>
+          </exclusion>
+          <exclusion>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
           </exclusion>
