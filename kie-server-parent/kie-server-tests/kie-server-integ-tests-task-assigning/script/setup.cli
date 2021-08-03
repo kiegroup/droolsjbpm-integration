@@ -1,0 +1,40 @@
+
+# Add new file system realm to ApplicationRealm. Benefit of File System realms is that it is editable from the Business Central UI.
+# We need to use "role" for roles, Business Central depends on it
+/subsystem=elytron/filesystem-realm=KieRealm:add(path=kie-fs-realm-users)
+/subsystem=elytron/simple-role-decoder=from-roles-attribute:add(attribute=role)
+
+/subsystem=elytron/security-domain=ApplicationDomain:list-add(name=realms, index=0, value={realm=KieRealm, role-decoder=from-roles-attribute})
+/subsystem=elytron/security-domain=ApplicationDomain:write-attribute(name=default-realm, value=KieRealm)
+/subsystem=elytron/security-domain=ApplicationDomain:write-attribute(name=permission-mapper, value=default-permission-mapper)
+
+/subsystem=undertow/application-security-domain=other:add(security-domain=ApplicationDomain)
+
+/subsystem=elytron/http-authentication-factory=application-http-authentication:add(http-server-mechanism-factory=global,security-domain=ApplicationDomain,mechanism-configurations=[{mechanism-name=BASIC,mechanism-realm-configurations=[{realm-name=KieRealm}]}, {mechanism-name=FORM}])
+
+/subsystem=ejb3/service=remote:remove
+/subsystem=ejb3/service=remote:add(connector-ref=http-remoting-connector, thread-pool-name=default)
+
+/core-service=management/security-realm=KieRealm:add()
+/core-service=management/security-realm=KieRealm/server-identity=ssl:add(keystore-relative-to=jboss.server.config.dir, keystore-password=password)
+
+
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity(identity=yoda)
+/subsystem=elytron/filesystem-realm=KieRealm:set-password(identity=yoda, clear={password="usetheforce123@"})
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity-attribute(identity=yoda, name=role, value=["kie-server","guest","process-admin"])
+
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity(identity=john)
+/subsystem=elytron/filesystem-realm=KieRealm:set-password(identity=john, clear={password="john123*"})
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity-attribute(identity=john, name=role, value=["kie-server","user", "ClientRelations"])
+
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity(identity=mary)
+/subsystem=elytron/filesystem-realm=KieRealm:set-password(identity=mary, clear={password="mary123*"})
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity-attribute(identity=mary, name=role, value=["kie-server","user", "ClientRelations"])
+
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity(identity=katy)
+/subsystem=elytron/filesystem-realm=KieRealm:set-password(identity=katy, clear={password="katy123*"})
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity-attribute(identity=katy, name=role, value=["kie-server","user","CreditAnalyst"])
+
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity(identity=maciek)
+/subsystem=elytron/filesystem-realm=KieRealm:set-password(identity=maciek, clear={password="maciek123*"})
+/subsystem=elytron/filesystem-realm=KieRealm:add-identity-attribute(identity=maciek, name=role, value=["kie-server","user","CreditAnalyst"])

@@ -164,6 +164,7 @@
               <org.optaplanner.server.ext.disabled>${org.optaplanner.server.ext.disabled}</org.optaplanner.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
           <deployables>
@@ -171,6 +172,11 @@
               <location>${project.build.directory}/kie-server.war</location>
             </deployable>
           </deployables>
+          <configuration>
+            <properties>
+              <cargo.wildfly.script.cli.embedded>${project.parent.parent.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
+            </properties>
+          </configuration>
         </configuration>
       </plugin>
     </plugins>
