@@ -16,6 +16,8 @@
 
   <properties>
     <java.module.name>org.kie.server.services.openshift</java.module.name>
+    <!-- Server mock version 4.7.2 doesn't handle label selectors properly, need to use older version. -->
+    <version.kubernetes-client.server-mock>4.6.0</version.kubernetes-client.server-mock>
   </properties>
 
   <dependencyManagement>
@@ -52,6 +54,16 @@
         <version>${version.kubernetes-client}</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-server-mock</artifactId>
+        <version>${version.kubernetes-client.server-mock}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>openshift-server-mock</artifactId>
+        <version>${version.kubernetes-client.server-mock}</version>
+      </dependency>
       <!-- Added back excluded dependency from parent pom due to required 
         by test run -->
       <dependency>
