@@ -45,6 +45,7 @@ import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_ABORT_P
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
+import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.VAR_NAME;
 import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 import static org.kie.server.api.rest.RestURI.build;
@@ -57,6 +58,7 @@ public class ProcessServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrati
 
     protected static final String CONTAINER_ID = "definition-project";
     protected static final String NON_EXISTING_CONTAINER_ID = "non-existing-container";
+    protected static final String CORRELATION_KEY= "TestCorrelationKey";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -104,6 +106,41 @@ public class ProcessServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrati
             assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
         } finally {
             if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    //JBPM-9841
+    @Test
+    public void testStartProcessWithExistingCorrelationKey() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_USERTASK);
+        valuesMap.put(RestURI.CORRELATION_KEY, CORRELATION_KEY);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_WITH_CORRELATION_KEY_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+
+            Long result = response.readEntity(JaxbLong.class).unwrap();
+            assertThat(result).isNotNull();
+            response.close();
+
+            //Start Process with same correlationKey to check response code
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_WITH_CORRELATION_KEY_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+
+            assertThat(response.getStatus()).isEqualTo(Response.Status.CONFLICT.getStatusCode());
+            response.close();
+
+        } finally {
+            if (response != null) {
                 response.close();
             }
         }
