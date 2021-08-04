@@ -27,9 +27,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -142,6 +146,7 @@ public class ImageServiceBaseTest {
         return svgDocument;
     }
 
+
     @Test
     public void testLoopSubProcess() throws Exception {
         String containerId = "test-container";
@@ -168,8 +173,12 @@ public class ImageServiceBaseTest {
         NodeInstanceDesc nodeInstanceDescActive2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("4", nodeId, "", "", "", 1L, null,
                                                                                                          "", 0, 1L, 1L, "", null, 1);
 
-        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2));
-        when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(Arrays.asList(nodeInstanceDescActive1, nodeInstanceDescActive2));
+        List<NodeInstanceDesc> activeNodes = Arrays.asList(nodeInstanceDescActive1, nodeInstanceDescActive2);
+        List<NodeInstanceDesc> completedNodes = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2);
+        List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2, nodeInstanceDescActive1, nodeInstanceDescActive2);
+        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(completedNodes);
+        when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(activeNodes);
+        when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
         Map<String, ImageReference> imageReferenceMap = new HashMap<>();
         imageReferenceMap.put(containerId, imageReference);
 
@@ -187,6 +196,53 @@ public class ImageServiceBaseTest {
         String onclick = subprocessPlusIcon.getAttribute("onclick");
         assertNotNull(onclick);
         assertEquals("window.open('/containers/test-container/images/processes/instances/4')", onclick);
+        String style = subprocessPlusIcon.getAttribute("style");
+        assertNotNull(style);
+        assertEquals("cursor: pointer;", style);
+    }
+
+    @Test
+    public void testSignalEventSubProcess() throws Exception {
+        String containerId = "test-container";
+        String processId = "test-processId";
+        long processInstanceId = 10;
+
+        byte[] byteArray = getInputStreamAsByteArray(ImageServiceBaseTest.class.getResourceAsStream("/signal-event-subprocess-svg.svg"));
+
+        when(dataService.getProcessesByDeploymentIdProcessId(containerId, processId)).thenReturn(mock(ProcessDefinition.class));
+        when(imageReference.getImageContent(anyString(), anyString())).thenReturn(byteArray);
+        when(kieServerRegistry.getConfig()).thenReturn(config);
+        when(config.getConfigItemValue(anyString(), anyString())).thenReturn("");
+        final String abortNodeId = "_66CB2BD8-424B-4057-B672-F17B6D6F2AB4";
+        final String completedNodeId = "_9ACAA96A-93EC-4D51-8CF0-EAB1F28F5F56";
+        NodeInstanceDesc nodeInstanceDescCompleted1 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("1", completedNodeId, "", "StartNode", "", 1L, null,
+                                                                                                            "", 1, 1L, 3L, "", null, 1);
+
+        NodeInstanceDesc nodeInstanceDescAbort = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("2", abortNodeId, "", "SubProcessNode", "", 1L, null,
+                                                                                                       "", 2, 1L, 3L, "", null, 1);
+
+        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(Arrays.asList(nodeInstanceDescCompleted1));
+        when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(Collections.EMPTY_LIST);
+        List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstanceDescAbort, nodeInstanceDescCompleted1);
+        when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
+
+        Map<String, ImageReference> imageReferenceMap = new HashMap<>();
+        imageReferenceMap.put(containerId, imageReference);
+
+        ProcessInstanceDesc processInstanceDesc = new org.jbpm.kie.services.impl.model.ProcessInstanceDesc(processInstanceId, processId, "", "", 1, containerId, null
+                , "", "", "");
+
+        when(dataService.getProcessInstanceById(processInstanceId)).thenReturn(processInstanceDesc);
+
+        ImageServiceBase imageServiceBase = new ImageServiceBase(dataService, imageReferenceMap, kieServerRegistry);
+        String processImageStr = imageServiceBase.getActiveProcessImage(containerId, processInstanceId);
+
+        Document svgDocument = readSVG(processImageStr);
+
+        Element subprocessPlusIcon = svgDocument.getElementById(abortNodeId + "_subProcessReusableNormalReusableIcon");
+        String onclick = subprocessPlusIcon.getAttribute("onclick");
+        assertNotNull(onclick);
+        assertEquals("window.open('/containers/test-container/images/processes/instances/3')", onclick);
         String style = subprocessPlusIcon.getAttribute("style");
         assertNotNull(style);
         assertEquals("cursor: pointer;", style);
