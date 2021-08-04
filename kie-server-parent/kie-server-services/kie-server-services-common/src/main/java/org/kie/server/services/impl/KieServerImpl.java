@@ -17,6 +17,7 @@
 package org.kie.server.services.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -159,6 +160,12 @@ public class KieServerImpl implements KieServer {
 
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
 
+        // we sync env with state just in case for some env entries only
+        // if there is an update we just need to store it again
+        if (updateMutableEnvironmentState(currentState)) {
+            repository.store(KieServerEnvironment.getServerId(), currentState);
+        }
+
         List<KieServerExtension> extensions = sortKnownExtensions();
 
         for (KieServerExtension extension : extensions) {
@@ -194,6 +201,34 @@ public class KieServerImpl implements KieServer {
         startupStrategy.startup(this, containerManager, currentState, kieServerActive);
         
         eventSupport.fireAfterServerStarted(this);
+    }
+
+    /**
+     * we allow some config items to be overwritten by properties
+     * @param currentState
+     */
+    private boolean updateMutableEnvironmentState(KieServerState currentState) {
+        boolean updated = false;
+        for (String key : Arrays.asList(KieServerConstants.CFG_KIE_CONTROLLER_USER, KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, KieServerConstants.CFG_KIE_CONTROLLER_TOKEN)) {
+            updated |= updateConfigItemFromEnv(currentState, key);
+        }
+        return updated;
+    }
+
+    private boolean updateConfigItemFromEnv(KieServerState state, String key) {
+        String envValue = System.getProperty(key);
+        KieServerConfigItem item = state.getConfiguration().getConfigItem(key);
+
+        if (envValue == null && item == null) {
+            return false;
+        } else if (envValue != null && item != null && envValue.equals(state.getConfiguration().getConfigItem(key).getValue())) {
+            return false;
+        }
+
+        // the only cases left is when one of them is null and the other one not or both are different (value is changed)
+        logger.info("Property {} has a value different from environment. Updating current server state config item to {}", key, envValue);
+        state.getConfiguration().addConfigItem(new KieServerConfigItem(key, envValue, String.class.getName()));
+        return true;
     }
 
     public KieServerRegistry getServerRegistry() {
