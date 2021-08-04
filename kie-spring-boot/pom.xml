@@ -50,10 +50,6 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
           </exclusion>
-          <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-          </exclusion>
         </exclusions>
       </dependency>
 
@@ -65,10 +61,6 @@
           <exclusion>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -93,12 +85,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>
         <version>${version.org.springframework.boot}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- spring boot auto configuration modules -->

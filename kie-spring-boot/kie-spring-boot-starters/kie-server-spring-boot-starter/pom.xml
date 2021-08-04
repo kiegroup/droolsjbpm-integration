@@ -26,10 +26,6 @@
           <groupId>jakarta.validation</groupId>
           <artifactId>jakarta.validation-api</artifactId>
         </exclusion>
-        <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -62,26 +58,10 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>jakarta.activation</groupId>
-          <artifactId>jakarta.activation-api</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration-drools</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>jakarta.activation</groupId>
-          <artifactId>jakarta.activation-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
