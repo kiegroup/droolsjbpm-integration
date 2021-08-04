@@ -47,7 +47,35 @@
                 "methodName": "queryUserTasksByVariables",
                 "elementKind": "method",
                 "justification": "https://issues.redhat.com/browse/JBPM-9714"
-              }]
+              },
+	       {
+   	 	 "code":"java.annotation.attributeValueChanged",
+                 "old":"method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::startProcessWithCorrelationKeyFromNodeIds(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+   	 	 "new":"method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::startProcessWithCorrelationKeyFromNodeIds(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)","annotationType":"io.swagger.annotations.ApiResponses","annotation":"@io.swagger.annotations.ApiResponses({@io.swagger.annotations.ApiResponse(code = 201, response = java.lang.Long.class, message = \"Process instance created\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"10\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<long-type>\n    <value>10<\/value>\n<\/long-type>\")})), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Process ID or Container Id not found\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User does not have permission to access this asset\"), @io.swagger.annotations.ApiResponse(code = 409, message = \"Duplicate correlation key\")})",
+ 		 "attribute":"value",
+         	 "oldValue":"{@io.swagger.annotations.ApiResponse(code = 201, response = java.lang.Long.class, message = \"Process instance created\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"10\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<long-type>\n    <value>10<\/value>\n<\/long-type>\")})), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Process ID or Container Id not found\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User does not have permission to access this asset\")}",
+   	         "newValue":"{@io.swagger.annotations.ApiResponse(code = 201, response = java.lang.Long.class, message = \"Process instance created\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"10\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<long-type>\n    <value>10<\/value>\n<\/long-type>\")})), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Process ID or Container Id not found\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User does not have permission to access this asset\"), @io.swagger.annotations.ApiResponse(code = 409, message = \"Duplicate correlation key\")}",
+   		 "package":"org.kie.server.remote.rest.jbpm",
+   		 "classSimpleName":"ProcessResource",
+   		 "methodName":"startProcessWithCorrelationKeyFromNodeIds",
+   		 "elementKind":"method",
+   		 "justification":"https://issues.redhat.com/browse/JBPM-9841"
+	       },
+	       {
+    	         "code": "java.annotation.attributeValueChanged",
+   		 "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::startProcessWithCorrelation(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+   		 "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::startProcessWithCorrelation(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+   		 "annotationType": "io.swagger.annotations.ApiResponses",
+   		 "annotation": "@io.swagger.annotations.ApiResponses({@io.swagger.annotations.ApiResponse(code = 201, response = java.lang.Long.class, message = \"Process instance started\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"10\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<long-type>\n    <value>10<\/value>\n<\/long-type>\")})), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Process ID or Container Id not found\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User does not have permission to access this asset\"), @io.swagger.annotations.ApiResponse(code = 409, message = \"Duplicate correlation key\")})",
+   		 "attribute": "value",
+   		 "oldValue": "{@io.swagger.annotations.ApiResponse(code = 201, response = java.lang.Long.class, message = \"Process instance started\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"10\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<long-type>\n    <value>10<\/value>\n<\/long-type>\")})), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Process ID or Container Id not found\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User does not have permission to access this asset\")}",
+   		 "newValue": "{@io.swagger.annotations.ApiResponse(code = 201, response = java.lang.Long.class, message = \"Process instance started\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"10\"), @io.swagger.annotations.ExampleProperty(mediaType = \"application\/xml\", value = \"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<long-type>\n    <value>10<\/value>\n<\/long-type>\")})), @io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 404, message = \"Process ID or Container Id not found\"), @io.swagger.annotations.ApiResponse(code = 403, message = \"User does not have permission to access this asset\"), @io.swagger.annotations.ApiResponse(code = 409, message = \"Duplicate correlation key\")}",
+   		 "package": "org.kie.server.remote.rest.jbpm",
+   		 "classSimpleName": "ProcessResource",
+   		 "methodName": "startProcessWithCorrelation",
+   		 "elementKind": "method",
+   		 "justification": "https://issues.redhat.com/browse/JBPM-9841"
+ 	      }]
         }
     }
 }
