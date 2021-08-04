@@ -96,12 +96,14 @@ import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY
 import static org.kie.server.api.rest.RestURI.COMPUTE_PROCESS_OUTCOME_POST_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.conflict;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.isCorrelationKeyAlreadyExists;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
@@ -328,9 +330,12 @@ public class ProcessResource  {
         } catch (SecurityException e) {
             return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
+            if (isCorrelationKeyAlreadyExists(e)) {
+                return conflict(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+            }
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
-                                       MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
+                    MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
         }
     }
 
@@ -373,6 +378,9 @@ public class ProcessResource  {
         } catch (SecurityException e) {
             return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
+            if (isCorrelationKeyAlreadyExists(e)) {
+                return conflict(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+            }
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
                     MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);

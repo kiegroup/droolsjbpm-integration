@@ -17,6 +17,7 @@ package org.kie.server.remote.rest.common.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
@@ -215,7 +216,10 @@ public class RestUtils {
     public static Response serviceUnavailable(Header... customHeaders) {
         return createResponse("", ERROR_VARIANT, Response.Status.SERVICE_UNAVAILABLE, customHeaders);
     }
-
+    
+    public static Response conflict(String reason, Variant v, Header... customHeaders) {
+        return createResponse("\"" +reason + "\"", ERROR_VARIANT, Response.Status.CONFLICT, customHeaders);
+    }
     protected static void applyCustomHeaders(Response.ResponseBuilder builder, Header... customHeaders) {
         if (customHeaders != null && customHeaders.length > 0) {
             for (Header header : customHeaders) {
@@ -263,5 +267,25 @@ public class RestUtils {
     
     public static String errorMessage(Throwable e) {        
         return errorMessage(e, MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()));
+    }
+    
+    public static Boolean isCorrelationKeyAlreadyExists(Exception e) {
+        SQLIntegrityConstraintViolationException constraintViolationException = null;
+
+        Throwable t = e.getCause();
+        while ((t != null) && !(t instanceof SQLIntegrityConstraintViolationException))
+            t = t.getCause();
+
+        constraintViolationException = (SQLIntegrityConstraintViolationException) t;
+
+        /*
+         * 23000 SQLState is used by MySQL, MSSQL,Oracle,Postgres and MariaDB for constraint Violation. 
+         * 'already exists' keyword is used in RuntimeException which is thrown by org.jbpm.persistence.JpaProcessPersistenceContext class to indicate that Correlation key already exists in database. 
+         * */
+        if ((constraintViolationException != null && (constraintViolationException.getSQLState().equals("23000"))) || e.getMessage().contains("already exists")) {
+            return true;
+        }
+        return false;
+
     }
 }
