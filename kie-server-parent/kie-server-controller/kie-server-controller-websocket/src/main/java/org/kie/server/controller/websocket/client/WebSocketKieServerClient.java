@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.websocket.Session;
 
@@ -62,6 +63,7 @@ import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceCustomVars;
+import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariables;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.VariableInstance;
@@ -73,6 +75,8 @@ import org.kie.server.controller.websocket.common.WebSocketUtils;
 import org.kie.server.controller.websocket.common.handlers.WebSocketServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.Collections.emptyList;
 
 @SuppressWarnings("unchecked")
 public class WebSocketKieServerClient implements KieServicesClient {
@@ -90,6 +94,10 @@ public class WebSocketKieServerClient implements KieServicesClient {
 
     private static <T> T throwUnsupportedException(){
         throw new UnsupportedOperationException("Not supported for Web Socket implementation");
+    }
+
+    private List<?> safeList(List<?> list) {
+        return list == null ? emptyList() : list;
     }
 
     @Override
@@ -277,15 +285,27 @@ public class WebSocketKieServerClient implements KieServicesClient {
                 public List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize) {
                     return throwUnsupportedException();
                 }
-                
+
                 @Override
                 public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-                    return throwUnsupportedException();
+                    CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("QueryService", "getProcessInstancesByDeploymentId", new Object[]{containerId, safeList(status), page, pageSize, sort, sortOrder})));
+                    ServiceResponse<ProcessInstanceList> listResponse = (ServiceResponse<ProcessInstanceList>) sendCommand(script, new WebSocketServiceResponse(true, (message) -> {
+                        ServiceResponsesList list = WebSocketUtils.unmarshal(message, ServiceResponsesList.class);
+                        return list.getResponses().get(0);
+                    })).getResponses().get(0);
+
+                    throwExceptionOnFailure(listResponse);
+
+                    if (shouldReturnWithNullResponse(listResponse)) {
+                        return emptyList();
+                    }
+
+                    return Arrays.asList(listResponse.getResult().getProcessInstances());
                 }
-                
+
                 @Override
                 public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize) {
-                    return throwUnsupportedException();
+                    return findProcessInstancesByContainerId(containerId, status, page, pageSize, "", true);
                 }
                 
                 @Override
@@ -372,7 +392,22 @@ public class WebSocketKieServerClient implements KieServicesClient {
 
         return throwUnsupportedException();
     }
-    
+
+    private void throwExceptionOnFailure(ServiceResponse<?> serviceResponse) {
+        if (serviceResponse != null && ServiceResponse.ResponseType.FAILURE.equals(serviceResponse.getType())){
+            throw new KieServicesException(serviceResponse.getMsg());
+        }
+    }
+
+    private boolean shouldReturnWithNullResponse(ServiceResponse<?> serviceResponse) {
+        if (serviceResponse != null && ServiceResponse.ResponseType.NO_RESPONSE.equals(serviceResponse.getType())){
+            logger.debug("Returning null as the response type is NO_RESPONSE");
+            return true;
+        }
+
+        return false;
+    }
+
     protected ServiceResponsesList sendCommand(CommandScript script, WebSocketServiceResponse response) {
         logger.debug("About to send command {} to kie server located at {}", script, url);
         List<Session> sessions = manager.getByUrl(url);
