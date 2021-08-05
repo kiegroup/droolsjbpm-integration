@@ -50,9 +50,9 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
 
         Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(new Object[][]
                         {
-                                {MarshallingFormat.JAXB, restConfiguration},
+//                                {MarshallingFormat.JAXB, restConfiguration},
                                 {MarshallingFormat.JSON, restConfiguration},
-                                {MarshallingFormat.XSTREAM, restConfiguration}
+//                                {MarshallingFormat.XSTREAM, restConfiguration}
                         }
         ));
 
@@ -61,9 +61,9 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
             KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
             parameterData.addAll(Arrays.asList(new Object[][]
                             {
-                                    {MarshallingFormat.JAXB, jmsConfiguration},
+//                                    {MarshallingFormat.JAXB, jmsConfiguration},
                                     {MarshallingFormat.JSON, jmsConfiguration},
-                                    {MarshallingFormat.XSTREAM, jmsConfiguration}
+//                                    {MarshallingFormat.XSTREAM, jmsConfiguration}
                             })
             );
         }
