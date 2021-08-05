@@ -9,6 +9,7 @@
   <properties>
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
+    <version.jakarta.xml.bind-api>${version.jakarta.xml.bind-api}</version.jakarta.xml.bind-api>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
@@ -22,6 +23,11 @@
         <artifactId>drools-model-compiler</artifactId>
         <version>${version.org.kie}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>${version.jakarta.xml.bind-api}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
