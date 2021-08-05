@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.KieSession;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieSessionLookupHandler;
@@ -38,7 +39,13 @@ public class KieSessionLookupManager {
     public CommandExecutor lookup(String kieSessionId, KieContainerInstance containerInstance, KieServerRegistry registry) {
         CommandExecutor commandExecutor = null;
         for (KieSessionLookupHandler handler : handlers) {
-            commandExecutor = handler.lookupKieSession(kieSessionId, containerInstance, registry);
+            synchronized (this) {
+                commandExecutor = handler.lookupKieSession(kieSessionId, containerInstance, registry);
+                KieSession kieSession = (KieSession) commandExecutor;
+                Thread currentThread = Thread.currentThread();
+                System.out.println("****************** Lookup session: " + kieSession.hashCode() + " threadId: " + currentThread.getId());
+
+            }
 
             if (commandExecutor != null) {
                 break;
