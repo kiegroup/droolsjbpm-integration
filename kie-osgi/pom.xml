@@ -20,6 +20,7 @@
     <!-- The OSGi modules depend on both non-osgi and osgi jars (with different GAs. It seems there is no easy way
          to fix this. -->
     <enforcer.failOnDuplicatedClasses>false</enforcer.failOnDuplicatedClasses>
+    <enforcer.failOnBannedDependencies>false</enforcer.failOnBannedDependencies>
   </properties>
 
   <modules>
