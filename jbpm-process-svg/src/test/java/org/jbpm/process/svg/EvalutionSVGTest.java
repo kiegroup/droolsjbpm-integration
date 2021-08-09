@@ -42,7 +42,7 @@ import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
 
-public class TestEvalutionSVG {
+public class EvalutionSVGTest {
 
     private XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -52,7 +52,7 @@ public class TestEvalutionSVG {
         completed.add("_343B16DA-961A-49BF-8697-9A86DEAFBAF4");
         List<String> active = new ArrayList<String>();
         active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
-        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"), completed, active);
+        String svg = SVGImageProcessor.transform(EvalutionSVGTest.class.getResourceAsStream("/evaluation-svg.svg"), completed, active);
 
         // verify transformation
         Document svgDocument = readSVG(svg);
@@ -71,7 +71,7 @@ public class TestEvalutionSVG {
         completed.add("Self Evaluation");
         List<String> active = new ArrayList<String>();
         active.add("PM Evaluation");
-        String svg = SVGImageProcessor.transformByName(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"), completed, active);
+        String svg = SVGImageProcessor.transformByName(EvalutionSVGTest.class.getResourceAsStream("/evaluation-svg.svg"), completed, active);
 
         // verify transformation
         Document svgDocument = readSVG(svg);
@@ -86,7 +86,7 @@ public class TestEvalutionSVG {
         completed.add("_6063D302-9D81-4C86-920B-E808A45377C2");
         List<String> active = new ArrayList<String>();
         active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
-        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"), completed, active);
+        String svg = SVGImageProcessor.transform(EvalutionSVGTest.class.getResourceAsStream("/evaluation-svg.svg"), completed, active);
 
         // verify transformation
         Document svgDocument = readSVG(svg);
@@ -104,7 +104,7 @@ public class TestEvalutionSVG {
 
         Map<String, String> links = new HashMap<>();
         links.put("_35262208-8B3E-457E-8D8A-798E70CC280D", "http://localhost/processes/1");
-        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/call-activity-svg.svg"), completed, active, links);
+        String svg = SVGImageProcessor.transform(EvalutionSVGTest.class.getResourceAsStream("/call-activity-svg.svg"), completed, active, links);
 
         // verify transformation
         Document svgDocument = readSVG(svg);
@@ -129,7 +129,7 @@ public class TestEvalutionSVG {
 
         Map<String, String> links = new HashMap<>();
         links.put(elementId, "http://localhost/processes/1");
-        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream(svgFile), completed, active, links);
+        String svg = SVGImageProcessor.transform(EvalutionSVGTest.class.getResourceAsStream(svgFile), completed, active, links);
 
         // verify transformation
         Document svgDocument = readSVG(svg);
@@ -152,7 +152,7 @@ public class TestEvalutionSVG {
         completed.add("_343B16DA-961A-49BF-8697-9A86DEAFBAF4");
         List<String> active = new ArrayList<String>();
         active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
-        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"),
+        String svg = SVGImageProcessor.transform(EvalutionSVGTest.class.getResourceAsStream("/evaluation-svg.svg"),
                                                  completed, active, null, completedNodeColor,
                                                  completedNodeBorderColor, activeNodeBorderColor, null);
 
@@ -168,7 +168,7 @@ public class TestEvalutionSVG {
         completed.add("_343B16DA-961A-49BF-8697-9A86DEAFBAF4");
         List<String> active = new ArrayList<String>();
         active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
-        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"),
+        String svg = SVGImageProcessor.transform(EvalutionSVGTest.class.getResourceAsStream("/evaluation-svg.svg"),
                                                  completed, active, null, "#888888",
                                                  "#888887", "#888886", null);
 
@@ -266,7 +266,7 @@ public class TestEvalutionSVG {
         Map<String, Long> nodeBadges = new HashMap<>();
         nodeBadges.put(completedNodeId, 1L);
         nodeBadges.put(activeNodeId, 1L);
-        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/stunner.parentP-svg.svg"), completed,
+        String svg = SVGImageProcessor.transform(EvalutionSVGTest.class.getResourceAsStream("/stunner.parentP-svg.svg"), completed,
                                                  active, null, COMPLETED_BORDER_COLOR, COMPLETED_COLOR, ACTIVE_BORDER_COLOR, nodeBadges);
 
         // verify transformation
