@@ -160,8 +160,8 @@
       <artifactId>kie-server-services-jbpm</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.dom4j</groupId>
@@ -169,7 +169,7 @@
         </exclusion>
         <exclusion>
           <groupId>jakarta.el</groupId>
-          <artifactId>jboss-el-api_2.2_spec</artifactId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
         <exclusion>
           <artifactId>asm</artifactId>
@@ -186,8 +186,8 @@
       <artifactId>kie-server-services-case-mgmt</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.dom4j</groupId>
@@ -195,7 +195,7 @@
         </exclusion>
         <exclusion>
           <groupId>jakarta.el</groupId>
-          <artifactId>jboss-el-api_2.2_spec</artifactId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
         <exclusion>
           <artifactId>asm</artifactId>
@@ -213,8 +213,8 @@
       <artifactId>kie-server-services-jbpm-ui</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.dom4j</groupId>
@@ -222,7 +222,7 @@
         </exclusion>
         <exclusion>
           <groupId>jakarta.el</groupId>
-          <artifactId>jboss-el-api_2.2_spec</artifactId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

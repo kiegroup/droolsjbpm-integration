@@ -80,12 +80,6 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-core</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>jakarta.activation</groupId>
-          <artifactId>jakarta.activation-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Used as an email client in UserTaskEscalationIntegrationTest -->
@@ -317,10 +311,6 @@
           <artifactId>hibernate-core</artifactId>
           <scope>test</scope>
           <exclusions>
-            <exclusion>
-              <groupId>jakarta.activation</groupId>
-              <artifactId>javax.activation-api</artifactId>
-            </exclusion>
             <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
             <exclusion>
               <groupId>org.glassfish.jaxb</groupId>
