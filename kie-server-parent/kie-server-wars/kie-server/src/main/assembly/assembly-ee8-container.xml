@@ -106,7 +106,8 @@
         <exclude>jakarta.activation:jakarta.activation-api</exclude>
         <exclude>jakarta.persistence:jakarta.persistence-api</exclude>
         <exclude>xml-apis:xml-apis:jar</exclude>
-        <exclude>javax.mail:mail</exclude>
+        <exclude>jakarta.mail:jakarta.mail-api</exclude>
+        <exclude>com.sun.mail:jakarta.mail</exclude>
       </excludes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>

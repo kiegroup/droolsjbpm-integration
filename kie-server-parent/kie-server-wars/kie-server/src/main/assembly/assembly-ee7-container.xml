@@ -109,7 +109,8 @@
         <exclude>stax:stax-api</exclude>
         <exclude>jakarta.activation:jakarta.activation-api</exclude>
         <exclude>xml-apis:xml-apis:jar</exclude>
-        <exclude>javax.mail:mail</exclude>
+        <exclude>jakarta.mail:jakarta.mail-api</exclude>
+        <exclude>com.sun.mail:jakarta.mail</exclude>
         <exclude>org.apache.cxf:cxf-rt-ws-policy</exclude>
       </excludes>
       <outputDirectory>WEB-INF/lib</outputDirectory>

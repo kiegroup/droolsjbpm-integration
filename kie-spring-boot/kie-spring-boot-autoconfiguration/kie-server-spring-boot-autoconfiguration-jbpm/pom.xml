@@ -26,10 +26,6 @@
       <artifactId>spring-boot-autoconfigure</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>jakarta.ejb</groupId>
-          <artifactId>jakarta.ejb-api</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
         </exclusion>
@@ -160,16 +156,8 @@
       <artifactId>kie-server-services-jbpm</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>jakarta.transaction</groupId>
-          <artifactId>jakarta.transaction-api</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>jakarta.el</groupId>
-          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
         <exclusion>
           <artifactId>asm</artifactId>
@@ -186,16 +174,8 @@
       <artifactId>kie-server-services-case-mgmt</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>jakarta.transaction</groupId>
-          <artifactId>jakarta.transaction-api</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>jakarta.el</groupId>
-          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
         <exclusion>
           <artifactId>asm</artifactId>
@@ -213,16 +193,8 @@
       <artifactId>kie-server-services-jbpm-ui</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>jakarta.transaction</groupId>
-          <artifactId>jakarta.transaction-api</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>jakarta.el</groupId>
-          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

@@ -73,12 +73,6 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration-jbpm</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>jakarta.transaction</groupId>
-          <artifactId>jakarta.transaction-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 
