@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.type.TypeModifier;
 import com.fasterxml.jackson.databind.type.TypeParser;
 import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import com.fasterxml.jackson.databind.util.ClassUtil;
-import com.fasterxml.jackson.databind.util.LRUMap;
 import com.fasterxml.jackson.databind.util.LookupCache;
 
 public class FallbackableTypeFactory extends TypeFactory {
@@ -34,24 +33,24 @@ public class FallbackableTypeFactory extends TypeFactory {
     protected static final FallbackableTypeFactory instance = new FallbackableTypeFactory();
 
     private FallbackableTypeFactory() {
-        super(null);
+        super((LookupCache<Object,JavaType>) null);
         this.fallbackClassLoader = null;
     }
 
-    protected FallbackableTypeFactory(LRUMap<Object, JavaType> typeCache) {
+    protected FallbackableTypeFactory(LookupCache<Object, JavaType> typeCache) {
         super(typeCache);
         this.fallbackClassLoader = null;
     }
 
-    protected FallbackableTypeFactory(LRUMap<Object, JavaType> typeCache, TypeParser p,
+    protected FallbackableTypeFactory(LookupCache<Object, JavaType> typeCache, TypeParser p,
                                       TypeModifier[] mods, ClassLoader classLoader) {
         super(typeCache, p, mods, classLoader);
         this.fallbackClassLoader = null;
     }
 
-    protected FallbackableTypeFactory(LookupCache<Object, JavaType> _typeCache, TypeParser p,
+    protected FallbackableTypeFactory(LookupCache<Object, JavaType> typeCache, TypeParser p,
                                       TypeModifier[] mods, ClassLoader classLoader, ClassLoader fallbackClassLoader) {
-        super(_typeCache, p, mods, classLoader);
+        super(typeCache, p, mods, classLoader);
         this.fallbackClassLoader = fallbackClassLoader;
     }
 
@@ -103,10 +102,10 @@ public class FallbackableTypeFactory extends TypeFactory {
      * identical settings except for different cache; most likely one with
      * bigger maximum size.
      *
-     * @since 2.8
+     * @since 2.12
      */
     @Override
-    public FallbackableTypeFactory withCache(LRUMap<Object, JavaType> cache) {
+    public FallbackableTypeFactory withCache(LookupCache<Object, JavaType> cache) {
         return new FallbackableTypeFactory(cache, _parser, _modifiers, _classLoader, fallbackClassLoader);
     }
 
