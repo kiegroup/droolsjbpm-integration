@@ -24,11 +24,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -71,12 +76,15 @@ import org.springframework.util.ReflectionUtils;
 @ConditionalOnClass({ KieServerImpl.class })
 @EnableConfigurationProperties(KieServerProperties.class)
 public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerAutoConfiguration.class);
+
     @Value("${cxf.path:/}")
     private String cxfPath;
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerAutoConfiguration.class);
-    
+    @Value("${org.kie.maven.resolver.folder:/workspace}")
+    private String explodedJarFolder;
+
     private KieServerProperties properties;   
     private IdentityProvider identityProvider;
     private List<Object> endpoints;
@@ -165,8 +173,33 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     public List<KieContainerResource> buildAutoScanDeployments(KieServerProperties kieServerProperties) throws IOException {
         ApplicationHome appHome = new ApplicationHome();
         final String folder = "BOOT-INF/classes/KIE-INF/lib/";
-        File root = appHome.getSource();
-        return discoverDeployments(folder, new FileInputStream(root));
+        return (explodedJarFolder == null) ? discoverDeployments(folder, new FileInputStream(appHome.getSource())) :  discoverDeployments(folder, new File(explodedJarFolder));
+    }
+
+    public List<KieContainerResource> discoverDeployments(String folder, File root) {
+
+        Path base = Paths.get(root.toString(), folder);
+        if(!Files.isDirectory(base)) {
+            logger.error("Autoscan folder failed. {} does not exist or it is not a folder", base);
+            return Collections.emptyList();
+        }
+        List<KieContainerResource> files = new ArrayList<>();
+        try (Stream<Path> filesInFolder = Files.walk(base)){
+            List<Path> candidates = filesInFolder.filter(Files::isRegularFile).collect(Collectors.toList());
+            for(Path candidate : candidates) {
+                logger.debug("Verifying {} is a valid deployment", candidate);
+                Optional<KieContainerResource> resource = scanPossibleDeployment(Files.newInputStream(candidate));
+                if(resource.isPresent()) {
+                    logger.info("autoscan in folder {} found {} deployment", root, resource.get());
+                    files.add(resource.get());
+                }
+            }
+            return files;
+        } catch (IOException e) {
+            logger.error("Error when trying to scan folder {} for deployments", root, e);
+            return Collections.emptyList();
+        }
+
     }
 
     private List<KieContainerResource>  discoverDeployments(String folder, InputStream inputStream) {
