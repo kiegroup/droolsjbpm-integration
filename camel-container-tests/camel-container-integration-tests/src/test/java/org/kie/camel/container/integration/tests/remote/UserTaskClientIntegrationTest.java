@@ -20,11 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 
+@Ignore
 public class UserTaskClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     private static final String INITIAL_PROCESS_VARIABLE_VALUE = "initial-value";
