@@ -63,7 +63,7 @@ public class ContainerAliasResolver {
      * @throws IllegalArgumentException in case there are no containers for given alias
      */
     public String forProcessInstance(String alias, long processInstanceId) {
-        return registry.getContainerId(alias, new ByProcessInstanceIdContainerLocator(processInstanceId));
+        return registry.getContainerId(alias, ByProcessInstanceIdContainerLocator.get(processInstanceId));
     }
     
     /**

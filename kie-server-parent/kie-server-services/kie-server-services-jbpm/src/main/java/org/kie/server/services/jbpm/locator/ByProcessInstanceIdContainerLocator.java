@@ -38,28 +38,30 @@ public class ByProcessInstanceIdContainerLocator implements ContainerLocator {
 
     private static final Logger logger = LoggerFactory.getLogger(ByProcessInstanceIdContainerLocator.class);
 
-    private static final String CONTAINER_ID_QUERY = "select log.externalId from ProcessInstanceLog log where log.processInstanceId = :piId";
-    private Long processInstanceId;
+    private static final String CONTAINER_ID_QUERY = "select cmi.ownerId from ContextMappingInfo cmi where cmi.contextId = :piId";
+    private final Long processInstanceId;
 
     private String containerId;
 
-    public ByProcessInstanceIdContainerLocator(Long processInstanceId) {
+    private ByProcessInstanceIdContainerLocator(final Long processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
     @Override
-    public String locateContainer(String alias, List<? extends KieContainerInstance> containerInstances) {
+    public String locateContainer(final String alias, final List<? extends KieContainerInstance> containerInstances) {
         if (containerId != null) {
             logger.debug("Container id has already be found for process instance {} and is {}", processInstanceId, containerId);
             return containerId;
         }
         logger.debug("Searching for container id for process instance id {} and alias {}", processInstanceId, alias);
-        EntityManager em = EntityManagerFactoryManager.get().getOrCreate(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME).createEntityManager();
+        EntityManager em = EntityManagerFactoryManager.get()
+            .getOrCreate(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME)
+            .createEntityManager();
 
         try {
 
-            containerId = (String)em.createQuery(CONTAINER_ID_QUERY)
-                    .setParameter("piId", processInstanceId)
+            containerId = (String) em.createQuery(CONTAINER_ID_QUERY)
+                    .setParameter("piId", processInstanceId.toString())
                     .getSingleResult();
             logger.debug("Found container id '{}' for process instance id {}", containerId, processInstanceId);
             return containerId;
@@ -71,6 +73,9 @@ public class ByProcessInstanceIdContainerLocator implements ContainerLocator {
         } finally {
             em.close();
         }
+    }
 
+    public static ByProcessInstanceIdContainerLocator get(final Number processInstanceId) {
+        return new ByProcessInstanceIdContainerLocator(processInstanceId.longValue());
     }
 }
