@@ -94,7 +94,9 @@
         
         <include>xerces:xercesImpl</include>
 
-        <include>com.sun.xml.bind:jaxb-xjc</include>
+	<include>com.sun.xml.bind:jaxb-xjc</include>
+
+        <include>org.yaml:snakeyaml</include>
       </includes>
       <excludes>
         <exclude>org.jboss.resteasy:*</exclude>
