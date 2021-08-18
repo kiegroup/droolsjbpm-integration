@@ -52,9 +52,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -283,8 +285,52 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
     }
 
     @Test
-    public void testCreateServerTemplateAndAddRemoveContainer() {
+    public void testRemoveContainerFailed() {
+        Container container = new Container();
+        container.setStatus(KieContainerStatus.FAILED);
+        when(kieServerInstanceManager.stopContainer(any(ServerTemplate.class), any(ContainerSpec.class))).thenReturn(asList(container));
 
+        ServerTemplate serverTemplate = new ServerTemplate();
+
+        serverTemplate.setName("test server");
+        serverTemplate.setId(UUID.randomUUID().toString());
+
+        specManagementService.saveServerTemplate(serverTemplate);
+
+        ServerTemplateKeyList existing = specManagementService.listServerTemplateKeys();
+        assertNotNull(existing);
+        assertEquals(1, existing.getServerTemplates().length);
+
+        Map<Capability, ContainerConfig> configs = new HashMap<Capability, ContainerConfig>();
+        RuleConfig ruleConfig = new RuleConfig();
+        ruleConfig.setPollInterval(1000l);
+        ruleConfig.setScannerStatus(KieScannerStatus.STARTED);
+
+        ProcessConfig processConfig = new ProcessConfig();
+        processConfig.setKBase("defaultKieBase");
+        processConfig.setKSession("defaultKieSession");
+        processConfig.setMergeMode("MERGE_COLLECTION");
+        processConfig.setRuntimeStrategy("PER_PROCESS_INSTANCE");
+
+        ContainerSpec containerSpec = new ContainerSpec();
+        containerSpec.setId("test container");
+        containerSpec.setServerTemplateKey(new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()));
+        containerSpec.setReleasedId(new ReleaseId("org.kie", "kie-server-kjar", "1.0"));
+        containerSpec.setStatus(KieContainerStatus.STARTED);
+        containerSpec.setConfigs(configs);
+
+        specManagementService.saveContainerSpec(serverTemplate.getId(), containerSpec);
+
+        org.kie.server.controller.api.model.spec.ServerTemplate createdServerTemplate = specManagementService.getServerTemplate(serverTemplate.getId());
+        assertNotNull(createdServerTemplate);
+        assertNotNull(createdServerTemplate.getContainersSpec());
+        assertEquals(1, createdServerTemplate.getContainersSpec().size());
+
+        assertThrows("Failed to stop all container test container instances", KieServerControllerIllegalArgumentException.class, () -> specManagementService.deleteContainerSpec(serverTemplate.getId(), "test container"));
+    }
+
+    @Test
+    public void testCreateServerTemplateAndAddRemoveContainer() {
         ServerTemplate serverTemplate = new ServerTemplate();
 
         serverTemplate.setName("test server");

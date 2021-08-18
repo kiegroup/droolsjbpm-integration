@@ -32,7 +32,18 @@ import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.*;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerConfig;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ContainerSpecKey;
+import org.kie.server.controller.api.model.spec.ContainerSpecList;
+import org.kie.server.controller.api.model.spec.ProcessConfig;
+import org.kie.server.controller.api.model.spec.RuleConfig;
+import org.kie.server.controller.api.model.spec.ServerConfig;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.ServerTemplateKeyList;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -207,7 +218,11 @@ public class SpecManagementServiceImpl implements SpecManagementService {
 
         if (serverTemplate.hasContainerSpec(containerSpecId)) {
             ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecId);
-            kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
+            List<Container> containers = kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
+            if (containers.stream().anyMatch(c -> c.getStatus() != KieContainerStatus.STOPPED)) {
+                System.out.println("containers = " + containers);
+                throw new KieServerControllerIllegalArgumentException("Failed to stop all container " + containerSpecId + " instances");
+            }
             serverTemplate.deleteContainerSpec(containerSpecId);
             templateStorage.update(serverTemplate);
             notificationService.notify(new ServerTemplateUpdated(serverTemplate));
