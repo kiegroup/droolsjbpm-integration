@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,27 @@
 package org.kie.server.integrationtests.jbpm;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.integrationtests.category.JEEOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 
 @Category({JEEOnly.class})
-public class WebServiceIntegrationTest extends WebServiceBase {
-
-    protected static final String PROCESS_ID_WS = "org.specialtripsagency.specialtripsagencyprocess";
+public class WebServiceHeadersNoEscapeIntegrationTest extends WebServiceBase {
 
     @Test
-    public void testCallWebServiceFromProcess() {
+    public void testCallWebServiceHeadersNoEscape() {
         Map<String, Object> params = new HashMap<>();
         params.put("serviceUrl", TestConfig.getWebServiceHttpURL());
-        Long pid = processClient.startProcess(WS_CONTAINER_ID, PROCESS_ID_WS, params);
-
-        assertThat(pid).isNotNull();
-        ProcessInstance pi = queryClient.findProcessInstanceById(pid);
-        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
-
+        params.put("coupon", "<Coupon><Number><![CDATA[AT&T]]></Number></Coupon>");
+        params.put("ns_coupon", "http://acme-travel.com");
+        
+        Map<String, Object> outputParams = processClient.computeProcessOutcome(WS_CONTAINER_ID, "org.specialtripsagency.travelAgencyHeadersProcess", params);
+        assertEquals("100", outputParams.get("ratePerPerson"));
     }
 }
