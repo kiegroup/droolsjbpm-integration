@@ -14,6 +14,22 @@
 
   <build>
     <finalName>kie-server-test-web-service</finalName>
+    <plugins>
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-war-plugin</artifactId>
+       <configuration>
+          <archive>
+             <manifestEntries>
+                <Dependencies>
+                org.apache.cxf.impl, 
+                org.apache.cxf
+                </Dependencies>
+             </manifestEntries>
+          </archive>
+       </configuration>
+     </plugin>
+    </plugins>
   </build>
 
   <dependencies>
@@ -27,5 +43,16 @@
       <artifactId>jakarta.xml.ws-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
+  
 </project>

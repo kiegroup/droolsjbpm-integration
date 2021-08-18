@@ -43,16 +43,4 @@ public class WebServiceIntegrationTest extends WebServiceBase {
         assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
 
     }
-
-    @Test
-    public void testCallWebServiceHeaders() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("serviceUrl", TestConfig.getWebServiceHttpURL());
-        Long pid = processClient.startProcess(WS_CONTAINER_ID, "org.specialtripsagency.travelAgencyHeadersProcess", params);
-
-        assertThat(pid).isNotNull();
-        ProcessInstance pi = queryClient.findProcessInstanceById(pid);
-        assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
-
-    }
 }
