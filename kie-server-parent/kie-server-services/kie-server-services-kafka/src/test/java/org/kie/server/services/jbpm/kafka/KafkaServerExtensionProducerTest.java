@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.drools.core.event.MessageEventImpl;
 import org.drools.core.event.SignalEventImpl;
 import org.jbpm.runtime.manager.impl.SimpleRegisterableItemsFactory;
@@ -88,7 +90,7 @@ public class KafkaServerExtensionProducerTest {
         System.setProperty(SIGNAL_MAPPING_PROPERTY, Mapping.AUTO.toString());
         itemsFactory = new SimpleRegisterableItemsFactory();
         itemsFactory.addProcessListener(new KafkaServerProcessListener());
-        mockProducer = new MockProducer<>();
+        mockProducer = new MockProducer<>(false, new StringSerializer(), new ByteArraySerializer());
         extension = new MockKafkaServerExtension(mockProducer);
         server = mock(KieServerImpl.class);
         registry = mock(KieServerRegistry.class);
