@@ -685,7 +685,11 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             return "Boolean(";
         } else if (type.contains("Date")) {
             return "Object(";
-        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("multipleSelector") || type.contains("multipleInput")) {
+        } else if (type.contains("file")
+                || type.contains("Document")
+                || type.contains("documentCollection")
+                || type.contains("multipleSelector")
+                || type.contains("multipleInput")) {
             return "Object(";
         } else if (type.contains("slider")) {
             return " { \"java.lang.Double\" : Number(";
