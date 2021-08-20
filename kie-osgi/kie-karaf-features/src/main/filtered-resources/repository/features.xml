@@ -15,10 +15,10 @@
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
     <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
     <bundle>wrap:mvn:org.eclipse.jdt/ecj/${karaf.version.org.eclipse.jdt}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt}</bundle>
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
-    <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>
-    <bundle>mvn:org.jboss.spec.javax.el/jboss-el-api_3.0_spec/${karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec}</bundle>
-    <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/${karaf.version.org.jboss.spec.javax.interceptor}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.org.apache.geronimo.specs.atinject}</bundle>
+    <bundle>wrap:mvn:jakarta.enterprise/jakarta.enterprise.cdi-api/${version.jakarta.enterprise.cdi-api}</bundle>
+    <bundle>mvn:jakarta.el/jakarta.el-api/${version.jakarta.el-api}</bundle>
+    <bundle>mvn:jakarta.interceptor/jakarta.interceptor-api/${version.jakarta.interceptor-api}</bundle>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
   </feature>
@@ -61,13 +61,15 @@
     <feature version="${project.version}">servlet-api-kie</feature>
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
-    <bundle>mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/${karaf.version.org.jboss.spec.javax.security.jacc}</bundle>
+    <bundle>mvn:jakarta.security.jacc/jakarta.security.jacc-api/${version.jakarta.security.jacc-api}</bundle>
+    <bundle>mvn:jakarta.servlet/jakarta.servlet-api/${version.jakarta.servlet-api}</bundle>
     <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
-    <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/${karaf.version.org.jboss.spec.javax.interceptor}</bundle>
+    <bundle>mvn:jakarta.interceptor/jakarta.interceptor-api/${version.jakarta.interceptor-api}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.1_spec/${karaf.version.org.apache.geronimo.specs.jpa}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
   </feature>
+
 
   <feature name="jbpm-human-task" version="${project.version}" description="jBPM Human Task">
     <feature version="${project.version}">drools-module</feature>
@@ -77,7 +79,8 @@
     <feature version="${project.version}">jackson</feature>
     <bundle>mvn:com.google.guava/guava/${version.com.google.guava}</bundle>
     <bundle>mvn:com.google.guava/failureaccess/${version.com.google.guava.failureaccess}</bundle>
-    <bundle>mvn:javax.mail/mail/${version.javax.mail}</bundle>
+    <bundle>mvn:jakarta.mail/jakarta.mail-api/${version.jakarta.mail-api}</bundle>
+    <bundle>mvn:com.sun.mail/jakarta.mail/${version.jakarta.mail-api}</bundle>
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
@@ -133,7 +136,8 @@
     <bundle dependency="true">mvn:com.fasterxml/classmate/${karaf.version.com.fasterxml.classmate}</bundle>
     <bundle dependency="true">mvn:org.javassist/javassist/${version.org.javassist}</bundle>
     <bundle dependency="true">mvn:net.bytebuddy/byte-buddy/${version.net.byte-buddy}</bundle>
-    <bundle dependency="true">mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/${version.org.jboss.spec.javax.security.jacc.jboss-jacc-api_1.5_spec}</bundle>
+    <bundle dependency="true">mvn:jakarta.security.jacc/jakarta.security.jacc-api/${version.jakarta.security.jacc-api}</bundle>
+    <bundle dependency="true">mvn:jakarta.servlet/jakarta.servlet-api/${version.jakarta.servlet-api}</bundle>
     <bundle dependency="true">wrap:mvn:org.jboss/jandex/${karaf.version.org.jboss.jandex}</bundle>
     <bundle dependency="true">mvn:javax.validation/validation-api/${karaf.version.javax.validation}</bundle>
     <bundle dependency="true">mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
@@ -170,7 +174,7 @@
     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>   <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api -->
     <bundle>mvn:org.drools/drools-ruleunit/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/kie-pmml/${version.org.kie}</bundle>
-    <bundle>wrap:mvn:org.jboss.spec.javax.ws.rs/jboss-jaxrs-api_2.1_spec/${version.org.jboss.spec.javax.ws.rs.jboss-jaxrs-api_2.1_spec}</bundle>
+    <bundle>wrap:mvn:jakarta.ws.rs/jakarta.ws.rs-api/${version.jakarta.ws.rs-api}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
@@ -178,7 +182,7 @@
   </feature>
 
   <feature name="servlet-api-kie" version="${project.version}">
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/${karaf.version.org.apache.geronimo.specs.servlet}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/1.0</bundle>
   </feature>
 
   <feature name="kie-pmml" version="${project.version}">

@@ -23,12 +23,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 
+@Ignore
 public class QueryClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     @Test

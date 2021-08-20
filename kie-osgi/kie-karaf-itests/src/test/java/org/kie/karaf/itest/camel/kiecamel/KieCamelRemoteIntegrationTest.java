@@ -30,6 +30,7 @@ import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.ExecutableCommand;
@@ -53,6 +54,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerClass.class)
+@Ignore
 public class KieCamelRemoteIntegrationTest extends AbstractKarafIntegrationTest {
 
     public static final String HOST = "localhost";

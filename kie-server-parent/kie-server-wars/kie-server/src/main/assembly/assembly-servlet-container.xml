@@ -37,7 +37,7 @@
   <dependencySets>
     <dependencySet>
       <excludes>
-        <exclude>org.jboss.spec.javax.transaction:*</exclude>
+        <exclude>jakarta.transaction:*</exclude>
       </excludes>
       <includes>
         <include>org.kie.server:kie-server-services-common</include>
@@ -84,7 +84,7 @@
         <include>org.dom4j:dom4j</include>
         <include>xerces:xercesImpl</include>
 
-        <include>org.jboss.spec.javax.jms:jboss-jms-api_2.0_spec</include>
+        <include>jakarta.jms:jakarta.jms-api</include>
 
         <include>org.quartz-scheduler:quartz</include>
 

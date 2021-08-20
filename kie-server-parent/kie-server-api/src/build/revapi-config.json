@@ -8,6 +8,9 @@
             "regex": true,
             "include": [
               "org\\.kie\\.server\\.api.*"
+            ],
+            "exclude": [
+              "org\\.kie\\.server\\.api\\.marshalling\\.json"
             ]
           }
         }

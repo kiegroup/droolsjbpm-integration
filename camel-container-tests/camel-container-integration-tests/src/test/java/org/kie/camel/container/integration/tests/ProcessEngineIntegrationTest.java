@@ -24,8 +24,10 @@ import org.drools.core.command.runtime.process.GetProcessIdsCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.kie.api.runtime.ExecutionResults;
 
+@Ignore
 public class ProcessEngineIntegrationTest extends AbstractKieCamelIntegrationTest {
 
     private static final String SIMPLE_PROCESS_ID = "process1";

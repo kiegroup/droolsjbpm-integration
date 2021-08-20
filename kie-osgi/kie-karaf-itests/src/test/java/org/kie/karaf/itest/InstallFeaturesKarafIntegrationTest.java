@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.apache.karaf.features.FeaturesService;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,6 +44,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
  */
 @RunWith(PaxExamParameterized.class)
 @ExamReactorStrategy(PerClass.class)
+@Ignore
 public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     private String featureName;

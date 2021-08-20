@@ -557,7 +557,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         };
         KieServerHttpRequest request = newRequest(url);
         assertEquals(HTTP_OK, request.get().response().code());
-        assertEquals(CHARSET_UTF8, request.response().charset());
+        assertEquals(CHARSET_UTF8, request.response().charset().toUpperCase());
     }
 
     /**
@@ -880,7 +880,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         KieServerHttpRequest request = newRequest(url).header("h1", 5).header("h2", (Number) null);
         assertEquals(HTTP_OK, request.get().response().code());
         assertEquals("5", h1.get());
-        assertEquals(null, h2.get());
+        assertEquals("", h2.get());
     }
 
     /**

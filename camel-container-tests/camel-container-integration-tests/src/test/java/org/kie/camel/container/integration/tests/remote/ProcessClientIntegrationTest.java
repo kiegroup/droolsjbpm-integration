@@ -19,10 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.server.api.model.definition.ProcessDefinition;
 
+@Ignore
 public class ProcessClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     @Test
