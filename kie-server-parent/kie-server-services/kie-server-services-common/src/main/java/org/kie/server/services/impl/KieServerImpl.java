@@ -219,9 +219,11 @@ public class KieServerImpl implements KieServer {
         String envValue = System.getProperty(key);
         KieServerConfigItem item = state.getConfiguration().getConfigItem(key);
 
-        if (envValue == null && item == null) {
+        if (envValue == null) {
             return false;
-        } else if (envValue != null && item != null && envValue.equals(state.getConfiguration().getConfigItem(key).getValue())) {
+        }
+
+        if (item != null && envValue.equals(item.getValue())) {
             return false;
         }
 
