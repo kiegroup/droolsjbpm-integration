@@ -49,6 +49,7 @@ import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
+@Ignore
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class PlannerCloudBalanceIntegrationTest extends AbstractKarafIntegrationTest {

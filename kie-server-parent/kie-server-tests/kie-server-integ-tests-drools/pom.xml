@@ -148,7 +148,7 @@
     <plugins>
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
+        <artifactId>cargo-maven3-plugin</artifactId>
         <configuration>
           <container>
             <systemProperties>
@@ -179,13 +179,6 @@
           <groupId>org.kie.server</groupId>
           <artifactId>kie-server-services-common</artifactId>
           <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
-              <groupId>javax.xml.stream</groupId>
-              <artifactId>stax-api</artifactId>
-            </exclusion>
-          </exclusions>
         </dependency>
         <dependency>
           <groupId>org.kie.server</groupId>

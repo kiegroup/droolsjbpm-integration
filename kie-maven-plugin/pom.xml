@@ -244,8 +244,8 @@
       <artifactId>kie-pmml</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>com.sun.xml.bind</groupId>
@@ -256,8 +256,8 @@
           <artifactId>jaxb-impl</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.xml.bind</groupId>
-          <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
         </exclusion>
       </exclusions>
       <scope>runtime</scope>

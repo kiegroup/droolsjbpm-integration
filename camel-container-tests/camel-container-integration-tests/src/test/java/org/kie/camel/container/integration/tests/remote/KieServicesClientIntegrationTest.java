@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.server.api.model.KieContainerResource;
@@ -27,6 +28,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
 
+@Ignore
 public class KieServicesClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     private static final String KIE_SERVER_CAPABILITY = "KieServer";

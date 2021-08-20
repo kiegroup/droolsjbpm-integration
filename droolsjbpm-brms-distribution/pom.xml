@@ -110,8 +110,8 @@
       <artifactId>slf4j-jdk14</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+      <groupId>jakarta.security.jacc</groupId>
+      <artifactId>jakarta.security.jacc-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jta</groupId>
