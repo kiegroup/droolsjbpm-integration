@@ -25,22 +25,22 @@ import org.kie.server.services.api.ContainerLocator;
  * and stored as part of the instance of this class so in case of multiple method calls will require it
  * single instance of this class should be used to avoid too many look ups.
  */
-public class ByProcessInstanceIdContainerLocator extends ProcessContainerLocator {
-    private static final String CONTAINER_ID_QUERY = "select log.externalId from ProcessInstanceLog log where log.processInstanceId = :piId";
+public class ByContextMappingInfoContainerLocator extends ProcessContainerLocator {
+    private static final String CONTAINER_ID_QUERY = "select cmi.ownerId from ContextMappingInfo cmi where cmi.contextId = :piId";
 
-    private ByProcessInstanceIdContainerLocator(final Long processInstanceId) {
+    private ByContextMappingInfoContainerLocator(final Long processInstanceId) {
         super(processInstanceId);
     }
 
     @Override
     protected String invokeQuery(final EntityManager em, final Long processInstanceId) {
         return (String) em.createQuery(CONTAINER_ID_QUERY)
-            .setParameter("piId", processInstanceId)
+            .setParameter("piId", processInstanceId.toString())
             .getSingleResult();
     }
 
-    private static ByProcessInstanceIdContainerLocator get(final Number processInstanceId) {
-        return new ByProcessInstanceIdContainerLocator(processInstanceId.longValue());
+    private static ByContextMappingInfoContainerLocator get(final Number processInstanceId) {
+        return new ByContextMappingInfoContainerLocator(processInstanceId.longValue());
     }
 
     public static class Factory implements ContainerLocatorFactory{
@@ -52,7 +52,7 @@ public class ByProcessInstanceIdContainerLocator extends ProcessContainerLocator
 
         @Override
         public ContainerLocator create(final Number processInstanceId) {
-            return ByProcessInstanceIdContainerLocator.get(processInstanceId);
+            return ByContextMappingInfoContainerLocator.get(processInstanceId);
         }
     }
 }

@@ -24,8 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ByProcessInstanceIdContainerLocatorTest {
-    private static final String CONTAINER_ID_QUERY = "select log.externalId from ProcessInstanceLog log where log.processInstanceId = :piId";
+public class ByContextMappingInfoContainerLocatorTest {
+    private static final String CONTAINER_ID_QUERY = "select cmi.ownerId from ContextMappingInfo cmi where cmi.contextId = :piId";
     private static final String CONTAINER_ID = "containerId";
 
     @Mock
@@ -50,12 +50,11 @@ public class ByProcessInstanceIdContainerLocatorTest {
         EntityManagerFactoryManager.get().clear();
     }
 
-
     @Test
     public void testLocateContainer() {
         EntityManagerFactoryManager.get()
             .addEntityManagerFactory(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME, entityManagerFactory);
-        ContainerLocator locator = ByProcessInstanceIdContainerLocator.Factory.get().create(1L);
+        ContainerLocator locator = ByContextMappingInfoContainerLocator.Factory.get().create(1L);
 
         String containerId = locator.locateContainer("alias", null);
 
@@ -64,10 +63,10 @@ public class ByProcessInstanceIdContainerLocatorTest {
     }
 
     @Test
-    public void testQueryShouldExecuteOne() {
+    public void testQueryShouldExecuteOnes() {
         EntityManagerFactoryManager.get()
             .addEntityManagerFactory(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME, entityManagerFactory);
-        ContainerLocator locator = ByProcessInstanceIdContainerLocator.Factory.get().create(1L);
+        ContainerLocator locator = ByContextMappingInfoContainerLocator.Factory.get().create(1L);
 
         String containerId = locator.locateContainer("alias", null);
 
@@ -85,7 +84,7 @@ public class ByProcessInstanceIdContainerLocatorTest {
 
         EntityManagerFactoryManager.get()
             .addEntityManagerFactory(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME, entityManagerFactory);
-        ContainerLocator locator = ByProcessInstanceIdContainerLocator.Factory.get().create(1L);
+        ContainerLocator locator = ByContextMappingInfoContainerLocator.Factory.get().create(1L);
 
         locator.locateContainer("alias", null);
     }
@@ -96,7 +95,7 @@ public class ByProcessInstanceIdContainerLocatorTest {
 
         EntityManagerFactoryManager.get()
             .addEntityManagerFactory(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME, entityManagerFactory);
-        ContainerLocator locator = ByProcessInstanceIdContainerLocator.Factory.get().create(1L);
+        ContainerLocator locator = ByContextMappingInfoContainerLocator.Factory.get().create(1L);
 
         locator.locateContainer("alias", null);
     }
