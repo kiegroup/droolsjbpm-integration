@@ -16,6 +16,7 @@
 
 package org.kie.karaf.itest.kieserver;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
@@ -35,6 +36,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerClass.class)
+@Ignore
 public class KieServerClientKarafIntegrationJaxbIntegrationTest extends BaseKieServerClientKarafIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationJaxbIntegrationTest.class);

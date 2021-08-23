@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-parent</artifactId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
     <!-- relativePath causes out-of-date problems on hudson secondary nodes -->
     <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
   </parent>
@@ -116,11 +116,6 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>javax.persistence-api</artifactId>
-        <version>${version.javax.persistence-api}</version>
-      </dependency>
-      <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-karaf-itests-domain-model</artifactId>
         <version>${project.version}</version>
@@ -157,7 +152,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <configuration>
                   <properties>

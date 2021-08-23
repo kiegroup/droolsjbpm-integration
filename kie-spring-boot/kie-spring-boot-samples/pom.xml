@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot</artifactId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-spring-boot-samples</artifactId>
@@ -46,6 +46,32 @@
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
         <version>${version.org.apache.cxf}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.jboss.spec.javax.rmi</groupId>
+            <artifactId>jboss-rmi-api_1.0_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Notice that higher versions like 1.5.20 contain a bug (No message body writer has been found) so downgraded to 1.5.15 -->
       <dependency>

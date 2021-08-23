@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-autoconfiguration</artifactId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-spring-boot-autoconfiguration-audit-replication</artifactId>
@@ -32,10 +32,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-autoconfigure</artifactId>
       <exclusions>
-        <exclusion>
-          <groupId>org.jboss.spec.javax.ejb</groupId>
-          <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
@@ -71,16 +67,16 @@
           <artifactId>aopalliance</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.el</groupId>
-          <artifactId>jboss-el-api_3.0_spec</artifactId>
+          <groupId>jakarta.el</groupId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -89,8 +85,8 @@
       <artifactId>kie-server-api</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -99,8 +95,12 @@
       <artifactId>kie-server-services-common</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
@@ -166,16 +166,8 @@
       <artifactId>kie-server-services-jbpm</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jboss.spec.javax.el</groupId>
-          <artifactId>jboss-el-api_2.2_spec</artifactId>
         </exclusion>
         <exclusion>
           <artifactId>asm</artifactId>
@@ -192,16 +184,8 @@
       <artifactId>kie-server-services-case-mgmt</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jboss.spec.javax.el</groupId>
-          <artifactId>jboss-el-api_2.2_spec</artifactId>
         </exclusion>
         <exclusion>
           <artifactId>asm</artifactId>
@@ -220,16 +204,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-artemis</artifactId>
         <scope>test</scope>
-        <exclusions>
-            <exclusion>
-                <groupId>jakarta.jms</groupId>
-                <artifactId>jakarta.jms-api</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-            </exclusion>
-        </exclusions>
     </dependency>
     <dependency>
         <groupId>org.apache.activemq</groupId>
@@ -285,8 +259,8 @@
         <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>javax.json</groupId>
-        <artifactId>javax.json-api</artifactId>
+        <groupId>jakarta.json</groupId>
+        <artifactId>jakarta.json-api</artifactId>
          <scope>test</scope>
     </dependency>
   </dependencies>

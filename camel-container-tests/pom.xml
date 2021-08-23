@@ -5,7 +5,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,13 +28,34 @@
     <dependencies>
       <dependency>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-rs-client</artifactId>
-        <version>${version.org.apache.cxf}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http-hc</artifactId>
         <version>${version.org.apache.cxf}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.jboss.spec.javax.rmi</groupId>
+            <artifactId>jboss-rmi-api_1.0_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

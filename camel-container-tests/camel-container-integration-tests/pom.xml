@@ -5,7 +5,7 @@
   <parent>
     <artifactId>camel-container-tests</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -53,6 +53,11 @@
           <groupId>com.fasterxml.woodstox</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
     </dependency>
 
     <dependency>
@@ -193,10 +198,10 @@
           </plugin>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
+            <artifactId>cargo-maven3-plugin</artifactId>
             <configuration>
               <container>
-                <containerId>wildfly19x</containerId>
+                <containerId>wildfly23x</containerId>
                 <home>${project.build.directory}/application-server/wildfly-${version.org.wildfly}</home>
                 <type>installed</type>
                 <systemProperties>
@@ -309,7 +314,7 @@
           </plugin>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
+            <artifactId>cargo-maven3-plugin</artifactId>
             <executions>
               <execution>
                 <id>start-fuse-container</id>
@@ -319,7 +324,7 @@
                 </goals>
                 <configuration>
                   <container>
-                    <containerId>wildfly19x</containerId>
+                    <containerId>wildfly23x</containerId>
                     <home>${project.build.directory}/application-server-fuse</home>
                     <type>installed</type>
                     <contextKey>fuse</contextKey>
@@ -367,7 +372,7 @@
                 </goals>
                 <configuration>
                   <container>
-                    <containerId>wildfly19x</containerId>
+                    <containerId>wildfly23x</containerId>
                     <home>${project.build.directory}/application-server-kie-server</home>
                     <type>installed</type>
                     <contextKey>kie-server</contextKey>
@@ -441,7 +446,7 @@
         <plugins>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
+            <artifactId>cargo-maven3-plugin</artifactId>
             <executions>
               <execution>
                 <id>start-container</id>

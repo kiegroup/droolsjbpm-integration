@@ -33,6 +33,7 @@ public class KieServerRouterConstants {
     public static final String ROUTER_KEYSTORE_PASSWORD = "org.kie.server.router.tls.keystore.password";
     public static final String ROUTER_KEYSTORE_KEYALIAS = "org.kie.server.router.tls.keystore.keyalias";
 
+    public static final String ROUTER_CONFIG_FILE = "org.kie.server.router.config.file";
     public static final String ROUTER_REPOSITORY_DIR = "org.kie.server.router.repo";
     public static final String ROUTER_IDENTITY_FILE = "org.kie.server.router.identity.file";
 

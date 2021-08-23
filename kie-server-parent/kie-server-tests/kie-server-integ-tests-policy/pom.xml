@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-policy</artifactId>
@@ -152,7 +152,7 @@
     <plugins>
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
+        <artifactId>cargo-maven3-plugin</artifactId>
         <configuration>
           <container>
             <systemProperties>
@@ -182,12 +182,6 @@
           <groupId>org.kie.server</groupId>
           <artifactId>kie-server-services-common</artifactId>
           <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>javax.xml.stream</groupId>
-              <artifactId>stax-api</artifactId>
-            </exclusion>
-          </exclusions>
         </dependency>
         <dependency>
           <groupId>org.kie.server</groupId>
@@ -238,10 +232,6 @@
           <artifactId>hibernate-core</artifactId>
           <scope>test</scope>
           <exclusions>
-            <exclusion>
-              <groupId>javax.activation</groupId>
-              <artifactId>javax.activation-api</artifactId>
-            </exclusion>
             <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
             <exclusion>
               <groupId>org.glassfish.jaxb</groupId>

@@ -6,7 +6,7 @@
   <parent>
     <artifactId>kie-server-controller</artifactId>
     <groupId>org.kie.server</groupId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-controller-client</artifactId>
@@ -39,14 +39,14 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec.javax.websocket</groupId>
-      <artifactId>jboss-websocket-api_1.1_spec</artifactId>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -77,6 +77,12 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services</artifactId>
-    <version>7.58.0-SNAPSHOT</version>
+    <version>7.59.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-openshift</artifactId>
@@ -108,12 +108,6 @@
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-model</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.fabric8</groupId>
@@ -139,6 +133,12 @@
       <artifactId>openshift-server-mock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <scope>test</scope>
+    </dependency>
+
 
     <dependency>
       <groupId>org.yaml</groupId>

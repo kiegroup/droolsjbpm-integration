@@ -16,6 +16,7 @@
 
 package org.kie.karaf.itest.kieserver;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
+@Ignore
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerClass.class)
 public class KieServerClientKarafIntegrationJsonIntegrationTest extends BaseKieServerClientKarafIntegrationTest {
