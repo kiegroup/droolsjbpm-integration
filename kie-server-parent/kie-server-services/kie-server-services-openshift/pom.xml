@@ -16,7 +16,64 @@
 
   <properties>
     <java.module.name>org.kie.server.services.openshift</java.module.name>
+    <!-- Server mock version 4.7.2 doesn't handle label selectors properly, need to use older version. -->
+    <version.kubernetes-client.server-mock>4.6.0</version.kubernetes-client.server-mock>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client-bom</artifactId>
+        <version>${version.kubernetes-client}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Override fabric8 dependencies specified from parent pom with newer 
+        version -->
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-model</artifactId>
+        <version>${version.kubernetes-client}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client</artifactId>
+        <version>${version.kubernetes-client}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>openshift-client</artifactId>
+        <version>${version.kubernetes-client}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-server-mock</artifactId>
+        <version>${version.kubernetes-client.server-mock}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>openshift-server-mock</artifactId>
+        <version>${version.kubernetes-client.server-mock}</version>
+      </dependency>
+      <!-- Added back excluded dependency from parent pom due to required 
+        by test run -->
+      <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${version.org.yaml.snakeyaml}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- kie server dependencies -->
