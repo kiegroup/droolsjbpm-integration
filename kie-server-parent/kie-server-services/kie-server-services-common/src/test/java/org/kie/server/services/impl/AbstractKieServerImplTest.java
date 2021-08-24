@@ -87,7 +87,9 @@ import static org.mockito.Mockito.when;
 
 public abstract class AbstractKieServerImplTest {
 
+    static final String DEFAULT_KIE_SERVER_FILE = "kie-server-impl-test.xml";
     static final File REPOSITORY_DIR = new File("target/repository-dir");
+    static final File NEW_REPOSITORY_DIR = new File("new-repository-dir");
     static final String KIE_SERVER_ID = "kie-server-impl-test";
     static final String GROUP_ID = "org.kie.server.test";
     static final String PRODUCTION_MODE_VERSION = "1.0.0.Final";
@@ -604,6 +606,38 @@ public abstract class AbstractKieServerImplTest {
         }
 
     }
+    
+    @Test
+    public void testSystemPropertiesSynchronizeAtStartup() throws IOException {
+        FileUtils.deleteDirectory(NEW_REPOSITORY_DIR);
+        FileUtils.forceMkdir(NEW_REPOSITORY_DIR);
+        
+        FileUtils.copyFile(new File(getClass().getClassLoader().getResource(DEFAULT_KIE_SERVER_FILE).getFile()),
+                           new File(NEW_REPOSITORY_DIR, DEFAULT_KIE_SERVER_FILE));
+        
+        //No controller user in system properties, but it does exist in the default kie-server file
+        System.clearProperty(KieServerConstants.CFG_KIE_CONTROLLER_USER);
+        
+        try {
+            kieServer.destroy();
+            kieServer = new KieServerImpl(new KieServerStateFileRepository(NEW_REPOSITORY_DIR));
+            kieServer.init();
+
+            ServiceResponse<KieServerStateInfo> kieServerStateResponse = kieServer.getServerState();
+
+            assertNotNull(kieServerStateResponse);
+            Assertions.assertThat(kieServerStateResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+
+            List<KieServerConfigItem> configItems = kieServerStateResponse.getResult().getConfiguration()
+                    .getConfigItems();
+            
+            assertEquals(0L, configItems.stream().filter(x -> KieServerConstants.CFG_KIE_CONTROLLER_USER.equals(x.getName())).count());
+            
+        } finally {
+            FileUtils.deleteDirectory(NEW_REPOSITORY_DIR);
+        }
+    }
+
 
     @Test
     public void testExecutorPropertiesInStateRepository() {

@@ -1,0 +1,18 @@
+<kie-server-state>
+  <controllers/>
+  <configuration>
+    <configItems>
+      <config-item>
+        <name>org.kie.server.id</name>
+        <value>kie-server-impl-test</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
+        <name>org.kie.server.controller.user</name>
+        <value>old-ControllerUser</value>
+        <type>java.lang.String</type>
+      </config-item>
+    </configItems>
+  </configuration>
+  <containers/>
+</kie-server-state>
