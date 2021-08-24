@@ -285,6 +285,21 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-evaluator-assembler</artifactId>
     </dependency>
+
+    <!-- required to fetch before maven-invoker-plugin -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-compiler-api</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
