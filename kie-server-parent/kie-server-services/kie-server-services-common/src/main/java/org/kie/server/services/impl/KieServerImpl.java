@@ -226,8 +226,13 @@ public class KieServerImpl implements KieServer {
         }
 
         // the only cases left is when one of them is null and the other one not or both are different (value is changed)
-        logger.info("Property {} has a value different from environment. Updating current server state config item to {}", key, envValue);
-        state.getConfiguration().addConfigItem(new KieServerConfigItem(key, envValue, String.class.getName()));
+        if (envValue != null) {
+            logger.info("Property {} has a value different from environment. Updating current server state config item to {}", key, envValue);
+            state.getConfiguration().addConfigItem(new KieServerConfigItem(key, envValue, String.class.getName()));
+        } else {
+            logger.info("Property {} has null value from environment. Removing current server state config item", key);
+            state.getConfiguration().removeConfigItem(new KieServerConfigItem(key, item.getValue(), String.class.getName()));
+        }
         return true;
     }
 
