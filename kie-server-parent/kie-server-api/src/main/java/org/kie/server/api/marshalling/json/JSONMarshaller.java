@@ -105,6 +105,10 @@ public class JSONMarshaller implements Marshaller {
 
     private boolean fallbackClassLoaderEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.fallbackClassLoader.enabled", "false"));
 
+    private boolean findDeserializerFirst = Boolean.parseBoolean(System.getProperty("org.kie.server.json.findDeserializerFirst.enabled", "true"));
+
+    private boolean typeResolverBuilderForExtendedJaxbAnnotationIntrospectorEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.typeResolverBuilderForExtendedJaxbAnnotationIntrospector.enabled", "false"));
+
     public static class JSONContext {
 
         private boolean stripped;
@@ -250,6 +254,9 @@ public class JSONMarshaller implements Marshaller {
             typer = typer.init(JsonTypeInfo.Id.CLASS, null);
             typer = typer.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
             customObjectMapper.setDefaultTyping(typer);
+            if (typeResolverBuilderForExtendedJaxbAnnotationIntrospectorEnabled) {
+                customSerializationMapper.setDefaultTyping(typer);
+            }
 
             customObjectMapper.setConfig(customObjectMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
 
@@ -937,6 +944,16 @@ public class JSONMarshaller implements Marshaller {
             try {
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
+
+                    if (findDeserializerFirst) {
+                        String nextFieldName = jp.nextFieldName();
+//                        logger.info("nextFieldName : {}", nextFieldName);
+                        if (!baseTypeName().equals(nextFieldName)) {
+                            JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                            Object value = deser.deserialize(jp, ctxt);
+                            return value;
+                        }
+                    }
 
                     try {
                         return super.deserializeTypedFromObject(jp, ctxt);
