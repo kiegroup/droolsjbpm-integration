@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.json.JSONMarshallerExtension;
@@ -66,6 +67,14 @@ public class JSONMarshallerExtensionCustomPerson implements JSONMarshallerExtens
         public void serialize(CustomPerson value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
             // Regardless of the Object, write a constant String
             jgen.writeRaw("{ \"name\" : \"John is CustomPerson\",  \"age\" : 20 }");
+        }
+
+        @Override
+        public void serializeWithType(CustomPerson value,
+                                      JsonGenerator jgen,
+                                      SerializerProvider serializers,
+                                      TypeSerializer typeSer) throws IOException {
+            jgen.writeRaw("{ \"org.kie.server.api.marshalling.objects.CustomPerson\" : { \"name\" : \"John is CustomPerson\",  \"age\" : 20 } }");
         }
     }
 }

@@ -107,7 +107,7 @@ public class JSONMarshaller implements Marshaller {
 
     private boolean findDeserializerFirst = Boolean.parseBoolean(System.getProperty("org.kie.server.json.findDeserializerFirst.enabled", "true"));
 
-    private boolean typeResolverBuilderForExtendedJaxbAnnotationIntrospectorEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.typeResolverBuilderForExtendedJaxbAnnotationIntrospector.enabled", "false"));
+    private boolean typeResolverBuilderForExtendedJaxbAnnotationIntrospectorEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.typeResolverBuilderForExtendedJaxbAnnotationIntrospector.enabled", "true"));
 
     public static class JSONContext {
 

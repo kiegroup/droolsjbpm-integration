@@ -92,16 +92,22 @@ public class DroolsCommandMarshallingTest {
                                                       "  \"lookup\" : null,\n" +
                                                       "  \"commands\" : [ {\n" +
                                                       "    \"insert\" : {\n" +
-                                                      "      \"object\" : {\"org.kie.server.api.marshalling.objects.Pojo1\":{\n" +
-                                                      "  \"desc\" : \"C\",\n" +
-                                                      "  \"pojo2\" : {\n" +
-                                                      "    \"desc2\" : \"B\",\n" +
-                                                      "    \"primitiveBoolean\" : true,\n" +
-                                                      "    \"pojo3\" : {\n" +
-                                                      "      \"desc3\" : \"A\"\n" +
+                                                      "      \"object\" : {\n" +
+                                                      "  \"org.kie.server.api.marshalling.objects.Pojo1\" : {\n" +
+                                                      "    \"desc\" : \"C\",\n" +
+                                                      "    \"pojo2\" : {\n" +
+                                                      "      \"org.kie.server.api.marshalling.objects.Pojo2\" : {\n" +
+                                                      "        \"desc2\" : \"B\",\n" +
+                                                      "        \"primitiveBoolean\" : true,\n" +
+                                                      "        \"pojo3\" : {\n" +
+                                                      "          \"org.kie.server.api.marshalling.objects.Pojo3\" : {\n" +
+                                                      "            \"desc3\" : \"A\"\n" +
+                                                      "          }\n" +
+                                                      "        }\n" +
+                                                      "      }\n" +
                                                       "    }\n" +
                                                       "  }\n" +
-                                                      "}},\n" +
+                                                      "},\n" +
                                                       "      \"out-identifier\" : \"fact-pojo1\",\n" +
                                                       "      \"return-object\" : true,\n" +
                                                       "      \"entry-point\" : \"DEFAULT\",\n" +
