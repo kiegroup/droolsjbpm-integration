@@ -28,11 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
@@ -56,6 +51,29 @@ import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVari
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.EXAMPLE_CONTAINER_ID;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.EXAMPLE_KIESERVER_GET_RESPONSE_JSON;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.EXAMPLE_KIESERVER_GET_RESPONSE_XML;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.EXAMPLE_KIESERVER_POST_REQ_JSON;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.EXAMPLE_KIESERVER_POST_REQ_XML;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.EXAMPLE_KIESERVER_POST_RESPONSE_JSON;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.EXAMPLE_KIESERVER_POST_RESPONSE_XML;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.MODEL_SPECIFIC_DEFINITIONS_EP;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.MODEL_SPECIFIC_DMN_EVALUATION_EP;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.PARAM_CONTAINER_ID_DEFS;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.PARAM_CONTAINER_ID_EVAL;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.PARAM_REF_CONTAINER_SPECIFIC_OAS;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.REF_GET_OAS;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.REF_KIESERVER_DMN_API_DOC;
+import static org.kie.server.remote.rest.dmn.docs.ModelEvaluatorResourceDocsAndSamples.REF_TE;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 
 @Api(value="DMN models")
 @Path("server/"+ RestURI.DMN_URI )
@@ -75,12 +93,17 @@ public class ModelEvaluatorResource {
     }
 
     @ApiOperation(value="Retrieves DMN model for given container",
-            response=ServiceResponse.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Models or container not found") })
+                  response = ServiceResponse.class, code = 200,
+                  notes = REF_KIESERVER_DMN_API_DOC)
+    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"),
+                           @ApiResponse(code = 404, message = "Models or container not found"),
+                           @ApiResponse(code = 200, response = String.class, message = "Successful response",
+                                        examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_GET_RESPONSE_JSON),
+                                                                     @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_GET_RESPONSE_XML)}))})
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getModels(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "Container id that modesl should be loaded from", required = true) @PathParam( CONTAINER_ID ) String containerId ) {
+                              @ApiParam(value = "Container id that models should be loaded from", required = true, example = EXAMPLE_CONTAINER_ID) @PathParam(CONTAINER_ID) String containerId) {
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
         try {
@@ -96,14 +119,21 @@ public class ModelEvaluatorResource {
     }
 
     @ApiOperation(value="Evaluates decisions for given input",
-            response=ServiceResponse.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Container not found") })
+                  response = ServiceResponse.class, code = 200,
+                  notes = REF_KIESERVER_DMN_API_DOC)
+    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"),
+                           @ApiResponse(code = 404, message = "Container not found"),
+                           @ApiResponse(code = 200, response = String.class, message = "Successful response",
+                                        examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_POST_RESPONSE_JSON),
+                                                                     @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_POST_RESPONSE_XML)}))})
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response evaluateDecisions(@javax.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "DMN context to be used while evaluation decisions as DMNContextKS type", required = true) String payload) {
+                                      @ApiParam(value = PARAM_CONTAINER_ID_EVAL, required = true, example = EXAMPLE_CONTAINER_ID) @PathParam(CONTAINER_ID) String containerId,
+                                      @ApiParam(value = "DMN context to be used while evaluation decisions as DMNContextKS type", required = true,
+                                                examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_POST_REQ_JSON),
+                                                                             @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_POST_REQ_XML)})) String payload) {
         LOG.debug( "About to evaluateDecisions() on container {}", containerId );
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
@@ -123,70 +153,76 @@ public class ModelEvaluatorResource {
     }
 
     @Path(DMN_MODEL_URI)
-    @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
+    @ApiOperation(value = MODEL_SPECIFIC_DMN_EVALUATION_EP,
+                  notes = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response evaluateModel(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
-                                  @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
-                                  @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
+    public Response evaluateModel(@ApiParam(value = PARAM_CONTAINER_ID_EVAL, required = true) @PathParam(CONTAINER_ID) String containerId,
+                                  @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) @PathParam(MODEL_ID) String modelId,
+                                  @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) String payload) {
         LOG.debug("About to evaluateModel() on container {}", containerId);
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, false, null);
     }
 
     @Path(DMN_MODEL_URI)
-    @ApiOperation(value = "Model-specific definitions get. Reference container-specific Swagger/OAS descriptor")
+    @ApiOperation(value = MODEL_SPECIFIC_DEFINITIONS_EP,
+                  notes = REF_TE)
     @GET
     @Produces(MediaType.APPLICATION_XML)
-    public Response getModel(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
-                             @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId) {
+    public Response getModel(@ApiParam(value = PARAM_CONTAINER_ID_DEFS, required = true) @PathParam(CONTAINER_ID) String containerId,
+                             @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) @PathParam(MODEL_ID) String modelId) {
         LOG.debug("About to evaluateModel() on container {}", containerId);
         return modelEvaluatorService.getModel(containerId, modelId);
     }
 
     @Path(DMN_MODEL_DMNRESULT_URI)
-    @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
+    @ApiOperation(value = MODEL_SPECIFIC_DMN_EVALUATION_EP,
+                  notes = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response evaluateModelAsDmnResult(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
-                                             @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
-                                             @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
+    public Response evaluateModelAsDmnResult(@ApiParam(value = PARAM_CONTAINER_ID_EVAL, required = true) @PathParam(CONTAINER_ID) String containerId,
+                                             @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) @PathParam(MODEL_ID) String modelId,
+                                             @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) String payload) {
         LOG.debug("About to evaluateModelAsDmnResult() on container {}", containerId);
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, true, null);
     }
 
     @Path(DMN_MODEL_DS_URI)
-    @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
+    @ApiOperation(value = MODEL_SPECIFIC_DMN_EVALUATION_EP,
+                  notes = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response evaluateModelDS(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
-                                    @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
-                                    @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(DECISIONSERVICE_ID) String decisionServiceId,
-                                    @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
+    public Response evaluateModelDS(@ApiParam(value = PARAM_CONTAINER_ID_EVAL, required = true) @PathParam(CONTAINER_ID) String containerId,
+                                    @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) @PathParam(MODEL_ID) String modelId,
+                                    @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) @PathParam(DECISIONSERVICE_ID) String decisionServiceId,
+                                    @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) String payload) {
         LOG.debug("About to evaluateModelDS() on container {}", containerId);
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, false, decisionServiceId);
     }
 
     @Path(DMN_MODEL_DS_DMNRESULT_URI)
-    @ApiOperation(value = "Model-specific DMN evaluation. Reference container-specific Swagger/OAS descriptor")
+    @ApiOperation(value = MODEL_SPECIFIC_DMN_EVALUATION_EP,
+                  notes = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response evaluateModelDSAsDmnResult(@ApiParam(value = "Container id to be used to evaluate decisions on", required = true) @PathParam(CONTAINER_ID) String containerId,
-                                               @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(MODEL_ID) String modelId,
-                                               @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) @PathParam(DECISIONSERVICE_ID) String decisionServiceId,
-                                               @ApiParam(value = "Reference container-specific Swagger/OAS descriptor", required = true) String payload) {
+    public Response evaluateModelDSAsDmnResult(@ApiParam(value = PARAM_CONTAINER_ID_EVAL, required = true) @PathParam(CONTAINER_ID) String containerId,
+                                               @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) @PathParam(MODEL_ID) String modelId,
+                                               @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) @PathParam(DECISIONSERVICE_ID) String decisionServiceId,
+                                               @ApiParam(value = PARAM_REF_CONTAINER_SPECIFIC_OAS, required = true) String payload) {
         LOG.debug("About to evaluateModelDSAsDmnResult() on container {}", containerId);
         return modelEvaluatorService.evaluateModel(containerId, modelId, payload, true, decisionServiceId);
     }
 
     @Path(OPENAPI + ".{type:json|yaml}")
-    @ApiOperation(value = "Model-specific definitions get. Reference container-specific Swagger/OAS descriptor")
+    @ApiOperation(value = MODEL_SPECIFIC_DEFINITIONS_EP,
+                  notes = REF_GET_OAS)
     @GET
     @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
-    public Response getOASType(@ApiParam(value = "Container id to retrieve the Swagger/OAS descriptor for DMN endpoints", required = true) @PathParam(CONTAINER_ID) String containerId,
+    public Response getOASType(@ApiParam(value = PARAM_CONTAINER_ID_DEFS, required = true) @PathParam(CONTAINER_ID) String containerId,
                                @PathParam("type") String type) {
         LOG.debug("About to getOASType() on container {}", containerId);
         if (type != null && type.equals("yaml")) {
@@ -197,10 +233,11 @@ public class ModelEvaluatorResource {
     }
 
     @Path(OPENAPI)
-    @ApiOperation(value = "JSON Model-specific definitions get. Reference container-specific Swagger/OAS descriptor")
+    @ApiOperation(value = MODEL_SPECIFIC_DEFINITIONS_EP,
+                  notes = REF_GET_OAS)
     @GET
     @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
-    public Response getOAS(@ApiParam(value = "Container id to retrieve the Swagger/OAS descriptor for DMN endpoints", required = true) @PathParam(CONTAINER_ID) String containerId) {
+    public Response getOAS(@ApiParam(value = PARAM_CONTAINER_ID_DEFS, required = true) @PathParam(CONTAINER_ID) String containerId) {
         LOG.debug("About to getOAS() on container {}", containerId);
         return getOASType(containerId, "json");
     }
