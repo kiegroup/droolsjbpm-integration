@@ -24,13 +24,11 @@ import org.assertj.core.api.Assertions;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.command.ExecutableCommand;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.camel.container.api.model.Person;
 
-@Ignore
 public class RuleClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     @Test

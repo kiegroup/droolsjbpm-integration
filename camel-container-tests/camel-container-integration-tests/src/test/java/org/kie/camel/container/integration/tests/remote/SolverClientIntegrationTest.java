@@ -23,13 +23,11 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.camel.container.api.model.cloudbalance.CloudBalance;
 import org.kie.server.api.model.instance.SolverInstance;
 
-@Ignore
 public class SolverClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     private static final String CLOUD_BALANCE_SOLVER_ID = "cloudsolver";
