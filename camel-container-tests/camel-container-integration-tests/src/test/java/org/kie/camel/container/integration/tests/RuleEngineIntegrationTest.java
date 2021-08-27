@@ -23,13 +23,11 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.GetObjectCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.camel.container.api.model.Person;
 
-@Ignore
 public class RuleEngineIntegrationTest extends AbstractKieCamelIntegrationTest {
 
     private static final String GLOBAL_NAME = "testGlobal";

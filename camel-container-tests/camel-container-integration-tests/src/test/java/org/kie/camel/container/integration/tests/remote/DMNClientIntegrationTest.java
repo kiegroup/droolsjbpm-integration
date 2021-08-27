@@ -5,15 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 
-import static org.junit.Assert.assertThat;
-
-@Ignore
 public class DMNClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     @Test
