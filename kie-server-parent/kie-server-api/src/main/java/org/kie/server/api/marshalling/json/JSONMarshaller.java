@@ -105,6 +105,8 @@ public class JSONMarshaller implements Marshaller {
 
     private boolean fallbackClassLoaderEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.fallbackClassLoader.enabled", "false"));
 
+    private boolean findDeserializerFirst = Boolean.parseBoolean(System.getProperty("org.kie.server.json.findDeserializerFirst.enabled", "true"));
+
     public static class JSONContext {
 
         private boolean stripped;
@@ -937,13 +939,10 @@ public class JSONMarshaller implements Marshaller {
             try {
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
-
-                    try {
-                        return super.deserializeTypedFromObject(jp, ctxt);
-                    } catch (Exception e) {
-                        JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
-                        Object value = deser.deserialize(jp, ctxt);
-                        return value;
+                    if (findDeserializerFirst) {
+                        return deserializerFirstLookup(jp, ctxt);
+                    } else {
+                        return classLoadingFirstLookup(jp, ctxt);
                     }
                 }
                 jsonContext.get().reset();
@@ -952,6 +951,27 @@ public class JSONMarshaller implements Marshaller {
                 return value;
             } finally {
                 Thread.currentThread().setContextClassLoader(current);
+            }
+        }
+
+        private Object deserializerFirstLookup(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            String nextFieldName = jp.nextFieldName();
+            if (!baseTypeName().equals(nextFieldName)) {
+                JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                Object value = deser.deserialize(jp, ctxt);
+                return value;
+            } else {
+                return super.deserializeTypedFromObject(jp, ctxt);
+            }
+        }
+
+        private Object classLoadingFirstLookup(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            try {
+                return super.deserializeTypedFromObject(jp, ctxt);
+            } catch (Exception e) {
+                JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                Object value = deser.deserialize(jp, ctxt);
+                return value;
             }
         }
 
