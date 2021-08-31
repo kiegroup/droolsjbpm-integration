@@ -217,7 +217,7 @@ public class DroolsCommandWithListMarshallingTest {
 
     private void verifyMarshallingRoundTrip(Marshaller marshaller, BatchExecutionCommand inputCommand, String expectedPayload) {
         String rawContent = marshaller.marshall(inputCommand);
-        logger.info(rawContent);
+        logger.debug(rawContent);
         Assertions.assertThat(rawContent).isEqualToIgnoringWhitespace(expectedPayload);
 
         BatchExecutionCommandImpl inputBatch = (BatchExecutionCommandImpl) inputCommand;

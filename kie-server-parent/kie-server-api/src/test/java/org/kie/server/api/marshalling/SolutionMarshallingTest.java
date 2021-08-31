@@ -75,7 +75,7 @@ public class SolutionMarshallingTest {
         );
 
         String marshalledSolverInstance = marshaller.marshall(solverInstance);
-        logger.info("Marshalled SolverInstance ({}): {}", marshallingFormat, marshalledSolverInstance);
+        logger.debug("Marshalled SolverInstance ({}): {}", marshallingFormat, marshalledSolverInstance);
         assertThat(marshalledSolverInstance)
                 .as("Dates should be formatted")
                 .contains(

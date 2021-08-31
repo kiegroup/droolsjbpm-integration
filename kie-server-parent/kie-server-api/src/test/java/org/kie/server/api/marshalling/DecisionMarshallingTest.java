@@ -33,6 +33,8 @@ import org.kie.internal.utils.KieHelper;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNResultKS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -40,6 +42,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class DecisionMarshallingTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(DecisionMarshallingTest.class);
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
@@ -99,7 +103,7 @@ public class DecisionMarshallingTest {
     private <V> V marshallUnmarshall(V input) {
         try {
             String marshall = marshaller.marshall(input);
-            System.out.println(marshall);
+            logger.debug(marshall);
             V unmarshall = (V) marshaller.unmarshall(marshall, input.getClass());
             return unmarshall;
         } catch (Exception e) {
