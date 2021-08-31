@@ -378,6 +378,9 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
+              <minPortNumber>49152</minPortNumber>
+              <maxPortNumber>65535</maxPortNumber>
+              <randomPort>true</randomPort>
               <portNames>
                 <portName>container.port</portName>
                 <portName>cargo.jboss.ajp.port</portName>
@@ -394,6 +397,9 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
+              <minPortNumber>49152</minPortNumber>
+              <maxPortNumber>65535</maxPortNumber>
+              <randomPort>true</randomPort>
               <portNames>
                 <portName>router.port</portName>
               </portNames>
