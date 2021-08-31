@@ -31,10 +31,14 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.objects.CustomPerson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 
 public class JSONMarshallerExtensionTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(JSONMarshallerExtensionTest.class);
 
     private static final DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
@@ -56,7 +60,7 @@ public class JSONMarshallerExtensionTest {
         String mshl = marshaller.marshall(request);
         PMMLRequestData rd = marshaller.unmarshall(mshl, PMMLRequestData.class);
         assertEquals(rd, request);
-        System.out.println(rd);
+        logger.info(rd.toString());
     }
 
     @Test
