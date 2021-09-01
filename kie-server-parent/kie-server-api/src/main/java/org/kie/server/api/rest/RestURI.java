@@ -110,6 +110,7 @@ public class RestURI {
 
     public static final String PROCESS_INSTANCES_NODE_INSTANCES_GET_URI = "instances/{" + PROCESS_INST_ID + "}/nodes/instances";
     public static final String PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID + "}/completed";
+    public static final String PROCESS_INSTANCE_WORK_ITEM_COMPLETE_AND_VARS_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID + "}/completed/variables";
     public static final String PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID + "}/aborted";
     public static final String PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID + "}";
     public static final String PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI = "instances/{" + PROCESS_INST_ID + "}/workitems";
