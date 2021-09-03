@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.bean.PojoProxyHelper;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
@@ -43,7 +42,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 /**
  * Basic KIE-Camel with Blueprint functional tests running in Fuse.
  */
-@Ignore
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class KieCamelBlueprintIntegrationTest extends AbstractKarafIntegrationTest {

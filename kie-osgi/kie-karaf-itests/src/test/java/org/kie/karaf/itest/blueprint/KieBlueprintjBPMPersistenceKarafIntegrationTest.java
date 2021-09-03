@@ -21,7 +21,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieSession;
@@ -50,7 +49,6 @@ import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 /**
  * Tests starting a jBPM process using RuntimeManager with persistence enabled in Blueprint environment.
  */
-@Ignore("JPA 2.1 not supported with Aries Blueprint - see https://issues.jboss.org/browse/DROOLS-1380")
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKarafIntegrationTest {
@@ -122,7 +120,7 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
                 .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Datasource-Bundle")
                 .set(Constants.IMPORT_PACKAGE, "javax.transaction," +
                                                "javax.sql," +
-                                               "org.apache.commons.dbcp.managed," +
+                                               "org.apache.commons.dbcp2.managed," +
                                                "org.h2")
                 .build()).start());
 
@@ -166,15 +164,23 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
                                                "org.kie.api.runtime.manager," +
                                                "org.kie.api.runtime.process," +
                                                "org.kie.api.task," +
+                                               "org.kie.api.task.model," +
+                                               "org.jbpm.persistence.correlation," +
                                                "org.jbpm.persistence.processinstance," +
                                                "org.jbpm.runtime.manager.impl," +
+                                               "org.jbpm.runtime.manager.impl.jpa," +
+                                               "org.jbpm.process.audit," +
                                                "org.jbpm.process.instance.impl," +
+                                               "org.jbpm.services.task.audit.impl.model," +
                                                "org.jbpm.services.task.identity," +
                                                "org.jbpm.services.task.impl.model," +
+                                               "org.jbpm.services.task.query," +
+                                               "org.kie.internal.task.api," +
+                                               "org.kie.internal.task.api.model," +
                                                "org.kie.internal.runtime.manager.context," +
+                                               "org.drools.persistence.info," +
                                                "javax.transaction," +
-                                               "javax.persistence," +
-                                               "*")
+                                               "javax.persistence")
                 .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Bundle")
                 .build()).start());
 
