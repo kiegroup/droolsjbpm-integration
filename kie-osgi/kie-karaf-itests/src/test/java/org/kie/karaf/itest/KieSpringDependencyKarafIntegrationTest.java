@@ -18,7 +18,6 @@ package org.kie.karaf.itest;
 
 import javax.inject.Inject;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieSession;
@@ -40,7 +39,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
-@Ignore
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
 public class KieSpringDependencyKarafIntegrationTest extends AbstractKarafIntegrationTest {
