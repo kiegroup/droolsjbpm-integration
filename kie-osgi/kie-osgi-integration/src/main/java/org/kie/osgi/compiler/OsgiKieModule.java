@@ -161,7 +161,13 @@ public class OsgiKieModule extends AbstractKieModule {
     public static String parseBundleId(String url) {
         if (isOsgiBundleUrl(url)) {
             int slashesIdx = url.indexOf("://");
-            return url.substring(slashesIdx + "://".length(), url.indexOf('.'));
+            int underscoreIdx = url.indexOf("_", slashesIdx + "://".length());
+            if (underscoreIdx >= 0) {
+                // special format for OSGi Core R7 (bundle://<uuid>_<id>.n:m/)
+                return url.substring(underscoreIdx + 1, url.indexOf('.'));
+            } else {
+                return url.substring(slashesIdx + "://".length(), url.indexOf('.'));
+            }
         } else {
             return null;
         }

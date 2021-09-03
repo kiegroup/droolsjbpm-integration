@@ -19,13 +19,11 @@ package org.kie.karaf.itest.pmml;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-@Ignore
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class KiePmmlIntegrationTest extends AbstractPmmlIntegrationTest {

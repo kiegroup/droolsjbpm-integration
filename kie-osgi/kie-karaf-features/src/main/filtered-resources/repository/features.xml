@@ -62,7 +62,6 @@
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
     <bundle>mvn:jakarta.security.jacc/jakarta.security.jacc-api/${version.jakarta.security.jacc-api}</bundle>
-    <bundle>mvn:jakarta.servlet/jakarta.servlet-api/${version.jakarta.servlet-api}</bundle>
     <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
     <bundle>mvn:jakarta.interceptor/jakarta.interceptor-api/${version.jakarta.interceptor-api}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
@@ -137,13 +136,11 @@
     <bundle dependency="true">mvn:org.javassist/javassist/${version.org.javassist}</bundle>
     <bundle dependency="true">mvn:net.bytebuddy/byte-buddy/${version.net.byte-buddy}</bundle>
     <bundle dependency="true">mvn:jakarta.security.jacc/jakarta.security.jacc-api/${version.jakarta.security.jacc-api}</bundle>
-    <bundle dependency="true">mvn:jakarta.servlet/jakarta.servlet-api/${version.jakarta.servlet-api}</bundle>
-    <bundle dependency="true">wrap:mvn:org.jboss/jandex/${karaf.version.org.jboss.jandex}</bundle>
+    <bundle dependency="true">mvn:org.jboss/jandex/${karaf.version.org.jboss.jandex}</bundle>
     <bundle dependency="true">mvn:javax.validation/validation-api/${karaf.version.javax.validation}</bundle>
     <bundle dependency="true">mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
     <bundle dependency="true">mvn:org.hibernate.common/hibernate-commons-annotations/${version.org.hibernate.commons.annotations}</bundle>
-    <bundle start-level="100">wrap:mvn:org.hibernate/hibernate-core/${version.org.hibernate}$overwrite=merge&amp;Import-Package=org.jbpm.services.task*,*</bundle>
-    <bundle start-level="100">wrap:mvn:org.hibernate/hibernate-entitymanager/${version.org.hibernate}$overwrite=merge&amp;DynamicImport-Package=*</bundle>
+    <bundle start-level="100">mvn:org.hibernate/hibernate-core/${version.org.hibernate}</bundle>
     <bundle start-level="100">mvn:org.hibernate/hibernate-osgi/${version.org.hibernate}</bundle>
     <bundle start-level="100">mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
   </feature>
@@ -151,8 +148,8 @@
   <feature name="h2" version="${h2.version}" description="H2 database">
     <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
-    <bundle start-level="100">mvn:commons-dbcp/commons-dbcp/${version.commons-dbcp}</bundle>
-    <bundle start-level="100">mvn:commons-pool/commons-pool/${version.commons-pool}</bundle>
+    <bundle start-level="100">mvn:org.apache.commons/commons-dbcp2/${version.org.apache.commons.dbcp2}</bundle>
+    <bundle start-level="100">mvn:org.apache.commons/commons-pool2/${version.org.apache.commons.pool2}</bundle>
   </feature>
 
   <feature name="jackson" version="${project.version}">
@@ -182,7 +179,8 @@
   </feature>
 
   <feature name="servlet-api-kie" version="${project.version}">
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/1.0</bundle>
+    <bundle start="false">mvn:org.kie/kie-osgi-servlet3-compatibility/${project.version}</bundle>
+    <bundle>mvn:jakarta.servlet/jakarta.servlet-api/${version.jakarta.servlet-api}</bundle>
   </feature>
 
   <feature name="kie-pmml" version="${project.version}">

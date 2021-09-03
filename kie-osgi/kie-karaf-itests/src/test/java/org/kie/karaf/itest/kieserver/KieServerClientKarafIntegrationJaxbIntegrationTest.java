@@ -36,7 +36,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerClass.class)
-@Ignore
+@Ignore("DROOLS-6581")
 public class KieServerClientKarafIntegrationJaxbIntegrationTest extends BaseKieServerClientKarafIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationJaxbIntegrationTest.class);

@@ -42,7 +42,16 @@ public abstract class AbstractProcessWithPersistenceBean {
         final RuntimeEnvironment runtimeEnvironment = this.getRuntimeEnvironment(kieBase);
 
         RuntimeManagerFactory factory = RuntimeManagerFactory.Factory.get(this.getClass().getClassLoader());
-        this.runtimeManager = factory.newPerProcessInstanceRuntimeManager(runtimeEnvironment, this.getClass().getSimpleName());
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        try {
+            // TCCL has to be set to a CL of jbpm-runtime-manager bundle to find its META-INF/services
+            if (runtimeEnvironment != null) {
+                Thread.currentThread().setContextClassLoader(runtimeEnvironment.getClass().getClassLoader());
+            }
+            this.runtimeManager = factory.newPerProcessInstanceRuntimeManager(runtimeEnvironment, this.getClass().getSimpleName());
+        } finally {
+            Thread.currentThread().setContextClassLoader(tccl);
+        }
         this.runtimeEngine = this.runtimeManager.getRuntimeEngine(ProcessInstanceIdContext.get());
     }
 

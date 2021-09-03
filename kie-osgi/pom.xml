@@ -26,6 +26,7 @@
   <modules>
     <module>kie-karaf-itests-domain-model</module>
     <module>kie-osgi-integration</module>
+    <module>kie-osgi-servlet3-compatibility</module>
     <module>kie-karaf-features</module>
     <module>kie-karaf-itests</module>
   </modules>
