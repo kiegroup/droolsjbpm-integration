@@ -43,7 +43,7 @@ public class TestAutoConfiguration {
                 contextUsers.pop();
             }
             
-            private List<String> roles = Arrays.asList("PM", "HR");
+            private List<String> roles = Arrays.asList("PM", "HR", "Administrators");
             
             @Override
             public boolean hasRole(String arg0) {
