@@ -415,7 +415,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             assertEquals(query.getExpression(), replaced.getExpression());
             assertEquals(query.getTarget(), replaced.getTarget());
             assertNotNull(replaced.getColumns());
-            assertEquals(replaced.getColumns().size(), 19);
+            assertEquals(replaced.getColumns().size(), 18);
 
             tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
             assertNotNull(tasks);
