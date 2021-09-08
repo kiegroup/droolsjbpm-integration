@@ -18,11 +18,11 @@ package org.kie.server.client.credentials;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
-import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
 
 import org.kie.server.client.CredentialsProvider;
 import org.wildfly.security.auth.server.IdentityCredentials;
+import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityIdentity;
 import org.wildfly.security.credential.PasswordCredential;
 import org.wildfly.security.password.interfaces.ClearPassword;
@@ -38,18 +38,23 @@ public class SubjectCredentialsProvider implements CredentialsProvider {
 
     @Override
     public String getAuthorization() {
+
         try {
-            SecurityIdentity context = (SecurityIdentity) PolicyContext.getContext(SecurityIdentity.class.getName());
-            IdentityCredentials credentials = context.getPrivateCredentials();
-            if (credentials != null) {
-                ClearPassword clearPassword = getClearPassword(credentials);
-                if (clearPassword != null) {
-                    String basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((context.getPrincipal().getName() + ":" + String.valueOf(clearPassword.getPassword())).getBytes("UTF-8"));
-                    return basicAuthHeader;
+            SecurityIdentity securityIdentity = null;
+            ClearPassword password = null;
+
+            SecurityDomain securityDomain = SecurityDomain.getCurrent();
+            if (securityDomain != null) {
+                securityIdentity = securityDomain.getCurrentSecurityIdentity();
+                IdentityCredentials credentials = securityIdentity.getPrivateCredentials();
+                if (credentials != null) {
+                    ClearPassword clearPassword = getClearPassword(credentials);
+                    if (clearPassword != null) {
+                        String basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((securityIdentity.getPrincipal().getName() + ":" + String.valueOf(clearPassword.getPassword())).getBytes("UTF-8"));
+                        return basicAuthHeader;
+                    }
                 }
             }
-        } catch (PolicyContextException e) {
-            e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
