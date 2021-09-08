@@ -60,6 +60,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_MODE = "org.kie.server.mode";
     public static final String KIE_SERVER_INCLUDE_STACKTRACE = "org.kie.server.stacktrace.included";
     public static final String KIE_SERVER_STRICT_ID_FORMAT = "org.kie.server.strict.id.format";
+    public static final String KIE_SERVER_STRICT_JAVABEANS_SERIALIZERS = "org.kie.server.strict.javaBeans.serializers";
     public static final String KIE_SERVER_STRICT_JAXB_FORMAT = "org.kie.server.strict.jaxb.format";
     public static final String KIE_SERVER_IMAGESERVICE_MAX_NODES = "org.kie.server.service.image.max_nodes";
     public static final String KIE_SERVER_REST_MODE_READONLY = "org.kie.server.rest.mode.readonly";
