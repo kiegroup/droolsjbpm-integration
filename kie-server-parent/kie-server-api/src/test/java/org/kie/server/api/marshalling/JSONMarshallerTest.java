@@ -36,6 +36,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.assertj.core.util.Arrays;
 import org.assertj.core.util.Files;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.junit.After;
 import org.junit.Test;
@@ -252,12 +254,81 @@ public class JSONMarshallerTest {
     
     @Test
     public void testCapitalizedFieldnames() throws Exception {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JSON, getClass().getClassLoader());
-        
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, true); 
+
         Order order = new Order("all");
         String converted = marshaller.marshall(order);
+        assertEquals("{\n"
+                + "  \"ORDER_ID\" : \"all\"\n"
+                + "}", converted);
         Order unconverted = marshaller.unmarshall(converted, Order.class);
         assertEquals("all", unconverted.getORDER_ID());
     }
 
+    @Test
+    public void testLegacyFieldnames() throws Exception {
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, false); 
+
+        Order order = new Order("all");
+        String converted = marshaller.marshall(order);
+        assertEquals("{\n"
+                + "  \"order_ID\" : \"all\"\n"
+                + "}", converted);
+        Order unconverted = marshaller.unmarshall(converted, Order.class);
+        assertEquals("all", unconverted.getORDER_ID());
+    }
+
+    @Test
+    public void testCapitalizedWrapObjectFieldnames() throws Exception {
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, true); 
+
+        BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl();
+        batch.addCommand(new InsertObjectCommand(new Order("all")));
+
+        
+        String converted = marshaller.marshall(batch);
+        assertEquals("{\n"
+                + "  \"lookup\" : null,\n"
+                + "  \"commands\" : [ {\n"
+                + "    \"insert\" : {\n"
+                + "      \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{\n"
+                + "  \"ORDER_ID\" : \"all\"\n"
+                + "}},\n"
+                + "      \"out-identifier\" : null,\n"
+                + "      \"return-object\" : true,\n"
+                + "      \"entry-point\" : \"DEFAULT\",\n"
+                + "      \"disconnected\" : false\n"
+                + "    }\n"
+                + "  } ]\n"
+                + "}", converted);
+        BatchExecutionCommandImpl unconverted = marshaller.unmarshall(converted, BatchExecutionCommandImpl.class);
+        assertEquals("all", ((Order) ((InsertObjectCommand) unconverted.getCommands().get(0)).getObject()).getORDER_ID());
+    }
+
+    @Test
+    public void testLegalizeWrapObjectFieldnames() throws Exception {
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, false); 
+
+        BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl();
+        batch.addCommand(new InsertObjectCommand(new Order("all")));
+
+        
+        String converted = marshaller.marshall(batch);
+        assertEquals("{\n"
+                + "  \"lookup\" : null,\n"
+                + "  \"commands\" : [ {\n"
+                + "    \"insert\" : {\n"
+                + "      \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{\n"
+                + "  \"order_ID\" : \"all\"\n"
+                + "}},\n"
+                + "      \"out-identifier\" : null,\n"
+                + "      \"return-object\" : true,\n"
+                + "      \"entry-point\" : \"DEFAULT\",\n"
+                + "      \"disconnected\" : false\n"
+                + "    }\n"
+                + "  } ]\n"
+                + "}", converted);
+        BatchExecutionCommandImpl unconverted = marshaller.unmarshall(converted, BatchExecutionCommandImpl.class);
+        assertEquals("all", ((Order) ((InsertObjectCommand) unconverted.getCommands().get(0)).getObject()).getORDER_ID());
+    }
 }
