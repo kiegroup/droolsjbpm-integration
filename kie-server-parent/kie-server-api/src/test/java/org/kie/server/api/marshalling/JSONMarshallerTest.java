@@ -175,7 +175,11 @@ public class JSONMarshallerTest {
     public static class Order {
 
         private String ORDER_ID;
-        
+
+        private String SSN;
+
+        private String USCitizens;
+
         public Order() {}
         
         public Order(String o){
@@ -188,6 +192,20 @@ public class JSONMarshallerTest {
 
         public void setORDER_ID(String o) {
             this.ORDER_ID = o;
+        }
+
+        public String getSSN() {
+            return SSN;
+        }
+
+        public String getUSCitizens() {
+            return USCitizens;
+        }
+        public void setSSN(String sSN) {
+            SSN = sSN;
+        }
+        public void setUSCitizens(String uSCitizens) {
+            USCitizens = uSCitizens;
         }
     }
 
@@ -255,7 +273,14 @@ public class JSONMarshallerTest {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JSON, getClass().getClassLoader());
         
         Order order = new Order("all");
+        order.setSSN("my ssn");
+        order.setUSCitizens("my us citizends");
         String converted = marshaller.marshall(order);
+        assertEquals("{\n"
+                + "  \"ORDER_ID\" : \"all\",\n"
+                + "  \"SSN\" : \"my ssn\",\n"
+                + "  \"USCitizens\" : \"my us citizends\"\n"
+                + "}", converted);
         Order unconverted = marshaller.unmarshall(converted, Order.class);
         assertEquals("all", unconverted.getORDER_ID());
     }
