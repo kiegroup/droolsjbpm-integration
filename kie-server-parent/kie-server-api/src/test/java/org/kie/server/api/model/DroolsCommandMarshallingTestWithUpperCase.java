@@ -31,25 +31,24 @@ import org.kie.api.command.KieCommands;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.marshalling.objects.Pojo1;
-import org.kie.server.api.marshalling.objects.Pojo2;
-import org.kie.server.api.marshalling.objects.Pojo3;
+import org.kie.server.api.marshalling.objects.Pojo1Upper;
+import org.kie.server.api.marshalling.objects.Pojo2Upper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 
-public class DroolsCommandMarshallingTest {
+public class DroolsCommandMarshallingTestWithUpperCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(DroolsCommandMarshallingTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(DroolsCommandMarshallingTestWithUpperCase.class);
 
     private static BatchExecutionCommand createTestCommand() {
 
         KieCommands commandsFactory = KieServices.Factory.get().getCommands();
         List<Command<?>> commands = new ArrayList<Command<?>>();
-        Pojo3 pojo3 = new Pojo3("A");
-        Pojo2 pojo2 = new Pojo2("B", true, pojo3);
-        Pojo1 pojo1 = new Pojo1("C", pojo2);
+        Pojo2Upper pojo2 = new Pojo2Upper(true);
+        Pojo1Upper pojo1 = new Pojo1Upper("SSNJim", pojo2);
+
         commands.add(commandsFactory.newInsert(pojo1, "fact-pojo1"));
         commands.add(commandsFactory.newFireAllRules("fire-result"));
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands);
@@ -58,9 +57,8 @@ public class DroolsCommandMarshallingTest {
 
     private Set<Class<?>> getCustomClasses() {
         HashSet<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(Pojo1.class);
-        classes.add(Pojo2.class);
-        classes.add(Pojo3.class);
+        classes.add(Pojo1Upper.class);
+        classes.add(Pojo2Upper.class);
         return classes;
     }
 

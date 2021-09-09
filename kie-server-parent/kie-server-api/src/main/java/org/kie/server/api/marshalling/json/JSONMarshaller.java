@@ -233,6 +233,7 @@ public class JSONMarshaller implements Marshaller {
         deserializeObjectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, true);
 
         // setup custom serialization mapper with jaxb adapters
+        customSerializationMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, true);
         customSerializationMapper.setConfig(customSerializationMapper.getDeserializationConfig().with(introspectorPair));
         customSerializationMapper.setConfig(customSerializationMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
 
