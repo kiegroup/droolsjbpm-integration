@@ -32,7 +32,6 @@ import org.h2.tools.Server;
 import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;
 import org.jbpm.services.task.identity.JBossUserGroupCallbackImpl;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
@@ -73,7 +72,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
-@Ignore
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class KieSpringjBPMPersistenceKarafIntegrationTest extends AbstractKieSpringKarafIntegrationTest {

@@ -19,7 +19,6 @@ package org.kie.karaf.itest;
 import javax.inject.Inject;
 
 import org.apache.karaf.features.FeaturesService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
@@ -39,7 +38,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
-@Ignore
 public class RuntimeManagerFeatureKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     @Inject

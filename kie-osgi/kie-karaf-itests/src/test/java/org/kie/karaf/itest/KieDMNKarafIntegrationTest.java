@@ -19,7 +19,6 @@ package org.kie.karaf.itest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
@@ -39,7 +38,6 @@ import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
-@Ignore
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class KieDMNKarafIntegrationTest extends AbstractKarafIntegrationTest {
