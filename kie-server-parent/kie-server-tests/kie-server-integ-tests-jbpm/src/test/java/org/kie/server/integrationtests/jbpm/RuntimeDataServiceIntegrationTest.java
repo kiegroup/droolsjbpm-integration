@@ -15,6 +15,23 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEPLOYMENT_ID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.kie.server.api.util.QueryParamFactory.equalsTo;
+import static org.kie.server.api.util.QueryParamFactory.history;
+import static org.kie.server.api.util.QueryParamFactory.list;
+import static org.kie.server.api.util.QueryParamFactory.onlyActiveTasks;
+import static org.kie.server.api.util.QueryParamFactory.onlyCompletedTasks;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,23 +71,6 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEPLOYMENT_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
-import static org.kie.server.api.util.QueryParamFactory.equalsTo;
-import static org.kie.server.api.util.QueryParamFactory.history;
-import static org.kie.server.api.util.QueryParamFactory.list;
-import static org.kie.server.api.util.QueryParamFactory.onlyActiveTasks;
-import static org.kie.server.api.util.QueryParamFactory.onlyCompletedTasks;
 
 
 
@@ -1462,6 +1462,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                     .type(TaskEvent.TaskEventType.ADDED.toString())
                     .processInstanceId(processInstanceId)
                     .taskId(taskInstance.getId())
+                    .assignedOwner("pepe")
                     .user(PROCESS_ID_USERTASK)      // is this really correct to set process id as user for added task
                     .build();
 
@@ -1959,6 +1960,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
         assertEquals(expected.getTaskId(), actual.getTaskId());
         assertEquals(expected.getUserId(), actual.getUserId());
+        assertEquals(expected.getAssignedOwner(), actual.getAssignedOwner());
         assertNotNull(actual.getId());
         assertNotNull(actual.getLogTime());
         assertNotNull(actual.getWorkItemId());
