@@ -15,6 +15,7 @@
 
 package org.kie.maven.plugin;
 
+import org.kie.memorycompiler.resources.KiePath;
 import org.kie.memorycompiler.resources.ResourceStore;
 
 import java.io.File;
@@ -26,20 +27,20 @@ import java.io.IOException;
 import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 
 public class DiskResourceStore implements ResourceStore {
-    private final File root;
+    private final KiePath rootPath;
 
     public DiskResourceStore(File root) {
-        this.root = root;
+        this.rootPath = KiePath.of(root.getAbsolutePath());
     }
 
     @Override
-    public void write(String pResourceName, byte[] pResourceData) {
-        write(pResourceName, pResourceData, false);
+    public void write(KiePath resourcePath, byte[] pResourceData) {
+        write(resourcePath, pResourceData, false);
     }
 
     @Override
-    public void write(String pResourceName, byte[] pResourceData, boolean createFolder) {
-        File file = new File(getFilePath(pResourceName));
+    public void write(KiePath resourcePath, byte[] pResourceData, boolean createFolder) {
+        File file = new File(getFilePath(resourcePath));
         if (createFolder) {
             File dir = file.getParentFile();
             if (!dir.exists()) {
@@ -65,10 +66,10 @@ public class DiskResourceStore implements ResourceStore {
     }
 
     @Override
-    public byte[] read(String pResourceName) {
+    public byte[] read(KiePath resourcePath) {
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(getFilePath(pResourceName));
+            fis = new FileInputStream(getFilePath(resourcePath));
             return readBytesFromInputStream(fis);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -84,14 +85,14 @@ public class DiskResourceStore implements ResourceStore {
     }
 
     @Override
-    public void remove(String pResourceName) {
-        File file = new File(getFilePath(pResourceName));
+    public void remove(KiePath resourcePath) {
+        File file = new File(getFilePath(resourcePath));
         if (file.exists()) {
             file.delete();
         }
     }
 
-    private String getFilePath(String pResourceName) {
-        return root.getAbsolutePath() + File.separator + pResourceName;
+    private String getFilePath(KiePath resourcePath) {
+        return rootPath.resolve(resourcePath).asString();
     }
 }

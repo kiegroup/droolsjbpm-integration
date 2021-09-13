@@ -192,7 +192,7 @@ public class BuildMojo extends AbstractDMNValidationAwareMojo {
 
     private void saveFile(MemoryFileSystem mfs, String fileName) throws MojoFailureException {
         MemoryFile memFile = (MemoryFile)mfs.getFile(fileName);
-        final Path path = Paths.get(outputDirectory.getPath(), memFile.getPath().toPortableString());
+        final Path path = Paths.get(outputDirectory.getPath(), memFile.getPath().asString());
 
         try {
             Files.deleteIfExists(path);

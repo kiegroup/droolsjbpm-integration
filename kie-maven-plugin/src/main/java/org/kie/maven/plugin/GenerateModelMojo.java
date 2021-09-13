@@ -159,7 +159,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
             // copy the META-INF packages file
             final String path = CanonicalKieModule.getModelFileWithGAV(kieModule.getReleaseId());
             final MemoryFile packagesMemoryFile = (MemoryFile) mfs.getFile(path);
-            final String packagesMemoryFilePath = packagesMemoryFile.getFolder().getPath().toPortableString();
+            final String packagesMemoryFilePath = packagesMemoryFile.getFolder().getPath().asString();
             final Path packagesDestinationPath = Paths.get(targetDirectory.getPath(), "classes", packagesMemoryFilePath, packagesMemoryFile.getName());
 
             try {
