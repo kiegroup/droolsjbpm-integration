@@ -15,6 +15,30 @@
 
 package org.kie.server.services.jbpm;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_NAME;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_OWNER;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_STATUS;
+import static org.jbpm.services.api.query.model.QueryParam.all;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
+import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
+import static org.kie.server.services.jbpm.ConvertUtils.buildTaskStatuses;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcess;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToServiceApiQueryParam;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTask;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToUserTaskWithVariablesList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToVariablesList;
+import static org.kie.server.services.jbpm.ConvertUtils.nullEmpty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,30 +87,6 @@ import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_NAME;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_OWNER;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_STATUS;
-import static org.jbpm.services.api.query.model.QueryParam.all;
-import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
-import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
-import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
-import static org.kie.server.services.jbpm.ConvertUtils.buildTaskStatuses;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstance;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstanceList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcess;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToServiceApiQueryParam;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTask;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToUserTaskWithVariablesList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToVariablesList;
-import static org.kie.server.services.jbpm.ConvertUtils.nullEmpty;
 
 public class RuntimeDataServiceBase {
 
@@ -603,6 +603,7 @@ public class RuntimeDataServiceBase {
                         .message(taskSummary.getMessage())
                         .correlationKey(taskSummary.getCorrelationKey())
                         .processType(taskSummary.getProcessType())
+                        .assignedOwner(taskSummary.getCurrentOwner())
                         .build();
                 instances[counter] = task;
                 counter++;
