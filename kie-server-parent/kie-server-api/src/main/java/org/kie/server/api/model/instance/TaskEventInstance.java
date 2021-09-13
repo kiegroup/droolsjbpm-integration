@@ -58,9 +58,8 @@ public class TaskEventInstance {
     @XmlElement(name = "process-type")
     private Integer processType;
 
-
-    public TaskEventInstance() {
-    }
+    @XmlElement(name = "assigned-owner")
+    private String assignedOwner;
 
     public static Builder builder() {
         return new Builder();
@@ -150,10 +149,18 @@ public class TaskEventInstance {
         this.message = message;
     }
 
+    public String getAssignedOwner() {
+        return assignedOwner;
+    }
+
+    public void setAssignedOwner(String actualOwner) {
+        this.assignedOwner = actualOwner;
+    }
+
     @Override
     public String toString() {
         return "TaskEventInstance [id=" + id + ", taskId=" + taskId + ", type=" + type + ", userId=" + userId + ", logTime=" + logTime + ", processInstanceId=" + processInstanceId + ", workItemId=" + workItemId +
-               ", message=" + message + ", correlationKey=" + correlationKey + ", processType=" + processType + "]";
+               ", message=" + message + ", correlationKey=" + correlationKey + ", processType=" + processType + ", actualOwner=" + assignedOwner + "]";
     }
 
     public static class Builder {
@@ -211,6 +218,11 @@ public class TaskEventInstance {
 
         public Builder message(String message) {
             taskEventInstance.setMessage(message);
+            return this;
+        }
+        
+        public Builder assignedOwner (String actualOwner) {
+            taskEventInstance.setAssignedOwner(actualOwner);
             return this;
         }
     }
