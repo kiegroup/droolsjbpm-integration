@@ -35,8 +35,7 @@ public class BuildPMMLTrustyTestIT {
     private static final String GAV_VERSION = "${org.kie.version}";
 
     private static final String PMML_FILE_NAME = "logisticregressionirisdata/logisticRegressionIrisData.pmml";
-    private static final List<String> EXAMPLE_PMML_CLASSES = Arrays.asList("compoundnestedpredicatescorecard/CompoundNestedPredicateScorecardFactory.class",
-                                                                           "compoundnestedpredicatescorecard/compoundnestedpredicatescorecard/PMMLRuleMappersImpl.class");
+    private static final List<String> EXAMPLE_PMML_CLASSES = Arrays.asList("compoundnestedpredicatescorecard/CompoundNestedPredicateScorecardFactory.class");
 
     @Test
     public void testContentKjarWithPMML() throws Exception {
