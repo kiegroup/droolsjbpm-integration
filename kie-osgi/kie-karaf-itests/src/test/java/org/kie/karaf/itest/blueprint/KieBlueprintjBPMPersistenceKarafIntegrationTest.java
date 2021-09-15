@@ -65,11 +65,11 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
     private static final String PROCESS_ID = "orderApproval";
 
     @Inject
-    @Filter("(osgi.jndi.service.name=kiesession/sessionWithoutEnv)")
+    @Filter(value = "(osgi.jndi.service.name=kiesession/sessionWithoutEnv)", timeout = 120000)
     private KieSession processWithPersistenceNoEnv;
 
     @Inject
-    @Filter("(osgi.jndi.service.name=kiesession/sessionWithEnv)")
+    @Filter(value = "(osgi.jndi.service.name=kiesession/sessionWithEnv)", timeout = 120000)
     private KieSession processWithPersistenceEnv;
 
     @Test
