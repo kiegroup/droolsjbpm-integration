@@ -21,6 +21,7 @@
 	<strong style="color: red">*</strong>
 	</#if>
 	<select id="${item.id}" name="${item.name}" class="form-control" ${(item.required)?string('required', '')}>
+	<option value="" disabled selected>Select a value</option>
 	<#list item.options as option>
 	  <option value="${option.value}" ${(item.value == option.value)?string('selected', '')}>${option.text}</option>	  
 	  </#list>
