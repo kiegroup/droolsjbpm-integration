@@ -50,6 +50,7 @@ import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.KieServerRouter;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,6 +88,8 @@ public class KieServerRouterMultiNodeTest {
         repository = new File("target/standalone-router-repo");
         repository.mkdirs();
         System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, repository.getAbsolutePath());
+        System.setProperty(KieServerRouterConstants.KIE_ROUTER_MANAGEMENT_SECURED, "false");
+        System.setProperty(KieServerRouterConstants.KIE_ROUTER_IDENTITY_PROVIDER, "mock");
 
         bodyProcessInstance = getFileContent("process-instance.xml");
         bodyProcessDefinition1 = getFileContent("process-definition-1.xml");
@@ -99,7 +102,7 @@ public class KieServerRouterMultiNodeTest {
 
         // setup and start router
         Integer port = allocatePort();
-        router = new KieServerRouter(false, "mock");
+        router = new KieServerRouter(new KieServerRouterEnvironment());
         router.start("localhost", port);
 
         serverUrl = "http://localhost:" + port;
@@ -135,6 +138,8 @@ public class KieServerRouterMultiNodeTest {
     public void stopStandaloneRouter() {
         // stop router and remove its config
         System.clearProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR);
+        System.clearProperty(KieServerRouterConstants.KIE_ROUTER_MANAGEMENT_SECURED);
+        System.clearProperty(KieServerRouterConstants.KIE_ROUTER_IDENTITY_PROVIDER);
         router.stop(true);
         router = null;
 

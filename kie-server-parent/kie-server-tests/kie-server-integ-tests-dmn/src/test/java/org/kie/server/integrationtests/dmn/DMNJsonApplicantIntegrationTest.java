@@ -28,14 +28,15 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 public class DMNJsonApplicantIntegrationTest extends DMNKieServerBaseIntegrationTest {
 
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "json-applicant", "1.0.0.Final");
 
     private static final String CONTAINER_1_ID = "json-applicant";
+    private static final String CONTAINER_2_ID = "json-applicant-bis";
 
     private static final String APPLICANT_FQCN = "com.acme.Applicant";
     private static final String ADDRESS_FQCN = "com.acme.Address";
@@ -47,6 +48,7 @@ public class DMNJsonApplicantIntegrationTest extends DMNKieServerBaseIntegration
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
         createContainer(CONTAINER_1_ID, kjar1);
+        createContainer(CONTAINER_2_ID, kjar1);
     }
 
     @Override
@@ -91,6 +93,20 @@ public class DMNJsonApplicantIntegrationTest extends DMNKieServerBaseIntegration
 
         DMNContext result = dmnResult.getContext();
         assertThat(result.get("Decision-1"), is("John Doe lives in Italy"));
+
+        // DROOLS-6571 DMN evaluation errors when the same FEEL object-access invocation is used by two kie containers
+        // Additionally, spin up the same kjar in a new kie-server kiecontainer, for DROOLS-6571
+        ServiceResponse<DMNResult> evaluateAll2 = dmnClient.evaluateAll(CONTAINER_2_ID,
+                                                                        "https://kiegroup.org/dmn/_8E568485-BC02-4917-830C-39D17632BD3A",
+                                                                        "model2",
+                                                                        dmnContext);
+        KieServerAssert.assertSuccess(evaluateAll2);
+
+        DMNResult dmnResult2 = evaluateAll2.getResult();
+        assertThat(dmnResult2.getMessages().toString(), dmnResult2.hasErrors(), is(false));
+
+        DMNContext result2 = dmnResult2.getContext();
+        assertThat(result2.get("Decision-1"), is("John Doe lives in Italy"));
     }
 
 }

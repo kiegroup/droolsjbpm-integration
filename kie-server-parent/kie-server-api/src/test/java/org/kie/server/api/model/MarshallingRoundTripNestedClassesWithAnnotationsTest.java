@@ -81,7 +81,7 @@ public class MarshallingRoundTripNestedClassesWithAnnotationsTest {
 
     private void verifyMarshallingRoundTrip(Marshaller marshaller, Object inputObject) {
         String rawContent = marshaller.marshall(inputObject);
-        logger.info(rawContent);
+        logger.debug(rawContent);
         Object testObjectAfterMarshallingTurnAround = marshaller.unmarshall(rawContent, inputObject.getClass());
         Assertions.assertThat(testObjectAfterMarshallingTurnAround).isEqualTo(inputObject);
     }

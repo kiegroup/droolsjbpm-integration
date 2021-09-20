@@ -1,6 +1,7 @@
 package org.jbpm.process.svg.processor;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,11 +17,27 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.svg.SVGElement;
 
 public class StunnerSVGProcessor extends AbstractSVGProcessor {
 
+    private static String SPECIAL_SUB_PROCESS_INSTANCE_ID = "_subProcessReusableNormalReusableIcon";
+    private static String OLD_SPECIAL_SUB_PROCESS_INSTANCE_ID = "undefined";
+
     public StunnerSVGProcessor(Document svgDocument) {
         super(svgDocument, true);
+    }
+
+    private Map<String, String> subProcessLinks;
+
+    private Map<String, Long> nodeBadges = new HashMap<>();
+
+    public void setSubProcessLinks(final Map<String, String> subProcessLinks) {
+        this.subProcessLinks = subProcessLinks;
+    }
+
+    public void setNodeBadges(Map<String, Long> nodeBadges) {
+        this.nodeBadges = nodeBadges;
     }
 
     @Override
@@ -87,14 +104,53 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
                         Element border = Objects.equals(parameters.get("shapeType"), "BORDER") ? (Element) node : nodeSummary.getBorder();
                         Element background = Objects.equals(parameters.get("shapeType"), "BACKGROUND") ? (Element) node : nodeSummary.getBackground();
                         RenderType renderType = RenderType.valueOf(Optional.ofNullable(parameters.get("renderType")).orElse(nodeSummary.getRenderType().orElse(RenderType.STROKE).name()));
-
-                        summary.addNode(new NodeSummary(nodeId, border, background, null, null, renderType));
+                        Element plusButton = null;
+                        if (subProcessLinks != null && subProcessLinks.containsKey(nodeId) && (value.equals(nodeId + SPECIAL_SUB_PROCESS_INSTANCE_ID) || value.equals(nodeId + OLD_SPECIAL_SUB_PROCESS_INSTANCE_ID))) {
+                            plusButton = (Element) node;
+                        }
+                        /** JBPM-9820 **/
+                        if (value.contains(nodeId)) {
+                            summary.addNode(new NodeSummary(nodeId, border, background, null, null, renderType, plusButton));
+                        }
                     }
                     break;
                 }
             }
             processNode(node, nodeId);
         }
+    }
+
+    private void renderBadges(Node node, Long badgesCount) {
+        Element svgElement = (Element) node;
+        String nodeId = ((SVGElement) svgElement).getId();
+        Element jbpmNodeBadge = svgDocument.createElement("g");
+        jbpmNodeBadge.setAttribute("jbpm-node-badge", nodeId);
+
+        Element jbpmNodeBadgeRect = svgDocument.createElement("rect");
+        Element jbpmNodeBadgeText = svgDocument.createElement("text");
+
+        jbpmNodeBadgeRect.setAttribute("x", "0");
+        jbpmNodeBadgeRect.setAttribute("y", "0");
+        jbpmNodeBadgeRect.setAttribute("width", "25");
+        jbpmNodeBadgeRect.setAttribute("height", "20");
+        jbpmNodeBadgeRect.setAttribute("rx", "5");
+        jbpmNodeBadgeRect.setAttribute("ry", "5");
+        jbpmNodeBadgeRect.setAttribute("fill", "grey");
+        jbpmNodeBadgeRect.setAttribute("opacity", "0.5");
+
+        jbpmNodeBadgeText.setAttribute("font-size", "10pt");
+        jbpmNodeBadgeText.setAttribute("font-weight", "normal");
+        jbpmNodeBadgeText.setAttribute("font-family", "Open Sans");
+        jbpmNodeBadgeText.setAttribute("font-style", "normal");
+        jbpmNodeBadgeText.setAttribute("text-anchor", "middle");
+        jbpmNodeBadgeText.setAttribute("fill", "white");
+        jbpmNodeBadgeText.setAttribute("x", "12");
+        jbpmNodeBadgeText.setAttribute("y", "15");
+        jbpmNodeBadgeText.setTextContent(String.valueOf(badgesCount));
+
+        jbpmNodeBadge.appendChild(jbpmNodeBadgeRect);
+        jbpmNodeBadge.appendChild(jbpmNodeBadgeText);
+        svgElement.appendChild(jbpmNodeBadge);
     }
 
     @Override
@@ -108,6 +164,12 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
                     Node nodeIdNode = attributes.getNamedItem("bpmn2nodeid");
                     if (nodeIdNode != null) {
                         String nodeId = nodeIdNode.getNodeValue();
+                        if (nodeBadges != null) {
+                            nodeBadges.computeIfPresent(nodeId, (key, value) -> {
+                                renderBadges(node, value);
+                                return null;
+                            });
+                        }
                         if (nodeId != null) {
                             //process bpmn2 node to parse the attributes
                             processNode(node, nodeId);

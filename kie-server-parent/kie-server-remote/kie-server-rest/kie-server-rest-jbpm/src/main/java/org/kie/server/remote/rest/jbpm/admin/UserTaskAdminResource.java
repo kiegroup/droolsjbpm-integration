@@ -137,12 +137,13 @@ public class UserTaskAdminResource {
     public Response addPotentialOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "optional flag that indicates if existing potential owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
             @ApiParam(value = "list of users/groups to be added as potential owners, as OrgEntities type", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
                     @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
 
-        return addToTask(headers, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
+        return addToTask(headers, userId, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
     }
 
     @ApiOperation(value="Adds users and groups to be excluded from being owners for a specified task instance.",
@@ -156,12 +157,13 @@ public class UserTaskAdminResource {
     public Response addExcludedOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "optional flag that indicates if existing excluded owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
             @ApiParam(value = "list of users/groups to be added as excluded owners, as OrgEntities type", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
                     @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
 
-        return addToTask(headers, containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
+        return addToTask(headers, userId,  containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
     }
 
     @ApiOperation(value="Adds business administrator users or groups to a specified task instance.",
@@ -175,12 +177,13 @@ public class UserTaskAdminResource {
     public Response addAdmins(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "optional flag that indicates if existing business admins should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
             @ApiParam(value = "list of users/groups to be added as business admins, as OrgEntities type", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
                     @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
 
-        return addToTask(headers, containerId, tInstanceId, removeExisting, payload, ADMIN);
+        return addToTask(headers, userId, containerId, tInstanceId, removeExisting, payload, ADMIN);
     }
 
     
@@ -194,9 +197,10 @@ public class UserTaskAdminResource {
     public Response removePotentialOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of users to be removed from potantial owners list", required = true, example = "john") @PathParam("entityId") String users) {
 
-        return removeFromTask(headers, containerId, tInstanceId, true, users, POT_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, true, users, POT_OWNER);
     }
 
     @ApiOperation(value="Deletes specified users previously added as excluded owners for a specified task instance. ",
@@ -209,9 +213,10 @@ public class UserTaskAdminResource {
     public Response removeExcludedOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of users to be removed from excluded owners list", required = true, example = "john") @PathParam("entityId") String users) {
 
-        return removeFromTask(headers, containerId, tInstanceId, true, users, EXL_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, true, users, EXL_OWNER);
     }
 
     @ApiOperation(value="Deletes specified users previously added as business administrators for a specified task instance.",
@@ -224,9 +229,10 @@ public class UserTaskAdminResource {
     public Response removeAdminsUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of users to be removed from business admin list", required = true, example = "john") @PathParam("entityId") String users) {
 
-        return removeFromTask(headers, containerId, tInstanceId, true, users, ADMIN);
+        return removeFromTask(headers, userId, containerId, tInstanceId, true, users, ADMIN);
     }
 
     @ApiOperation(value="Deletes specified groups previously added as potential owners for a specified task instance.",
@@ -239,9 +245,10 @@ public class UserTaskAdminResource {
     public Response removePotentialOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of groups to be removed from potantial owners list", required = true, example = "HR") @PathParam("entityId") String groups) {
 
-        return removeFromTask(headers, containerId, tInstanceId, false, groups, POT_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, POT_OWNER);
     }
 
     @ApiOperation(value="Deletes specified groups previously added as excluded owners for a specified task instance.",
@@ -254,9 +261,10 @@ public class UserTaskAdminResource {
     public Response removeExcludedOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of groups to be removed from excluded owners list", required = true, example = "HR") @PathParam("entityId") String groups) {
 
-        return removeFromTask(headers, containerId, tInstanceId, false, groups, EXL_OWNER);
+        return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, EXL_OWNER);
     }
 
     @ApiOperation(value="Deletes specified groups previously added as business administrators for a specified task instance.",
@@ -269,9 +277,10 @@ public class UserTaskAdminResource {
     public Response removeAdminsGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @ApiParam(value = "list of groups to be removed from business admin list", required = true, example = "HR") @PathParam("entityId") String groups) {
 
-        return removeFromTask(headers, containerId, tInstanceId, false, groups, ADMIN);
+        return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, ADMIN);
     }
 
     @ApiOperation(value="Adds input data to a specified task instance.",
@@ -714,22 +723,22 @@ public class UserTaskAdminResource {
      * internal methods
      */
 
-    protected Response addToTask(HttpHeaders headers, String containerId, Long tInstanceId, boolean removeExisting, String payload, int operation) {
+    protected Response addToTask(HttpHeaders headers, String userId, String containerId, Long tInstanceId, boolean removeExisting, String payload, int operation) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             switch (operation) {
                 case POT_OWNER:
-                    userTaskAdminServiceBase.addPotentialOwners(containerId, tInstanceId, removeExisting, payload, type);
+                    userTaskAdminServiceBase.addPotentialOwners(userId, containerId, tInstanceId, removeExisting, payload, type);
                     break;
 
                 case EXL_OWNER:
-                    userTaskAdminServiceBase.addExcludedOwners(containerId, tInstanceId, removeExisting, payload, type);
+                    userTaskAdminServiceBase.addExcludedOwners(userId, containerId, tInstanceId, removeExisting, payload, type);
                     break;
 
                 case ADMIN:
-                    userTaskAdminServiceBase.addBusinessAdmins(containerId, tInstanceId, removeExisting, payload, type);
+                    userTaskAdminServiceBase.addBusinessAdmins(userId, containerId, tInstanceId, removeExisting, payload, type);
                     break;
             }
 
@@ -744,7 +753,7 @@ public class UserTaskAdminResource {
         }
     }
 
-    protected Response removeFromTask(HttpHeaders headers, String containerId, Long tInstanceId, boolean isUser, String entities, int operation) {
+    protected Response removeFromTask(HttpHeaders headers, String userId, String containerId, Long tInstanceId, boolean isUser, String entities, int operation) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -754,15 +763,15 @@ public class UserTaskAdminResource {
 
             switch (operation) {
                 case POT_OWNER:
-                    userTaskAdminServiceBase.removePotentialOwners(containerId, tInstanceId, listOfEntities, isUser);
+                    userTaskAdminServiceBase.removePotentialOwners(userId, containerId, tInstanceId, listOfEntities, isUser);
                     break;
 
                 case EXL_OWNER:
-                    userTaskAdminServiceBase.removeExcludedOwners(containerId, tInstanceId, listOfEntities, isUser);
+                    userTaskAdminServiceBase.removeExcludedOwners(userId, containerId, tInstanceId, listOfEntities, isUser);
                     break;
 
                 case ADMIN:
-                    userTaskAdminServiceBase.removeBusinessAdmins(containerId, tInstanceId, listOfEntities, isUser);
+                    userTaskAdminServiceBase.removeBusinessAdmins(userId, containerId, tInstanceId, listOfEntities, isUser);
                     break;
             }
 

@@ -34,8 +34,13 @@ import org.jbpm.process.svg.processor.SVGProcessor;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import static org.junit.Assert.*;
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
 
 public class TestEvalutionSVG {
 
@@ -108,6 +113,37 @@ public class TestEvalutionSVG {
     }
 
     @Test
+    public void testStunnerSubProcessLink() throws Exception {
+        testSubProcessLink("_D254259B-8C23-4498-9BE1-995E2DC66726", "/stunner.parentP-svg.svg");
+    }
+
+    @Test
+    public void testBoundaryEventSubProcessLink() throws Exception {
+        testSubProcessLink("_86E33F6B-FD3B-4E07-8D60-D273A54FE6B7", "/stunner.parentP.boundaryEvent-svg.svg");
+    }
+
+    private void testSubProcessLink(String elementId, String svgFile) throws IOException {
+        List<String> completed = new ArrayList<String>();
+        List<String> active = new ArrayList<String>();
+        active.add(elementId);
+
+        Map<String, String> links = new HashMap<>();
+        links.put(elementId, "http://localhost/processes/1");
+        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream(svgFile), completed, active, links);
+
+        // verify transformation
+        Document svgDocument = readSVG(svg);
+
+        Element subprocessPlusIcon = svgDocument.getElementById(elementId + "_subProcessReusableNormalReusableIcon");
+        String onclick = subprocessPlusIcon.getAttribute("onclick");
+        assertNotNull(onclick);
+        assertEquals("window.open('http://localhost/processes/1')", onclick);
+        String style = subprocessPlusIcon.getAttribute("style");
+        assertNotNull(style);
+        assertEquals("cursor: pointer;", style);
+    }
+
+    @Test
     public void testCustomColor() throws Exception {
         String completedNodeColor = "#888888";
         String completedNodeBorderColor = "#888887";
@@ -118,7 +154,7 @@ public class TestEvalutionSVG {
         active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
         String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"),
                                                  completed, active, null, completedNodeColor,
-                                                 completedNodeBorderColor, activeNodeBorderColor);
+                                                 completedNodeBorderColor, activeNodeBorderColor, null);
 
         // verify transformation
         Document svgDocument = readSVG(svg);
@@ -134,7 +170,7 @@ public class TestEvalutionSVG {
         active.add("_6063D302-9D81-4C86-920B-E808A45377C2");
         String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"),
                                                  completed, active, null, "#888888",
-                                                 "#888887", "#888886");
+                                                 "#888887", "#888886", null);
 
         Document svgDocument = readSVG(svg);
         assertEquals("", ((Element) svgDocument.getFirstChild()).getAttribute("width"));
@@ -216,5 +252,52 @@ public class TestEvalutionSVG {
         Document svgDocument = factory.createDocument("http://jbpm.org", new StringReader(svgContent));
 
         return svgDocument;
+    }
+
+    @Test
+    public void testRenderBadges() throws Exception {
+        List<String> completed = new ArrayList<String>();
+        String completedNodeId = "_FCDCAA8D-378C-4ADF-9A8C-053FF7363D67";
+        completed.add(completedNodeId);
+        List<String> active = new ArrayList<String>();
+        String activeNodeId = "_D254259B-8C23-4498-9BE1-995E2DC66726";
+        active.add(activeNodeId);
+
+        Map<String, Long> nodeBadges = new HashMap<>();
+        nodeBadges.put(completedNodeId, 1L);
+        nodeBadges.put(activeNodeId, 1L);
+        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/stunner.parentP-svg.svg"), completed,
+                                                 active, null, COMPLETED_BORDER_COLOR, COMPLETED_COLOR, ACTIVE_BORDER_COLOR, nodeBadges);
+
+        // verify transformation
+        Document svgDocument = readSVG(svg);
+        Element completedNode = svgDocument.getElementById(completedNodeId);
+        assertNodeBadgesofNode(completedNode, completedNodeId);
+
+        Element activeNode = svgDocument.getElementById(activeNodeId);
+        assertNodeBadgesofNode(activeNode, activeNodeId);
+    }
+
+
+    private void assertNodeBadgesofNode(Element completedNode, String targetNode) {
+        Node nodeIdNode = completedNode.getAttributes().getNamedItem("bpmn2nodeid");
+        assertNotNull(nodeIdNode);
+        NodeList nodeList = completedNode.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node nodeBadgeNode = nodeList.item(i).getAttributes().getNamedItem("jbpm-node-badge");
+            if (nodeBadgeNode != null) {
+                assertEquals(targetNode, nodeBadgeNode.getNodeValue());
+                Node rectNode = nodeList.item(i).getChildNodes().item(0);
+                assertNotNull(rectNode);
+                Node textNode = nodeList.item(i).getChildNodes().item(1);
+                assertNotNull(textNode);
+                assertEquals("1", textNode.getFirstChild().getNodeValue());
+            } else {
+                Node idNode = nodeList.item(i).getAttributes().getNamedItem("id");
+                if (idNode != null && targetNode.equals(idNode.getNodeValue())) {
+                    assertTrue(false);
+                }
+            }
+        }
     }
 }

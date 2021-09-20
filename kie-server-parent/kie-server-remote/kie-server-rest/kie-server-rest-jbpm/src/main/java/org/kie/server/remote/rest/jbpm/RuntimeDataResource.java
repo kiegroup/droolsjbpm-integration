@@ -748,15 +748,22 @@ public class RuntimeDataResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
-    public Response queryProcessesByVariables(@Context HttpHeaders headers, String payload,
-                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+    public Response queryProcessesByVariables(@Context HttpHeaders headers,
+                                              String payload,
+                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)",
+                                                        required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10",
+                                                        required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+                                              @ApiParam(value = "optional sort column",
+                                                        required = false) @QueryParam("orderBy") String orderBy,
+                                              @ApiParam(value = "optional sort direction - true ascending, false descending",
+                                                        required = false) @QueryParam("asc") @DefaultValue("true") boolean asc) {
 
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         Variant v = getVariant(headers);
         try {
             String type = getContentType(headers);
-            ProcessInstanceCustomVarsList processVariableSummaryList = runtimeDataServiceBase.queryProcessesByVariables(payload, type, new QueryContext(page * pageSize, pageSize));
+            ProcessInstanceCustomVarsList processVariableSummaryList = runtimeDataServiceBase.queryProcessesByVariables(payload, type, new QueryContext(page * pageSize, pageSize, orderBy, asc));
             logger.debug("Returning result of process instance search: {}", processVariableSummaryList);
 
             return createCorrectVariant(processVariableSummaryList, headers, Response.Status.OK, conversationIdHeader);
@@ -774,15 +781,22 @@ public class RuntimeDataResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
-    public Response queryUserTasksByVariables(@Context HttpHeaders headers, String payload,
-                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+    public Response queryUserTasksByVariables(@Context HttpHeaders headers,
+                                              String payload,
+                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)",
+                                                        required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10",
+                                                        required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+                                              @ApiParam(value = "optional sort column",
+                                                        required = false) @QueryParam("orderBy") String orderBy,
+                                              @ApiParam(value = "optional sort direction - true ascending, false descending",
+                                                        required = false) @QueryParam("asc") @DefaultValue("true") boolean asc) {
 
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         Variant v = getVariant(headers);
         try {
             String type = getContentType(headers);
-            ProcessInstanceUserTaskWithVariablesList taskVariableSummaryList = runtimeDataServiceBase.queryUserTasksByVariables(payload, type, new QueryContext(page * pageSize, pageSize));
+            ProcessInstanceUserTaskWithVariablesList taskVariableSummaryList = runtimeDataServiceBase.queryUserTasksByVariables(payload, type, new QueryContext(page * pageSize, pageSize, orderBy, asc));
             logger.debug("Returning result of process tasks search: {}", taskVariableSummaryList);
 
             return createCorrectVariant(taskVariableSummaryList, headers, Response.Status.OK, conversationIdHeader);

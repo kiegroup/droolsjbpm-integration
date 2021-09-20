@@ -6,8 +6,8 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-parent</artifactId>
-    <version>7.51.0-SNAPSHOT</version>
-    <!-- relativePath causes out-of-date problems on hudson slaves -->
+    <version>7.60.0-SNAPSHOT</version>
+    <!-- relativePath causes out-of-date problems on hudson secondary nodes -->
     <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
   </parent>
 
@@ -52,9 +52,6 @@
     <module>kie-swagger-ui</module>
     <module>kie-maven-plugin</module>
     <module>kie-takari-plugin</module>
-    <!-- The example can not be in the build because of the chicken-egg problem with depending on the plugin,
-         that is about to be build in the same Maven reactor build -->
-    <!--<module>kie-maven-plugin-example</module>-->
     <module>droolsjbpm-integration-examples</module>
     <module>jbpm-simulation</module>
     <module>kie-spring</module>
@@ -70,7 +67,6 @@
     <module>kie-plugins-testing</module>
     <module>kie-spring-boot</module>
     <module>camel-container-tests</module>
-    <module>process-migration-service</module>
     <module>optaplanner-workbench-models</module>
     <module>drools-ha</module>
   </modules>
@@ -120,11 +116,6 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>javax.persistence-api</artifactId>
-        <version>${version.javax.persistence-api}</version>
-      </dependency>
-      <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-karaf-itests-domain-model</artifactId>
         <version>${project.version}</version>
@@ -161,7 +152,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <configuration>
                   <properties>

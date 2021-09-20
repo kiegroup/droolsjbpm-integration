@@ -46,6 +46,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String USER_YODA = "yoda";
     protected static final String USER_JOHN = "john";
     protected static final String USER_ADMINISTRATOR = "administrator";
+    protected static final String USER_SECOND_ADMINISTRATOR = "second-administrator";
     protected static final String USER_MARY = "mary";
 
     protected static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
@@ -61,6 +62,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String CONTAINER_ID_NOTIFICATION = "notification-project";
    
     protected static final String PROCESS_ID_RESTART = "restart-project.simple";
+    protected static final String PROCESS_SYNC_ID = "restart-project.syncProcess";
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
     protected static final String PROCESS_ID_USERTASK2 = "definition-project.usertask2";
     protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
@@ -71,6 +73,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_TIMER = "definition-project.timer-process";
     protected static final String PROCESS_ID_SIGNAL_PROCESS = "definition-project.signalprocess";
     protected static final String PROCESS_ID_SIGNAL_PROCESS_2 = "definition-project.signalprocess2";
+    protected static final String PROCESS_ID_VARIABLES = "variables";
     protected static final String PROCESS_ID_BOUNDARY_SIGNAL_PROCESS = "definition-project.boundarysignalprocess";
     protected static final String PROCESS_ID_BOUNDARY_SIGNAL_EXPRESSION_PROCESS = "definition-project.boundarysignalexpressionprocess";
     protected static final String PROCESS_ID_SIGNAL_START = "signal-start";

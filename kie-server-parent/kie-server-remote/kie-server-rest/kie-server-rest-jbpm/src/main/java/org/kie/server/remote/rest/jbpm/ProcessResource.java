@@ -93,14 +93,17 @@ import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
+import static org.kie.server.api.rest.RestURI.COMPUTE_PROCESS_OUTCOME_POST_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.conflict;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.isCorrelationKeyAlreadyExists;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
@@ -199,6 +202,52 @@ public class ProcessResource  {
         }
     }
 
+
+    @ApiOperation(value="Starts a new synchronous process instance of a specified process.")
+    @ApiResponses(value = { 
+            @ApiResponse(code = 201, response=Map.class, message = "Process instance started", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})),
+            @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+    @POST
+    @Path(COMPUTE_PROCESS_OUTCOME_POST_URI)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response startSynchronousProcess(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
+            @ApiParam(value = "optional map of process variables", required = false, examples=@Example(value= {
+                                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) @DefaultValue("") String payload) {
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        
+        try {
+            String response = processServiceBase.computeProcessOutcome(containerId, processId, payload, type);
+
+            logger.debug("Returning CREATED response with content '{}'", response);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+        } catch (DeploymentNotActiveException e) {
+            return badRequest(
+                    e.getMessage(), v);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(
+                    MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
+        }
+    }
+
     @ApiOperation(value = "Starts a new process instance from the specific nodes")
     @ApiResponses(value = {@ApiResponse(code = 201, response = Long.class, message = "Process instance created",
                                         examples = @Example(value = {@ExampleProperty(mediaType = JSON, value = LONG_RESPONSE_JSON),
@@ -248,7 +297,8 @@ public class ProcessResource  {
                                                                      @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
                            @ApiResponse(code = 500, message = "Unexpected error"),
                            @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
-                           @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+                           @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
+                           @ApiResponse(code = 409, message = "Duplicate correlation key")})
     @POST
     @Path(START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -281,9 +331,12 @@ public class ProcessResource  {
         } catch (SecurityException e) {
             return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
+            if (isCorrelationKeyAlreadyExists(e)) {
+                return conflict(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+            }
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
-                                       MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
+                    MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
         }
     }
 
@@ -293,7 +346,8 @@ public class ProcessResource  {
             @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
             @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
-            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
+            @ApiResponse(code = 409, message = "Duplicate correlation key")})
     @POST
     @Path(START_PROCESS_WITH_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -326,6 +380,9 @@ public class ProcessResource  {
         } catch (SecurityException e) {
             return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
+            if (isCorrelationKeyAlreadyExists(e)) {
+                return conflict(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+            }
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
                     MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);

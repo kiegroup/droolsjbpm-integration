@@ -22,10 +22,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.util.ValidationEventCollector;
 
 import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.runtime.AdvanceSessionTimeCommand;
@@ -100,8 +103,10 @@ import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
+import org.kie.server.api.model.admin.MigrationProcessSpecification;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.MigrationSpecification;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.ProcessNodeList;
@@ -202,6 +207,9 @@ import org.kie.server.api.model.type.JaxbMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static javax.xml.bind.ValidationEvent.ERROR;
+import static javax.xml.bind.ValidationEvent.FATAL_ERROR;
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_STRICT_JAXB_FORMAT;;
 
 public class JaxbMarshaller implements Marshaller {
 
@@ -359,6 +367,8 @@ public class JaxbMarshaller implements Marshaller {
                                                  TaskReassignmentList.class,
                                                  ExecutionErrorInstance.class,
                                                  ExecutionErrorInstanceList.class,
+                                                 MigrationSpecification.class,
+                                                 MigrationProcessSpecification.class,
 
                                                  // case management
                                                  CaseMilestone.class,
@@ -467,7 +477,24 @@ public class JaxbMarshaller implements Marshaller {
     @Override
     public <T> T unmarshall(String input, Class<T> type) {
         try {
-            return (T) unwrap(getUnmarshaller().unmarshal(new StringReader(input)));
+            Unmarshaller unmarshaller = getUnmarshaller();
+            ValidationEventCollector vec = new ValidationEventCollector();
+            boolean strict = Boolean.getBoolean(KIE_SERVER_STRICT_JAXB_FORMAT);
+            unmarshaller.setEventHandler(vec);
+            Object result = unmarshaller.unmarshal(new StringReader(input));
+            if (strict || logger.isWarnEnabled()) {
+                String errorMessage = Arrays.stream(vec.getEvents())
+                        .filter(ve -> ve.getSeverity() == ERROR || ve.getSeverity() == FATAL_ERROR)
+                        .map(ValidationEvent::getMessage)
+                        .collect(Collectors.joining("\n"));
+                if (!errorMessage.isEmpty()) {
+                    logger.warn(errorMessage);
+                    if (strict) {
+                        throw new MarshallingException(errorMessage);
+                    }
+                }
+            }
+            return (T) unwrap(result);
         } catch (JAXBException e) {
             throw new MarshallingException("Can't unmarshall input string: " + input, e);
         }
@@ -477,13 +504,12 @@ public class JaxbMarshaller implements Marshaller {
         if (data instanceof Wrapped) {
             return ((Wrapped) data).unwrap();
         }
-
         return data;
     }
 
     @Override
     public void dispose() {
-
+        //nothing to do 
     }
 
     @Override
@@ -494,7 +520,6 @@ public class JaxbMarshaller implements Marshaller {
     protected javax.xml.bind.Marshaller getMarshaller() throws JAXBException {
         javax.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
         return marshaller;
     }
 

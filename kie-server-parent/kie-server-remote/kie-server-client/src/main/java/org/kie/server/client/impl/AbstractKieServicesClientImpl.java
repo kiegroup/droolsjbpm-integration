@@ -36,6 +36,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
@@ -54,6 +55,7 @@ import org.kie.server.client.jms.ResponseHandler;
 import org.kie.server.common.rest.KieServerHttpRequest;
 import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.common.rest.KieServerHttpResponse;
+import org.kie.server.common.rest.NoEndpointFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -285,12 +287,28 @@ public abstract class AbstractKieServicesClientImpl {
         return makeHttpPostRequestAndCreateServiceResponse( uri, serialize( bodyObject ), resultType, headers );
     }
 
+    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri,
+                                                                                 Object bodyObject,
+                                                                                 Class<T> resultType,
+                                                                                 Map<String, String> headers,
+                                                                                 Status status) {
+        return makeHttpPostRequestAndCreateServiceResponse(uri, serialize(bodyObject), resultType, headers, status);
+    }
+
     protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         return  makeHttpPostRequestAndCreateServiceResponse( uri, body, resultType, new HashMap<String, String>() );
     }
 
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
+        return makeHttpPostRequestAndCreateServiceResponse(uri, body, resultType, headers, Status.OK);
+    }
+
+    protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri,
+                                                                                 String body,
+                                                                                 Class<T> resultType,
+                                                                                 Map<String, String> headers,
+                                                                                 Status status) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
@@ -303,13 +321,14 @@ public abstract class AbstractKieServicesClientImpl {
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
-        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+        if (response.code() == status.getStatusCode()) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             checkResultType( serviceResponse, resultType );
             return serviceResponse;
         } else {
             throw createExceptionForUnexpectedResponseCode( request, response );
         }
+
     }
 
 
@@ -674,13 +693,16 @@ public abstract class AbstractKieServicesClientImpl {
 
         return headers;
     }
+    
+    protected String getUserQueryStr(String userId, char prefix) {
+        if (BYPASS_AUTH_USER && userId != null) {
+            return prefix + "user=" + userId;
+        }
+        return "";
+    }
 
     protected String getUserQueryStr(String userId) {
-        if (BYPASS_AUTH_USER && userId != null) {
-            return "?user=" + userId;
-        }
-
-        return "";
+        return getUserQueryStr(userId, '?');
     }
 
     protected String getUserAndPagingQueryString(String userId, Integer page, Integer pageSize) {
@@ -785,13 +807,21 @@ public abstract class AbstractKieServicesClientImpl {
  * override of the regular method to allow backward compatibility for string based result of ServiceResponse
  */
     protected <T> ServiceResponse<T> makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(String uri, Object body, Class<T> resultType, Map<String, String> headers) {
+        return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(uri, body, resultType, headers, Status.OK);
+    }
+
+    protected <T> ServiceResponse<T> makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(String uri,
+                                                                                                   Object body,
+                                                                                                   Class<T> resultType,
+                                                                                                   Map<String, String> headers,
+                                                                                                   Status expectedStatus) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieServerHttpRequest request = newRequest( uri ).headers(headers).body(serialize( body )).post();
         KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
-        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+        if (response.code() == expectedStatus.getStatusCode()) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             // serialize it back to string to make it backward compatible
             serviceResponse.setResult(serialize(serviceResponse.getResult()));
@@ -800,7 +830,9 @@ public abstract class AbstractKieServicesClientImpl {
         } else {
             throw createExceptionForUnexpectedResponseCode( request, response );
         }
+
     }
+
 
     protected <T> ServiceResponse<T> makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
@@ -833,9 +865,13 @@ public abstract class AbstractKieServicesClientImpl {
                 if (e.getCause() instanceof IOException) {
                     logger.warn("Marking endpoint '{}' as failed due to {}", url, e.getCause().getMessage());
                     String failedBaseUrl = loadBalancer.markAsFailed(url);
-                    nextUrl = loadBalancer.getUrl();
-                    url = url.replace(failedBaseUrl, nextUrl);
-                    logger.debug("Selecting next endpoint from load balancer - '{}'", url);
+                    try {
+                        nextUrl = loadBalancer.getUrl();
+                        url = url.replace(failedBaseUrl, nextUrl);
+                        logger.debug("Selecting next endpoint from load balancer - '{}'", url);
+                    } catch (NoEndpointFoundException noEndpointFoundException) {
+                        logger.warn("Cannot invoke request - '{}'", noEndpointFoundException.getMessage());
+                    }
                 } else {
                     throw e;
                 }

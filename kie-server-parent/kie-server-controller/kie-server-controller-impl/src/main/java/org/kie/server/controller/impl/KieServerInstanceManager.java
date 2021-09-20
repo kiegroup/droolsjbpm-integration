@@ -18,6 +18,7 @@ package org.kie.server.controller.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.function.Consumer;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -154,10 +155,18 @@ public class KieServerInstanceManager {
 
     public synchronized List<Container> startContainer(final ServerTemplate serverTemplate,
                                                        final ContainerSpec containerSpec) {
+        return this.startContainer(serverTemplate, containerSpec, containers -> {} );
+    }
+
+    public synchronized List<Container> startContainer(final ServerTemplate serverTemplate,
+                                                       final ContainerSpec containerSpec,
+                                                       final Consumer<List<Container>> notification) {
 
         final RemoteKieServerOperation<Void> startContainerOperation = makeStartContainerOperation(containerSpec);
 
-        return callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+        List<Container> containers = callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+        notification.accept(containers);
+        return containers;
     }
 
     RemoteKieServerOperation<Void> makeStartContainerOperation(final ContainerSpec containerSpec) {
@@ -266,8 +275,14 @@ public class KieServerInstanceManager {
 
     public synchronized List<Container> stopContainer(ServerTemplate serverTemplate,
                                                       final ContainerSpec containerSpec) {
+        return this.stopContainer(serverTemplate, containerSpec, containers -> {});
+    }
+    
+    public synchronized List<Container> stopContainer(ServerTemplate serverTemplate,
+                                                      final ContainerSpec containerSpec,
+                                                      Consumer<List<Container>> notification) {
 
-        return callRemoteKieServerOperation(serverTemplate,
+        List<Container> containers = callRemoteKieServerOperation(serverTemplate,
                                             containerSpec,
                                             new RemoteKieServerOperation<Void>() {
                                                 @Override
@@ -287,6 +302,8 @@ public class KieServerInstanceManager {
                                                     return null;
                                                 }
                                             });
+        notification.accept(containers);
+        return containers;
     }
 
     public List<Container> upgradeContainer(final ServerTemplate serverTemplate,
@@ -305,17 +322,26 @@ public class KieServerInstanceManager {
 
     public List<Container> upgradeAndStartContainer(final ServerTemplate serverTemplate,
                                                     final ContainerSpec containerSpec) {
-
-        return upgradeAndStartContainer(serverTemplate, containerSpec, false);
+        return this.upgradeAndStartContainer(serverTemplate, containerSpec, container -> {});
     }
 
     public List<Container> upgradeAndStartContainer(final ServerTemplate serverTemplate,
                                                     final ContainerSpec containerSpec,
-                                                    final boolean resetBeforeUpdate) {
+                                                    Consumer<List<Container>> notification) {
 
-        return callRemoteKieServerOperation(serverTemplate,
+        return upgradeAndStartContainer(serverTemplate, containerSpec, false, notification);
+    }
+
+    public List<Container> upgradeAndStartContainer(final ServerTemplate serverTemplate,
+                                                    final ContainerSpec containerSpec,
+                                                    final boolean resetBeforeUpdate,
+                                                    Consumer<List<Container>> notification) {
+
+        List<Container> containers = callRemoteKieServerOperation(serverTemplate,
                                             containerSpec,
                                             makeUpgradeAndStartContainerOperation(containerSpec, resetBeforeUpdate));
+        notification.accept(containers);
+        return containers;
     }
 
     RemoteKieServerOperation<Void> makeUpgradeContainerOperation(final ContainerSpec containerSpec, final boolean resetBeforeUpdate) {
@@ -438,11 +464,13 @@ public class KieServerInstanceManager {
         return containers;
     }
 
-    public synchronized List<Container> activateContainer(final ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public synchronized List<Container> activateContainer(final ServerTemplate serverTemplate, final ContainerSpec containerSpec, Consumer<List<Container>> notification) {
 
         final RemoteKieServerOperation<Void> startContainerOperation = makeActivateContainerOperation(containerSpec);
 
-        return callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+        List<Container> containers =  callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+        notification.accept(containers);
+        return containers;
     }
 
     RemoteKieServerOperation<Void> makeActivateContainerOperation(final ContainerSpec containerSpec) {
@@ -464,11 +492,13 @@ public class KieServerInstanceManager {
         };
     }
     
-    public synchronized List<Container> deactivateContainer(final ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public synchronized List<Container> deactivateContainer(final ServerTemplate serverTemplate, final ContainerSpec containerSpec, Consumer<List<Container>> notification) {
 
         final RemoteKieServerOperation<Void> startContainerOperation = makeDeactivateContainerOperation(containerSpec);
 
-        return callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+        List<Container> containers = callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+        notification.accept(containers);
+        return containers;
     }
 
     RemoteKieServerOperation<Void> makeDeactivateContainerOperation(final ContainerSpec containerSpec) {
@@ -496,7 +526,7 @@ public class KieServerInstanceManager {
 
     protected List<Container> callRemoteKieServerOperation(ServerTemplate serverTemplate,
                                                            ContainerSpec containerSpec,
-                                                           RemoteKieServerOperation operation) {
+                                                           RemoteKieServerOperation<?> operation) {
         List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
 
         if (serverTemplate.getServerInstanceKeys() == null || serverTemplate.getServerInstanceKeys().isEmpty() || containerSpec == null) {
@@ -561,6 +591,7 @@ public class KieServerInstanceManager {
             container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId() : containerResource.getResolvedReleaseId());
             container.setMessages(containerResource.getMessages());
             container.setStatus(containerResource.getStatus());
+            container.setContainerName(containerResource.getContainerAlias());
         }
     }
 

@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-osgi</artifactId>
-    <version>7.51.0-SNAPSHOT</version>
+    <version>7.60.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-karaf-itests</artifactId>
@@ -15,10 +15,10 @@
     <skipTests>true</skipTests>
 
     <java.module.name>org.kie.karaf.itests.main</java.module.name>
-    <version.org.apache.karaf>4.2.3</version.org.apache.karaf>
+    <version.org.apache.karaf>4.3.2</version.org.apache.karaf>
     <!-- use global version property from kie-parent -->
     <!-- <version.org.apache.cxf>3.2.8</version.org.apache.cxf> -->
-    <version.org.apache.camel>2.21.5</version.org.apache.camel>
+    <!-- version.org.apache.camel>2.21.5</version.org.apache.camel -->
     <version.org.ops4j.pax.exam>4.13.4</version.org.ops4j.pax.exam>
     <version.org.apache.servicemix.bundles.javax-inject>1_2</version.org.apache.servicemix.bundles.javax-inject>
 
@@ -30,7 +30,8 @@
     <maven.jdbc.driver.jar/>
     <maven.jdbc.username>sa</maven.jdbc.username>
     <maven.jdbc.password>sa</maven.jdbc.password>
-    <maven.jdbc.url>jdbc:h2:tcp://localhost/${project.basedir}/target/kie-karaf-itests;MVCC=TRUE</maven.jdbc.url>
+    <maven.jdbc.url>jdbc:h2:mem:test_mem;MVCC=TRUE</maven.jdbc.url>
+    <maven.jdbc.tcp.url>jdbc:h2:tcp://localhost/${project.basedir}/target/kie-karaf-itests;MVCC=TRUE</maven.jdbc.tcp.url>
     <maven.jdbc.schema>public</maven.jdbc.schema>
   </properties>
 
@@ -186,12 +187,6 @@
       <artifactId>wiremock</artifactId>
       <classifier>standalone</classifier>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Karaf distribution-->

@@ -28,14 +28,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jboss.logging.Logger;
 import org.kie.server.router.Configuration;
-import org.kie.server.router.KieServerRouter;
-import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 
 public class ConfigFileWatcher implements Runnable {
     
-    private static final Logger log = Logger.getLogger(KieServerRouter.class);
-    
-    private long sleepTime = Long.parseLong(System.getProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "30000"));
+    private static final Logger log = Logger.getLogger(ConfigFileWatcher.class);
 
     private Path toWatch;
     private AtomicBoolean active = new AtomicBoolean(true);
@@ -44,8 +41,11 @@ public class ConfigFileWatcher implements Runnable {
     private Configuration configuration;
     
     private long lastUpdate = -1;
+
+    private KieServerRouterEnvironment env;
     
-    public ConfigFileWatcher(String configFilePath, ConfigurationMarshaller marshaller, Configuration configuration) {
+    public ConfigFileWatcher(KieServerRouterEnvironment env, String configFilePath, ConfigurationMarshaller marshaller, Configuration configuration) {
+        this.env = env;
         this.marshaller = marshaller;
         this.configuration = configuration;
         this.toWatch = Paths.get(configFilePath);
@@ -76,6 +76,10 @@ public class ConfigFileWatcher implements Runnable {
         }
     }
 
+    private KieServerRouterEnvironment environment() {
+        return env;
+    }
+
     public void stop() {
         this.active.set(false);
     }
@@ -87,7 +91,7 @@ public class ConfigFileWatcher implements Runnable {
                 try {
                     if(!toWatch.toFile().exists()) {
                        log.warnv("configuration file does not exist {0} ", this.toWatch);
-                       Thread.sleep(sleepTime);
+                       Thread.sleep(environment().getConfigFileWatcherInterval());
                        continue;
                     }
                     FileTime lastModified = Files.getLastModifiedTime(toWatch);
@@ -106,7 +110,7 @@ public class ConfigFileWatcher implements Runnable {
                 } catch(IOException ioe) {
                     log.warn("Unexpected exception while watching config file, maybe file does not exist? ", ioe);
                 }
-                Thread.sleep(sleepTime);
+                Thread.sleep(environment().getConfigFileWatcherInterval());
             }
         } catch (InterruptedException e) {
             log.debug("Interrupted exception received...");

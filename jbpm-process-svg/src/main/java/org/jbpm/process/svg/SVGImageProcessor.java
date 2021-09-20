@@ -25,6 +25,7 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.jbpm.process.svg.model.Transformation;
 import org.jbpm.process.svg.processor.SVGProcessor;
 import org.jbpm.process.svg.processor.SVGProcessorFactory;
+import org.jbpm.process.svg.processor.StunnerSVGProcessor;
 import org.w3c.dom.Document;
 
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
@@ -38,7 +39,26 @@ public class SVGImageProcessor {
     public SVGImageProcessor(InputStream svg) {
         this(svg, true);
     }
-    
+
+    public SVGImageProcessor(InputStream svg, Map<String, String> subProcessLinks, Map<String, Long> badges) {
+        try {
+            String parser = XMLResourceDescriptor.getXMLParserClassName();
+            SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+            factory.setValidating(false);
+            Document svgDocument = factory.createDocument("http://jbpm.org", svg);
+
+            svgProcessor = new SVGProcessorFactory().create(svgDocument, true);
+            if (svgProcessor instanceof StunnerSVGProcessor) {
+                ((StunnerSVGProcessor) svgProcessor).setSubProcessLinks(subProcessLinks);
+                ((StunnerSVGProcessor) svgProcessor).setNodeBadges(badges);
+            }
+            svgProcessor.processNodes(svgDocument.getChildNodes());
+
+        } catch (IOException e) {
+            throw new RuntimeException("Could not parse svg", e);
+        }
+    }
+
     public SVGImageProcessor(InputStream svg, boolean mapById) {
 
         try {
@@ -62,17 +82,17 @@ public class SVGImageProcessor {
     //Static methods to keep backward compatibility
 
     public static String transform(InputStream svg, List<String> completed, List<String> active) {
-        return transform(svg, completed, active, null, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
+        return transform(svg, completed, active, null, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR, null);
     }
 
-    public static String transform(InputStream svg, List<String> completed, List<String> active, Map<String, String> subProcessLinks){
-        return transform(svg, completed, active, subProcessLinks, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
+    public static String transform(InputStream svg, List<String> completed, List<String> active, Map<String, String> subProcessLinks) {
+        return transform(svg, completed, active, subProcessLinks, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR, null);
     }
 
     public static String transform(InputStream svg, List<String> completed, List<String> active,
                                    Map<String, String> subProcessLinks, String completedNodeColor,
-                                   String completedNodeBorderColor, String activeNodeBorderColor) {
-        SVGProcessor processor = new SVGImageProcessor(svg).getProcessor();
+                                   String completedNodeBorderColor, String activeNodeBorderColor, Map<String, Long> badges) {
+        SVGProcessor processor = new SVGImageProcessor(svg, subProcessLinks, badges).getProcessor();
 
         for (String nodeId : completed) {
             if (!active.contains(nodeId)) {
@@ -89,6 +109,7 @@ public class SVGImageProcessor {
                 processor.defaultSubProcessLinkTransformation(subProcessLink.getKey(), subProcessLink.getValue());
             }
         }
+
         return processor.getSVG();
     }
 

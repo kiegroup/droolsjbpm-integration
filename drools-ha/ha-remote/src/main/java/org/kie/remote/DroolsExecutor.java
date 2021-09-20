@@ -28,7 +28,7 @@ public abstract class DroolsExecutor {
     protected Queue<Serializable> executionResults = new ArrayDeque<>();
 
     public static DroolsExecutor getInstance() {
-        return isLeader ? Leader.INSTANCE : Slave.INSTANCE;
+        return isLeader ? Leader.INSTANCE : Secondary.INSTANCE;
     }
 
     public static void setAsLeader() {
@@ -83,9 +83,9 @@ public abstract class DroolsExecutor {
         }
     }
 
-    public static class Slave extends DroolsExecutor {
+    public static class Secondary extends DroolsExecutor {
 
-        private static final Slave INSTANCE = new Slave();
+        private static final Secondary INSTANCE = new Secondary();
 
         @Override
         public boolean isLeader() {

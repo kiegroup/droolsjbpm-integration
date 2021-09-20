@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.51.0-SNAPSHOT</version>
+    <version>7.60.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-tests</artifactId>
@@ -98,6 +98,7 @@
     <module>kie-server-integ-tests-dmn-pmml</module>
     <module>kie-server-integ-tests-dmn-pmml-trusty</module>
     <module>kie-server-integ-tests-pmml</module>
+    <module>kie-server-integ-tests-pmml-legacy</module>
   </modules>
 
   <dependencyManagement>
@@ -208,10 +209,6 @@
         <version>${version.org.kie}</version>
         <type>war</type>
       </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -219,44 +216,8 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>ban-duplicated-classes</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <banDuplicateClasses>
-                    <dependencies>
-                      <!-- kie-server-router-proxy is an uberjar as it seems to be expected to work like that. -->
-                      <dependency>
-                        <groupId>org.kie.server</groupId>
-                        <artifactId>kie-server-router-proxy</artifactId>
-                        <ignoreClasses>
-                          <ignoreClass>*</ignoreClass>
-                        </ignoreClasses>
-                      </dependency>
-                      <dependency>
-                        <groupId>org.wildfly.security</groupId>
-                        <artifactId>wildfly-elytron</artifactId>
-                        <type>jar</type>
-                        <ignoreClasses>
-                          <ignoreClass>*</ignoreClass>
-                        </ignoreClasses>
-                      </dependency>
-                    </dependencies>
-                  </banDuplicateClasses>
-                </rules>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.codehaus.cargo</groupId>
-          <artifactId>cargo-maven2-plugin</artifactId>
+          <artifactId>cargo-maven3-plugin</artifactId>
           <configuration>
             <container>
               <containerId>${cargo.container.id}</containerId>
@@ -302,6 +263,15 @@
                 </user>
                 <user>
                   <name>administrator</name>
+                  <password>usetheforce123@</password>
+                  <roles>
+                    <role>kie-server</role>
+                    <role>guest</role>
+                    <role>Administrators</role>
+                  </roles>
+                </user>
+                <user>
+                  <name>second-administrator</name>
                   <password>usetheforce123@</password>
                   <roles>
                     <role>kie-server</role>
@@ -458,7 +428,7 @@
       <id>mysql</id>
       <properties>
         <org.kie.server.persistence.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</org.kie.server.persistence.dialect>
-        <org.kie.server.datasource.driver.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</org.kie.server.datasource.driver.class>
+        <org.kie.server.datasource.driver.class>com.mysql.cj.jdbc.MysqlXADataSource</org.kie.server.datasource.driver.class>
         <!-- Connection URL, format example: jdbc:mysql://localhost:3306/mydb -->
         <org.kie.server.datasource.connection.url>specify-mysql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
         <springboot.jdbc.driver.jar>${mysql:mysql-connector-java:jar}</springboot.jdbc.driver.jar>
@@ -468,7 +438,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
                   <dependencies combine.children="append">
@@ -504,7 +474,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
                   <dependencies combine.children="append">
@@ -540,7 +510,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
                   <dependencies combine.children="append">
@@ -572,7 +542,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <configuration>
                   <properties>
@@ -612,7 +582,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
                   <type>installed</type>
@@ -642,16 +612,16 @@
                       <artifactId>slf4j-api</artifactId>
                     </dependency>
                     <dependency>
-                      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-                      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+                      <groupId>jakarta.security.jacc</groupId>
+                      <artifactId>jakarta.security.jacc-api</artifactId>
                     </dependency>
                     <dependency>
                       <groupId>org.kie</groupId>
                       <artifactId>kie-tomcat-integration</artifactId>
                     </dependency>
                     <dependency>
-                      <groupId>org.jboss.spec.javax.transaction</groupId>
-                      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+                      <groupId>jakarta.transaction</groupId>
+                      <artifactId>jakarta.transaction-api</artifactId>
                     </dependency>
                     <dependency>
                       <groupId>org.jboss.integration</groupId>
@@ -663,7 +633,7 @@
                     </dependency>
                     <dependency>
                       <groupId>org.jboss</groupId>
-                      <artifactId>jboss-transaction-spi</artifactId>
+                      <artifactId>jboss-transaction-spi-jakarta</artifactId>
                     </dependency>
                     <dependency>
                       <groupId>org.jboss.logging</groupId>
@@ -730,13 +700,13 @@
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.jboss.spec.javax.security.jacc</groupId>
-          <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+          <groupId>jakarta.security.jacc</groupId>
+          <artifactId>jakarta.security.jacc-api</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -756,7 +726,7 @@
         </dependency>
         <dependency>
           <groupId>org.jboss</groupId>
-          <artifactId>jboss-transaction-spi</artifactId>
+          <artifactId>jboss-transaction-spi-jakarta</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -778,7 +748,7 @@
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <kie.server.context.factory>org.wildfly.naming.client.WildFlyInitialContextFactory</kie.server.context.factory>
         <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
-        <cargo.container.id>wildfly19x</cargo.container.id>
+        <cargo.container.id>wildfly23x</cargo.container.id>
         <!-- Enable integration tests and Cargo when running with application server. -->
         <skipITs>false</skipITs>
         <cargo.maven.skip>false</cargo.maven.skip>
@@ -788,7 +758,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
                   <type>installed</type>
@@ -885,10 +855,19 @@
             <artifactId>netty-transport-native-epoll</artifactId>
             <version>${version.io.netty}</version>
           </dependency>
-          <!-- Redeclare jboss-connector-api_1.7_spec dependency here to use version from Kie BOM, otherwise it will bring duplicated dependencies -->
           <dependency>
-            <groupId>org.jboss.spec.javax.resource</groupId>
-            <artifactId>jboss-connector-api_1.7_spec</artifactId>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-socks</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler-proxy</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
+          <dependency>
+            <groupId>jakarta.resource</groupId>
+            <artifactId>jakarta.resource-api</artifactId>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -904,10 +883,6 @@
           <type>pom</type>
           <scope>test</scope>
           <exclusions>
-            <exclusion>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-            </exclusion>
             <exclusion>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_2.0_spec</artifactId>
@@ -938,6 +913,14 @@
           <groupId>io.netty</groupId>
           <artifactId>netty-transport-native-epoll</artifactId>
         </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-codec-socks</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-handler-proxy</artifactId>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -951,8 +934,8 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-        <!-- eap7.3 is basically wildfly19; until there is a EAP 7 specific containerId, 'wildfly19x' should work just fine -->
-        <cargo.container.id>wildfly19x</cargo.container.id>
+        <!-- eap7.4 is basically wildfly23; until there is a EAP 7 specific containerId, 'wildfly23x' should work just fine -->
+        <cargo.container.id>wildfly23x</cargo.container.id>
         <!-- Enable integration tests and Cargo when running with application server. -->
         <skipITs>false</skipITs>
         <cargo.maven.skip>false</cargo.maven.skip>
@@ -962,10 +945,10 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
-                  <type>installed</type>
+		  <type>installed</type>
                   <zipUrlInstaller>
                     <url>${eap7.download.url}</url>
                   </zipUrlInstaller>
@@ -1036,15 +1019,24 @@
            <artifactId>netty-codec-http</artifactId>
            <version>${version.io.netty}</version>
          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-socks</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler-proxy</artifactId>
+            <version>${version.io.netty}</version>
+          </dependency>
          <dependency>
            <groupId>io.netty</groupId>
            <artifactId>netty-transport-native-epoll</artifactId>
            <version>${version.io.netty}</version>
          </dependency>
-          <!-- Redeclare jboss-connector-api_1.7_spec dependency here to use version from Kie BOM, otherwise it will bring duplicated dependencies -->
           <dependency>
-            <groupId>org.jboss.spec.javax.resource</groupId>
-            <artifactId>jboss-connector-api_1.7_spec</artifactId>
+            <groupId>jakarta.resource</groupId>
+            <artifactId>jakarta.resource-api</artifactId>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -1055,10 +1047,6 @@
           <type>pom</type>
           <scope>test</scope>
           <exclusions>
-            <exclusion>
-              <groupId>jakarta.json</groupId>
-              <artifactId>jakarta.json-api</artifactId>
-            </exclusion>
             <exclusion>
               <groupId>org.apache.geronimo.specs</groupId>
               <artifactId>geronimo-jms_2.0_spec</artifactId>
@@ -1088,6 +1076,14 @@
         <dependency>
           <groupId>io.netty</groupId>
           <artifactId>netty-transport-native-epoll</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-codec-socks</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-handler-proxy</artifactId>
         </dependency>
       </dependencies>
     </profile>
@@ -1119,7 +1115,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
                   <type>installed</type>
@@ -1248,7 +1244,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <container>
                   <type>installed</type>
@@ -1577,6 +1573,26 @@
      </mirror>
    </mirrors>]]></maven.settings.mirror>
       </properties>
+    </profile>
+
+    <profile>
+      <id>fuse-on-springboot</id>
+      <activation>
+        <property>
+          <name>fuse.springboot.version</name>
+        </property>
+      </activation>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.redhat-fuse</groupId>
+            <artifactId>fuse-springboot-bom</artifactId>
+            <version>${fuse.springboot.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
     </profile>
   </profiles>
 </project>

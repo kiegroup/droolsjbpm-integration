@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jbpm.process.svg.SVGImageProcessor;
 import org.jbpm.process.svg.processor.SVGProcessor;
@@ -37,6 +38,7 @@ import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.jbpm.ui.img.ImageReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import  org.jbpm.services.api.RuntimeDataService.EntryType;
 
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
@@ -114,11 +116,11 @@ public class ImageServiceBase {
     }
 
     public String getActiveProcessImage(String containerId, long procInstId) {
-        return getActiveProcessImage(containerId, procInstId, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR);
+        return getActiveProcessImage(containerId, procInstId, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR, false);
     }
 
     public String getActiveProcessImage(String containerId, long procInstId, String completedNodeColor,
-                                        String completedNodeBorderColor, String activeNodeBorderColor) {
+                                        String completedNodeBorderColor, String activeNodeBorderColor, Boolean showBadges) {
         ProcessInstanceDesc instance = dataService.getProcessInstanceById(procInstId);
         if (instance == null) {
             throw new ProcessInstanceNotFoundException("No instance found for process instance id " + procInstId);
@@ -132,28 +134,41 @@ public class ImageServiceBase {
             QueryContext qc = MAX_NODES > 0 ? new QueryContext(0, MAX_NODES) : null;
             Collection<NodeInstanceDesc> activeLogs = dataService.getProcessInstanceHistoryActive(procInstId, qc);
             Collection<NodeInstanceDesc> completedLogs = dataService.getProcessInstanceHistoryCompleted(procInstId, qc);
+            Collection<NodeInstanceDesc> fullLogs = dataService.getProcessInstanceFullHistory(procInstId, qc);
             Map<Long, String> active = new HashMap<Long, String>();
             List<String> completed = new ArrayList<String>();
 
             for (NodeInstanceDesc activeNode : activeLogs) {
                 active.put(activeNode.getId(), activeNode.getNodeId());
-
-                populateSubProcessLink(containerId, activeNode, subProcessLinks);
             }
 
             for (NodeInstanceDesc completeNode : completedLogs) {
                 completed.add(completeNode.getNodeId());
 
                 active.remove(completeNode.getId());
-
                 populateSubProcessLink(containerId, completeNode, subProcessLinks);
+            }
+            // The code related to JBPM-9740 and JBPM-9821 and JBPM-5304
+            activeLogs.forEach(activeNode -> {
+                populateSubProcessLink(containerId, activeNode, subProcessLinks);
+            });
+
+            fullLogs.stream().filter(node -> ((org.jbpm.kie.services.impl.model.NodeInstanceDesc) node).getType() != EntryType.START.getValue() && ((org.jbpm.kie.services.impl.model.NodeInstanceDesc) node).getType() != EntryType.END.getValue())
+                    .forEach(node -> populateSubProcessLink(containerId, node, subProcessLinks));
+            Map<String, Long> badges = null;
+            if (showBadges) {
+                Collection<NodeInstanceDesc> allNodes = new ArrayList<>();
+                allNodes.addAll(completedLogs);
+                allNodes.addAll(activeLogs);
+
+                badges = allNodes.stream().collect(Collectors.groupingBy(NodeInstanceDesc::getNodeId, Collectors.counting()));
             }
 
             ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
 
             imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()),
                                                          subProcessLinks, completedNodeColor, completedNodeBorderColor,
-                                                         activeNodeBorderColor);
+                                                         activeNodeBorderColor, badges);
 
             return imageSVGString;
         }

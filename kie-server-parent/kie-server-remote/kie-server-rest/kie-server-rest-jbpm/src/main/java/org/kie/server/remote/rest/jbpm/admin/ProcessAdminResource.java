@@ -69,6 +69,7 @@ import static org.kie.server.api.rest.RestURI.ERRORS_GET_URI;
 import static org.kie.server.api.rest.RestURI.ERROR_GET_URI;
 import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_INSTANCES_PUT_URI;
 import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_INST_PUT_URI;
+import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI;
 import static org.kie.server.api.rest.RestURI.NODES_PROCESS_INST_GET_URI;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_PROCESS_INST_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
@@ -93,6 +94,8 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_NODES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TIMERS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.MIGRATION_VAR_MAP_JSON;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.MIGRATION_VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.SIMPLE_VAR_MAP_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.SIMPLE_VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.TIMER_VAR_MAP_JSON;
@@ -161,6 +164,43 @@ public class ProcessAdminResource {
         }
     }
 
+    @ApiOperation(value="Migrates a specified process instance with all subprocesses to process definition in another KIE container.")
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process instance or Container Id not found"),
+            @ApiResponse(code = 404, message = "Container Id not found"), 
+            @ApiResponse(code = 201, response = MigrationReportInstanceList.class, message = "Successful response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORTS_RESPONSE_JSON)})) })
+    @PUT
+    @Path(MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response migrateProcessInstanceWithSubprocess(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that process instances belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "list of identifiers of process instance to be migrated", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
+            @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
+            @ApiParam(value = "process definition that process instances should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
+            @ApiParam(value = "migration specifcation. It contains process mapping and node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=MIGRATION_VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=MIGRATION_VAR_MAP_XML)})) String payload) {
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            MigrationReportInstanceList reportInstances = processAdminServiceBase.migrateProcessInstanceWithAllSubprocess(containerId, processInstanceId, targetContainerId, payload, type);
+
+            return createCorrectVariant(reportInstances, headers, Response.Status.CREATED, conversationIdHeader);
+        } catch (ProcessInstanceNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
+        }
+    }
+
 
     @ApiOperation(value="Migrates multiple process instances to process definition in another KIE container.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
@@ -198,6 +238,7 @@ public class ProcessAdminResource {
             return internalServerError(errorMessage(e), v, conversationIdHeader);
         }
     }
+
 
 
     @ApiOperation(value="Aborts a specified node instance within a specified process instance.",

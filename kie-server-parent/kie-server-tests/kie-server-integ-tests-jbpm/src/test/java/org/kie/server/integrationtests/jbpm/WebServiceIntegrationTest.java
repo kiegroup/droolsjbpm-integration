@@ -21,34 +21,16 @@ import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.api.KieServices;
-import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.integrationtests.category.JEEOnly;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 @Category({JEEOnly.class})
-public class WebServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
+public class WebServiceIntegrationTest extends WebServiceBase {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "webservice-project", "1.0.0.Final");
-    protected static final String WS_CONTAINER_ID = "webservice-project";
     protected static final String PROCESS_ID_WS = "org.specialtripsagency.specialtripsagencyprocess";
-
-    @BeforeClass
-    public static void buildAndDeployArtifacts() {
-
-        KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/webservice-project");
-
-        kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
-
-        createContainer(WS_CONTAINER_ID, releaseId);
-    }
-
 
     @Test
     public void testCallWebServiceFromProcess() {
@@ -61,5 +43,4 @@ public class WebServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertThat(pi.getState()).isEqualTo(STATE_COMPLETED);
 
     }
-
 }

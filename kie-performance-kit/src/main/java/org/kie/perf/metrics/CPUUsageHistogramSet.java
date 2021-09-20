@@ -1,8 +1,7 @@
 package org.kie.perf.metrics;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.reflect.Method;
+import com.sun.management.OperatingSystemMXBean;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -19,22 +18,15 @@ public class CPUUsageHistogramSet implements MetricSet {
     private Class<?> scenario;
     private Histogram cpuUsageHistogram = new Histogram(new UniformReservoir());
     private OperatingSystemMXBean operatingSystemMXBean;
-    private Method getProcessCpuLoad;
     private Timer timer = new Timer();
 
     private static CPUUsageHistogramSet instance = null;
 
     private CPUUsageHistogramSet(Class<?> scenario) {
         this.scenario = scenario;
-
-        operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-        try {
-            getProcessCpuLoad = operatingSystemMXBean.getClass().getMethod("getProcessCpuLoad");
-            getProcessCpuLoad.setAccessible(true);
-        } catch (Exception e) {
-
+        operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         }
-    }
+
 
     public static CPUUsageHistogramSet getInstance(Class<?> scenario) {
         if (instance == null) {
@@ -46,8 +38,8 @@ public class CPUUsageHistogramSet implements MetricSet {
     private void update() {
         Double value = null;
         try {
-            if (getProcessCpuLoad != null && operatingSystemMXBean != null) {
-                value = (Double) getProcessCpuLoad.invoke(operatingSystemMXBean);
+            if (operatingSystemMXBean != null) {
+                value = operatingSystemMXBean.getProcessCpuLoad();
                 value *= 100;
             }
         } catch (Exception e) {
@@ -76,7 +68,7 @@ public class CPUUsageHistogramSet implements MetricSet {
     public Map<String, Metric> getMetrics() {
         final Map<String, Metric> metrics = new HashMap<String, Metric>();
 
-        if (getProcessCpuLoad != null && operatingSystemMXBean != null) {
+        if (operatingSystemMXBean != null) {
             metrics.put(MetricRegistry.name(scenario, "cpu.usage"), cpuUsageHistogram);
         }
 

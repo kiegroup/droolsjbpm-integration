@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services</artifactId>
-    <version>7.51.0-SNAPSHOT</version>
+    <version>7.60.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-openshift</artifactId>
@@ -16,6 +16,8 @@
 
   <properties>
     <java.module.name>org.kie.server.services.openshift</java.module.name>
+    <!-- Server mock version 4.7.2 doesn't handle label selectors properly, need to use older version. -->
+    <version.kubernetes-client.server-mock>4.6.0</version.kubernetes-client.server-mock>
   </properties>
 
   <dependencyManagement>
@@ -39,6 +41,10 @@
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -52,6 +58,16 @@
         <version>${version.kubernetes-client}</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-server-mock</artifactId>
+        <version>${version.kubernetes-client.server-mock}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>openshift-server-mock</artifactId>
+        <version>${version.kubernetes-client.server-mock}</version>
+      </dependency>
       <!-- Added back excluded dependency from parent pom due to required 
         by test run -->
       <dependency>
@@ -96,12 +112,6 @@
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-model</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.fabric8</groupId>
@@ -127,6 +137,12 @@
       <artifactId>openshift-server-mock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <scope>test</scope>
+    </dependency>
+
 
     <dependency>
       <groupId>org.yaml</groupId>

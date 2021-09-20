@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.51.0-SNAPSHOT</version>
+    <version>7.60.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -20,11 +20,13 @@
     <!-- The OSGi modules depend on both non-osgi and osgi jars (with different GAs. It seems there is no easy way
          to fix this. -->
     <enforcer.failOnDuplicatedClasses>false</enforcer.failOnDuplicatedClasses>
+    <enforcer.failOnBannedDependencies>false</enforcer.failOnBannedDependencies>
   </properties>
 
   <modules>
     <module>kie-karaf-itests-domain-model</module>
     <module>kie-osgi-integration</module>
+    <module>kie-osgi-servlet3-compatibility</module>
     <module>kie-karaf-features</module>
     <module>kie-karaf-itests</module>
   </modules>

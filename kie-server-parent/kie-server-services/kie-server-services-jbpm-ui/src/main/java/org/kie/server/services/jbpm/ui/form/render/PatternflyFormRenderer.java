@@ -34,7 +34,7 @@ public class PatternflyFormRenderer extends AbstractFormRenderer {
     }
     
     protected void loadTemplates() {
-        loadTemplate(MASTER_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/patternfly/master-template.html"));
+        loadTemplate(MAIN_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/patternfly/master-template.html"));
         loadTemplate(PROCESS_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/patternfly/process-layout-template.html"));
         loadTemplate(TASK_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/patternfly/task-layout-template.html"));
         loadTemplate(FORM_GROUP_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/patternfly/input-form-group-template.html"));

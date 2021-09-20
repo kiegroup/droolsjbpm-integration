@@ -19,8 +19,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.core.Application;
+
 import org.drools.compiler.kie.builder.impl.KieServicesImpl;
-import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
+import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
+import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.kie.api.KieServices;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
@@ -32,9 +35,11 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 
+import static io.undertow.Undertow.builder;
+
 public class KieServerExecutor {
 
-    protected TJWSEmbeddedJaxrsServer server;
+    protected UndertowJaxrsServer server;
 
     // Need to hold kie server instance because we need to manually handle startup/shutdown behavior defined in
     // context listener org.kie.server.services.Bootstrap. Embedded server doesn't support ServletContextListeners.
@@ -65,11 +70,8 @@ public class KieServerExecutor {
         registerKieServerId();
         setKieServerProperties(syncWithController);
         
-
-        server = new TJWSEmbeddedJaxrsServer();
-        server.setPort(kieServerAllocatedPort);
-        server.start();
-
+        server = new UndertowJaxrsServer();
+        server.start(builder().addHttpListener(kieServerAllocatedPort, "localhost"));
         addServerSingletonResources();
     }
 
@@ -105,16 +107,19 @@ public class KieServerExecutor {
     private void addServerSingletonResources() {
         kieServer = new KieServerImpl();
         kieServer.init();
-        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl(kieServer));
+
+        ResteasyDeployment deployment = new ResteasyDeployment();
+        deployment.setApplication(new Application());
+
+        deployment.getResources().add(new KieServerRestImpl(kieServer));
 
         List<KieServerExtension> extensions = kieServer.getServerExtensions();
 
         for (KieServerExtension extension : extensions) {
             List<Object> components = extension.getAppComponents(SupportedTransports.REST);
-            for (Object component : components) {
-                server.getDeployment().getRegistry().addSingletonResource(component);
-            }
+            deployment.getResources().addAll(components);
         }
+        server.deploy(deployment);
     }
 
     public void stopKieServer() {

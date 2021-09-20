@@ -18,11 +18,10 @@ package org.kie.server.router.repository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.kie.server.router.Configuration;
-import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 import org.kie.server.router.spi.ConfigRepository;
 
 public class FileRepository implements ConfigRepository {
@@ -33,14 +32,15 @@ public class FileRepository implements ConfigRepository {
     private Configuration configuration;
     
     private ConfigFileWatcher watcher;
-    private boolean configWatcherEnabled = Boolean.parseBoolean(System.getProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "false"));
-    
-    public FileRepository() {
-        this(new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, ".")));
+    private KieServerRouterEnvironment env;
+
+    public FileRepository(KieServerRouterEnvironment env) {
+        this.repositoryDir = new File(env.getRepositoryDir());
+        this.env = env;
     }
-    
-    public FileRepository(File repositoryDir) {
-        this.repositoryDir = repositoryDir;   
+
+    private KieServerRouterEnvironment environment() {
+        return env;
     }
 
     @Override
@@ -76,8 +76,8 @@ public class FileRepository implements ConfigRepository {
             }
         }
         // setup config file watcher to be updated when changes are discovered
-        if (configWatcherEnabled ) {
-            this.watcher = new ConfigFileWatcher(serverStateFile.getParentFile().getAbsolutePath(), marshaller, configuration);
+        if (environment().isConfigFileWatcherEnabled() ) {
+            this.watcher = new ConfigFileWatcher(environment(), serverStateFile.getParentFile().getAbsolutePath(), marshaller, configuration);
             Thread watcherThread = new Thread(watcher, "Kie Router Config Watch Thread");
             watcherThread.start();
         }

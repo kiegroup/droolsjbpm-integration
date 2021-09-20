@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.server.router.KieServerRouter;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -58,7 +59,7 @@ public class KieServerRouterAuthNoIdPTest {
 
     @Test
     public void testValidAuthMgmtKieServerRouter() throws Exception {
-        router = new KieServerRouter(true, "fake");
+        router = new KieServerRouter(new KieServerRouterEnvironment());
         
         Throwable thrown = catchThrowable(() -> {
             router.start("localhost", 1234);

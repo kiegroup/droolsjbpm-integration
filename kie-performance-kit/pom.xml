@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.51.0-SNAPSHOT</version>
+    <version>7.60.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -14,7 +14,7 @@
 
   <properties>
     <java.module.name>org.kie.performance.kit</java.module.name>
-    <metrics.version>3.1.0</metrics.version>
+    <metrics.version>4.1.18</metrics.version>
     <perfrepo.version>1.7</perfrepo.version>
   </properties>
 
@@ -39,6 +39,12 @@
         <groupId>org.perfrepo</groupId>
         <artifactId>perfrepo-model</artifactId>
         <version>${perfrepo.version}</version>
+        <exclusions>
+        <exclusion>
+          <groupId>org.hibernate.javax.persistence</groupId>
+          <artifactId>hibernate-jpa-2.1-api</artifactId>
+        </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -51,6 +57,10 @@
     <dependency>
       <groupId>io.dropwizard.metrics</groupId>
       <artifactId>metrics-jvm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.perfrepo</groupId>

@@ -60,6 +60,8 @@ public class KieServerConstants {
     public static final String KIE_SERVER_MODE = "org.kie.server.mode";
     public static final String KIE_SERVER_INCLUDE_STACKTRACE = "org.kie.server.stacktrace.included";
     public static final String KIE_SERVER_STRICT_ID_FORMAT = "org.kie.server.strict.id.format";
+    public static final String KIE_SERVER_STRICT_JAVABEANS_SERIALIZERS = "org.kie.server.strict.javaBeans.serializers";
+    public static final String KIE_SERVER_STRICT_JAXB_FORMAT = "org.kie.server.strict.jaxb.format";
     public static final String KIE_SERVER_IMAGESERVICE_MAX_NODES = "org.kie.server.service.image.max_nodes";
     public static final String KIE_SERVER_REST_MODE_READONLY = "org.kie.server.rest.mode.readonly";
     public static final String KIE_SERVER_NOTIFY_UPDATES_TO_CONTROLLERS = "org.kie.server.update.notifications.rest.enabled";
@@ -111,6 +113,8 @@ public class KieServerConstants {
     public static final String CFG_KIE_MVN_SETTINGS = "kie.maven.settings.custom";
 
     public static final String CFG_SYNC_DEPLOYMENT = "org.kie.server.sync.deploy";
+
+    public static final String CFG_SB_CXF_PATH = "org.kie.server.sb.cfg.cxf.path";
 
     public static final String KIE_SERVER_PARAM_MODULE_METADATA = "KieModuleMetaData";
     public static final String KIE_SERVER_PARAM_MESSAGES = "ContainerMessages";

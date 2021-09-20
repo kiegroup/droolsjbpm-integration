@@ -15,25 +15,32 @@
  */
 package org.kie.server.integrationtests.shared;
 
-import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
+import javax.ws.rs.core.Application;
+
+import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
+import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
 import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
-import org.kie.server.integrationtests.config.TestConfig;
+
+import static io.undertow.Undertow.builder;
+import static java.util.Arrays.asList;
+import static org.kie.server.integrationtests.config.TestConfig.getControllerAllocatedPort;
 
 public class KieControllerExecutor {
 
-    protected TJWSEmbeddedJaxrsServer controller;
+    protected UndertowJaxrsServer controller;
 
     public void startKieController() {
         if (controller != null) {
             throw new RuntimeException("Kie execution controller is already created!");
         }
 
-        controller = new TJWSEmbeddedJaxrsServer();
-        controller.setPort(TestConfig.getControllerAllocatedPort());
-        controller.start();
-        controller.getDeployment().getRegistry().addSingletonResource(new StandaloneKieServerControllerImpl());
-        controller.getDeployment().getRegistry().addSingletonResource(new StandaloneSpecManagementServiceImpl());
+        controller = new UndertowJaxrsServer();
+        controller.start(builder().addHttpListener(getControllerAllocatedPort(), "localhost"));
+        ResteasyDeployment deployment = new ResteasyDeployment();
+        deployment.setApplication(new Application());
+        deployment.setResources(asList(new StandaloneSpecManagementServiceImpl(), new StandaloneKieServerControllerImpl()));
+        controller.deploy(deployment);
     }
 
     public void stopKieController() {

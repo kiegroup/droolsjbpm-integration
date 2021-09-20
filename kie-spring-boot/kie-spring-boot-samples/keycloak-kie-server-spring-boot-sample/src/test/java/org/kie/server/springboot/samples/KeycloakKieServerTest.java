@@ -104,11 +104,12 @@ public class KeycloakKieServerTest {
     private KModuleDeploymentUnit unit;
     private KieServicesClient kieServicesClient;
     
-    private static KeycloakContainer keycloak = new KeycloakContainer();
+    private static KeycloakContainer keycloak;
     
     @BeforeClass
     public static void startTestContainers() {
         assumeTrue(isDockerAvailable());
+        keycloak = new KeycloakContainer();
         keycloak.start();
         KeycloakFixture.setup(keycloak.getAuthServerUrl());
     }
@@ -120,7 +121,8 @@ public class KeycloakKieServerTest {
 
     @AfterClass
     public static void generalCleanup() {
-        keycloak.stop();
+        if (keycloak!=null)
+            keycloak.stop();
         System.clearProperty(KieServerConstants.KIE_SERVER_MODE);
     }
 

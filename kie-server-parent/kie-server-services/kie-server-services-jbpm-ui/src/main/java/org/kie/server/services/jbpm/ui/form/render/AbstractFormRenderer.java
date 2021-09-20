@@ -29,10 +29,11 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     
     private static final Logger logger = LoggerFactory.getLogger(AbstractFormRenderer.class);
     
-    public static final String MASTER_LAYOUT_TEMPLATE = "master";
+    public static final String MAIN_LAYOUT_TEMPLATE = "main";
     public static final String HEADER_LAYOUT_TEMPLATE = "header";
     public static final String FORM_GROUP_LAYOUT_TEMPLATE = "form-group";
     public static final String CASE_LAYOUT_TEMPLATE = "case-layout";
@@ -95,7 +96,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("ListBox", "select");
         this.inputTypes.put("RadioGroup", "radio");
         this.inputTypes.put("Document", "file");
-        this.inputTypes.put("DatePicker", "date");
+        this.inputTypes.put("DatePicker", "Date");
         this.inputTypes.put("Slider", "slider");
         this.inputTypes.put("DocumentCollection", "documentCollection");
         this.inputTypes.put("MultipleSelector", "multipleSelector");
@@ -119,7 +120,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     }
     
     public String renderCase(String containerId, CaseDefinition caseDefinition, FormInstance form) {
-        List<String> scriptDataList = new ArrayList<>();        
+        List<String> scriptDataList = new ArrayList<>();
         
         
         StringBuilder jsonTemplate = new StringBuilder();
@@ -178,7 +179,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);        
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -229,7 +230,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);        
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -282,7 +283,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -449,9 +450,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                     item.setValue((value != null) ? value.toString() : "");
                                     break;
                             }
-
-                            item.setReadOnly(field.isReadOnly());
-                            item.setRequired(field.isRequired());
+                            Set<String> tags = field.getTags();
+                            if (tags != null) {
+                                item.setRequired(tags.contains("required"));
+                                item.setReadOnly(tags.contains("readonly"));
+                            } else {
+                                item.setRequired(field.isRequired());
+                                item.setReadOnly(field.isReadOnly());
+                            }
 
                             // generate column content                    
                             Map<String, Object> parameters = new HashMap<>();
@@ -679,7 +685,11 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             return "Boolean(";
         } else if (type.contains("Date")) {
             return "Object(";
-        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("multipleSelector") || type.contains("multipleInput")) {
+        } else if (type.contains("file")
+                || type.contains("Document")
+                || type.contains("documentCollection")
+                || type.contains("multipleSelector")
+                || type.contains("multipleInput")) {
             return "Object(";
         } else if (type.contains("slider")) {
             return " { \"java.lang.Double\" : Number(";

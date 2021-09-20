@@ -56,6 +56,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -94,13 +95,20 @@ public class JSONMarshaller implements Marshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(MarshallerFactory.class);
 
-    private static final boolean STRICT_ID_FORMAT = Boolean.parseBoolean(
-            KieServerConstants.KIE_SERVER_STRICT_ID_FORMAT);
+    private static final boolean STRICT_ID_FORMAT = Boolean.getBoolean(KieServerConstants.KIE_SERVER_STRICT_ID_FORMAT);
+    private final boolean STRICT_JAVABEANS_SERIALIZERS = Boolean.getBoolean(KieServerConstants.KIE_SERVER_STRICT_JAVABEANS_SERIALIZERS);
+
     private static final String FIELDS = "fields";
     private static final String NOT_NULL = "not_null";
 
     private boolean formatDate;
     private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+
+
+    private boolean useStrictJavaBeans;
+    private boolean fallbackClassLoaderEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.fallbackClassLoader.enabled", "false"));
+
+    private boolean findDeserializerFirst = Boolean.parseBoolean(System.getProperty("org.kie.server.json.findDeserializerFirst.enabled", "true"));
 
     public static class JSONContext {
 
@@ -176,20 +184,25 @@ public class JSONMarshaller implements Marshaller {
     }
 
     public JSONMarshaller(boolean formatDate) {
-        this(null, null, formatDate);
+        this(null, null, formatDate, false);
     }
 
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
-        this(classes, classLoader, Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date",
-                "false")));
+        this(classes, classLoader, Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false")), false);
     }
 
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader, boolean formatDate) {
+        this(classes, classLoader, formatDate, false);
+    }
+
+    public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader, boolean formatDate, boolean useStrictJavaBeans) {
         this.formatDate = formatDate;
         this.classLoader = classLoader;
+        this.useStrictJavaBeans = useStrictJavaBeans | STRICT_JAVABEANS_SERIALIZERS;
         buildMarshaller(classes, classLoader);
         configureMarshaller(classes, classLoader);
         this.notNullObjectMapper = objectMapper.copy().setSerializationInclusion(Include.NON_NULL);
+
     }
 
     protected void buildMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
@@ -224,7 +237,11 @@ public class JSONMarshaller implements Marshaller {
                 .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
 
+        objectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, this.useStrictJavaBeans);
+        deserializeObjectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, this.useStrictJavaBeans);
+
         // setup custom serialization mapper with jaxb adapters
+        customSerializationMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, this.useStrictJavaBeans);
         customSerializationMapper.setConfig(customSerializationMapper.getDeserializationConfig().with(introspectorPair));
         customSerializationMapper.setConfig(customSerializationMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
 
@@ -246,6 +263,7 @@ public class JSONMarshaller implements Marshaller {
             customObjectMapper.setDefaultTyping(typer);
 
             customObjectMapper.setConfig(customObjectMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
+            customObjectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, this.useStrictJavaBeans);
 
             SimpleModule mod = new SimpleModule("custom-object-mapper", Version.unknownVersion());
             CustomObjectSerializer customObjectSerializer = new CustomObjectSerializer(customObjectMapper);
@@ -291,8 +309,11 @@ public class JSONMarshaller implements Marshaller {
 
             deserializeObjectMapper.registerModule(modDeser);
             deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(introspectorPair));
-            // Don't use withClassLoader() because we rely on thread context classloader. We use classLoader only for fallback
-            deserializeObjectMapper.setTypeFactory(FallbackableTypeFactory.defaultInstance().withFallbackClassLoader(classLoader));
+
+            if (fallbackClassLoaderEnabled) {
+                // Don't use withClassLoader() because we rely on thread context classloader. We use classLoader only for fallback
+                deserializeObjectMapper.setTypeFactory(FallbackableTypeFactory.defaultInstance().withFallbackClassLoader(classLoader));
+            }
         }
 
         if (formatDate) {
@@ -928,13 +949,10 @@ public class JSONMarshaller implements Marshaller {
             try {
                 Thread.currentThread().setContextClassLoader(_baseType.getRawClass().getClassLoader());
                 if (classesSet.contains(_baseType.getRawClass()) && !jsonContext.get().isStripped()) {
-
-                    try {
-                        return super.deserializeTypedFromObject(jp, ctxt);
-                    } catch (Exception e) {
-                        JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
-                        Object value = deser.deserialize(jp, ctxt);
-                        return value;
+                    if (findDeserializerFirst) {
+                        return deserializerFirstLookup(jp, ctxt);
+                    } else {
+                        return classLoadingFirstLookup(jp, ctxt);
                     }
                 }
                 jsonContext.get().reset();
@@ -943,6 +961,27 @@ public class JSONMarshaller implements Marshaller {
                 return value;
             } finally {
                 Thread.currentThread().setContextClassLoader(current);
+            }
+        }
+
+        private Object deserializerFirstLookup(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            String nextFieldName = jp.nextFieldName();
+            if (!baseTypeName().equals(nextFieldName)) {
+                JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                Object value = deser.deserialize(jp, ctxt);
+                return value;
+            } else {
+                return super.deserializeTypedFromObject(jp, ctxt);
+            }
+        }
+
+        private Object classLoadingFirstLookup(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            try {
+                return super.deserializeTypedFromObject(jp, ctxt);
+            } catch (Exception e) {
+                JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                Object value = deser.deserialize(jp, ctxt);
+                return value;
             }
         }
 

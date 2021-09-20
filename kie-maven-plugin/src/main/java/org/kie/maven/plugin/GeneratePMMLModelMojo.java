@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,35 +45,29 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.drools.compiler.builder.impl.KnowledgeBuilderConfigurationImpl;
 import org.drools.compiler.builder.impl.KnowledgeBuilderImpl;
-import org.drools.compiler.compiler.DroolsError;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
-import org.drools.compiler.kproject.ReleaseIdImpl;
-import org.drools.compiler.lang.descr.PackageDescr;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseImpl;
-import org.drools.core.io.impl.DescrResource;
 import org.drools.core.io.impl.FileSystemResource;
 import org.drools.modelcompiler.builder.GeneratedFile;
-import org.drools.modelcompiler.builder.ModelBuilderImpl;
-import org.drools.modelcompiler.builder.PackageSources;
 import org.kie.api.KieServices;
 import org.kie.api.io.Resource;
-import org.kie.api.io.ResourceType;
-import org.kie.internal.builder.CompositeKnowledgeBuilder;
+import org.kie.memorycompiler.JavaCompilerSettings;
 import org.kie.pmml.commons.model.HasNestedModels;
 import org.kie.pmml.commons.model.HasSourcesMap;
 import org.kie.pmml.commons.model.KiePMMLModel;
-import org.kie.pmml.models.drools.commons.model.KiePMMLDroolsModelWithSources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.stream.Collectors.toList;
 import static org.kie.api.pmml.PMMLConstants.KIE_PMML_IMPLEMENTATION;
 import static org.kie.api.pmml.PMMLConstants.LEGACY;
 import static org.kie.api.pmml.PMMLConstants.NEW;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
+import static org.kie.maven.plugin.GenerateCodeUtil.compileAndWriteClasses;
+import static org.kie.maven.plugin.GenerateCodeUtil.createJavaCompilerSettings;
+import static org.kie.maven.plugin.GenerateCodeUtil.getProjectClassLoader;
+import static org.kie.maven.plugin.GenerateCodeUtil.toClassName;
 import static org.kie.pmml.evaluator.assembler.service.PMMLCompilerService.getKiePMMLModelsFromResourceWithSources;
 
 @Mojo(name = "generatePMMLModel",
@@ -84,7 +79,6 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
     private static final Logger logger = LoggerFactory.getLogger(GeneratePMMLModelMojo.class);
 
     private static final String PMML = "pmml";
-    private static final String generatedSourcesPath = "/generated-sources/";
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
     @Parameter(required = true, defaultValue = "${project.build.directory}")
@@ -104,50 +98,36 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (!isNewInvoked()) {
+        if (isLegacyInvoked()) {
             getLog().warn("Skipping `generatePMMLModel` because " + KIE_PMML_IMPLEMENTATION.getName() +
-                                  " is not " + NEW.getName());
+                    " is " + LEGACY.getName());
             return;
         }
         boolean modelCompilerInClassPath = isModelCompilerInClassPath(project.getDependencies());
         if (!modelCompilerInClassPath) {
             getLog().warn("Skipping `generatePMMLModel` because you did" +
-                                  " not provide the required dependency on the project classpath.\n" +
-                                  "To enable it for your project, add the `drools-model-compiler`" +
-                                  " dependency in the `pom.xml` file of your project.\n");
+                    " not provide the required dependency on the project classpath.\n" +
+                    "To enable it for your project, add the `drools-model-compiler`" +
+                    " dependency in the `pom.xml` file of your project.\n");
         } else {
             generateModel();
         }
     }
 
-    static boolean isNewInvoked() {
-        final String property = System.getProperty(KIE_PMML_IMPLEMENTATION.getName(), LEGACY.getName());
-        return property.equals(NEW.getName());
+    static boolean isLegacyInvoked() {
+        final String property = System.getProperty(KIE_PMML_IMPLEMENTATION.getName(), NEW.getName());
+        return property.equals(LEGACY.getName());
     }
 
     private void generateModel() throws MojoExecutionException {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        URLClassLoader projectClassLoader = null;
-        try {
-            Set<URL> urls = new HashSet<>();
-            for (String element : project.getCompileClasspathElements()) {
-                urls.add(new File(element).toURI().toURL());
-            }
+        JavaCompilerSettings javaCompilerSettings = createJavaCompilerSettings();
+        URLClassLoader projectClassLoader = getProjectClassLoader(project, outputDirectory, javaCompilerSettings);
 
-            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile",
-                                                                                      "runtime")));
-            for (Artifact artifact : project.getArtifacts()) {
-                File file = artifact.getFile();
-                if (file != null) {
-                    urls.add(file.toURI().toURL());
-                }
-            }
-            urls.add(outputDirectory.toURI().toURL());
-            projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]), getClass().getClassLoader());
-            Thread.currentThread().setContextClassLoader(projectClassLoader);
-            generateFiles();
-        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(projectClassLoader);
+
+        try {
+            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), generateFiles(), dumpKieSourcesFolder);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
             if (projectClassLoader != null) {
@@ -158,35 +138,23 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 }
             }
         }
+
         getLog().info("PMML model successfully generated");
     }
 
-    private void generateFiles() throws MojoExecutionException {
+    private  Map<String, String> generateFiles() throws MojoExecutionException {
         final List<GeneratedFile> generatedFiles = getGeneratedFiles();
         KieServices ks = KieServices.Factory.get();
         final KieBuilderImpl kieBuilder = (KieBuilderImpl) ks.newKieBuilder(projectDir);
         kieBuilder.setPomModel(new ProjectPomModel(mavenSession));
-        final String newCompileSourceRoot = targetDirectory.getPath() + generatedSourcesPath;
-        project.addCompileSourceRoot(newCompileSourceRoot);
-        for (GeneratedFile generatedFile : generatedFiles) {
-            writeFile(generatedFile);
-        }
-    }
 
-    void writeFile(final GeneratedFile generatedFile) throws MojoExecutionException {
-        final Path newFile = Paths.get(targetDirectory.getPath(),
-                                       generatedSourcesPath,
-                                       generatedFile.getPath());
-        try {
-            Files.deleteIfExists(newFile);
-            Files.createDirectories(newFile.getParent());
-            Files.copy(new ByteArrayInputStream(generatedFile.getData()), newFile,
-                       StandardCopyOption.REPLACE_EXISTING);
-            getLog().info("Generating " + newFile);
-        } catch (IOException e) {
-            getLog().error(e);
-            throw new MojoExecutionException("Unable to write file", e);
+        Map<String, String> classNameSourceMap = new HashMap<>();
+        for (GeneratedFile generatedFile : generatedFiles) {
+            String className = toClassName(generatedFile.getPath());
+            classNameSourceMap.put(className, new String(generatedFile.getData()));
+            getLog().info("Generating " + className);
         }
+        return classNameSourceMap;
     }
 
     private List<GeneratedFile> getGeneratedFiles() throws MojoExecutionException {
@@ -219,7 +187,7 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
         final List<GeneratedFile> toReturn = new ArrayList<>();
         try (Stream<Path> stream = Files
                 .walk(resourceDirectory.toPath(), Integer.MAX_VALUE)
-                .filter(path -> path.toString().endsWith(PMML))) {
+                .filter(path -> path.toFile().isFile() && path.toString().endsWith(PMML))) {
             return stream
                     .map(Path::toFile)
                     .map(FileSystemResource::new)
@@ -236,32 +204,24 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
 
     private List<GeneratedFile> getGenerateFiles(final PMMLResource pmmlResources) {
         final List<GeneratedFile> toReturn = new ArrayList<>();
-        ModelBuilderImpl<PackageSources> modelBuilder = new ModelBuilderImpl<>(PackageSources::dumpSources,
-                                                                               new KnowledgeBuilderConfigurationImpl(getClass().getClassLoader()),
-                                                                               new ReleaseIdImpl("dummy:dummy:0.0" +
-                                                                                                         ".0"),
-                                                                               true, false);
-        CompositeKnowledgeBuilder batch = modelBuilder.batch();
         List<KiePMMLModel> kiepmmlModels = pmmlResources.getKiePmmlModels();
-        addModels(kiepmmlModels, pmmlResources, batch, toReturn);
-        toReturn.addAll(generateRules(modelBuilder, batch));
+        addModels(kiepmmlModels, pmmlResources, toReturn);
         return toReturn;
     }
 
     private void addModels(final List<KiePMMLModel> kiepmmlModels,
                            final PMMLResource resource,
-                           final CompositeKnowledgeBuilder batch,
                            final List<GeneratedFile> generatedFiles) {
         for (KiePMMLModel model : kiepmmlModels) {
             if (model.getName() == null || model.getName().isEmpty()) {
                 String errorMessage = String.format("Model name should not be empty inside %s",
-                                                    resource.getModelPath());
+                        resource.getModelPath());
                 throw new RuntimeException(errorMessage);
             }
             if (!(model instanceof HasSourcesMap)) {
                 String errorMessage = String.format("Expecting HasSourcesMap instance, retrieved %s inside %s",
-                                                    model.getClass().getName(),
-                                                    resource.getModelPath());
+                        model.getClass().getName(),
+                        resource.getModelPath());
                 throw new RuntimeException(errorMessage);
             }
             Map<String, String> sourceMap = ((HasSourcesMap) model).getSourcesMap();
@@ -269,49 +229,17 @@ public class GeneratePMMLModelMojo extends AbstractKieMojo {
                 String path = sourceMapEntry.getKey().replace('.', File.separatorChar) + ".java";
                 generatedFiles.add(new GeneratedFile(GeneratedFile.Type.PMML, path, sourceMapEntry.getValue()));
             }
-            if (model instanceof KiePMMLDroolsModelWithSources) {
-                PackageDescr packageDescr = ((KiePMMLDroolsModelWithSources) model).getPackageDescr();
-                batch.add(new DescrResource(packageDescr), ResourceType.DESCR);
+            Map<String, String> rulesSourceMap = ((HasSourcesMap) model).getRulesSourcesMap();
+            if (rulesSourceMap != null) {
+                for (Map.Entry<String, String> rulesSourceMapEntry : rulesSourceMap.entrySet()) {
+                    String path = rulesSourceMapEntry.getKey().replace('.', File.separatorChar) + ".java";
+                    generatedFiles.add(new GeneratedFile(GeneratedFile.Type.RULE, path, rulesSourceMapEntry.getValue()));
+                }
             }
             if (model instanceof HasNestedModels) {
-                addModels(((HasNestedModels) model).getNestedModels(), resource, batch, generatedFiles);
+                addModels(((HasNestedModels) model).getNestedModels(), resource, generatedFiles);
             }
         }
-    }
-
-    private List<GeneratedFile> generateRules(ModelBuilderImpl<PackageSources> modelBuilder,
-                                              CompositeKnowledgeBuilder batch) {
-        try {
-            batch.build();
-            if (modelBuilder.hasErrors()) {
-                StringBuilder builder = new StringBuilder();
-                for (DroolsError error : modelBuilder.getErrors().getErrors()) {
-                    logger.error(error.toString());
-                    builder.append(error.toString()).append(" ");
-                }
-                throw new MojoExecutionException(builder.toString());
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            StringBuilder builder = new StringBuilder(e.getMessage()).append(" ");
-            for (DroolsError error : modelBuilder.getErrors().getErrors()) {
-                logger.error(error.toString());
-                builder.append(error.toString()).append(" ");
-            }
-            throw new RuntimeException(builder.toString(), e);
-        }
-        return generateModels(modelBuilder)
-                .stream()
-                .map(f -> new GeneratedFile(GeneratedFile.Type.RULE, f.getPath(), new String(f.getData())))
-                .collect(toList());
-    }
-
-    List<org.drools.modelcompiler.builder.GeneratedFile> generateModels(ModelBuilderImpl<PackageSources> modelBuilder) {
-        List<org.drools.modelcompiler.builder.GeneratedFile> toReturn = new ArrayList<>();
-        for (PackageSources pkgSources : modelBuilder.getPackageSources()) {
-            pkgSources.collectGeneratedFiles(toReturn);
-        }
-        return toReturn;
     }
 
     private PMMLResource parseResource(Resource resource) {

@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,5 +133,13 @@ public class StartProcessServiceIntegrationTest extends JbpmKieServerBaseIntegra
             }
             fail(e.getMessage());
         }
+    }
+
+    @Test()
+    public void testComputeProcessOutcome() {
+        Map<String, Object> outcome = processClient.computeProcessOutcome(CONTAINER_ID_RESTART, PROCESS_SYNC_ID, Collections.singletonMap("name", "hello"));
+        assertNotNull(outcome);
+        assertEquals("bye", outcome.get("name"));
+
     }
 }

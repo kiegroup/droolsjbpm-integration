@@ -17,6 +17,7 @@
 package org.kie.server.springboot.samples.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,12 +27,14 @@ import org.kie.server.springboot.samples.KieServerApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {KieServerApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations="classpath:application-jaxrstest.properties")
+@DirtiesContext(classMode= AFTER_CLASS)
 public class KieServerWithExtraEndpointTest {
 
     @LocalServerPort
@@ -49,7 +52,7 @@ public class KieServerWithExtraEndpointTest {
         KieServerHttpRequest httpRequest =
                 KieServerHttpRequest.newRequest(extraEndpoint, user, password)
                 .followRedirects(true)
-                .timeout(1000)
+                .timeout(5000)
                 .contentType("application/json")
                 .accept("application/json");
         httpRequest.get();
