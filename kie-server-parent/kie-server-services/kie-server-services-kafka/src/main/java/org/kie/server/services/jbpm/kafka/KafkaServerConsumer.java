@@ -14,6 +14,8 @@
 */
 package org.kie.server.services.jbpm.kafka;
 
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
@@ -42,8 +44,6 @@ import org.jbpm.services.api.model.SignalDesc;
 import org.jbpm.services.api.model.SignalDescBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
 
 class KafkaServerConsumer implements Runnable {
 
@@ -200,6 +200,7 @@ class KafkaServerConsumer implements Runnable {
     private void printEventsLog(ConsumerRecords<String, byte[]> events) {
         Map<String, Integer> eventsPerTopic = new HashMap<>();
         for (ConsumerRecord<String, byte[]> event : events) {
+            logger.trace("Kafka event received {}", event);
             eventsPerTopic.compute(event.topic(), (k, v) -> v == null ? 1 : v++);
         }
         logger.debug("Number of events received per topic {}", eventsPerTopic);
