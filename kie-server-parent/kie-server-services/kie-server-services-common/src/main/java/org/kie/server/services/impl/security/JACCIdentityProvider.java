@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.services.impl.security;
 
@@ -20,41 +20,20 @@ import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.Stack;
 
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 
-import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.security.SecurityAdapter;
 
 import static java.util.Collections.emptyList;
 
-public class JACCIdentityProvider implements IdentityProvider {
-    
-    private Stack<String> contextUsers;
+public class JACCIdentityProvider
+        extends BaseIdentityProvider {
 
-    private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
-
-    private List<SecurityAdapter> adapters = new ArrayList<>();
-
-    public JACCIdentityProvider() {
-        for (SecurityAdapter adapter : securityAdapters) {
-            adapters.add(adapter);
-        }
-        contextUsers = new Stack<>();
-    }
-    
-    @Override
-    public void setContextIdentity(String userId) {
-        contextUsers.push(userId);
-    }
-
-    @Override
-    public void removeContextIdentity() {
-        contextUsers.pop();
+    public static boolean available() {
+        return getSubjectFromContainer() != null;
     }
 
     @Override
@@ -99,14 +78,13 @@ public class JACCIdentityProvider implements IdentityProvider {
                         Enumeration<? extends Principal> groups = ((Group) principal).members();
 
                         while (groups.hasMoreElements()) {
-                            Principal groupPrincipal =  groups.nextElement();
+                            Principal groupPrincipal = groups.nextElement();
                             roles.add(groupPrincipal.getName());
                         }
                         break;
                     }
                 }
             }
-
         }
 
         roles.addAll(getRolesFromAdapter());
@@ -124,7 +102,7 @@ public class JACCIdentityProvider implements IdentityProvider {
                     if (principal instanceof Group) {
                         Enumeration<? extends Principal> groups = ((Group) principal).members();
                         while (groups.hasMoreElements()) {
-                            Principal groupPrincipal =  groups.nextElement();
+                            Principal groupPrincipal = groups.nextElement();
                             if (groupPrincipal.getName().equals(s)) {
                                 return true;
                             }
@@ -140,40 +118,16 @@ public class JACCIdentityProvider implements IdentityProvider {
                 return true;
             }
         }
-        
+
         return false;
     }
 
-    protected Subject getSubjectFromContainer() {
+    protected static Subject getSubjectFromContainer() {
         try {
             return (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
         } catch (Exception e) {
             return null;
         }
-    }
-
-    protected String getNameFromAdapter() {
-        for (SecurityAdapter adapter : adapters) {
-            String name = adapter.getUser();
-            if (name != null && !name.isEmpty()) {
-                return name;
-            }
-        }
-
-        return "unknown";
-    }
-
-    protected List<String> getRolesFromAdapter() {
-        List<String> roles = new ArrayList<String>();
-
-        for (SecurityAdapter adapter : adapters) {
-            List<String> adapterRoles = adapter.getRoles();
-            if (adapterRoles != null && !adapterRoles.isEmpty()) {
-                roles.addAll(adapterRoles);
-            }
-        }
-
-        return roles;
     }
 
     protected boolean supportedPrincipal(Principal principal) {
