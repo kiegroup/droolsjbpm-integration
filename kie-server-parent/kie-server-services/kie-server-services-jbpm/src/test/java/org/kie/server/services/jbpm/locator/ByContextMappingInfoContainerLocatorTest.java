@@ -78,7 +78,7 @@ public class ByContextMappingInfoContainerLocatorTest {
     }
 
     @Test
-    public void testQueryShouldExecuteOnes() {
+    public void testQueryShouldBeExecutedOnes() {
         EntityManagerFactoryManager.get()
             .addEntityManagerFactory(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME, entityManagerFactory);
         ContainerLocator locator = ByContextMappingInfoContainerLocator.Factory.get().create(1L);

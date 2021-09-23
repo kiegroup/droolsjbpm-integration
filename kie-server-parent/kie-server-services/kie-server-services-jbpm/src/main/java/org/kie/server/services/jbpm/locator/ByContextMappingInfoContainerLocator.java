@@ -36,7 +36,7 @@ public class ByContextMappingInfoContainerLocator extends ProcessContainerLocato
     @Override
     protected String invokeQuery(final EntityManager em, final Long processInstanceId) {
         return (String) em.createQuery(CONTAINER_ID_QUERY)
-            .setParameter("piId", processInstanceId.toString())
+            .setParameter("piId", String.valueOf(processInstanceId))
             .getSingleResult();
     }
 
