@@ -16,6 +16,7 @@
         <class>org.jbpm.persistence.correlation.CorrelationKeyInfo</class>
         <class>org.jbpm.persistence.correlation.CorrelationPropertyInfo</class>
         <class>org.jbpm.runtime.manager.impl.jpa.ContextMappingInfo</class>
+        <class>org.jbpm.runtime.manager.impl.jpa.TimerMappingInfo</class>
 
         <!-- Classes required for audit purposes -->
         <class>org.jbpm.process.audit.ProcessInstanceLog</class>
