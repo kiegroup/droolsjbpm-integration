@@ -196,6 +196,9 @@
                 </roles>
               </user>
             </users>
+            <properties>
+              <cargo.wildfly.script.cli.embedded>${project.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
+            </properties>
           </configuration>
         </configuration>
       </plugin>

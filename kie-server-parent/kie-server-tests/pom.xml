@@ -305,6 +305,7 @@
                 </user>
               </users>
               <properties>
+                <cargo.wildfly.script.cli.embedded>${project.parent.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
                 <cargo.servlet.port>${container.port}</cargo.servlet.port>
               </properties>
             </configuration>
