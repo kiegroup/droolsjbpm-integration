@@ -54,6 +54,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_STATE_IMMUTABLE_INIT = "org.kie.server.state.immutable.init";
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "org.kie.server.container.deployment";
     public static final String KIE_SERVER_CONTAINER_LOCATOR = "org.kie.server.container.locator";
+    public static final String KIE_SERVER_PROCESS_INSTANCE_CONTAINER_LOCATOR = "org.kie.server.process.instance.container.locator";
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
     public static final String KIE_SERVER_MGMT_API_DISABLED = "org.kie.server.mgmt.api.disabled";
     public static final String KIE_SERVER_STARTUP_STRATEGY = "org.kie.server.startup.strategy";
