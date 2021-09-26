@@ -18,8 +18,8 @@ package org.kie.server.springboot.jbpm;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.locator.ByCaseIdContainerLocator;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
-import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
 import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
+import org.kie.server.services.jbpm.locator.ProcessContainerLocatorProvider;
 
 /**
  * Helper class that provides easy access to find container ids for an alias.
@@ -63,7 +63,7 @@ public class ContainerAliasResolver {
      * @throws IllegalArgumentException in case there are no containers for given alias
      */
     public String forProcessInstance(String alias, long processInstanceId) {
-        return registry.getContainerId(alias, new ByProcessInstanceIdContainerLocator(processInstanceId));
+        return registry.getContainerId(alias, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
     }
     
     /**

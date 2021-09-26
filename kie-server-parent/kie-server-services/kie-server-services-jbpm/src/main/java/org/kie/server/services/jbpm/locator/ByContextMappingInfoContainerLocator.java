@@ -1,8 +1,9 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -11,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.services.jbpm.locator;
 
@@ -25,22 +26,22 @@ import org.kie.server.services.api.ContainerLocator;
  * and stored as part of the instance of this class so in case of multiple method calls will require it
  * single instance of this class should be used to avoid too many look ups.
  */
-public class ByProcessInstanceIdContainerLocator extends ProcessContainerLocator {
-    private static final String CONTAINER_ID_QUERY = "select log.externalId from ProcessInstanceLog log where log.processInstanceId = :piId";
+public class ByContextMappingInfoContainerLocator extends ProcessContainerLocator {
+    private static final String CONTAINER_ID_QUERY = "select cmi.ownerId from ContextMappingInfo cmi where cmi.contextId = :piId";
 
-    private ByProcessInstanceIdContainerLocator(final Long processInstanceId) {
+    private ByContextMappingInfoContainerLocator(final Long processInstanceId) {
         super(processInstanceId);
     }
 
     @Override
     protected String invokeQuery(final EntityManager em, final Long processInstanceId) {
         return (String) em.createQuery(CONTAINER_ID_QUERY)
-            .setParameter("piId", processInstanceId)
+            .setParameter("piId", String.valueOf(processInstanceId))
             .getSingleResult();
     }
 
-    private static ByProcessInstanceIdContainerLocator get(final Number processInstanceId) {
-        return new ByProcessInstanceIdContainerLocator(processInstanceId.longValue());
+    private static ByContextMappingInfoContainerLocator get(final Number processInstanceId) {
+        return new ByContextMappingInfoContainerLocator(processInstanceId.longValue());
     }
 
     public static class Factory implements ContainerLocatorFactory{
@@ -52,7 +53,7 @@ public class ByProcessInstanceIdContainerLocator extends ProcessContainerLocator
 
         @Override
         public ContainerLocator create(final Number processInstanceId) {
-            return ByProcessInstanceIdContainerLocator.get(processInstanceId);
+            return ByContextMappingInfoContainerLocator.get(processInstanceId);
         }
     }
 }
